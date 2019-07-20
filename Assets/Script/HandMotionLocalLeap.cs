@@ -28,16 +28,14 @@ public class HandMotionLocalLeap : NetworkBehaviour
         RightArmBicep.active = true;
         RightArmElbow.active = true;
         
-        Debug.Log("RightArmBicep  always true :::" + RightArmBicep.active);
-        Debug.Log("RightArmElbow  always true :::" + RightArmElbow.active);
+
         ///hiding the right arm 
         if (GameObject.Find("Right Interaction Hand Contact Bones").active == true)
         {
             RightArmBicep.active = false;
             RightArmElbow.active = false;
            
-            Debug.Log("Inside if RightArmBicep active == true  :::" + RightArmBicep.active);
-            Debug.Log("Inside if RightArmElbow active == true  :::" + RightArmElbow.active);
+            
         }       
                   
 

@@ -47,7 +47,7 @@ public class health : NetworkBehaviour
       {
         if ( count > 1 )
         {
-          Debug.Log( "Do nothing" );
+          
           //Destroy( GetComponent<Rigidbody>() );
           this.gameObject.active = false;
 
@@ -64,7 +64,7 @@ public class health : NetworkBehaviour
 
      else
       {
-          Debug.Log( "Client stopped" );
+          
                 //NetworkManager.singleton.StopClient();
                 this.gameObject.active = false;
 

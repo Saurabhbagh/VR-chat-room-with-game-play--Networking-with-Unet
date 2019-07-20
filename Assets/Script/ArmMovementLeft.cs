@@ -29,11 +29,11 @@ using Valve.VR;
         {
             if (!isLocalPlayer)
             {
-                Debug.Log("this is a not local player sample rotator");
+               
                 return;
             }
 
-            Debug.Log("Press Registered on local player ");
+            
 
             ///End Effector Gets the coordinates of the left Controller 
             Bone.transform.position = Camera.main.transform.parent.GetChild(0).gameObject.transform.position;

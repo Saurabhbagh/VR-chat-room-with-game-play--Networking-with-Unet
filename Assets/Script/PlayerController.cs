@@ -105,9 +105,9 @@ public class PlayerController : NetworkBehaviour
     [Command]
     void CmdFireLeft(Vector3 x, Quaternion y)
     {
-        Debug.Log("Bullet pressed left");
+        
         /// Create the Bullet from the Bullet Prefab
-        Debug.Log("\ti AM local player!");
+        
         var bullet = (GameObject)Instantiate(bulletPrefab, x, y);
         /// Add velocity to the bullet
         bullet.GetComponent<Rigidbody>().velocity = bullet.transform.forward * 20;

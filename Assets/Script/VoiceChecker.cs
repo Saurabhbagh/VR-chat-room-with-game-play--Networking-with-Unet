@@ -40,11 +40,11 @@ public class VoiceChecker : NetworkBehaviour
 
 
             voice = Microphone.Start(null, true, 50, 8000); // it takes  lenght and frquency 
-            Debug.Log("Recording");
+          
             while (Microphone.GetPosition(null) < 0) //latency 
             { }
 
-            Debug.Log("CheckPoint on end of the start  " + Checkpoint);
+            
         }
     }
     /// <summary>
@@ -57,13 +57,10 @@ public class VoiceChecker : NetworkBehaviour
             ///for GRIP             
             if (SteamVR_Actions._default.GrabGrip.GetState(SteamVR_Input_Sources.Any))  // for any state it works !!
             {
-                Debug.Log("Button pressed");
+                
                 int currentposition = Microphone.GetPosition(null);
                 int recordlength = currentposition - Checkpoint;
-                Debug.Log("Diff" + recordlength);
-                Debug.Log("pos" + currentposition);
-                Debug.Log("Checkpoint" + Checkpoint);
-                Debug.Log("channel " + voice.channels);
+               
                 if (recordlength > 0)
                 {
                     ///Sample count is determined by the length of the float array 
@@ -81,7 +78,7 @@ public class VoiceChecker : NetworkBehaviour
                     CmdSendData(bytedata);
                 }
                 Checkpoint = currentposition;
-                Debug.Log("Converting");
+               
             }
 
         }
@@ -117,7 +114,7 @@ public class VoiceChecker : NetworkBehaviour
     [Command]
     public void CmdSendData(byte[] data)
     {
-        Debug.Log("Receiving");
+        
         SoundOut(data);
         RpcSendAudioToClients(data); // to send data from server to client 
     }
@@ -128,7 +125,7 @@ public class VoiceChecker : NetworkBehaviour
     [ClientRpc]
     public void RpcSendAudioToClients(byte[] bytedata)
     {
-        Debug.Log("Sending");
+       
         SoundOut(bytedata);
     }
 

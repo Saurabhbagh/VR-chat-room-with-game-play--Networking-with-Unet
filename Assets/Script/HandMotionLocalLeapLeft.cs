@@ -27,8 +27,7 @@ public class HandMotionLocalLeapLeft : NetworkBehaviour
         LeftArmBicep.active = true;
         LeftArmElbow.active = true;
 
-        Debug.Log("LeftArmBicep:  always true ::" + LeftArmBicep.active);
-        Debug.Log("LeftArmElbow:  always true ::" + LeftArmElbow.active);
+       
        ///hiding the left arm 
         if (GameObject.Find("Left Interaction Hand Contact Bones").active == true)
         {

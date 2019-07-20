@@ -13,7 +13,7 @@ public class bulletcollider : NetworkBehaviour {
   /// <param name="collision"></param>
 	void OnCollisionEnter(Collision collision)
 	{
-    Debug.Log( "HIT!" );
+   
 		GameObject hit = collision.transform.parent.gameObject;
 		health health = hit.GetComponent<health>();
     if ( health != null )
