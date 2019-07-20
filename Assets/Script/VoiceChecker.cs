@@ -125,7 +125,7 @@ public class VoiceChecker : NetworkBehaviour
     [ClientRpc]
     public void RpcSendAudioToClients(byte[] bytedata)
     {
-        
+        Debug.Log("Sending the voice ");
         SoundOut(bytedata);
     }
 
