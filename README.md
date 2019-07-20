@@ -7,7 +7,9 @@ Multi user VR Viewer with voice chat and Hand IK
            Now you can play.  
            Look at the Multi USER VR Viewer Presentation for more information on networking   
 #More about the code:              
-           Doxygen Documentation- To be uploaded soon   
+           Doxygen Documentation - uploaded 20th july 
+           Multi User VR Viewer ppt - 20th July 
+           
            
 
 #Developed by :  
