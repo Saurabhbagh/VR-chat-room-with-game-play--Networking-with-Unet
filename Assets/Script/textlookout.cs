@@ -22,8 +22,8 @@ public class textlookout : NetworkBehaviour
         //username = PlayerId.ToString(); // to check 
         if (isLocalPlayer)
         {
-            username = GUI.TextField(new Rect(25, Screen.height - 40, 100, 30), username);
-            if (GUI.Button(new Rect(130, Screen.height - 40, 100, 30), "Change"))
+            username = GUI.TextField(new Rect(27, Screen.height - 38, 97, 33), username);
+            if (GUI.Button(new Rect(126, Screen.height - 38, 97, 33), "Change"))
             {
                 CmdChange(username);
             }
