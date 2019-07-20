@@ -1,0 +1,471 @@
+<?xml version='1.0' encoding='UTF-8' standalone='no'?>
+<section xmlns="http://docbook.org/ns/docbook" version="5.0" xmlns:xlink="http://www.w3.org/1999/xlink" xml:id="__material_reference_manager_8cs_source">
+<title>MaterialReferenceManager.cs</title>
+<indexterm><primary>O:/GitHUBMINIPRoject/Library/PackageCache/com.unity.textmeshpro@1.3.0/Scripts/Runtime/MaterialReferenceManager.cs</primary></indexterm>
+<programlisting>00001 <emphasis role="keyword">using</emphasis>&#32;<link linkend="__balloon_8cs_1a7d67e097df9376eb709b6a23aa3c7d23">UnityEngine</link>;
+00002 <emphasis role="keyword">using</emphasis>&#32;System.Collections;
+00003 <emphasis role="keyword">using</emphasis>&#32;System.Collections.Generic;
+00004 
+00005 
+00006 <emphasis role="keyword">namespace&#32;</emphasis><link linkend="_namespace_t_m_pro">TMPro</link>
+00007 {
+00008 
+<anchor xml:id="__material_reference_manager_8cs_source_1l00009"/><link linkend="_class_t_m_pro_1_1_material_reference_manager">00009</link> &#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keyword">class&#32;</emphasis><link linkend="_class_t_m_pro_1_1_material_reference_manager">MaterialReferenceManager</link>
+00010 &#32;&#32;&#32;&#32;{
+00011 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;<emphasis role="keyword">static</emphasis>&#32;<link linkend="_class_t_m_pro_1_1_material_reference_manager">MaterialReferenceManager</link>&#32;s_Instance;
+00012 
+00013 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;Dictionaries&#32;used&#32;to&#32;track&#32;Asset&#32;references.</emphasis>
+00014 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;Dictionary&lt;int,&#32;Material&gt;&#32;m_FontMaterialReferenceLookup&#32;=&#32;<emphasis role="keyword">new</emphasis>&#32;Dictionary&lt;int,&#32;Material&gt;();
+00015 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;Dictionary&lt;int,&#32;TMP_FontAsset&gt;&#32;m_FontAssetReferenceLookup&#32;=&#32;<emphasis role="keyword">new</emphasis>&#32;Dictionary&lt;int,&#32;TMP_FontAsset&gt;();
+00016 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;Dictionary&lt;int,&#32;TMP_SpriteAsset&gt;&#32;m_SpriteAssetReferenceLookup&#32;=&#32;<emphasis role="keyword">new</emphasis>&#32;Dictionary&lt;int,&#32;TMP_SpriteAsset&gt;();
+00017 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;Dictionary&lt;int,&#32;TMP_ColorGradient&gt;&#32;m_ColorGradientReferenceLookup&#32;=&#32;<emphasis role="keyword">new</emphasis>&#32;Dictionary&lt;int,&#32;TMP_ColorGradient&gt;();
+00018 
+00019 
+00023 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keyword">static</emphasis>&#32;<link linkend="_class_t_m_pro_1_1_material_reference_manager">MaterialReferenceManager</link>&#32;<link linkend="_class_t_m_pro_1_1_material_reference_manager_1a51b1daac64638054a8ae2afbae3628f5">instance</link>
+<anchor xml:id="__material_reference_manager_8cs_source_1l00024"/><link linkend="_class_t_m_pro_1_1_material_reference_manager_1a51b1daac64638054a8ae2afbae3628f5">00024</link> &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00025 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">get</emphasis>
+00026 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00027 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(<link linkend="_class_t_m_pro_1_1_material_reference_manager">MaterialReferenceManager</link>.s_Instance&#32;==&#32;<emphasis role="keyword">null</emphasis>)
+00028 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_t_m_pro_1_1_material_reference_manager">MaterialReferenceManager</link>.s_Instance&#32;=&#32;<emphasis role="keyword">new</emphasis>&#32;<link linkend="_class_t_m_pro_1_1_material_reference_manager">MaterialReferenceManager</link>();
+00029 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;<link linkend="_class_t_m_pro_1_1_material_reference_manager">MaterialReferenceManager</link>.s_Instance;
+00030 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00031 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00032 
+00033 
+00034 
+<anchor xml:id="__material_reference_manager_8cs_source_1l00039"/><link linkend="_class_t_m_pro_1_1_material_reference_manager_1aef7197e07d5b322b6ed3d8baf4d8c0cf">00039</link> &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keyword">static</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;<link linkend="_class_t_m_pro_1_1_material_reference_manager_1aef7197e07d5b322b6ed3d8baf4d8c0cf">AddFontAsset</link>(<link linkend="_class_t_m_pro_1_1_t_m_p___font_asset">TMP_FontAsset</link>&#32;fontAsset)
+00040 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00041 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_t_m_pro_1_1_material_reference_manager">MaterialReferenceManager</link>.<link linkend="_class_t_m_pro_1_1_material_reference_manager_1a51b1daac64638054a8ae2afbae3628f5">instance</link>.AddFontAssetInternal(fontAsset);
+00042 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00043 
+00048 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;AddFontAssetInternal(<link linkend="_class_t_m_pro_1_1_t_m_p___font_asset">TMP_FontAsset</link>&#32;fontAsset)
+00049 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00050 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(m_FontAssetReferenceLookup.ContainsKey(fontAsset.<link linkend="_class_t_m_pro_1_1_t_m_p___asset_1a63f177ff7028859d2b431789737d8ccc">hashCode</link>))&#32;<emphasis role="keywordflow">return</emphasis>;
+00051 
+00052 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;Add&#32;reference&#32;to&#32;the&#32;font&#32;asset.</emphasis>
+00053 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;m_FontAssetReferenceLookup.Add(fontAsset.<link linkend="_class_t_m_pro_1_1_t_m_p___asset_1a63f177ff7028859d2b431789737d8ccc">hashCode</link>,&#32;fontAsset);
+00054 
+00055 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;Add&#32;reference&#32;to&#32;the&#32;font&#32;material.</emphasis>
+00056 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;m_FontMaterialReferenceLookup.Add(fontAsset.<link linkend="_class_t_m_pro_1_1_t_m_p___asset_1a55abe9aef1cf6d3e49fec1257abd152c">materialHashCode</link>,&#32;fontAsset.<link linkend="_class_t_m_pro_1_1_t_m_p___asset_1a8dcd405969e8c3aaa441c0fe3b0b6eaa">material</link>);
+00057 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00058 
+00059 
+00060 
+<anchor xml:id="__material_reference_manager_8cs_source_1l00066"/><link linkend="_class_t_m_pro_1_1_material_reference_manager_1a3810186f9c82e44d3ca54ed456f6d8bd">00066</link> &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keyword">static</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;<link linkend="_class_t_m_pro_1_1_material_reference_manager_1a3810186f9c82e44d3ca54ed456f6d8bd">AddSpriteAsset</link>(<link linkend="_class_t_m_pro_1_1_t_m_p___sprite_asset">TMP_SpriteAsset</link>&#32;spriteAsset)
+00067 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00068 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_t_m_pro_1_1_material_reference_manager">MaterialReferenceManager</link>.<link linkend="_class_t_m_pro_1_1_material_reference_manager_1a51b1daac64638054a8ae2afbae3628f5">instance</link>.AddSpriteAssetInternal(spriteAsset);
+00069 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00070 
+00076 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;AddSpriteAssetInternal(<link linkend="_class_t_m_pro_1_1_t_m_p___sprite_asset">TMP_SpriteAsset</link>&#32;spriteAsset)
+00077 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00078 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(m_SpriteAssetReferenceLookup.ContainsKey(spriteAsset.<link linkend="_class_t_m_pro_1_1_t_m_p___asset_1a63f177ff7028859d2b431789737d8ccc">hashCode</link>))&#32;<emphasis role="keywordflow">return</emphasis>;
+00079 
+00080 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;Add&#32;reference&#32;to&#32;sprite&#32;asset.</emphasis>
+00081 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;m_SpriteAssetReferenceLookup.Add(spriteAsset.<link linkend="_class_t_m_pro_1_1_t_m_p___asset_1a63f177ff7028859d2b431789737d8ccc">hashCode</link>,&#32;spriteAsset);
+00082 
+00083 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;Adding&#32;reference&#32;to&#32;the&#32;sprite&#32;asset&#32;material&#32;as&#32;well</emphasis>
+00084 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;m_FontMaterialReferenceLookup.Add(spriteAsset.<link linkend="_class_t_m_pro_1_1_t_m_p___asset_1a63f177ff7028859d2b431789737d8ccc">hashCode</link>,&#32;spriteAsset.<link linkend="_class_t_m_pro_1_1_t_m_p___asset_1a8dcd405969e8c3aaa441c0fe3b0b6eaa">material</link>);
+00085 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00086 
+<anchor xml:id="__material_reference_manager_8cs_source_1l00092"/><link linkend="_class_t_m_pro_1_1_material_reference_manager_1a6ec369694dfd5ba0c8dbebcbc7bd1f97">00092</link> &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keyword">static</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;<link linkend="_class_t_m_pro_1_1_material_reference_manager_1a6ec369694dfd5ba0c8dbebcbc7bd1f97">AddSpriteAsset</link>(<emphasis role="keywordtype">int</emphasis>&#32;hashCode,&#32;<link linkend="_class_t_m_pro_1_1_t_m_p___sprite_asset">TMP_SpriteAsset</link>&#32;spriteAsset)
+00093 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00094 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_t_m_pro_1_1_material_reference_manager">MaterialReferenceManager</link>.<link linkend="_class_t_m_pro_1_1_material_reference_manager_1a51b1daac64638054a8ae2afbae3628f5">instance</link>.AddSpriteAssetInternal(hashCode,&#32;spriteAsset);
+00095 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00096 
+00102 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;AddSpriteAssetInternal(<emphasis role="keywordtype">int</emphasis>&#32;hashCode,&#32;<link linkend="_class_t_m_pro_1_1_t_m_p___sprite_asset">TMP_SpriteAsset</link>&#32;spriteAsset)
+00103 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00104 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(m_SpriteAssetReferenceLookup.ContainsKey(hashCode))&#32;<emphasis role="keywordflow">return</emphasis>;
+00105 
+00106 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;Add&#32;reference&#32;to&#32;Sprite&#32;Asset.</emphasis>
+00107 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;m_SpriteAssetReferenceLookup.Add(hashCode,&#32;spriteAsset);
+00108 
+00109 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;Add&#32;reference&#32;to&#32;Sprite&#32;Asset&#32;using&#32;the&#32;asset&#32;hashcode.</emphasis>
+00110 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;m_FontMaterialReferenceLookup.Add(hashCode,&#32;spriteAsset.<link linkend="_class_t_m_pro_1_1_t_m_p___asset_1a8dcd405969e8c3aaa441c0fe3b0b6eaa">material</link>);
+00111 
+00112 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;Compatibility&#32;check</emphasis>
+00113 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(spriteAsset.<link linkend="_class_t_m_pro_1_1_t_m_p___asset_1a63f177ff7028859d2b431789737d8ccc">hashCode</link>&#32;==&#32;0)&#32;spriteAsset.<link linkend="_class_t_m_pro_1_1_t_m_p___asset_1a63f177ff7028859d2b431789737d8ccc">hashCode</link>&#32;=&#32;hashCode;
+00114 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00115 
+00116 
+<anchor xml:id="__material_reference_manager_8cs_source_1l00122"/><link linkend="_class_t_m_pro_1_1_material_reference_manager_1ad32f019ea73193084d8e7f90f387b679">00122</link> &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keyword">static</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;<link linkend="_class_t_m_pro_1_1_material_reference_manager_1ad32f019ea73193084d8e7f90f387b679">AddFontMaterial</link>(<emphasis role="keywordtype">int</emphasis>&#32;hashCode,&#32;Material&#32;material)
+00123 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00124 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_t_m_pro_1_1_material_reference_manager">MaterialReferenceManager</link>.<link linkend="_class_t_m_pro_1_1_material_reference_manager_1a51b1daac64638054a8ae2afbae3628f5">instance</link>.AddFontMaterialInternal(hashCode,&#32;material);
+00125 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00126 
+00132 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;AddFontMaterialInternal(<emphasis role="keywordtype">int</emphasis>&#32;hashCode,&#32;Material&#32;material)
+00133 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00134 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;Since&#32;this&#32;function&#32;is&#32;called&#32;after&#32;checking&#32;if&#32;the&#32;material&#32;is</emphasis>
+00135 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;contained&#32;in&#32;the&#32;dictionary,&#32;there&#32;is&#32;no&#32;need&#32;to&#32;check&#32;again.</emphasis>
+00136 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;m_FontMaterialReferenceLookup.Add(hashCode,&#32;material);
+00137 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00138 
+00139 
+<anchor xml:id="__material_reference_manager_8cs_source_1l00145"/><link linkend="_class_t_m_pro_1_1_material_reference_manager_1aaff4d63fa8a94aa0b4badb98076ce0b3">00145</link> &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keyword">static</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;<link linkend="_class_t_m_pro_1_1_material_reference_manager_1aaff4d63fa8a94aa0b4badb98076ce0b3">AddColorGradientPreset</link>(<emphasis role="keywordtype">int</emphasis>&#32;hashCode,&#32;<link linkend="_class_t_m_pro_1_1_t_m_p___color_gradient">TMP_ColorGradient</link>&#32;spriteAsset)
+00146 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00147 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_t_m_pro_1_1_material_reference_manager">MaterialReferenceManager</link>.<link linkend="_class_t_m_pro_1_1_material_reference_manager_1a51b1daac64638054a8ae2afbae3628f5">instance</link>.AddColorGradientPreset_Internal(hashCode,&#32;spriteAsset);
+00148 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00149 
+00155 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;AddColorGradientPreset_Internal(<emphasis role="keywordtype">int</emphasis>&#32;hashCode,&#32;<link linkend="_class_t_m_pro_1_1_t_m_p___color_gradient">TMP_ColorGradient</link>&#32;spriteAsset)
+00156 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00157 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(m_ColorGradientReferenceLookup.ContainsKey(hashCode))&#32;<emphasis role="keywordflow">return</emphasis>;
+00158 
+00159 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;Add&#32;reference&#32;to&#32;Color&#32;Gradient&#32;Preset&#32;Asset.</emphasis>
+00160 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;m_ColorGradientReferenceLookup.Add(hashCode,&#32;spriteAsset);
+00161 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00162 
+00163 
+00164 
+00171 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//public&#32;int&#32;AddMaterial(Material&#32;material,&#32;int&#32;materialHashCode,&#32;TMP_FontAsset&#32;fontAsset)</emphasis>
+00172 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//{</emphasis>
+00173 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;&#32;&#32;&#32;if&#32;(!m_MaterialReferenceLookup.ContainsKey(materialHashCode))</emphasis>
+00174 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;&#32;&#32;&#32;{</emphasis>
+00175 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;int&#32;index&#32;=&#32;m_MaterialReferenceLookup.Count;</emphasis>
+00176 
+00177 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;materialReferences[index].fontAsset&#32;=&#32;fontAsset;</emphasis>
+00178 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;materialReferences[index].material&#32;=&#32;material;</emphasis>
+00179 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;materialReferences[index].isDefaultMaterial&#32;=&#32;material.GetInstanceID()&#32;==&#32;fontAsset.material.GetInstanceID()&#32;?&#32;true&#32;:&#32;false;</emphasis>
+00180 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;materialReferences[index].index&#32;=&#32;index;</emphasis>
+00181 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;materialReferences[index].referenceCount&#32;=&#32;0;</emphasis>
+00182 
+00183 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;m_MaterialReferenceLookup[materialHashCode]&#32;=&#32;index;</emphasis>
+00184 
+00185 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;//&#32;Compute&#32;Padding&#32;value&#32;and&#32;store&#32;it</emphasis>
+00186 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;//&#32;TODO</emphasis>
+00187 
+00188 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;int&#32;fontAssetHashCode&#32;=&#32;fontAsset.hashCode;</emphasis>
+00189 
+00190 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;if&#32;(!m_FontAssetReferenceLookup.ContainsKey(fontAssetHashCode))</emphasis>
+00191 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;m_FontAssetReferenceLookup.Add(fontAssetHashCode,&#32;fontAsset);</emphasis>
+00192 
+00193 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;m_countInternal&#32;+=&#32;1;</emphasis>
+00194 
+00195 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;return&#32;index;</emphasis>
+00196 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;&#32;&#32;&#32;}</emphasis>
+00197 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;&#32;&#32;&#32;else</emphasis>
+00198 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;&#32;&#32;&#32;{</emphasis>
+00199 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;return&#32;m_MaterialReferenceLookup[materialHashCode];</emphasis>
+00200 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;&#32;&#32;&#32;}</emphasis>
+00201 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//}</emphasis>
+00202 
+00203 
+00211 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//public&#32;int&#32;AddMaterial(Material&#32;material,&#32;int&#32;materialHashCode,&#32;TMP_SpriteAsset&#32;spriteAsset)</emphasis>
+00212 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//{</emphasis>
+00213 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;&#32;&#32;&#32;if&#32;(!m_MaterialReferenceLookup.ContainsKey(materialHashCode))</emphasis>
+00214 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;&#32;&#32;&#32;{</emphasis>
+00215 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;int&#32;index&#32;=&#32;m_MaterialReferenceLookup.Count;</emphasis>
+00216 
+00217 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;materialReferences[index].fontAsset&#32;=&#32;materialReferences[0].fontAsset;</emphasis>
+00218 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;materialReferences[index].spriteAsset&#32;=&#32;spriteAsset;</emphasis>
+00219 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;materialReferences[index].material&#32;=&#32;material;</emphasis>
+00220 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;materialReferences[index].isDefaultMaterial&#32;=&#32;true;</emphasis>
+00221 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;materialReferences[index].index&#32;=&#32;index;</emphasis>
+00222 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;materialReferences[index].referenceCount&#32;=&#32;0;</emphasis>
+00223 
+00224 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;m_MaterialReferenceLookup[materialHashCode]&#32;=&#32;index;</emphasis>
+00225 
+00226 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;int&#32;spriteAssetHashCode&#32;=&#32;&#32;spriteAsset.hashCode;</emphasis>
+00227 
+00228 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;if&#32;(!m_SpriteAssetReferenceLookup.ContainsKey(spriteAssetHashCode))</emphasis>
+00229 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;m_SpriteAssetReferenceLookup.Add(spriteAssetHashCode,&#32;spriteAsset);</emphasis>
+00230 
+00231 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;m_countInternal&#32;+=&#32;1;</emphasis>
+00232 
+00233 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;return&#32;index;</emphasis>
+00234 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;&#32;&#32;&#32;}</emphasis>
+00235 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;&#32;&#32;&#32;else</emphasis>
+00236 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;&#32;&#32;&#32;{</emphasis>
+00237 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;return&#32;m_MaterialReferenceLookup[materialHashCode];</emphasis>
+00238 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;&#32;&#32;&#32;}</emphasis>
+00239 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//}</emphasis>
+00240 
+00241 
+<anchor xml:id="__material_reference_manager_8cs_source_1l00247"/><link linkend="_class_t_m_pro_1_1_material_reference_manager_1a573b9237cc9247f29300bd6074fa6cb0">00247</link> &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keywordtype">bool</emphasis>&#32;<link linkend="_class_t_m_pro_1_1_material_reference_manager_1a573b9237cc9247f29300bd6074fa6cb0">Contains</link>(<link linkend="_class_t_m_pro_1_1_t_m_p___font_asset">TMP_FontAsset</link>&#32;font)
+00248 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00249 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(m_FontAssetReferenceLookup.ContainsKey(font.<link linkend="_class_t_m_pro_1_1_t_m_p___asset_1a63f177ff7028859d2b431789737d8ccc">hashCode</link>))
+00250 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;<emphasis role="keyword">true</emphasis>;
+00251 
+00252 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;<emphasis role="keyword">false</emphasis>;
+00253 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00254 
+00255 
+<anchor xml:id="__material_reference_manager_8cs_source_1l00261"/><link linkend="_class_t_m_pro_1_1_material_reference_manager_1a900e5d78f7716ac071050558f4f838fa">00261</link> &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keywordtype">bool</emphasis>&#32;<link linkend="_class_t_m_pro_1_1_material_reference_manager_1a900e5d78f7716ac071050558f4f838fa">Contains</link>(<link linkend="_class_t_m_pro_1_1_t_m_p___sprite_asset">TMP_SpriteAsset</link>&#32;sprite)
+00262 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00263 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(m_FontAssetReferenceLookup.ContainsKey(sprite.<link linkend="_class_t_m_pro_1_1_t_m_p___asset_1a63f177ff7028859d2b431789737d8ccc">hashCode</link>))
+00264 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;<emphasis role="keyword">true</emphasis>;
+00265 
+00266 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;<emphasis role="keyword">false</emphasis>;
+00267 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00268 
+00269 
+00270 
+<anchor xml:id="__material_reference_manager_8cs_source_1l00277"/><link linkend="_class_t_m_pro_1_1_material_reference_manager_1aea90526985cf5081a931bfbc4d36af81">00277</link> &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keyword">static</emphasis>&#32;<emphasis role="keywordtype">bool</emphasis>&#32;<link linkend="_class_t_m_pro_1_1_material_reference_manager_1aea90526985cf5081a931bfbc4d36af81">TryGetFontAsset</link>(<emphasis role="keywordtype">int</emphasis>&#32;hashCode,&#32;out&#32;<link linkend="_class_t_m_pro_1_1_t_m_p___font_asset">TMP_FontAsset</link>&#32;fontAsset)
+00278 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00279 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;<link linkend="_class_t_m_pro_1_1_material_reference_manager">MaterialReferenceManager</link>.<link linkend="_class_t_m_pro_1_1_material_reference_manager_1a51b1daac64638054a8ae2afbae3628f5">instance</link>.TryGetFontAssetInternal(hashCode,&#32;out&#32;fontAsset);
+00280 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00281 
+00288 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;<emphasis role="keywordtype">bool</emphasis>&#32;TryGetFontAssetInternal(<emphasis role="keywordtype">int</emphasis>&#32;hashCode,&#32;out&#32;<link linkend="_class_t_m_pro_1_1_t_m_p___font_asset">TMP_FontAsset</link>&#32;fontAsset)
+00289 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00290 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;fontAsset&#32;=&#32;<emphasis role="keyword">null</emphasis>;
+00291 
+00292 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(m_FontAssetReferenceLookup.TryGetValue(hashCode,&#32;out&#32;fontAsset))
+00293 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00294 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;<emphasis role="keyword">true</emphasis>;
+00295 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00296 
+00297 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;<emphasis role="keyword">false</emphasis>;
+00298 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00299 
+00300 
+00301 
+<anchor xml:id="__material_reference_manager_8cs_source_1l00308"/><link linkend="_class_t_m_pro_1_1_material_reference_manager_1a134f55b51c7660176516e2fe3b71d4ae">00308</link> &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keyword">static</emphasis>&#32;<emphasis role="keywordtype">bool</emphasis>&#32;<link linkend="_class_t_m_pro_1_1_material_reference_manager_1a134f55b51c7660176516e2fe3b71d4ae">TryGetSpriteAsset</link>(<emphasis role="keywordtype">int</emphasis>&#32;hashCode,&#32;out&#32;<link linkend="_class_t_m_pro_1_1_t_m_p___sprite_asset">TMP_SpriteAsset</link>&#32;spriteAsset)
+00309 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00310 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;<link linkend="_class_t_m_pro_1_1_material_reference_manager">MaterialReferenceManager</link>.<link linkend="_class_t_m_pro_1_1_material_reference_manager_1a51b1daac64638054a8ae2afbae3628f5">instance</link>.TryGetSpriteAssetInternal(hashCode,&#32;out&#32;spriteAsset);
+00311 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00312 
+00319 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;<emphasis role="keywordtype">bool</emphasis>&#32;TryGetSpriteAssetInternal(<emphasis role="keywordtype">int</emphasis>&#32;hashCode,&#32;out&#32;<link linkend="_class_t_m_pro_1_1_t_m_p___sprite_asset">TMP_SpriteAsset</link>&#32;spriteAsset)
+00320 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00321 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;spriteAsset&#32;=&#32;<emphasis role="keyword">null</emphasis>;
+00322 
+00323 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(m_SpriteAssetReferenceLookup.TryGetValue(hashCode,&#32;out&#32;spriteAsset))
+00324 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00325 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;<emphasis role="keyword">true</emphasis>;
+00326 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00327 
+00328 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;<emphasis role="keyword">false</emphasis>;
+00329 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00330 
+00331 
+<anchor xml:id="__material_reference_manager_8cs_source_1l00338"/><link linkend="_class_t_m_pro_1_1_material_reference_manager_1a61de4a348042d6714254fd9558f8f632">00338</link> &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keyword">static</emphasis>&#32;<emphasis role="keywordtype">bool</emphasis>&#32;<link linkend="_class_t_m_pro_1_1_material_reference_manager_1a61de4a348042d6714254fd9558f8f632">TryGetColorGradientPreset</link>(<emphasis role="keywordtype">int</emphasis>&#32;hashCode,&#32;out&#32;<link linkend="_class_t_m_pro_1_1_t_m_p___color_gradient">TMP_ColorGradient</link>&#32;gradientPreset)
+00339 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00340 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;<link linkend="_class_t_m_pro_1_1_material_reference_manager">MaterialReferenceManager</link>.<link linkend="_class_t_m_pro_1_1_material_reference_manager_1a51b1daac64638054a8ae2afbae3628f5">instance</link>.TryGetColorGradientPresetInternal(hashCode,&#32;out&#32;gradientPreset);
+00341 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00342 
+00349 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;<emphasis role="keywordtype">bool</emphasis>&#32;TryGetColorGradientPresetInternal(<emphasis role="keywordtype">int</emphasis>&#32;hashCode,&#32;out&#32;<link linkend="_class_t_m_pro_1_1_t_m_p___color_gradient">TMP_ColorGradient</link>&#32;gradientPreset)
+00350 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00351 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;gradientPreset&#32;=&#32;<emphasis role="keyword">null</emphasis>;
+00352 
+00353 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(m_ColorGradientReferenceLookup.TryGetValue(hashCode,&#32;out&#32;gradientPreset))
+00354 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00355 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;<emphasis role="keyword">true</emphasis>;
+00356 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00357 
+00358 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;<emphasis role="keyword">false</emphasis>;
+00359 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00360 
+00361 
+<anchor xml:id="__material_reference_manager_8cs_source_1l00368"/><link linkend="_class_t_m_pro_1_1_material_reference_manager_1a4826b2b5ac5de579423e0eaee6955dfc">00368</link> &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keyword">static</emphasis>&#32;<emphasis role="keywordtype">bool</emphasis>&#32;<link linkend="_class_t_m_pro_1_1_material_reference_manager_1a4826b2b5ac5de579423e0eaee6955dfc">TryGetMaterial</link>(<emphasis role="keywordtype">int</emphasis>&#32;hashCode,&#32;out&#32;Material&#32;material)
+00369 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00370 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;<link linkend="_class_t_m_pro_1_1_material_reference_manager">MaterialReferenceManager</link>.<link linkend="_class_t_m_pro_1_1_material_reference_manager_1a51b1daac64638054a8ae2afbae3628f5">instance</link>.TryGetMaterialInternal(hashCode,&#32;out&#32;material);
+00371 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00372 
+00379 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;<emphasis role="keywordtype">bool</emphasis>&#32;TryGetMaterialInternal(<emphasis role="keywordtype">int</emphasis>&#32;hashCode,&#32;out&#32;Material&#32;material)
+00380 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00381 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;material&#32;=&#32;<emphasis role="keyword">null</emphasis>;
+00382 
+00383 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(m_FontMaterialReferenceLookup.TryGetValue(hashCode,&#32;out&#32;material))
+00384 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00385 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;<emphasis role="keyword">true</emphasis>;
+00386 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00387 
+00388 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;<emphasis role="keyword">false</emphasis>;
+00389 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00390 
+00391 
+00398 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//public&#32;bool&#32;TryGetMaterial(int&#32;hashCode,&#32;out&#32;MaterialReference&#32;materialReference)</emphasis>
+00399 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//{</emphasis>
+00400 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;&#32;&#32;&#32;int&#32;materialIndex&#32;=&#32;-1;</emphasis>
+00401 
+00402 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;&#32;&#32;&#32;if&#32;(m_MaterialReferenceLookup.TryGetValue(hashCode,&#32;out&#32;materialIndex))</emphasis>
+00403 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;&#32;&#32;&#32;{</emphasis>
+00404 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;materialReference&#32;=&#32;materialReferences[materialIndex];</emphasis>
+00405 
+00406 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;return&#32;true;</emphasis>
+00407 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;&#32;&#32;&#32;}</emphasis>
+00408 
+00409 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;&#32;&#32;&#32;materialReference&#32;=&#32;new&#32;MaterialReference();</emphasis>
+00410 
+00411 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;&#32;&#32;&#32;return&#32;false;</emphasis>
+00412 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//}</emphasis>
+00413 
+00414 
+00415 
+00421 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//public&#32;int&#32;GetMaterialIndex(TMP_FontAsset&#32;fontAsset)</emphasis>
+00422 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//{</emphasis>
+00423 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;&#32;&#32;&#32;if&#32;(m_MaterialReferenceLookup.ContainsKey(fontAsset.materialHashCode))</emphasis>
+00424 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;return&#32;m_MaterialReferenceLookup[fontAsset.materialHashCode];</emphasis>
+00425 
+00426 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;&#32;&#32;&#32;return&#32;-1;</emphasis>
+00427 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//}</emphasis>
+00428 
+00429 
+00435 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//public&#32;TMP_FontAsset&#32;GetFontAsset(int&#32;index)</emphasis>
+00436 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//{</emphasis>
+00437 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;&#32;&#32;&#32;if&#32;(index&#32;&gt;=&#32;0&#32;&#32;&amp;&amp;&#32;index&#32;&lt;&#32;materialReferences.Length)</emphasis>
+00438 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;return&#32;materialReferences[index].fontAsset;</emphasis>
+00439 
+00440 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;&#32;&#32;&#32;return&#32;null;</emphasis>
+00441 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//}</emphasis>
+00442 
+00443 
+00450 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//public&#32;void&#32;SetDefaultMaterial(Material&#32;material,&#32;int&#32;materialHashCode,&#32;TMP_FontAsset&#32;fontAsset)</emphasis>
+00451 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//{</emphasis>
+00452 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;&#32;&#32;&#32;if&#32;(!m_MaterialReferenceLookup.ContainsKey(materialHashCode))</emphasis>
+00453 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;&#32;&#32;&#32;{</emphasis>
+00454 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;materialReferences[0].fontAsset&#32;=&#32;fontAsset;</emphasis>
+00455 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;materialReferences[0].material&#32;=&#32;material;</emphasis>
+00456 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;materialReferences[0].index&#32;=&#32;0;</emphasis>
+00457 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;materialReferences[0].isDefaultMaterial&#32;=&#32;material.GetInstanceID()&#32;==&#32;fontAsset.material.GetInstanceID()&#32;?&#32;true&#32;:&#32;false;</emphasis>
+00458 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;materialReferences[0].referenceCount&#32;=&#32;0;</emphasis>
+00459 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;m_MaterialReferenceLookup[materialHashCode]&#32;=&#32;0;</emphasis>
+00460 
+00461 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;//&#32;Compute&#32;Padding&#32;value&#32;and&#32;store&#32;it</emphasis>
+00462 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;//&#32;TODO</emphasis>
+00463 
+00464 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;int&#32;fontHashCode&#32;=&#32;fontAsset.hashCode;</emphasis>
+00465 
+00466 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;if&#32;(!m_FontAssetReferenceLookup.ContainsKey(fontHashCode))</emphasis>
+00467 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;m_FontAssetReferenceLookup.Add(fontHashCode,&#32;fontAsset);</emphasis>
+00468 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;&#32;&#32;&#32;}</emphasis>
+00469 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;&#32;&#32;&#32;else</emphasis>
+00470 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;&#32;&#32;&#32;{</emphasis>
+00471 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;materialReferences[0].fontAsset&#32;=&#32;fontAsset;</emphasis>
+00472 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;materialReferences[0].material&#32;=&#32;material;</emphasis>
+00473 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;materialReferences[0].index&#32;=&#32;0;</emphasis>
+00474 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;materialReferences[0].referenceCount&#32;=&#32;0;</emphasis>
+00475 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;m_MaterialReferenceLookup[materialHashCode]&#32;=&#32;0;</emphasis>
+00476 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;&#32;&#32;&#32;}</emphasis>
+00477 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;&#32;&#32;&#32;//&#32;Compute&#32;padding</emphasis>
+00478 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;&#32;&#32;&#32;//&#32;TODO</emphasis>
+00479 
+00480 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;&#32;&#32;&#32;m_countInternal&#32;=&#32;1;</emphasis>
+00481 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//}</emphasis>
+00482 
+00483 
+00484 
+00488 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//public&#32;void&#32;Clear()</emphasis>
+00489 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//{</emphasis>
+00490 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;&#32;&#32;&#32;//m_currentIndex&#32;=&#32;0;</emphasis>
+00491 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;&#32;&#32;&#32;m_MaterialReferenceLookup.Clear();</emphasis>
+00492 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;&#32;&#32;&#32;m_SpriteAssetReferenceLookup.Clear();</emphasis>
+00493 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;&#32;&#32;&#32;m_FontAssetReferenceLookup.Clear();</emphasis>
+00494 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//}</emphasis>
+00495 
+00496 
+00500 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//public&#32;void&#32;ClearReferenceCount()</emphasis>
+00501 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//{</emphasis>
+00502 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;&#32;&#32;&#32;m_countInternal&#32;=&#32;0;</emphasis>
+00503 
+00504 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;&#32;&#32;&#32;for&#32;(int&#32;i&#32;=&#32;0;&#32;i&#32;&lt;&#32;materialReferences.Length;&#32;i++)</emphasis>
+00505 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;&#32;&#32;&#32;{</emphasis>
+00506 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;if&#32;(materialReferences[i].fontAsset&#32;==&#32;null)</emphasis>
+00507 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;return;</emphasis>
+00508 
+00509 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;materialReferences[i].referenceCount&#32;=&#32;0;</emphasis>
+00510 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;&#32;&#32;&#32;}</emphasis>
+00511 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//}</emphasis>
+00512 
+00513 &#32;&#32;&#32;&#32;}
+00514 
+00515 
+00516 
+<anchor xml:id="__material_reference_manager_8cs_source_1l00517"/><link linkend="_struct_t_m_pro_1_1_material_reference">00517</link> &#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keyword">struct&#32;</emphasis><link linkend="_struct_t_m_pro_1_1_material_reference">MaterialReference</link>
+00518 &#32;&#32;&#32;&#32;{
+00519 
+<anchor xml:id="__material_reference_manager_8cs_source_1l00520"/><link linkend="_struct_t_m_pro_1_1_material_reference_1af0e1e670567aeaa6b1b1bc67b41d4d3d">00520</link> &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keywordtype">int</emphasis>&#32;<link linkend="_struct_t_m_pro_1_1_material_reference_1af0e1e670567aeaa6b1b1bc67b41d4d3d">index</link>;
+<anchor xml:id="__material_reference_manager_8cs_source_1l00521"/><link linkend="_struct_t_m_pro_1_1_material_reference_1a57d6038454b7627a678c178751ae7b2e">00521</link> &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<link linkend="_class_t_m_pro_1_1_t_m_p___font_asset">TMP_FontAsset</link>&#32;<link linkend="_struct_t_m_pro_1_1_material_reference_1a57d6038454b7627a678c178751ae7b2e">fontAsset</link>;
+<anchor xml:id="__material_reference_manager_8cs_source_1l00522"/><link linkend="_struct_t_m_pro_1_1_material_reference_1a1ebf5e832a0bc9cab36327cc0208362e">00522</link> &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<link linkend="_class_t_m_pro_1_1_t_m_p___sprite_asset">TMP_SpriteAsset</link>&#32;<link linkend="_struct_t_m_pro_1_1_material_reference_1a1ebf5e832a0bc9cab36327cc0208362e">spriteAsset</link>;
+<anchor xml:id="__material_reference_manager_8cs_source_1l00523"/><link linkend="_struct_t_m_pro_1_1_material_reference_1ab5f2e88a52f52cea5eb3f62ff9d452ef">00523</link> &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;Material&#32;<link linkend="_struct_t_m_pro_1_1_material_reference_1ab5f2e88a52f52cea5eb3f62ff9d452ef">material</link>;
+<anchor xml:id="__material_reference_manager_8cs_source_1l00524"/><link linkend="_struct_t_m_pro_1_1_material_reference_1ab986ec897bc828a682be0bc9d254e0a5">00524</link> &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keywordtype">bool</emphasis>&#32;<link linkend="_struct_t_m_pro_1_1_material_reference_1ab986ec897bc828a682be0bc9d254e0a5">isDefaultMaterial</link>;
+<anchor xml:id="__material_reference_manager_8cs_source_1l00525"/><link linkend="_struct_t_m_pro_1_1_material_reference_1ae529e7d956ccdd30cb246eab15ffe15b">00525</link> &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keywordtype">bool</emphasis>&#32;<link linkend="_struct_t_m_pro_1_1_material_reference_1ae529e7d956ccdd30cb246eab15ffe15b">isFallbackMaterial</link>;
+<anchor xml:id="__material_reference_manager_8cs_source_1l00526"/><link linkend="_struct_t_m_pro_1_1_material_reference_1afb2e5da38674a7a363ad2b4f3c6215d7">00526</link> &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;Material&#32;<link linkend="_struct_t_m_pro_1_1_material_reference_1afb2e5da38674a7a363ad2b4f3c6215d7">fallbackMaterial</link>;
+<anchor xml:id="__material_reference_manager_8cs_source_1l00527"/><link linkend="_struct_t_m_pro_1_1_material_reference_1ab1a087e354c66d5ab731cba0beb4ad9a">00527</link> &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keywordtype">float</emphasis>&#32;<link linkend="_struct_t_m_pro_1_1_material_reference_1ab1a087e354c66d5ab731cba0beb4ad9a">padding</link>;
+<anchor xml:id="__material_reference_manager_8cs_source_1l00528"/><link linkend="_struct_t_m_pro_1_1_material_reference_1ab6c0b50ab86f6743bb71af70dd2ba0ed">00528</link> &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keywordtype">int</emphasis>&#32;<link linkend="_struct_t_m_pro_1_1_material_reference_1ab6c0b50ab86f6743bb71af70dd2ba0ed">referenceCount</link>;
+00529 
+00530 
+<anchor xml:id="__material_reference_manager_8cs_source_1l00539"/><link linkend="_struct_t_m_pro_1_1_material_reference_1a5af83438b727dbb8cf9c49b02fdc2fda">00539</link> &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<link linkend="_struct_t_m_pro_1_1_material_reference_1a5af83438b727dbb8cf9c49b02fdc2fda">MaterialReference</link>(<emphasis role="keywordtype">int</emphasis>&#32;<link linkend="_struct_t_m_pro_1_1_material_reference_1af0e1e670567aeaa6b1b1bc67b41d4d3d">index</link>,&#32;<link linkend="_class_t_m_pro_1_1_t_m_p___font_asset">TMP_FontAsset</link>&#32;<link linkend="_struct_t_m_pro_1_1_material_reference_1a57d6038454b7627a678c178751ae7b2e">fontAsset</link>,&#32;<link linkend="_class_t_m_pro_1_1_t_m_p___sprite_asset">TMP_SpriteAsset</link>&#32;<link linkend="_struct_t_m_pro_1_1_material_reference_1a1ebf5e832a0bc9cab36327cc0208362e">spriteAsset</link>,&#32;Material&#32;<link linkend="_struct_t_m_pro_1_1_material_reference_1ab5f2e88a52f52cea5eb3f62ff9d452ef">material</link>,&#32;<emphasis role="keywordtype">float</emphasis>&#32;<link linkend="_struct_t_m_pro_1_1_material_reference_1ab1a087e354c66d5ab731cba0beb4ad9a">padding</link>)
+00540 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00541 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;this.index&#32;=&#32;<link linkend="_struct_t_m_pro_1_1_material_reference_1af0e1e670567aeaa6b1b1bc67b41d4d3d">index</link>;
+00542 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;this.fontAsset&#32;=&#32;<link linkend="_struct_t_m_pro_1_1_material_reference_1a57d6038454b7627a678c178751ae7b2e">fontAsset</link>;
+00543 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;this.spriteAsset&#32;=&#32;<link linkend="_struct_t_m_pro_1_1_material_reference_1a1ebf5e832a0bc9cab36327cc0208362e">spriteAsset</link>;
+00544 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;this.material&#32;=&#32;<link linkend="_struct_t_m_pro_1_1_material_reference_1ab5f2e88a52f52cea5eb3f62ff9d452ef">material</link>;
+00545 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;this.isDefaultMaterial&#32;=&#32;<link linkend="_struct_t_m_pro_1_1_material_reference_1ab5f2e88a52f52cea5eb3f62ff9d452ef">material</link>.GetInstanceID()&#32;==&#32;<link linkend="_struct_t_m_pro_1_1_material_reference_1a57d6038454b7627a678c178751ae7b2e">fontAsset</link>.<link linkend="_class_t_m_pro_1_1_t_m_p___asset_1a8dcd405969e8c3aaa441c0fe3b0b6eaa">material</link>.GetInstanceID()&#32;?&#32;true&#32;:&#32;<emphasis role="keyword">false</emphasis>;
+00546 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;this.isFallbackMaterial&#32;=&#32;<emphasis role="keyword">false</emphasis>;
+00547 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;this.fallbackMaterial&#32;=&#32;<emphasis role="keyword">null</emphasis>;
+00548 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;this.padding&#32;=&#32;<link linkend="_struct_t_m_pro_1_1_material_reference_1ab1a087e354c66d5ab731cba0beb4ad9a">padding</link>;
+00549 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;this.referenceCount&#32;=&#32;0;
+00550 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00551 
+00552 
+<anchor xml:id="__material_reference_manager_8cs_source_1l00559"/><link linkend="_struct_t_m_pro_1_1_material_reference_1a9b5219f0d1330cd811cfa3aa837d0b33">00559</link> &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keyword">static</emphasis>&#32;<emphasis role="keywordtype">bool</emphasis>&#32;<link linkend="_struct_t_m_pro_1_1_material_reference_1a9b5219f0d1330cd811cfa3aa837d0b33">Contains</link>(<link linkend="_struct_t_m_pro_1_1_material_reference">MaterialReference</link>[]&#32;materialReferences,&#32;<link linkend="_class_t_m_pro_1_1_t_m_p___font_asset">TMP_FontAsset</link>&#32;<link linkend="_struct_t_m_pro_1_1_material_reference_1a57d6038454b7627a678c178751ae7b2e">fontAsset</link>)
+00560 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00561 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordtype">int</emphasis>&#32;<emphasis role="keywordtype">id</emphasis>&#32;=&#32;<link linkend="_struct_t_m_pro_1_1_material_reference_1a57d6038454b7627a678c178751ae7b2e">fontAsset</link>.GetInstanceID();
+00562 
+00563 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">for</emphasis>&#32;(<emphasis role="keywordtype">int</emphasis>&#32;i&#32;=&#32;0;&#32;i&#32;&lt;&#32;materialReferences.Length&#32;&amp;&amp;&#32;materialReferences[i].<link linkend="_struct_t_m_pro_1_1_material_reference_1a57d6038454b7627a678c178751ae7b2e">fontAsset</link>&#32;!=&#32;<emphasis role="keyword">null</emphasis>;&#32;i++)
+00564 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00565 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(materialReferences[i].<link linkend="_struct_t_m_pro_1_1_material_reference_1a57d6038454b7627a678c178751ae7b2e">fontAsset</link>.GetInstanceID()&#32;==&#32;id)
+00566 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;<emphasis role="keyword">true</emphasis>;
+00567 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00568 
+00569 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;<emphasis role="keyword">false</emphasis>;
+00570 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00571 
+00572 
+<anchor xml:id="__material_reference_manager_8cs_source_1l00581"/><link linkend="_struct_t_m_pro_1_1_material_reference_1a671a784525ebc4709414c442d7af7187">00581</link> &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keyword">static</emphasis>&#32;<emphasis role="keywordtype">int</emphasis>&#32;<link linkend="_struct_t_m_pro_1_1_material_reference_1a671a784525ebc4709414c442d7af7187">AddMaterialReference</link>(Material&#32;<link linkend="_struct_t_m_pro_1_1_material_reference_1ab5f2e88a52f52cea5eb3f62ff9d452ef">material</link>,&#32;<link linkend="_class_t_m_pro_1_1_t_m_p___font_asset">TMP_FontAsset</link>&#32;<link linkend="_struct_t_m_pro_1_1_material_reference_1a57d6038454b7627a678c178751ae7b2e">fontAsset</link>,&#32;<link linkend="_struct_t_m_pro_1_1_material_reference">MaterialReference</link>[]&#32;materialReferences,&#32;Dictionary&lt;int,&#32;int&gt;&#32;materialReferenceIndexLookup)
+00582 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00583 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordtype">int</emphasis>&#32;materialID&#32;=&#32;<link linkend="_struct_t_m_pro_1_1_material_reference_1ab5f2e88a52f52cea5eb3f62ff9d452ef">material</link>.GetInstanceID();
+00584 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordtype">int</emphasis>&#32;<link linkend="_struct_t_m_pro_1_1_material_reference_1af0e1e670567aeaa6b1b1bc67b41d4d3d">index</link>&#32;=&#32;0;
+00585 
+00586 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(materialReferenceIndexLookup.TryGetValue(materialID,&#32;out&#32;<link linkend="_struct_t_m_pro_1_1_material_reference_1af0e1e670567aeaa6b1b1bc67b41d4d3d">index</link>))
+00587 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00588 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;<link linkend="_struct_t_m_pro_1_1_material_reference_1af0e1e670567aeaa6b1b1bc67b41d4d3d">index</link>;
+00589 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00590 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">else</emphasis>
+00591 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00592 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_struct_t_m_pro_1_1_material_reference_1af0e1e670567aeaa6b1b1bc67b41d4d3d">index</link>&#32;=&#32;materialReferenceIndexLookup.Count;
+00593 
+00594 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;Add&#32;new&#32;reference&#32;index</emphasis>
+00595 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;materialReferenceIndexLookup[materialID]&#32;=&#32;<link linkend="_struct_t_m_pro_1_1_material_reference_1af0e1e670567aeaa6b1b1bc67b41d4d3d">index</link>;
+00596 
+00597 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;materialReferences[<link linkend="_struct_t_m_pro_1_1_material_reference_1af0e1e670567aeaa6b1b1bc67b41d4d3d">index</link>].<link linkend="_struct_t_m_pro_1_1_material_reference_1af0e1e670567aeaa6b1b1bc67b41d4d3d">index</link>&#32;=&#32;<link linkend="_struct_t_m_pro_1_1_material_reference_1af0e1e670567aeaa6b1b1bc67b41d4d3d">index</link>;
+00598 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;materialReferences[<link linkend="_struct_t_m_pro_1_1_material_reference_1af0e1e670567aeaa6b1b1bc67b41d4d3d">index</link>].<link linkend="_struct_t_m_pro_1_1_material_reference_1a57d6038454b7627a678c178751ae7b2e">fontAsset</link>&#32;=&#32;<link linkend="_struct_t_m_pro_1_1_material_reference_1a57d6038454b7627a678c178751ae7b2e">fontAsset</link>;
+00599 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;materialReferences[<link linkend="_struct_t_m_pro_1_1_material_reference_1af0e1e670567aeaa6b1b1bc67b41d4d3d">index</link>].<link linkend="_struct_t_m_pro_1_1_material_reference_1a1ebf5e832a0bc9cab36327cc0208362e">spriteAsset</link>&#32;=&#32;<emphasis role="keyword">null</emphasis>;
+00600 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;materialReferences[<link linkend="_struct_t_m_pro_1_1_material_reference_1af0e1e670567aeaa6b1b1bc67b41d4d3d">index</link>].<link linkend="_struct_t_m_pro_1_1_material_reference_1ab5f2e88a52f52cea5eb3f62ff9d452ef">material</link>&#32;=&#32;<link linkend="_struct_t_m_pro_1_1_material_reference_1ab5f2e88a52f52cea5eb3f62ff9d452ef">material</link>;
+00601 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;materialReferences[<link linkend="_struct_t_m_pro_1_1_material_reference_1af0e1e670567aeaa6b1b1bc67b41d4d3d">index</link>].<link linkend="_struct_t_m_pro_1_1_material_reference_1ab986ec897bc828a682be0bc9d254e0a5">isDefaultMaterial</link>&#32;=&#32;materialID&#32;==&#32;<link linkend="_struct_t_m_pro_1_1_material_reference_1a57d6038454b7627a678c178751ae7b2e">fontAsset</link>.<link linkend="_class_t_m_pro_1_1_t_m_p___asset_1a8dcd405969e8c3aaa441c0fe3b0b6eaa">material</link>.GetInstanceID()&#32;?&#32;true&#32;:&#32;<emphasis role="keyword">false</emphasis>;
+00602 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//materialReferences[index].padding&#32;=&#32;0;</emphasis>
+00603 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;materialReferences[<link linkend="_struct_t_m_pro_1_1_material_reference_1af0e1e670567aeaa6b1b1bc67b41d4d3d">index</link>].<link linkend="_struct_t_m_pro_1_1_material_reference_1ab6c0b50ab86f6743bb71af70dd2ba0ed">referenceCount</link>&#32;=&#32;0;
+00604 
+00605 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;<link linkend="_struct_t_m_pro_1_1_material_reference_1af0e1e670567aeaa6b1b1bc67b41d4d3d">index</link>;
+00606 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00607 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00608 
+00609 
+<anchor xml:id="__material_reference_manager_8cs_source_1l00618"/><link linkend="_struct_t_m_pro_1_1_material_reference_1ad911a49231e643344d43a137a8b72baf">00618</link> &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keyword">static</emphasis>&#32;<emphasis role="keywordtype">int</emphasis>&#32;<link linkend="_struct_t_m_pro_1_1_material_reference_1ad911a49231e643344d43a137a8b72baf">AddMaterialReference</link>(Material&#32;<link linkend="_struct_t_m_pro_1_1_material_reference_1ab5f2e88a52f52cea5eb3f62ff9d452ef">material</link>,&#32;<link linkend="_class_t_m_pro_1_1_t_m_p___sprite_asset">TMP_SpriteAsset</link>&#32;<link linkend="_struct_t_m_pro_1_1_material_reference_1a1ebf5e832a0bc9cab36327cc0208362e">spriteAsset</link>,&#32;<link linkend="_struct_t_m_pro_1_1_material_reference">MaterialReference</link>[]&#32;materialReferences,&#32;Dictionary&lt;int,&#32;int&gt;&#32;materialReferenceIndexLookup)
+00619 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00620 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordtype">int</emphasis>&#32;materialID&#32;=&#32;<link linkend="_struct_t_m_pro_1_1_material_reference_1ab5f2e88a52f52cea5eb3f62ff9d452ef">material</link>.GetInstanceID();
+00621 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordtype">int</emphasis>&#32;<link linkend="_struct_t_m_pro_1_1_material_reference_1af0e1e670567aeaa6b1b1bc67b41d4d3d">index</link>&#32;=&#32;0;
+00622 
+00623 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(materialReferenceIndexLookup.TryGetValue(materialID,&#32;out&#32;<link linkend="_struct_t_m_pro_1_1_material_reference_1af0e1e670567aeaa6b1b1bc67b41d4d3d">index</link>))
+00624 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00625 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;<link linkend="_struct_t_m_pro_1_1_material_reference_1af0e1e670567aeaa6b1b1bc67b41d4d3d">index</link>;
+00626 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00627 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">else</emphasis>
+00628 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00629 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_struct_t_m_pro_1_1_material_reference_1af0e1e670567aeaa6b1b1bc67b41d4d3d">index</link>&#32;=&#32;materialReferenceIndexLookup.Count;
+00630 
+00631 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;Add&#32;new&#32;reference&#32;index</emphasis>
+00632 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;materialReferenceIndexLookup[materialID]&#32;=&#32;<link linkend="_struct_t_m_pro_1_1_material_reference_1af0e1e670567aeaa6b1b1bc67b41d4d3d">index</link>;
+00633 
+00634 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;materialReferences[<link linkend="_struct_t_m_pro_1_1_material_reference_1af0e1e670567aeaa6b1b1bc67b41d4d3d">index</link>].<link linkend="_struct_t_m_pro_1_1_material_reference_1af0e1e670567aeaa6b1b1bc67b41d4d3d">index</link>&#32;=&#32;<link linkend="_struct_t_m_pro_1_1_material_reference_1af0e1e670567aeaa6b1b1bc67b41d4d3d">index</link>;
+00635 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;materialReferences[<link linkend="_struct_t_m_pro_1_1_material_reference_1af0e1e670567aeaa6b1b1bc67b41d4d3d">index</link>].<link linkend="_struct_t_m_pro_1_1_material_reference_1a57d6038454b7627a678c178751ae7b2e">fontAsset</link>&#32;=&#32;materialReferences[0].<link linkend="_struct_t_m_pro_1_1_material_reference_1a57d6038454b7627a678c178751ae7b2e">fontAsset</link>;
+00636 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;materialReferences[<link linkend="_struct_t_m_pro_1_1_material_reference_1af0e1e670567aeaa6b1b1bc67b41d4d3d">index</link>].<link linkend="_struct_t_m_pro_1_1_material_reference_1a1ebf5e832a0bc9cab36327cc0208362e">spriteAsset</link>&#32;=&#32;<link linkend="_struct_t_m_pro_1_1_material_reference_1a1ebf5e832a0bc9cab36327cc0208362e">spriteAsset</link>;
+00637 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;materialReferences[<link linkend="_struct_t_m_pro_1_1_material_reference_1af0e1e670567aeaa6b1b1bc67b41d4d3d">index</link>].<link linkend="_struct_t_m_pro_1_1_material_reference_1ab5f2e88a52f52cea5eb3f62ff9d452ef">material</link>&#32;=&#32;<link linkend="_struct_t_m_pro_1_1_material_reference_1ab5f2e88a52f52cea5eb3f62ff9d452ef">material</link>;
+00638 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;materialReferences[<link linkend="_struct_t_m_pro_1_1_material_reference_1af0e1e670567aeaa6b1b1bc67b41d4d3d">index</link>].<link linkend="_struct_t_m_pro_1_1_material_reference_1ab986ec897bc828a682be0bc9d254e0a5">isDefaultMaterial</link>&#32;=&#32;<emphasis role="keyword">true</emphasis>;
+00639 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//materialReferences[index].padding&#32;=&#32;0;</emphasis>
+00640 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;materialReferences[<link linkend="_struct_t_m_pro_1_1_material_reference_1af0e1e670567aeaa6b1b1bc67b41d4d3d">index</link>].<link linkend="_struct_t_m_pro_1_1_material_reference_1ab6c0b50ab86f6743bb71af70dd2ba0ed">referenceCount</link>&#32;=&#32;0;
+00641 
+00642 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;<link linkend="_struct_t_m_pro_1_1_material_reference_1af0e1e670567aeaa6b1b1bc67b41d4d3d">index</link>;
+00643 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00644 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00645 &#32;&#32;&#32;&#32;}
+00646 }
+</programlisting></section>

@@ -1,0 +1,750 @@
+<?xml version='1.0' encoding='UTF-8' standalone='no'?>
+<section xmlns="http://docbook.org/ns/docbook" version="5.0" xmlns:xlink="http://www.w3.org/1999/xlink" xml:id="__interaction_x_r_controller_8cs_source">
+<title>InteractionXRController.cs</title>
+<indexterm><primary>O:/GitHUBMINIPRoject/Assets/LeapMotion/Modules/InteractionEngine/Scripts/InteractionXRController.cs</primary></indexterm>
+<programlisting>00001 <emphasis role="comment">/******************************************************************************</emphasis>
+00002 <emphasis role="comment">&#32;*&#32;Copyright&#32;(C)&#32;Leap&#32;Motion,&#32;Inc.&#32;2011-2018.&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;*</emphasis>
+00003 <emphasis role="comment">&#32;*&#32;Leap&#32;Motion&#32;proprietary&#32;and&#32;confidential.&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;*</emphasis>
+00004 <emphasis role="comment">&#32;*&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;*</emphasis>
+00005 <emphasis role="comment">&#32;*&#32;Use&#32;subject&#32;to&#32;the&#32;terms&#32;of&#32;the&#32;Leap&#32;Motion&#32;SDK&#32;Agreement&#32;available&#32;at&#32;&#32;&#32;&#32;&#32;*</emphasis>
+00006 <emphasis role="comment">&#32;*&#32;https://developer.leapmotion.com/sdk_agreement,&#32;or&#32;another&#32;agreement&#32;&#32;&#32;&#32;&#32;&#32;&#32;*</emphasis>
+00007 <emphasis role="comment">&#32;*&#32;between&#32;Leap&#32;Motion&#32;and&#32;you,&#32;your&#32;company&#32;or&#32;other&#32;organization.&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;*</emphasis>
+00008 <emphasis role="comment">&#32;******************************************************************************/</emphasis>
+00009 
+00010 <emphasis role="keyword">using</emphasis>&#32;<link linkend="_namespace_leap">Leap</link>.<link linkend="_namespace_leap_1_1_unity">Unity</link>.<link linkend="_namespace_leap_1_1_unity_1_1_attributes">Attributes</link>;
+00011 
+00012 <emphasis role="preprocessor">#if&#32;UNITY_2017_2_OR_NEWER</emphasis>
+00013 <emphasis role="keyword">using</emphasis>&#32;<link linkend="_namespace_unity_engine">UnityEngine</link>.XR;
+00014 <emphasis role="preprocessor">#else</emphasis>
+00015 <emphasis role="keyword">using</emphasis>&#32;<link linkend="_namespace_unity_engine">UnityEngine</link>.VR;
+00016 <emphasis role="preprocessor">#endif</emphasis>
+00017 
+00018 <emphasis role="keyword">using</emphasis>&#32;System;
+00019 <emphasis role="keyword">using</emphasis>&#32;System.Collections.Generic;
+00020 <emphasis role="keyword">using</emphasis>&#32;<link linkend="__balloon_8cs_1a7d67e097df9376eb709b6a23aa3c7d23">UnityEngine</link>;
+00021 <emphasis role="keyword">using</emphasis>&#32;<link linkend="_namespace_leap">Leap</link>.<link linkend="_namespace_leap_1_1_unity">Unity</link>.<link linkend="_namespace_leap_1_1_unity_1_1_query">Query</link>;
+00022 <emphasis role="keyword">using</emphasis>&#32;<link linkend="_namespace_leap">Leap</link>.<link linkend="_namespace_leap_1_1_unity">Unity</link>.<link linkend="_namespace_leap_1_1_unity_1_1_space">Space</link>;
+00023 <emphasis role="keyword">using</emphasis>&#32;<link linkend="_namespace_unity_engine">UnityEngine</link>.Serialization;
+00024 
+00025 <emphasis role="keyword">namespace&#32;</emphasis><link linkend="_namespace_leap_1_1_unity_1_1_interaction">Leap.Unity.Interaction</link>&#32;{
+00026 
+00027 &#32;&#32;[DisallowMultipleComponent]
+<anchor xml:id="__interaction_x_r_controller_8cs_source_1l00028"/><link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_x_r_controller">00028</link> &#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keyword">class&#32;</emphasis><link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_x_r_controller">InteractionXRController</link>&#32;:&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_controller">InteractionController</link>&#32;{
+00029 
+00030 <emphasis role="preprocessor">&#32;&#32;&#32;&#32;#region&#32;Inspector</emphasis>
+00031 
+00032 &#32;&#32;&#32;&#32;[Header(<emphasis role="stringliteral">&quot;Controller&#32;Configuration&quot;</emphasis>)]
+00033 
+00034 &#32;&#32;&#32;&#32;[Tooltip(<emphasis role="stringliteral">&quot;Read-only.&#32;InteractionXRControllers&#32;use&#32;Unity&apos;s&#32;built-in&#32;XRNode&#32;tracking&#32;&quot;</emphasis>
+00035 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;+&#32;<emphasis role="stringliteral">&quot;API&#32;to&#32;receive&#32;tracking&#32;data&#32;for&#32;XR&#32;controllers&#32;by&#32;default.&#32;If&#32;you&#32;add&#32;a&#32;&quot;</emphasis>
+00036 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;+&#32;<emphasis role="stringliteral">&quot;custom&#32;script&#32;to&#32;set&#32;this&#32;controller&apos;s&#32;trackingProvider&#32;to&#32;something&#32;&quot;</emphasis>
+00037 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;+&#32;<emphasis role="stringliteral">&quot;other&#32;than&#32;the&#32;DefaultXRNodeTrackingProvider,&#32;the&#32;change&#32;will&#32;be&#32;reflected&#32;&quot;</emphasis>
+00038 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;+&#32;<emphasis role="stringliteral">&quot;here.&#32;(Hint:&#32;Use&#32;the&#32;ExecuteInEditMode&#32;attribute.)&quot;</emphasis>)]
+00039 &#32;&#32;&#32;&#32;[Disable,&#32;SerializeField]
+00040 <emphasis role="preprocessor">&#32;&#32;&#32;&#32;#pragma&#32;warning&#32;disable&#32;0414</emphasis>
+00041 &#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;<emphasis role="keywordtype">string</emphasis>&#32;_trackingProviderType&#32;=&#32;<emphasis role="stringliteral">&quot;DefaultXRNodeTrackingProvider&quot;</emphasis>;
+00042 <emphasis role="preprocessor">#pragma&#32;warning&#32;restore&#32;0414</emphasis>
+<anchor xml:id="__interaction_x_r_controller_8cs_source_1l00043"/><link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_x_r_controller_1a621446c06cfa8391f7f0d8990d885bf5">00043</link> &#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keywordtype">bool</emphasis>&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_x_r_controller_1a621446c06cfa8391f7f0d8990d885bf5">isUsingCustomTracking</link>&#32;{
+00044 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">get</emphasis>&#32;{&#32;<emphasis role="keywordflow">return</emphasis>&#32;!(<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_x_r_controller_1aebc2b694592123f75013dd012e8f357f">trackingProvider</link>&#32;is&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_default_x_r_node_tracking_provider">DefaultXRNodeTrackingProvider</link>);&#32;}
+00045 &#32;&#32;&#32;&#32;}
+00046 
+00047 &#32;&#32;&#32;&#32;[Tooltip(<emphasis role="stringliteral">&quot;If&#32;this&#32;string&#32;is&#32;not&#32;empty&#32;and&#32;does&#32;not&#32;match&#32;a&#32;controller&#32;in&#32;&quot;</emphasis>
+00048 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;+&#32;<emphasis role="stringliteral">&quot;Input.GetJoystickNames(),&#32;then&#32;this&#32;game&#32;object&#32;will&#32;disable&#32;itself.&quot;</emphasis>)]
+00049 &#32;&#32;&#32;&#32;[SerializeField,&#32;<link linkend="_class_leap_1_1_unity_1_1_attributes_1_1_edit_time_only">EditTimeOnly</link>]
+00050 &#32;&#32;&#32;&#32;[FormerlySerializedAs(<emphasis role="stringliteral">&quot;_deviceString&quot;</emphasis>)]
+00051 &#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;<emphasis role="keywordtype">string</emphasis>&#32;_deviceJoystickTokens&#32;=&#32;<emphasis role="stringliteral">&quot;oculus&#32;touch&#32;right&quot;</emphasis>;&#32;<emphasis role="comment">//&#32;or,&#32;e.g.,&#32;&quot;openvr&#32;controller&#32;right&quot;</emphasis>
+<anchor xml:id="__interaction_x_r_controller_8cs_source_1l00052"/><link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_x_r_controller_1ac3f3ac7b791e70390c8ba9a547162525">00052</link> &#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keywordtype">string</emphasis>&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_x_r_controller_1ac3f3ac7b791e70390c8ba9a547162525">deviceJoystickTokens</link>&#32;{&#32;<emphasis role="keyword">get</emphasis>&#32;{&#32;<emphasis role="keywordflow">return</emphasis>&#32;_deviceJoystickTokens;&#32;}&#32;}
+00053 
+00054 &#32;&#32;&#32;&#32;[Tooltip(<emphasis role="stringliteral">&quot;Which&#32;hand&#32;will&#32;hold&#32;this&#32;controller?&#32;This&#32;property&#32;cannot&#32;be&#32;changed&#32;&quot;</emphasis>
+00055 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;+&#32;<emphasis role="stringliteral">&quot;at&#32;runtime.&quot;</emphasis>)]
+00056 &#32;&#32;&#32;&#32;[SerializeField,&#32;<link linkend="_class_leap_1_1_unity_1_1_attributes_1_1_edit_time_only">EditTimeOnly</link>]
+00057 &#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;<link linkend="_namespace_leap_1_1_unity_1a4d15adcf20ba121b2cd9c07f503b606f">Chirality</link>&#32;_chirality;
+<anchor xml:id="__interaction_x_r_controller_8cs_source_1l00058"/><link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_x_r_controller_1a84e32cb318c25dbb329b6766c6f895f8">00058</link> &#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<link linkend="_namespace_leap_1_1_unity_1a4d15adcf20ba121b2cd9c07f503b606f">Chirality</link>&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_x_r_controller_1a84e32cb318c25dbb329b6766c6f895f8">chirality</link>&#32;{&#32;<emphasis role="keyword">get</emphasis>&#32;{&#32;<emphasis role="keywordflow">return</emphasis>&#32;_chirality;&#32;}&#32;}
+00059 
+00060 &#32;&#32;&#32;&#32;[Tooltip(<emphasis role="stringliteral">&quot;Whether&#32;to&#32;continuously&#32;poll&#32;attached&#32;joystick&#32;data&#32;for&#32;a&#32;joystick&#32;that&#32;&quot;</emphasis>
+00061 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;+&#32;<emphasis role="stringliteral">&quot;matches&#32;the&#32;device&#32;joystick&#32;tokens,&#32;using&#32;Input.GetJoystickNames().&#32;This&#32;&quot;</emphasis>
+00062 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;+&#32;<emphasis role="stringliteral">&quot;call&#32;allocates&#32;garbage,&#32;so&#32;be&#32;wary&#32;of&#32;setting&#32;a&#32;low&#32;polling&#32;interval.&quot;</emphasis>)]
+00063 &#32;&#32;&#32;&#32;[SerializeField,&#32;OnEditorChange(<emphasis role="stringliteral">&quot;pollConnection&quot;</emphasis>)]
+00064 &#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;<emphasis role="keywordtype">bool</emphasis>&#32;_pollConnection&#32;=&#32;<emphasis role="keyword">true</emphasis>;
+<anchor xml:id="__interaction_x_r_controller_8cs_source_1l00074"/><link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_x_r_controller_1a96ffe3a41a49ca69c3e15de4badbb98b">00074</link> &#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keywordtype">bool</emphasis>&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_x_r_controller_1a96ffe3a41a49ca69c3e15de4badbb98b">pollConnection</link>&#32;{
+00075 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">get</emphasis>&#32;{&#32;<emphasis role="keywordflow">return</emphasis>&#32;_pollConnection;&#32;}
+00076 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">set</emphasis>&#32;{&#32;_pollConnection&#32;=&#32;value;&#32;}
+00077 &#32;&#32;&#32;&#32;}
+00078 &#32;&#32;&#32;&#32;[Tooltip(<emphasis role="stringliteral">&quot;The&#32;period&#32;in&#32;seconds&#32;at&#32;which&#32;to&#32;check&#32;if&#32;the&#32;controller&#32;is&#32;connected&#32;&quot;</emphasis>
+00079 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;+&#32;<emphasis role="stringliteral">&quot;by&#32;calling&#32;Input.GetJoystickNames().&#32;This&#32;call&#32;allocates&#32;garbage,&#32;so&#32;be&#32;&quot;</emphasis>
+00080 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;+&#32;<emphasis role="stringliteral">&quot;wary&#32;of&#32;setting&#32;a&#32;low&#32;polling&#32;interval.&quot;</emphasis>)]
+00081 &#32;&#32;&#32;&#32;[<link linkend="_class_leap_1_1_unity_1_1_attributes_1_1_min_value">MinValue</link>(0f)]
+00082 &#32;&#32;&#32;&#32;[<link linkend="_class_leap_1_1_unity_1_1_attributes_1_1_disable_if">DisableIf</link>(<emphasis role="stringliteral">&quot;_pollConnection&quot;</emphasis>,&#32;isEqualTo:&#32;<emphasis role="keyword">false</emphasis>)]
+<anchor xml:id="__interaction_x_r_controller_8cs_source_1l00083"/><link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_x_r_controller_1a870363d8aa13c1d14481b988608b195e">00083</link> &#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keywordtype">float</emphasis>&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_x_r_controller_1a870363d8aa13c1d14481b988608b195e">pollConnectionInterval</link>&#32;=&#32;2f;
+00084 
+00085 &#32;&#32;&#32;&#32;[Header(<emphasis role="stringliteral">&quot;Hover&#32;Configuration&quot;</emphasis>)]
+00086 
+00087 &#32;&#32;&#32;&#32;[Tooltip(<emphasis role="stringliteral">&quot;This&#32;is&#32;the&#32;point&#32;used&#32;to&#32;determine&#32;the&#32;distance&#32;to&#32;objects&#32;for&#32;the&#32;&quot;</emphasis>
+00088 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;+&#32;<emphasis role="stringliteral">&quot;purposes&#32;of&#32;their&#32;&apos;hovered&apos;&#32;state.&#32;Generally,&#32;it&#32;should&#32;be&#32;somewhere&#32;&quot;</emphasis>
+00089 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;+&#32;<emphasis role="stringliteral">&quot;between&#32;the&#32;tip&#32;of&#32;the&#32;controller&#32;and&#32;the&#32;controller&apos;s&#32;center&#32;of&#32;mass.&quot;</emphasis>)]
+00090 &#32;&#32;&#32;&#32;[SerializeField]
+00091 &#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;Transform&#32;_hoverPoint;
+00092 
+00093 &#32;&#32;&#32;&#32;[Tooltip(<emphasis role="stringliteral">&quot;These&#32;points&#32;refine&#32;the&#32;hover&#32;point&#32;when&#32;determining&#32;distances&#32;to&#32;&quot;</emphasis>
+00094 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;+&#32;<emphasis role="stringliteral">&quot;interaction&#32;objects&#32;for&#32;evaluating&#32;which&#32;object&#32;should&#32;be&#32;the&#32;primary&#32;hover&#32;&quot;</emphasis>
+00095 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;+&#32;<emphasis role="stringliteral">&quot;of&#32;this&#32;interaction&#32;controller.&#32;An&#32;object&apos;s&#32;proximity&#32;to&#32;one&#32;of&#32;these&#32;&quot;</emphasis>
+00096 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;+&#32;<emphasis role="stringliteral">&quot;points&#32;is&#32;interpreted&#32;as&#32;the&#32;user&apos;s&#32;intention&#32;to&#32;interact&#32;specifically&#32;&quot;</emphasis>
+00097 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;+&#32;<emphasis role="stringliteral">&quot;with&#32;that&#32;object,&#32;and&#32;is&#32;important&#32;when&#32;building&#32;less&#32;accident-prone&#32;user&#32;&quot;</emphasis>
+00098 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;+&#32;<emphasis role="stringliteral">&quot;interfaces.&#32;For&#32;example,&#32;hands&#32;place&#32;their&#32;primary&#32;hover&#32;points&#32;on&#32;the&#32;&quot;</emphasis>
+00099 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;+&#32;<emphasis role="stringliteral">&quot;thumb,&#32;index&#32;finger,&#32;and&#32;middle&#32;finger&#32;by&#32;default.&#32;Controllers&#32;generally&#32;&quot;</emphasis>
+00100 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;+&#32;<emphasis role="stringliteral">&quot;should&#32;have&#32;a&#32;primary&#32;hover&#32;point&#32;at&#32;any&#32;tip&#32;of&#32;the&#32;controller&#32;you&#32;expect&#32;&quot;</emphasis>
+00101 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;+&#32;<emphasis role="stringliteral">&quot;users&#32;might&#32;use&#32;to&#32;hit&#32;a&#32;button.&#32;Warning:&#32;Each&#32;point&#32;costs&#32;distance&#32;checks&#32;&quot;</emphasis>
+00102 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;+&#32;<emphasis role="stringliteral">&quot;against&#32;nearby&#32;objects,&#32;so&#32;making&#32;this&#32;list&#32;large&#32;is&#32;costly!&quot;</emphasis>)]
+00103 &#32;&#32;&#32;&#32;[SerializeField]
+<anchor xml:id="__interaction_x_r_controller_8cs_source_1l00104"/><link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_x_r_controller_1a1b5abc7602f840695df4eae23ead0e37">00104</link> &#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keyword">new</emphasis>&#32;List&lt;Transform&gt;&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_x_r_controller_1a1b5abc7602f840695df4eae23ead0e37">primaryHoverPoints</link>;
+00105 
+00106 &#32;&#32;&#32;&#32;[Header(<emphasis role="stringliteral">&quot;Grasping&#32;Configuration&quot;</emphasis>)]
+00107 
+00108 &#32;&#32;&#32;&#32;[Tooltip(<emphasis role="stringliteral">&quot;The&#32;point&#32;around&#32;which&#32;to&#32;check&#32;objects&#32;eligible&#32;for&#32;being&#32;grasped.&#32;Only&#32;&quot;</emphasis>
+00109 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;+&#32;<emphasis role="stringliteral">&quot;objects&#32;with&#32;an&#32;InteractionBehaviour&#32;component&#32;with&#32;ignoreGrasping&#32;disabled&#32;&quot;</emphasis>
+00110 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;+&#32;<emphasis role="stringliteral">&quot;are&#32;eligible&#32;for&#32;grasping.&#32;Upon&#32;attempting&#32;to&#32;grasp&#32;with&#32;a&#32;controller,&#32;the&#32;&quot;</emphasis>
+00111 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;+&#32;<emphasis role="stringliteral">&quot;object&#32;closest&#32;to&#32;the&#32;grasp&#32;point&#32;is&#32;chosen&#32;for&#32;grasping.&quot;</emphasis>)]
+<anchor xml:id="__interaction_x_r_controller_8cs_source_1l00112"/><link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_x_r_controller_1a45e35489ae52235acd3cece14cf4dbae">00112</link> &#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;Transform&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_x_r_controller_1a45e35489ae52235acd3cece14cf4dbae">graspPoint</link>;
+00113 
+<anchor xml:id="__interaction_x_r_controller_8cs_source_1l00114"/><link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_x_r_controller_1abd2f8566d2d0e95acd51ae7718b8bc98">00114</link> &#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keywordtype">float</emphasis>&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_x_r_controller_1abd2f8566d2d0e95acd51ae7718b8bc98">maxGraspDistance</link>&#32;=&#32;0.06F;
+00115 
+00116 &#32;&#32;&#32;&#32;[Tooltip(<emphasis role="stringliteral">&quot;This&#32;string&#32;should&#32;match&#32;an&#32;Axis&#32;specified&#32;in&#32;Edit-&gt;Project&#32;Settings-&gt;&quot;</emphasis>
+00117 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;+&#32;<emphasis role="stringliteral">&quot;Input.&#32;This&#32;is&#32;the&#32;button&#32;to&#32;use&#32;to&#32;listen&#32;for&#32;grasping.&quot;</emphasis>)]
+<anchor xml:id="__interaction_x_r_controller_8cs_source_1l00118"/><link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_x_r_controller_1a857761fb2f53cdf7e9ffd28f396c4712">00118</link> &#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keywordtype">string</emphasis>&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_x_r_controller_1a857761fb2f53cdf7e9ffd28f396c4712">graspButtonAxis</link>;
+00119 
+00120 &#32;&#32;&#32;&#32;[Tooltip(<emphasis role="stringliteral">&quot;The&#32;duration&#32;of&#32;time&#32;in&#32;seconds&#32;beyond&#32;initially&#32;pressing&#32;the&#32;grasp&#32;button&#32;&quot;</emphasis>
+00121 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;+&#32;<emphasis role="stringliteral">&quot;that&#32;the&#32;user&#32;can&#32;move&#32;the&#32;grasp&#32;point&#32;within&#32;range&#32;of&#32;a&#32;graspable&#32;&quot;</emphasis>
+00122 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;+&#32;<emphasis role="stringliteral">&quot;interaction&#32;object&#32;and&#32;still&#32;trigger&#32;a&#32;grasp.&#32;With&#32;a&#32;value&#32;of&#32;zero,&#32;objects&#32;&quot;</emphasis>
+00123 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;+&#32;<emphasis role="stringliteral">&quot;can&#32;only&#32;be&#32;grasped&#32;if&#32;they&#32;are&#32;already&#32;within&#32;the&#32;grasp&#32;distance&#32;of&#32;the&#32;&quot;</emphasis>
+00124 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;+&#32;<emphasis role="stringliteral">&quot;grasp&#32;point.&quot;</emphasis>)]
+<anchor xml:id="__interaction_x_r_controller_8cs_source_1l00125"/><link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_x_r_controller_1a6fe4112d61321e09eabefbc59af9d13a">00125</link> &#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keywordtype">float</emphasis>&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_x_r_controller_1a6fe4112d61321e09eabefbc59af9d13a">graspTimingSlop</link>&#32;=&#32;0.10F;
+00126 
+00127 &#32;&#32;&#32;&#32;[Header(<emphasis role="stringliteral">&quot;Enable/Disable&#32;GameObjects&#32;with&#32;Tracking&#32;State&quot;</emphasis>)]
+00128 &#32;&#32;&#32;&#32;
+00129 &#32;&#32;&#32;&#32;[Tooltip(<emphasis role="stringliteral">&quot;These&#32;objects&#32;will&#32;be&#32;made&#32;active&#32;only&#32;while&#32;the&#32;controller&#32;is&#32;tracked.&#32;&quot;</emphasis>
+00130 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;+&#32;<emphasis role="stringliteral">&quot;For&#32;more&#32;fine-tuned&#32;behavior,&#32;we&#32;recommend&#32;implementing&#32;your&#32;own&#32;logic.&#32;&quot;</emphasis>
+00131 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;+&#32;<emphasis role="stringliteral">&quot;controller.isJoystickDetected&#32;and&#32;controller.isTracked&#32;are&#32;useful&#32;for&#32;this.&quot;</emphasis>)]
+00132 &#32;&#32;&#32;&#32;[SerializeField]
+00133 &#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;List&lt;GameObject&gt;&#32;_enableObjectsOnlyWhenTracked;
+<anchor xml:id="__interaction_x_r_controller_8cs_source_1l00140"/><link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_x_r_controller_1a0cf4a1150ff9575affb5532f1e252b6a">00140</link> &#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;List&lt;GameObject&gt;&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_x_r_controller_1a0cf4a1150ff9575affb5532f1e252b6a">enableObjectsOnlyWhenTracked</link>&#32;{
+00141 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">get</emphasis>&#32;{
+00142 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(_enableObjectsOnlyWhenTracked&#32;==&#32;<emphasis role="keyword">null</emphasis>)&#32;{
+00143 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;_enableObjectsOnlyWhenTracked&#32;=&#32;<emphasis role="keyword">new</emphasis>&#32;List&lt;GameObject&gt;();
+00144 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00145 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;_enableObjectsOnlyWhenTracked;
+00146 &#32;&#32;&#32;&#32;&#32;&#32;}
+00147 &#32;&#32;&#32;&#32;}
+00148 
+00149 <emphasis role="preprocessor">&#32;&#32;&#32;&#32;#endregion&#32;//&#32;Inspector</emphasis>
+00150 
+00151 <emphasis role="preprocessor">&#32;&#32;&#32;&#32;#region&#32;Unity&#32;Events</emphasis>
+00152 
+<anchor xml:id="__interaction_x_r_controller_8cs_source_1l00153"/><link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_x_r_controller_1a17a8608c8d69b586256fbcb9877394b3">00153</link> &#32;&#32;&#32;&#32;<emphasis role="keyword">protected</emphasis>&#32;<emphasis role="keyword">override</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_x_r_controller_1a17a8608c8d69b586256fbcb9877394b3">Reset</link>()&#32;{
+00154 &#32;&#32;&#32;&#32;&#32;&#32;base.Reset();
+00155 
+00156 &#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_controller_1a17364abc0f18966b489ee8125c0386ff">hoverEnabled</link>&#32;=&#32;<emphasis role="keyword">true</emphasis>;
+00157 &#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_controller_1acb035b29714d862ed7378ac8c71f03e1">contactEnabled</link>&#32;=&#32;<emphasis role="keyword">true</emphasis>;
+00158 &#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_controller_1aa8c6c126e8c40ce9874739f531c7f53f">graspingEnabled</link>&#32;=&#32;<emphasis role="keyword">true</emphasis>;
+00159 
+00160 &#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_x_r_controller_1aebc2b694592123f75013dd012e8f357f">trackingProvider</link>&#32;=&#32;_defaultTrackingProvider;
+00161 &#32;&#32;&#32;&#32;&#32;&#32;_hoverPoint&#32;=&#32;<emphasis role="keyword">null</emphasis>;
+00162 &#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_x_r_controller_1a1b5abc7602f840695df4eae23ead0e37">primaryHoverPoints</link>.Clear();
+00163 &#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_x_r_controller_1a45e35489ae52235acd3cece14cf4dbae">graspPoint</link>&#32;=&#32;<emphasis role="keyword">null</emphasis>;
+00164 
+00165 &#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_x_r_controller_1abd2f8566d2d0e95acd51ae7718b8bc98">maxGraspDistance</link>&#32;=&#32;0.06F;
+00166 &#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_x_r_controller_1a6fe4112d61321e09eabefbc59af9d13a">graspTimingSlop</link>&#32;=&#32;0.1F;
+00167 &#32;&#32;&#32;&#32;}
+00168 
+<anchor xml:id="__interaction_x_r_controller_8cs_source_1l00169"/><link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_x_r_controller_1ac43db0f1fd87084d1b1468ce95bd58ac">00169</link> &#32;&#32;&#32;&#32;<emphasis role="keyword">protected</emphasis>&#32;<emphasis role="keyword">virtual</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_x_r_controller_1ac43db0f1fd87084d1b1468ce95bd58ac">OnValidate</link>()&#32;{
+00170 &#32;&#32;&#32;&#32;&#32;&#32;_trackingProviderType&#32;=&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_x_r_controller_1aebc2b694592123f75013dd012e8f357f">trackingProvider</link>.GetType().ToString();
+00171 &#32;&#32;&#32;&#32;}
+00172 
+<anchor xml:id="__interaction_x_r_controller_8cs_source_1l00173"/><link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_x_r_controller_1ac50b109d0cd82bb14cd8a19199850c9e">00173</link> &#32;&#32;&#32;&#32;<emphasis role="keyword">protected</emphasis>&#32;<emphasis role="keyword">override</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_x_r_controller_1ac50b109d0cd82bb14cd8a19199850c9e">Start</link>()&#32;{
+00174 &#32;&#32;&#32;&#32;&#32;&#32;base.Start();
+00175 
+00176 &#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_x_r_controller_1aebc2b694592123f75013dd012e8f357f">trackingProvider</link>.<link linkend="_interface_leap_1_1_unity_1_1_interaction_1_1_i_x_r_controller_tracking_provider_1a621b53b241147b7a9af4c3c58c15fba4">OnTrackingDataUpdate</link>&#32;+=&#32;refreshControllerTrackingData;
+00177 &#32;&#32;&#32;&#32;}
+00178 
+<anchor xml:id="__interaction_x_r_controller_8cs_source_1l00179"/><link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_x_r_controller_1aa7e13f419009b2f0fd02018cc96f81b4">00179</link> &#32;&#32;&#32;&#32;<emphasis role="keyword">protected</emphasis>&#32;<emphasis role="keyword">override</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_x_r_controller_1aa7e13f419009b2f0fd02018cc96f81b4">fixedUpdateController</link>()&#32;{
+00180 &#32;&#32;&#32;&#32;&#32;&#32;fixedUpdatePollConnection();
+00181 
+00182 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_x_r_controller_1ab5d50597383ad3e552e3c16d1e91e5a7">isTracked</link>)&#32;{
+00183 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">foreach</emphasis>&#32;(var&#32;gameObject&#32;<emphasis role="keywordflow">in</emphasis>&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_x_r_controller_1a0cf4a1150ff9575affb5532f1e252b6a">enableObjectsOnlyWhenTracked</link>)&#32;{
+00184 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;gameObject.SetActive(<emphasis role="keyword">true</emphasis>);
+00185 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00186 &#32;&#32;&#32;&#32;&#32;&#32;}
+00187 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">else</emphasis>&#32;{
+00188 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">foreach</emphasis>&#32;(var&#32;gameObject&#32;<emphasis role="keywordflow">in</emphasis>&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_x_r_controller_1a0cf4a1150ff9575affb5532f1e252b6a">enableObjectsOnlyWhenTracked</link>)&#32;{
+00189 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;gameObject.SetActive(<emphasis role="keyword">false</emphasis>);
+00190 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00191 &#32;&#32;&#32;&#32;&#32;&#32;}
+00192 
+00193 &#32;&#32;&#32;&#32;&#32;&#32;refreshContactBoneTargets();
+00194 &#32;&#32;&#32;&#32;}
+00195 
+00196 <emphasis role="preprocessor">&#32;&#32;&#32;&#32;#endregion</emphasis>
+00197 
+00198 <emphasis role="preprocessor">&#32;&#32;&#32;&#32;#region&#32;Controller&#32;Connection&#32;Polling</emphasis>
+00199 
+00200 &#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;<emphasis role="keywordtype">bool</emphasis>&#32;_isJoystickDetected&#32;=&#32;<emphasis role="keyword">false</emphasis>;
+<anchor xml:id="__interaction_x_r_controller_8cs_source_1l00211"/><link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_x_r_controller_1ac017dcb1298c729f9cc46f24aeeb6a00">00211</link> &#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keywordtype">bool</emphasis>&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_x_r_controller_1ac017dcb1298c729f9cc46f24aeeb6a00">isJoystickDetected</link>&#32;{
+00212 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">get</emphasis>&#32;{&#32;<emphasis role="keywordflow">return</emphasis>&#32;<emphasis role="keywordtype">string</emphasis>.IsNullOrEmpty(<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_x_r_controller_1ac3f3ac7b791e70390c8ba9a547162525">deviceJoystickTokens</link>)&#32;||&#32;_isJoystickDetected;&#32;}
+00213 &#32;&#32;&#32;&#32;}
+00214 
+00215 &#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;<emphasis role="keywordtype">float</emphasis>&#32;_pollTimer&#32;=&#32;0f;
+00216 
+00217 &#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;fixedUpdatePollConnection()&#32;{
+00218 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(_pollConnection&#32;&amp;&amp;&#32;!_isJoystickDetected)&#32;{
+00219 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;_pollTimer&#32;+=&#32;Time.fixedDeltaTime;
+00220 &#32;&#32;&#32;&#32;&#32;&#32;}
+00221 
+00222 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(_pollConnection&#32;&amp;&amp;&#32;_pollTimer&#32;&gt;=&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_x_r_controller_1a870363d8aa13c1d14481b988608b195e">pollConnectionInterval</link>)&#32;{
+00223 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;_pollTimer&#32;=&#32;0f;
+00224 
+00225 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_x_r_controller_1a84947d3cd2c236dab7849e2d805465b6">RefreshControllerConnection</link>();
+00226 &#32;&#32;&#32;&#32;&#32;&#32;}
+00227 &#32;&#32;&#32;&#32;}
+00228 
+<anchor xml:id="__interaction_x_r_controller_8cs_source_1l00229"/><link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_x_r_controller_1a84947d3cd2c236dab7849e2d805465b6">00229</link> &#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_x_r_controller_1a84947d3cd2c236dab7849e2d805465b6">RefreshControllerConnection</link>()&#32;{
+00230 &#32;&#32;&#32;&#32;&#32;&#32;_isJoystickDetected&#32;=&#32;<emphasis role="keyword">true</emphasis>;&#32;<emphasis role="comment">//&#32;deviceJoystickTokens&#32;must&#32;be&#32;parsible&#32;to&#32;falsify.</emphasis>
+00231 
+00232 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_x_r_controller_1ac3f3ac7b791e70390c8ba9a547162525">deviceJoystickTokens</link>&#32;!=&#32;<emphasis role="keyword">null</emphasis>&#32;&amp;&amp;&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_x_r_controller_1ac3f3ac7b791e70390c8ba9a547162525">deviceJoystickTokens</link>.Length&#32;&gt;&#32;0)&#32;{
+00233 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordtype">string</emphasis>[]&#32;joysticksConnected&#32;=&#32;Input.GetJoystickNames().Query()
+00234 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;.Select(s&#32;=&gt;&#32;s.ToLower()).ToArray();
+00235 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordtype">string</emphasis>[]&#32;controllerSupportTokens&#32;=&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_x_r_controller_1ac3f3ac7b791e70390c8ba9a547162525">deviceJoystickTokens</link>.ToLower()
+00236 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;.Split(<emphasis role="stringliteral">&quot;&#32;&quot;</emphasis>.ToCharArray());
+00237 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordtype">bool</emphasis>&#32;matchesController&#32;=&#32;joysticksConnected.Query()
+00238 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;.Any(joystick&#32;=&gt;&#32;controllerSupportTokens.Query()
+00239 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;.All(token&#32;=&gt;&#32;joystick.Contains(token)));
+00240 
+00241 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;_isJoystickDetected&#32;=&#32;matchesController;
+00242 &#32;&#32;&#32;&#32;&#32;&#32;}
+00243 &#32;&#32;&#32;&#32;}
+00244 
+00245 <emphasis role="preprocessor">&#32;&#32;&#32;&#32;#endregion</emphasis>
+00246 
+00247 <emphasis role="preprocessor">&#32;&#32;&#32;&#32;#region&#32;Controller&#32;Tracking</emphasis>
+00248 
+00249 &#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;<emphasis role="keywordtype">bool</emphasis>&#32;_hasTrackedPositionLastFrame&#32;=&#32;<emphasis role="keyword">false</emphasis>;
+00250 &#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;Vector3&#32;_trackedPositionLastFrame&#32;=&#32;Vector3.zero;
+00251 &#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;Quaternion&#32;_trackedRotationLastFrame&#32;=&#32;Quaternion.identity;
+00252 
+00253 &#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;<link linkend="_interface_leap_1_1_unity_1_1_interaction_1_1_i_x_r_controller_tracking_provider">IXRControllerTrackingProvider</link>&#32;_backingTrackingProvider&#32;=&#32;<emphasis role="keyword">null</emphasis>;
+<anchor xml:id="__interaction_x_r_controller_8cs_source_1l00254"/><link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_x_r_controller_1aebc2b694592123f75013dd012e8f357f">00254</link> &#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<link linkend="_interface_leap_1_1_unity_1_1_interaction_1_1_i_x_r_controller_tracking_provider">IXRControllerTrackingProvider</link>&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_x_r_controller_1aebc2b694592123f75013dd012e8f357f">trackingProvider</link>&#32;{
+00255 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">get</emphasis>&#32;{
+00256 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(_backingDefaultTrackingProvider&#32;==&#32;<emphasis role="keyword">null</emphasis>)&#32;{
+00257 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;_backingDefaultTrackingProvider&#32;=&#32;_defaultTrackingProvider;
+00258 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00259 
+00260 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;_backingDefaultTrackingProvider;
+00261 &#32;&#32;&#32;&#32;&#32;&#32;}
+00262 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">set</emphasis>&#32;{
+00263 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(_backingTrackingProvider&#32;!=&#32;<emphasis role="keyword">null</emphasis>)&#32;{
+00264 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;_backingTrackingProvider.<link linkend="_interface_leap_1_1_unity_1_1_interaction_1_1_i_x_r_controller_tracking_provider_1a621b53b241147b7a9af4c3c58c15fba4">OnTrackingDataUpdate</link>&#32;-=&#32;refreshControllerTrackingData;
+00265 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00266 
+00267 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;_backingTrackingProvider&#32;=&#32;value;
+00268 
+00269 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(_backingTrackingProvider&#32;!=&#32;<emphasis role="keyword">null</emphasis>)&#32;{
+00270 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;_backingTrackingProvider.<link linkend="_interface_leap_1_1_unity_1_1_interaction_1_1_i_x_r_controller_tracking_provider_1a621b53b241147b7a9af4c3c58c15fba4">OnTrackingDataUpdate</link>&#32;+=&#32;refreshControllerTrackingData;
+00271 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00272 &#32;&#32;&#32;&#32;&#32;&#32;}
+00273 &#32;&#32;&#32;&#32;}
+00274 
+00275 &#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;<link linkend="_interface_leap_1_1_unity_1_1_interaction_1_1_i_x_r_controller_tracking_provider">IXRControllerTrackingProvider</link>&#32;_backingDefaultTrackingProvider;
+00276 &#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;<link linkend="_interface_leap_1_1_unity_1_1_interaction_1_1_i_x_r_controller_tracking_provider">IXRControllerTrackingProvider</link>&#32;_defaultTrackingProvider&#32;{
+00277 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">get</emphasis>&#32;{
+00278 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(_backingDefaultTrackingProvider&#32;==&#32;<emphasis role="keyword">null</emphasis>)&#32;{
+00279 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;refreshDefaultTrackingProvider();
+00280 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00281 
+00282 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;_backingDefaultTrackingProvider;
+00283 &#32;&#32;&#32;&#32;&#32;&#32;}
+00284 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">set</emphasis>&#32;{
+00285 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;_backingDefaultTrackingProvider&#32;=&#32;value;
+00286 &#32;&#32;&#32;&#32;&#32;&#32;}
+00287 &#32;&#32;&#32;&#32;}
+00288 
+00289 &#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;refreshDefaultTrackingProvider()&#32;{
+00290 &#32;&#32;&#32;&#32;&#32;&#32;var&#32;defaultProvider&#32;=&#32;gameObject.GetComponent&lt;DefaultXRNodeTrackingProvider&gt;();
+00291 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(defaultProvider&#32;==&#32;<emphasis role="keyword">null</emphasis>)&#32;{
+00292 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;defaultProvider&#32;=&#32;gameObject.AddComponent&lt;DefaultXRNodeTrackingProvider&gt;();
+00293 &#32;&#32;&#32;&#32;&#32;&#32;}
+00294 &#32;&#32;&#32;&#32;&#32;&#32;defaultProvider.xrNode&#32;=&#32;this.<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_x_r_controller_1a11711962768f6818de5fb89cbbaeea65">xrNode</link>;
+00295 
+00296 &#32;&#32;&#32;&#32;&#32;&#32;_defaultTrackingProvider&#32;=&#32;defaultProvider;
+00297 &#32;&#32;&#32;&#32;}
+00298 
+00299 &#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;refreshControllerTrackingData(Vector3&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_x_r_controller_1aaaa34551dbab0d0a98f1ab22f85adaa6">position</link>,&#32;Quaternion&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_x_r_controller_1ac6a09708dffecce4b8ef9e4e88097328">rotation</link>)&#32;{
+00300 &#32;&#32;&#32;&#32;&#32;&#32;refreshIsBeingMoved(<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_x_r_controller_1aaaa34551dbab0d0a98f1ab22f85adaa6">position</link>,&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_x_r_controller_1ac6a09708dffecce4b8ef9e4e88097328">rotation</link>);
+00301 
+00302 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(_hasTrackedPositionLastFrame)&#32;{
+00303 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;_trackedPositionLastFrame&#32;=&#32;this.transform.position;
+00304 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;_trackedRotationLastFrame&#32;=&#32;this.transform.rotation;
+00305 &#32;&#32;&#32;&#32;&#32;&#32;}
+00306 
+00307 &#32;&#32;&#32;&#32;&#32;&#32;this.transform.position&#32;=&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_x_r_controller_1aaaa34551dbab0d0a98f1ab22f85adaa6">position</link>;
+00308 &#32;&#32;&#32;&#32;&#32;&#32;this.transform.rotation&#32;=&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_x_r_controller_1ac6a09708dffecce4b8ef9e4e88097328">rotation</link>;
+00309 &#32;&#32;&#32;&#32;&#32;&#32;refreshContactBoneTargets();
+00310 
+00311 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(!_hasTrackedPositionLastFrame)&#32;{
+00312 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;_hasTrackedPositionLastFrame&#32;=&#32;<emphasis role="keyword">true</emphasis>;
+00313 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;_trackedPositionLastFrame&#32;=&#32;this.transform.position;
+00314 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;_trackedRotationLastFrame&#32;=&#32;this.transform.rotation;
+00315 &#32;&#32;&#32;&#32;&#32;&#32;}
+00316 &#32;&#32;&#32;&#32;}
+00317 
+00318 <emphasis role="preprocessor">&#32;&#32;&#32;&#32;#endregion</emphasis>
+00319 
+00320 <emphasis role="preprocessor">&#32;&#32;&#32;&#32;#region&#32;Movement&#32;Detection</emphasis>
+00321 
+00322 &#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;<emphasis role="keyword">const</emphasis>&#32;<emphasis role="keywordtype">float</emphasis>&#32;RIG_LOCAL_MOVEMENT_SPEED_THRESHOLD&#32;=&#32;00.07F;
+00323 &#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;<emphasis role="keyword">const</emphasis>&#32;<emphasis role="keywordtype">float</emphasis>&#32;RIG_LOCAL_MOVEMENT_SPEED_THRESHOLD_SQR
+00324 &#32;&#32;&#32;&#32;&#32;&#32;=&#32;RIG_LOCAL_MOVEMENT_SPEED_THRESHOLD&#32;*&#32;RIG_LOCAL_MOVEMENT_SPEED_THRESHOLD;
+00325 &#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;<emphasis role="keyword">const</emphasis>&#32;<emphasis role="keywordtype">float</emphasis>&#32;RIG_LOCAL_ROTATION_SPEED_THRESHOLD&#32;=&#32;10.00F;
+00326 &#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;<emphasis role="keyword">const</emphasis>&#32;<emphasis role="keywordtype">float</emphasis>&#32;BEING_MOVED_TIMEOUT&#32;=&#32;0.5F;
+00327 
+00328 &#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;<emphasis role="keywordtype">float</emphasis>&#32;_lastTimeMoved&#32;=&#32;0F;
+00329 &#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;<emphasis role="keywordtype">bool</emphasis>&#32;&#32;_isBeingMoved&#32;=&#32;<emphasis role="keyword">false</emphasis>;
+00330 &#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;refreshIsBeingMoved(Vector3&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_x_r_controller_1aaaa34551dbab0d0a98f1ab22f85adaa6">position</link>,&#32;Quaternion&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_x_r_controller_1ac6a09708dffecce4b8ef9e4e88097328">rotation</link>)&#32;{
+00331 &#32;&#32;&#32;&#32;&#32;&#32;var&#32;isMoving&#32;=&#32;<emphasis role="keyword">false</emphasis>;
+00332 &#32;&#32;&#32;&#32;&#32;&#32;var&#32;baseTransform&#32;=&#32;this.<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_controller_1a9e906a87460175737227bd0f42bebdce">manager</link>.transform;
+00333 
+00334 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;Check&#32;translation&#32;speed,&#32;relative&#32;to&#32;the&#32;Interaction&#32;Manager.</emphasis>
+00335 &#32;&#32;&#32;&#32;&#32;&#32;var&#32;baseLocalPos&#32;=&#32;baseTransform.InverseTransformPoint(<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_x_r_controller_1aaaa34551dbab0d0a98f1ab22f85adaa6">position</link>);
+00336 &#32;&#32;&#32;&#32;&#32;&#32;var&#32;baseLocalPosLastFrame&#32;=baseTransform.InverseTransformPoint(
+00337 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;_trackedPositionLastFrame);
+00338 &#32;&#32;&#32;&#32;&#32;&#32;var&#32;baseLocalSqrSpeed&#32;=&#32;((baseLocalPos&#32;-&#32;baseLocalPosLastFrame)
+00339 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;/&#32;Time.fixedDeltaTime).sqrMagnitude;
+00340 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(baseLocalSqrSpeed&#32;&gt;&#32;RIG_LOCAL_MOVEMENT_SPEED_THRESHOLD_SQR)&#32;{
+00341 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;isMoving&#32;=&#32;<emphasis role="keyword">true</emphasis>;
+00342 &#32;&#32;&#32;&#32;&#32;&#32;}
+00343 
+00344 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;Check&#32;rotation&#32;speed,&#32;relative&#32;to&#32;the&#32;Interaction&#32;Manager.</emphasis>
+00345 &#32;&#32;&#32;&#32;&#32;&#32;var&#32;baseLocalRot&#32;=&#32;baseTransform.InverseTransformRotation(<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_x_r_controller_1ac6a09708dffecce4b8ef9e4e88097328">rotation</link>);
+00346 &#32;&#32;&#32;&#32;&#32;&#32;var&#32;baseLocalRotLastFrame&#32;=&#32;baseTransform.InverseTransformRotation(
+00347 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;_trackedRotationLastFrame);
+00348 &#32;&#32;&#32;&#32;&#32;&#32;var&#32;baseLocalAngularSpeed&#32;=&#32;Quaternion.Angle(baseLocalRot,&#32;baseLocalRotLastFrame)
+00349 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;/&#32;Time.fixedDeltaTime;
+00350 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(baseLocalAngularSpeed&#32;&gt;&#32;RIG_LOCAL_ROTATION_SPEED_THRESHOLD)&#32;{
+00351 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;isMoving&#32;=&#32;<emphasis role="keyword">true</emphasis>;
+00352 &#32;&#32;&#32;&#32;&#32;&#32;}
+00353 
+00354 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(isMoving)&#32;{
+00355 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;_lastTimeMoved&#32;=&#32;Time.fixedTime;
+00356 &#32;&#32;&#32;&#32;&#32;&#32;}
+00357 
+00358 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;&quot;isMoving&quot;&#32;lasts&#32;for&#32;a&#32;bit&#32;after&#32;the&#32;controller&#32;stops&#32;moving,&#32;to&#32;avoid</emphasis>
+00359 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;rapid&#32;oscillation&#32;of&#32;the&#32;value.</emphasis>
+00360 &#32;&#32;&#32;&#32;&#32;&#32;var&#32;timeSinceLastMoving&#32;=&#32;Time.fixedTime&#32;-&#32;_lastTimeMoved;
+00361 &#32;&#32;&#32;&#32;&#32;&#32;_isBeingMoved&#32;=&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_x_r_controller_1aebc2b694592123f75013dd012e8f357f">trackingProvider</link>&#32;!=&#32;<emphasis role="keyword">null</emphasis>&#32;&amp;&amp;&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_x_r_controller_1aebc2b694592123f75013dd012e8f357f">trackingProvider</link>.<link linkend="_interface_leap_1_1_unity_1_1_interaction_1_1_i_x_r_controller_tracking_provider_1a7f6ac99e8fafd091151ed615626ddf1b">isTracked</link>
+00362 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&amp;&amp;&#32;timeSinceLastMoving&#32;&lt;&#32;BEING_MOVED_TIMEOUT;
+00363 &#32;&#32;&#32;&#32;}
+00364 
+00365 <emphasis role="preprocessor">&#32;&#32;&#32;&#32;#endregion</emphasis>
+00366 
+00367 <emphasis role="preprocessor">&#32;&#32;&#32;&#32;#region&#32;General&#32;InteractionController&#32;Implementation</emphasis>
+00368 
+<anchor xml:id="__interaction_x_r_controller_8cs_source_1l00374"/><link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_x_r_controller_1ab5d50597383ad3e552e3c16d1e91e5a7">00374</link> &#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keyword">override</emphasis>&#32;<emphasis role="keywordtype">bool</emphasis>&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_x_r_controller_1ab5d50597383ad3e552e3c16d1e91e5a7">isTracked</link>&#32;{
+00375 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">get</emphasis>&#32;{
+00376 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_x_r_controller_1ac017dcb1298c729f9cc46f24aeeb6a00">isJoystickDetected</link>&#32;&amp;&amp;&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_x_r_controller_1aebc2b694592123f75013dd012e8f357f">trackingProvider</link>&#32;!=&#32;<emphasis role="keyword">null</emphasis>&#32;&amp;&amp;&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_x_r_controller_1aebc2b694592123f75013dd012e8f357f">trackingProvider</link>.<link linkend="_interface_leap_1_1_unity_1_1_interaction_1_1_i_x_r_controller_tracking_provider_1a7f6ac99e8fafd091151ed615626ddf1b">isTracked</link>;
+00377 &#32;&#32;&#32;&#32;&#32;&#32;}
+00378 &#32;&#32;&#32;&#32;}
+00379 
+<anchor xml:id="__interaction_x_r_controller_8cs_source_1l00387"/><link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_x_r_controller_1a362ab5e9ffb5ac5046a869668670b40c">00387</link> &#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keyword">override</emphasis>&#32;<emphasis role="keywordtype">bool</emphasis>&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_x_r_controller_1a362ab5e9ffb5ac5046a869668670b40c">isBeingMoved</link>&#32;{
+00388 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">get</emphasis>&#32;{
+00389 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;_isBeingMoved;
+00390 &#32;&#32;&#32;&#32;&#32;&#32;}
+00391 &#32;&#32;&#32;&#32;}
+00392 
+00399 <emphasis role="preprocessor">&#32;&#32;&#32;&#32;#if&#32;UNITY_2017_2_OR_NEWER</emphasis>
+00400 &#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;XRNode&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_x_r_controller_1a11711962768f6818de5fb89cbbaeea65">xrNode</link>&#32;{
+00401 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">get</emphasis>&#32;{&#32;<emphasis role="keywordflow">return</emphasis>&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_x_r_controller_1a84e32cb318c25dbb329b6766c6f895f8">chirality</link>&#32;==&#32;<link linkend="_namespace_leap_1_1_unity_1a4d15adcf20ba121b2cd9c07f503b606f">Chirality</link>.Left&#32;?&#32;XRNode.LeftHand&#32;:&#32;XRNode.RightHand;&#32;}
+00402 &#32;&#32;&#32;&#32;}
+00403 <emphasis role="preprocessor">&#32;&#32;&#32;&#32;#else</emphasis>
+<anchor xml:id="__interaction_x_r_controller_8cs_source_1l00404"/><link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_x_r_controller_1a11711962768f6818de5fb89cbbaeea65">00404</link> &#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;VRNode&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_x_r_controller_1a11711962768f6818de5fb89cbbaeea65">xrNode</link>&#32;{
+00405 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">get</emphasis>&#32;{&#32;<emphasis role="keywordflow">return</emphasis>&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_x_r_controller_1a84e32cb318c25dbb329b6766c6f895f8">chirality</link>&#32;==&#32;<link linkend="_namespace_leap_1_1_unity_1a4d15adcf20ba121b2cd9c07f503b606f">Chirality</link>.Left&#32;?&#32;VRNode.LeftHand&#32;:&#32;VRNode.RightHand;&#32;}
+00406 &#32;&#32;&#32;&#32;}
+00407 <emphasis role="preprocessor">&#32;&#32;&#32;&#32;#endif</emphasis>
+00408 
+<anchor xml:id="__interaction_x_r_controller_8cs_source_1l00412"/><link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_x_r_controller_1aa97e1a14b291fe8057eed37d09aa586d">00412</link> &#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keyword">override</emphasis>&#32;<emphasis role="keywordtype">bool</emphasis>&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_x_r_controller_1aa97e1a14b291fe8057eed37d09aa586d">isLeft</link>&#32;{
+00413 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">get</emphasis>&#32;{&#32;<emphasis role="keywordflow">return</emphasis>&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_x_r_controller_1a84e32cb318c25dbb329b6766c6f895f8">chirality</link>&#32;==&#32;<link linkend="_namespace_leap_1_1_unity_1a4d15adcf20ba121b2cd9c07f503b606f">Chirality</link>.Left;&#32;}
+00414 &#32;&#32;&#32;&#32;}
+00415 
+<anchor xml:id="__interaction_x_r_controller_8cs_source_1l00419"/><link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_x_r_controller_1aaaa34551dbab0d0a98f1ab22f85adaa6">00419</link> &#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keyword">override</emphasis>&#32;Vector3&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_x_r_controller_1aaaa34551dbab0d0a98f1ab22f85adaa6">position</link>&#32;{
+00420 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">get</emphasis>&#32;{
+00421 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;this.transform.position;
+00422 &#32;&#32;&#32;&#32;&#32;&#32;}
+00423 &#32;&#32;&#32;&#32;}
+00424 
+<anchor xml:id="__interaction_x_r_controller_8cs_source_1l00428"/><link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_x_r_controller_1ac6a09708dffecce4b8ef9e4e88097328">00428</link> &#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keyword">override</emphasis>&#32;Quaternion&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_x_r_controller_1ac6a09708dffecce4b8ef9e4e88097328">rotation</link>&#32;{
+00429 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">get</emphasis>&#32;{
+00430 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;this.transform.rotation;
+00431 &#32;&#32;&#32;&#32;&#32;&#32;}
+00432 &#32;&#32;&#32;&#32;}
+00433 
+<anchor xml:id="__interaction_x_r_controller_8cs_source_1l00437"/><link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_x_r_controller_1ae21cfe425c83f331f03044e9132674f7">00437</link> &#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keyword">override</emphasis>&#32;Vector3&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_x_r_controller_1ae21cfe425c83f331f03044e9132674f7">velocity</link>&#32;{
+00438 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">get</emphasis>&#32;{
+00439 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(_hasTrackedPositionLastFrame)&#32;{
+00440 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;(this.transform.position&#32;-&#32;_trackedPositionLastFrame)&#32;/&#32;Time.fixedDeltaTime;
+00441 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00442 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">else</emphasis>&#32;{
+00443 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;Vector3.zero;
+00444 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00445 &#32;&#32;&#32;&#32;&#32;&#32;}
+00446 &#32;&#32;&#32;&#32;}
+00447 
+<anchor xml:id="__interaction_x_r_controller_8cs_source_1l00452"/><link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_x_r_controller_1aae01e4ff3ef50d766b1a25d02b0e3e26">00452</link> &#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keyword">override</emphasis>&#32;<link linkend="_namespace_leap_1_1_unity_1_1_interaction_1a9752eb3e2905e8ebd134fff20c155e6b">ControllerType</link>&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_x_r_controller_1aae01e4ff3ef50d766b1a25d02b0e3e26">controllerType</link>&#32;{
+00453 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">get</emphasis>&#32;{&#32;<emphasis role="keywordflow">return</emphasis>&#32;<link linkend="_namespace_leap_1_1_unity_1_1_interaction_1a9752eb3e2905e8ebd134fff20c155e6b">ControllerType</link>.XRController;&#32;}
+00454 &#32;&#32;&#32;&#32;}
+00455 
+<anchor xml:id="__interaction_x_r_controller_8cs_source_1l00460"/><link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_x_r_controller_1a482076db355cd75653f6d9efc8015409">00460</link> &#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keyword">override</emphasis>&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_hand">InteractionHand</link>&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_x_r_controller_1a482076db355cd75653f6d9efc8015409">intHand</link>&#32;{
+00461 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">get</emphasis>&#32;{&#32;<emphasis role="keywordflow">return</emphasis>&#32;<emphasis role="keyword">null</emphasis>;&#32;}
+00462 &#32;&#32;&#32;&#32;}
+00463 
+<anchor xml:id="__interaction_x_r_controller_8cs_source_1l00468"/><link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_x_r_controller_1ab287ac4fbd0ba8471ef9787a371470ef">00468</link> &#32;&#32;&#32;&#32;<emphasis role="keyword">protected</emphasis>&#32;<emphasis role="keyword">override</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_x_r_controller_1ab287ac4fbd0ba8471ef9787a371470ef">onObjectUnregistered</link>(<link linkend="_interface_leap_1_1_unity_1_1_interaction_1_1_i_interaction_behaviour">IInteractionBehaviour</link>&#32;intObj)&#32;{&#32;}
+00469 
+00470 <emphasis role="preprocessor">&#32;&#32;&#32;&#32;#endregion</emphasis>
+00471 
+00472 <emphasis role="preprocessor">&#32;&#32;&#32;&#32;#region&#32;Hover&#32;Implementation</emphasis>
+00473 
+<anchor xml:id="__interaction_x_r_controller_8cs_source_1l00477"/><link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_x_r_controller_1a162487d30c42a8d26711bf80e75230c8">00477</link> &#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keyword">override</emphasis>&#32;Vector3&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_x_r_controller_1a162487d30c42a8d26711bf80e75230c8">hoverPoint</link>&#32;{
+00478 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">get</emphasis>&#32;{&#32;<emphasis role="keywordflow">return</emphasis>&#32;_hoverPoint&#32;==&#32;<emphasis role="keyword">null</emphasis>&#32;?&#32;Vector3.zero&#32;:&#32;_hoverPoint.position;&#32;}
+00479 &#32;&#32;&#32;&#32;}
+00480 
+<anchor xml:id="__interaction_x_r_controller_8cs_source_1l00489"/><link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_x_r_controller_1a79aa1c89e60ed3e606957e9c0d92a2b9">00489</link> &#32;&#32;&#32;&#32;<emphasis role="keyword">protected</emphasis>&#32;<emphasis role="keyword">override</emphasis>&#32;List&lt;Transform&gt;&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_x_r_controller_1a79aa1c89e60ed3e606957e9c0d92a2b9">_primaryHoverPoints</link>&#32;{
+00490 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">get</emphasis>&#32;{&#32;<emphasis role="keywordflow">return</emphasis>&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_x_r_controller_1a1b5abc7602f840695df4eae23ead0e37">primaryHoverPoints</link>;&#32;}
+00491 &#32;&#32;&#32;&#32;}
+00492 
+00493 &#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;Vector3&#32;&#32;&#32;&#32;_pivotingPositionOffset&#32;&#32;=&#32;Vector3.zero;
+00494 &#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;Vector3&#32;&#32;&#32;&#32;_unwarpingPositionOffset&#32;=&#32;Vector3.zero;
+00495 &#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;Quaternion&#32;_unwarpingRotationOffset&#32;=&#32;Quaternion.identity;
+00496 
+<anchor xml:id="__interaction_x_r_controller_8cs_source_1l00497"/><link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_x_r_controller_1aae371c99d08f9ce6e8850e36109690c5">00497</link> &#32;&#32;&#32;&#32;<emphasis role="keyword">protected</emphasis>&#32;<emphasis role="keyword">override</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_x_r_controller_1aae371c99d08f9ce6e8850e36109690c5">unwarpColliders</link>(Transform&#32;primaryHoverPoint,&#32;<link linkend="_interface_leap_1_1_unity_1_1_space_1_1_i_space_component">ISpaceComponent</link>&#32;warpedSpaceElement)&#32;{
+00498 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;Extension&#32;method&#32;calculates&#32;&quot;unwarped&quot;&#32;pose&#32;in&#32;world&#32;space.</emphasis>
+00499 &#32;&#32;&#32;&#32;&#32;&#32;Vector3&#32;&#32;&#32;&#32;unwarpedPosition;
+00500 &#32;&#32;&#32;&#32;&#32;&#32;Quaternion&#32;unwarpedRotation;
+00501 &#32;&#32;&#32;&#32;&#32;&#32;warpedSpaceElement.<link linkend="_interface_leap_1_1_unity_1_1_space_1_1_i_space_component_1aa8e8762d2a71655cd50455d87e6a9ef4">anchor</link>.<link linkend="_class_leap_1_1_unity_1_1_space_1_1_leap_space_anchor_1a6f98d35d75f83e2ff2c978715520c836">transformer</link>.WorldSpaceUnwarp(primaryHoverPoint.position,&#32;
+00502 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;primaryHoverPoint.rotation,
+00503 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;out&#32;unwarpedPosition,
+00504 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;out&#32;unwarpedRotation);
+00505 
+00506 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;Shift&#32;the&#32;controller&#32;to&#32;have&#32;its&#32;origin&#32;on&#32;the&#32;primary&#32;hover&#32;point&#32;so&#32;that</emphasis>
+00507 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;rotations&#32;applied&#32;to&#32;the&#32;hand&#32;cause&#32;it&#32;to&#32;pivot&#32;around&#32;that&#32;point,&#32;then&#32;apply</emphasis>
+00508 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;the&#32;position&#32;and&#32;rotation&#32;transformation.</emphasis>
+00509 &#32;&#32;&#32;&#32;&#32;&#32;_pivotingPositionOffset&#32;&#32;=&#32;-primaryHoverPoint.position;
+00510 &#32;&#32;&#32;&#32;&#32;&#32;_unwarpingPositionOffset&#32;=&#32;unwarpedPosition;
+00511 &#32;&#32;&#32;&#32;&#32;&#32;_unwarpingRotationOffset&#32;=&#32;unwarpedRotation&#32;*&#32;Quaternion.Inverse(primaryHoverPoint.rotation);
+00512 
+00513 &#32;&#32;&#32;&#32;&#32;&#32;refreshContactBoneTargets(useUnwarpingData:&#32;<emphasis role="keyword">true</emphasis>);
+00514 &#32;&#32;&#32;&#32;}
+00515 
+00516 <emphasis role="preprocessor">&#32;&#32;&#32;&#32;#endregion</emphasis>
+00517 
+00518 <emphasis role="preprocessor">&#32;&#32;&#32;&#32;#region&#32;Contact&#32;Implementation</emphasis>
+00519 
+00520 &#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;Vector3[]&#32;_contactBoneLocalPositions;
+00521 &#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;Quaternion[]&#32;_contactBoneLocalRotations;
+00522 
+00523 &#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;Vector3[]&#32;_contactBoneTargetPositions;
+00524 &#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;Quaternion[]&#32;_contactBoneTargetRotations;
+00525 
+00526 &#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_contact_bone">ContactBone</link>[]&#32;_contactBones;
+<anchor xml:id="__interaction_x_r_controller_8cs_source_1l00527"/><link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_x_r_controller_1a97aebd084ca67cee40ef9f09a362394f">00527</link> &#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keyword">override</emphasis>&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_contact_bone">ContactBone</link>[]&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_x_r_controller_1a97aebd084ca67cee40ef9f09a362394f">contactBones</link>&#32;{
+00528 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">get</emphasis>&#32;{&#32;<emphasis role="keywordflow">return</emphasis>&#32;_contactBones;&#32;}
+00529 &#32;&#32;&#32;&#32;}
+00530 
+00531 &#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;GameObject&#32;_contactBoneParent;
+<anchor xml:id="__interaction_x_r_controller_8cs_source_1l00532"/><link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_x_r_controller_1a7dc27e56bd7d91b9af6bc5104b8cbd4e">00532</link> &#32;&#32;&#32;&#32;<emphasis role="keyword">protected</emphasis>&#32;<emphasis role="keyword">override</emphasis>&#32;GameObject&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_x_r_controller_1a7dc27e56bd7d91b9af6bc5104b8cbd4e">contactBoneParent</link>&#32;{
+00533 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">get</emphasis>&#32;{&#32;<emphasis role="keywordflow">return</emphasis>&#32;_contactBoneParent;&#32;}
+00534 &#32;&#32;&#32;&#32;}
+00535 
+<anchor xml:id="__interaction_x_r_controller_8cs_source_1l00536"/><link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_x_r_controller_1a6646ebf671991c5bc47a66b2129538b6">00536</link> &#32;&#32;&#32;&#32;<emphasis role="keyword">protected</emphasis>&#32;<emphasis role="keyword">override</emphasis>&#32;<emphasis role="keywordtype">bool</emphasis>&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_x_r_controller_1a6646ebf671991c5bc47a66b2129538b6">initContact</link>()&#32;{
+00537 &#32;&#32;&#32;&#32;&#32;&#32;initContactBones();
+00538 
+00539 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(_contactBoneParent&#32;==&#32;<emphasis role="keyword">null</emphasis>)&#32;{
+00540 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;_contactBoneParent&#32;=&#32;<emphasis role="keyword">new</emphasis>&#32;GameObject(<emphasis role="stringliteral">&quot;VR&#32;Controller&#32;Contact&#32;Bones&#32;&quot;</emphasis>
+00541 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;+&#32;(<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_x_r_controller_1aa97e1a14b291fe8057eed37d09aa586d">isLeft</link>&#32;?&#32;<emphasis role="stringliteral">&quot;(Left)&quot;</emphasis>&#32;:&#32;<emphasis role="stringliteral">&quot;(Right&quot;</emphasis>));
+00542 &#32;&#32;&#32;&#32;&#32;&#32;}
+00543 
+00544 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">foreach</emphasis>&#32;(var&#32;contactBone&#32;<emphasis role="keywordflow">in</emphasis>&#32;_contactBones)&#32;{
+00545 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;contactBone.transform.parent&#32;=&#32;_contactBoneParent.transform;
+00546 &#32;&#32;&#32;&#32;&#32;&#32;}
+00547 
+00548 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;<emphasis role="keyword">true</emphasis>;
+00549 &#32;&#32;&#32;&#32;}
+00550 
+00551 &#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;refreshContactBoneTargets(<emphasis role="keywordtype">bool</emphasis>&#32;useUnwarpingData&#32;=&#32;<emphasis role="keyword">false</emphasis>)&#32;{
+00552 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_controller_1ad42f1bf4fa7ae05e23a3fbc314c6020f">_wasContactInitialized</link>)&#32;{
+00553 
+00554 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;Move&#32;the&#32;controller&#32;transform&#32;temporarily&#32;into&#32;its&#32;&quot;unwarped&#32;space&quot;&#32;pose</emphasis>
+00555 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;(only&#32;if&#32;we&#32;are&#32;using&#32;the&#32;controller&#32;in&#32;a&#32;curved&#32;space)</emphasis>
+00556 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(useUnwarpingData)&#32;{
+00557 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;moveControllerTransform(_pivotingPositionOffset,&#32;Quaternion.identity);
+00558 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;moveControllerTransform(_unwarpingPositionOffset,&#32;_unwarpingRotationOffset);
+00559 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00560 
+00561 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">for</emphasis>&#32;(<emphasis role="keywordtype">int</emphasis>&#32;i&#32;=&#32;0;&#32;i&#32;&lt;&#32;_contactBones.Length;&#32;i++)&#32;{
+00562 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;_contactBoneTargetPositions[i]
+00563 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;=&#32;this.transform.TransformPoint(_contactBoneLocalPositions[i]);
+00564 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;_contactBoneTargetRotations[i]
+00565 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;=&#32;this.transform.TransformRotation(_contactBoneLocalRotations[i]);
+00566 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00567 
+00568 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;Move&#32;the&#32;controller&#32;transform&#32;back&#32;to&#32;its&#32;original&#32;pose.</emphasis>
+00569 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(useUnwarpingData)&#32;{
+00570 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;moveControllerTransform(-_unwarpingPositionOffset,&#32;Quaternion.Inverse(_unwarpingRotationOffset));
+00571 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;moveControllerTransform(-_pivotingPositionOffset,&#32;Quaternion.identity);
+00572 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00573 &#32;&#32;&#32;&#32;&#32;&#32;}
+00574 &#32;&#32;&#32;&#32;}
+00575 
+00576 &#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;moveControllerTransform(Vector3&#32;deltaPosition,&#32;Quaternion&#32;deltaRotation)&#32;{
+00577 &#32;&#32;&#32;&#32;&#32;&#32;this.transform.rotation&#32;=&#32;deltaRotation&#32;*&#32;this.transform.rotation;
+00578 &#32;&#32;&#32;&#32;&#32;&#32;this.transform.position&#32;=&#32;deltaPosition&#32;+&#32;this.transform.position;
+00579 &#32;&#32;&#32;&#32;}
+00580 
+00581 &#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;List&lt;ContactBone&gt;&#32;_contactBoneBuffer&#32;=&#32;<emphasis role="keyword">new</emphasis>&#32;List&lt;ContactBone&gt;();
+00582 &#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;List&lt;Collider&gt;&#32;_colliderBuffer&#32;=&#32;<emphasis role="keyword">new</emphasis>&#32;List&lt;Collider&gt;();
+00583 &#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;initContactBones()&#32;{
+00584 &#32;&#32;&#32;&#32;&#32;&#32;_colliderBuffer.Clear();
+00585 &#32;&#32;&#32;&#32;&#32;&#32;_contactBoneBuffer.Clear();
+00586 
+00587 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;Scan&#32;for&#32;existing&#32;colliders&#32;and&#32;construct&#32;contact&#32;bones&#32;out&#32;of&#32;them.</emphasis>
+00588 &#32;&#32;&#32;&#32;&#32;&#32;Utils.FindColliders&lt;Collider&gt;(this.gameObject,&#32;_colliderBuffer,
+00589 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;includeInactiveObjects:&#32;<emphasis role="keyword">true</emphasis>);
+00590 
+00591 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">foreach</emphasis>&#32;(var&#32;collider&#32;<emphasis role="keywordflow">in</emphasis>&#32;_colliderBuffer)&#32;{
+00592 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(collider.isTrigger)&#32;<emphasis role="keywordflow">continue</emphasis>;&#32;<emphasis role="comment">//&#32;Contact&#32;Bones&#32;are&#32;for&#32;&quot;contacting&quot;&#32;colliders.</emphasis>
+00593 
+00594 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;ContactBone&#32;contactBone&#32;=&#32;collider.gameObject.AddComponent&lt;ContactBone&gt;();
+00595 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;Rigidbody&#32;body&#32;=&#32;collider.gameObject.GetComponent&lt;Rigidbody&gt;();
+00596 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(body&#32;==&#32;<emphasis role="keyword">null</emphasis>)&#32;{
+00597 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;body&#32;=&#32;collider.gameObject.AddComponent&lt;Rigidbody&gt;();
+00598 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00599 
+00600 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;body.freezeRotation&#32;=&#32;<emphasis role="keyword">true</emphasis>;
+00601 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;body.useGravity&#32;=&#32;<emphasis role="keyword">false</emphasis>;
+00602 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;body.collisionDetectionMode&#32;=&#32;CollisionDetectionMode.ContinuousDynamic;
+00603 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;body.mass&#32;=&#32;1F;
+00604 
+00605 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;contactBone.interactionController&#32;=&#32;<emphasis role="keyword">this</emphasis>;
+00606 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;contactBone.rigidbody&#32;=&#32;body;
+00607 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;contactBone.collider&#32;=&#32;collider;
+00608 
+00609 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;_contactBoneBuffer.Add(contactBone);
+00610 &#32;&#32;&#32;&#32;&#32;&#32;}
+00611 &#32;&#32;&#32;&#32;&#32;&#32;
+00612 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordtype">int</emphasis>&#32;numBones&#32;=&#32;_colliderBuffer.Count;
+00613 &#32;&#32;&#32;&#32;&#32;&#32;_contactBones&#32;=&#32;<emphasis role="keyword">new</emphasis>&#32;ContactBone[numBones];
+00614 &#32;&#32;&#32;&#32;&#32;&#32;_contactBoneLocalPositions&#32;=&#32;<emphasis role="keyword">new</emphasis>&#32;Vector3[numBones];
+00615 &#32;&#32;&#32;&#32;&#32;&#32;_contactBoneLocalRotations&#32;=&#32;<emphasis role="keyword">new</emphasis>&#32;Quaternion[numBones];
+00616 &#32;&#32;&#32;&#32;&#32;&#32;_contactBoneTargetPositions&#32;=&#32;<emphasis role="keyword">new</emphasis>&#32;Vector3[numBones];
+00617 &#32;&#32;&#32;&#32;&#32;&#32;_contactBoneTargetRotations&#32;=&#32;<emphasis role="keyword">new</emphasis>&#32;Quaternion[numBones];
+00618 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">for</emphasis>&#32;(<emphasis role="keywordtype">int</emphasis>&#32;i&#32;=&#32;0;&#32;i&#32;&lt;&#32;numBones;&#32;i++)&#32;{
+00619 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;_contactBones[i]&#32;=&#32;_contactBoneBuffer[i];
+00620 
+00621 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;_contactBoneLocalPositions[i]
+00622 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;=&#32;_contactBoneTargetPositions[i]
+00623 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;=&#32;this.transform.InverseTransformPoint(_contactBones[i].transform.position);
+00624 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;_contactBoneLocalRotations[i]
+00625 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;=&#32;_contactBoneTargetRotations[i]
+00626 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;=&#32;this.transform.InverseTransformRotation(_contactBones[i].transform.rotation);
+00627 &#32;&#32;&#32;&#32;&#32;&#32;}
+00628 &#32;&#32;&#32;&#32;}
+00629 
+<anchor xml:id="__interaction_x_r_controller_8cs_source_1l00630"/><link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_x_r_controller_1a6870022c14d8cea42d36502b7a0a299f">00630</link> &#32;&#32;&#32;&#32;<emphasis role="keyword">protected</emphasis>&#32;<emphasis role="keyword">override</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_x_r_controller_1a6870022c14d8cea42d36502b7a0a299f">getColliderBoneTargetPositionRotation</link>(<emphasis role="keywordtype">int</emphasis>&#32;contactBoneIndex,
+00631 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;out&#32;Vector3&#32;targetPosition,
+00632 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;out&#32;Quaternion&#32;targetRotation)&#32;{
+00633 &#32;&#32;&#32;&#32;&#32;&#32;targetPosition&#32;=&#32;_contactBoneTargetPositions[contactBoneIndex];
+00634 &#32;&#32;&#32;&#32;&#32;&#32;targetRotation&#32;=&#32;_contactBoneTargetRotations[contactBoneIndex];
+00635 &#32;&#32;&#32;&#32;}
+00636 
+00637 <emphasis role="preprocessor">&#32;&#32;&#32;&#32;#endregion</emphasis>
+00638 
+00639 <emphasis role="preprocessor">&#32;&#32;&#32;&#32;#region&#32;Grasping&#32;Implementation</emphasis>
+00640 
+<anchor xml:id="__interaction_x_r_controller_8cs_source_1l00652"/><link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_x_r_controller_1a5c3b54bb8249aacff51aa5e898d95021">00652</link> &#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;Func&lt;float&gt;&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_x_r_controller_1a5c3b54bb8249aacff51aa5e898d95021">graspAxisOverride</link>&#32;=&#32;<emphasis role="keyword">null</emphasis>;
+00653 
+00654 &#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;<emphasis role="keywordtype">float</emphasis>&#32;_graspDepressedValue&#32;=&#32;0.8F;
+<anchor xml:id="__interaction_x_r_controller_8cs_source_1l00659"/><link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_x_r_controller_1aa003958b17f12b0c1cfe801649e45147">00659</link> &#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keywordtype">float</emphasis>&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_x_r_controller_1aa003958b17f12b0c1cfe801649e45147">graspDepressedValue</link>&#32;{
+00660 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">get</emphasis>&#32;{&#32;<emphasis role="keywordflow">return</emphasis>&#32;_graspDepressedValue;&#32;}
+00661 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">set</emphasis>&#32;{&#32;_graspDepressedValue&#32;=&#32;value;&#32;}
+00662 &#32;&#32;&#32;&#32;}
+00663 
+00664 &#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;<emphasis role="keywordtype">float</emphasis>&#32;_graspReleasedValue&#32;=&#32;0.7F;
+<anchor xml:id="__interaction_x_r_controller_8cs_source_1l00670"/><link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_x_r_controller_1aebfaa8d5cd025180c86947dcfb5c5cd8">00670</link> &#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keywordtype">float</emphasis>&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_x_r_controller_1aebfaa8d5cd025180c86947dcfb5c5cd8">graspReleasedValue</link>&#32;{
+00671 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">get</emphasis>&#32;{&#32;<emphasis role="keywordflow">return</emphasis>&#32;_graspReleasedValue;&#32;}
+00672 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">set</emphasis>&#32;{&#32;_graspReleasedValue&#32;=&#32;value;&#32;}
+00673 &#32;&#32;&#32;&#32;}
+00674 
+00675 &#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;List&lt;Vector3&gt;&#32;_graspManipulatorPointsBuffer&#32;=&#32;<emphasis role="keyword">new</emphasis>&#32;List&lt;Vector3&gt;();
+<anchor xml:id="__interaction_x_r_controller_8cs_source_1l00682"/><link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_x_r_controller_1a521422a5de1b36220698adc1c2b3da18">00682</link> &#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keyword">override</emphasis>&#32;List&lt;Vector3&gt;&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_x_r_controller_1a521422a5de1b36220698adc1c2b3da18">graspManipulatorPoints</link>&#32;{
+00683 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">get</emphasis>&#32;{
+00684 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;_graspManipulatorPointsBuffer.Clear();
+00685 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;_graspManipulatorPointsBuffer.Add(<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_x_r_controller_1a162487d30c42a8d26711bf80e75230c8">hoverPoint</link>);
+00686 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;_graspManipulatorPointsBuffer.Add(<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_x_r_controller_1a162487d30c42a8d26711bf80e75230c8">hoverPoint</link>&#32;+&#32;this.transform.rotation&#32;*&#32;Vector3.forward&#32;*&#32;0.05F);
+00687 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;_graspManipulatorPointsBuffer.Add(<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_x_r_controller_1a162487d30c42a8d26711bf80e75230c8">hoverPoint</link>&#32;+&#32;this.transform.rotation&#32;*&#32;Vector3.right&#32;&#32;&#32;*&#32;0.05F);
+00688 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;_graspManipulatorPointsBuffer;
+00689 &#32;&#32;&#32;&#32;&#32;&#32;}
+00690 &#32;&#32;&#32;&#32;}
+00691 
+00692 &#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;<link linkend="_interface_leap_1_1_unity_1_1_interaction_1_1_i_interaction_behaviour">IInteractionBehaviour</link>&#32;_closestGraspableObject&#32;=&#32;<emphasis role="keyword">null</emphasis>;
+00693 
+00694 &#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;<emphasis role="keywordtype">bool</emphasis>&#32;_graspButtonLastFrame&#32;=&#32;<emphasis role="keyword">false</emphasis>;
+00695 &#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;<emphasis role="keywordtype">bool</emphasis>&#32;_graspButtonDown&#32;=&#32;<emphasis role="keyword">false</emphasis>;
+00696 &#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;<emphasis role="keywordtype">bool</emphasis>&#32;_graspButtonUp&#32;=&#32;<emphasis role="keyword">false</emphasis>;
+00697 &#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;<emphasis role="keywordtype">float</emphasis>&#32;_graspButtonDownSlopTimer&#32;=&#32;0F;
+00698 
+<anchor xml:id="__interaction_x_r_controller_8cs_source_1l00699"/><link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_x_r_controller_1acf5f67ce22587c6d638890d9af2ecadb">00699</link> &#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keyword">override</emphasis>&#32;Vector3&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_x_r_controller_1acf5f67ce22587c6d638890d9af2ecadb">GetGraspPoint</link>()&#32;{
+00700 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_x_r_controller_1a45e35489ae52235acd3cece14cf4dbae">graspPoint</link>.transform.position;
+00701 &#32;&#32;&#32;&#32;}
+00702 
+<anchor xml:id="__interaction_x_r_controller_8cs_source_1l00703"/><link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_x_r_controller_1abbf181ce05807d75809cac14c0fa8a27">00703</link> &#32;&#32;&#32;&#32;<emphasis role="keyword">protected</emphasis>&#32;<emphasis role="keyword">override</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_x_r_controller_1abbf181ce05807d75809cac14c0fa8a27">fixedUpdateGraspingState</link>()&#32;{
+00704 &#32;&#32;&#32;&#32;&#32;&#32;refreshClosestGraspableObject();
+00705 
+00706 &#32;&#32;&#32;&#32;&#32;&#32;fixedUpdateGraspButtonState();
+00707 &#32;&#32;&#32;&#32;}
+00708 
+00709 &#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;refreshClosestGraspableObject()&#32;{
+00710 &#32;&#32;&#32;&#32;&#32;&#32;_closestGraspableObject&#32;=&#32;<emphasis role="keyword">null</emphasis>;
+00711 
+00712 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordtype">float</emphasis>&#32;closestGraspableDistance&#32;=&#32;<emphasis role="keywordtype">float</emphasis>.PositiveInfinity;
+00713 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">foreach</emphasis>&#32;(var&#32;intObj&#32;<emphasis role="keywordflow">in</emphasis>&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_controller_1a7b07298222ede0d272988129488ef445">graspCandidates</link>)&#32;{
+00714 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordtype">float</emphasis>&#32;testDist&#32;=&#32;intObj.<link linkend="_interface_leap_1_1_unity_1_1_interaction_1_1_i_interaction_behaviour_1a5f314b48c8c3b8f6f5067bcf5a97003c">GetHoverDistance</link>(this.graspPoint.position);
+00715 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(testDist&#32;&lt;&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_x_r_controller_1abd2f8566d2d0e95acd51ae7718b8bc98">maxGraspDistance</link>&#32;&amp;&amp;&#32;testDist&#32;&lt;&#32;closestGraspableDistance)&#32;{
+00716 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;_closestGraspableObject&#32;=&#32;intObj;
+00717 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;closestGraspableDistance&#32;=&#32;testDist;
+00718 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00719 &#32;&#32;&#32;&#32;&#32;&#32;}
+00720 &#32;&#32;&#32;&#32;}
+00721 
+00722 &#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;fixedUpdateGraspButtonState(<emphasis role="keywordtype">bool</emphasis>&#32;ignoreTemporal&#32;=&#32;<emphasis role="keyword">false</emphasis>)&#32;{
+00723 &#32;&#32;&#32;&#32;&#32;&#32;_graspButtonDown&#32;=&#32;<emphasis role="keyword">false</emphasis>;
+00724 &#32;&#32;&#32;&#32;&#32;&#32;_graspButtonUp&#32;=&#32;<emphasis role="keyword">false</emphasis>;
+00725 
+00726 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordtype">bool</emphasis>&#32;graspButton&#32;=&#32;_graspButtonLastFrame;
+00727 
+00728 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(!_graspButtonLastFrame)&#32;{
+00729 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_x_r_controller_1a5c3b54bb8249aacff51aa5e898d95021">graspAxisOverride</link>&#32;==&#32;<emphasis role="keyword">null</emphasis>)&#32;{
+00730 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">try</emphasis>&#32;{
+00731 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;graspButton&#32;=&#32;Input.GetAxis(<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_x_r_controller_1a857761fb2f53cdf7e9ffd28f396c4712">graspButtonAxis</link>)&#32;&gt;&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_x_r_controller_1aa003958b17f12b0c1cfe801649e45147">graspDepressedValue</link>;
+00732 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}&#32;<emphasis role="keywordflow">catch</emphasis>&#32;{
+00733 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;Debug.LogError(<emphasis role="stringliteral">&quot;INPUT&#32;AXIS&#32;NOT&#32;SET&#32;UP.&#32;&#32;Go&#32;to&#32;your&#32;Input&#32;Manager&#32;and&#32;add&#32;a&#32;definition&#32;for&#32;&quot;</emphasis>&#32;+&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_x_r_controller_1a857761fb2f53cdf7e9ffd28f396c4712">graspButtonAxis</link>&#32;+&#32;<emphasis role="stringliteral">&quot;&#32;on&#32;the&#32;&quot;</emphasis>&#32;+&#32;(<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_x_r_controller_1aa97e1a14b291fe8057eed37d09aa586d">isLeft</link>&#32;?&#32;<emphasis role="stringliteral">&quot;9&quot;</emphasis>&#32;:&#32;<emphasis role="stringliteral">&quot;10&quot;</emphasis>)&#32;+&#32;<emphasis role="stringliteral">&quot;th&#32;Joystick&#32;Axis.&quot;</emphasis>);
+00734 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;graspButton&#32;=&#32;Input.GetKey(<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_x_r_controller_1aa97e1a14b291fe8057eed37d09aa586d">isLeft</link>&#32;?&#32;KeyCode.JoystickButton14:&#32;KeyCode.JoystickButton15);
+00735 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00736 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00737 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">else</emphasis>&#32;{
+00738 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;graspButton&#32;=&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_x_r_controller_1a5c3b54bb8249aacff51aa5e898d95021">graspAxisOverride</link>()&#32;&gt;&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_x_r_controller_1aa003958b17f12b0c1cfe801649e45147">graspDepressedValue</link>;
+00739 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00740 
+00741 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(graspButton)&#32;{
+00742 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;Grasp&#32;button&#32;was&#32;_just_&#32;depressed&#32;this&#32;frame.</emphasis>
+00743 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;_graspButtonDown&#32;=&#32;<emphasis role="keyword">true</emphasis>;
+00744 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;_graspButtonDownSlopTimer&#32;=&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_x_r_controller_1a6fe4112d61321e09eabefbc59af9d13a">graspTimingSlop</link>;
+00745 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00746 &#32;&#32;&#32;&#32;&#32;&#32;}
+00747 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">else</emphasis>&#32;{
+00748 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_x_r_controller_1aebfaa8d5cd025180c86947dcfb5c5cd8">graspReleasedValue</link>&#32;&gt;&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_x_r_controller_1aa003958b17f12b0c1cfe801649e45147">graspDepressedValue</link>)&#32;{
+00749 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;Debug.LogWarning(<emphasis role="stringliteral">&quot;The&#32;graspReleasedValue&#32;should&#32;be&#32;less&#32;than&#32;or&#32;equal&#32;to&#32;the&#32;&quot;</emphasis>
+00750 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;+&#32;<emphasis role="stringliteral">&quot;graspDepressedValue!&quot;</emphasis>,&#32;<emphasis role="keyword">this</emphasis>);
+00751 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_x_r_controller_1aebfaa8d5cd025180c86947dcfb5c5cd8">graspReleasedValue</link>&#32;=&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_x_r_controller_1aa003958b17f12b0c1cfe801649e45147">graspDepressedValue</link>;
+00752 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00753 
+00754 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_x_r_controller_1a5c3b54bb8249aacff51aa5e898d95021">graspAxisOverride</link>&#32;==&#32;<emphasis role="keyword">null</emphasis>)&#32;{
+00755 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">try</emphasis>&#32;{
+00756 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;graspButton&#32;=&#32;Input.GetAxis(<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_x_r_controller_1a857761fb2f53cdf7e9ffd28f396c4712">graspButtonAxis</link>)&#32;&gt;&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_x_r_controller_1aa003958b17f12b0c1cfe801649e45147">graspDepressedValue</link>;
+00757 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}&#32;<emphasis role="keywordflow">catch</emphasis>&#32;{
+00758 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;Debug.LogError(<emphasis role="stringliteral">&quot;INPUT&#32;AXIS&#32;NOT&#32;SET&#32;UP.&#32;&#32;Go&#32;to&#32;your&#32;Input&#32;Manager&#32;and&#32;add&#32;a&#32;definition&#32;for&#32;&quot;</emphasis>&#32;+&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_x_r_controller_1a857761fb2f53cdf7e9ffd28f396c4712">graspButtonAxis</link>&#32;+&#32;<emphasis role="stringliteral">&quot;&#32;on&#32;the&#32;&quot;</emphasis>&#32;+&#32;(<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_x_r_controller_1aa97e1a14b291fe8057eed37d09aa586d">isLeft</link>&#32;?&#32;<emphasis role="stringliteral">&quot;9&quot;</emphasis>&#32;:&#32;<emphasis role="stringliteral">&quot;10&quot;</emphasis>)&#32;+&#32;<emphasis role="stringliteral">&quot;th&#32;Joystick&#32;Axis.&quot;</emphasis>);
+00759 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;graspButton&#32;=&#32;Input.GetKey(<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_x_r_controller_1aa97e1a14b291fe8057eed37d09aa586d">isLeft</link>&#32;?&#32;KeyCode.JoystickButton14&#32;:&#32;KeyCode.JoystickButton15);
+00760 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00761 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00762 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">else</emphasis>&#32;{
+00763 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;graspButton&#32;=&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_x_r_controller_1a5c3b54bb8249aacff51aa5e898d95021">graspAxisOverride</link>()&#32;&gt;&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_x_r_controller_1aebfaa8d5cd025180c86947dcfb5c5cd8">graspReleasedValue</link>;
+00764 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00765 
+00766 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(!graspButton)&#32;{
+00767 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;Grasp&#32;button&#32;was&#32;_just_&#32;released&#32;this&#32;frame.</emphasis>
+00768 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;_graspButtonUp&#32;=&#32;<emphasis role="keyword">true</emphasis>;
+00769 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;_graspButtonDownSlopTimer&#32;=&#32;0F;
+00770 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00771 &#32;&#32;&#32;&#32;&#32;&#32;}
+00772 
+00773 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(_graspButtonDownSlopTimer&#32;&gt;&#32;0F)&#32;{
+00774 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;_graspButtonDownSlopTimer&#32;-=&#32;Time.fixedDeltaTime;
+00775 &#32;&#32;&#32;&#32;&#32;&#32;}
+00776 &#32;&#32;&#32;&#32;&#32;&#32;
+00777 &#32;&#32;&#32;&#32;&#32;&#32;_graspButtonLastFrame&#32;=&#32;graspButton;
+00778 &#32;&#32;&#32;&#32;}
+00779 
+<anchor xml:id="__interaction_x_r_controller_8cs_source_1l00780"/><link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_x_r_controller_1aad12f5a78dea6345158e44d87e17a5f6">00780</link> &#32;&#32;&#32;&#32;<emphasis role="keyword">protected</emphasis>&#32;<emphasis role="keyword">override</emphasis>&#32;<emphasis role="keywordtype">bool</emphasis>&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_x_r_controller_1aad12f5a78dea6345158e44d87e17a5f6">checkShouldGrasp</link>(out&#32;<link linkend="_interface_leap_1_1_unity_1_1_interaction_1_1_i_interaction_behaviour">IInteractionBehaviour</link>&#32;objectToGrasp)&#32;{
+00781 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordtype">bool</emphasis>&#32;shouldGrasp&#32;=&#32;!<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_controller_1afd400c908dffa22a7fb025f067df34e5">isGraspingObject</link>
+00782 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&amp;&amp;&#32;(_graspButtonDown&#32;||&#32;_graspButtonDownSlopTimer&#32;&gt;&#32;0F)
+00783 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&amp;&amp;&#32;_closestGraspableObject&#32;!=&#32;<emphasis role="keyword">null</emphasis>;
+00784 
+00785 &#32;&#32;&#32;&#32;&#32;&#32;objectToGrasp&#32;=&#32;<emphasis role="keyword">null</emphasis>;
+00786 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(shouldGrasp)&#32;{&#32;objectToGrasp&#32;=&#32;_closestGraspableObject;&#32;}
+00787 
+00788 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;shouldGrasp;
+00789 &#32;&#32;&#32;&#32;}
+00790 
+<anchor xml:id="__interaction_x_r_controller_8cs_source_1l00796"/><link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_x_r_controller_1a4756d119b4d5a13574ed990e439e64f3">00796</link> &#32;&#32;&#32;&#32;<emphasis role="keyword">protected</emphasis>&#32;<emphasis role="keyword">override</emphasis>&#32;<emphasis role="keywordtype">bool</emphasis>&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_x_r_controller_1a4756d119b4d5a13574ed990e439e64f3">checkShouldGraspAtemporal</link>(<link linkend="_interface_leap_1_1_unity_1_1_interaction_1_1_i_interaction_behaviour">IInteractionBehaviour</link>&#32;intObj)&#32;{
+00797 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordtype">bool</emphasis>&#32;shouldGrasp&#32;=&#32;!<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_controller_1afd400c908dffa22a7fb025f067df34e5">isGraspingObject</link>
+00798 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&amp;&amp;&#32;_graspButtonLastFrame
+00799 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&amp;&amp;&#32;intObj.<link linkend="_interface_leap_1_1_unity_1_1_interaction_1_1_i_interaction_behaviour_1a5f314b48c8c3b8f6f5067bcf5a97003c">GetHoverDistance</link>(<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_x_r_controller_1a45e35489ae52235acd3cece14cf4dbae">graspPoint</link>.position)&#32;&lt;&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_x_r_controller_1abd2f8566d2d0e95acd51ae7718b8bc98">maxGraspDistance</link>;
+00800 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(shouldGrasp)&#32;{
+00801 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;var&#32;tempControllers&#32;=&#32;Pool&lt;List&lt;InteractionController&gt;&gt;.Spawn();
+00802 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">try</emphasis>&#32;{
+00803 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;intObj.<link linkend="_interface_leap_1_1_unity_1_1_interaction_1_1_i_interaction_behaviour_1af603fe6d03b61ae9e5d05c7809b05160">BeginGrasp</link>(tempControllers);
+00804 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00805 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">finally</emphasis>&#32;{
+00806 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;tempControllers.Clear();
+00807 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;Pool&lt;List&lt;InteractionController&gt;&gt;.Recycle(tempControllers);
+00808 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00809 &#32;&#32;&#32;&#32;&#32;&#32;}
+00810 
+00811 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;shouldGrasp;
+00812 &#32;&#32;&#32;&#32;}
+00813 
+<anchor xml:id="__interaction_x_r_controller_8cs_source_1l00814"/><link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_x_r_controller_1a46275014cfc4325621c01097047bb701">00814</link> &#32;&#32;&#32;&#32;<emphasis role="keyword">protected</emphasis>&#32;<emphasis role="keyword">override</emphasis>&#32;<emphasis role="keywordtype">bool</emphasis>&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_x_r_controller_1a46275014cfc4325621c01097047bb701">checkShouldRelease</link>(out&#32;<link linkend="_interface_leap_1_1_unity_1_1_interaction_1_1_i_interaction_behaviour">IInteractionBehaviour</link>&#32;objectToRelease)&#32;{
+00815 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordtype">bool</emphasis>&#32;shouldRelease&#32;=&#32;_graspButtonUp&#32;&amp;&amp;&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_controller_1afd400c908dffa22a7fb025f067df34e5">isGraspingObject</link>;
+00816 
+00817 &#32;&#32;&#32;&#32;&#32;&#32;objectToRelease&#32;=&#32;<emphasis role="keyword">null</emphasis>;
+00818 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(shouldRelease)&#32;{&#32;objectToRelease&#32;=&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_controller_1aecfb55af7f506df76774eac811ad25fc">graspedObject</link>;&#32;}
+00819 
+00820 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;shouldRelease;
+00821 &#32;&#32;&#32;&#32;}
+00822 
+00823 <emphasis role="preprocessor">&#32;&#32;&#32;&#32;#endregion</emphasis>
+00824 
+00825 <emphasis role="preprocessor">&#32;&#32;&#32;&#32;#region&#32;Gizmos</emphasis>
+00826 
+<anchor xml:id="__interaction_x_r_controller_8cs_source_1l00827"/><link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_x_r_controller_1a3d2b1845b1041d41e2a157df230ca42b">00827</link> &#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keyword">override</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_x_r_controller_1a3d2b1845b1041d41e2a157df230ca42b">OnDrawRuntimeGizmos</link>(RuntimeGizmos.RuntimeGizmoDrawer&#32;drawer)&#32;{
+00828 &#32;&#32;&#32;&#32;&#32;&#32;base.OnDrawRuntimeGizmos(drawer);
+00829 
+00830 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;Grasp&#32;Point</emphasis>
+00831 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordtype">float</emphasis>&#32;graspAmount&#32;=&#32;0F;
+00832 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_x_r_controller_1a5c3b54bb8249aacff51aa5e898d95021">graspAxisOverride</link>&#32;!=&#32;<emphasis role="keyword">null</emphasis>)&#32;graspAmount&#32;=&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_x_r_controller_1a5c3b54bb8249aacff51aa5e898d95021">graspAxisOverride</link>();
+00833 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">else</emphasis>&#32;{
+00834 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">try</emphasis>&#32;{
+00835 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;graspAmount&#32;=&#32;Input.GetAxis(<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_x_r_controller_1a857761fb2f53cdf7e9ffd28f396c4712">graspButtonAxis</link>);
+00836 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00837 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">catch</emphasis>&#32;(ArgumentException)&#32;{&#32;}
+00838 &#32;&#32;&#32;&#32;&#32;&#32;}
+00839 
+00840 &#32;&#32;&#32;&#32;&#32;&#32;drawer.color&#32;=&#32;Color.Lerp(GizmoColors.GraspPoint,&#32;Color.white,&#32;graspAmount);
+00841 &#32;&#32;&#32;&#32;&#32;&#32;drawer.DrawWireSphere(<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_x_r_controller_1acf5f67ce22587c6d638890d9af2ecadb">GetGraspPoint</link>(),&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_x_r_controller_1abd2f8566d2d0e95acd51ae7718b8bc98">maxGraspDistance</link>);
+00842 
+00843 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;Nearest&#32;graspable&#32;object</emphasis>
+00844 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(_closestGraspableObject&#32;!=&#32;<emphasis role="keyword">null</emphasis>)&#32;{
+00845 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;drawer.color&#32;=&#32;Color.Lerp(GizmoColors.Graspable,&#32;Color.white,&#32;Mathf.Sin(Time.time&#32;*&#32;2&#32;*&#32;Mathf.PI&#32;*&#32;2F));
+00846 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;drawer.DrawWireSphere(_closestGraspableObject.<link linkend="_interface_leap_1_1_unity_1_1_interaction_1_1_i_interaction_behaviour_1a9e83e4dac0c2d1117738b55b34dbde2d">rigidbody</link>.position,&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_x_r_controller_1abd2f8566d2d0e95acd51ae7718b8bc98">maxGraspDistance</link>&#32;*&#32;0.75F);
+00847 &#32;&#32;&#32;&#32;&#32;&#32;}
+00848 &#32;&#32;&#32;&#32;}
+00849 
+00850 <emphasis role="preprocessor">&#32;&#32;&#32;&#32;#endregion</emphasis>
+00851 
+00852 &#32;&#32;}
+00853 
+00854 }
+</programlisting></section>

@@ -1,0 +1,114 @@
+<?xml version='1.0' encoding='UTF-8' standalone='no'?>
+<section xmlns="http://docbook.org/ns/docbook" version="5.0" xmlns:xlink="http://www.w3.org/1999/xlink" xml:id="__ring_buffer_8cs_source">
+<title>RingBuffer.cs</title>
+<indexterm><primary>O:/GitHUBMINIPRoject/Assets/LeapMotion/Core/Scripts/DataStructures/RingBuffer.cs</primary></indexterm>
+<programlisting>00001 <emphasis role="comment">/******************************************************************************</emphasis>
+00002 <emphasis role="comment">&#32;*&#32;Copyright&#32;(C)&#32;Leap&#32;Motion,&#32;Inc.&#32;2011-2018.&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;*</emphasis>
+00003 <emphasis role="comment">&#32;*&#32;Leap&#32;Motion&#32;proprietary&#32;and&#32;confidential.&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;*</emphasis>
+00004 <emphasis role="comment">&#32;*&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;*</emphasis>
+00005 <emphasis role="comment">&#32;*&#32;Use&#32;subject&#32;to&#32;the&#32;terms&#32;of&#32;the&#32;Leap&#32;Motion&#32;SDK&#32;Agreement&#32;available&#32;at&#32;&#32;&#32;&#32;&#32;*</emphasis>
+00006 <emphasis role="comment">&#32;*&#32;https://developer.leapmotion.com/sdk_agreement,&#32;or&#32;another&#32;agreement&#32;&#32;&#32;&#32;&#32;&#32;&#32;*</emphasis>
+00007 <emphasis role="comment">&#32;*&#32;between&#32;Leap&#32;Motion&#32;and&#32;you,&#32;your&#32;company&#32;or&#32;other&#32;organization.&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;*</emphasis>
+00008 <emphasis role="comment">&#32;******************************************************************************/</emphasis>
+00009 
+00010 <emphasis role="keyword">using</emphasis>&#32;System;
+00011 
+00012 <emphasis role="keyword">namespace&#32;</emphasis><link linkend="_namespace_leap_1_1_unity">Leap.Unity</link>&#32;{
+00013 
+<anchor xml:id="__ring_buffer_8cs_source_1l00014"/><link linkend="_class_leap_1_1_unity_1_1_ring_buffer">00014</link> &#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keyword">class&#32;</emphasis><link linkend="_class_leap_1_1_unity_1_1_ring_buffer">RingBuffer</link>&lt;T&gt;&#32;:&#32;<link linkend="_interface_leap_1_1_unity_1_1_i_indexable">IIndexable</link>&lt;T&gt;&#32;{
+00015 
+00016 &#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;T[]&#32;arr;
+00017 &#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;<emphasis role="keywordtype">int</emphasis>&#32;firstIdx&#32;=&#32;0;
+00018 &#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;<emphasis role="keywordtype">int</emphasis>&#32;lastIdx&#32;=&#32;-1;
+00019 
+<anchor xml:id="__ring_buffer_8cs_source_1l00020"/><link linkend="_class_leap_1_1_unity_1_1_ring_buffer_1a1c34a2abe28e3cb69969b2d54410df2e">00020</link> &#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<link linkend="_class_leap_1_1_unity_1_1_ring_buffer_1a1c34a2abe28e3cb69969b2d54410df2e">RingBuffer</link>(<emphasis role="keywordtype">int</emphasis>&#32;bufferSize)&#32;{
+00021 &#32;&#32;&#32;&#32;&#32;&#32;bufferSize&#32;=&#32;System.Math.Max(1,&#32;bufferSize);
+00022 &#32;&#32;&#32;&#32;&#32;&#32;arr&#32;=&#32;<emphasis role="keyword">new</emphasis>&#32;T[bufferSize];
+00023 &#32;&#32;&#32;&#32;}
+00024 
+<anchor xml:id="__ring_buffer_8cs_source_1l00025"/><link linkend="_class_leap_1_1_unity_1_1_ring_buffer_1a3361425f9bf601a6c7e0532c63e8b9e6">00025</link> &#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keywordtype">int</emphasis>&#32;<link linkend="_class_leap_1_1_unity_1_1_ring_buffer_1a3361425f9bf601a6c7e0532c63e8b9e6">Count</link>&#32;{
+00026 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">get</emphasis>&#32;{
+00027 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(lastIdx&#32;==&#32;-1)&#32;<emphasis role="keywordflow">return</emphasis>&#32;0;
+00028 
+00029 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordtype">int</emphasis>&#32;endIdx&#32;=&#32;(lastIdx&#32;+&#32;1)&#32;%&#32;arr.Length;
+00030 
+00031 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;if&#32;(endIdx&#32;&lt;=&#32;firstIdx)&#32;{&#32;endIdx&#32;+=&#32;arr.Length;&#32;}
+00032 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;endIdx&#32;-&#32;firstIdx;
+00033 &#32;&#32;&#32;&#32;&#32;&#32;}
+00034 &#32;&#32;&#32;&#32;}
+00035 
+<anchor xml:id="__ring_buffer_8cs_source_1l00036"/><link linkend="_class_leap_1_1_unity_1_1_ring_buffer_1a0907fbd8b3b1949fde0c3976a1b34826">00036</link> &#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keywordtype">int</emphasis>&#32;<link linkend="_class_leap_1_1_unity_1_1_ring_buffer_1a0907fbd8b3b1949fde0c3976a1b34826">Capacity</link>&#32;{
+00037 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">get</emphasis>&#32;{&#32;<emphasis role="keywordflow">return</emphasis>&#32;arr.Length;&#32;}
+00038 &#32;&#32;&#32;&#32;}
+00039 
+<anchor xml:id="__ring_buffer_8cs_source_1l00040"/><link linkend="_class_leap_1_1_unity_1_1_ring_buffer_1a91a5cab77461964082498ba9a6455306">00040</link> &#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keywordtype">bool</emphasis>&#32;<link linkend="_class_leap_1_1_unity_1_1_ring_buffer_1a91a5cab77461964082498ba9a6455306">IsFull</link>&#32;{
+00041 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">get</emphasis>&#32;{&#32;<emphasis role="keywordflow">return</emphasis>&#32;lastIdx&#32;!=&#32;-1
+00042 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&amp;&amp;&#32;((lastIdx&#32;+&#32;1&#32;+&#32;arr.Length)&#32;%&#32;arr.Length)&#32;==&#32;firstIdx;&#32;}
+00043 &#32;&#32;&#32;&#32;}
+00044 
+<anchor xml:id="__ring_buffer_8cs_source_1l00045"/><link linkend="_class_leap_1_1_unity_1_1_ring_buffer_1a4ccf75588bc5ec7150108f22ee689ba3">00045</link> &#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keywordtype">bool</emphasis>&#32;<link linkend="_class_leap_1_1_unity_1_1_ring_buffer_1a4ccf75588bc5ec7150108f22ee689ba3">IsEmpty</link>&#32;{
+00046 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">get</emphasis>&#32;{&#32;<emphasis role="keywordflow">return</emphasis>&#32;lastIdx&#32;==&#32;-1;&#32;}
+00047 &#32;&#32;&#32;&#32;}
+00048 
+<anchor xml:id="__ring_buffer_8cs_source_1l00049"/><link linkend="_class_leap_1_1_unity_1_1_ring_buffer_1a78141075db5bb630c84bd9065939f235">00049</link> &#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;T&#32;<emphasis role="keyword">this</emphasis>[<emphasis role="keywordtype">int</emphasis>&#32;idx]&#32;{
+00050 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">get</emphasis>&#32;{&#32;<emphasis role="keywordflow">return</emphasis>&#32;<link linkend="_class_leap_1_1_unity_1_1_ring_buffer_1a101894f5bdc4878a0b002a1dff76a450">Get</link>(idx);&#32;}
+00051 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">set</emphasis>&#32;{&#32;<link linkend="_class_leap_1_1_unity_1_1_ring_buffer_1afc03c6393eac17fc5c1bbdd5a74eaf52">Set</link>(idx,&#32;value);&#32;}
+00052 &#32;&#32;&#32;&#32;}
+00053 
+<anchor xml:id="__ring_buffer_8cs_source_1l00054"/><link linkend="_class_leap_1_1_unity_1_1_ring_buffer_1a9b45994f96338d2b8d35b8e0b030953f">00054</link> &#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;<link linkend="_class_leap_1_1_unity_1_1_ring_buffer_1a9b45994f96338d2b8d35b8e0b030953f">Clear</link>()&#32;{
+00055 &#32;&#32;&#32;&#32;&#32;&#32;firstIdx&#32;=&#32;0;
+00056 &#32;&#32;&#32;&#32;&#32;&#32;lastIdx&#32;=&#32;-1;
+00057 &#32;&#32;&#32;&#32;}
+00058 
+<anchor xml:id="__ring_buffer_8cs_source_1l00059"/><link linkend="_class_leap_1_1_unity_1_1_ring_buffer_1a0f0615cbed9b67fce603552f490beeb4">00059</link> &#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;<link linkend="_class_leap_1_1_unity_1_1_ring_buffer_1a0f0615cbed9b67fce603552f490beeb4">Add</link>(T&#32;t)&#32;{
+00060 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(<link linkend="_class_leap_1_1_unity_1_1_ring_buffer_1a91a5cab77461964082498ba9a6455306">IsFull</link>)&#32;{
+00061 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;firstIdx&#32;+=&#32;1;
+00062 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;firstIdx&#32;%=&#32;arr.Length;
+00063 &#32;&#32;&#32;&#32;&#32;&#32;}
+00064 &#32;&#32;&#32;&#32;&#32;&#32;lastIdx&#32;+=&#32;1;
+00065 &#32;&#32;&#32;&#32;&#32;&#32;lastIdx&#32;%=&#32;arr.Length;
+00066 
+00067 &#32;&#32;&#32;&#32;&#32;&#32;arr[lastIdx]&#32;=&#32;t;
+00068 &#32;&#32;&#32;&#32;}
+00069 
+<anchor xml:id="__ring_buffer_8cs_source_1l00073"/><link linkend="_class_leap_1_1_unity_1_1_ring_buffer_1a101894f5bdc4878a0b002a1dff76a450">00073</link> &#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;T&#32;<link linkend="_class_leap_1_1_unity_1_1_ring_buffer_1a101894f5bdc4878a0b002a1dff76a450">Get</link>(<emphasis role="keywordtype">int</emphasis>&#32;idx)&#32;{
+00074 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(idx&#32;&lt;&#32;0&#32;||&#32;idx&#32;&gt;&#32;<link linkend="_class_leap_1_1_unity_1_1_ring_buffer_1a3361425f9bf601a6c7e0532c63e8b9e6">Count</link>&#32;-&#32;1)&#32;{&#32;<emphasis role="keywordflow">throw</emphasis>&#32;<emphasis role="keyword">new</emphasis>&#32;IndexOutOfRangeException();&#32;}
+00075 
+00076 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;arr[(firstIdx&#32;+&#32;idx)&#32;%&#32;arr.Length];
+00077 &#32;&#32;&#32;&#32;}
+00078 
+<anchor xml:id="__ring_buffer_8cs_source_1l00079"/><link linkend="_class_leap_1_1_unity_1_1_ring_buffer_1a3a0c08b9bbf58d09f22f8b5cccd7bcb9">00079</link> &#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;T&#32;<link linkend="_class_leap_1_1_unity_1_1_ring_buffer_1a3a0c08b9bbf58d09f22f8b5cccd7bcb9">GetLatest</link>()&#32;{
+00080 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(<link linkend="_class_leap_1_1_unity_1_1_ring_buffer_1a3361425f9bf601a6c7e0532c63e8b9e6">Count</link>&#32;==&#32;0)&#32;{
+00081 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">throw</emphasis>&#32;<emphasis role="keyword">new</emphasis>&#32;IndexOutOfRangeException(<emphasis role="stringliteral">&quot;Can&apos;t&#32;get&#32;latest&#32;value&#32;in&#32;an&#32;empty&#32;RingBuffer.&quot;</emphasis>);
+00082 &#32;&#32;&#32;&#32;&#32;&#32;}
+00083 
+00084 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;<link linkend="_class_leap_1_1_unity_1_1_ring_buffer_1a101894f5bdc4878a0b002a1dff76a450">Get</link>(<link linkend="_class_leap_1_1_unity_1_1_ring_buffer_1a3361425f9bf601a6c7e0532c63e8b9e6">Count</link>&#32;-&#32;1);
+00085 &#32;&#32;&#32;&#32;}
+00086 
+<anchor xml:id="__ring_buffer_8cs_source_1l00087"/><link linkend="_class_leap_1_1_unity_1_1_ring_buffer_1ad5ba9a1ac565279534e9ff9bf0fcd7a4">00087</link> &#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;T&#32;<link linkend="_class_leap_1_1_unity_1_1_ring_buffer_1ad5ba9a1ac565279534e9ff9bf0fcd7a4">GetOldest</link>()&#32;{
+00088 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(<link linkend="_class_leap_1_1_unity_1_1_ring_buffer_1a3361425f9bf601a6c7e0532c63e8b9e6">Count</link>&#32;==&#32;0)&#32;{
+00089 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">throw</emphasis>&#32;<emphasis role="keyword">new</emphasis>&#32;IndexOutOfRangeException(<emphasis role="stringliteral">&quot;Can&apos;t&#32;get&#32;oldest&#32;value&#32;in&#32;an&#32;empty&#32;RingBuffer.&quot;</emphasis>);
+00090 &#32;&#32;&#32;&#32;&#32;&#32;}
+00091 
+00092 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;<link linkend="_class_leap_1_1_unity_1_1_ring_buffer_1a101894f5bdc4878a0b002a1dff76a450">Get</link>(0);
+00093 &#32;&#32;&#32;&#32;}
+00094 
+<anchor xml:id="__ring_buffer_8cs_source_1l00095"/><link linkend="_class_leap_1_1_unity_1_1_ring_buffer_1afc03c6393eac17fc5c1bbdd5a74eaf52">00095</link> &#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;<link linkend="_class_leap_1_1_unity_1_1_ring_buffer_1afc03c6393eac17fc5c1bbdd5a74eaf52">Set</link>(<emphasis role="keywordtype">int</emphasis>&#32;idx,&#32;T&#32;t)&#32;{
+00096 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(idx&#32;&lt;&#32;0&#32;||&#32;idx&#32;&gt;&#32;<link linkend="_class_leap_1_1_unity_1_1_ring_buffer_1a3361425f9bf601a6c7e0532c63e8b9e6">Count</link>&#32;-&#32;1)&#32;{&#32;<emphasis role="keywordflow">throw</emphasis>&#32;<emphasis role="keyword">new</emphasis>&#32;IndexOutOfRangeException();&#32;}
+00097 
+00098 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordtype">int</emphasis>&#32;actualIdx&#32;=&#32;(firstIdx&#32;+&#32;idx)&#32;%&#32;arr.Length;
+00099 &#32;&#32;&#32;&#32;&#32;&#32;arr[actualIdx]&#32;=&#32;t;
+00100 &#32;&#32;&#32;&#32;}
+00101 
+<anchor xml:id="__ring_buffer_8cs_source_1l00102"/><link linkend="_class_leap_1_1_unity_1_1_ring_buffer_1ad8da49c67d67dbeb3dd311c50901778c">00102</link> &#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;<link linkend="_class_leap_1_1_unity_1_1_ring_buffer_1ad8da49c67d67dbeb3dd311c50901778c">SetLatest</link>(T&#32;t)&#32;{
+00103 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(<link linkend="_class_leap_1_1_unity_1_1_ring_buffer_1a3361425f9bf601a6c7e0532c63e8b9e6">Count</link>&#32;==&#32;0)&#32;{
+00104 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">throw</emphasis>&#32;<emphasis role="keyword">new</emphasis>&#32;IndexOutOfRangeException(<emphasis role="stringliteral">&quot;Can&apos;t&#32;set&#32;latest&#32;value&#32;in&#32;an&#32;empty&#32;RingBuffer.&quot;</emphasis>);
+00105 &#32;&#32;&#32;&#32;&#32;&#32;}
+00106 
+00107 &#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_leap_1_1_unity_1_1_ring_buffer_1afc03c6393eac17fc5c1bbdd5a74eaf52">Set</link>(<link linkend="_class_leap_1_1_unity_1_1_ring_buffer_1a3361425f9bf601a6c7e0532c63e8b9e6">Count</link>&#32;-&#32;1,&#32;t);
+00108 &#32;&#32;&#32;&#32;}
+00109 
+00110 &#32;&#32;}
+00111 
+00112 }
+</programlisting></section>

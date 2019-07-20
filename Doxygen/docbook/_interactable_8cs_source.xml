@@ -1,0 +1,347 @@
+<?xml version='1.0' encoding='UTF-8' standalone='no'?>
+<section xmlns="http://docbook.org/ns/docbook" version="5.0" xmlns:xlink="http://www.w3.org/1999/xlink" xml:id="__interactable_8cs_source">
+<title>Interactable.cs</title>
+<indexterm><primary>O:/GitHUBMINIPRoject/Assets/SteamVR/InteractionSystem/Core/Scripts/Interactable.cs</primary></indexterm>
+<programlisting>00001 <emphasis role="comment">//=======&#32;Copyright&#32;(c)&#32;Valve&#32;Corporation,&#32;All&#32;rights&#32;reserved.&#32;===============</emphasis>
+00002 <emphasis role="comment">//</emphasis>
+00003 <emphasis role="comment">//&#32;Purpose:&#32;This&#32;object&#32;will&#32;get&#32;hover&#32;events&#32;and&#32;can&#32;be&#32;attached&#32;to&#32;the&#32;hands</emphasis>
+00004 <emphasis role="comment">//</emphasis>
+00005 <emphasis role="comment">//=============================================================================</emphasis>
+00006 
+00007 <emphasis role="keyword">using</emphasis>&#32;<link linkend="__balloon_8cs_1a7d67e097df9376eb709b6a23aa3c7d23">UnityEngine</link>;
+00008 <emphasis role="keyword">using</emphasis>&#32;<link linkend="_namespace_unity_engine">UnityEngine</link>.Events;
+00009 <emphasis role="keyword">using</emphasis>&#32;System.Collections;
+00010 <emphasis role="keyword">using</emphasis>&#32;System.Collections.Generic;
+00011 
+00012 <emphasis role="keyword">namespace&#32;</emphasis><link linkend="_namespace_valve_1_1_v_r_1_1_interaction_system">Valve.VR.InteractionSystem</link>
+00013 {
+00014 &#32;&#32;&#32;&#32;<emphasis role="comment">//-------------------------------------------------------------------------</emphasis>
+<anchor xml:id="__interactable_8cs_source_1l00015"/><link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_interactable">00015</link> &#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keyword">class&#32;</emphasis><link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_interactable">Interactable</link>&#32;:&#32;MonoBehaviour
+00016 &#32;&#32;&#32;&#32;{
+00017 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;[Tooltip(<emphasis role="stringliteral">&quot;Activates&#32;an&#32;action&#32;set&#32;on&#32;attach&#32;and&#32;deactivates&#32;on&#32;detach&quot;</emphasis>)]
+<anchor xml:id="__interactable_8cs_source_1l00018"/><link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_interactable_1a3db5d422f3dcdd7ae3eb601d61f219dd">00018</link> &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___action_set">SteamVR_ActionSet</link>&#32;<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_interactable_1a3db5d422f3dcdd7ae3eb601d61f219dd">activateActionSetOnAttach</link>;
+00019 
+00020 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;[Tooltip(<emphasis role="stringliteral">&quot;Hide&#32;the&#32;whole&#32;hand&#32;on&#32;attachment&#32;and&#32;show&#32;on&#32;detach&quot;</emphasis>)]
+<anchor xml:id="__interactable_8cs_source_1l00021"/><link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_interactable_1a491fd1599c1f2e7e964d316d5522d9cb">00021</link> &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keywordtype">bool</emphasis>&#32;<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_interactable_1a491fd1599c1f2e7e964d316d5522d9cb">hideHandOnAttach</link>&#32;=&#32;<emphasis role="keyword">true</emphasis>;
+00022 
+00023 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;[Tooltip(<emphasis role="stringliteral">&quot;Hide&#32;the&#32;skeleton&#32;part&#32;of&#32;the&#32;hand&#32;on&#32;attachment&#32;and&#32;show&#32;on&#32;detach&quot;</emphasis>)]
+<anchor xml:id="__interactable_8cs_source_1l00024"/><link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_interactable_1ab363ae0e1f44fd0957e454d2759deba2">00024</link> &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keywordtype">bool</emphasis>&#32;<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_interactable_1ab363ae0e1f44fd0957e454d2759deba2">hideSkeletonOnAttach</link>&#32;=&#32;<emphasis role="keyword">false</emphasis>;
+00025 
+00026 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;[Tooltip(<emphasis role="stringliteral">&quot;Hide&#32;the&#32;controller&#32;part&#32;of&#32;the&#32;hand&#32;on&#32;attachment&#32;and&#32;show&#32;on&#32;detach&quot;</emphasis>)]
+<anchor xml:id="__interactable_8cs_source_1l00027"/><link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_interactable_1a40cc396011f2fabb28c0fd2882444598">00027</link> &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keywordtype">bool</emphasis>&#32;<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_interactable_1a40cc396011f2fabb28c0fd2882444598">hideControllerOnAttach</link>&#32;=&#32;<emphasis role="keyword">false</emphasis>;
+00028 
+00029 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;[Tooltip(<emphasis role="stringliteral">&quot;The&#32;integer&#32;in&#32;the&#32;animator&#32;to&#32;trigger&#32;on&#32;pickup.&#32;0&#32;for&#32;none&quot;</emphasis>)]
+<anchor xml:id="__interactable_8cs_source_1l00030"/><link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_interactable_1a8cb40c3f42b89256c1cf182825b7a95f">00030</link> &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keywordtype">int</emphasis>&#32;<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_interactable_1a8cb40c3f42b89256c1cf182825b7a95f">handAnimationOnPickup</link>&#32;=&#32;0;
+00031 
+00032 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;[Tooltip(<emphasis role="stringliteral">&quot;The&#32;range&#32;of&#32;motion&#32;to&#32;set&#32;on&#32;the&#32;skeleton.&#32;None&#32;for&#32;no&#32;change.&quot;</emphasis>)]
+<anchor xml:id="__interactable_8cs_source_1l00033"/><link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_interactable_1a7d89faa46f0f9dcd8f182b210194d84d">00033</link> &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<link linkend="_namespace_valve_1_1_v_r_1aabb506007a41244de5c315ff5519439f">SkeletalMotionRangeChange</link>&#32;<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_interactable_1a7d89faa46f0f9dcd8f182b210194d84d">setRangeOfMotionOnPickup</link>&#32;=&#32;<link linkend="_namespace_valve_1_1_v_r_1aabb506007a41244de5c315ff5519439f">SkeletalMotionRangeChange</link>.None;
+00034 
+00035 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;delegate&#32;<emphasis role="keywordtype">void</emphasis>&#32;<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_interactable_1a3ec0150eb5701a6782f6dc07c9ddd1a0">OnAttachedToHandDelegate</link>(<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_hand">Hand</link>&#32;hand);
+00036 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;delegate&#32;<emphasis role="keywordtype">void</emphasis>&#32;<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_interactable_1abbbcb1950b93f7b9fcbbddc464b88d93">OnDetachedFromHandDelegate</link>(<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_hand">Hand</link>&#32;hand);
+00037 
+<anchor xml:id="__interactable_8cs_source_1l00038"/><link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_interactable_1a93c512ea325e910f4810fe4fb126f2c0">00038</link> &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keyword">event</emphasis>&#32;<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_interactable_1a3ec0150eb5701a6782f6dc07c9ddd1a0">OnAttachedToHandDelegate</link>&#32;<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_interactable_1a93c512ea325e910f4810fe4fb126f2c0">onAttachedToHand</link>;
+<anchor xml:id="__interactable_8cs_source_1l00039"/><link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_interactable_1a3c06e1a11432b5aa3046bb336a1e40f4">00039</link> &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keyword">event</emphasis>&#32;<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_interactable_1abbbcb1950b93f7b9fcbbddc464b88d93">OnDetachedFromHandDelegate</link>&#32;<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_interactable_1a3c06e1a11432b5aa3046bb336a1e40f4">onDetachedFromHand</link>;
+00040 
+00041 
+00042 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;[Tooltip(<emphasis role="stringliteral">&quot;Specify&#32;whether&#32;you&#32;want&#32;to&#32;snap&#32;to&#32;the&#32;hand&apos;s&#32;object&#32;attachment&#32;point,&#32;or&#32;just&#32;the&#32;raw&#32;hand&quot;</emphasis>)]
+<anchor xml:id="__interactable_8cs_source_1l00043"/><link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_interactable_1adab4955f68b0bee987e47238b4199623">00043</link> &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keywordtype">bool</emphasis>&#32;<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_interactable_1adab4955f68b0bee987e47238b4199623">useHandObjectAttachmentPoint</link>&#32;=&#32;<emphasis role="keyword">true</emphasis>;
+00044 
+<anchor xml:id="__interactable_8cs_source_1l00045"/><link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_interactable_1a96fc34b469a69d85a29588f2f5b13f2b">00045</link> &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keywordtype">bool</emphasis>&#32;<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_interactable_1a96fc34b469a69d85a29588f2f5b13f2b">attachEaseIn</link>&#32;=&#32;<emphasis role="keyword">false</emphasis>;
+00046 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;[HideInInspector]
+<anchor xml:id="__interactable_8cs_source_1l00047"/><link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_interactable_1a5a89126ac4ccf07d3f5ee2b1e7f4cfb7">00047</link> &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;AnimationCurve&#32;<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_interactable_1a5a89126ac4ccf07d3f5ee2b1e7f4cfb7">snapAttachEaseInCurve</link>&#32;=&#32;AnimationCurve.EaseInOut(0.0f,&#32;0.0f,&#32;1.0f,&#32;1.0f);
+<anchor xml:id="__interactable_8cs_source_1l00048"/><link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_interactable_1a811959ba2752dab29cd5e8b0307fc6ff">00048</link> &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keywordtype">float</emphasis>&#32;<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_interactable_1a811959ba2752dab29cd5e8b0307fc6ff">snapAttachEaseInTime</link>&#32;=&#32;0.15f;
+00049 
+<anchor xml:id="__interactable_8cs_source_1l00050"/><link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_interactable_1a8543fb5dde7ea3c93dfb07c60896b56a">00050</link> &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keywordtype">bool</emphasis>&#32;<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_interactable_1a8543fb5dde7ea3c93dfb07c60896b56a">snapAttachEaseInCompleted</link>&#32;=&#32;<emphasis role="keyword">false</emphasis>;
+00051 
+00052 
+00053 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;[Tooltip(&quot;The&#32;skeleton&#32;pose&#32;to&#32;apply&#32;when&#32;grabbing.&#32;Can&#32;only&#32;set&#32;this&#32;or&#32;handFollowTransform.&quot;)]</emphasis>
+00054 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;[HideInInspector]
+<anchor xml:id="__interactable_8cs_source_1l00055"/><link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_interactable_1a2c40a5c96721218f3f768cc9c9b88209">00055</link> &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___skeleton___poser">SteamVR_Skeleton_Poser</link>&#32;<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_interactable_1a2c40a5c96721218f3f768cc9c9b88209">skeletonPoser</link>;
+00056 
+00057 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;[Tooltip(<emphasis role="stringliteral">&quot;Should&#32;the&#32;rendered&#32;hand&#32;lock&#32;on&#32;to&#32;and&#32;follow&#32;the&#32;object&quot;</emphasis>)]
+<anchor xml:id="__interactable_8cs_source_1l00058"/><link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_interactable_1acec0c3e5d1431be50d556af659dbe713">00058</link> &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keywordtype">bool</emphasis>&#32;<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_interactable_1acec0c3e5d1431be50d556af659dbe713">handFollowTransform</link>=&#32;<emphasis role="keyword">true</emphasis>;
+00059 
+00060 
+00061 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;[Tooltip(<emphasis role="stringliteral">&quot;Set&#32;whether&#32;or&#32;not&#32;you&#32;want&#32;this&#32;interactible&#32;to&#32;highlight&#32;when&#32;hovering&#32;over&#32;it&quot;</emphasis>)]
+<anchor xml:id="__interactable_8cs_source_1l00062"/><link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_interactable_1aa4ff8cefc1fa007fc932c1e4793865e8">00062</link> &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keywordtype">bool</emphasis>&#32;<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_interactable_1aa4ff8cefc1fa007fc932c1e4793865e8">highlightOnHover</link>&#32;=&#32;<emphasis role="keyword">true</emphasis>;
+<anchor xml:id="__interactable_8cs_source_1l00063"/><link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_interactable_1a4419695933e79ee0fcc09e8640033c77">00063</link> &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">protected</emphasis>&#32;MeshRenderer[]&#32;<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_interactable_1a4419695933e79ee0fcc09e8640033c77">highlightRenderers</link>;
+<anchor xml:id="__interactable_8cs_source_1l00064"/><link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_interactable_1aff2b9c4512966aea11163897ae0bee4c">00064</link> &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">protected</emphasis>&#32;MeshRenderer[]&#32;<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_interactable_1aff2b9c4512966aea11163897ae0bee4c">existingRenderers</link>;
+<anchor xml:id="__interactable_8cs_source_1l00065"/><link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_interactable_1a644001123a5b130b174d1bebc7b348ee">00065</link> &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">protected</emphasis>&#32;GameObject&#32;<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_interactable_1a644001123a5b130b174d1bebc7b348ee">highlightHolder</link>;
+<anchor xml:id="__interactable_8cs_source_1l00066"/><link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_interactable_1a4a0a9489cbfb6f6f4bb12deb9ebe3f30">00066</link> &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">protected</emphasis>&#32;SkinnedMeshRenderer[]&#32;<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_interactable_1a4a0a9489cbfb6f6f4bb12deb9ebe3f30">highlightSkinnedRenderers</link>;
+<anchor xml:id="__interactable_8cs_source_1l00067"/><link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_interactable_1a7027b7be7cfb777e96ee8cda85c42cfc">00067</link> &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">protected</emphasis>&#32;SkinnedMeshRenderer[]&#32;<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_interactable_1a7027b7be7cfb777e96ee8cda85c42cfc">existingSkinnedRenderers</link>;
+<anchor xml:id="__interactable_8cs_source_1l00068"/><link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_interactable_1ad3324bd529fcdcc13f276bf7de59e3d9">00068</link> &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">protected</emphasis>&#32;<emphasis role="keyword">static</emphasis>&#32;Material&#32;<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_interactable_1ad3324bd529fcdcc13f276bf7de59e3d9">highlightMat</link>;
+00069 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;[Tooltip(<emphasis role="stringliteral">&quot;An&#32;array&#32;of&#32;child&#32;gameObjects&#32;to&#32;not&#32;render&#32;a&#32;highlight&#32;for.&#32;Things&#32;like&#32;transparent&#32;parts,&#32;vfx,&#32;etc.&quot;</emphasis>)]
+<anchor xml:id="__interactable_8cs_source_1l00070"/><link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_interactable_1aa93ae8eaafbdee09f72945e69a75da35">00070</link> &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;GameObject[]&#32;<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_interactable_1aa93ae8eaafbdee09f72945e69a75da35">hideHighlight</link>;
+00071 
+00072 
+00073 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;[System.NonSerialized]
+<anchor xml:id="__interactable_8cs_source_1l00074"/><link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_interactable_1a1980377b09ca72c574f045e7d6aac17f">00074</link> &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_hand">Hand</link>&#32;<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_interactable_1a1980377b09ca72c574f045e7d6aac17f">attachedToHand</link>;
+00075 
+00076 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;[System.NonSerialized]
+<anchor xml:id="__interactable_8cs_source_1l00077"/><link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_interactable_1a2a30e475f04b0b6f35395d4518377d84">00077</link> &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_hand">Hand</link>&#32;<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_interactable_1a2a30e475f04b0b6f35395d4518377d84">hoveringHand</link>;
+00078 
+<anchor xml:id="__interactable_8cs_source_1l00079"/><link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_interactable_1add1caee2e4a31ce4cbbbf345a7f1e794">00079</link> &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keywordtype">bool</emphasis>&#32;<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_interactable_1add1caee2e4a31ce4cbbbf345a7f1e794">isDestroying</link>&#32;{&#32;<emphasis role="keyword">get</emphasis>;&#32;<emphasis role="keyword">protected</emphasis>&#32;<emphasis role="keyword">set</emphasis>;&#32;}
+<anchor xml:id="__interactable_8cs_source_1l00080"/><link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_interactable_1aded7f16cb07fa8238e399ea8d69f8c28">00080</link> &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keywordtype">bool</emphasis>&#32;<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_interactable_1aded7f16cb07fa8238e399ea8d69f8c28">isHovering</link>&#32;{&#32;<emphasis role="keyword">get</emphasis>;&#32;<emphasis role="keyword">protected</emphasis>&#32;<emphasis role="keyword">set</emphasis>;&#32;}
+<anchor xml:id="__interactable_8cs_source_1l00081"/><link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_interactable_1aca11ae1746a8c3f61fc1e4a5223c8862">00081</link> &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keywordtype">bool</emphasis>&#32;<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_interactable_1aca11ae1746a8c3f61fc1e4a5223c8862">wasHovering</link>&#32;{&#32;<emphasis role="keyword">get</emphasis>;&#32;<emphasis role="keyword">protected</emphasis>&#32;<emphasis role="keyword">set</emphasis>;&#32;}
+00082 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;
+00083 
+00084 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;Awake()
+00085 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00086 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_interactable_1a2c40a5c96721218f3f768cc9c9b88209">skeletonPoser</link>&#32;=&#32;GetComponent&lt;SteamVR_Skeleton_Poser&gt;();
+00087 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00088 
+<anchor xml:id="__interactable_8cs_source_1l00089"/><link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_interactable_1aef61a645fffad29d9a6865ca38026a89">00089</link> &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">protected</emphasis>&#32;<emphasis role="keyword">virtual</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_interactable_1aef61a645fffad29d9a6865ca38026a89">Start</link>()
+00090 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00091 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_interactable_1ad3324bd529fcdcc13f276bf7de59e3d9">highlightMat</link>&#32;=&#32;(Material)Resources.Load(<emphasis role="stringliteral">&quot;SteamVR_HoverHighlight&quot;</emphasis>,&#32;typeof(Material));
+00092 
+00093 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_interactable_1ad3324bd529fcdcc13f276bf7de59e3d9">highlightMat</link>&#32;==&#32;<emphasis role="keyword">null</emphasis>)
+00094 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;Debug.LogError(<emphasis role="stringliteral">&quot;&lt;b&gt;[SteamVR&#32;Interaction]&lt;/b&gt;&#32;Hover&#32;Highlight&#32;Material&#32;is&#32;missing.&#32;Please&#32;create&#32;a&#32;material&#32;named&#32;&apos;SteamVR_HoverHighlight&apos;&#32;and&#32;place&#32;it&#32;in&#32;a&#32;Resources&#32;folder&quot;</emphasis>);
+00095 
+00096 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_interactable_1a2c40a5c96721218f3f768cc9c9b88209">skeletonPoser</link>&#32;!=&#32;<emphasis role="keyword">null</emphasis>)
+00097 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00098 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_interactable_1adab4955f68b0bee987e47238b4199623">useHandObjectAttachmentPoint</link>)
+00099 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00100 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//Debug.LogWarning(&quot;&lt;b&gt;[SteamVR&#32;Interaction]&lt;/b&gt;&#32;SkeletonPose&#32;and&#32;useHandObjectAttachmentPoint&#32;both&#32;set&#32;at&#32;the&#32;same&#32;time.&#32;Ignoring&#32;useHandObjectAttachmentPoint.&quot;);</emphasis>
+00101 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_interactable_1adab4955f68b0bee987e47238b4199623">useHandObjectAttachmentPoint</link>&#32;=&#32;<emphasis role="keyword">false</emphasis>;
+00102 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00103 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00104 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00105 
+<anchor xml:id="__interactable_8cs_source_1l00106"/><link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_interactable_1aa80dd17da786ba7b76a0c6a713f6443e">00106</link> &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">protected</emphasis>&#32;<emphasis role="keyword">virtual</emphasis>&#32;<emphasis role="keywordtype">bool</emphasis>&#32;<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_interactable_1aa80dd17da786ba7b76a0c6a713f6443e">ShouldIgnoreHighlight</link>(Component&#32;component)
+00107 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00108 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_interactable_1a7097ad808a2fec8c884e31c81de46198">ShouldIgnore</link>(component.gameObject);
+00109 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00110 
+<anchor xml:id="__interactable_8cs_source_1l00111"/><link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_interactable_1a7097ad808a2fec8c884e31c81de46198">00111</link> &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">protected</emphasis>&#32;<emphasis role="keyword">virtual</emphasis>&#32;<emphasis role="keywordtype">bool</emphasis>&#32;<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_interactable_1a7097ad808a2fec8c884e31c81de46198">ShouldIgnore</link>(GameObject&#32;check)
+00112 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00113 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">for</emphasis>&#32;(<emphasis role="keywordtype">int</emphasis>&#32;ignoreIndex&#32;=&#32;0;&#32;ignoreIndex&#32;&lt;&#32;<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_interactable_1aa93ae8eaafbdee09f72945e69a75da35">hideHighlight</link>.Length;&#32;ignoreIndex++)
+00114 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00115 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(check&#32;==&#32;<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_interactable_1aa93ae8eaafbdee09f72945e69a75da35">hideHighlight</link>[ignoreIndex])
+00116 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;<emphasis role="keyword">true</emphasis>;
+00117 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00118 
+00119 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;<emphasis role="keyword">false</emphasis>;
+00120 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00121 
+<anchor xml:id="__interactable_8cs_source_1l00122"/><link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_interactable_1ae90583dd7a15aecc2cdb8b1640c6ac44">00122</link> &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">protected</emphasis>&#32;<emphasis role="keyword">virtual</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_interactable_1ae90583dd7a15aecc2cdb8b1640c6ac44">CreateHighlightRenderers</link>()
+00123 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00124 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_interactable_1a7027b7be7cfb777e96ee8cda85c42cfc">existingSkinnedRenderers</link>&#32;=&#32;this.GetComponentsInChildren&lt;SkinnedMeshRenderer&gt;(<emphasis role="keyword">true</emphasis>);
+00125 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_interactable_1a644001123a5b130b174d1bebc7b348ee">highlightHolder</link>&#32;=&#32;<emphasis role="keyword">new</emphasis>&#32;GameObject(<emphasis role="stringliteral">&quot;Highlighter&quot;</emphasis>);
+00126 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_interactable_1a4a0a9489cbfb6f6f4bb12deb9ebe3f30">highlightSkinnedRenderers</link>&#32;=&#32;<emphasis role="keyword">new</emphasis>&#32;SkinnedMeshRenderer[<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_interactable_1a7027b7be7cfb777e96ee8cda85c42cfc">existingSkinnedRenderers</link>.Length];
+00127 
+00128 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">for</emphasis>&#32;(<emphasis role="keywordtype">int</emphasis>&#32;skinnedIndex&#32;=&#32;0;&#32;skinnedIndex&#32;&lt;&#32;<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_interactable_1a7027b7be7cfb777e96ee8cda85c42cfc">existingSkinnedRenderers</link>.Length;&#32;skinnedIndex++)
+00129 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00130 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;SkinnedMeshRenderer&#32;existingSkinned&#32;=&#32;<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_interactable_1a7027b7be7cfb777e96ee8cda85c42cfc">existingSkinnedRenderers</link>[skinnedIndex];
+00131 
+00132 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_interactable_1aa80dd17da786ba7b76a0c6a713f6443e">ShouldIgnoreHighlight</link>(existingSkinned))
+00133 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">continue</emphasis>;
+00134 
+00135 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;GameObject&#32;newSkinnedHolder&#32;=&#32;<emphasis role="keyword">new</emphasis>&#32;GameObject(<emphasis role="stringliteral">&quot;SkinnedHolder&quot;</emphasis>);
+00136 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;newSkinnedHolder.transform.parent&#32;=&#32;<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_interactable_1a644001123a5b130b174d1bebc7b348ee">highlightHolder</link>.transform;
+00137 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;SkinnedMeshRenderer&#32;newSkinned&#32;=&#32;newSkinnedHolder.AddComponent&lt;SkinnedMeshRenderer&gt;();
+00138 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;Material[]&#32;materials&#32;=&#32;<emphasis role="keyword">new</emphasis>&#32;Material[existingSkinned.sharedMaterials.Length];
+00139 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">for</emphasis>&#32;(<emphasis role="keywordtype">int</emphasis>&#32;materialIndex&#32;=&#32;0;&#32;materialIndex&#32;&lt;&#32;materials.Length;&#32;materialIndex++)
+00140 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00141 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;materials[materialIndex]&#32;=&#32;<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_interactable_1ad3324bd529fcdcc13f276bf7de59e3d9">highlightMat</link>;
+00142 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00143 
+00144 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;newSkinned.sharedMaterials&#32;=&#32;materials;
+00145 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;newSkinned.sharedMesh&#32;=&#32;existingSkinned.sharedMesh;
+00146 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;newSkinned.rootBone&#32;=&#32;existingSkinned.rootBone;
+00147 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;newSkinned.updateWhenOffscreen&#32;=&#32;existingSkinned.updateWhenOffscreen;
+00148 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;newSkinned.bones&#32;=&#32;existingSkinned.bones;
+00149 
+00150 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_interactable_1a4a0a9489cbfb6f6f4bb12deb9ebe3f30">highlightSkinnedRenderers</link>[skinnedIndex]&#32;=&#32;newSkinned;
+00151 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00152 
+00153 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;MeshFilter[]&#32;existingFilters&#32;=&#32;this.GetComponentsInChildren&lt;MeshFilter&gt;(<emphasis role="keyword">true</emphasis>);
+00154 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_interactable_1aff2b9c4512966aea11163897ae0bee4c">existingRenderers</link>&#32;=&#32;<emphasis role="keyword">new</emphasis>&#32;MeshRenderer[existingFilters.Length];
+00155 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_interactable_1a4419695933e79ee0fcc09e8640033c77">highlightRenderers</link>&#32;=&#32;<emphasis role="keyword">new</emphasis>&#32;MeshRenderer[existingFilters.Length];
+00156 
+00157 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">for</emphasis>&#32;(<emphasis role="keywordtype">int</emphasis>&#32;filterIndex&#32;=&#32;0;&#32;filterIndex&#32;&lt;&#32;existingFilters.Length;&#32;filterIndex++)
+00158 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00159 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;MeshFilter&#32;existingFilter&#32;=&#32;existingFilters[filterIndex];
+00160 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;MeshRenderer&#32;existingRenderer&#32;=&#32;existingFilter.GetComponent&lt;MeshRenderer&gt;();
+00161 
+00162 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(existingFilter&#32;==&#32;<emphasis role="keyword">null</emphasis>&#32;||&#32;existingRenderer&#32;==&#32;<emphasis role="keyword">null</emphasis>&#32;||&#32;<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_interactable_1aa80dd17da786ba7b76a0c6a713f6443e">ShouldIgnoreHighlight</link>(existingFilter))
+00163 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">continue</emphasis>;
+00164 
+00165 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;GameObject&#32;newFilterHolder&#32;=&#32;<emphasis role="keyword">new</emphasis>&#32;GameObject(<emphasis role="stringliteral">&quot;FilterHolder&quot;</emphasis>);
+00166 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;newFilterHolder.transform.parent&#32;=&#32;<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_interactable_1a644001123a5b130b174d1bebc7b348ee">highlightHolder</link>.transform;
+00167 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;MeshFilter&#32;newFilter&#32;=&#32;newFilterHolder.AddComponent&lt;MeshFilter&gt;();
+00168 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;newFilter.sharedMesh&#32;=&#32;existingFilter.sharedMesh;
+00169 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;MeshRenderer&#32;newRenderer&#32;=&#32;newFilterHolder.AddComponent&lt;MeshRenderer&gt;();
+00170 
+00171 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;Material[]&#32;materials&#32;=&#32;<emphasis role="keyword">new</emphasis>&#32;Material[existingRenderer.sharedMaterials.Length];
+00172 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">for</emphasis>&#32;(<emphasis role="keywordtype">int</emphasis>&#32;materialIndex&#32;=&#32;0;&#32;materialIndex&#32;&lt;&#32;materials.Length;&#32;materialIndex++)
+00173 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00174 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;materials[materialIndex]&#32;=&#32;<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_interactable_1ad3324bd529fcdcc13f276bf7de59e3d9">highlightMat</link>;
+00175 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00176 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;newRenderer.sharedMaterials&#32;=&#32;materials;
+00177 
+00178 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_interactable_1a4419695933e79ee0fcc09e8640033c77">highlightRenderers</link>[filterIndex]&#32;=&#32;newRenderer;
+00179 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_interactable_1aff2b9c4512966aea11163897ae0bee4c">existingRenderers</link>[filterIndex]&#32;=&#32;existingRenderer;
+00180 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00181 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00182 
+<anchor xml:id="__interactable_8cs_source_1l00183"/><link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_interactable_1a1dad43cca9e520121e707ff18340dd0a">00183</link> &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">protected</emphasis>&#32;<emphasis role="keyword">virtual</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_interactable_1a1dad43cca9e520121e707ff18340dd0a">UpdateHighlightRenderers</link>()
+00184 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00185 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_interactable_1a644001123a5b130b174d1bebc7b348ee">highlightHolder</link>&#32;==&#32;<emphasis role="keyword">null</emphasis>)
+00186 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>;
+00187 
+00188 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">for</emphasis>&#32;(<emphasis role="keywordtype">int</emphasis>&#32;skinnedIndex&#32;=&#32;0;&#32;skinnedIndex&#32;&lt;&#32;<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_interactable_1a7027b7be7cfb777e96ee8cda85c42cfc">existingSkinnedRenderers</link>.Length;&#32;skinnedIndex++)
+00189 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00190 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;SkinnedMeshRenderer&#32;existingSkinned&#32;=&#32;<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_interactable_1a7027b7be7cfb777e96ee8cda85c42cfc">existingSkinnedRenderers</link>[skinnedIndex];
+00191 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;SkinnedMeshRenderer&#32;highlightSkinned&#32;=&#32;<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_interactable_1a4a0a9489cbfb6f6f4bb12deb9ebe3f30">highlightSkinnedRenderers</link>[skinnedIndex];
+00192 
+00193 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(existingSkinned&#32;!=&#32;<emphasis role="keyword">null</emphasis>&#32;&amp;&amp;&#32;highlightSkinned&#32;!=&#32;<emphasis role="keyword">null</emphasis>&#32;&amp;&amp;&#32;<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_interactable_1a1980377b09ca72c574f045e7d6aac17f">attachedToHand</link>&#32;==&#32;<emphasis role="keyword">false</emphasis>)
+00194 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00195 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;highlightSkinned.transform.position&#32;=&#32;existingSkinned.transform.position;
+00196 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;highlightSkinned.transform.rotation&#32;=&#32;existingSkinned.transform.rotation;
+00197 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;highlightSkinned.transform.localScale&#32;=&#32;existingSkinned.transform.lossyScale;
+00198 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;highlightSkinned.localBounds&#32;=&#32;existingSkinned.localBounds;
+00199 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;highlightSkinned.enabled&#32;=&#32;<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_interactable_1aded7f16cb07fa8238e399ea8d69f8c28">isHovering</link>&#32;&amp;&amp;&#32;existingSkinned.enabled&#32;&amp;&amp;&#32;existingSkinned.gameObject.activeInHierarchy;
+00200 
+00201 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordtype">int</emphasis>&#32;blendShapeCount&#32;=&#32;existingSkinned.sharedMesh.blendShapeCount;
+00202 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">for</emphasis>&#32;(<emphasis role="keywordtype">int</emphasis>&#32;blendShapeIndex&#32;=&#32;0;&#32;blendShapeIndex&#32;&lt;&#32;blendShapeCount;&#32;blendShapeIndex++)
+00203 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00204 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;highlightSkinned.SetBlendShapeWeight(blendShapeIndex,&#32;existingSkinned.GetBlendShapeWeight(blendShapeIndex));
+00205 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00206 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00207 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">else</emphasis>&#32;<emphasis role="keywordflow">if</emphasis>&#32;(highlightSkinned&#32;!=&#32;<emphasis role="keyword">null</emphasis>)
+00208 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;highlightSkinned.enabled&#32;=&#32;<emphasis role="keyword">false</emphasis>;
+00209 
+00210 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00211 
+00212 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">for</emphasis>&#32;(<emphasis role="keywordtype">int</emphasis>&#32;rendererIndex&#32;=&#32;0;&#32;rendererIndex&#32;&lt;&#32;<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_interactable_1a4419695933e79ee0fcc09e8640033c77">highlightRenderers</link>.Length;&#32;rendererIndex++)
+00213 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00214 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;MeshRenderer&#32;existingRenderer&#32;=&#32;<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_interactable_1aff2b9c4512966aea11163897ae0bee4c">existingRenderers</link>[rendererIndex];
+00215 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;MeshRenderer&#32;highlightRenderer&#32;=&#32;<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_interactable_1a4419695933e79ee0fcc09e8640033c77">highlightRenderers</link>[rendererIndex];
+00216 
+00217 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(existingRenderer&#32;!=&#32;<emphasis role="keyword">null</emphasis>&#32;&amp;&amp;&#32;highlightRenderer&#32;!=&#32;<emphasis role="keyword">null</emphasis>&#32;&amp;&amp;&#32;<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_interactable_1a1980377b09ca72c574f045e7d6aac17f">attachedToHand</link>&#32;==&#32;<emphasis role="keyword">false</emphasis>)
+00218 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00219 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;highlightRenderer.transform.position&#32;=&#32;existingRenderer.transform.position;
+00220 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;highlightRenderer.transform.rotation&#32;=&#32;existingRenderer.transform.rotation;
+00221 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;highlightRenderer.transform.localScale&#32;=&#32;existingRenderer.transform.lossyScale;
+00222 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;highlightRenderer.enabled&#32;=&#32;<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_interactable_1aded7f16cb07fa8238e399ea8d69f8c28">isHovering</link>&#32;&amp;&amp;&#32;existingRenderer.enabled&#32;&amp;&amp;&#32;existingRenderer.gameObject.activeInHierarchy;
+00223 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00224 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">else</emphasis>&#32;<emphasis role="keywordflow">if</emphasis>&#32;(highlightRenderer&#32;!=&#32;<emphasis role="keyword">null</emphasis>)
+00225 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;highlightRenderer.enabled&#32;=&#32;<emphasis role="keyword">false</emphasis>;
+00226 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00227 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00228 
+<anchor xml:id="__interactable_8cs_source_1l00232"/><link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_interactable_1a763e6964143b0de95520d50f5192fee6">00232</link> &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">protected</emphasis>&#32;<emphasis role="keyword">virtual</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_interactable_1a763e6964143b0de95520d50f5192fee6">OnHandHoverBegin</link>(<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_hand">Hand</link>&#32;hand)
+00233 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00234 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_interactable_1aca11ae1746a8c3f61fc1e4a5223c8862">wasHovering</link>&#32;=&#32;<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_interactable_1aded7f16cb07fa8238e399ea8d69f8c28">isHovering</link>;
+00235 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_interactable_1aded7f16cb07fa8238e399ea8d69f8c28">isHovering</link>&#32;=&#32;<emphasis role="keyword">true</emphasis>;
+00236 
+00237 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_interactable_1a2a30e475f04b0b6f35395d4518377d84">hoveringHand</link>&#32;=&#32;hand;
+00238 
+00239 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_interactable_1aa4ff8cefc1fa007fc932c1e4793865e8">highlightOnHover</link>&#32;==&#32;<emphasis role="keyword">true</emphasis>)
+00240 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00241 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_interactable_1ae90583dd7a15aecc2cdb8b1640c6ac44">CreateHighlightRenderers</link>();
+00242 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_interactable_1a1dad43cca9e520121e707ff18340dd0a">UpdateHighlightRenderers</link>();
+00243 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00244 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00245 
+00246 
+00250 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;OnHandHoverEnd(<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_hand">Hand</link>&#32;hand)
+00251 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00252 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_interactable_1aca11ae1746a8c3f61fc1e4a5223c8862">wasHovering</link>&#32;=&#32;<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_interactable_1aded7f16cb07fa8238e399ea8d69f8c28">isHovering</link>;
+00253 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_interactable_1aded7f16cb07fa8238e399ea8d69f8c28">isHovering</link>&#32;=&#32;<emphasis role="keyword">false</emphasis>;
+00254 
+00255 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_interactable_1aa4ff8cefc1fa007fc932c1e4793865e8">highlightOnHover</link>&#32;&amp;&amp;&#32;<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_interactable_1a644001123a5b130b174d1bebc7b348ee">highlightHolder</link>&#32;!=&#32;<emphasis role="keyword">null</emphasis>)
+00256 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;Destroy(<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_interactable_1a644001123a5b130b174d1bebc7b348ee">highlightHolder</link>);
+00257 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00258 
+<anchor xml:id="__interactable_8cs_source_1l00259"/><link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_interactable_1a4da06a25433c660a51df6bcf7caf1c12">00259</link> &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">protected</emphasis>&#32;<emphasis role="keyword">virtual</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_interactable_1a4da06a25433c660a51df6bcf7caf1c12">Update</link>()
+00260 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00261 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_interactable_1aa4ff8cefc1fa007fc932c1e4793865e8">highlightOnHover</link>)
+00262 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00263 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_interactable_1a1dad43cca9e520121e707ff18340dd0a">UpdateHighlightRenderers</link>();
+00264 
+00265 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_interactable_1aded7f16cb07fa8238e399ea8d69f8c28">isHovering</link>&#32;==&#32;<emphasis role="keyword">false</emphasis>&#32;&amp;&amp;&#32;<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_interactable_1a644001123a5b130b174d1bebc7b348ee">highlightHolder</link>&#32;!=&#32;<emphasis role="keyword">null</emphasis>)
+00266 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;Destroy(<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_interactable_1a644001123a5b130b174d1bebc7b348ee">highlightHolder</link>);
+00267 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00268 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00269 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;
+00270 
+<anchor xml:id="__interactable_8cs_source_1l00271"/><link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_interactable_1aa12eafae403f08c79b7c6da56e4258cb">00271</link> &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">protected</emphasis>&#32;<emphasis role="keywordtype">float</emphasis>&#32;<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_interactable_1aa12eafae403f08c79b7c6da56e4258cb">blendToPoseTime</link>&#32;=&#32;0.1f;
+<anchor xml:id="__interactable_8cs_source_1l00272"/><link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_interactable_1afcc8f08198ce95e8da914f46cb836fe0">00272</link> &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">protected</emphasis>&#32;<emphasis role="keywordtype">float</emphasis>&#32;<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_interactable_1afcc8f08198ce95e8da914f46cb836fe0">releasePoseBlendTime</link>&#32;=&#32;0.2f;
+00273 
+<anchor xml:id="__interactable_8cs_source_1l00274"/><link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_interactable_1a0afd06a107877372ec2b4ea5705df3d5">00274</link> &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">protected</emphasis>&#32;<emphasis role="keyword">virtual</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_interactable_1a0afd06a107877372ec2b4ea5705df3d5">OnAttachedToHand</link>(<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_hand">Hand</link>&#32;hand)
+00275 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00276 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_interactable_1a3db5d422f3dcdd7ae3eb601d61f219dd">activateActionSetOnAttach</link>&#32;!=&#32;<emphasis role="keyword">null</emphasis>)
+00277 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_interactable_1a3db5d422f3dcdd7ae3eb601d61f219dd">activateActionSetOnAttach</link>.<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___action_set_1aeabdda07095a66c6937d796713356120">Activate</link>(hand.<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_hand_1a05520135148fd74ca10b8549d5c7354d">handType</link>);
+00278 
+00279 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_interactable_1a93c512ea325e910f4810fe4fb126f2c0">onAttachedToHand</link>&#32;!=&#32;<emphasis role="keyword">null</emphasis>)
+00280 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00281 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_interactable_1a93c512ea325e910f4810fe4fb126f2c0">onAttachedToHand</link>.Invoke(hand);
+00282 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00283 
+00284 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_interactable_1a2c40a5c96721218f3f768cc9c9b88209">skeletonPoser</link>&#32;!=&#32;<emphasis role="keyword">null</emphasis>&#32;&amp;&amp;&#32;hand.<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_hand_1ad992f20640f09e339d3d933e013e4a4c">skeleton</link>&#32;!=&#32;<emphasis role="keyword">null</emphasis>)
+00285 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00286 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;hand.<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_hand_1ad992f20640f09e339d3d933e013e4a4c">skeleton</link>.<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___behaviour___skeleton_1a7cad4650f70ac4fe81acdf6800a33392">BlendToPoser</link>(<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_interactable_1a2c40a5c96721218f3f768cc9c9b88209">skeletonPoser</link>,&#32;<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_interactable_1aa12eafae403f08c79b7c6da56e4258cb">blendToPoseTime</link>);
+00287 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00288 
+00289 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_interactable_1a1980377b09ca72c574f045e7d6aac17f">attachedToHand</link>&#32;=&#32;hand;
+00290 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00291 
+<anchor xml:id="__interactable_8cs_source_1l00292"/><link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_interactable_1af0c021201187d64f34c28122b6d39949">00292</link> &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">protected</emphasis>&#32;<emphasis role="keyword">virtual</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_interactable_1af0c021201187d64f34c28122b6d39949">OnDetachedFromHand</link>(<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_hand">Hand</link>&#32;hand)
+00293 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00294 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_interactable_1a3db5d422f3dcdd7ae3eb601d61f219dd">activateActionSetOnAttach</link>&#32;!=&#32;<emphasis role="keyword">null</emphasis>)
+00295 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00296 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(hand.<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_hand_1af5e110dcf7ecc1498c8e8e1425636f81">otherHand</link>&#32;==&#32;<emphasis role="keyword">null</emphasis>&#32;||&#32;hand.<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_hand_1af5e110dcf7ecc1498c8e8e1425636f81">otherHand</link>.<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_hand_1a2ba850f3dedb0fe8e2e32ac32e45e92d">currentAttachedObjectInfo</link>.HasValue&#32;==&#32;<emphasis role="keyword">false</emphasis>&#32;||
+00297 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;(hand.<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_hand_1af5e110dcf7ecc1498c8e8e1425636f81">otherHand</link>.<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_hand_1a2ba850f3dedb0fe8e2e32ac32e45e92d">currentAttachedObjectInfo</link>.Value.<link linkend="_struct_valve_1_1_v_r_1_1_interaction_system_1_1_hand_1_1_attached_object_1afa93283f20acbbec5b6c94b11108adf3">interactable</link>&#32;!=&#32;<emphasis role="keyword">null</emphasis>&#32;&amp;&amp;
+00298 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;hand.<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_hand_1af5e110dcf7ecc1498c8e8e1425636f81">otherHand</link>.<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_hand_1a2ba850f3dedb0fe8e2e32ac32e45e92d">currentAttachedObjectInfo</link>.Value.<link linkend="_struct_valve_1_1_v_r_1_1_interaction_system_1_1_hand_1_1_attached_object_1afa93283f20acbbec5b6c94b11108adf3">interactable</link>.<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_interactable_1a3db5d422f3dcdd7ae3eb601d61f219dd">activateActionSetOnAttach</link>&#32;!=&#32;<emphasis role="keyword">this</emphasis>.activateActionSetOnAttach))
+00299 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00300 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_interactable_1a3db5d422f3dcdd7ae3eb601d61f219dd">activateActionSetOnAttach</link>.<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___action_set_1ac1cf6b278cd4df49f18da3f59d8d9fc4">Deactivate</link>(hand.<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_hand_1a05520135148fd74ca10b8549d5c7354d">handType</link>);
+00301 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00302 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00303 
+00304 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_interactable_1a3c06e1a11432b5aa3046bb336a1e40f4">onDetachedFromHand</link>&#32;!=&#32;<emphasis role="keyword">null</emphasis>)
+00305 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00306 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_interactable_1a3c06e1a11432b5aa3046bb336a1e40f4">onDetachedFromHand</link>.Invoke(hand);
+00307 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00308 
+00309 
+00310 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_interactable_1a2c40a5c96721218f3f768cc9c9b88209">skeletonPoser</link>&#32;!=&#32;<emphasis role="keyword">null</emphasis>)
+00311 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00312 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(hand.<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_hand_1ad992f20640f09e339d3d933e013e4a4c">skeleton</link>&#32;!=&#32;<emphasis role="keyword">null</emphasis>)
+00313 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;hand.<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_hand_1ad992f20640f09e339d3d933e013e4a4c">skeleton</link>.<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___behaviour___skeleton_1a52072e1064b22388257dbd4b965a5550">BlendToSkeleton</link>(<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_interactable_1afcc8f08198ce95e8da914f46cb836fe0">releasePoseBlendTime</link>);
+00314 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00315 
+00316 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_interactable_1a1980377b09ca72c574f045e7d6aac17f">attachedToHand</link>&#32;=&#32;<emphasis role="keyword">null</emphasis>;
+00317 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00318 
+<anchor xml:id="__interactable_8cs_source_1l00319"/><link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_interactable_1a229fd3f673c88a917fa40faa228e3b5f">00319</link> &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">protected</emphasis>&#32;<emphasis role="keyword">virtual</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_interactable_1a229fd3f673c88a917fa40faa228e3b5f">OnDestroy</link>()
+00320 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00321 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_interactable_1add1caee2e4a31ce4cbbbf345a7f1e794">isDestroying</link>&#32;=&#32;<emphasis role="keyword">true</emphasis>;
+00322 
+00323 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_interactable_1a1980377b09ca72c574f045e7d6aac17f">attachedToHand</link>&#32;!=&#32;<emphasis role="keyword">null</emphasis>)
+00324 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00325 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_interactable_1a1980377b09ca72c574f045e7d6aac17f">attachedToHand</link>.<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_hand_1ab0bccf232d1291c6c3000d9a967635ca">DetachObject</link>(this.gameObject,&#32;<emphasis role="keyword">false</emphasis>);
+00326 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_interactable_1a1980377b09ca72c574f045e7d6aac17f">attachedToHand</link>.<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_hand_1ad992f20640f09e339d3d933e013e4a4c">skeleton</link>.<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___behaviour___skeleton_1a52072e1064b22388257dbd4b965a5550">BlendToSkeleton</link>(0.1f);
+00327 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00328 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;
+00329 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_interactable_1a644001123a5b130b174d1bebc7b348ee">highlightHolder</link>&#32;!=&#32;<emphasis role="keyword">null</emphasis>)
+00330 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;Destroy(<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_interactable_1a644001123a5b130b174d1bebc7b348ee">highlightHolder</link>);
+00331 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;
+00332 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00333 
+00334 
+<anchor xml:id="__interactable_8cs_source_1l00335"/><link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_interactable_1a410b0986667094a1437b1669b7dd6cbe">00335</link> &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">protected</emphasis>&#32;<emphasis role="keyword">virtual</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_interactable_1a410b0986667094a1437b1669b7dd6cbe">OnDisable</link>()
+00336 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00337 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_interactable_1add1caee2e4a31ce4cbbbf345a7f1e794">isDestroying</link>&#32;=&#32;<emphasis role="keyword">true</emphasis>;
+00338 
+00339 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_interactable_1a1980377b09ca72c574f045e7d6aac17f">attachedToHand</link>&#32;!=&#32;<emphasis role="keyword">null</emphasis>)
+00340 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00341 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_interactable_1a1980377b09ca72c574f045e7d6aac17f">attachedToHand</link>.<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_hand_1a93b111e767435715745cb1dda7817b0c">ForceHoverUnlock</link>();
+00342 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00343 
+00344 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_interactable_1a644001123a5b130b174d1bebc7b348ee">highlightHolder</link>&#32;!=&#32;<emphasis role="keyword">null</emphasis>)
+00345 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;Destroy(<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_interactable_1a644001123a5b130b174d1bebc7b348ee">highlightHolder</link>);
+00346 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00347 &#32;&#32;&#32;&#32;}
+00348 }
+</programlisting></section>

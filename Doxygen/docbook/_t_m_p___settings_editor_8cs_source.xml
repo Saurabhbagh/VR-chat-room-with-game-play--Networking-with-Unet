@@ -1,0 +1,298 @@
+<?xml version='1.0' encoding='UTF-8' standalone='no'?>
+<section xmlns="http://docbook.org/ns/docbook" version="5.0" xmlns:xlink="http://www.w3.org/1999/xlink" xml:id="__t_m_p___settings_editor_8cs_source">
+<title>TMP_SettingsEditor.cs</title>
+<indexterm><primary>O:/GitHUBMINIPRoject/Library/PackageCache/com.unity.textmeshpro@1.3.0/Scripts/Editor/TMP_SettingsEditor.cs</primary></indexterm>
+<programlisting>00001 <emphasis role="keyword">using</emphasis>&#32;<link linkend="__balloon_8cs_1a7d67e097df9376eb709b6a23aa3c7d23">UnityEngine</link>;
+00002 <emphasis role="keyword">using</emphasis>&#32;<link linkend="_namespace_unity_editor">UnityEditor</link>;
+00003 <emphasis role="keyword">using</emphasis>&#32;UnityEditorInternal;
+00004 
+00005 <emphasis role="preprocessor">#pragma&#32;warning&#32;disable&#32;0414&#32;//&#32;Disabled&#32;a&#32;few&#32;warnings&#32;for&#32;not&#32;yet&#32;implemented&#32;features.</emphasis>
+00006 
+00007 <emphasis role="keyword">namespace&#32;</emphasis><link linkend="_namespace_t_m_pro_1_1_editor_utilities">TMPro.EditorUtilities</link>
+00008 {
+00009 &#32;&#32;&#32;&#32;[CustomEditor(typeof(TMP_Settings))]
+<anchor xml:id="__t_m_p___settings_editor_8cs_source_1l00010"/><link linkend="_class_t_m_pro_1_1_editor_utilities_1_1_t_m_p___settings_editor">00010</link> &#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keyword">class&#32;</emphasis><link linkend="_class_t_m_pro_1_1_editor_utilities_1_1_t_m_p___settings_editor">TMP_SettingsEditor</link>&#32;:&#32;Editor
+00011 &#32;&#32;&#32;&#32;{
+00012 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">class&#32;</emphasis>Styles
+00013 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00014 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keyword">static</emphasis>&#32;readonly&#32;GUIContent&#32;defaultFontAssetLabel&#32;=&#32;<emphasis role="keyword">new</emphasis>&#32;GUIContent(<emphasis role="stringliteral">&quot;Default&#32;Font&#32;Asset&quot;</emphasis>,&#32;<emphasis role="stringliteral">&quot;The&#32;Font&#32;Asset&#32;that&#32;will&#32;be&#32;assigned&#32;by&#32;default&#32;to&#32;newly&#32;created&#32;text&#32;objects&#32;when&#32;no&#32;Font&#32;Asset&#32;is&#32;specified.&quot;</emphasis>);
+00015 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keyword">static</emphasis>&#32;readonly&#32;GUIContent&#32;defaultFontAssetPathLabel&#32;=&#32;<emphasis role="keyword">new</emphasis>&#32;GUIContent(<emphasis role="stringliteral">&quot;Path:&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;Resources/&quot;</emphasis>,&#32;<emphasis role="stringliteral">&quot;The&#32;relative&#32;path&#32;to&#32;a&#32;Resources&#32;folder&#32;where&#32;the&#32;Font&#32;Assets&#32;and&#32;Material&#32;Presets&#32;are&#32;located.\nExample&#32;\&quot;Fonts&#32;&amp;&#32;Materials/\&quot;&quot;</emphasis>);
+00016 
+00017 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keyword">static</emphasis>&#32;readonly&#32;GUIContent&#32;fallbackFontAssetsLabel&#32;=&#32;<emphasis role="keyword">new</emphasis>&#32;GUIContent(<emphasis role="stringliteral">&quot;Fallback&#32;Font&#32;Assets&quot;</emphasis>,&#32;<emphasis role="stringliteral">&quot;The&#32;Font&#32;Assets&#32;that&#32;will&#32;be&#32;searched&#32;to&#32;locate&#32;and&#32;replace&#32;missing&#32;characters&#32;from&#32;a&#32;given&#32;Font&#32;Asset.&quot;</emphasis>);
+00018 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keyword">static</emphasis>&#32;readonly&#32;GUIContent&#32;fallbackFontAssetsListLabel&#32;=&#32;<emphasis role="keyword">new</emphasis>&#32;GUIContent(<emphasis role="stringliteral">&quot;Fallback&#32;Font&#32;Assets&#32;List&quot;</emphasis>,&#32;<emphasis role="stringliteral">&quot;The&#32;Font&#32;Assets&#32;that&#32;will&#32;be&#32;searched&#32;to&#32;locate&#32;and&#32;replace&#32;missing&#32;characters&#32;from&#32;a&#32;given&#32;Font&#32;Asset.&quot;</emphasis>);
+00019 
+00020 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keyword">static</emphasis>&#32;readonly&#32;GUIContent&#32;fallbackMaterialSettingsLabel&#32;=&#32;<emphasis role="keyword">new</emphasis>&#32;GUIContent(<emphasis role="stringliteral">&quot;Fallback&#32;Material&#32;Settings&quot;</emphasis>);
+00021 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keyword">static</emphasis>&#32;readonly&#32;GUIContent&#32;matchMaterialPresetLabel&#32;=&#32;<emphasis role="keyword">new</emphasis>&#32;GUIContent(<emphasis role="stringliteral">&quot;Match&#32;Material&#32;Presets&quot;</emphasis>);
+00022 
+00023 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keyword">static</emphasis>&#32;readonly&#32;GUIContent&#32;containerDefaultSettingsLabel&#32;=&#32;<emphasis role="keyword">new</emphasis>&#32;GUIContent(<emphasis role="stringliteral">&quot;Text&#32;Container&#32;Default&#32;Settings&quot;</emphasis>);
+00024 
+00025 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keyword">static</emphasis>&#32;readonly&#32;GUIContent&#32;textMeshProLabel&#32;=&#32;<emphasis role="keyword">new</emphasis>&#32;GUIContent(<emphasis role="stringliteral">&quot;TextMeshPro&quot;</emphasis>);
+00026 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keyword">static</emphasis>&#32;readonly&#32;GUIContent&#32;textMeshProUiLabel&#32;=&#32;<emphasis role="keyword">new</emphasis>&#32;GUIContent(<emphasis role="stringliteral">&quot;TextMeshPro&#32;UI&quot;</emphasis>);
+00027 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keyword">static</emphasis>&#32;readonly&#32;GUIContent&#32;autoSizeContainerLabel&#32;=&#32;<emphasis role="keyword">new</emphasis>&#32;GUIContent(<emphasis role="stringliteral">&quot;Auto&#32;Size&#32;Text&#32;Container&quot;</emphasis>,&#32;<emphasis role="stringliteral">&quot;Set&#32;the&#32;size&#32;of&#32;the&#32;text&#32;container&#32;to&#32;match&#32;the&#32;text.&quot;</emphasis>);
+00028 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;
+00029 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keyword">static</emphasis>&#32;readonly&#32;GUIContent&#32;textComponentDefaultSettingsLabel&#32;=&#32;<emphasis role="keyword">new</emphasis>&#32;GUIContent(<emphasis role="stringliteral">&quot;Text&#32;Component&#32;Default&#32;Settings&quot;</emphasis>);
+00030 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keyword">static</emphasis>&#32;readonly&#32;GUIContent&#32;defaultFontSize&#32;=&#32;<emphasis role="keyword">new</emphasis>&#32;GUIContent(<emphasis role="stringliteral">&quot;Default&#32;Font&#32;Size&quot;</emphasis>);
+00031 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keyword">static</emphasis>&#32;readonly&#32;GUIContent&#32;autoSizeRatioLabel&#32;=&#32;<emphasis role="keyword">new</emphasis>&#32;GUIContent(<emphasis role="stringliteral">&quot;Text&#32;Auto&#32;Size&#32;Ratios&quot;</emphasis>);
+00032 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keyword">static</emphasis>&#32;readonly&#32;GUIContent&#32;minLabel&#32;=&#32;<emphasis role="keyword">new</emphasis>&#32;GUIContent(<emphasis role="stringliteral">&quot;Min&quot;</emphasis>);
+00033 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keyword">static</emphasis>&#32;readonly&#32;GUIContent&#32;maxLabel&#32;=&#32;<emphasis role="keyword">new</emphasis>&#32;GUIContent(<emphasis role="stringliteral">&quot;Max&quot;</emphasis>);
+00034 
+00035 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keyword">static</emphasis>&#32;readonly&#32;GUIContent&#32;wordWrappingLabel&#32;=&#32;<emphasis role="keyword">new</emphasis>&#32;GUIContent(<emphasis role="stringliteral">&quot;Word&#32;Wrapping&quot;</emphasis>);
+00036 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keyword">static</emphasis>&#32;readonly&#32;GUIContent&#32;kerningLabel&#32;=&#32;<emphasis role="keyword">new</emphasis>&#32;GUIContent(<emphasis role="stringliteral">&quot;Kerning&quot;</emphasis>);
+00037 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keyword">static</emphasis>&#32;readonly&#32;GUIContent&#32;extraPaddingLabel&#32;=&#32;<emphasis role="keyword">new</emphasis>&#32;GUIContent(<emphasis role="stringliteral">&quot;Extra&#32;Padding&quot;</emphasis>);
+00038 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keyword">static</emphasis>&#32;readonly&#32;GUIContent&#32;tintAllSpritesLabel&#32;=&#32;<emphasis role="keyword">new</emphasis>&#32;GUIContent(<emphasis role="stringliteral">&quot;Tint&#32;All&#32;Sprites&quot;</emphasis>);
+00039 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keyword">static</emphasis>&#32;readonly&#32;GUIContent&#32;parseEscapeCharactersLabel&#32;=&#32;<emphasis role="keyword">new</emphasis>&#32;GUIContent(<emphasis role="stringliteral">&quot;Parse&#32;Escape&#32;Sequence&quot;</emphasis>);
+00040 
+00041 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keyword">static</emphasis>&#32;readonly&#32;GUIContent&#32;missingGlyphsTitleLabel&#32;=&#32;<emphasis role="keyword">new</emphasis>&#32;GUIContent(<emphasis role="stringliteral">&quot;Missing&#32;glyphs&quot;</emphasis>);
+00042 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keyword">static</emphasis>&#32;readonly&#32;GUIContent&#32;missingGlyphLabel&#32;=&#32;<emphasis role="keyword">new</emphasis>&#32;GUIContent(<emphasis role="stringliteral">&quot;Replacement&quot;</emphasis>,&#32;<emphasis role="stringliteral">&quot;The&#32;glyph&#32;to&#32;be&#32;used&#32;as&#32;a&#32;replacement&#32;when&#32;a&#32;glyph&#32;can&apos;t&#32;be&#32;found&#32;in&#32;a&#32;font&#32;asset.&quot;</emphasis>);
+00043 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keyword">static</emphasis>&#32;readonly&#32;GUIContent&#32;disableWarningsLabel&#32;=&#32;<emphasis role="keyword">new</emphasis>&#32;GUIContent(<emphasis role="stringliteral">&quot;Disable&#32;warnings&quot;</emphasis>);
+00044 
+00045 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keyword">static</emphasis>&#32;readonly&#32;GUIContent&#32;defaultSpriteAssetLabel&#32;=&#32;<emphasis role="keyword">new</emphasis>&#32;GUIContent(<emphasis role="stringliteral">&quot;Default&#32;Sprite&#32;Asset&quot;</emphasis>,&#32;<emphasis role="stringliteral">&quot;The&#32;Sprite&#32;Asset&#32;that&#32;will&#32;be&#32;assigned&#32;by&#32;default&#32;when&#32;using&#32;the&#32;&lt;sprite&gt;&#32;tag&#32;when&#32;no&#32;Sprite&#32;Asset&#32;is&#32;specified.&quot;</emphasis>);
+00046 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keyword">static</emphasis>&#32;readonly&#32;GUIContent&#32;enableEmojiSupportLabel&#32;=&#32;<emphasis role="keyword">new</emphasis>&#32;GUIContent(<emphasis role="stringliteral">&quot;iOS&#32;Emoji&#32;Support&quot;</emphasis>,&#32;<emphasis role="stringliteral">&quot;Enables&#32;Emoji&#32;support&#32;for&#32;Touch&#32;Screen&#32;Keyboards&#32;on&#32;target&#32;devices.&quot;</emphasis>);
+00047 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keyword">static</emphasis>&#32;readonly&#32;GUIContent&#32;spriteAssetsPathLabel&#32;=&#32;<emphasis role="keyword">new</emphasis>&#32;GUIContent(<emphasis role="stringliteral">&quot;Path:&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;Resources/&quot;</emphasis>,&#32;<emphasis role="stringliteral">&quot;The&#32;relative&#32;path&#32;to&#32;a&#32;Resources&#32;folder&#32;where&#32;the&#32;Sprite&#32;Assets&#32;are&#32;located.\nExample&#32;\&quot;Sprite&#32;Assets/\&quot;&quot;</emphasis>);
+00048 
+00049 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keyword">static</emphasis>&#32;readonly&#32;GUIContent&#32;defaultStyleSheetLabel&#32;=&#32;<emphasis role="keyword">new</emphasis>&#32;GUIContent(<emphasis role="stringliteral">&quot;Default&#32;Style&#32;Sheet&quot;</emphasis>,&#32;<emphasis role="stringliteral">&quot;The&#32;Style&#32;Sheet&#32;that&#32;will&#32;be&#32;used&#32;for&#32;all&#32;text&#32;objects&#32;in&#32;this&#32;project.&quot;</emphasis>);
+00050 
+00051 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keyword">static</emphasis>&#32;readonly&#32;GUIContent&#32;colorGradientPresetsLabel&#32;=&#32;<emphasis role="keyword">new</emphasis>&#32;GUIContent(<emphasis role="stringliteral">&quot;Color&#32;Gradient&#32;Presets&quot;</emphasis>,&#32;<emphasis role="stringliteral">&quot;The&#32;relative&#32;path&#32;to&#32;a&#32;Resources&#32;folder&#32;where&#32;the&#32;Color&#32;Gradient&#32;Presets&#32;are&#32;located.\nExample&#32;\&quot;Color&#32;Gradient&#32;Presets/\&quot;&quot;</emphasis>);
+00052 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keyword">static</emphasis>&#32;readonly&#32;GUIContent&#32;colorGradientsPathLabel&#32;=&#32;<emphasis role="keyword">new</emphasis>&#32;GUIContent(<emphasis role="stringliteral">&quot;Path:&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;Resources/&quot;</emphasis>,&#32;<emphasis role="stringliteral">&quot;The&#32;relative&#32;path&#32;to&#32;a&#32;Resources&#32;folder&#32;where&#32;the&#32;Color&#32;Gradient&#32;Presets&#32;are&#32;located.\nExample&#32;\&quot;Color&#32;Gradient&#32;Presets/\&quot;&quot;</emphasis>);
+00053 
+00054 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keyword">static</emphasis>&#32;readonly&#32;GUIContent&#32;lineBreakingLabel&#32;=&#32;<emphasis role="keyword">new</emphasis>&#32;GUIContent(<emphasis role="stringliteral">&quot;Line&#32;Breaking&#32;for&#32;Asian&#32;languages&quot;</emphasis>,&#32;<emphasis role="stringliteral">&quot;The&#32;text&#32;assets&#32;that&#32;contain&#32;the&#32;Leading&#32;and&#32;Following&#32;characters&#32;which&#32;define&#32;the&#32;rules&#32;for&#32;line&#32;breaking&#32;with&#32;Asian&#32;languages.&quot;</emphasis>);
+00055 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00056 
+00057 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;SerializedProperty&#32;m_PropFontAsset;
+00058 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;SerializedProperty&#32;m_PropDefaultFontAssetPath;
+00059 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;SerializedProperty&#32;m_PropDefaultFontSize;
+00060 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;SerializedProperty&#32;m_PropDefaultAutoSizeMinRatio;
+00061 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;SerializedProperty&#32;m_PropDefaultAutoSizeMaxRatio;
+00062 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;SerializedProperty&#32;m_PropDefaultTextMeshProTextContainerSize;
+00063 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;SerializedProperty&#32;m_PropDefaultTextMeshProUITextContainerSize;
+00064 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;SerializedProperty&#32;m_PropAutoSizeTextContainer;
+00065 
+00066 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;SerializedProperty&#32;m_PropSpriteAsset;
+00067 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;SerializedProperty&#32;m_PropSpriteAssetPath;
+00068 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;SerializedProperty&#32;m_PropEnableEmojiSupport;
+00069 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;SerializedProperty&#32;m_PropStyleSheet;
+00070 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;ReorderableList&#32;m_List;
+00071 
+00072 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;SerializedProperty&#32;m_PropColorGradientPresetsPath;
+00073 
+00074 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;SerializedProperty&#32;m_PropMatchMaterialPreset;
+00075 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;SerializedProperty&#32;m_PropWordWrapping;
+00076 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;SerializedProperty&#32;m_PropKerning;
+00077 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;SerializedProperty&#32;m_PropExtraPadding;
+00078 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;SerializedProperty&#32;m_PropTintAllSprites;
+00079 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;SerializedProperty&#32;m_PropParseEscapeCharacters;
+00080 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;SerializedProperty&#32;m_PropMissingGlyphCharacter;
+00081 
+00082 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;SerializedProperty&#32;m_PropWarningsDisabled;
+00083 
+00084 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;SerializedProperty&#32;m_PropLeadingCharacters;
+00085 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;SerializedProperty&#32;m_PropFollowingCharacters;
+00086 
+<anchor xml:id="__t_m_p___settings_editor_8cs_source_1l00087"/><link linkend="_class_t_m_pro_1_1_editor_utilities_1_1_t_m_p___settings_editor_1aa1e2d9326a325078d8bd7ad9cc186078">00087</link> &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;<link linkend="_class_t_m_pro_1_1_editor_utilities_1_1_t_m_p___settings_editor_1aa1e2d9326a325078d8bd7ad9cc186078">OnEnable</link>()
+00088 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00089 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(target&#32;==&#32;<emphasis role="keyword">null</emphasis>)
+00090 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>;
+00091 
+00092 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;m_PropFontAsset&#32;=&#32;serializedObject.FindProperty(<emphasis role="stringliteral">&quot;m_defaultFontAsset&quot;</emphasis>);
+00093 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;m_PropDefaultFontAssetPath&#32;=&#32;serializedObject.FindProperty(<emphasis role="stringliteral">&quot;m_defaultFontAssetPath&quot;</emphasis>);
+00094 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;m_PropDefaultFontSize&#32;=&#32;serializedObject.FindProperty(<emphasis role="stringliteral">&quot;m_defaultFontSize&quot;</emphasis>);
+00095 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;m_PropDefaultAutoSizeMinRatio&#32;=&#32;serializedObject.FindProperty(<emphasis role="stringliteral">&quot;m_defaultAutoSizeMinRatio&quot;</emphasis>);
+00096 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;m_PropDefaultAutoSizeMaxRatio&#32;=&#32;serializedObject.FindProperty(<emphasis role="stringliteral">&quot;m_defaultAutoSizeMaxRatio&quot;</emphasis>);
+00097 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;m_PropDefaultTextMeshProTextContainerSize&#32;=&#32;serializedObject.FindProperty(<emphasis role="stringliteral">&quot;m_defaultTextMeshProTextContainerSize&quot;</emphasis>);
+00098 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;m_PropDefaultTextMeshProUITextContainerSize&#32;=&#32;serializedObject.FindProperty(<emphasis role="stringliteral">&quot;m_defaultTextMeshProUITextContainerSize&quot;</emphasis>);
+00099 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;m_PropAutoSizeTextContainer&#32;=&#32;serializedObject.FindProperty(<emphasis role="stringliteral">&quot;m_autoSizeTextContainer&quot;</emphasis>);
+00100 
+00101 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;m_PropSpriteAsset&#32;=&#32;serializedObject.FindProperty(<emphasis role="stringliteral">&quot;m_defaultSpriteAsset&quot;</emphasis>);
+00102 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;m_PropSpriteAssetPath&#32;=&#32;serializedObject.FindProperty(<emphasis role="stringliteral">&quot;m_defaultSpriteAssetPath&quot;</emphasis>);
+00103 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;m_PropEnableEmojiSupport&#32;=&#32;serializedObject.FindProperty(<emphasis role="stringliteral">&quot;m_enableEmojiSupport&quot;</emphasis>);
+00104 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;m_PropStyleSheet&#32;=&#32;serializedObject.FindProperty(<emphasis role="stringliteral">&quot;m_defaultStyleSheet&quot;</emphasis>);
+00105 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;m_PropColorGradientPresetsPath&#32;=&#32;serializedObject.FindProperty(<emphasis role="stringliteral">&quot;m_defaultColorGradientPresetsPath&quot;</emphasis>);
+00106 
+00107 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;m_List&#32;=&#32;<emphasis role="keyword">new</emphasis>&#32;ReorderableList(serializedObject,&#32;serializedObject.FindProperty(<emphasis role="stringliteral">&quot;m_fallbackFontAssets&quot;</emphasis>),&#32;<emphasis role="keyword">true</emphasis>,&#32;<emphasis role="keyword">true</emphasis>,&#32;<emphasis role="keyword">true</emphasis>,&#32;<emphasis role="keyword">true</emphasis>);
+00108 
+00109 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;m_List.drawElementCallback&#32;=&#32;(rect,&#32;index,&#32;isActive,&#32;isFocused)&#32;=&gt;
+00110 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00111 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;var&#32;element&#32;=&#32;m_List.serializedProperty.GetArrayElementAtIndex(index);
+00112 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;rect.y&#32;+=&#32;2;
+00113 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;EditorGUI.PropertyField(<emphasis role="keyword">new</emphasis>&#32;Rect(rect.x,&#32;rect.y,&#32;rect.width,&#32;EditorGUIUtility.singleLineHeight),&#32;element,&#32;GUIContent.none);
+00114 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;};
+00115 
+00116 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;m_List.drawHeaderCallback&#32;=&#32;rect&#32;=&gt;
+00117 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00118 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;EditorGUI.LabelField(rect,&#32;Styles.fallbackFontAssetsListLabel);
+00119 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;};
+00120 
+00121 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;m_PropMatchMaterialPreset&#32;=&#32;serializedObject.FindProperty(<emphasis role="stringliteral">&quot;m_matchMaterialPreset&quot;</emphasis>);
+00122 
+00123 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;m_PropWordWrapping&#32;=&#32;serializedObject.FindProperty(<emphasis role="stringliteral">&quot;m_enableWordWrapping&quot;</emphasis>);
+00124 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;m_PropKerning&#32;=&#32;serializedObject.FindProperty(<emphasis role="stringliteral">&quot;m_enableKerning&quot;</emphasis>);
+00125 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;m_PropExtraPadding&#32;=&#32;serializedObject.FindProperty(<emphasis role="stringliteral">&quot;m_enableExtraPadding&quot;</emphasis>);
+00126 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;m_PropTintAllSprites&#32;=&#32;serializedObject.FindProperty(<emphasis role="stringliteral">&quot;m_enableTintAllSprites&quot;</emphasis>);
+00127 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;m_PropParseEscapeCharacters&#32;=&#32;serializedObject.FindProperty(<emphasis role="stringliteral">&quot;m_enableParseEscapeCharacters&quot;</emphasis>);
+00128 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;m_PropMissingGlyphCharacter&#32;=&#32;serializedObject.FindProperty(<emphasis role="stringliteral">&quot;m_missingGlyphCharacter&quot;</emphasis>);
+00129 
+00130 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;m_PropWarningsDisabled&#32;=&#32;serializedObject.FindProperty(<emphasis role="stringliteral">&quot;m_warningsDisabled&quot;</emphasis>);
+00131 
+00132 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;m_PropLeadingCharacters&#32;=&#32;serializedObject.FindProperty(<emphasis role="stringliteral">&quot;m_leadingCharacters&quot;</emphasis>);
+00133 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;m_PropFollowingCharacters&#32;=&#32;serializedObject.FindProperty(<emphasis role="stringliteral">&quot;m_followingCharacters&quot;</emphasis>);
+00134 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00135 
+<anchor xml:id="__t_m_p___settings_editor_8cs_source_1l00136"/><link linkend="_class_t_m_pro_1_1_editor_utilities_1_1_t_m_p___settings_editor_1a11891e45e7299c16ee2cf20b420d09b1">00136</link> &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keyword">override</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;<link linkend="_class_t_m_pro_1_1_editor_utilities_1_1_t_m_p___settings_editor_1a11891e45e7299c16ee2cf20b420d09b1">OnInspectorGUI</link>()
+00137 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00138 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;serializedObject.Update();
+00139 
+00140 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordtype">float</emphasis>&#32;labelWidth&#32;=&#32;EditorGUIUtility.labelWidth;
+00141 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordtype">float</emphasis>&#32;fieldWidth&#32;=&#32;EditorGUIUtility.fieldWidth;
+00142 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;
+00143 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;TextMeshPro&#32;Font&#32;Info&#32;Panel</emphasis>
+00144 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;EditorGUI.indentLevel&#32;=&#32;0;
+00145 
+00146 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;FONT&#32;ASSET</emphasis>
+00147 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;EditorGUILayout.BeginVertical(EditorStyles.helpBox);
+00148 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;GUILayout.Label(Styles.defaultFontAssetLabel,&#32;EditorStyles.boldLabel);
+00149 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;EditorGUI.indentLevel&#32;=&#32;1;
+00150 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;EditorGUILayout.PropertyField(m_PropFontAsset,&#32;Styles.defaultFontAssetLabel);
+00151 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;EditorGUILayout.PropertyField(m_PropDefaultFontAssetPath,&#32;Styles.defaultFontAssetPathLabel);
+00152 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;EditorGUI.indentLevel&#32;=&#32;0;
+00153 
+00154 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;EditorGUILayout.Space();
+00155 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;EditorGUILayout.EndVertical();
+00156 
+00157 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;FALLBACK&#32;FONT&#32;ASSETs</emphasis>
+00158 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;EditorGUILayout.BeginVertical(EditorStyles.helpBox);
+00159 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;GUILayout.Label(Styles.fallbackFontAssetsLabel,&#32;EditorStyles.boldLabel);
+00160 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;m_List.DoLayoutList();
+00161 
+00162 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;GUILayout.Label(Styles.fallbackMaterialSettingsLabel,&#32;EditorStyles.boldLabel);
+00163 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;EditorGUI.indentLevel&#32;=&#32;1;
+00164 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;EditorGUILayout.PropertyField(m_PropMatchMaterialPreset,&#32;Styles.matchMaterialPresetLabel);
+00165 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;EditorGUI.indentLevel&#32;=&#32;0;
+00166 
+00167 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;EditorGUILayout.Space();
+00168 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;EditorGUILayout.EndVertical();
+00169 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;
+00170 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;MISSING&#32;GLYPHS</emphasis>
+00171 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;EditorGUILayout.BeginVertical(EditorStyles.helpBox);
+00172 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;GUILayout.Label(Styles.missingGlyphsTitleLabel,&#32;EditorStyles.boldLabel);
+00173 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;EditorGUI.indentLevel&#32;=&#32;1;
+00174 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;EditorGUILayout.PropertyField(m_PropMissingGlyphCharacter,&#32;Styles.missingGlyphLabel);
+00175 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;EditorGUILayout.PropertyField(m_PropWarningsDisabled,&#32;Styles.disableWarningsLabel);
+00176 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;EditorGUI.indentLevel&#32;=&#32;0;
+00177 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;
+00178 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;EditorGUILayout.Space();
+00179 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;EditorGUILayout.EndVertical();
+00180 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;
+00181 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;TEXT&#32;OBJECT&#32;DEFAULT&#32;PROPERTIES</emphasis>
+00182 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;EditorGUILayout.BeginVertical(EditorStyles.helpBox);
+00183 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;GUILayout.Label(Styles.containerDefaultSettingsLabel,&#32;EditorStyles.boldLabel);
+00184 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;EditorGUI.indentLevel&#32;=&#32;1;
+00185 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;
+00186 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;EditorGUILayout.PropertyField(m_PropDefaultTextMeshProTextContainerSize,&#32;Styles.textMeshProLabel);
+00187 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;EditorGUILayout.PropertyField(m_PropDefaultTextMeshProUITextContainerSize,&#32;Styles.textMeshProUiLabel);
+00188 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;EditorGUILayout.PropertyField(m_PropAutoSizeTextContainer,&#32;Styles.autoSizeContainerLabel);
+00189 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;EditorGUI.indentLevel&#32;=&#32;0;
+00190 
+00191 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;EditorGUILayout.Space();
+00192 
+00193 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;GUILayout.Label(Styles.textComponentDefaultSettingsLabel,&#32;EditorStyles.boldLabel);
+00194 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;EditorGUI.indentLevel&#32;=&#32;1;
+00195 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;EditorGUILayout.PropertyField(m_PropDefaultFontSize,&#32;Styles.defaultFontSize);
+00196 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;
+00197 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;EditorGUILayout.BeginHorizontal();
+00198 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00199 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;EditorGUILayout.PrefixLabel(Styles.autoSizeRatioLabel);
+00200 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;EditorGUIUtility.labelWidth&#32;=&#32;32;
+00201 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;EditorGUIUtility.fieldWidth&#32;=&#32;10;
+00202 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;
+00203 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;EditorGUI.indentLevel&#32;=&#32;0;
+00204 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;EditorGUILayout.PropertyField(m_PropDefaultAutoSizeMinRatio,&#32;Styles.minLabel);
+00205 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;EditorGUILayout.PropertyField(m_PropDefaultAutoSizeMaxRatio,&#32;Styles.maxLabel);
+00206 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;EditorGUI.indentLevel&#32;=&#32;1;
+00207 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00208 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;EditorGUILayout.EndHorizontal();
+00209 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;
+00210 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;EditorGUIUtility.labelWidth&#32;=&#32;labelWidth;
+00211 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;EditorGUIUtility.fieldWidth&#32;=&#32;fieldWidth;
+00212 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;
+00213 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;EditorGUILayout.PropertyField(m_PropWordWrapping,&#32;Styles.wordWrappingLabel);
+00214 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;EditorGUILayout.PropertyField(m_PropKerning,&#32;Styles.kerningLabel);
+00215 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;
+00216 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;EditorGUILayout.PropertyField(m_PropExtraPadding,&#32;Styles.extraPaddingLabel);
+00217 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;EditorGUILayout.PropertyField(m_PropTintAllSprites,&#32;Styles.tintAllSpritesLabel);
+00218 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;
+00219 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;EditorGUILayout.PropertyField(m_PropParseEscapeCharacters,&#32;Styles.parseEscapeCharactersLabel);
+00220 
+00221 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;EditorGUI.indentLevel&#32;=&#32;0;
+00222 
+00223 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;EditorGUILayout.Space();
+00224 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;EditorGUILayout.EndVertical();
+00225 
+00226 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;SPRITE&#32;ASSET</emphasis>
+00227 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;EditorGUILayout.BeginVertical(EditorStyles.helpBox);
+00228 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;GUILayout.Label(Styles.defaultSpriteAssetLabel,&#32;EditorStyles.boldLabel);
+00229 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;EditorGUI.indentLevel&#32;=&#32;1;
+00230 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;EditorGUILayout.PropertyField(m_PropSpriteAsset,&#32;Styles.defaultSpriteAssetLabel);
+00231 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;EditorGUILayout.PropertyField(m_PropEnableEmojiSupport,&#32;Styles.enableEmojiSupportLabel);
+00232 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;EditorGUILayout.PropertyField(m_PropSpriteAssetPath,&#32;Styles.spriteAssetsPathLabel);
+00233 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;EditorGUI.indentLevel&#32;=&#32;0;
+00234 
+00235 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;EditorGUILayout.Space();
+00236 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;EditorGUILayout.EndVertical();
+00237 
+00238 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;STYLE&#32;SHEET</emphasis>
+00239 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;EditorGUILayout.BeginVertical(EditorStyles.helpBox);
+00240 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;GUILayout.Label(Styles.defaultStyleSheetLabel,&#32;EditorStyles.boldLabel);
+00241 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;EditorGUI.indentLevel&#32;=&#32;1;
+00242 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;EditorGUI.BeginChangeCheck();
+00243 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;EditorGUILayout.PropertyField(m_PropStyleSheet,&#32;Styles.defaultStyleSheetLabel);
+00244 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(EditorGUI.EndChangeCheck())
+00245 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00246 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;serializedObject.ApplyModifiedProperties();
+00247 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_t_m_pro_1_1_t_m_p___style_sheet">TMP_StyleSheet</link>.<link linkend="_class_t_m_pro_1_1_t_m_p___style_sheet_1a4bab3ca47934d537b41ae066eabac404">UpdateStyleSheet</link>();
+00248 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00249 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;EditorGUI.indentLevel&#32;=&#32;0;
+00250 
+00251 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;EditorGUILayout.Space();
+00252 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;EditorGUILayout.EndVertical();
+00253 
+00254 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;COLOR&#32;GRADIENT&#32;PRESETS</emphasis>
+00255 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;EditorGUILayout.BeginVertical(EditorStyles.helpBox);
+00256 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;GUILayout.Label(Styles.colorGradientPresetsLabel,&#32;EditorStyles.boldLabel);
+00257 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;EditorGUI.indentLevel&#32;=&#32;1;
+00258 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;EditorGUILayout.PropertyField(m_PropColorGradientPresetsPath,&#32;Styles.colorGradientsPathLabel);
+00259 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;EditorGUI.indentLevel&#32;=&#32;0;
+00260 
+00261 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;EditorGUILayout.Space();
+00262 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;EditorGUILayout.EndVertical();
+00263 
+00264 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;LINE&#32;BREAKING&#32;RULE</emphasis>
+00265 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;EditorGUILayout.BeginVertical(EditorStyles.helpBox);
+00266 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;GUILayout.Label(Styles.lineBreakingLabel,&#32;EditorStyles.boldLabel);
+00267 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;EditorGUI.indentLevel&#32;=&#32;1;
+00268 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;EditorGUILayout.PropertyField(m_PropLeadingCharacters);
+00269 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;EditorGUILayout.PropertyField(m_PropFollowingCharacters);
+00270 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;EditorGUI.indentLevel&#32;=&#32;0;
+00271 
+00272 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;EditorGUILayout.Space();
+00273 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;EditorGUILayout.EndVertical();
+00274 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;
+00275 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(serializedObject.ApplyModifiedProperties())
+00276 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00277 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;EditorUtility.SetDirty(target);
+00278 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;TMPro_EventManager.ON_TMP_SETTINGS_CHANGED();
+00279 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00280 
+00281 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00282 
+00283 <emphasis role="preprocessor">&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;#if&#32;UNITY_2018_3_OR_NEWER</emphasis>
+00284 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;[SettingsProvider]
+00285 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">static</emphasis>&#32;SettingsProvider&#32;CreateTMPSettingsProvider()
+00286 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00287 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;var&#32;provider&#32;=&#32;<emphasis role="keyword">new</emphasis>&#32;AssetSettingsProvider(<emphasis role="stringliteral">&quot;Project/TextMesh&#32;Pro&quot;</emphasis>,&#32;()&#32;=&gt;&#32;<link linkend="_class_t_m_pro_1_1_t_m_p___settings">TMP_Settings</link>.<link linkend="_class_t_m_pro_1_1_t_m_p___settings_1a27bd5ea027ced6add42d15cc09d2925b">instance</link>);
+00288 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;provider.PopulateSearchKeywordsFromGUIContentProperties&lt;Styles&gt;();
+00289 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;provider;
+00290 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00291 <emphasis role="preprocessor">&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;#endif</emphasis>
+00292 &#32;&#32;&#32;&#32;}
+00293 }
+</programlisting></section>

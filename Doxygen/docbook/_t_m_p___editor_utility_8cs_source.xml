@@ -1,0 +1,404 @@
+<?xml version='1.0' encoding='UTF-8' standalone='no'?>
+<section xmlns="http://docbook.org/ns/docbook" version="5.0" xmlns:xlink="http://www.w3.org/1999/xlink" xml:id="__t_m_p___editor_utility_8cs_source">
+<title>TMP_EditorUtility.cs</title>
+<indexterm><primary>O:/GitHUBMINIPRoject/Library/PackageCache/com.unity.textmeshpro@1.3.0/Scripts/Editor/TMP_EditorUtility.cs</primary></indexterm>
+<programlisting>00001 <emphasis role="keyword">using</emphasis>&#32;<link linkend="__balloon_8cs_1a7d67e097df9376eb709b6a23aa3c7d23">UnityEngine</link>;
+00002 <emphasis role="keyword">using</emphasis>&#32;<link linkend="_namespace_unity_editor">UnityEditor</link>;
+00003 <emphasis role="keyword">using</emphasis>&#32;System.Text;
+00004 <emphasis role="keyword">using</emphasis>&#32;System.IO;
+00005 <emphasis role="keyword">using</emphasis>&#32;System.Collections;
+00006 <emphasis role="keyword">using</emphasis>&#32;System.Collections.Generic;
+00007 
+00008 
+00009 <emphasis role="keyword">namespace&#32;</emphasis><link linkend="_namespace_t_m_pro_1_1_editor_utilities">TMPro.EditorUtilities</link>
+00010 {
+00011 
+00012 &#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keyword">static</emphasis>&#32;<emphasis role="keyword">class&#32;</emphasis>TMP_EditorUtility
+00013 &#32;&#32;&#32;&#32;{
+00017 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keyword">static</emphasis>&#32;<emphasis role="keywordtype">string</emphasis>&#32;packageRelativePath
+00018 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00019 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">get</emphasis>
+00020 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00021 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(<emphasis role="keywordtype">string</emphasis>.IsNullOrEmpty(m_PackagePath))
+00022 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;m_PackagePath&#32;=&#32;GetPackageRelativePath();
+00023 
+00024 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;m_PackagePath;
+00025 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00026 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00027 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;[SerializeField]
+00028 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;<emphasis role="keyword">static</emphasis>&#32;<emphasis role="keywordtype">string</emphasis>&#32;m_PackagePath;
+00029 
+00033 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keyword">static</emphasis>&#32;<emphasis role="keywordtype">string</emphasis>&#32;packageFullPath
+00034 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00035 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">get</emphasis>
+00036 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00037 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(<emphasis role="keywordtype">string</emphasis>.IsNullOrEmpty(m_PackageFullPath))
+00038 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;m_PackageFullPath&#32;=&#32;GetPackageFullPath();
+00039 
+00040 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;m_PackageFullPath;
+00041 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00042 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00043 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;[SerializeField]
+00044 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;<emphasis role="keyword">static</emphasis>&#32;<emphasis role="keywordtype">string</emphasis>&#32;m_PackageFullPath;
+00045 
+00046 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;
+00047 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;Static&#32;Fields&#32;Related&#32;to&#32;locating&#32;the&#32;TextMesh&#32;Pro&#32;Asset</emphasis>
+00048 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;<emphasis role="keyword">static</emphasis>&#32;<emphasis role="keywordtype">string</emphasis>&#32;folderPath&#32;=&#32;<emphasis role="stringliteral">&quot;Not&#32;Found&quot;</emphasis>;
+00049 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;
+00050 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;<emphasis role="keyword">static</emphasis>&#32;EditorWindow&#32;Gameview;
+00051 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;<emphasis role="keyword">static</emphasis>&#32;<emphasis role="keywordtype">bool</emphasis>&#32;isInitialized&#32;=&#32;<emphasis role="keyword">false</emphasis>;
+00052 
+00053 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;<emphasis role="keyword">static</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;GetGameview()
+00054 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00055 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;System.Reflection.Assembly&#32;assembly&#32;=&#32;typeof(<link linkend="_namespace_unity_editor">UnityEditor</link>.EditorWindow).Assembly;
+00056 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;System.Type&#32;type&#32;=&#32;assembly.GetType(<emphasis role="stringliteral">&quot;UnityEditor.GameView&quot;</emphasis>);
+00057 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;Gameview&#32;=&#32;EditorWindow.GetWindow(type);
+00058 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00059 
+00060 
+00061 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keyword">static</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;RepaintAll()
+00062 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00063 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(isInitialized&#32;==&#32;<emphasis role="keyword">false</emphasis>)
+00064 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00065 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;GetGameview();
+00066 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;isInitialized&#32;=&#32;<emphasis role="keyword">true</emphasis>;
+00067 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00068 
+00069 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;SceneView.RepaintAll();
+00070 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;Gameview.Repaint();
+00071 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00072 
+00073 
+00083 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keyword">static</emphasis>&#32;T&#32;CreateAsset&lt;T&gt;(<emphasis role="keywordtype">string</emphasis>&#32;name)&#32;where&#32;T&#32;:&#32;ScriptableObject
+00084 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00085 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordtype">string</emphasis>&#32;path&#32;=&#32;AssetDatabase.GetAssetPath(Selection.activeObject);
+00086 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(path.Length&#32;==&#32;0)
+00087 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00088 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;no&#32;asset&#32;selected,&#32;place&#32;in&#32;asset&#32;root</emphasis>
+00089 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;path&#32;=&#32;<emphasis role="stringliteral">&quot;Assets/&quot;</emphasis>&#32;+&#32;name&#32;+&#32;<emphasis role="stringliteral">&quot;.asset&quot;</emphasis>;
+00090 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00091 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">else</emphasis>&#32;<emphasis role="keywordflow">if</emphasis>&#32;(Directory.Exists(path))
+00092 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00093 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;place&#32;in&#32;currently&#32;selected&#32;directory</emphasis>
+00094 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;path&#32;+=&#32;<emphasis role="stringliteral">&quot;/&quot;</emphasis>&#32;+&#32;name&#32;+&#32;<emphasis role="stringliteral">&quot;.asset&quot;</emphasis>;
+00095 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00096 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">else</emphasis>&#32;{
+00097 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;place&#32;in&#32;current&#32;selection&apos;s&#32;containing&#32;directory</emphasis>
+00098 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;path&#32;=&#32;Path.GetDirectoryName(path)&#32;+&#32;<emphasis role="stringliteral">&quot;/&quot;</emphasis>&#32;+&#32;name&#32;+&#32;<emphasis role="stringliteral">&quot;.asset&quot;</emphasis>;
+00099 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00100 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;T&#32;asset&#32;=&#32;ScriptableObject.CreateInstance&lt;T&gt;();
+00101 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;AssetDatabase.CreateAsset(asset,&#32;AssetDatabase.GenerateUniqueAssetPath(path));
+00102 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;EditorUtility.FocusProjectWindow();
+00103 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;Selection.activeObject&#32;=&#32;asset;
+00104 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;asset;
+00105 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00106 
+00107 
+00108 
+00109 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;Function&#32;used&#32;to&#32;find&#32;all&#32;materials&#32;which&#32;reference&#32;a&#32;font&#32;atlas&#32;so&#32;we&#32;can&#32;update&#32;all&#32;their&#32;references.</emphasis>
+00110 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keyword">static</emphasis>&#32;Material[]&#32;FindMaterialReferences(TMP_FontAsset&#32;fontAsset)
+00111 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00112 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;List&lt;Material&gt;&#32;refs&#32;=&#32;<emphasis role="keyword">new</emphasis>&#32;List&lt;Material&gt;();
+00113 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;Material&#32;mat&#32;=&#32;fontAsset.material;
+00114 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;refs.Add(mat);
+00115 
+00116 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;Get&#32;materials&#32;matching&#32;the&#32;search&#32;pattern.</emphasis>
+00117 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordtype">string</emphasis>&#32;searchPattern&#32;=&#32;<emphasis role="stringliteral">&quot;t:Material&quot;</emphasis>&#32;+&#32;<emphasis role="stringliteral">&quot;&#32;&quot;</emphasis>&#32;+&#32;fontAsset.name.Split(<emphasis role="keyword">new</emphasis>&#32;<emphasis role="keywordtype">char</emphasis>[]&#32;{&#32;<emphasis role="charliteral">&apos;&#32;&apos;</emphasis>&#32;})[0];
+00118 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordtype">string</emphasis>[]&#32;materialAssetGUIDs&#32;=&#32;AssetDatabase.FindAssets(searchPattern);
+00119 
+00120 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">for</emphasis>&#32;(<emphasis role="keywordtype">int</emphasis>&#32;i&#32;=&#32;0;&#32;i&#32;&lt;&#32;materialAssetGUIDs.Length;&#32;i++)
+00121 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00122 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordtype">string</emphasis>&#32;materialPath&#32;=&#32;AssetDatabase.GUIDToAssetPath(materialAssetGUIDs[i]);
+00123 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;Material&#32;targetMaterial&#32;=&#32;AssetDatabase.LoadAssetAtPath&lt;Material&gt;(materialPath);
+00124 
+00125 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(targetMaterial.HasProperty(ShaderUtilities.ID_MainTex)&#32;&amp;&amp;&#32;targetMaterial.GetTexture(ShaderUtilities.ID_MainTex)&#32;!=&#32;<emphasis role="keyword">null</emphasis>&#32;&amp;&amp;&#32;mat.GetTexture(ShaderUtilities.ID_MainTex)&#32;!=&#32;<emphasis role="keyword">null</emphasis>&#32;&amp;&amp;&#32;targetMaterial.GetTexture(ShaderUtilities.ID_MainTex).GetInstanceID()&#32;==&#32;mat.GetTexture(ShaderUtilities.ID_MainTex).GetInstanceID())
+00126 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00127 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(!refs.Contains(targetMaterial))
+00128 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;refs.Add(targetMaterial);
+00129 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00130 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">else</emphasis>
+00131 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00132 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;TODO:&#32;Find&#32;a&#32;more&#32;efficient&#32;method&#32;to&#32;unload&#32;resources.</emphasis>
+00133 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//Resources.UnloadAsset(targetMaterial.GetTexture(ShaderUtilities.ID_MainTex));</emphasis>
+00134 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00135 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00136 
+00137 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;refs.ToArray();
+00138 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00139 
+00140 
+00141 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;Function&#32;used&#32;to&#32;find&#32;the&#32;Font&#32;Asset&#32;which&#32;matches&#32;the&#32;given&#32;Material&#32;Preset&#32;and&#32;Font&#32;Atlas&#32;Texture.</emphasis>
+00142 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keyword">static</emphasis>&#32;TMP_FontAsset&#32;FindMatchingFontAsset(Material&#32;mat)
+00143 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00144 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(mat.GetTexture(ShaderUtilities.ID_MainTex)&#32;==&#32;<emphasis role="keyword">null</emphasis>)&#32;<emphasis role="keywordflow">return</emphasis>&#32;<emphasis role="keyword">null</emphasis>;
+00145 
+00146 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;Find&#32;the&#32;dependent&#32;assets&#32;of&#32;this&#32;material.</emphasis>
+00147 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordtype">string</emphasis>[]&#32;dependentAssets&#32;=&#32;AssetDatabase.GetDependencies(AssetDatabase.GetAssetPath(mat),&#32;<emphasis role="keyword">false</emphasis>);
+00148 
+00149 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">for</emphasis>&#32;(<emphasis role="keywordtype">int</emphasis>&#32;i&#32;=&#32;0;&#32;i&#32;&lt;&#32;dependentAssets.Length;&#32;i++)
+00150 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00151 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;TMP_FontAsset&#32;fontAsset&#32;=&#32;AssetDatabase.LoadAssetAtPath&lt;TMP_FontAsset&gt;(dependentAssets[i]);
+00152 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(fontAsset&#32;!=&#32;<emphasis role="keyword">null</emphasis>)
+00153 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;fontAsset;
+00154 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00155 
+00156 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;<emphasis role="keyword">null</emphasis>;
+00157 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00158 
+00159 
+00160 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;<emphasis role="keyword">static</emphasis>&#32;<emphasis role="keywordtype">string</emphasis>&#32;GetPackageRelativePath()
+00161 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00162 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;Check&#32;for&#32;potential&#32;UPM&#32;package</emphasis>
+00163 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordtype">string</emphasis>&#32;packagePath&#32;=&#32;Path.GetFullPath(<emphasis role="stringliteral">&quot;Packages/com.unity.textmeshpro&quot;</emphasis>);
+00164 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(Directory.Exists(packagePath))
+00165 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00166 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;<emphasis role="stringliteral">&quot;Packages/com.unity.textmeshpro&quot;</emphasis>;
+00167 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00168 
+00169 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;packagePath&#32;=&#32;Path.GetFullPath(<emphasis role="stringliteral">&quot;Assets/..&quot;</emphasis>);
+00170 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(Directory.Exists(packagePath))
+00171 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00172 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;Search&#32;default&#32;location&#32;for&#32;development&#32;package</emphasis>
+00173 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(Directory.Exists(packagePath&#32;+&#32;<emphasis role="stringliteral">&quot;/Assets/Packages/com.unity.TextMeshPro/Editor&#32;Resources&quot;</emphasis>))
+00174 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00175 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;<emphasis role="stringliteral">&quot;Assets/Packages/com.unity.TextMeshPro&quot;</emphasis>;
+00176 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00177 
+00178 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;Search&#32;for&#32;default&#32;location&#32;of&#32;normal&#32;TextMesh&#32;Pro&#32;AssetStore&#32;package</emphasis>
+00179 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(Directory.Exists(packagePath&#32;+&#32;<emphasis role="stringliteral">&quot;/Assets/TextMesh&#32;Pro/Editor&#32;Resources&quot;</emphasis>))
+00180 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00181 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;<emphasis role="stringliteral">&quot;Assets/TextMesh&#32;Pro&quot;</emphasis>;
+00182 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00183 
+00184 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;Search&#32;for&#32;potential&#32;alternative&#32;locations&#32;in&#32;the&#32;user&#32;project</emphasis>
+00185 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordtype">string</emphasis>[]&#32;matchingPaths&#32;=&#32;Directory.GetDirectories(packagePath,&#32;<emphasis role="stringliteral">&quot;TextMesh&#32;Pro&quot;</emphasis>,&#32;SearchOption.AllDirectories);
+00186 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;packagePath&#32;=&#32;ValidateLocation(matchingPaths,&#32;packagePath);
+00187 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(packagePath&#32;!=&#32;<emphasis role="keyword">null</emphasis>)&#32;<emphasis role="keywordflow">return</emphasis>&#32;packagePath;
+00188 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00189 
+00190 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;<emphasis role="keyword">null</emphasis>;
+00191 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00192 
+00193 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;<emphasis role="keyword">static</emphasis>&#32;<emphasis role="keywordtype">string</emphasis>&#32;GetPackageFullPath()
+00194 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00195 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;Check&#32;for&#32;potential&#32;UPM&#32;package</emphasis>
+00196 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordtype">string</emphasis>&#32;packagePath&#32;=&#32;Path.GetFullPath(<emphasis role="stringliteral">&quot;Packages/com.unity.textmeshpro&quot;</emphasis>);
+00197 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(Directory.Exists(packagePath))
+00198 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00199 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;packagePath;
+00200 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00201 
+00202 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;packagePath&#32;=&#32;Path.GetFullPath(<emphasis role="stringliteral">&quot;Assets/..&quot;</emphasis>);
+00203 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(Directory.Exists(packagePath))
+00204 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00205 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;Search&#32;default&#32;location&#32;for&#32;development&#32;package</emphasis>
+00206 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(Directory.Exists(packagePath&#32;+&#32;<emphasis role="stringliteral">&quot;/Assets/Packages/com.unity.TextMeshPro/Editor&#32;Resources&quot;</emphasis>))
+00207 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00208 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;packagePath&#32;+&#32;<emphasis role="stringliteral">&quot;/Assets/Packages/com.unity.TextMeshPro&quot;</emphasis>;
+00209 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00210 
+00211 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;Search&#32;for&#32;default&#32;location&#32;of&#32;normal&#32;TextMesh&#32;Pro&#32;AssetStore&#32;package</emphasis>
+00212 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(Directory.Exists(packagePath&#32;+&#32;<emphasis role="stringliteral">&quot;/Assets/TextMesh&#32;Pro/Editor&#32;Resources&quot;</emphasis>))
+00213 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00214 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;packagePath&#32;+&#32;<emphasis role="stringliteral">&quot;/Assets/TextMesh&#32;Pro&quot;</emphasis>;
+00215 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00216 
+00217 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;Search&#32;for&#32;potential&#32;alternative&#32;locations&#32;in&#32;the&#32;user&#32;project</emphasis>
+00218 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordtype">string</emphasis>[]&#32;matchingPaths&#32;=&#32;Directory.GetDirectories(packagePath,&#32;<emphasis role="stringliteral">&quot;TextMesh&#32;Pro&quot;</emphasis>,&#32;SearchOption.AllDirectories);
+00219 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordtype">string</emphasis>&#32;path&#32;=&#32;ValidateLocation(matchingPaths,&#32;packagePath);
+00220 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(path&#32;!=&#32;<emphasis role="keyword">null</emphasis>)&#32;<emphasis role="keywordflow">return</emphasis>&#32;packagePath&#32;+&#32;path;
+00221 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00222 
+00223 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;<emphasis role="keyword">null</emphasis>;
+00224 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00225 
+00226 
+00232 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;<emphasis role="keyword">static</emphasis>&#32;<emphasis role="keywordtype">string</emphasis>&#32;ValidateLocation(<emphasis role="keywordtype">string</emphasis>[]&#32;paths,&#32;<emphasis role="keywordtype">string</emphasis>&#32;projectPath)
+00233 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00234 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">for</emphasis>&#32;(<emphasis role="keywordtype">int</emphasis>&#32;i&#32;=&#32;0;&#32;i&#32;&lt;&#32;paths.Length;&#32;i++)
+00235 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00236 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;Check&#32;if&#32;any&#32;of&#32;the&#32;matching&#32;directories&#32;contain&#32;a&#32;GUISkins&#32;directory.</emphasis>
+00237 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(Directory.Exists(paths[i]&#32;+&#32;<emphasis role="stringliteral">&quot;/Editor&#32;Resources&quot;</emphasis>))
+00238 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00239 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;folderPath&#32;=&#32;paths[i].Replace(projectPath,&#32;<emphasis role="stringliteral">&quot;&quot;</emphasis>);
+00240 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;folderPath&#32;=&#32;folderPath.TrimStart(<emphasis role="charliteral">&apos;\\&apos;</emphasis>,&#32;<emphasis role="charliteral">&apos;/&apos;</emphasis>);
+00241 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;folderPath;
+00242 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00243 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00244 
+00245 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;<emphasis role="keyword">null</emphasis>;
+00246 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00247 
+00248 
+00254 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keyword">static</emphasis>&#32;<emphasis role="keywordtype">string</emphasis>&#32;GetDecimalCharacterSequence(<emphasis role="keywordtype">int</emphasis>[]&#32;characterSet)
+00255 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00256 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordtype">string</emphasis>&#32;characterSequence&#32;=&#32;<emphasis role="keywordtype">string</emphasis>.Empty;
+00257 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordtype">int</emphasis>&#32;count&#32;=&#32;characterSet.Length;
+00258 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordtype">int</emphasis>&#32;first&#32;=&#32;characterSet[0];
+00259 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordtype">int</emphasis>&#32;last&#32;=&#32;first;
+00260 
+00261 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">for</emphasis>&#32;(<emphasis role="keywordtype">int</emphasis>&#32;i&#32;=&#32;1;&#32;i&#32;&lt;&#32;count;&#32;i++)
+00262 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00263 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(characterSet[i&#32;-&#32;1]&#32;+&#32;1&#32;==&#32;characterSet[i])
+00264 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00265 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;last&#32;=&#32;characterSet[i];
+00266 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00267 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">else</emphasis>
+00268 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00269 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(first&#32;==&#32;last)
+00270 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;characterSequence&#32;+=&#32;first&#32;+&#32;<emphasis role="stringliteral">&quot;,&quot;</emphasis>;
+00271 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">else</emphasis>
+00272 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;characterSequence&#32;+=&#32;first&#32;+&#32;<emphasis role="stringliteral">&quot;-&quot;</emphasis>&#32;+&#32;last&#32;+&#32;<emphasis role="stringliteral">&quot;,&quot;</emphasis>;
+00273 
+00274 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;first&#32;=&#32;last&#32;=&#32;characterSet[i];
+00275 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00276 
+00277 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00278 
+00279 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;handle&#32;the&#32;final&#32;group</emphasis>
+00280 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(first&#32;==&#32;last)
+00281 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;characterSequence&#32;+=&#32;first;
+00282 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">else</emphasis>
+00283 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;characterSequence&#32;+=&#32;first&#32;+&#32;<emphasis role="stringliteral">&quot;-&quot;</emphasis>&#32;+&#32;last;
+00284 
+00285 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;characterSequence;
+00286 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00287 
+00288 
+00294 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keyword">static</emphasis>&#32;<emphasis role="keywordtype">string</emphasis>&#32;GetUnicodeCharacterSequence(<emphasis role="keywordtype">int</emphasis>[]&#32;characterSet)
+00295 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00296 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordtype">string</emphasis>&#32;characterSequence&#32;=&#32;<emphasis role="keywordtype">string</emphasis>.Empty;
+00297 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordtype">int</emphasis>&#32;count&#32;=&#32;characterSet.Length;
+00298 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordtype">int</emphasis>&#32;first&#32;=&#32;characterSet[0];
+00299 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordtype">int</emphasis>&#32;last&#32;=&#32;first;
+00300 
+00301 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">for</emphasis>&#32;(<emphasis role="keywordtype">int</emphasis>&#32;i&#32;=&#32;1;&#32;i&#32;&lt;&#32;count;&#32;i++)
+00302 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00303 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(characterSet[i&#32;-&#32;1]&#32;+&#32;1&#32;==&#32;characterSet[i])
+00304 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00305 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;last&#32;=&#32;characterSet[i];
+00306 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00307 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">else</emphasis>
+00308 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00309 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(first&#32;==&#32;last)
+00310 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;characterSequence&#32;+=&#32;first.ToString(<emphasis role="stringliteral">&quot;X2&quot;</emphasis>)&#32;+&#32;<emphasis role="stringliteral">&quot;,&quot;</emphasis>;
+00311 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">else</emphasis>
+00312 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;characterSequence&#32;+=&#32;first.ToString(<emphasis role="stringliteral">&quot;X2&quot;</emphasis>)&#32;+&#32;<emphasis role="stringliteral">&quot;-&quot;</emphasis>&#32;+&#32;last.ToString(<emphasis role="stringliteral">&quot;X2&quot;</emphasis>)&#32;+&#32;<emphasis role="stringliteral">&quot;,&quot;</emphasis>;
+00313 
+00314 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;first&#32;=&#32;last&#32;=&#32;characterSet[i];
+00315 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00316 
+00317 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00318 
+00319 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;handle&#32;the&#32;final&#32;group</emphasis>
+00320 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(first&#32;==&#32;last)
+00321 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;characterSequence&#32;+=&#32;first.ToString(<emphasis role="stringliteral">&quot;X2&quot;</emphasis>);
+00322 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">else</emphasis>
+00323 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;characterSequence&#32;+=&#32;first.ToString(<emphasis role="stringliteral">&quot;X2&quot;</emphasis>)&#32;+&#32;<emphasis role="stringliteral">&quot;-&quot;</emphasis>&#32;+&#32;last.ToString(<emphasis role="stringliteral">&quot;X2&quot;</emphasis>);
+00324 
+00325 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;characterSequence;
+00326 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00327 
+00328 
+00335 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keyword">static</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;DrawBox(Rect&#32;rect,&#32;<emphasis role="keywordtype">float</emphasis>&#32;thickness,&#32;Color&#32;color)
+00336 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00337 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;EditorGUI.DrawRect(<emphasis role="keyword">new</emphasis>&#32;Rect(rect.x&#32;-&#32;thickness,&#32;rect.y&#32;+&#32;thickness,&#32;rect.width&#32;+&#32;thickness&#32;*&#32;2,&#32;thickness),&#32;color);
+00338 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;EditorGUI.DrawRect(<emphasis role="keyword">new</emphasis>&#32;Rect(rect.x&#32;-&#32;thickness,&#32;rect.y&#32;+&#32;thickness,&#32;thickness,&#32;rect.height&#32;-&#32;thickness&#32;*&#32;2),&#32;color);
+00339 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;EditorGUI.DrawRect(<emphasis role="keyword">new</emphasis>&#32;Rect(rect.x&#32;-&#32;thickness,&#32;rect.y&#32;+&#32;rect.height&#32;-&#32;thickness&#32;*&#32;2,&#32;rect.width&#32;+&#32;thickness&#32;*&#32;2,&#32;thickness),&#32;color);
+00340 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;EditorGUI.DrawRect(<emphasis role="keyword">new</emphasis>&#32;Rect(rect.x&#32;+&#32;rect.width,&#32;rect.y&#32;+&#32;thickness,&#32;thickness,&#32;rect.height&#32;-&#32;thickness&#32;*&#32;2),&#32;color);
+00341 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00342 
+00343 
+00349 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keyword">static</emphasis>&#32;<emphasis role="keywordtype">int</emphasis>&#32;GetHorizontalAlignmentGridValue(<emphasis role="keywordtype">int</emphasis>&#32;value)
+00350 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00351 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;((value&#32;&amp;&#32;0x1)&#32;==&#32;0x1)
+00352 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;0;
+00353 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">else</emphasis>&#32;<emphasis role="keywordflow">if</emphasis>&#32;((value&#32;&amp;&#32;0x2)&#32;==&#32;0x2)
+00354 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;1;
+00355 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">else</emphasis>&#32;<emphasis role="keywordflow">if</emphasis>&#32;((value&#32;&amp;&#32;0x4)&#32;==&#32;0x4)
+00356 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;2;
+00357 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">else</emphasis>&#32;<emphasis role="keywordflow">if</emphasis>&#32;((value&#32;&amp;&#32;0x8)&#32;==&#32;0x8)
+00358 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;3;
+00359 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">else</emphasis>&#32;<emphasis role="keywordflow">if</emphasis>&#32;((value&#32;&amp;&#32;0x10)&#32;==&#32;0x10)
+00360 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;4;
+00361 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">else</emphasis>&#32;<emphasis role="keywordflow">if</emphasis>&#32;((value&#32;&amp;&#32;0x20)&#32;==&#32;0x20)
+00362 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;5;
+00363 
+00364 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;0;
+00365 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00366 
+00372 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keyword">static</emphasis>&#32;<emphasis role="keywordtype">int</emphasis>&#32;GetVerticalAlignmentGridValue(<emphasis role="keywordtype">int</emphasis>&#32;value)
+00373 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00374 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;((value&#32;&amp;&#32;0x100)&#32;==&#32;0x100)
+00375 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;0;
+00376 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;((value&#32;&amp;&#32;0x200)&#32;==&#32;0x200)
+00377 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;1;
+00378 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;((value&#32;&amp;&#32;0x400)&#32;==&#32;0x400)
+00379 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;2;
+00380 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;((value&#32;&amp;&#32;0x800)&#32;==&#32;0x800)
+00381 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;3;
+00382 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;((value&#32;&amp;&#32;0x1000)&#32;==&#32;0x1000)
+00383 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;4;
+00384 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;((value&#32;&amp;&#32;0x2000)&#32;==&#32;0x2000)
+00385 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;5;
+00386 
+00387 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;0;
+00388 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00389 
+00390 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keyword">static</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;DrawColorProperty(Rect&#32;rect,&#32;SerializedProperty&#32;property)
+00391 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00392 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordtype">int</emphasis>&#32;oldIndent&#32;=&#32;EditorGUI.indentLevel;
+00393 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;EditorGUI.indentLevel&#32;=&#32;0;
+00394 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(EditorGUIUtility.wideMode)
+00395 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00396 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;EditorGUI.PropertyField(<emphasis role="keyword">new</emphasis>&#32;Rect(rect.x,&#32;rect.y,&#32;50f,&#32;rect.height),&#32;property,&#32;GUIContent.none);
+00397 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;rect.x&#32;+=&#32;50f;
+00398 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;rect.width&#32;=&#32;Mathf.Min(100f,&#32;rect.width&#32;-&#32;55f);
+00399 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00400 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">else</emphasis>
+00401 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00402 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;rect.height&#32;/=&#32;2f;
+00403 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;rect.width&#32;=&#32;Mathf.Min(100f,&#32;rect.width&#32;-&#32;5f);
+00404 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;EditorGUI.PropertyField(rect,&#32;property,&#32;GUIContent.none);
+00405 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;rect.y&#32;+=&#32;rect.height;
+00406 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00407 
+00408 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;EditorGUI.BeginChangeCheck();
+00409 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordtype">string</emphasis>&#32;colorString&#32;=&#32;EditorGUI.TextField(rect,&#32;<emphasis role="keywordtype">string</emphasis>.Format(<emphasis role="stringliteral">&quot;#{0}&quot;</emphasis>,&#32;ColorUtility.ToHtmlStringRGBA(property.colorValue)));
+00410 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(EditorGUI.EndChangeCheck())
+00411 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00412 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;Color&#32;color;
+00413 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(ColorUtility.TryParseHtmlString(colorString,&#32;out&#32;color))
+00414 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00415 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">property</emphasis>.colorValue&#32;=&#32;color;
+00416 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00417 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00418 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;EditorGUI.indentLevel&#32;=&#32;oldIndent;
+00419 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00420 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;
+00421 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keyword">static</emphasis>&#32;<emphasis role="keywordtype">bool</emphasis>&#32;EditorToggle(Rect&#32;position,&#32;<emphasis role="keywordtype">bool</emphasis>&#32;value,&#32;GUIContent&#32;content,&#32;GUIStyle&#32;style)
+00422 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00423 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;var&#32;<emphasis role="keywordtype">id</emphasis>&#32;=&#32;GUIUtility.GetControlID(content,&#32;FocusType.Keyboard,&#32;position);
+00424 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;var&#32;evt&#32;=&#32;Event.current;
+00425 
+00426 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;Toggle&#32;selected&#32;toggle&#32;on&#32;space&#32;or&#32;return&#32;key</emphasis>
+00427 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(GUIUtility.keyboardControl&#32;==&#32;<emphasis role="keywordtype">id</emphasis>&#32;&amp;&amp;&#32;evt.type&#32;==&#32;EventType.KeyDown&#32;&amp;&amp;&#32;(evt.keyCode&#32;==&#32;KeyCode.Space&#32;||&#32;evt.keyCode&#32;==&#32;KeyCode.Return&#32;||&#32;evt.keyCode&#32;==&#32;KeyCode.KeypadEnter))
+00428 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00429 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;value&#32;=&#32;!value;
+00430 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;evt.Use();
+00431 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;GUI.changed&#32;=&#32;<emphasis role="keyword">true</emphasis>;
+00432 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00433 
+00434 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(evt.type&#32;==&#32;EventType.MouseDown&#32;&amp;&amp;&#32;position.Contains(Event.current.mousePosition))
+00435 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00436 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;GUIUtility.keyboardControl&#32;=&#32;id;
+00437 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;EditorGUIUtility.editingTextField&#32;=&#32;<emphasis role="keyword">false</emphasis>;
+00438 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;HandleUtility.Repaint();
+00439 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00440 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;
+00441 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;GUI.Toggle(position,&#32;<emphasis role="keywordtype">id</emphasis>,&#32;value,&#32;content,&#32;style);
+00442 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00443 
+00444 &#32;&#32;&#32;&#32;}
+00445 }
+</programlisting></section>

@@ -1,0 +1,213 @@
+<?xml version='1.0' encoding='UTF-8' standalone='no'?>
+<section xmlns="http://docbook.org/ns/docbook" version="5.0" xmlns:xlink="http://www.w3.org/1999/xlink" xml:id="__steam_v_r___events_8cs_source">
+<title>SteamVR_Events.cs</title>
+<indexterm><primary>O:/GitHUBMINIPRoject/Assets/SteamVR/Scripts/SteamVR_Events.cs</primary></indexterm>
+<programlisting>00001 <emphasis role="comment">//=======&#32;Copyright&#32;(c)&#32;Valve&#32;Corporation,&#32;All&#32;rights&#32;reserved.&#32;===============</emphasis>
+00002 <emphasis role="comment">//</emphasis>
+00003 <emphasis role="comment">//&#32;Purpose:&#32;Simple&#32;event&#32;system&#32;for&#32;SteamVR.</emphasis>
+00004 <emphasis role="comment">//</emphasis>
+00005 <emphasis role="comment">//&#32;Example&#32;usage:</emphasis>
+00006 <emphasis role="comment">//</emphasis>
+00007 <emphasis role="comment">//&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;void&#32;OnDeviceConnected(int&#32;i,&#32;bool&#32;connected)&#32;{&#32;...&#32;}</emphasis>
+00008 <emphasis role="comment">//&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;SteamVR_Events.DeviceConnected.Listen(OnDeviceConnected);&#32;//&#32;Usually&#32;in&#32;OnEnable</emphasis>
+00009 <emphasis role="comment">//&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;SteamVR_Events.DeviceConnected.Remove(OnDeviceConnected);&#32;//&#32;Usually&#32;in&#32;OnDisable</emphasis>
+00010 <emphasis role="comment">//</emphasis>
+00011 <emphasis role="comment">//&#32;Alternatively,&#32;if&#32;Listening/Removing&#32;often&#32;these&#32;can&#32;be&#32;cached&#32;as&#32;follows:</emphasis>
+00012 <emphasis role="comment">//</emphasis>
+00013 <emphasis role="comment">//&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;SteamVR_Event.Action&#32;deviceConnectedAction;</emphasis>
+00014 <emphasis role="comment">//&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;void&#32;OnAwake()&#32;{&#32;deviceConnectedAction&#32;=&#32;SteamVR_Event.DeviceConnectedAction(OnDeviceConnected);&#32;}</emphasis>
+00015 <emphasis role="comment">//&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;void&#32;OnEnable()&#32;{&#32;deviceConnectedAction.enabled&#32;=&#32;true;&#32;}</emphasis>
+00016 <emphasis role="comment">//&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;void&#32;OnDisable()&#32;{&#32;deviceConnectedAction.enabled&#32;=&#32;false;&#32;}</emphasis>
+00017 <emphasis role="comment">//</emphasis>
+00018 <emphasis role="comment">//=============================================================================</emphasis>
+00019 
+00020 <emphasis role="keyword">using</emphasis>&#32;<link linkend="__balloon_8cs_1a7d67e097df9376eb709b6a23aa3c7d23">UnityEngine</link>;
+00021 <emphasis role="keyword">using</emphasis>&#32;<link linkend="_namespace_unity_engine">UnityEngine</link>.Events;
+00022 <emphasis role="keyword">using</emphasis>&#32;<link linkend="_namespace_valve">Valve</link>.<link linkend="_namespace_valve_1_1_v_r">VR</link>;
+00023 
+00024 <emphasis role="keyword">namespace&#32;</emphasis><link linkend="_namespace_valve_1_1_v_r">Valve.VR</link>
+00025 {
+00026 &#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keyword">static</emphasis>&#32;<emphasis role="keyword">class&#32;</emphasis>SteamVR_Events
+00027 &#32;&#32;&#32;&#32;{
+<anchor xml:id="__steam_v_r___events_8cs_source_1l00028"/><link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___events_1_1_action">00028</link> &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keyword">abstract</emphasis>&#32;<emphasis role="keyword">class&#32;</emphasis><link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___events_1_1_action">Action</link>
+00029 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00030 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keyword">abstract</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;Enable(<emphasis role="keywordtype">bool</emphasis>&#32;enabled);
+<anchor xml:id="__steam_v_r___events_8cs_source_1l00031"/><link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___events_1_1_action_1ac97bf64c1b08dce1571092995f28f793">00031</link> &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keywordtype">bool</emphasis>&#32;enabled&#32;{&#32;<emphasis role="keyword">set</emphasis>&#32;{&#32;Enable(value);&#32;}&#32;}
+00032 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00033 
+00034 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;[System.Serializable]
+<anchor xml:id="__steam_v_r___events_8cs_source_1l00035"/><link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___events_1_1_action_no_args">00035</link> &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keyword">class&#32;</emphasis><link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___events_1_1_action_no_args">ActionNoArgs</link>&#32;:&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___events_1_1_action">Action</link>
+00036 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+<anchor xml:id="__steam_v_r___events_8cs_source_1l00037"/><link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___events_1_1_action_no_args_1a523295b564844b3a8f3f0389f8f1a281">00037</link> &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___events_1_1_action_no_args_1a523295b564844b3a8f3f0389f8f1a281">ActionNoArgs</link>(<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___events_1_1_event">Event</link>&#32;_event,&#32;UnityAction&#32;action)
+00038 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00039 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;this._event&#32;=&#32;_event;
+00040 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;this.action&#32;=&#32;action;
+00041 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00042 
+<anchor xml:id="__steam_v_r___events_8cs_source_1l00043"/><link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___events_1_1_action_no_args_1a2e2ea6edeefdd43950cbeb6fd2313441">00043</link> &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keyword">override</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___events_1_1_action_no_args_1a2e2ea6edeefdd43950cbeb6fd2313441">Enable</link>(<emphasis role="keywordtype">bool</emphasis>&#32;enabled)
+00044 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00045 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(enabled)
+00046 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;_event.Listen(action);
+00047 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">else</emphasis>
+00048 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;_event.Remove(action);
+00049 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00050 
+00051 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___events_1_1_event">Event</link>&#32;_event;
+00052 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;UnityAction&#32;action;
+00053 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00054 
+00055 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;[System.Serializable]
+<anchor xml:id="__steam_v_r___events_8cs_source_1l00056"/><link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___events_1_1_action">00056</link> &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keyword">class&#32;</emphasis><link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___events_1_1_action">Action</link>&lt;T&gt;&#32;:&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___events_1_1_action">Action</link>
+00057 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+<anchor xml:id="__steam_v_r___events_8cs_source_1l00058"/><link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___events_1_1_action_1ae485ea57df5e5852766bac3cc38dea00">00058</link> &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___events_1_1_action_1ae485ea57df5e5852766bac3cc38dea00">Action</link>(<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___events_1_1_event">Event&lt;T&gt;</link>&#32;_event,&#32;UnityAction&lt;T&gt;&#32;action)
+00059 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00060 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;this._event&#32;=&#32;_event;
+00061 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;this.action&#32;=&#32;action;
+00062 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00063 
+<anchor xml:id="__steam_v_r___events_8cs_source_1l00064"/><link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___events_1_1_action_1a72eac4a06613fdc651aff1a83236950c">00064</link> &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keyword">override</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___events_1_1_action_1a72eac4a06613fdc651aff1a83236950c">Enable</link>(<emphasis role="keywordtype">bool</emphasis>&#32;enabled)
+00065 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00066 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(enabled)
+00067 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;_event.Listen(action);
+00068 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">else</emphasis>
+00069 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;_event.Remove(action);
+00070 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00071 
+00072 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___events_1_1_event">Event&lt;T&gt;</link>&#32;_event;
+00073 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;UnityAction&lt;T&gt;&#32;action;
+00074 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00075 
+00076 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;[System.Serializable]
+<anchor xml:id="__steam_v_r___events_8cs_source_1l00077"/><link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___events_1_1_action">00077</link> &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keyword">class&#32;</emphasis><link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___events_1_1_action">Action</link>&lt;T0,&#32;T1&gt;&#32;:&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___events_1_1_action">Action</link>
+00078 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+<anchor xml:id="__steam_v_r___events_8cs_source_1l00079"/><link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___events_1_1_action_1a84f01b74764783b8d7d74b5cb1a06d44">00079</link> &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___events_1_1_action_1a84f01b74764783b8d7d74b5cb1a06d44">Action</link>(<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___events_1_1_event">Event&lt;T0, T1&gt;</link>&#32;_event,&#32;UnityAction&lt;T0,&#32;T1&gt;&#32;action)
+00080 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00081 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;this._event&#32;=&#32;_event;
+00082 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;this.action&#32;=&#32;action;
+00083 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00084 
+<anchor xml:id="__steam_v_r___events_8cs_source_1l00085"/><link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___events_1_1_action_1a72eac4a06613fdc651aff1a83236950c">00085</link> &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keyword">override</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___events_1_1_action_1a72eac4a06613fdc651aff1a83236950c">Enable</link>(<emphasis role="keywordtype">bool</emphasis>&#32;enabled)
+00086 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00087 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(enabled)
+00088 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;_event.Listen(action);
+00089 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">else</emphasis>
+00090 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;_event.Remove(action);
+00091 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00092 
+00093 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___events_1_1_event">Event&lt;T0, T1&gt;</link>&#32;_event;
+00094 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;UnityAction&lt;T0,&#32;T1&gt;&#32;action;
+00095 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00096 
+00097 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;[System.Serializable]
+<anchor xml:id="__steam_v_r___events_8cs_source_1l00098"/><link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___events_1_1_action">00098</link> &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keyword">class&#32;</emphasis><link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___events_1_1_action">Action</link>&lt;T0,&#32;T1,&#32;T2&gt;&#32;:&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___events_1_1_action">Action</link>
+00099 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+<anchor xml:id="__steam_v_r___events_8cs_source_1l00100"/><link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___events_1_1_action_1a56dc3699ecd112da217d49fb81ce3d45">00100</link> &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___events_1_1_action_1a56dc3699ecd112da217d49fb81ce3d45">Action</link>(<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___events_1_1_event">Event&lt;T0, T1, T2&gt;</link>&#32;_event,&#32;UnityAction&lt;T0,&#32;T1,&#32;T2&gt;&#32;action)
+00101 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00102 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;this._event&#32;=&#32;_event;
+00103 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;this.action&#32;=&#32;action;
+00104 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00105 
+<anchor xml:id="__steam_v_r___events_8cs_source_1l00106"/><link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___events_1_1_action_1a72eac4a06613fdc651aff1a83236950c">00106</link> &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keyword">override</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___events_1_1_action_1a72eac4a06613fdc651aff1a83236950c">Enable</link>(<emphasis role="keywordtype">bool</emphasis>&#32;enabled)
+00107 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00108 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(enabled)
+00109 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;_event.Listen(action);
+00110 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">else</emphasis>
+00111 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;_event.Remove(action);
+00112 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00113 
+00114 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___events_1_1_event">Event&lt;T0, T1, T2&gt;</link>&#32;_event;
+00115 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;UnityAction&lt;T0,&#32;T1,&#32;T2&gt;&#32;action;
+00116 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00117 
+<anchor xml:id="__steam_v_r___events_8cs_source_1l00118"/><link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___events_1_1_event">00118</link> &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keyword">class&#32;</emphasis><link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___events_1_1_event">Event</link>&#32;:&#32;UnityEvent
+00119 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+<anchor xml:id="__steam_v_r___events_8cs_source_1l00120"/><link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___events_1_1_event_1aba909cc96e966145932d193aaa4b1e98">00120</link> &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___events_1_1_event_1aba909cc96e966145932d193aaa4b1e98">Listen</link>(UnityAction&#32;action)&#32;{&#32;this.AddListener(action);&#32;}
+<anchor xml:id="__steam_v_r___events_8cs_source_1l00121"/><link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___events_1_1_event_1a46f2b8f3c76d3115ff626f3f81b2d25d">00121</link> &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___events_1_1_event_1a46f2b8f3c76d3115ff626f3f81b2d25d">Remove</link>(UnityAction&#32;action)&#32;{&#32;this.RemoveListener(action);&#32;}
+<anchor xml:id="__steam_v_r___events_8cs_source_1l00122"/><link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___events_1_1_event_1a2e2bed3d2e9b31cd2b54f843a4524285">00122</link> &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___events_1_1_event_1a2e2bed3d2e9b31cd2b54f843a4524285">Send</link>()&#32;{&#32;this.Invoke();&#32;}
+00123 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00124 
+<anchor xml:id="__steam_v_r___events_8cs_source_1l00125"/><link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___events_1_1_event">00125</link> &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keyword">class&#32;</emphasis><link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___events_1_1_event">Event</link>&lt;T&gt;&#32;:&#32;UnityEvent&lt;T&gt;
+00126 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+<anchor xml:id="__steam_v_r___events_8cs_source_1l00127"/><link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___events_1_1_event_1ae0c83128ec4757fc0d20e19de8a9be1d">00127</link> &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___events_1_1_event_1ae0c83128ec4757fc0d20e19de8a9be1d">Listen</link>(UnityAction&lt;T&gt;&#32;action)&#32;{&#32;this.AddListener(action);&#32;}
+<anchor xml:id="__steam_v_r___events_8cs_source_1l00128"/><link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___events_1_1_event_1a9c2d2158b4112e647f9ae5a153b9e206">00128</link> &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___events_1_1_event_1a9c2d2158b4112e647f9ae5a153b9e206">Remove</link>(UnityAction&lt;T&gt;&#32;action)&#32;{&#32;this.RemoveListener(action);&#32;}
+<anchor xml:id="__steam_v_r___events_8cs_source_1l00129"/><link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___events_1_1_event_1a2d0c8107665fbb38ab43bc80fc283982">00129</link> &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___events_1_1_event_1a2d0c8107665fbb38ab43bc80fc283982">Send</link>(T&#32;arg0)&#32;{&#32;this.Invoke(arg0);&#32;}
+00130 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00131 
+<anchor xml:id="__steam_v_r___events_8cs_source_1l00132"/><link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___events_1_1_event">00132</link> &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keyword">class&#32;</emphasis><link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___events_1_1_event">Event</link>&lt;T0,&#32;T1&gt;&#32;:&#32;UnityEvent&lt;T0,&#32;T1&gt;
+00133 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+<anchor xml:id="__steam_v_r___events_8cs_source_1l00134"/><link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___events_1_1_event_1afd37f17cf60ce691ed4841bf530148d3">00134</link> &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___events_1_1_event_1afd37f17cf60ce691ed4841bf530148d3">Listen</link>(UnityAction&lt;T0,&#32;T1&gt;&#32;action)&#32;{&#32;this.AddListener(action);&#32;}
+<anchor xml:id="__steam_v_r___events_8cs_source_1l00135"/><link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___events_1_1_event_1ae05966f336e6fa7a5bcc864b4e9cb6b8">00135</link> &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___events_1_1_event_1ae05966f336e6fa7a5bcc864b4e9cb6b8">Remove</link>(UnityAction&lt;T0,&#32;T1&gt;&#32;action)&#32;{&#32;this.RemoveListener(action);&#32;}
+<anchor xml:id="__steam_v_r___events_8cs_source_1l00136"/><link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___events_1_1_event_1a7cae509468245af221f710c4d8312ed7">00136</link> &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___events_1_1_event_1a7cae509468245af221f710c4d8312ed7">Send</link>(T0&#32;arg0,&#32;T1&#32;arg1)&#32;{&#32;this.Invoke(arg0,&#32;arg1);&#32;}
+00137 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00138 
+<anchor xml:id="__steam_v_r___events_8cs_source_1l00139"/><link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___events_1_1_event">00139</link> &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keyword">class&#32;</emphasis><link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___events_1_1_event">Event</link>&lt;T0,&#32;T1,&#32;T2&gt;&#32;:&#32;UnityEvent&lt;T0,&#32;T1,&#32;T2&gt;
+00140 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+<anchor xml:id="__steam_v_r___events_8cs_source_1l00141"/><link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___events_1_1_event_1a5ef4a196ecb729036d38867c3350448a">00141</link> &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___events_1_1_event_1a5ef4a196ecb729036d38867c3350448a">Listen</link>(UnityAction&lt;T0,&#32;T1,&#32;T2&gt;&#32;action)&#32;{&#32;this.AddListener(action);&#32;}
+<anchor xml:id="__steam_v_r___events_8cs_source_1l00142"/><link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___events_1_1_event_1a6bf82abbd94b3d724e1feaec30063637">00142</link> &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___events_1_1_event_1a6bf82abbd94b3d724e1feaec30063637">Remove</link>(UnityAction&lt;T0,&#32;T1,&#32;T2&gt;&#32;action)&#32;{&#32;this.RemoveListener(action);&#32;}
+<anchor xml:id="__steam_v_r___events_8cs_source_1l00143"/><link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___events_1_1_event_1ad8515dba66bf603a85a343211e040069">00143</link> &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___events_1_1_event_1ad8515dba66bf603a85a343211e040069">Send</link>(T0&#32;arg0,&#32;T1&#32;arg1,&#32;T2&#32;arg2)&#32;{&#32;this.Invoke(arg0,&#32;arg1,&#32;arg2);&#32;}
+00144 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00145 
+00146 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keyword">static</emphasis>&#32;Event&lt;bool&gt;&#32;Calibrating&#32;=&#32;<emphasis role="keyword">new</emphasis>&#32;Event&lt;bool&gt;();
+00147 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keyword">static</emphasis>&#32;Action&#32;CalibratingAction(UnityAction&lt;bool&gt;&#32;action)&#32;{&#32;<emphasis role="keywordflow">return</emphasis>&#32;<emphasis role="keyword">new</emphasis>&#32;Action&lt;bool&gt;(Calibrating,&#32;action);&#32;}
+00148 
+00149 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keyword">static</emphasis>&#32;Event&lt;int,&#32;bool&gt;&#32;DeviceConnected&#32;=&#32;<emphasis role="keyword">new</emphasis>&#32;Event&lt;int,&#32;bool&gt;();
+00150 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keyword">static</emphasis>&#32;Action&#32;DeviceConnectedAction(UnityAction&lt;int,&#32;bool&gt;&#32;action)&#32;{&#32;<emphasis role="keywordflow">return</emphasis>&#32;<emphasis role="keyword">new</emphasis>&#32;Action&lt;int,&#32;bool&gt;(DeviceConnected,&#32;action);&#32;}
+00151 
+00152 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keyword">static</emphasis>&#32;Event&lt;Color,&#32;float,&#32;bool&gt;&#32;Fade&#32;=&#32;<emphasis role="keyword">new</emphasis>&#32;Event&lt;Color,&#32;float,&#32;bool&gt;();
+00153 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keyword">static</emphasis>&#32;Action&#32;FadeAction(UnityAction&lt;Color,&#32;float,&#32;bool&gt;&#32;action)&#32;{&#32;<emphasis role="keywordflow">return</emphasis>&#32;<emphasis role="keyword">new</emphasis>&#32;Action&lt;Color,&#32;float,&#32;bool&gt;(Fade,&#32;action);&#32;}
+00154 
+00155 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keyword">static</emphasis>&#32;Event&#32;FadeReady&#32;=&#32;<emphasis role="keyword">new</emphasis>&#32;Event();
+00156 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keyword">static</emphasis>&#32;Action&#32;FadeReadyAction(UnityAction&#32;action)&#32;{&#32;<emphasis role="keywordflow">return</emphasis>&#32;<emphasis role="keyword">new</emphasis>&#32;ActionNoArgs(FadeReady,&#32;action);&#32;}
+00157 
+00158 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keyword">static</emphasis>&#32;Event&lt;bool&gt;&#32;HideRenderModels&#32;=&#32;<emphasis role="keyword">new</emphasis>&#32;Event&lt;bool&gt;();
+00159 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keyword">static</emphasis>&#32;Action&#32;HideRenderModelsAction(UnityAction&lt;bool&gt;&#32;action)&#32;{&#32;<emphasis role="keywordflow">return</emphasis>&#32;<emphasis role="keyword">new</emphasis>&#32;Action&lt;bool&gt;(HideRenderModels,&#32;action);&#32;}
+00160 
+00161 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keyword">static</emphasis>&#32;Event&lt;bool&gt;&#32;Initializing&#32;=&#32;<emphasis role="keyword">new</emphasis>&#32;Event&lt;bool&gt;();
+00162 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keyword">static</emphasis>&#32;Action&#32;InitializingAction(UnityAction&lt;bool&gt;&#32;action)&#32;{&#32;<emphasis role="keywordflow">return</emphasis>&#32;<emphasis role="keyword">new</emphasis>&#32;Action&lt;bool&gt;(Initializing,&#32;action);&#32;}
+00163 
+00164 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keyword">static</emphasis>&#32;Event&lt;bool&gt;&#32;InputFocus&#32;=&#32;<emphasis role="keyword">new</emphasis>&#32;Event&lt;bool&gt;();
+00165 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keyword">static</emphasis>&#32;Action&#32;InputFocusAction(UnityAction&lt;bool&gt;&#32;action)&#32;{&#32;<emphasis role="keywordflow">return</emphasis>&#32;<emphasis role="keyword">new</emphasis>&#32;Action&lt;bool&gt;(InputFocus,&#32;action);&#32;}
+00166 
+00167 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keyword">static</emphasis>&#32;Event&lt;bool&gt;&#32;<link linkend="_namespace_valve_1_1_v_r_1ac95dda09bbb588fd83a8ac0ba3c82266a16bfbf9c462762cf1cba4134ec53c504">Loading</link>&#32;=&#32;<emphasis role="keyword">new</emphasis>&#32;Event&lt;bool&gt;();
+00168 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keyword">static</emphasis>&#32;Action&#32;LoadingAction(UnityAction&lt;bool&gt;&#32;action)&#32;{&#32;<emphasis role="keywordflow">return</emphasis>&#32;<emphasis role="keyword">new</emphasis>&#32;Action&lt;bool&gt;(<link linkend="_namespace_valve_1_1_v_r_1ac95dda09bbb588fd83a8ac0ba3c82266a16bfbf9c462762cf1cba4134ec53c504">Loading</link>,&#32;action);&#32;}
+00169 
+00170 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keyword">static</emphasis>&#32;Event&lt;float&gt;&#32;LoadingFadeIn&#32;=&#32;<emphasis role="keyword">new</emphasis>&#32;Event&lt;float&gt;();
+00171 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keyword">static</emphasis>&#32;Action&#32;LoadingFadeInAction(UnityAction&lt;float&gt;&#32;action)&#32;{&#32;<emphasis role="keywordflow">return</emphasis>&#32;<emphasis role="keyword">new</emphasis>&#32;Action&lt;float&gt;(LoadingFadeIn,&#32;action);&#32;}
+00172 
+00173 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keyword">static</emphasis>&#32;Event&lt;float&gt;&#32;LoadingFadeOut&#32;=&#32;<emphasis role="keyword">new</emphasis>&#32;Event&lt;float&gt;();
+00174 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keyword">static</emphasis>&#32;Action&#32;LoadingFadeOutAction(UnityAction&lt;float&gt;&#32;action)&#32;{&#32;<emphasis role="keywordflow">return</emphasis>&#32;<emphasis role="keyword">new</emphasis>&#32;Action&lt;float&gt;(LoadingFadeOut,&#32;action);&#32;}
+00175 
+00176 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keyword">static</emphasis>&#32;Event&lt;TrackedDevicePose_t[]&gt;&#32;NewPoses&#32;=&#32;<emphasis role="keyword">new</emphasis>&#32;Event&lt;TrackedDevicePose_t[]&gt;();
+00177 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keyword">static</emphasis>&#32;Action&#32;NewPosesAction(UnityAction&lt;<link linkend="_struct_valve_1_1_v_r_1_1_tracked_device_pose__t">TrackedDevicePose_t</link>[]&gt;&#32;action)&#32;{&#32;<emphasis role="keywordflow">return</emphasis>&#32;<emphasis role="keyword">new</emphasis>&#32;Action&lt;TrackedDevicePose_t[]&gt;(NewPoses,&#32;action);&#32;}
+00178 
+00179 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keyword">static</emphasis>&#32;Event&#32;NewPosesApplied&#32;=&#32;<emphasis role="keyword">new</emphasis>&#32;Event();
+00180 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keyword">static</emphasis>&#32;Action&#32;NewPosesAppliedAction(UnityAction&#32;action)&#32;{&#32;<emphasis role="keywordflow">return</emphasis>&#32;<emphasis role="keyword">new</emphasis>&#32;ActionNoArgs(NewPosesApplied,&#32;action);&#32;}
+00181 
+00182 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keyword">static</emphasis>&#32;Event&lt;bool&gt;&#32;Initialized&#32;=&#32;<emphasis role="keyword">new</emphasis>&#32;Event&lt;bool&gt;();
+00183 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keyword">static</emphasis>&#32;Action&#32;InitializedAction(UnityAction&lt;bool&gt;&#32;action)&#32;{&#32;<emphasis role="keywordflow">return</emphasis>&#32;<emphasis role="keyword">new</emphasis>&#32;Action&lt;bool&gt;(Initialized,&#32;action);&#32;}
+00184 
+00185 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keyword">static</emphasis>&#32;Event&lt;bool&gt;&#32;OutOfRange&#32;=&#32;<emphasis role="keyword">new</emphasis>&#32;Event&lt;bool&gt;();
+00186 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keyword">static</emphasis>&#32;Action&#32;OutOfRangeAction(UnityAction&lt;bool&gt;&#32;action)&#32;{&#32;<emphasis role="keywordflow">return</emphasis>&#32;<emphasis role="keyword">new</emphasis>&#32;Action&lt;bool&gt;(OutOfRange,&#32;action);&#32;}
+00187 
+00188 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keyword">static</emphasis>&#32;Event&lt;SteamVR_RenderModel,&#32;bool&gt;&#32;RenderModelLoaded&#32;=&#32;<emphasis role="keyword">new</emphasis>&#32;Event&lt;SteamVR_RenderModel,&#32;bool&gt;();
+00189 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keyword">static</emphasis>&#32;Action&#32;RenderModelLoadedAction(UnityAction&lt;SteamVR_RenderModel,&#32;bool&gt;&#32;action)&#32;{&#32;<emphasis role="keywordflow">return</emphasis>&#32;<emphasis role="keyword">new</emphasis>&#32;Action&lt;SteamVR_RenderModel,&#32;bool&gt;(RenderModelLoaded,&#32;action);&#32;}
+00190 
+00191 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">static</emphasis>&#32;System.Collections.Generic.Dictionary&lt;<link linkend="_namespace_valve_1_1_v_r_1afe3398b9e5cb1ea06335142d1b9289f3">EVREventType</link>,&#32;Event&lt;VREvent_t&gt;&gt;&#32;systemEvents&#32;=&#32;<emphasis role="keyword">new</emphasis>&#32;System.Collections.Generic.Dictionary&lt;<link linkend="_namespace_valve_1_1_v_r_1afe3398b9e5cb1ea06335142d1b9289f3">EVREventType</link>,&#32;Event&lt;VREvent_t&gt;&gt;();
+00192 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keyword">static</emphasis>&#32;Event&lt;VREvent_t&gt;&#32;System(<link linkend="_namespace_valve_1_1_v_r_1afe3398b9e5cb1ea06335142d1b9289f3">EVREventType</link>&#32;eventType)
+00193 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00194 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;Event&lt;VREvent_t&gt;&#32;e;
+00195 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(!systemEvents.TryGetValue(eventType,&#32;out&#32;e))
+00196 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00197 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;e&#32;=&#32;<emphasis role="keyword">new</emphasis>&#32;Event&lt;VREvent_t&gt;();
+00198 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;systemEvents.Add(eventType,&#32;e);
+00199 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00200 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;e;
+00201 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00202 
+00203 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keyword">static</emphasis>&#32;Action&#32;SystemAction(<link linkend="_namespace_valve_1_1_v_r_1afe3398b9e5cb1ea06335142d1b9289f3">EVREventType</link>&#32;eventType,&#32;UnityAction&lt;VREvent_t&gt;&#32;action)
+00204 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00205 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;<emphasis role="keyword">new</emphasis>&#32;Action&lt;VREvent_t&gt;(System(eventType),&#32;action);
+00206 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00207 &#32;&#32;&#32;&#32;}
+00208 }
+</programlisting></section>

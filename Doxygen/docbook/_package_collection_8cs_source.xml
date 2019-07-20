@@ -1,0 +1,289 @@
+<?xml version='1.0' encoding='UTF-8' standalone='no'?>
+<section xmlns="http://docbook.org/ns/docbook" version="5.0" xmlns:xlink="http://www.w3.org/1999/xlink" xml:id="__package_collection_8cs_source">
+<title>PackageCollection.cs</title>
+<indexterm><primary>O:/GitHUBMINIPRoject/Library/PackageCache/com.unity.package-manager-ui@2.0.7/Editor/Sources/Services/Packages/PackageCollection.cs</primary></indexterm>
+<programlisting>00001 <emphasis role="keyword">using</emphasis>&#32;System;
+00002 <emphasis role="keyword">using</emphasis>&#32;System.Collections.Generic;
+00003 <emphasis role="keyword">using</emphasis>&#32;System.Linq;
+00004 <emphasis role="keyword">using</emphasis>&#32;<link linkend="__balloon_8cs_1a7d67e097df9376eb709b6a23aa3c7d23">UnityEngine</link>;
+00005 
+00006 <emphasis role="keyword">namespace&#32;</emphasis><link linkend="_namespace_unity_editor_1_1_package_manager_1_1_u_i">UnityEditor.PackageManager.UI</link>
+00007 {
+00008 &#32;&#32;&#32;&#32;[Serializable]
+<anchor xml:id="__package_collection_8cs_source_1l00009"/><link linkend="_class_unity_editor_1_1_package_manager_1_1_u_i_1_1_package_collection">00009</link> &#32;&#32;&#32;&#32;<emphasis role="keyword">internal</emphasis>&#32;<emphasis role="keyword">class&#32;</emphasis><link linkend="_class_unity_editor_1_1_package_manager_1_1_u_i_1_1_package_collection">PackageCollection</link>
+00010 &#32;&#32;&#32;&#32;{
+00011 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;<emphasis role="keyword">static</emphasis>&#32;<link linkend="_class_unity_editor_1_1_package_manager_1_1_u_i_1_1_package_collection">PackageCollection</link>&#32;instance&#32;=&#32;<emphasis role="keyword">new</emphasis>&#32;<link linkend="_class_unity_editor_1_1_package_manager_1_1_u_i_1_1_package_collection">PackageCollection</link>();
+<anchor xml:id="__package_collection_8cs_source_1l00012"/><link linkend="_class_unity_editor_1_1_package_manager_1_1_u_i_1_1_package_collection_1a75a698a6c798e48fbddf0e7edbf6db71">00012</link> &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keyword">static</emphasis>&#32;<link linkend="_class_unity_editor_1_1_package_manager_1_1_u_i_1_1_package_collection">PackageCollection</link>&#32;<link linkend="_class_unity_editor_1_1_package_manager_1_1_u_i_1_1_package_collection_1a75a698a6c798e48fbddf0e7edbf6db71">Instance</link>&#32;{&#32;<emphasis role="keyword">get</emphasis>&#32;{&#32;<emphasis role="keywordflow">return</emphasis>&#32;instance;&#32;}&#32;}
+00013 
+<anchor xml:id="__package_collection_8cs_source_1l00014"/><link linkend="_class_unity_editor_1_1_package_manager_1_1_u_i_1_1_package_collection_1a41622c71bb27ca9e063a73e09dffb382">00014</link> &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keyword">event</emphasis>&#32;Action&lt;IEnumerable&lt;Package&gt;&gt;&#32;<link linkend="_class_unity_editor_1_1_package_manager_1_1_u_i_1_1_package_collection_1a41622c71bb27ca9e063a73e09dffb382">OnPackagesChanged</link>&#32;=&#32;delegate&#32;{&#32;};
+<anchor xml:id="__package_collection_8cs_source_1l00015"/><link linkend="_class_unity_editor_1_1_package_manager_1_1_u_i_1_1_package_collection_1afdd6859364e3a88ba00e9a3d9e092c09">00015</link> &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keyword">event</emphasis>&#32;Action&lt;PackageFilter&gt;&#32;<link linkend="_class_unity_editor_1_1_package_manager_1_1_u_i_1_1_package_collection_1afdd6859364e3a88ba00e9a3d9e092c09">OnFilterChanged</link>&#32;=&#32;delegate&#32;{&#32;};
+00016 
+00017 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;readonly&#32;Dictionary&lt;string,&#32;Package&gt;&#32;packages;
+00018 
+00019 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;<link linkend="_namespace_unity_editor_1_1_package_manager_1_1_u_i_1aec89f744729646d8e261787be78942c8">PackageFilter</link>&#32;filter;
+00020 
+00021 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;<emphasis role="keywordtype">string</emphasis>&#32;selectedListPackage;
+00022 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;<emphasis role="keywordtype">string</emphasis>&#32;selectedSearchPackage;
+00023 
+00024 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">internal</emphasis>&#32;<emphasis role="keywordtype">string</emphasis>&#32;lastUpdateTime;
+00025 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;List&lt;PackageInfo&gt;&#32;listPackagesOffline;
+00026 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;List&lt;PackageInfo&gt;&#32;listPackages;
+00027 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;List&lt;PackageInfo&gt;&#32;searchPackages;
+00028 
+00029 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;List&lt;PackageError&gt;&#32;packageErrors;
+00030 
+00031 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;<emphasis role="keywordtype">int</emphasis>&#32;listPackagesVersion;
+00032 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;<emphasis role="keywordtype">int</emphasis>&#32;listPackagesOfflineVersion;
+00033 
+00034 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;<emphasis role="keywordtype">bool</emphasis>&#32;searchOperationOngoing;
+00035 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;<emphasis role="keywordtype">bool</emphasis>&#32;listOperationOngoing;
+00036 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;<emphasis role="keywordtype">bool</emphasis>&#32;listOperationOfflineOngoing;
+00037 
+00038 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;<link linkend="_interface_unity_editor_1_1_package_manager_1_1_u_i_1_1_i_list_operation">IListOperation</link>&#32;listOperationOffline;
+00039 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;<link linkend="_interface_unity_editor_1_1_package_manager_1_1_u_i_1_1_i_list_operation">IListOperation</link>&#32;listOperation;
+00040 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;<link linkend="_interface_unity_editor_1_1_package_manager_1_1_u_i_1_1_i_search_operation">ISearchOperation</link>&#32;searchOperation;
+00041 
+<anchor xml:id="__package_collection_8cs_source_1l00042"/><link linkend="_class_unity_editor_1_1_package_manager_1_1_u_i_1_1_package_collection_1a0ae7851281d0246d8c715db1e3b10a63">00042</link> &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;readonly&#32;<link linkend="_class_unity_editor_1_1_package_manager_1_1_u_i_1_1_operation_signal">OperationSignal&lt;ISearchOperation&gt;</link>&#32;<link linkend="_class_unity_editor_1_1_package_manager_1_1_u_i_1_1_package_collection_1a0ae7851281d0246d8c715db1e3b10a63">SearchSignal</link>&#32;=&#32;<emphasis role="keyword">new</emphasis>&#32;<link linkend="_class_unity_editor_1_1_package_manager_1_1_u_i_1_1_operation_signal">OperationSignal&lt;ISearchOperation&gt;</link>();
+<anchor xml:id="__package_collection_8cs_source_1l00043"/><link linkend="_class_unity_editor_1_1_package_manager_1_1_u_i_1_1_package_collection_1a6859e240ee04e416808e527b11107775">00043</link> &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;readonly&#32;<link linkend="_class_unity_editor_1_1_package_manager_1_1_u_i_1_1_operation_signal">OperationSignal&lt;IListOperation&gt;</link>&#32;<link linkend="_class_unity_editor_1_1_package_manager_1_1_u_i_1_1_package_collection_1a6859e240ee04e416808e527b11107775">ListSignal</link>&#32;=&#32;<emphasis role="keyword">new</emphasis>&#32;<link linkend="_class_unity_editor_1_1_package_manager_1_1_u_i_1_1_operation_signal">OperationSignal&lt;IListOperation&gt;</link>();
+00044 
+<anchor xml:id="__package_collection_8cs_source_1l00045"/><link linkend="_class_unity_editor_1_1_package_manager_1_1_u_i_1_1_package_collection_1ad4f8e8391ee918c13e8a7afb888a5b66">00045</link> &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keyword">static</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;<link linkend="_class_unity_editor_1_1_package_manager_1_1_u_i_1_1_package_collection_1ad4f8e8391ee918c13e8a7afb888a5b66">InitInstance</link>(ref&#32;<link linkend="_class_unity_editor_1_1_package_manager_1_1_u_i_1_1_package_collection">PackageCollection</link>&#32;value)
+00046 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00047 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(value&#32;==&#32;<emphasis role="keyword">null</emphasis>)&#32;&#32;<emphasis role="comment">//&#32;UI&#32;window&#32;opened</emphasis>
+00048 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00049 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;value&#32;=&#32;instance;
+00050 
+00051 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_unity_editor_1_1_package_manager_1_1_u_i_1_1_package_collection_1a75a698a6c798e48fbddf0e7edbf6db71">Instance</link>.<link linkend="_class_unity_editor_1_1_package_manager_1_1_u_i_1_1_package_collection_1a41622c71bb27ca9e063a73e09dffb382">OnPackagesChanged</link>&#32;=&#32;delegate&#32;{&#32;};
+00052 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_unity_editor_1_1_package_manager_1_1_u_i_1_1_package_collection_1a75a698a6c798e48fbddf0e7edbf6db71">Instance</link>.<link linkend="_class_unity_editor_1_1_package_manager_1_1_u_i_1_1_package_collection_1afdd6859364e3a88ba00e9a3d9e092c09">OnFilterChanged</link>&#32;=&#32;delegate&#32;{&#32;};
+00053 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_unity_editor_1_1_package_manager_1_1_u_i_1_1_package_collection_1a75a698a6c798e48fbddf0e7edbf6db71">Instance</link>.<link linkend="_class_unity_editor_1_1_package_manager_1_1_u_i_1_1_package_collection_1a0ae7851281d0246d8c715db1e3b10a63">SearchSignal</link>.ResetEvents();
+00054 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_unity_editor_1_1_package_manager_1_1_u_i_1_1_package_collection_1a75a698a6c798e48fbddf0e7edbf6db71">Instance</link>.<link linkend="_class_unity_editor_1_1_package_manager_1_1_u_i_1_1_package_collection_1a6859e240ee04e416808e527b11107775">ListSignal</link>.ResetEvents();
+00055 
+00056 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_unity_editor_1_1_package_manager_1_1_u_i_1_1_package_collection_1a75a698a6c798e48fbddf0e7edbf6db71">Instance</link>.FetchListOfflineCache(<emphasis role="keyword">true</emphasis>);
+00057 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_unity_editor_1_1_package_manager_1_1_u_i_1_1_package_collection_1a75a698a6c798e48fbddf0e7edbf6db71">Instance</link>.FetchListCache(<emphasis role="keyword">true</emphasis>);
+00058 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_unity_editor_1_1_package_manager_1_1_u_i_1_1_package_collection_1a75a698a6c798e48fbddf0e7edbf6db71">Instance</link>.FetchSearchCache(<emphasis role="keyword">true</emphasis>);
+00059 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00060 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">else</emphasis>&#32;<emphasis role="comment">//&#32;Domain&#32;reload</emphasis>
+00061 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00062 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;instance&#32;=&#32;value;
+00063 
+00064 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_unity_editor_1_1_package_manager_1_1_u_i_1_1_package_collection_1a75a698a6c798e48fbddf0e7edbf6db71">Instance</link>.RebuildPackageDictionary();
+00065 
+00066 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;Resume&#32;operations&#32;interrupted&#32;by&#32;domain&#32;reload</emphasis>
+00067 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_unity_editor_1_1_package_manager_1_1_u_i_1_1_package_collection_1a75a698a6c798e48fbddf0e7edbf6db71">Instance</link>.FetchListOfflineCache(<link linkend="_class_unity_editor_1_1_package_manager_1_1_u_i_1_1_package_collection_1a75a698a6c798e48fbddf0e7edbf6db71">Instance</link>.listOperationOfflineOngoing);
+00068 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_unity_editor_1_1_package_manager_1_1_u_i_1_1_package_collection_1a75a698a6c798e48fbddf0e7edbf6db71">Instance</link>.FetchListCache(<link linkend="_class_unity_editor_1_1_package_manager_1_1_u_i_1_1_package_collection_1a75a698a6c798e48fbddf0e7edbf6db71">Instance</link>.listOperationOngoing);
+00069 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_unity_editor_1_1_package_manager_1_1_u_i_1_1_package_collection_1a75a698a6c798e48fbddf0e7edbf6db71">Instance</link>.FetchSearchCache(<link linkend="_class_unity_editor_1_1_package_manager_1_1_u_i_1_1_package_collection_1a75a698a6c798e48fbddf0e7edbf6db71">Instance</link>.searchOperationOngoing);
+00070 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00071 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00072 
+00073 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<link linkend="_namespace_unity_editor_1_1_package_manager_1_1_u_i_1aec89f744729646d8e261787be78942c8">PackageFilter</link>&#32;<link linkend="_class_unity_editor_1_1_package_manager_1_1_u_i_1_1_package_collection_1ae9d3d53d670427dfbe398441d7be141e">Filter</link>
+<anchor xml:id="__package_collection_8cs_source_1l00074"/><link linkend="_class_unity_editor_1_1_package_manager_1_1_u_i_1_1_package_collection_1ae9d3d53d670427dfbe398441d7be141e">00074</link> &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00075 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">get</emphasis>&#32;{&#32;<emphasis role="keywordflow">return</emphasis>&#32;filter;&#32;}
+00076 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;
+00077 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;For&#32;public&#32;usage,&#32;use&#32;SetFilter()&#32;instead</emphasis>
+00078 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;<emphasis role="keyword">set</emphasis>
+00079 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00080 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;var&#32;changed&#32;=&#32;value&#32;!=&#32;filter;
+00081 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;filter&#32;=&#32;value;
+00082 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;
+00083 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(changed)
+00084 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_unity_editor_1_1_package_manager_1_1_u_i_1_1_package_collection_1afdd6859364e3a88ba00e9a3d9e092c09">OnFilterChanged</link>(filter);
+00085 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00086 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00087 
+00088 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;List&lt;PackageInfo&gt;&#32;<link linkend="_class_unity_editor_1_1_package_manager_1_1_u_i_1_1_package_collection_1aecaff6ca4f7866ee058b7c70d3aa49bc">LatestListPackages</link>
+<anchor xml:id="__package_collection_8cs_source_1l00089"/><link linkend="_class_unity_editor_1_1_package_manager_1_1_u_i_1_1_package_collection_1aecaff6ca4f7866ee058b7c70d3aa49bc">00089</link> &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00090 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">get</emphasis>&#32;{&#32;<emphasis role="keywordflow">return</emphasis>&#32;listPackagesVersion&#32;&gt;&#32;listPackagesOfflineVersion?&#32;listPackages&#32;:&#32;listPackagesOffline;&#32;}
+00091 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00092 
+<anchor xml:id="__package_collection_8cs_source_1l00093"/><link linkend="_class_unity_editor_1_1_package_manager_1_1_u_i_1_1_package_collection_1a38b81a3076cdebddbfb0e4e09c0e807f">00093</link> &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;List&lt;PackageInfo&gt;&#32;<link linkend="_class_unity_editor_1_1_package_manager_1_1_u_i_1_1_package_collection_1a38b81a3076cdebddbfb0e4e09c0e807f">LatestSearchPackages</link>&#32;{&#32;<emphasis role="keyword">get</emphasis>&#32;{&#32;<emphasis role="keywordflow">return</emphasis>&#32;searchPackages;&#32;}&#32;}
+00094 
+00095 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keywordtype">string</emphasis>&#32;<link linkend="_class_unity_editor_1_1_package_manager_1_1_u_i_1_1_package_collection_1a1016b6f0d5db71f12b7e3948e8707841">SelectedPackage</link>
+<anchor xml:id="__package_collection_8cs_source_1l00096"/><link linkend="_class_unity_editor_1_1_package_manager_1_1_u_i_1_1_package_collection_1a1016b6f0d5db71f12b7e3948e8707841">00096</link> &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00097 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">get</emphasis>&#32;{&#32;<emphasis role="keywordflow">return</emphasis>&#32;<link linkend="_namespace_unity_editor_1_1_package_manager_1_1_u_i_1aec89f744729646d8e261787be78942c8">PackageFilter</link>.All&#32;==&#32;<link linkend="_class_unity_editor_1_1_package_manager_1_1_u_i_1_1_package_collection_1ae9d3d53d670427dfbe398441d7be141e">Filter</link>&#32;?&#32;selectedSearchPackage&#32;:&#32;selectedListPackage;&#32;}
+00098 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">set</emphasis>
+00099 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00100 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(<link linkend="_namespace_unity_editor_1_1_package_manager_1_1_u_i_1aec89f744729646d8e261787be78942c8">PackageFilter</link>.All&#32;==&#32;<link linkend="_class_unity_editor_1_1_package_manager_1_1_u_i_1_1_package_collection_1ae9d3d53d670427dfbe398441d7be141e">Filter</link>)
+00101 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;selectedSearchPackage&#32;=&#32;value;
+00102 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">else</emphasis>
+00103 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;selectedListPackage&#32;=&#32;value;
+00104 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00105 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00106 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;
+00107 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;<link linkend="_class_unity_editor_1_1_package_manager_1_1_u_i_1_1_package_collection">PackageCollection</link>()
+00108 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00109 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;packages&#32;=&#32;<emphasis role="keyword">new</emphasis>&#32;Dictionary&lt;string,&#32;Package&gt;();
+00110 
+00111 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;listPackagesOffline&#32;=&#32;<emphasis role="keyword">new</emphasis>&#32;List&lt;PackageInfo&gt;();
+00112 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;listPackages&#32;=&#32;<emphasis role="keyword">new</emphasis>&#32;List&lt;PackageInfo&gt;();
+00113 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;searchPackages&#32;=&#32;<emphasis role="keyword">new</emphasis>&#32;List&lt;PackageInfo&gt;();
+00114 
+00115 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;packageErrors&#32;=&#32;<emphasis role="keyword">new</emphasis>&#32;List&lt;PackageError&gt;();
+00116 
+00117 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;listPackagesVersion&#32;=&#32;0;
+00118 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;listPackagesOfflineVersion&#32;=&#32;0;
+00119 
+00120 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;searchOperationOngoing&#32;=&#32;<emphasis role="keyword">false</emphasis>;
+00121 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;listOperationOngoing&#32;=&#32;<emphasis role="keyword">false</emphasis>;
+00122 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;listOperationOfflineOngoing&#32;=&#32;<emphasis role="keyword">false</emphasis>;
+00123 
+00124 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_unity_editor_1_1_package_manager_1_1_u_i_1_1_package_collection_1ae9d3d53d670427dfbe398441d7be141e">Filter</link>&#32;=&#32;<link linkend="_namespace_unity_editor_1_1_package_manager_1_1_u_i_1aec89f744729646d8e261787be78942c8">PackageFilter</link>.All;
+00125 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00126 
+<anchor xml:id="__package_collection_8cs_source_1l00127"/><link linkend="_class_unity_editor_1_1_package_manager_1_1_u_i_1_1_package_collection_1a376f256e424d8ac231a101e35d83799b">00127</link> &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keywordtype">bool</emphasis>&#32;<link linkend="_class_unity_editor_1_1_package_manager_1_1_u_i_1_1_package_collection_1a376f256e424d8ac231a101e35d83799b">SetFilter</link>(<link linkend="_namespace_unity_editor_1_1_package_manager_1_1_u_i_1aec89f744729646d8e261787be78942c8">PackageFilter</link>&#32;value,&#32;<emphasis role="keywordtype">bool</emphasis>&#32;refresh&#32;=&#32;<emphasis role="keyword">true</emphasis>)
+00128 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00129 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(value&#32;==&#32;<link linkend="_class_unity_editor_1_1_package_manager_1_1_u_i_1_1_package_collection_1ae9d3d53d670427dfbe398441d7be141e">Filter</link>)&#32;
+00130 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;<emphasis role="keyword">false</emphasis>;
+00131 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;
+00132 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_unity_editor_1_1_package_manager_1_1_u_i_1_1_package_collection_1ae9d3d53d670427dfbe398441d7be141e">Filter</link>&#32;=&#32;value;
+00133 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(refresh)
+00134 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00135 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_unity_editor_1_1_package_manager_1_1_u_i_1_1_package_collection_1a96dc5d2b0f975f54efa2a57a93d0cbdb">UpdatePackageCollection</link>();
+00136 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00137 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;<emphasis role="keyword">true</emphasis>;
+00138 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00139 
+<anchor xml:id="__package_collection_8cs_source_1l00140"/><link linkend="_class_unity_editor_1_1_package_manager_1_1_u_i_1_1_package_collection_1a96dc5d2b0f975f54efa2a57a93d0cbdb">00140</link> &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;<link linkend="_class_unity_editor_1_1_package_manager_1_1_u_i_1_1_package_collection_1a96dc5d2b0f975f54efa2a57a93d0cbdb">UpdatePackageCollection</link>(<emphasis role="keywordtype">bool</emphasis>&#32;rebuildDictionary&#32;=&#32;<emphasis role="keyword">false</emphasis>)
+00141 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00142 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(rebuildDictionary)
+00143 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00144 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;lastUpdateTime&#32;=&#32;DateTime.Now.ToString(<emphasis role="stringliteral">&quot;HH:mm&quot;</emphasis>);
+00145 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;RebuildPackageDictionary();
+00146 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00147 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(packages.Any())
+00148 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_unity_editor_1_1_package_manager_1_1_u_i_1_1_package_collection_1a41622c71bb27ca9e063a73e09dffb382">OnPackagesChanged</link>(OrderedPackages());
+00149 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00150 
+00151 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">internal</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;FetchListOfflineCache(<emphasis role="keywordtype">bool</emphasis>&#32;forceRefetch&#32;=&#32;<emphasis role="keyword">false</emphasis>)
+00152 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00153 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(!forceRefetch&#32;&amp;&amp;&#32;(listOperationOfflineOngoing&#32;||&#32;listPackagesOffline.Any()))&#32;<emphasis role="keywordflow">return</emphasis>;
+00154 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(listOperationOffline&#32;!=&#32;<emphasis role="keyword">null</emphasis>)
+00155 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;listOperationOffline.<link linkend="_interface_unity_editor_1_1_package_manager_1_1_u_i_1_1_i_base_operation_1ab924259fe1ff324c238ae37c96c42c1e">Cancel</link>();
+00156 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;listOperationOfflineOngoing&#32;=&#32;<emphasis role="keyword">true</emphasis>;
+00157 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;listOperationOffline&#32;=&#32;OperationFactory.Instance.CreateListOperation(<emphasis role="keyword">true</emphasis>);
+00158 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;listOperationOffline.<link linkend="_interface_unity_editor_1_1_package_manager_1_1_u_i_1_1_i_base_operation_1a06c7f83f9ae4c86c58022b867d670e60">OnOperationFinalized</link>&#32;+=&#32;()&#32;=&gt;
+00159 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00160 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;listOperationOfflineOngoing&#32;=&#32;<emphasis role="keyword">false</emphasis>;
+00161 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_unity_editor_1_1_package_manager_1_1_u_i_1_1_package_collection_1a96dc5d2b0f975f54efa2a57a93d0cbdb">UpdatePackageCollection</link>(<emphasis role="keyword">true</emphasis>);
+00162 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;};
+00163 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;listOperationOffline.<link linkend="_interface_unity_editor_1_1_package_manager_1_1_u_i_1_1_i_list_operation_1af9786e05457b17b3cc3a5fdc4a5b42ae">GetPackageListAsync</link>(
+00164 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;infos&#32;=&gt;
+00165 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00166 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;var&#32;version&#32;=&#32;listPackagesVersion;
+00167 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;UpdateListPackageInfosOffline(infos,&#32;version);
+00168 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;},
+00169 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;error&#32;=&gt;&#32;{&#32;Debug.LogError(<emphasis role="stringliteral">&quot;Error&#32;fetching&#32;package&#32;list&#32;(offline&#32;mode).&quot;</emphasis>);&#32;});
+00170 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00171 
+00172 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">internal</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;FetchListCache(<emphasis role="keywordtype">bool</emphasis>&#32;forceRefetch&#32;=&#32;<emphasis role="keyword">false</emphasis>)
+00173 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00174 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(!forceRefetch&#32;&amp;&amp;&#32;(listOperationOngoing&#32;||&#32;listPackages.Any()))&#32;<emphasis role="keywordflow">return</emphasis>;
+00175 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(listOperation&#32;!=&#32;<emphasis role="keyword">null</emphasis>)
+00176 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;listOperation.<link linkend="_interface_unity_editor_1_1_package_manager_1_1_u_i_1_1_i_base_operation_1ab924259fe1ff324c238ae37c96c42c1e">Cancel</link>();
+00177 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;listOperationOngoing&#32;=&#32;<emphasis role="keyword">true</emphasis>;
+00178 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;listOperation&#32;=&#32;OperationFactory.Instance.CreateListOperation();
+00179 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;listOperation.<link linkend="_interface_unity_editor_1_1_package_manager_1_1_u_i_1_1_i_base_operation_1a06c7f83f9ae4c86c58022b867d670e60">OnOperationFinalized</link>&#32;+=&#32;()&#32;=&gt;
+00180 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00181 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;listOperationOngoing&#32;=&#32;<emphasis role="keyword">false</emphasis>;
+00182 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_unity_editor_1_1_package_manager_1_1_u_i_1_1_package_collection_1a96dc5d2b0f975f54efa2a57a93d0cbdb">UpdatePackageCollection</link>(<emphasis role="keyword">true</emphasis>);
+00183 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;};
+00184 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;listOperation.<link linkend="_interface_unity_editor_1_1_package_manager_1_1_u_i_1_1_i_list_operation_1af9786e05457b17b3cc3a5fdc4a5b42ae">GetPackageListAsync</link>(UpdateListPackageInfos,
+00185 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;error&#32;=&gt;&#32;{&#32;Debug.LogError(<emphasis role="stringliteral">&quot;Error&#32;fetching&#32;package&#32;list.&quot;</emphasis>);&#32;});
+00186 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_unity_editor_1_1_package_manager_1_1_u_i_1_1_package_collection_1a6859e240ee04e416808e527b11107775">ListSignal</link>.SetOperation(listOperation);
+00187 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00188 
+00189 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">internal</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;FetchSearchCache(<emphasis role="keywordtype">bool</emphasis>&#32;forceRefetch&#32;=&#32;<emphasis role="keyword">false</emphasis>)
+00190 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00191 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(!forceRefetch&#32;&amp;&amp;&#32;(searchOperationOngoing&#32;||&#32;searchPackages.Any()))&#32;<emphasis role="keywordflow">return</emphasis>;
+00192 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(searchOperation&#32;!=&#32;<emphasis role="keyword">null</emphasis>)
+00193 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;searchOperation.<link linkend="_interface_unity_editor_1_1_package_manager_1_1_u_i_1_1_i_base_operation_1ab924259fe1ff324c238ae37c96c42c1e">Cancel</link>();
+00194 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;searchOperationOngoing&#32;=&#32;<emphasis role="keyword">true</emphasis>;
+00195 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;searchOperation&#32;=&#32;OperationFactory.Instance.CreateSearchOperation();
+00196 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;searchOperation.<link linkend="_interface_unity_editor_1_1_package_manager_1_1_u_i_1_1_i_base_operation_1a06c7f83f9ae4c86c58022b867d670e60">OnOperationFinalized</link>&#32;+=&#32;()&#32;=&gt;
+00197 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00198 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;searchOperationOngoing&#32;=&#32;<emphasis role="keyword">false</emphasis>;
+00199 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_unity_editor_1_1_package_manager_1_1_u_i_1_1_package_collection_1a96dc5d2b0f975f54efa2a57a93d0cbdb">UpdatePackageCollection</link>(<emphasis role="keyword">true</emphasis>);
+00200 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;};
+00201 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;searchOperation.<link linkend="_interface_unity_editor_1_1_package_manager_1_1_u_i_1_1_i_search_operation_1af96c1798a1e3b84d88c4da64dcb1f05d">GetAllPackageAsync</link>(UpdateSearchPackageInfos,
+00202 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;error&#32;=&gt;&#32;{&#32;Debug.LogError(<emphasis role="stringliteral">&quot;Error&#32;searching&#32;packages&#32;online.&quot;</emphasis>);&#32;});
+00203 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_unity_editor_1_1_package_manager_1_1_u_i_1_1_package_collection_1a0ae7851281d0246d8c715db1e3b10a63">SearchSignal</link>.SetOperation(searchOperation);
+00204 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00205 
+00206 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;UpdateListPackageInfosOffline(IEnumerable&lt;PackageInfo&gt;&#32;newInfos,&#32;<emphasis role="keywordtype">int</emphasis>&#32;version)
+00207 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00208 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;listPackagesOfflineVersion&#32;=&#32;version;
+00209 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;listPackagesOffline&#32;=&#32;newInfos.Where(p&#32;=&gt;&#32;p.IsUserVisible).ToList();
+00210 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00211 
+00212 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;UpdateListPackageInfos(IEnumerable&lt;PackageInfo&gt;&#32;newInfos)
+00213 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00214 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;Each&#32;time&#32;we&#32;fetch&#32;list&#32;packages,&#32;the&#32;cache&#32;for&#32;offline&#32;mode&#32;will&#32;be&#32;updated</emphasis>
+00215 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;We&#32;keep&#32;track&#32;of&#32;the&#32;list&#32;packages&#32;version&#32;so&#32;that&#32;we&#32;know&#32;which&#32;version&#32;of&#32;cache</emphasis>
+00216 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;we&#32;are&#32;getting&#32;with&#32;the&#32;offline&#32;fetch&#32;operation.</emphasis>
+00217 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;listPackagesVersion++;
+00218 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;listPackages&#32;=&#32;newInfos.Where(p&#32;=&gt;&#32;p.IsUserVisible).ToList();
+00219 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;listPackagesOffline&#32;=&#32;listPackages;
+00220 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00221 
+00222 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;UpdateSearchPackageInfos(IEnumerable&lt;PackageInfo&gt;&#32;newInfos)
+00223 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00224 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;searchPackages&#32;=&#32;newInfos.Where(p&#32;=&gt;&#32;p.IsUserVisible).ToList();
+00225 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00226 
+00227 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;IEnumerable&lt;Package&gt;&#32;OrderedPackages()
+00228 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00229 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;packages.Values.OrderBy(pkg&#32;=&gt;&#32;pkg.Versions.LastOrDefault()&#32;==&#32;<emphasis role="keyword">null</emphasis>&#32;?&#32;pkg.Name&#32;:&#32;pkg.Versions.Last().DisplayName).AsEnumerable();
+00230 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00231 
+<anchor xml:id="__package_collection_8cs_source_1l00232"/><link linkend="_class_unity_editor_1_1_package_manager_1_1_u_i_1_1_package_collection_1a14d75c5f573cc182d33fe76cd4f3d7e8">00232</link> &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<link linkend="_class_unity_editor_1_1_package_manager_1_1_u_i_1_1_package">Package</link>&#32;<link linkend="_class_unity_editor_1_1_package_manager_1_1_u_i_1_1_package_collection_1a14d75c5f573cc182d33fe76cd4f3d7e8">GetPackageByName</link>(<emphasis role="keywordtype">string</emphasis>&#32;name)
+00233 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00234 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_unity_editor_1_1_package_manager_1_1_u_i_1_1_package">Package</link>&#32;package;
+00235 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;packages.TryGetValue(name,&#32;out&#32;package);
+00236 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;package;
+00237 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00238 
+<anchor xml:id="__package_collection_8cs_source_1l00239"/><link linkend="_class_unity_editor_1_1_package_manager_1_1_u_i_1_1_package_collection_1a05751206796fd79618b248930a0711ea">00239</link> &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<link linkend="_namespace_unity_editor_1_1_package_manager_1_1_u_i_1ab1815eb3e48074893d9dc1dc99a4a32aa902b0d55fddef6f8d651fe1035b7d4bd">Error</link>&#32;<link linkend="_class_unity_editor_1_1_package_manager_1_1_u_i_1_1_package_collection_1a05751206796fd79618b248930a0711ea">GetPackageError</link>(<link linkend="_class_unity_editor_1_1_package_manager_1_1_u_i_1_1_package">Package</link>&#32;package)
+00240 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00241 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(<emphasis role="keyword">null</emphasis>&#32;==&#32;package)&#32;<emphasis role="keywordflow">return</emphasis>&#32;<emphasis role="keyword">null</emphasis>;
+00242 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;var&#32;firstMatchingError&#32;=&#32;packageErrors.FirstOrDefault(p&#32;=&gt;&#32;p.PackageName&#32;==&#32;package.<link linkend="_class_unity_editor_1_1_package_manager_1_1_u_i_1_1_package_1a1044e19763ce3d709ee4547b975a1472">Name</link>);
+00243 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;firstMatchingError&#32;!=&#32;<emphasis role="keyword">null</emphasis>&#32;?&#32;firstMatchingError.Error&#32;:&#32;<emphasis role="keyword">null</emphasis>;
+00244 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00245 
+<anchor xml:id="__package_collection_8cs_source_1l00246"/><link linkend="_class_unity_editor_1_1_package_manager_1_1_u_i_1_1_package_collection_1a8bd5c0f86d4add56e3e7b578ed70e4a5">00246</link> &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;<link linkend="_class_unity_editor_1_1_package_manager_1_1_u_i_1_1_package_collection_1a8bd5c0f86d4add56e3e7b578ed70e4a5">AddPackageError</link>(<link linkend="_class_unity_editor_1_1_package_manager_1_1_u_i_1_1_package">Package</link>&#32;package,&#32;<link linkend="_namespace_unity_editor_1_1_package_manager_1_1_u_i_1ab1815eb3e48074893d9dc1dc99a4a32aa902b0d55fddef6f8d651fe1035b7d4bd">Error</link>&#32;error)
+00247 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00248 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(<emphasis role="keyword">null</emphasis>&#32;==&#32;package&#32;||&#32;<emphasis role="keyword">null</emphasis>&#32;==&#32;error)&#32;<emphasis role="keywordflow">return</emphasis>;
+00249 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;packageErrors.Add(<emphasis role="keyword">new</emphasis>&#32;<link linkend="_class_unity_editor_1_1_package_manager_1_1_u_i_1_1_package_error">PackageError</link>(package.<link linkend="_class_unity_editor_1_1_package_manager_1_1_u_i_1_1_package_1a1044e19763ce3d709ee4547b975a1472">Name</link>,&#32;error));
+00250 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00251 
+<anchor xml:id="__package_collection_8cs_source_1l00252"/><link linkend="_class_unity_editor_1_1_package_manager_1_1_u_i_1_1_package_collection_1a675bfec6785ec51c5f8c2d1d2aab3ff0">00252</link> &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;<link linkend="_class_unity_editor_1_1_package_manager_1_1_u_i_1_1_package_collection_1a675bfec6785ec51c5f8c2d1d2aab3ff0">RemovePackageErrors</link>(<link linkend="_class_unity_editor_1_1_package_manager_1_1_u_i_1_1_package">Package</link>&#32;package)
+00253 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00254 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(<emphasis role="keyword">null</emphasis>&#32;==&#32;package)&#32;<emphasis role="keywordflow">return</emphasis>;
+00255 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;packageErrors.RemoveAll(p&#32;=&gt;&#32;p.PackageName&#32;==&#32;package.<link linkend="_class_unity_editor_1_1_package_manager_1_1_u_i_1_1_package_1a1044e19763ce3d709ee4547b975a1472">Name</link>);
+00256 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00257 
+00258 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;RebuildPackageDictionary()
+00259 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00260 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;Merge&#32;list&#32;&amp;&#32;search&#32;packages</emphasis>
+00261 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;var&#32;allPackageInfos&#32;=&#32;<emphasis role="keyword">new</emphasis>&#32;List&lt;PackageInfo&gt;(<link linkend="_class_unity_editor_1_1_package_manager_1_1_u_i_1_1_package_collection_1aecaff6ca4f7866ee058b7c70d3aa49bc">LatestListPackages</link>);
+00262 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;var&#32;installedPackageIds&#32;=&#32;<emphasis role="keyword">new</emphasis>&#32;HashSet&lt;string&gt;(allPackageInfos.Select(p&#32;=&gt;&#32;p.PackageId));
+00263 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;allPackageInfos.AddRange(searchPackages.Where(p&#32;=&gt;&#32;!installedPackageIds.Contains(p.PackageId)));
+00264 
+00265 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(!PackageManagerPrefs.ShowPreviewPackages)
+00266 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00267 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;allPackageInfos&#32;=&#32;allPackageInfos.Where(p&#32;=&gt;&#32;!p.IsPreRelease&#32;||&#32;installedPackageIds.Contains(p.PackageId)).ToList();
+00268 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00269 
+00270 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;Rebuild&#32;packages&#32;dictionary</emphasis>
+00271 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;packages.Clear();
+00272 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">foreach</emphasis>&#32;(var&#32;p&#32;<emphasis role="keywordflow">in</emphasis>&#32;allPackageInfos)
+00273 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00274 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;var&#32;packageName&#32;=&#32;p.Name;
+00275 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(packages.ContainsKey(packageName))
+00276 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">continue</emphasis>;
+00277 
+00278 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;var&#32;packageQuery&#32;=&#32;from&#32;pkg&#32;in&#32;allPackageInfos&#32;where&#32;pkg.Name&#32;==&#32;packageName&#32;select&#32;pkg;
+00279 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;var&#32;<emphasis role="keyword">package&#32;</emphasis>=&#32;new&#32;Package(packageName,&#32;packageQuery);
+00280 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;packages[packageName]&#32;=&#32;package;
+00281 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00282 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00283 &#32;&#32;&#32;&#32;}
+00284 }
+</programlisting></section>

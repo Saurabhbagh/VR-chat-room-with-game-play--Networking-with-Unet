@@ -1,0 +1,421 @@
+<?xml version='1.0' encoding='UTF-8' standalone='no'?>
+<section xmlns="http://docbook.org/ns/docbook" version="5.0" xmlns:xlink="http://www.w3.org/1999/xlink" xml:id="__player_8cs_source">
+<title>Player.cs</title>
+<indexterm><primary>O:/GitHUBMINIPRoject/Assets/SteamVR/InteractionSystem/Core/Scripts/Player.cs</primary></indexterm>
+<programlisting>00001 <emphasis role="comment">//=======&#32;Copyright&#32;(c)&#32;Valve&#32;Corporation,&#32;All&#32;rights&#32;reserved.&#32;===============</emphasis>
+00002 <emphasis role="comment">//</emphasis>
+00003 <emphasis role="comment">//&#32;Purpose:&#32;Player&#32;interface&#32;used&#32;to&#32;query&#32;HMD&#32;transforms&#32;and&#32;VR&#32;hands</emphasis>
+00004 <emphasis role="comment">//</emphasis>
+00005 <emphasis role="comment">//=============================================================================</emphasis>
+00006 
+00007 <emphasis role="keyword">using</emphasis>&#32;<link linkend="__balloon_8cs_1a7d67e097df9376eb709b6a23aa3c7d23">UnityEngine</link>;
+00008 <emphasis role="keyword">using</emphasis>&#32;System.Collections;
+00009 <emphasis role="keyword">using</emphasis>&#32;System.Collections.Generic;
+00010 
+00011 <emphasis role="keyword">namespace&#32;</emphasis><link linkend="_namespace_valve_1_1_v_r_1_1_interaction_system">Valve.VR.InteractionSystem</link>
+00012 {
+00013 &#32;&#32;&#32;&#32;<emphasis role="comment">//-------------------------------------------------------------------------</emphasis>
+00014 &#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;Singleton&#32;representing&#32;the&#32;local&#32;VR&#32;player/user,&#32;with&#32;methods&#32;for&#32;getting</emphasis>
+00015 &#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;the&#32;player&apos;s&#32;hands,&#32;head,&#32;tracking&#32;origin,&#32;and&#32;guesses&#32;for&#32;various&#32;properties.</emphasis>
+00016 &#32;&#32;&#32;&#32;<emphasis role="comment">//-------------------------------------------------------------------------</emphasis>
+<anchor xml:id="__player_8cs_source_1l00017"/><link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_player">00017</link> &#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keyword">class&#32;</emphasis><link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_player">Player</link>&#32;:&#32;MonoBehaviour
+00018 &#32;&#32;&#32;&#32;{
+00019 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;[Tooltip(&#32;<emphasis role="stringliteral">&quot;Virtual&#32;transform&#32;corresponding&#32;to&#32;the&#32;meatspace&#32;tracking&#32;origin.&#32;Devices&#32;are&#32;tracked&#32;relative&#32;to&#32;this.&quot;</emphasis>&#32;)]
+<anchor xml:id="__player_8cs_source_1l00020"/><link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_player_1a8bcf90ac5a364154517e0a0343e090a3">00020</link> &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;Transform&#32;<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_player_1a8bcf90ac5a364154517e0a0343e090a3">trackingOriginTransform</link>;
+00021 
+00022 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;[Tooltip(&#32;<emphasis role="stringliteral">&quot;List&#32;of&#32;possible&#32;transforms&#32;for&#32;the&#32;head/HMD,&#32;including&#32;the&#32;no-SteamVR&#32;fallback&#32;camera.&quot;</emphasis>&#32;)]
+<anchor xml:id="__player_8cs_source_1l00023"/><link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_player_1ac298669d1664666a895c1821f11ed616">00023</link> &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;Transform[]&#32;<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_player_1ac298669d1664666a895c1821f11ed616">hmdTransforms</link>;
+00024 
+00025 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;[Tooltip(&#32;<emphasis role="stringliteral">&quot;List&#32;of&#32;possible&#32;Hands,&#32;including&#32;no-SteamVR&#32;fallback&#32;Hands.&quot;</emphasis>&#32;)]
+<anchor xml:id="__player_8cs_source_1l00026"/><link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_player_1a0125279478cf643348b0b88d8d70139a">00026</link> &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_hand">Hand</link>[]&#32;<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_player_1a0125279478cf643348b0b88d8d70139a">hands</link>;
+00027 
+00028 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;[Tooltip(&#32;<emphasis role="stringliteral">&quot;Reference&#32;to&#32;the&#32;physics&#32;collider&#32;that&#32;follows&#32;the&#32;player&apos;s&#32;HMD&#32;position.&quot;</emphasis>&#32;)]
+<anchor xml:id="__player_8cs_source_1l00029"/><link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_player_1a6988bfc619a4d79e509811f7eae16576">00029</link> &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;Collider&#32;<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_player_1a6988bfc619a4d79e509811f7eae16576">headCollider</link>;
+00030 
+00031 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;[Tooltip(&#32;<emphasis role="stringliteral">&quot;These&#32;objects&#32;are&#32;enabled&#32;when&#32;SteamVR&#32;is&#32;available&quot;</emphasis>&#32;)]
+<anchor xml:id="__player_8cs_source_1l00032"/><link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_player_1a185464fdf2e8086a7e54a1ba48acf1c2">00032</link> &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;GameObject&#32;<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_player_1a185464fdf2e8086a7e54a1ba48acf1c2">rigSteamVR</link>;
+00033 
+00034 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;[Tooltip(&#32;<emphasis role="stringliteral">&quot;These&#32;objects&#32;are&#32;enabled&#32;when&#32;SteamVR&#32;is&#32;not&#32;available,&#32;or&#32;when&#32;the&#32;user&#32;toggles&#32;out&#32;of&#32;VR&quot;</emphasis>&#32;)]
+<anchor xml:id="__player_8cs_source_1l00035"/><link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_player_1a0ccdff9c189f236280107c95774f9fdd">00035</link> &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;GameObject&#32;<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_player_1a0ccdff9c189f236280107c95774f9fdd">rig2DFallback</link>;
+00036 
+00037 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;[Tooltip(&#32;<emphasis role="stringliteral">&quot;The&#32;audio&#32;listener&#32;for&#32;this&#32;player&quot;</emphasis>&#32;)]
+<anchor xml:id="__player_8cs_source_1l00038"/><link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_player_1a89d7628f78d5518066c8dea0063ed083">00038</link> &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;Transform&#32;<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_player_1a89d7628f78d5518066c8dea0063ed083">audioListener</link>;
+00039 
+00040 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;[Tooltip(<emphasis role="stringliteral">&quot;This&#32;action&#32;lets&#32;you&#32;know&#32;when&#32;the&#32;player&#32;has&#32;placed&#32;the&#32;headset&#32;on&#32;their&#32;head&quot;</emphasis>)]
+<anchor xml:id="__player_8cs_source_1l00041"/><link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_player_1a22e6f26051cecb5311af29b25a55b54f">00041</link> &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___action___boolean">SteamVR_Action_Boolean</link>&#32;<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_player_1a22e6f26051cecb5311af29b25a55b54f">headsetOnHead</link>&#32;=&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___input">SteamVR_Input</link>.<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___input_1a1442b5592282c75d7caeb91fe3509124">GetBooleanAction</link>(<emphasis role="stringliteral">&quot;HeadsetOnHead&quot;</emphasis>);
+00042 
+<anchor xml:id="__player_8cs_source_1l00043"/><link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_player_1a116767125feabf5d82dd98ea4a14e3f7">00043</link> &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keywordtype">bool</emphasis>&#32;<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_player_1a116767125feabf5d82dd98ea4a14e3f7">allowToggleTo2D</link>&#32;=&#32;<emphasis role="keyword">true</emphasis>;
+00044 
+00045 
+00046 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//-------------------------------------------------</emphasis>
+00047 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;Singleton&#32;instance&#32;of&#32;the&#32;Player.&#32;Only&#32;one&#32;can&#32;exist&#32;at&#32;a&#32;time.</emphasis>
+00048 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//-------------------------------------------------</emphasis>
+00049 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;<emphasis role="keyword">static</emphasis>&#32;<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_player">Player</link>&#32;_instance;
+00050 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keyword">static</emphasis>&#32;<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_player">Player</link>&#32;<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_player_1ad6c38e0b00917563e4b19d206d20466e">instance</link>
+<anchor xml:id="__player_8cs_source_1l00051"/><link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_player_1ad6c38e0b00917563e4b19d206d20466e">00051</link> &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00052 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">get</emphasis>
+00053 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00054 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(&#32;_instance&#32;==&#32;<emphasis role="keyword">null</emphasis>&#32;)
+00055 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00056 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;_instance&#32;=&#32;FindObjectOfType&lt;Player&gt;();
+00057 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00058 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;_instance;
+00059 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00060 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00061 
+00062 
+00063 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//-------------------------------------------------</emphasis>
+00064 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;Get&#32;the&#32;number&#32;of&#32;active&#32;Hands.</emphasis>
+00065 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//-------------------------------------------------</emphasis>
+00066 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keywordtype">int</emphasis>&#32;<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_player_1a8c8598db3522a57c1c7ff7a2c50e4a28">handCount</link>
+<anchor xml:id="__player_8cs_source_1l00067"/><link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_player_1a8c8598db3522a57c1c7ff7a2c50e4a28">00067</link> &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00068 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">get</emphasis>
+00069 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00070 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordtype">int</emphasis>&#32;count&#32;=&#32;0;
+00071 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">for</emphasis>&#32;(&#32;<emphasis role="keywordtype">int</emphasis>&#32;i&#32;=&#32;0;&#32;i&#32;&lt;&#32;<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_player_1a0125279478cf643348b0b88d8d70139a">hands</link>.Length;&#32;i++&#32;)
+00072 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00073 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(&#32;<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_player_1a0125279478cf643348b0b88d8d70139a">hands</link>[i].gameObject.activeInHierarchy&#32;)
+00074 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00075 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;count++;
+00076 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00077 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00078 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;count;
+00079 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00080 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00081 
+00082 
+00083 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//-------------------------------------------------</emphasis>
+00084 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;Get&#32;the&#32;i-th&#32;active&#32;Hand.</emphasis>
+00085 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//</emphasis>
+00086 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;i&#32;-&#32;Zero-based&#32;index&#32;of&#32;the&#32;active&#32;Hand&#32;to&#32;get</emphasis>
+00087 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//-------------------------------------------------</emphasis>
+<anchor xml:id="__player_8cs_source_1l00088"/><link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_player_1a35d109a7314c2be9516f393f1c2bbb42">00088</link> &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_hand">Hand</link>&#32;<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_player_1a35d109a7314c2be9516f393f1c2bbb42">GetHand</link>(&#32;<emphasis role="keywordtype">int</emphasis>&#32;i&#32;)
+00089 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00090 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">for</emphasis>&#32;(&#32;<emphasis role="keywordtype">int</emphasis>&#32;j&#32;=&#32;0;&#32;j&#32;&lt;&#32;<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_player_1a0125279478cf643348b0b88d8d70139a">hands</link>.Length;&#32;j++&#32;)
+00091 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00092 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(&#32;!<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_player_1a0125279478cf643348b0b88d8d70139a">hands</link>[j].gameObject.activeInHierarchy&#32;)
+00093 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00094 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">continue</emphasis>;
+00095 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00096 
+00097 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(&#32;i&#32;&gt;&#32;0&#32;)
+00098 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00099 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;i--;
+00100 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">continue</emphasis>;
+00101 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00102 
+00103 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_player_1a0125279478cf643348b0b88d8d70139a">hands</link>[j];
+00104 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00105 
+00106 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;<emphasis role="keyword">null</emphasis>;
+00107 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00108 
+00109 
+00110 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//-------------------------------------------------</emphasis>
+00111 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_hand">Hand</link>&#32;<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_player_1a04948911127247b87dc2256099f1b33a">leftHand</link>
+<anchor xml:id="__player_8cs_source_1l00112"/><link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_player_1a04948911127247b87dc2256099f1b33a">00112</link> &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00113 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">get</emphasis>
+00114 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00115 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">for</emphasis>&#32;(&#32;<emphasis role="keywordtype">int</emphasis>&#32;j&#32;=&#32;0;&#32;j&#32;&lt;&#32;<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_player_1a0125279478cf643348b0b88d8d70139a">hands</link>.Length;&#32;j++&#32;)
+00116 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00117 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(&#32;!<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_player_1a0125279478cf643348b0b88d8d70139a">hands</link>[j].gameObject.activeInHierarchy&#32;)
+00118 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00119 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">continue</emphasis>;
+00120 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00121 
+00122 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(&#32;<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_player_1a0125279478cf643348b0b88d8d70139a">hands</link>[j].handType&#32;!=&#32;<link linkend="_namespace_valve_1_1_v_r_1a82e5bf501cc3aa155444ee3f0662853f">SteamVR_Input_Sources</link>.LeftHand)
+00123 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00124 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">continue</emphasis>;
+00125 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00126 
+00127 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_player_1a0125279478cf643348b0b88d8d70139a">hands</link>[j];
+00128 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00129 
+00130 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;<emphasis role="keyword">null</emphasis>;
+00131 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00132 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00133 
+00134 
+00135 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//-------------------------------------------------</emphasis>
+00136 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_hand">Hand</link>&#32;<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_player_1ad71b2ca999605bd6a1a9b1e8bc797bbb">rightHand</link>
+<anchor xml:id="__player_8cs_source_1l00137"/><link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_player_1ad71b2ca999605bd6a1a9b1e8bc797bbb">00137</link> &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00138 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">get</emphasis>
+00139 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00140 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">for</emphasis>&#32;(&#32;<emphasis role="keywordtype">int</emphasis>&#32;j&#32;=&#32;0;&#32;j&#32;&lt;&#32;<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_player_1a0125279478cf643348b0b88d8d70139a">hands</link>.Length;&#32;j++&#32;)
+00141 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00142 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(&#32;!<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_player_1a0125279478cf643348b0b88d8d70139a">hands</link>[j].gameObject.activeInHierarchy&#32;)
+00143 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00144 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">continue</emphasis>;
+00145 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00146 
+00147 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(&#32;<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_player_1a0125279478cf643348b0b88d8d70139a">hands</link>[j].handType&#32;!=&#32;<link linkend="_namespace_valve_1_1_v_r_1a82e5bf501cc3aa155444ee3f0662853f">SteamVR_Input_Sources</link>.RightHand)
+00148 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00149 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">continue</emphasis>;
+00150 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00151 
+00152 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_player_1a0125279478cf643348b0b88d8d70139a">hands</link>[j];
+00153 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00154 
+00155 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;<emphasis role="keyword">null</emphasis>;
+00156 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00157 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00158 
+00159 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//-------------------------------------------------</emphasis>
+00160 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;Get&#32;Player&#32;scale.&#32;Assumes&#32;it&#32;is&#32;scaled&#32;equally&#32;on&#32;all&#32;axes.</emphasis>
+00161 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//-------------------------------------------------</emphasis>
+00162 
+00163 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keywordtype">float</emphasis>&#32;<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_player_1ad14b51d09391a08cb5c6a293ce8f0c40">scale</link>
+<anchor xml:id="__player_8cs_source_1l00164"/><link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_player_1ad14b51d09391a08cb5c6a293ce8f0c40">00164</link> &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00165 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">get</emphasis>
+00166 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00167 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;transform.lossyScale.x;
+00168 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00169 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00170 
+00171 
+00172 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//-------------------------------------------------</emphasis>
+00173 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;Get&#32;the&#32;HMD&#32;transform.&#32;This&#32;might&#32;return&#32;the&#32;fallback&#32;camera&#32;transform&#32;if&#32;SteamVR&#32;is&#32;unavailable&#32;or&#32;disabled.</emphasis>
+00174 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//-------------------------------------------------</emphasis>
+00175 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;Transform&#32;<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_player_1a1ed62d545589d4e836edcc6e6e5494a3">hmdTransform</link>
+<anchor xml:id="__player_8cs_source_1l00176"/><link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_player_1a1ed62d545589d4e836edcc6e6e5494a3">00176</link> &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00177 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">get</emphasis>
+00178 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00179 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_player_1ac298669d1664666a895c1821f11ed616">hmdTransforms</link>&#32;!=&#32;<emphasis role="keyword">null</emphasis>)
+00180 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00181 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">for</emphasis>&#32;(<emphasis role="keywordtype">int</emphasis>&#32;i&#32;=&#32;0;&#32;i&#32;&lt;&#32;<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_player_1ac298669d1664666a895c1821f11ed616">hmdTransforms</link>.Length;&#32;i++)
+00182 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00183 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_player_1ac298669d1664666a895c1821f11ed616">hmdTransforms</link>[i].gameObject.activeInHierarchy)
+00184 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_player_1ac298669d1664666a895c1821f11ed616">hmdTransforms</link>[i];
+00185 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00186 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00187 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;<emphasis role="keyword">null</emphasis>;
+00188 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00189 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00190 
+00191 
+00192 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//-------------------------------------------------</emphasis>
+00193 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;Height&#32;of&#32;the&#32;eyes&#32;above&#32;the&#32;ground&#32;-&#32;useful&#32;for&#32;estimating&#32;player&#32;height.</emphasis>
+00194 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//-------------------------------------------------</emphasis>
+00195 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keywordtype">float</emphasis>&#32;<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_player_1a4a568595184f03fe631080aeed17c082">eyeHeight</link>
+<anchor xml:id="__player_8cs_source_1l00196"/><link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_player_1a4a568595184f03fe631080aeed17c082">00196</link> &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00197 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">get</emphasis>
+00198 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00199 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;Transform&#32;hmd&#32;=&#32;<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_player_1a1ed62d545589d4e836edcc6e6e5494a3">hmdTransform</link>;
+00200 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(&#32;hmd&#32;)
+00201 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00202 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;Vector3&#32;eyeOffset&#32;=&#32;Vector3.Project(&#32;hmd.position&#32;-&#32;<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_player_1a8bcf90ac5a364154517e0a0343e090a3">trackingOriginTransform</link>.position,&#32;<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_player_1a8bcf90ac5a364154517e0a0343e090a3">trackingOriginTransform</link>.up&#32;);
+00203 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;eyeOffset.magnitude&#32;/&#32;<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_player_1a8bcf90ac5a364154517e0a0343e090a3">trackingOriginTransform</link>.lossyScale.x;
+00204 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00205 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;0.0f;
+00206 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00207 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00208 
+00209 
+00210 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//-------------------------------------------------</emphasis>
+00211 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;Guess&#32;for&#32;the&#32;world-space&#32;position&#32;of&#32;the&#32;player&apos;s&#32;feet,&#32;directly&#32;beneath&#32;the&#32;HMD.</emphasis>
+00212 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//-------------------------------------------------</emphasis>
+00213 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;Vector3&#32;<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_player_1a13aff146a2745c855b879c43856fd2c0">feetPositionGuess</link>
+<anchor xml:id="__player_8cs_source_1l00214"/><link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_player_1a13aff146a2745c855b879c43856fd2c0">00214</link> &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00215 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">get</emphasis>
+00216 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00217 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;Transform&#32;hmd&#32;=&#32;<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_player_1a1ed62d545589d4e836edcc6e6e5494a3">hmdTransform</link>;
+00218 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(&#32;hmd&#32;)
+00219 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00220 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_player_1a8bcf90ac5a364154517e0a0343e090a3">trackingOriginTransform</link>.position&#32;+&#32;Vector3.ProjectOnPlane(&#32;hmd.position&#32;-&#32;<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_player_1a8bcf90ac5a364154517e0a0343e090a3">trackingOriginTransform</link>.position,&#32;<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_player_1a8bcf90ac5a364154517e0a0343e090a3">trackingOriginTransform</link>.up&#32;);
+00221 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00222 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_player_1a8bcf90ac5a364154517e0a0343e090a3">trackingOriginTransform</link>.position;
+00223 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00224 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00225 
+00226 
+00227 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//-------------------------------------------------</emphasis>
+00228 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;Guess&#32;for&#32;the&#32;world-space&#32;direction&#32;of&#32;the&#32;player&apos;s&#32;hips/torso.&#32;This&#32;is&#32;effectively&#32;just&#32;the&#32;gaze&#32;direction&#32;projected&#32;onto&#32;the&#32;floor&#32;plane.</emphasis>
+00229 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//-------------------------------------------------</emphasis>
+00230 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;Vector3&#32;<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_player_1abf5d27654c37fb8a0a83672eb6efa55c">bodyDirectionGuess</link>
+<anchor xml:id="__player_8cs_source_1l00231"/><link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_player_1abf5d27654c37fb8a0a83672eb6efa55c">00231</link> &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00232 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">get</emphasis>
+00233 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00234 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;Transform&#32;hmd&#32;=&#32;<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_player_1a1ed62d545589d4e836edcc6e6e5494a3">hmdTransform</link>;
+00235 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(&#32;hmd&#32;)
+00236 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00237 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;Vector3&#32;direction&#32;=&#32;Vector3.ProjectOnPlane(&#32;hmd.forward,&#32;<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_player_1a8bcf90ac5a364154517e0a0343e090a3">trackingOriginTransform</link>.up&#32;);
+00238 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(&#32;Vector3.Dot(&#32;hmd.up,&#32;<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_player_1a8bcf90ac5a364154517e0a0343e090a3">trackingOriginTransform</link>.up&#32;)&#32;&lt;&#32;0.0f&#32;)
+00239 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00240 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;The&#32;HMD&#32;is&#32;upside-down.&#32;Either</emphasis>
+00241 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;-The&#32;player&#32;is&#32;bending&#32;over&#32;backwards</emphasis>
+00242 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;-The&#32;player&#32;is&#32;bent&#32;over&#32;looking&#32;through&#32;their&#32;legs</emphasis>
+00243 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;direction&#32;=&#32;-direction;
+00244 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00245 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;direction;
+00246 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00247 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_player_1a8bcf90ac5a364154517e0a0343e090a3">trackingOriginTransform</link>.forward;
+00248 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00249 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00250 
+00251 
+00252 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//-------------------------------------------------</emphasis>
+00253 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;Awake()
+00254 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00255 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(&#32;<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_player_1a8bcf90ac5a364154517e0a0343e090a3">trackingOriginTransform</link>&#32;==&#32;<emphasis role="keyword">null</emphasis>&#32;)
+00256 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00257 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_player_1a8bcf90ac5a364154517e0a0343e090a3">trackingOriginTransform</link>&#32;=&#32;this.transform;
+00258 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00259 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00260 
+00261 
+00262 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//-------------------------------------------------</emphasis>
+00263 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;IEnumerator&#32;Start()
+00264 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00265 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;_instance&#32;=&#32;<emphasis role="keyword">this</emphasis>;
+00266 
+00267 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">while</emphasis>&#32;(SteamVR.initializedState&#32;==&#32;SteamVR.InitializedStates.None&#32;||&#32;SteamVR.initializedState&#32;==&#32;SteamVR.InitializedStates.Initializing)
+00268 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;yield&#32;<emphasis role="keywordflow">return</emphasis>&#32;<emphasis role="keyword">null</emphasis>;
+00269 
+00270 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(&#32;SteamVR.instance&#32;!=&#32;<emphasis role="keyword">null</emphasis>&#32;)
+00271 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00272 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;ActivateRig(&#32;<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_player_1a185464fdf2e8086a7e54a1ba48acf1c2">rigSteamVR</link>&#32;);
+00273 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00274 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">else</emphasis>
+00275 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00276 <emphasis role="preprocessor">#if&#32;!HIDE_DEBUG_UI</emphasis>
+00277 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;ActivateRig(&#32;<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_player_1a0ccdff9c189f236280107c95774f9fdd">rig2DFallback</link>&#32;);
+00278 <emphasis role="preprocessor">#endif</emphasis>
+00279 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00280 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00281 
+<anchor xml:id="__player_8cs_source_1l00282"/><link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_player_1a9910e0f1d5dc06cb2022d0ae0385d1eb">00282</link> &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">protected</emphasis>&#32;<emphasis role="keyword">virtual</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_player_1a9910e0f1d5dc06cb2022d0ae0385d1eb">Update</link>()
+00283 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00284 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r">SteamVR</link>.<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r_1aebdf879d97763960970090cfff20a8a7">initializedState</link>&#32;!=&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r">SteamVR</link>.<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r_1a09db867d75bbc654801bb318dd85a5e3">InitializedStates</link>.InitializeSuccess)
+00285 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>;
+00286 
+00287 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_player_1a22e6f26051cecb5311af29b25a55b54f">headsetOnHead</link>&#32;!=&#32;<emphasis role="keyword">null</emphasis>)
+00288 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00289 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_player_1a22e6f26051cecb5311af29b25a55b54f">headsetOnHead</link>.<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___action___boolean_1aa0a7eb5f7e02e35fd6922dd30b087f77">GetStateDown</link>(<link linkend="_namespace_valve_1_1_v_r_1a82e5bf501cc3aa155444ee3f0662853f">SteamVR_Input_Sources</link>.Head))
+00290 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00291 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;Debug.Log(<emphasis role="stringliteral">&quot;&lt;b&gt;SteamVR&#32;Interaction&#32;System&lt;/b&gt;&#32;Headset&#32;placed&#32;on&#32;head&quot;</emphasis>);
+00292 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00293 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">else</emphasis>&#32;<emphasis role="keywordflow">if</emphasis>&#32;(<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_player_1a22e6f26051cecb5311af29b25a55b54f">headsetOnHead</link>.<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___action___boolean_1a4b582272fb4f9c529e519246332e9922">GetStateUp</link>(<link linkend="_namespace_valve_1_1_v_r_1a82e5bf501cc3aa155444ee3f0662853f">SteamVR_Input_Sources</link>.Head))
+00294 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00295 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;Debug.Log(<emphasis role="stringliteral">&quot;&lt;b&gt;SteamVR&#32;Interaction&#32;System&lt;/b&gt;&#32;Headset&#32;removed&quot;</emphasis>);
+00296 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00297 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00298 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00299 
+00300 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//-------------------------------------------------</emphasis>
+00301 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordtype">void</emphasis>&#32;OnDrawGizmos()
+00302 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00303 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(&#32;<emphasis role="keyword">this</emphasis>&#32;!=&#32;<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_player_1ad6c38e0b00917563e4b19d206d20466e">instance</link>&#32;)
+00304 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00305 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>;
+00306 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00307 
+00308 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//NOTE:&#32;These&#32;gizmo&#32;icons&#32;don&apos;t&#32;work&#32;in&#32;the&#32;plugin&#32;since&#32;the&#32;icons&#32;need&#32;to&#32;exist&#32;in&#32;a&#32;specific&#32;&quot;Gizmos&quot;</emphasis>
+00309 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;&#32;&#32;&#32;&#32;&#32;folder&#32;in&#32;your&#32;Asset&#32;tree.&#32;These&#32;icons&#32;are&#32;included&#32;under&#32;Core/Icons.&#32;Moving&#32;them&#32;into&#32;a</emphasis>
+00310 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;&#32;&#32;&#32;&#32;&#32;&quot;Gizmos&quot;&#32;folder&#32;should&#32;make&#32;them&#32;work&#32;again.</emphasis>
+00311 
+00312 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;Gizmos.color&#32;=&#32;Color.white;
+00313 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;Gizmos.DrawIcon(&#32;<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_player_1a13aff146a2745c855b879c43856fd2c0">feetPositionGuess</link>,&#32;<emphasis role="stringliteral">&quot;vr_interaction_system_feet.png&quot;</emphasis>&#32;);
+00314 
+00315 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;Gizmos.color&#32;=&#32;Color.cyan;
+00316 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;Gizmos.DrawLine(&#32;<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_player_1a13aff146a2745c855b879c43856fd2c0">feetPositionGuess</link>,&#32;<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_player_1a13aff146a2745c855b879c43856fd2c0">feetPositionGuess</link>&#32;+&#32;<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_player_1a8bcf90ac5a364154517e0a0343e090a3">trackingOriginTransform</link>.up&#32;*&#32;<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_player_1a4a568595184f03fe631080aeed17c082">eyeHeight</link>&#32;);
+00317 
+00318 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;Body&#32;direction&#32;arrow</emphasis>
+00319 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;Gizmos.color&#32;=&#32;Color.blue;
+00320 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;Vector3&#32;bodyDirection&#32;=&#32;<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_player_1abf5d27654c37fb8a0a83672eb6efa55c">bodyDirectionGuess</link>;
+00321 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;Vector3&#32;bodyDirectionTangent&#32;=&#32;Vector3.Cross(&#32;<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_player_1a8bcf90ac5a364154517e0a0343e090a3">trackingOriginTransform</link>.up,&#32;bodyDirection&#32;);
+00322 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;Vector3&#32;startForward&#32;=&#32;<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_player_1a13aff146a2745c855b879c43856fd2c0">feetPositionGuess</link>&#32;+&#32;<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_player_1a8bcf90ac5a364154517e0a0343e090a3">trackingOriginTransform</link>.up&#32;*&#32;<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_player_1a4a568595184f03fe631080aeed17c082">eyeHeight</link>&#32;*&#32;0.75f;
+00323 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;Vector3&#32;endForward&#32;=&#32;startForward&#32;+&#32;bodyDirection&#32;*&#32;0.33f;
+00324 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;Gizmos.DrawLine(&#32;startForward,&#32;endForward&#32;);
+00325 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;Gizmos.DrawLine(&#32;endForward,&#32;endForward&#32;-&#32;0.033f&#32;*&#32;(&#32;bodyDirection&#32;+&#32;bodyDirectionTangent&#32;)&#32;);
+00326 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;Gizmos.DrawLine(&#32;endForward,&#32;endForward&#32;-&#32;0.033f&#32;*&#32;(&#32;bodyDirection&#32;-&#32;bodyDirectionTangent&#32;)&#32;);
+00327 
+00328 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;Gizmos.color&#32;=&#32;Color.red;
+00329 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordtype">int</emphasis>&#32;count&#32;=&#32;<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_player_1a8c8598db3522a57c1c7ff7a2c50e4a28">handCount</link>;
+00330 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">for</emphasis>&#32;(&#32;<emphasis role="keywordtype">int</emphasis>&#32;i&#32;=&#32;0;&#32;i&#32;&lt;&#32;count;&#32;i++&#32;)
+00331 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00332 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;Hand&#32;hand&#32;=&#32;<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_player_1a35d109a7314c2be9516f393f1c2bbb42">GetHand</link>(&#32;i&#32;);
+00333 
+00334 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(&#32;hand.handType&#32;==&#32;<link linkend="_namespace_valve_1_1_v_r_1a82e5bf501cc3aa155444ee3f0662853f">SteamVR_Input_Sources</link>.LeftHand)
+00335 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00336 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;Gizmos.DrawIcon(&#32;hand.transform.position,&#32;<emphasis role="stringliteral">&quot;vr_interaction_system_left_hand.png&quot;</emphasis>&#32;);
+00337 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00338 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">else</emphasis>&#32;<emphasis role="keywordflow">if</emphasis>&#32;(&#32;hand.handType&#32;==&#32;<link linkend="_namespace_valve_1_1_v_r_1a82e5bf501cc3aa155444ee3f0662853f">SteamVR_Input_Sources</link>.RightHand)
+00339 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00340 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;Gizmos.DrawIcon(&#32;hand.transform.position,&#32;<emphasis role="stringliteral">&quot;vr_interaction_system_right_hand.png&quot;</emphasis>&#32;);
+00341 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00342 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">else</emphasis>
+00343 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00344 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">/*</emphasis>
+00345 <emphasis role="comment">&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;Hand.HandType&#32;guessHandType&#32;=&#32;hand.currentHandType;</emphasis>
+00346 <emphasis role="comment"></emphasis>
+00347 <emphasis role="comment">&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;if&#32;(&#32;guessHandType&#32;==&#32;Hand.HandType.Left&#32;)</emphasis>
+00348 <emphasis role="comment">&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{</emphasis>
+00349 <emphasis role="comment">&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;Gizmos.DrawIcon(&#32;hand.transform.position,&#32;&quot;vr_interaction_system_left_hand_question.png&quot;&#32;);</emphasis>
+00350 <emphasis role="comment">&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}</emphasis>
+00351 <emphasis role="comment">&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;else&#32;if&#32;(&#32;guessHandType&#32;==&#32;Hand.HandType.Right&#32;)</emphasis>
+00352 <emphasis role="comment">&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{</emphasis>
+00353 <emphasis role="comment">&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;Gizmos.DrawIcon(&#32;hand.transform.position,&#32;&quot;vr_interaction_system_right_hand_question.png&quot;&#32;);</emphasis>
+00354 <emphasis role="comment">&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}</emphasis>
+00355 <emphasis role="comment">&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;else</emphasis>
+00356 <emphasis role="comment">&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{</emphasis>
+00357 <emphasis role="comment">&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;Gizmos.DrawIcon(&#32;hand.transform.position,&#32;&quot;vr_interaction_system_unknown_hand.png&quot;&#32;);</emphasis>
+00358 <emphasis role="comment">&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}</emphasis>
+00359 <emphasis role="comment">&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;*/</emphasis>
+00360 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00361 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00362 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00363 
+00364 
+00365 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//-------------------------------------------------</emphasis>
+<anchor xml:id="__player_8cs_source_1l00366"/><link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_player_1a31a5b321202e3bd3b545c5545bf17b2b">00366</link> &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_player_1a31a5b321202e3bd3b545c5545bf17b2b">Draw2DDebug</link>()
+00367 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00368 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(&#32;!<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_player_1a116767125feabf5d82dd98ea4a14e3f7">allowToggleTo2D</link>&#32;)
+00369 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>;
+00370 
+00371 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(&#32;!<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r">SteamVR</link>.<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r_1ad98d1d8dafb84740b3a005d435da62a5">active</link>&#32;)
+00372 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>;
+00373 
+00374 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordtype">int</emphasis>&#32;width&#32;=&#32;100;
+00375 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordtype">int</emphasis>&#32;height&#32;=&#32;25;
+00376 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordtype">int</emphasis>&#32;left&#32;=&#32;Screen.width&#32;/&#32;2&#32;-&#32;width&#32;/&#32;2;
+00377 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordtype">int</emphasis>&#32;top&#32;=&#32;Screen.height&#32;-&#32;height&#32;-&#32;10;
+00378 
+00379 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordtype">string</emphasis>&#32;text&#32;=&#32;(&#32;<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_player_1a185464fdf2e8086a7e54a1ba48acf1c2">rigSteamVR</link>.activeSelf&#32;)&#32;?&#32;<emphasis role="stringliteral">&quot;2D&#32;Debug&quot;</emphasis>&#32;:&#32;<emphasis role="stringliteral">&quot;VR&quot;</emphasis>;
+00380 
+00381 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(&#32;GUI.Button(&#32;<emphasis role="keyword">new</emphasis>&#32;Rect(&#32;left,&#32;top,&#32;width,&#32;height&#32;),&#32;text&#32;)&#32;)
+00382 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00383 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(&#32;<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_player_1a185464fdf2e8086a7e54a1ba48acf1c2">rigSteamVR</link>.activeSelf&#32;)
+00384 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00385 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;ActivateRig(&#32;<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_player_1a0ccdff9c189f236280107c95774f9fdd">rig2DFallback</link>&#32;);
+00386 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00387 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">else</emphasis>
+00388 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00389 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;ActivateRig(&#32;<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_player_1a185464fdf2e8086a7e54a1ba48acf1c2">rigSteamVR</link>&#32;);
+00390 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00391 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00392 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00393 
+00394 
+00395 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//-------------------------------------------------</emphasis>
+00396 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;ActivateRig(&#32;GameObject&#32;rig&#32;)
+00397 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00398 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_player_1a185464fdf2e8086a7e54a1ba48acf1c2">rigSteamVR</link>.SetActive(&#32;rig&#32;==&#32;<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_player_1a185464fdf2e8086a7e54a1ba48acf1c2">rigSteamVR</link>&#32;);
+00399 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_player_1a0ccdff9c189f236280107c95774f9fdd">rig2DFallback</link>.SetActive(&#32;rig&#32;==&#32;<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_player_1a0ccdff9c189f236280107c95774f9fdd">rig2DFallback</link>&#32;);
+00400 
+00401 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(&#32;<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_player_1a89d7628f78d5518066c8dea0063ed083">audioListener</link>&#32;)
+00402 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00403 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_player_1a89d7628f78d5518066c8dea0063ed083">audioListener</link>.transform.parent&#32;=&#32;<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_player_1a1ed62d545589d4e836edcc6e6e5494a3">hmdTransform</link>;
+00404 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_player_1a89d7628f78d5518066c8dea0063ed083">audioListener</link>.transform.localPosition&#32;=&#32;Vector3.zero;
+00405 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_player_1a89d7628f78d5518066c8dea0063ed083">audioListener</link>.transform.localRotation&#32;=&#32;Quaternion.identity;
+00406 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00407 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00408 
+00409 
+00410 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//-------------------------------------------------</emphasis>
+<anchor xml:id="__player_8cs_source_1l00411"/><link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_player_1a1739a9ea9f88c6a0963a172916ef2f70">00411</link> &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_player_1a1739a9ea9f88c6a0963a172916ef2f70">PlayerShotSelf</link>()
+00412 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00413 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//Do&#32;something&#32;appropriate&#32;here</emphasis>
+00414 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00415 &#32;&#32;&#32;&#32;}
+00416 }
+</programlisting></section>

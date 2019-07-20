@@ -1,0 +1,87 @@
+<?xml version='1.0' encoding='UTF-8' standalone='no'?>
+<section xmlns="http://docbook.org/ns/docbook" version="5.0" xmlns:xlink="http://www.w3.org/1999/xlink" xml:id="__single_layer_editor_8cs_source">
+<title>SingleLayerEditor.cs</title>
+<indexterm><primary>O:/GitHUBMINIPRoject/Assets/LeapMotion/Core/Scripts/Utils/Editor/SingleLayerEditor.cs</primary></indexterm>
+<programlisting>00001 <emphasis role="comment">/******************************************************************************</emphasis>
+00002 <emphasis role="comment">&#32;*&#32;Copyright&#32;(C)&#32;Leap&#32;Motion,&#32;Inc.&#32;2011-2018.&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;*</emphasis>
+00003 <emphasis role="comment">&#32;*&#32;Leap&#32;Motion&#32;proprietary&#32;and&#32;confidential.&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;*</emphasis>
+00004 <emphasis role="comment">&#32;*&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;*</emphasis>
+00005 <emphasis role="comment">&#32;*&#32;Use&#32;subject&#32;to&#32;the&#32;terms&#32;of&#32;the&#32;Leap&#32;Motion&#32;SDK&#32;Agreement&#32;available&#32;at&#32;&#32;&#32;&#32;&#32;*</emphasis>
+00006 <emphasis role="comment">&#32;*&#32;https://developer.leapmotion.com/sdk_agreement,&#32;or&#32;another&#32;agreement&#32;&#32;&#32;&#32;&#32;&#32;&#32;*</emphasis>
+00007 <emphasis role="comment">&#32;*&#32;between&#32;Leap&#32;Motion&#32;and&#32;you,&#32;your&#32;company&#32;or&#32;other&#32;organization.&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;*</emphasis>
+00008 <emphasis role="comment">&#32;******************************************************************************/</emphasis>
+00009 
+00010 <emphasis role="keyword">using</emphasis>&#32;<link linkend="__balloon_8cs_1a7d67e097df9376eb709b6a23aa3c7d23">UnityEngine</link>;
+00011 <emphasis role="keyword">using</emphasis>&#32;<link linkend="_namespace_unity_editor">UnityEditor</link>;
+00012 <emphasis role="keyword">using</emphasis>&#32;System.Linq;
+00013 <emphasis role="keyword">using</emphasis>&#32;System.Collections.Generic;
+00014 
+00015 <emphasis role="keyword">namespace&#32;</emphasis><link linkend="_namespace_leap_1_1_unity">Leap.Unity</link>&#32;{
+00016 
+00017 &#32;&#32;[CustomPropertyDrawer(typeof(SingleLayer))]
+<anchor xml:id="__single_layer_editor_8cs_source_1l00018"/><link linkend="_class_leap_1_1_unity_1_1_single_layer_editor">00018</link> &#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keyword">class&#32;</emphasis><link linkend="_class_leap_1_1_unity_1_1_single_layer_editor">SingleLayerEditor</link>&#32;:&#32;PropertyDrawer&#32;{
+00019 &#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;GUIContent[]&#32;_layerNames;
+00020 &#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;List&lt;int&gt;&#32;_layerValues;
+00021 
+<anchor xml:id="__single_layer_editor_8cs_source_1l00022"/><link linkend="_class_leap_1_1_unity_1_1_single_layer_editor_1aa2279c0d9f38650e8c14a0873b29d23a">00022</link> &#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keyword">override</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;<link linkend="_class_leap_1_1_unity_1_1_single_layer_editor_1aa2279c0d9f38650e8c14a0873b29d23a">OnGUI</link>(Rect&#32;position,&#32;SerializedProperty&#32;property,&#32;GUIContent&#32;label)&#32;{
+00023 &#32;&#32;&#32;&#32;&#32;&#32;ensureLayersInitialized();
+00024 
+00025 &#32;&#32;&#32;&#32;&#32;&#32;SerializedProperty&#32;layerProperty&#32;=&#32;<emphasis role="keyword">property</emphasis>.FindPropertyRelative(<emphasis role="stringliteral">&quot;layerIndex&quot;</emphasis>);
+00026 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(layerProperty&#32;==&#32;<emphasis role="keyword">null</emphasis>)&#32;{
+00027 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;Debug.LogWarning(<emphasis role="stringliteral">&quot;Could&#32;not&#32;find&#32;the&#32;layer&#32;index&#32;property,&#32;was&#32;it&#32;renamed&#32;or&#32;removed?&quot;</emphasis>);
+00028 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>;
+00029 &#32;&#32;&#32;&#32;&#32;&#32;}
+00030 
+00031 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordtype">int</emphasis>&#32;index&#32;=&#32;_layerValues.IndexOf(layerProperty.intValue);
+00032 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(index&#32;&lt;&#32;0)&#32;{
+00033 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(Application.isPlaying)&#32;{
+00034 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//If&#32;application&#32;is&#32;playing&#32;we&#32;dont&#32;want&#32;to&#32;change&#32;the&#32;layers&#32;on&#32;the&#32;fly</emphasis>
+00035 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//Instead,&#32;just&#32;display&#32;them&#32;as&#32;an&#32;int&#32;value</emphasis>
+00036 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;layerProperty.intValue&#32;=&#32;EditorGUI.IntField(position,&#32;property.displayName,&#32;layerProperty.intValue);
+00037 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>;
+00038 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}&#32;<emphasis role="keywordflow">else</emphasis>&#32;{
+00039 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//If&#32;the&#32;application&#32;is&#32;not&#32;running,&#32;reset&#32;the&#32;layer&#32;to&#32;the&#32;default&#32;layer</emphasis>
+00040 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;layerProperty.intValue&#32;=&#32;0;
+00041 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;index&#32;=&#32;0;
+00042 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00043 &#32;&#32;&#32;&#32;&#32;&#32;}
+00044 
+00045 &#32;&#32;&#32;&#32;&#32;&#32;var&#32;tooltipAttribute&#32;=&#32;fieldInfo.GetCustomAttributes(typeof(TooltipAttribute),&#32;<emphasis role="keyword">true</emphasis>).
+00046 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;Cast&lt;TooltipAttribute&gt;().
+00047 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;FirstOrDefault();
+00048 
+00049 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(tooltipAttribute&#32;!=&#32;<emphasis role="keyword">null</emphasis>)&#32;{
+00050 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;label.tooltip&#32;=&#32;tooltipAttribute.tooltip;
+00051 &#32;&#32;&#32;&#32;&#32;&#32;}
+00052 
+00053 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordtype">bool</emphasis>&#32;originalMixedValue&#32;=&#32;EditorGUI.showMixedValue;
+00054 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(layerProperty.hasMultipleDifferentValues)&#32;{
+00055 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;EditorGUI.showMixedValue&#32;=&#32;<emphasis role="keyword">true</emphasis>;
+00056 &#32;&#32;&#32;&#32;&#32;&#32;}
+00057 
+00058 &#32;&#32;&#32;&#32;&#32;&#32;EditorGUI.BeginChangeCheck();
+00059 &#32;&#32;&#32;&#32;&#32;&#32;index&#32;=&#32;EditorGUI.Popup(position,&#32;label,&#32;index,&#32;_layerNames);
+00060 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(EditorGUI.EndChangeCheck())&#32;{
+00061 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;layerProperty.intValue&#32;=&#32;_layerValues[index];
+00062 &#32;&#32;&#32;&#32;&#32;&#32;}
+00063 
+00064 &#32;&#32;&#32;&#32;&#32;&#32;EditorGUI.showMixedValue&#32;=&#32;originalMixedValue;
+00065 &#32;&#32;&#32;&#32;}
+00066 
+00067 &#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;ensureLayersInitialized()&#32;{
+00068 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(_layerNames&#32;==&#32;<emphasis role="keyword">null</emphasis>)&#32;{
+00069 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;Dictionary&lt;int,&#32;GUIContent&gt;&#32;valueToLayer&#32;=&#32;<emphasis role="keyword">new</emphasis>&#32;Dictionary&lt;int,&#32;GUIContent&gt;();
+00070 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">for</emphasis>&#32;(<emphasis role="keywordtype">int</emphasis>&#32;i&#32;=&#32;0;&#32;i&#32;&lt;&#32;32;&#32;i++)&#32;{
+00071 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordtype">string</emphasis>&#32;layerName&#32;=&#32;LayerMask.LayerToName(i);
+00072 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(!<emphasis role="keywordtype">string</emphasis>.IsNullOrEmpty(layerName))&#32;{
+00073 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;valueToLayer[i]&#32;=&#32;<emphasis role="keyword">new</emphasis>&#32;GUIContent(layerName);
+00074 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00075 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00076 
+00077 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;_layerValues&#32;=&#32;valueToLayer.Keys.ToList();
+00078 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;_layerNames&#32;=&#32;valueToLayer.Values.ToArray();
+00079 &#32;&#32;&#32;&#32;&#32;&#32;}
+00080 &#32;&#32;&#32;&#32;}
+00081 &#32;&#32;}
+00082 }
+</programlisting></section>

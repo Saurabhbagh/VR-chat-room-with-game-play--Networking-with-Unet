@@ -1,0 +1,83 @@
+<?xml version='1.0' encoding='UTF-8' standalone='no'?>
+<section xmlns="http://docbook.org/ns/docbook" version="5.0" xmlns:xlink="http://www.w3.org/1999/xlink" xml:id="__collab_history_drop_down_8cs_source">
+<title>CollabHistoryDropDown.cs</title>
+<indexterm><primary>O:/GitHUBMINIPRoject/Library/PackageCache/com.unity.collab-proxy@1.2.15/Editor/Collab/Views/CollabHistoryDropDown.cs</primary></indexterm>
+<programlisting>00001 <emphasis role="keyword">using</emphasis>&#32;<link linkend="__balloon_8cs_1a7d67e097df9376eb709b6a23aa3c7d23">UnityEngine</link>;
+00002 <emphasis role="keyword">using</emphasis>&#32;System.Collections.Generic;
+00003 <emphasis role="keyword">using</emphasis>&#32;<link linkend="_namespace_unity_editor">UnityEditor</link>.Connect;
+00004 
+00005 <emphasis role="preprocessor">#if&#32;UNITY_2019_1_OR_NEWER</emphasis>
+00006 <emphasis role="keyword">using</emphasis>&#32;<link linkend="_namespace_unity_engine">UnityEngine</link>.UIElements;
+00007 <emphasis role="preprocessor">#else</emphasis>
+00008 <emphasis role="keyword">using</emphasis>&#32;<link linkend="_namespace_unity_engine">UnityEngine</link>.Experimental.UIElements;
+00009 <emphasis role="preprocessor">#endif</emphasis>
+00010 
+00011 
+00012 <emphasis role="keyword">namespace&#32;</emphasis><link linkend="_namespace_unity_editor_1_1_collaboration">UnityEditor.Collaboration</link>
+00013 {
+<anchor xml:id="__collab_history_drop_down_8cs_source_1l00014"/><link linkend="_class_unity_editor_1_1_collaboration_1_1_collab_history_drop_down">00014</link> &#32;&#32;&#32;&#32;<emphasis role="keyword">internal</emphasis>&#32;<emphasis role="keyword">class&#32;</emphasis><link linkend="_class_unity_editor_1_1_collaboration_1_1_collab_history_drop_down">CollabHistoryDropDown</link>&#32;:&#32;VisualElement
+00015 &#32;&#32;&#32;&#32;{
+00016 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;readonly&#32;VisualElement&#32;m_FilesContainer;
+00017 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;readonly&#32;Label&#32;m_ToggleLabel;
+00018 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;<emphasis role="keywordtype">int</emphasis>&#32;m_ChangesTotal;
+00019 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;<emphasis role="keywordtype">string</emphasis>&#32;m_RevisionId;
+00020 
+<anchor xml:id="__collab_history_drop_down_8cs_source_1l00021"/><link linkend="_class_unity_editor_1_1_collaboration_1_1_collab_history_drop_down_1aaee64531a66eba063c6be582401a69d1">00021</link> &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<link linkend="_class_unity_editor_1_1_collaboration_1_1_collab_history_drop_down_1aaee64531a66eba063c6be582401a69d1">CollabHistoryDropDown</link>(ICollection&lt;ChangeData&gt;&#32;changes,&#32;<emphasis role="keywordtype">int</emphasis>&#32;changesTotal,&#32;<emphasis role="keywordtype">bool</emphasis>&#32;changesTruncated,&#32;<emphasis role="keywordtype">string</emphasis>&#32;revisionId)
+00022 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00023 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;m_FilesContainer&#32;=&#32;<emphasis role="keyword">new</emphasis>&#32;VisualElement();
+00024 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;m_ChangesTotal&#32;=&#32;changesTotal;
+00025 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;m_RevisionId&#32;=&#32;revisionId;
+00026 
+00027 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;m_ToggleLabel&#32;=&#32;<emphasis role="keyword">new</emphasis>&#32;Label(ToggleText(<emphasis role="keyword">false</emphasis>));
+00028 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;m_ToggleLabel.AddManipulator(<emphasis role="keyword">new</emphasis>&#32;Clickable(ToggleDropdown));
+00029 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;Add(m_ToggleLabel);
+00030 
+00031 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">foreach</emphasis>&#32;(ChangeData&#32;change&#32;<emphasis role="keywordflow">in</emphasis>&#32;changes)
+00032 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00033 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;m_FilesContainer.Add(<emphasis role="keyword">new</emphasis>&#32;<link linkend="_class_unity_editor_1_1_collaboration_1_1_collab_history_drop_down_item">CollabHistoryDropDownItem</link>(change.path,&#32;change.action));
+00034 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00035 
+00036 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(changesTruncated)
+00037 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00038 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;m_FilesContainer.Add(<emphasis role="keyword">new</emphasis>&#32;Button(ShowAllClick)
+00039 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00040 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;text&#32;=&#32;<emphasis role="stringliteral">&quot;Show&#32;all&#32;on&#32;dashboard&quot;</emphasis>
+00041 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;});
+00042 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00043 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00044 
+00045 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;ToggleDropdown()
+00046 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00047 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(Contains(m_FilesContainer))
+00048 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00049 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;CollabAnalytics.SendUserAction(CollabAnalytics.historyCategoryString,&#32;<emphasis role="stringliteral">&quot;CollapseAssets&quot;</emphasis>);
+00050 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;Remove(m_FilesContainer);
+00051 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;m_ToggleLabel.text&#32;=&#32;ToggleText(<emphasis role="keyword">false</emphasis>);
+00052 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00053 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">else</emphasis>
+00054 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00055 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;CollabAnalytics.SendUserAction(CollabAnalytics.historyCategoryString,&#32;<emphasis role="stringliteral">&quot;ExpandAssets&quot;</emphasis>);
+00056 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;Add(m_FilesContainer);
+00057 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;m_ToggleLabel.text&#32;=&#32;ToggleText(<emphasis role="keyword">true</emphasis>);
+00058 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00059 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00060 
+00061 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;<emphasis role="keywordtype">string</emphasis>&#32;ToggleText(<emphasis role="keywordtype">bool</emphasis>&#32;open)
+00062 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00063 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;var&#32;icon&#32;=&#32;open&#32;?&#32;<emphasis role="stringliteral">&quot;\u25bc&quot;</emphasis>&#32;:&#32;<emphasis role="stringliteral">&quot;\u25b6&quot;</emphasis>;
+00064 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;var&#32;change&#32;=&#32;m_ChangesTotal&#32;==&#32;1&#32;?&#32;<emphasis role="stringliteral">&quot;Change&quot;</emphasis>&#32;:&#32;<emphasis role="stringliteral">&quot;Changes&quot;</emphasis>;
+00065 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;<emphasis role="keywordtype">string</emphasis>.Format(<emphasis role="stringliteral">&quot;{0}&#32;{1}&#32;Asset&#32;{2}&quot;</emphasis>,&#32;icon,&#32;m_ChangesTotal,&#32;change);
+00066 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00067 
+00068 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;ShowAllClick()
+00069 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00070 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;var&#32;host&#32;=&#32;UnityConnect.instance.GetConfigurationURL(CloudConfigUrl.CloudServicesDashboard);
+00071 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;var&#32;org&#32;=&#32;UnityConnect.instance.GetOrganizationId();
+00072 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;var&#32;proj&#32;=&#32;UnityConnect.instance.GetProjectGUID();
+00073 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;var&#32;url&#32;=&#32;<emphasis role="keywordtype">string</emphasis>.Format(<emphasis role="stringliteral">&quot;{0}/collab/orgs/{1}/projects/{2}/commits?commit={3}&quot;</emphasis>,&#32;host,&#32;org,&#32;proj,&#32;m_RevisionId);
+00074 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;CollabAnalytics.SendUserAction(CollabAnalytics.historyCategoryString,&#32;<emphasis role="stringliteral">&quot;ShowAllOnDashboard&quot;</emphasis>);
+00075 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_namespace_valve_1_1_v_r_1aecd07a81fe79a9f96c6787513e2d98e4ae498749f3c42246d50b15c81c101d988">Application</link>.OpenURL(url);
+00076 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00077 &#32;&#32;&#32;&#32;}
+00078 }
+</programlisting></section>

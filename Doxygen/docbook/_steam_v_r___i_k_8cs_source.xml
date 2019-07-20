@@ -1,0 +1,177 @@
+<?xml version='1.0' encoding='UTF-8' standalone='no'?>
+<section xmlns="http://docbook.org/ns/docbook" version="5.0" xmlns:xlink="http://www.w3.org/1999/xlink" xml:id="__steam_v_r___i_k_8cs_source">
+<title>SteamVR_IK.cs</title>
+<indexterm><primary>O:/GitHUBMINIPRoject/Assets/SteamVR/Scripts/SteamVR_IK.cs</primary></indexterm>
+<programlisting>00001 <emphasis role="comment">//=======&#32;Copyright&#32;(c)&#32;Valve&#32;Corporation,&#32;All&#32;rights&#32;reserved.&#32;===============</emphasis>
+00002 <emphasis role="comment">//</emphasis>
+00003 <emphasis role="comment">//&#32;Purpose:&#32;Simple&#32;two&#32;bone&#32;ik&#32;solver.</emphasis>
+00004 <emphasis role="comment">//</emphasis>
+00005 <emphasis role="comment">//=============================================================================</emphasis>
+00006 
+00007 <emphasis role="keyword">using</emphasis>&#32;<link linkend="__balloon_8cs_1a7d67e097df9376eb709b6a23aa3c7d23">UnityEngine</link>;
+00008 
+00009 <emphasis role="keyword">namespace&#32;</emphasis><link linkend="_namespace_valve_1_1_v_r">Valve.VR</link>
+00010 {
+<anchor xml:id="__steam_v_r___i_k_8cs_source_1l00011"/><link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___i_k">00011</link> &#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keyword">class&#32;</emphasis><link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___i_k">SteamVR_IK</link>&#32;:&#32;MonoBehaviour
+00012 &#32;&#32;&#32;&#32;{
+<anchor xml:id="__steam_v_r___i_k_8cs_source_1l00013"/><link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___i_k_1ae00d693d3094a77dff1231324c32b193">00013</link> &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;Transform&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___i_k_1ae00d693d3094a77dff1231324c32b193">target</link>;
+<anchor xml:id="__steam_v_r___i_k_8cs_source_1l00014"/><link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___i_k_1aee03deee31f4a7b8793530b87d2e5ab6">00014</link> &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;Transform&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___i_k_1aee03deee31f4a7b8793530b87d2e5ab6">start</link>,&#32;joint,&#32;end;
+<anchor xml:id="__steam_v_r___i_k_8cs_source_1l00015"/><link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___i_k_1a0c7eca956f472c30f082ad6f671baa3c">00015</link> &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;Transform&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___i_k_1a0c7eca956f472c30f082ad6f671baa3c">poleVector</link>,&#32;upVector;
+00016 
+<anchor xml:id="__steam_v_r___i_k_8cs_source_1l00017"/><link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___i_k_1a142f297ba00068b83b2285f7cad44eea">00017</link> &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keywordtype">float</emphasis>&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___i_k_1a142f297ba00068b83b2285f7cad44eea">blendPct</link>&#32;=&#32;1.0f;
+00018 
+00019 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;[HideInInspector]
+<anchor xml:id="__steam_v_r___i_k_8cs_source_1l00020"/><link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___i_k_1aaa82d10575adf97342da4875673f1155">00020</link> &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;Transform&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___i_k_1aaa82d10575adf97342da4875673f1155">startXform</link>,&#32;jointXform,&#32;endXform;
+00021 
+00022 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordtype">void</emphasis>&#32;LateUpdate()
+00023 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00024 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">const</emphasis>&#32;<emphasis role="keywordtype">float</emphasis>&#32;epsilon&#32;=&#32;0.001f;
+00025 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___i_k_1a142f297ba00068b83b2285f7cad44eea">blendPct</link>&#32;&lt;&#32;epsilon)
+00026 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>;
+00027 
+00028 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;var&#32;preUp&#32;=&#32;upVector&#32;?&#32;upVector.up&#32;:&#32;Vector3.Cross(end.position&#32;-&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___i_k_1aee03deee31f4a7b8793530b87d2e5ab6">start</link>.position,&#32;joint.position&#32;-&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___i_k_1aee03deee31f4a7b8793530b87d2e5ab6">start</link>.position).normalized;
+00029 
+00030 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;var&#32;targetPosition&#32;=&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___i_k_1ae00d693d3094a77dff1231324c32b193">target</link>.position;
+00031 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;var&#32;targetRotation&#32;=&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___i_k_1ae00d693d3094a77dff1231324c32b193">target</link>.rotation;
+00032 
+00033 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;Vector3&#32;forward,&#32;up,&#32;result&#32;=&#32;joint.position;
+00034 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___i_k_1acacd1e3c67856323c56dc189cc5e1285">Solve</link>(<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___i_k_1aee03deee31f4a7b8793530b87d2e5ab6">start</link>.position,&#32;targetPosition,&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___i_k_1a0c7eca956f472c30f082ad6f671baa3c">poleVector</link>.position,
+00035 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;(joint.position&#32;-&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___i_k_1aee03deee31f4a7b8793530b87d2e5ab6">start</link>.position).magnitude,
+00036 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;(end.position&#32;-&#32;joint.position).magnitude,
+00037 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;ref&#32;result,&#32;out&#32;forward,&#32;out&#32;up);
+00038 
+00039 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(up&#32;==&#32;Vector3.zero)
+00040 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>;
+00041 
+00042 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;var&#32;startPosition&#32;=&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___i_k_1aee03deee31f4a7b8793530b87d2e5ab6">start</link>.position;
+00043 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;var&#32;jointPosition&#32;=&#32;joint.position;
+00044 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;var&#32;endPosition&#32;=&#32;end.position;
+00045 
+00046 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;var&#32;startRotationLocal&#32;=&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___i_k_1aee03deee31f4a7b8793530b87d2e5ab6">start</link>.localRotation;
+00047 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;var&#32;jointRotationLocal&#32;=&#32;joint.localRotation;
+00048 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;var&#32;endRotationLocal&#32;=&#32;end.localRotation;
+00049 
+00050 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;var&#32;startParent&#32;=&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___i_k_1aee03deee31f4a7b8793530b87d2e5ab6">start</link>.parent;
+00051 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;var&#32;jointParent&#32;=&#32;joint.parent;
+00052 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;var&#32;endParent&#32;=&#32;end.parent;
+00053 
+00054 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;var&#32;startScale&#32;=&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___i_k_1aee03deee31f4a7b8793530b87d2e5ab6">start</link>.localScale;
+00055 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;var&#32;jointScale&#32;=&#32;joint.localScale;
+00056 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;var&#32;endScale&#32;=&#32;end.localScale;
+00057 
+00058 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___i_k_1aaa82d10575adf97342da4875673f1155">startXform</link>&#32;==&#32;<emphasis role="keyword">null</emphasis>)
+00059 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00060 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___i_k_1aaa82d10575adf97342da4875673f1155">startXform</link>&#32;=&#32;<emphasis role="keyword">new</emphasis>&#32;GameObject(<emphasis role="stringliteral">&quot;startXform&quot;</emphasis>).transform;
+00061 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___i_k_1aaa82d10575adf97342da4875673f1155">startXform</link>.parent&#32;=&#32;transform;
+00062 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00063 
+00064 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___i_k_1aaa82d10575adf97342da4875673f1155">startXform</link>.position&#32;=&#32;startPosition;
+00065 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___i_k_1aaa82d10575adf97342da4875673f1155">startXform</link>.LookAt(joint,&#32;preUp);
+00066 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___i_k_1aee03deee31f4a7b8793530b87d2e5ab6">start</link>.parent&#32;=&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___i_k_1aaa82d10575adf97342da4875673f1155">startXform</link>;
+00067 
+00068 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(jointXform&#32;==&#32;<emphasis role="keyword">null</emphasis>)
+00069 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00070 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;jointXform&#32;=&#32;<emphasis role="keyword">new</emphasis>&#32;GameObject(<emphasis role="stringliteral">&quot;jointXform&quot;</emphasis>).transform;
+00071 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;jointXform.parent&#32;=&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___i_k_1aaa82d10575adf97342da4875673f1155">startXform</link>;
+00072 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00073 
+00074 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;jointXform.position&#32;=&#32;jointPosition;
+00075 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;jointXform.LookAt(end,&#32;preUp);
+00076 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;joint.parent&#32;=&#32;jointXform;
+00077 
+00078 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(endXform&#32;==&#32;<emphasis role="keyword">null</emphasis>)
+00079 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00080 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;endXform&#32;=&#32;<emphasis role="keyword">new</emphasis>&#32;GameObject(<emphasis role="stringliteral">&quot;endXform&quot;</emphasis>).transform;
+00081 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;endXform.parent&#32;=&#32;jointXform;
+00082 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00083 
+00084 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;endXform.position&#32;=&#32;endPosition;
+00085 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;end.parent&#32;=&#32;endXform;
+00086 
+00087 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___i_k_1aaa82d10575adf97342da4875673f1155">startXform</link>.LookAt(result,&#32;up);
+00088 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;jointXform.LookAt(targetPosition,&#32;up);
+00089 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;endXform.rotation&#32;=&#32;targetRotation;
+00090 
+00091 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___i_k_1aee03deee31f4a7b8793530b87d2e5ab6">start</link>.parent&#32;=&#32;startParent;
+00092 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;joint.parent&#32;=&#32;jointParent;
+00093 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;end.parent&#32;=&#32;endParent;
+00094 
+00095 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;end.rotation&#32;=&#32;targetRotation;&#32;<emphasis role="comment">//&#32;optionally&#32;blend?</emphasis>
+00096 
+00097 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;handle&#32;blending&#32;in/out</emphasis>
+00098 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___i_k_1a142f297ba00068b83b2285f7cad44eea">blendPct</link>&#32;&lt;&#32;1.0f)
+00099 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00100 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___i_k_1aee03deee31f4a7b8793530b87d2e5ab6">start</link>.localRotation&#32;=&#32;Quaternion.Slerp(startRotationLocal,&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___i_k_1aee03deee31f4a7b8793530b87d2e5ab6">start</link>.localRotation,&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___i_k_1a142f297ba00068b83b2285f7cad44eea">blendPct</link>);
+00101 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;joint.localRotation&#32;=&#32;Quaternion.Slerp(jointRotationLocal,&#32;joint.localRotation,&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___i_k_1a142f297ba00068b83b2285f7cad44eea">blendPct</link>);
+00102 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;end.localRotation&#32;=&#32;Quaternion.Slerp(endRotationLocal,&#32;end.localRotation,&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___i_k_1a142f297ba00068b83b2285f7cad44eea">blendPct</link>);
+00103 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00104 
+00105 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;restore&#32;scale&#32;so&#32;it&#32;doesn&apos;t&#32;blow&#32;out</emphasis>
+00106 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___i_k_1aee03deee31f4a7b8793530b87d2e5ab6">start</link>.localScale&#32;=&#32;startScale;
+00107 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;joint.localScale&#32;=&#32;jointScale;
+00108 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;end.localScale&#32;=&#32;endScale;
+00109 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00110 
+<anchor xml:id="__steam_v_r___i_k_8cs_source_1l00111"/><link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___i_k_1acacd1e3c67856323c56dc189cc5e1285">00111</link> &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keyword">static</emphasis>&#32;<emphasis role="keywordtype">bool</emphasis>&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___i_k_1acacd1e3c67856323c56dc189cc5e1285">Solve</link>(
+00112 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;Vector3&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___i_k_1aee03deee31f4a7b8793530b87d2e5ab6">start</link>,&#32;<emphasis role="comment">//&#32;shoulder&#32;/&#32;hip</emphasis>
+00113 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;Vector3&#32;end,&#32;<emphasis role="comment">//&#32;desired&#32;hand&#32;/&#32;foot&#32;position</emphasis>
+00114 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;Vector3&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___i_k_1a0c7eca956f472c30f082ad6f671baa3c">poleVector</link>,&#32;<emphasis role="comment">//&#32;point&#32;to&#32;aim&#32;elbow&#32;/&#32;knee&#32;toward</emphasis>
+00115 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordtype">float</emphasis>&#32;jointDist,&#32;<emphasis role="comment">//&#32;distance&#32;from&#32;start&#32;to&#32;elbow&#32;/&#32;knee</emphasis>
+00116 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordtype">float</emphasis>&#32;targetDist,&#32;<emphasis role="comment">//&#32;distance&#32;from&#32;joint&#32;to&#32;hand&#32;/&#32;ankle</emphasis>
+00117 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;ref&#32;Vector3&#32;result,&#32;<emphasis role="comment">//&#32;original&#32;and&#32;output&#32;elbow&#32;/&#32;knee&#32;position</emphasis>
+00118 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;out&#32;Vector3&#32;forward,&#32;out&#32;Vector3&#32;up)&#32;<emphasis role="comment">//&#32;plane&#32;formed&#32;by&#32;root,&#32;joint&#32;and&#32;target</emphasis>
+00119 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00120 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;var&#32;totalDist&#32;=&#32;jointDist&#32;+&#32;targetDist;
+00121 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;var&#32;start2end&#32;=&#32;end&#32;-&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___i_k_1aee03deee31f4a7b8793530b87d2e5ab6">start</link>;
+00122 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;var&#32;poleVectorDir&#32;=&#32;(<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___i_k_1a0c7eca956f472c30f082ad6f671baa3c">poleVector</link>&#32;-&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___i_k_1aee03deee31f4a7b8793530b87d2e5ab6">start</link>).normalized;
+00123 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;var&#32;baseDist&#32;=&#32;start2end.magnitude;
+00124 
+00125 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;result&#32;=&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___i_k_1aee03deee31f4a7b8793530b87d2e5ab6">start</link>;
+00126 
+00127 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">const</emphasis>&#32;<emphasis role="keywordtype">float</emphasis>&#32;epsilon&#32;=&#32;0.001f;
+00128 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(baseDist&#32;&lt;&#32;epsilon)
+00129 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00130 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;move&#32;jointDist&#32;toward&#32;jointTarget</emphasis>
+00131 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;result&#32;+=&#32;poleVectorDir&#32;*&#32;jointDist;
+00132 
+00133 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;forward&#32;=&#32;Vector3.Cross(poleVectorDir,&#32;Vector3.up);
+00134 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;up&#32;=&#32;Vector3.Cross(forward,&#32;poleVectorDir).normalized;
+00135 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00136 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">else</emphasis>
+00137 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00138 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;forward&#32;=&#32;start2end&#32;*&#32;(1.0f&#32;/&#32;baseDist);
+00139 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;up&#32;=&#32;Vector3.Cross(forward,&#32;poleVectorDir).normalized;
+00140 
+00141 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(baseDist&#32;+&#32;epsilon&#32;&lt;&#32;totalDist)
+00142 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00143 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;calculate&#32;the&#32;area&#32;of&#32;the&#32;triangle&#32;to&#32;determine&#32;its&#32;height</emphasis>
+00144 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;var&#32;p&#32;=&#32;(totalDist&#32;+&#32;baseDist)&#32;*&#32;0.5f;&#32;<emphasis role="comment">//&#32;half&#32;perimeter</emphasis>
+00145 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(p&#32;&gt;&#32;jointDist&#32;+&#32;epsilon&#32;&amp;&amp;&#32;p&#32;&gt;&#32;targetDist&#32;+&#32;epsilon)
+00146 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00147 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;var&#32;A&#32;=&#32;Mathf.Sqrt(p&#32;*&#32;(p&#32;-&#32;jointDist)&#32;*&#32;(p&#32;-&#32;targetDist)&#32;*&#32;(p&#32;-&#32;baseDist));
+00148 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;var&#32;height&#32;=&#32;2.0f&#32;*&#32;A&#32;/&#32;baseDist;&#32;<emphasis role="comment">//&#32;distance&#32;of&#32;joint&#32;from&#32;line&#32;between&#32;root&#32;and&#32;target</emphasis>
+00149 
+00150 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;var&#32;dist&#32;=&#32;Mathf.Sqrt((jointDist&#32;*&#32;jointDist)&#32;-&#32;(height&#32;*&#32;height));
+00151 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;var&#32;right&#32;=&#32;Vector3.Cross(up,&#32;forward);&#32;<emphasis role="comment">//&#32;no&#32;need&#32;to&#32;normalized&#32;-&#32;already&#32;orthonormal</emphasis>
+00152 
+00153 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;result&#32;+=&#32;(forward&#32;*&#32;dist)&#32;+&#32;(right&#32;*&#32;height);
+00154 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;<emphasis role="keyword">true</emphasis>;&#32;<emphasis role="comment">//&#32;in&#32;range</emphasis>
+00155 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00156 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">else</emphasis>
+00157 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00158 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;move&#32;jointDist&#32;toward&#32;jointTarget</emphasis>
+00159 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;result&#32;+=&#32;poleVectorDir&#32;*&#32;jointDist;
+00160 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00161 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00162 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">else</emphasis>
+00163 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00164 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;move&#32;elboDist&#32;toward&#32;target</emphasis>
+00165 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;result&#32;+=&#32;forward&#32;*&#32;jointDist;
+00166 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00167 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00168 
+00169 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;<emphasis role="keyword">false</emphasis>;&#32;<emphasis role="comment">//&#32;edge&#32;cases</emphasis>
+00170 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00171 &#32;&#32;&#32;&#32;}
+00172 }
+</programlisting></section>

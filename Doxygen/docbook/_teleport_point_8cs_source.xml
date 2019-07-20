@@ -1,0 +1,353 @@
+<?xml version='1.0' encoding='UTF-8' standalone='no'?>
+<section xmlns="http://docbook.org/ns/docbook" version="5.0" xmlns:xlink="http://www.w3.org/1999/xlink" xml:id="__teleport_point_8cs_source">
+<title>TeleportPoint.cs</title>
+<indexterm><primary>O:/GitHUBMINIPRoject/Assets/SteamVR/InteractionSystem/Teleport/Scripts/TeleportPoint.cs</primary></indexterm>
+<programlisting>00001 <emphasis role="comment">//=======&#32;Copyright&#32;(c)&#32;Valve&#32;Corporation,&#32;All&#32;rights&#32;reserved.&#32;===============</emphasis>
+00002 <emphasis role="comment">//</emphasis>
+00003 <emphasis role="comment">//&#32;Purpose:&#32;Single&#32;location&#32;that&#32;the&#32;player&#32;can&#32;teleport&#32;to</emphasis>
+00004 <emphasis role="comment">//</emphasis>
+00005 <emphasis role="comment">//=============================================================================</emphasis>
+00006 
+00007 <emphasis role="keyword">using</emphasis>&#32;<link linkend="__balloon_8cs_1a7d67e097df9376eb709b6a23aa3c7d23">UnityEngine</link>;
+00008 <emphasis role="keyword">using</emphasis>&#32;<link linkend="_namespace_unity_engine">UnityEngine</link>.UI;
+00009 <emphasis role="preprocessor">#if&#32;UNITY_EDITOR</emphasis>
+00010 <emphasis role="keyword">using</emphasis>&#32;<link linkend="_namespace_unity_editor">UnityEditor</link>;
+00011 <emphasis role="preprocessor">#endif</emphasis>
+00012 
+00013 <emphasis role="keyword">namespace&#32;</emphasis><link linkend="_namespace_valve_1_1_v_r_1_1_interaction_system">Valve.VR.InteractionSystem</link>
+00014 {
+00015 &#32;&#32;&#32;&#32;<emphasis role="comment">//-------------------------------------------------------------------------</emphasis>
+<anchor xml:id="__teleport_point_8cs_source_1l00016"/><link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_teleport_point">00016</link> &#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keyword">class&#32;</emphasis><link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_teleport_point">TeleportPoint</link>&#32;:&#32;<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_teleport_marker_base">TeleportMarkerBase</link>
+00017 &#32;&#32;&#32;&#32;{
+<anchor xml:id="__teleport_point_8cs_source_1l00018"/><link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_teleport_point_1a1a849ffcc7eea342470d494523085b57">00018</link> &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keyword">enum</emphasis>&#32;<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_teleport_point_1a1a849ffcc7eea342470d494523085b57">TeleportPointType</link>
+00019 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00020 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;MoveToLocation,
+00021 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;SwitchToNewScene
+00022 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;};
+00023 
+00024 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//Public&#32;variables</emphasis>
+<anchor xml:id="__teleport_point_8cs_source_1l00025"/><link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_teleport_point_1a6833ee4b88d0fbd19dbc5b511565f1c5">00025</link> &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_teleport_point_1a1a849ffcc7eea342470d494523085b57">TeleportPointType</link>&#32;<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_teleport_point_1a6833ee4b88d0fbd19dbc5b511565f1c5">teleportType</link>&#32;=&#32;<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_teleport_point_1a1a849ffcc7eea342470d494523085b57">TeleportPointType</link>.MoveToLocation;
+<anchor xml:id="__teleport_point_8cs_source_1l00026"/><link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_teleport_point_1add0bb364d611e45c9fb8595dcbcb50b5">00026</link> &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keywordtype">string</emphasis>&#32;<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_teleport_point_1add0bb364d611e45c9fb8595dcbcb50b5">title</link>;
+<anchor xml:id="__teleport_point_8cs_source_1l00027"/><link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_teleport_point_1a3488a33dfefd1d62c04bd1d3faad5371">00027</link> &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keywordtype">string</emphasis>&#32;<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_teleport_point_1a3488a33dfefd1d62c04bd1d3faad5371">switchToScene</link>;
+<anchor xml:id="__teleport_point_8cs_source_1l00028"/><link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_teleport_point_1acbfb78c77d89ff3fe945d0a66ecb2b4f">00028</link> &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;Color&#32;<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_teleport_point_1acbfb78c77d89ff3fe945d0a66ecb2b4f">titleVisibleColor</link>;
+<anchor xml:id="__teleport_point_8cs_source_1l00029"/><link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_teleport_point_1ab7ad6e57d737fe2b6de74239bc65b0ae">00029</link> &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;Color&#32;<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_teleport_point_1ab7ad6e57d737fe2b6de74239bc65b0ae">titleHighlightedColor</link>;
+<anchor xml:id="__teleport_point_8cs_source_1l00030"/><link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_teleport_point_1a23927294cd02fd994803e2890a3392bc">00030</link> &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;Color&#32;<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_teleport_point_1a23927294cd02fd994803e2890a3392bc">titleLockedColor</link>;
+<anchor xml:id="__teleport_point_8cs_source_1l00031"/><link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_teleport_point_1a6396ed2600b2259386405117a0c4cfc0">00031</link> &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keywordtype">bool</emphasis>&#32;<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_teleport_point_1a6396ed2600b2259386405117a0c4cfc0">playerSpawnPoint</link>&#32;=&#32;<emphasis role="keyword">false</emphasis>;
+00032 
+00033 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//Private&#32;data</emphasis>
+00034 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;<emphasis role="keywordtype">bool</emphasis>&#32;gotReleventComponents&#32;=&#32;<emphasis role="keyword">false</emphasis>;
+00035 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;MeshRenderer&#32;markerMesh;
+00036 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;MeshRenderer&#32;switchSceneIcon;
+00037 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;MeshRenderer&#32;moveLocationIcon;
+00038 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;MeshRenderer&#32;lockedIcon;
+00039 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;MeshRenderer&#32;pointIcon;
+00040 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;Transform&#32;lookAtJointTransform;
+00041 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;<emphasis role="keyword">new</emphasis>&#32;Animation&#32;animation;
+00042 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;Text&#32;titleText;
+00043 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_player">Player</link>&#32;player;
+00044 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;Vector3&#32;lookAtPosition&#32;=&#32;Vector3.zero;
+00045 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;<emphasis role="keywordtype">int</emphasis>&#32;tintColorID&#32;=&#32;0;
+00046 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;Color&#32;tintColor&#32;=&#32;Color.clear;
+00047 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;Color&#32;titleColor&#32;=&#32;Color.clear;
+00048 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;<emphasis role="keywordtype">float</emphasis>&#32;fullTitleAlpha&#32;=&#32;0.0f;
+00049 
+00050 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//Constants</emphasis>
+00051 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;<emphasis role="keyword">const</emphasis>&#32;<emphasis role="keywordtype">string</emphasis>&#32;switchSceneAnimation&#32;=&#32;<emphasis role="stringliteral">&quot;switch_scenes_idle&quot;</emphasis>;
+00052 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;<emphasis role="keyword">const</emphasis>&#32;<emphasis role="keywordtype">string</emphasis>&#32;moveLocationAnimation&#32;=&#32;<emphasis role="stringliteral">&quot;move_location_idle&quot;</emphasis>;
+00053 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;<emphasis role="keyword">const</emphasis>&#32;<emphasis role="keywordtype">string</emphasis>&#32;lockedAnimation&#32;=&#32;<emphasis role="stringliteral">&quot;locked_idle&quot;</emphasis>;
+00054 
+00055 
+00056 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//-------------------------------------------------</emphasis>
+00057 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keyword">override</emphasis>&#32;<emphasis role="keywordtype">bool</emphasis>&#32;<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_teleport_point_1a60ec8edfadfd8307124d22d77102f2f9">showReticle</link>
+<anchor xml:id="__teleport_point_8cs_source_1l00058"/><link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_teleport_point_1a60ec8edfadfd8307124d22d77102f2f9">00058</link> &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00059 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">get</emphasis>
+00060 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00061 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;<emphasis role="keyword">false</emphasis>;
+00062 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00063 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00064 
+00065 
+00066 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//-------------------------------------------------</emphasis>
+00067 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordtype">void</emphasis>&#32;Awake()
+00068 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00069 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_teleport_point_1aed4750e01ea0be08cf80d98679b7bc9a">GetRelevantComponents</link>();
+00070 
+00071 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;animation&#32;=&#32;GetComponent&lt;Animation&gt;();
+00072 
+00073 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;tintColorID&#32;=&#32;Shader.PropertyToID(&#32;<emphasis role="stringliteral">&quot;_TintColor&quot;</emphasis>&#32;);
+00074 
+00075 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;moveLocationIcon.gameObject.SetActive(&#32;<emphasis role="keyword">false</emphasis>&#32;);
+00076 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;switchSceneIcon.gameObject.SetActive(&#32;<emphasis role="keyword">false</emphasis>&#32;);
+00077 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;lockedIcon.gameObject.SetActive(&#32;<emphasis role="keyword">false</emphasis>&#32;);
+00078 
+00079 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_teleport_point_1aa62afea7412cbca6a7e5016b4a5788c6">UpdateVisuals</link>();
+00080 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00081 
+00082 
+00083 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//-------------------------------------------------</emphasis>
+00084 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordtype">void</emphasis>&#32;Start()
+00085 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00086 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;player&#32;=&#32;Player.<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_player_1ad6c38e0b00917563e4b19d206d20466e">instance</link>;
+00087 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00088 
+00089 
+00090 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//-------------------------------------------------</emphasis>
+00091 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordtype">void</emphasis>&#32;Update()
+00092 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00093 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(&#32;Application.isPlaying&#32;)
+00094 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00095 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;lookAtPosition.x&#32;=&#32;player.<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_player_1a1ed62d545589d4e836edcc6e6e5494a3">hmdTransform</link>.position.x;
+00096 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;lookAtPosition.y&#32;=&#32;lookAtJointTransform.position.y;
+00097 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;lookAtPosition.z&#32;=&#32;player.<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_player_1a1ed62d545589d4e836edcc6e6e5494a3">hmdTransform</link>.position.z;
+00098 
+00099 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;lookAtJointTransform.LookAt(&#32;lookAtPosition&#32;);
+00100 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00101 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00102 
+00103 
+00104 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//-------------------------------------------------</emphasis>
+<anchor xml:id="__teleport_point_8cs_source_1l00105"/><link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_teleport_point_1a3a5e0dae80f7d66fbffce006b3c0ab72">00105</link> &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keyword">override</emphasis>&#32;<emphasis role="keywordtype">bool</emphasis>&#32;<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_teleport_point_1a3a5e0dae80f7d66fbffce006b3c0ab72">ShouldActivate</link>(&#32;Vector3&#32;playerPosition&#32;)
+00106 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00107 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;(&#32;Vector3.Distance(&#32;transform.position,&#32;playerPosition&#32;)&#32;&gt;&#32;1.0f&#32;);
+00108 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00109 
+00110 
+00111 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//-------------------------------------------------</emphasis>
+<anchor xml:id="__teleport_point_8cs_source_1l00112"/><link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_teleport_point_1a27ab68b130e5ccc824ed7e93a7b880b8">00112</link> &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keyword">override</emphasis>&#32;<emphasis role="keywordtype">bool</emphasis>&#32;<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_teleport_point_1a27ab68b130e5ccc824ed7e93a7b880b8">ShouldMovePlayer</link>()
+00113 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00114 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;<emphasis role="keyword">true</emphasis>;
+00115 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00116 
+00117 
+00118 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//-------------------------------------------------</emphasis>
+<anchor xml:id="__teleport_point_8cs_source_1l00119"/><link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_teleport_point_1ad959cfb62361bc7b3b43d76a806d7bc7">00119</link> &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keyword">override</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_teleport_point_1ad959cfb62361bc7b3b43d76a806d7bc7">Highlight</link>(&#32;<emphasis role="keywordtype">bool</emphasis>&#32;highlight&#32;)
+00120 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00121 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(&#32;!<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_teleport_marker_base_1a0fe663ebf0fb74cfb7d6f5ca28c83493">locked</link>&#32;)
+00122 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00123 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(&#32;highlight&#32;)
+00124 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00125 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_teleport_point_1aea7e2c7f46242c8ce67249b94309915a">SetMeshMaterials</link>(&#32;<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_teleport">Teleport</link>.<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_teleport_1a46adf4ce0792e06c79053aa5b000c495">instance</link>.<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_teleport_1a0edcde5fd07ace591801b485f35e0858">pointHighlightedMaterial</link>,&#32;<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_teleport_point_1ab7ad6e57d737fe2b6de74239bc65b0ae">titleHighlightedColor</link>&#32;);
+00126 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00127 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">else</emphasis>
+00128 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00129 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_teleport_point_1aea7e2c7f46242c8ce67249b94309915a">SetMeshMaterials</link>(&#32;<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_teleport">Teleport</link>.<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_teleport_1a46adf4ce0792e06c79053aa5b000c495">instance</link>.<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_teleport_1ad6f50927a9a3b3fa6129f0835be8ca57">pointVisibleMaterial</link>,&#32;<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_teleport_point_1acbfb78c77d89ff3fe945d0a66ecb2b4f">titleVisibleColor</link>&#32;);
+00130 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00131 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00132 
+00133 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(&#32;highlight&#32;)
+00134 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00135 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;pointIcon.gameObject.SetActive(&#32;<emphasis role="keyword">true</emphasis>&#32;);
+00136 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;animation.Play();
+00137 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00138 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">else</emphasis>
+00139 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00140 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;pointIcon.gameObject.SetActive(&#32;<emphasis role="keyword">false</emphasis>&#32;);
+00141 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;animation.Stop();
+00142 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00143 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00144 
+00145 
+00146 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//-------------------------------------------------</emphasis>
+<anchor xml:id="__teleport_point_8cs_source_1l00147"/><link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_teleport_point_1aa62afea7412cbca6a7e5016b4a5788c6">00147</link> &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keyword">override</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_teleport_point_1aa62afea7412cbca6a7e5016b4a5788c6">UpdateVisuals</link>()
+00148 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00149 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(&#32;!gotReleventComponents&#32;)
+00150 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00151 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>;
+00152 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00153 
+00154 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(&#32;<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_teleport_marker_base_1a0fe663ebf0fb74cfb7d6f5ca28c83493">locked</link>&#32;)
+00155 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00156 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_teleport_point_1aea7e2c7f46242c8ce67249b94309915a">SetMeshMaterials</link>(&#32;<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_teleport">Teleport</link>.<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_teleport_1a46adf4ce0792e06c79053aa5b000c495">instance</link>.<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_teleport_1a982ea80a754876a05c803d25bf99a55d">pointLockedMaterial</link>,&#32;<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_teleport_point_1a23927294cd02fd994803e2890a3392bc">titleLockedColor</link>&#32;);
+00157 
+00158 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;pointIcon&#32;=&#32;lockedIcon;
+00159 
+00160 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;animation.clip&#32;=&#32;animation.GetClip(&#32;lockedAnimation&#32;);
+00161 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00162 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">else</emphasis>
+00163 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00164 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_teleport_point_1aea7e2c7f46242c8ce67249b94309915a">SetMeshMaterials</link>(&#32;<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_teleport">Teleport</link>.<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_teleport_1a46adf4ce0792e06c79053aa5b000c495">instance</link>.<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_teleport_1ad6f50927a9a3b3fa6129f0835be8ca57">pointVisibleMaterial</link>,&#32;<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_teleport_point_1acbfb78c77d89ff3fe945d0a66ecb2b4f">titleVisibleColor</link>&#32;);
+00165 
+00166 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">switch</emphasis>&#32;(&#32;<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_teleport_point_1a6833ee4b88d0fbd19dbc5b511565f1c5">teleportType</link>&#32;)
+00167 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00168 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">case</emphasis>&#32;<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_teleport_point_1a1a849ffcc7eea342470d494523085b57">TeleportPointType</link>.MoveToLocation:
+00169 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00170 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;pointIcon&#32;=&#32;moveLocationIcon;
+00171 
+00172 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;animation.clip&#32;=&#32;animation.GetClip(&#32;moveLocationAnimation&#32;);
+00173 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00174 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">break</emphasis>;
+00175 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">case</emphasis>&#32;<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_teleport_point_1a1a849ffcc7eea342470d494523085b57">TeleportPointType</link>.SwitchToNewScene:
+00176 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00177 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;pointIcon&#32;=&#32;switchSceneIcon;
+00178 
+00179 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;animation.clip&#32;=&#32;animation.GetClip(&#32;switchSceneAnimation&#32;);
+00180 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00181 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">break</emphasis>;
+00182 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00183 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00184 
+00185 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;titleText.text&#32;=&#32;<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_teleport_point_1add0bb364d611e45c9fb8595dcbcb50b5">title</link>;
+00186 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00187 
+00188 
+00189 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//-------------------------------------------------</emphasis>
+<anchor xml:id="__teleport_point_8cs_source_1l00190"/><link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_teleport_point_1a3ed605b7757540a5b6225716c18ee090">00190</link> &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keyword">override</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_teleport_point_1a3ed605b7757540a5b6225716c18ee090">SetAlpha</link>(&#32;<emphasis role="keywordtype">float</emphasis>&#32;tintAlpha,&#32;<emphasis role="keywordtype">float</emphasis>&#32;alphaPercent&#32;)
+00191 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00192 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;tintColor&#32;=&#32;markerMesh.material.GetColor(&#32;tintColorID&#32;);
+00193 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;tintColor.a&#32;=&#32;tintAlpha;
+00194 
+00195 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;markerMesh.material.SetColor(&#32;tintColorID,&#32;tintColor&#32;);
+00196 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;switchSceneIcon.material.SetColor(&#32;tintColorID,&#32;tintColor&#32;);
+00197 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;moveLocationIcon.material.SetColor(&#32;tintColorID,&#32;tintColor&#32;);
+00198 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;lockedIcon.material.SetColor(&#32;tintColorID,&#32;tintColor&#32;);
+00199 
+00200 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;titleColor.a&#32;=&#32;fullTitleAlpha&#32;*&#32;alphaPercent;
+00201 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;titleText.color&#32;=&#32;titleColor;
+00202 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00203 
+00204 
+00205 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//-------------------------------------------------</emphasis>
+<anchor xml:id="__teleport_point_8cs_source_1l00206"/><link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_teleport_point_1aea7e2c7f46242c8ce67249b94309915a">00206</link> &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_teleport_point_1aea7e2c7f46242c8ce67249b94309915a">SetMeshMaterials</link>(&#32;Material&#32;material,&#32;Color&#32;textColor&#32;)
+00207 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00208 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;markerMesh.material&#32;=&#32;material;
+00209 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;switchSceneIcon.material&#32;=&#32;material;
+00210 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;moveLocationIcon.material&#32;=&#32;material;
+00211 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;lockedIcon.material&#32;=&#32;material;
+00212 
+00213 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;titleColor&#32;=&#32;textColor;
+00214 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;fullTitleAlpha&#32;=&#32;textColor.a;
+00215 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;titleText.color&#32;=&#32;titleColor;
+00216 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00217 
+00218 
+00219 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//-------------------------------------------------</emphasis>
+<anchor xml:id="__teleport_point_8cs_source_1l00220"/><link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_teleport_point_1accbee6fb350019c7f18d72193fa085fb">00220</link> &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_teleport_point_1accbee6fb350019c7f18d72193fa085fb">TeleportToScene</link>()
+00221 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00222 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(&#32;!<emphasis role="keywordtype">string</emphasis>.IsNullOrEmpty(&#32;<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_teleport_point_1a3488a33dfefd1d62c04bd1d3faad5371">switchToScene</link>&#32;)&#32;)
+00223 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00224 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;Debug.Log(<emphasis role="stringliteral">&quot;&lt;b&gt;[SteamVR&#32;Interaction]&lt;/b&gt;&#32;TeleportPoint:&#32;Hook&#32;up&#32;your&#32;level&#32;loading&#32;logic&#32;to&#32;switch&#32;to&#32;new&#32;scene:&#32;&quot;</emphasis>&#32;+&#32;<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_teleport_point_1a3488a33dfefd1d62c04bd1d3faad5371">switchToScene</link>&#32;);
+00225 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00226 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">else</emphasis>
+00227 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00228 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;Debug.LogError(<emphasis role="stringliteral">&quot;&lt;b&gt;[SteamVR&#32;Interaction]&lt;/b&gt;&#32;TeleportPoint:&#32;Invalid&#32;scene&#32;name&#32;to&#32;switch&#32;to:&#32;&quot;</emphasis>&#32;+&#32;<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_teleport_point_1a3488a33dfefd1d62c04bd1d3faad5371">switchToScene</link>&#32;);
+00229 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00230 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00231 
+00232 
+00233 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//-------------------------------------------------</emphasis>
+<anchor xml:id="__teleport_point_8cs_source_1l00234"/><link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_teleport_point_1aed4750e01ea0be08cf80d98679b7bc9a">00234</link> &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_teleport_point_1aed4750e01ea0be08cf80d98679b7bc9a">GetRelevantComponents</link>()
+00235 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00236 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;markerMesh&#32;=&#32;transform.Find(&#32;<emphasis role="stringliteral">&quot;teleport_marker_mesh&quot;</emphasis>&#32;).GetComponent&lt;MeshRenderer&gt;();
+00237 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;switchSceneIcon&#32;=&#32;transform.Find(&#32;<emphasis role="stringliteral">&quot;teleport_marker_lookat_joint/teleport_marker_icons/switch_scenes_icon&quot;</emphasis>&#32;).GetComponent&lt;MeshRenderer&gt;();
+00238 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;moveLocationIcon&#32;=&#32;transform.Find(&#32;<emphasis role="stringliteral">&quot;teleport_marker_lookat_joint/teleport_marker_icons/move_location_icon&quot;</emphasis>&#32;).GetComponent&lt;MeshRenderer&gt;();
+00239 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;lockedIcon&#32;=&#32;transform.Find(&#32;<emphasis role="stringliteral">&quot;teleport_marker_lookat_joint/teleport_marker_icons/locked_icon&quot;</emphasis>&#32;).GetComponent&lt;MeshRenderer&gt;();
+00240 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;lookAtJointTransform&#32;=&#32;transform.Find(&#32;<emphasis role="stringliteral">&quot;teleport_marker_lookat_joint&quot;</emphasis>&#32;);
+00241 
+00242 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;titleText&#32;=&#32;transform.Find(&#32;<emphasis role="stringliteral">&quot;teleport_marker_lookat_joint/teleport_marker_canvas/teleport_marker_canvas_text&quot;</emphasis>&#32;).GetComponent&lt;Text&gt;();
+00243 
+00244 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;gotReleventComponents&#32;=&#32;<emphasis role="keyword">true</emphasis>;
+00245 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00246 
+00247 
+00248 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//-------------------------------------------------</emphasis>
+<anchor xml:id="__teleport_point_8cs_source_1l00249"/><link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_teleport_point_1a018ebad25bd2d5b4196af3e490dfe868">00249</link> &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_teleport_point_1a018ebad25bd2d5b4196af3e490dfe868">ReleaseRelevantComponents</link>()
+00250 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00251 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;markerMesh&#32;=&#32;<emphasis role="keyword">null</emphasis>;
+00252 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;switchSceneIcon&#32;=&#32;<emphasis role="keyword">null</emphasis>;
+00253 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;moveLocationIcon&#32;=&#32;<emphasis role="keyword">null</emphasis>;
+00254 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;lockedIcon&#32;=&#32;<emphasis role="keyword">null</emphasis>;
+00255 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;lookAtJointTransform&#32;=&#32;<emphasis role="keyword">null</emphasis>;
+00256 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;titleText&#32;=&#32;<emphasis role="keyword">null</emphasis>;
+00257 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00258 
+00259 
+00260 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//-------------------------------------------------</emphasis>
+<anchor xml:id="__teleport_point_8cs_source_1l00261"/><link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_teleport_point_1a1389539bcb637fce7f8622b5c06c37ec">00261</link> &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_teleport_point_1a1389539bcb637fce7f8622b5c06c37ec">UpdateVisualsInEditor</link>()
+00262 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00263 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(&#32;<link linkend="_namespace_valve_1_1_v_r_1aecd07a81fe79a9f96c6787513e2d98e4ae498749f3c42246d50b15c81c101d988">Application</link>.isPlaying&#32;)
+00264 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00265 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>;
+00266 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00267 
+00268 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_teleport_point_1aed4750e01ea0be08cf80d98679b7bc9a">GetRelevantComponents</link>();
+00269 
+00270 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(&#32;<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_teleport_marker_base_1a0fe663ebf0fb74cfb7d6f5ca28c83493">locked</link>&#32;)
+00271 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00272 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;lockedIcon.gameObject.SetActive(&#32;<emphasis role="keyword">true</emphasis>&#32;);
+00273 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;moveLocationIcon.gameObject.SetActive(&#32;<emphasis role="keyword">false</emphasis>&#32;);
+00274 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;switchSceneIcon.gameObject.SetActive(&#32;<emphasis role="keyword">false</emphasis>&#32;);
+00275 
+00276 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;markerMesh.sharedMaterial&#32;=&#32;<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_teleport">Teleport</link>.<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_teleport_1a46adf4ce0792e06c79053aa5b000c495">instance</link>.<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_teleport_1a982ea80a754876a05c803d25bf99a55d">pointLockedMaterial</link>;
+00277 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;lockedIcon.sharedMaterial&#32;=&#32;<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_teleport">Teleport</link>.<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_teleport_1a46adf4ce0792e06c79053aa5b000c495">instance</link>.<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_teleport_1a982ea80a754876a05c803d25bf99a55d">pointLockedMaterial</link>;
+00278 
+00279 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;titleText.color&#32;=&#32;<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_teleport_point_1a23927294cd02fd994803e2890a3392bc">titleLockedColor</link>;
+00280 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00281 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">else</emphasis>
+00282 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00283 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;lockedIcon.gameObject.SetActive(&#32;<emphasis role="keyword">false</emphasis>&#32;);
+00284 
+00285 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;markerMesh.sharedMaterial&#32;=&#32;<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_teleport">Teleport</link>.<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_teleport_1a46adf4ce0792e06c79053aa5b000c495">instance</link>.<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_teleport_1ad6f50927a9a3b3fa6129f0835be8ca57">pointVisibleMaterial</link>;
+00286 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;switchSceneIcon.sharedMaterial&#32;=&#32;<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_teleport">Teleport</link>.<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_teleport_1a46adf4ce0792e06c79053aa5b000c495">instance</link>.<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_teleport_1ad6f50927a9a3b3fa6129f0835be8ca57">pointVisibleMaterial</link>;
+00287 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;moveLocationIcon.sharedMaterial&#32;=&#32;<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_teleport">Teleport</link>.<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_teleport_1a46adf4ce0792e06c79053aa5b000c495">instance</link>.<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_teleport_1ad6f50927a9a3b3fa6129f0835be8ca57">pointVisibleMaterial</link>;
+00288 
+00289 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;titleText.color&#32;=&#32;<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_teleport_point_1acbfb78c77d89ff3fe945d0a66ecb2b4f">titleVisibleColor</link>;
+00290 
+00291 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">switch</emphasis>&#32;(&#32;<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_teleport_point_1a6833ee4b88d0fbd19dbc5b511565f1c5">teleportType</link>&#32;)
+00292 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00293 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">case</emphasis>&#32;<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_teleport_point_1a1a849ffcc7eea342470d494523085b57">TeleportPointType</link>.MoveToLocation:
+00294 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00295 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;moveLocationIcon.gameObject.SetActive(&#32;<emphasis role="keyword">true</emphasis>&#32;);
+00296 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;switchSceneIcon.gameObject.SetActive(&#32;<emphasis role="keyword">false</emphasis>&#32;);
+00297 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00298 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">break</emphasis>;
+00299 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">case</emphasis>&#32;<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_teleport_point_1a1a849ffcc7eea342470d494523085b57">TeleportPointType</link>.SwitchToNewScene:
+00300 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00301 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;moveLocationIcon.gameObject.SetActive(&#32;<emphasis role="keyword">false</emphasis>&#32;);
+00302 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;switchSceneIcon.gameObject.SetActive(&#32;<emphasis role="keyword">true</emphasis>&#32;);
+00303 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00304 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">break</emphasis>;
+00305 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00306 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00307 
+00308 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;titleText.text&#32;=&#32;<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_teleport_point_1add0bb364d611e45c9fb8595dcbcb50b5">title</link>;
+00309 
+00310 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_teleport_point_1a018ebad25bd2d5b4196af3e490dfe868">ReleaseRelevantComponents</link>();
+00311 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00312 &#32;&#32;&#32;&#32;}
+00313 
+00314 
+00315 <emphasis role="preprocessor">#if&#32;UNITY_EDITOR</emphasis>
+00316 &#32;&#32;&#32;&#32;<emphasis role="comment">//-------------------------------------------------------------------------</emphasis>
+00317 &#32;&#32;&#32;&#32;[CustomEditor(&#32;typeof(&#32;TeleportPoint&#32;)&#32;)]
+00318 &#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keyword">class&#32;</emphasis>TeleportPointEditor&#32;:&#32;Editor
+00319 &#32;&#32;&#32;&#32;{
+00320 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//-------------------------------------------------</emphasis>
+00321 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordtype">void</emphasis>&#32;OnEnable()
+00322 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00323 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(&#32;Selection.activeTransform&#32;)
+00324 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00325 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;TeleportPoint&#32;teleportPoint&#32;=&#32;Selection.activeTransform.GetComponent&lt;TeleportPoint&gt;();
+00326 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(teleportPoint&#32;!=&#32;<emphasis role="keyword">null</emphasis>)
+00327 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;teleportPoint.UpdateVisualsInEditor();
+00328 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00329 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00330 
+00331 
+00332 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//-------------------------------------------------</emphasis>
+00333 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keyword">override</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;OnInspectorGUI()
+00334 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00335 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;DrawDefaultInspector();
+00336 
+00337 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(&#32;Selection.activeTransform&#32;)
+00338 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00339 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;TeleportPoint&#32;teleportPoint&#32;=&#32;Selection.activeTransform.GetComponent&lt;TeleportPoint&gt;();
+00340 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(&#32;GUI.changed&#32;)
+00341 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00342 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;teleportPoint.UpdateVisualsInEditor();
+00343 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00344 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00345 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00346 &#32;&#32;&#32;&#32;}
+00347 <emphasis role="preprocessor">#endif</emphasis>
+00348 }
+</programlisting></section>

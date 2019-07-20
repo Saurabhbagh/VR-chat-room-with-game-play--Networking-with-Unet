@@ -1,0 +1,137 @@
+<?xml version='1.0' encoding='UTF-8' standalone='no'?>
+<section xmlns="http://docbook.org/ns/docbook" version="5.0" xmlns:xlink="http://www.w3.org/1999/xlink" xml:id="__data_privacy_8cs_source">
+<title>DataPrivacy.cs</title>
+<indexterm><primary>O:/GitHUBMINIPRoject/Library/PackageCache/com.unity.analytics@3.2.2/DataPrivacy/DataPrivacy.cs</primary></indexterm>
+<programlisting>00001 <emphasis role="preprocessor">#if&#32;ENABLE_CLOUD_SERVICES_ANALYTICS</emphasis>
+00002 <emphasis role="keyword">using</emphasis>&#32;System;
+00003 <emphasis role="keyword">using</emphasis>&#32;System.Text;
+00004 <emphasis role="keyword">using</emphasis>&#32;<link linkend="_namespace_unity_engine">UnityEngine</link>.Networking;
+00005 
+00006 <emphasis role="keyword">namespace&#32;</emphasis><link linkend="_namespace_unity_engine_1_1_analytics">UnityEngine.Analytics</link>
+00007 {
+00008 &#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keyword">class&#32;</emphasis>DataPrivacy
+00009 &#32;&#32;&#32;&#32;{
+00010 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;[Serializable]
+00011 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">internal</emphasis>&#32;<emphasis role="keyword">struct&#32;</emphasis>UserPostData
+00012 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00013 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keywordtype">string</emphasis>&#32;appid;
+00014 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keywordtype">string</emphasis>&#32;userid;
+00015 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keywordtype">long</emphasis>&#32;sessionid;
+00016 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keywordtype">string</emphasis>&#32;platform;
+00017 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;UInt32&#32;platformid;
+00018 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keywordtype">string</emphasis>&#32;sdk_ver;
+00019 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keywordtype">bool</emphasis>&#32;debug_device;
+00020 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keywordtype">string</emphasis>&#32;deviceid;
+00021 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keywordtype">string</emphasis>&#32;plugin_ver;
+00022 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00023 
+00024 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;[Serializable]
+00025 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">internal</emphasis>&#32;<emphasis role="keyword">struct&#32;</emphasis>TokenData
+00026 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00027 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keywordtype">string</emphasis>&#32;url;
+00028 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keywordtype">string</emphasis>&#32;token;
+00029 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00030 
+00031 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">const</emphasis>&#32;<emphasis role="keywordtype">string</emphasis>&#32;kVersion&#32;=&#32;<emphasis role="stringliteral">&quot;3.0.0&quot;</emphasis>;
+00032 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">const</emphasis>&#32;<emphasis role="keywordtype">string</emphasis>&#32;kVersionString&#32;=&#32;<emphasis role="stringliteral">&quot;DataPrivacyPackage/&quot;</emphasis>&#32;+&#32;kVersion;
+00033 
+00034 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">internal</emphasis>&#32;<emphasis role="keyword">const</emphasis>&#32;<emphasis role="keywordtype">string</emphasis>&#32;kBaseUrl&#32;=&#32;<emphasis role="stringliteral">&quot;https://data-optout-service.uca.cloud.unity3d.com&quot;</emphasis>;
+00035 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">const</emphasis>&#32;<emphasis role="keywordtype">string</emphasis>&#32;kTokenUrl&#32;=&#32;kBaseUrl&#32;+&#32;<emphasis role="stringliteral">&quot;/token&quot;</emphasis>;
+00036 
+00037 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">internal</emphasis>&#32;<emphasis role="keyword">static</emphasis>&#32;UserPostData&#32;GetUserData()
+00038 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00039 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;var&#32;postData&#32;=&#32;<emphasis role="keyword">new</emphasis>&#32;UserPostData
+00040 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00041 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;appid&#32;=&#32;<link linkend="_namespace_valve_1_1_v_r_1aecd07a81fe79a9f96c6787513e2d98e4ae498749f3c42246d50b15c81c101d988">Application</link>.cloudProjectId,
+00042 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;userid&#32;=&#32;AnalyticsSessionInfo.userId,
+00043 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;sessionid&#32;=&#32;AnalyticsSessionInfo.sessionId,
+00044 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;platform&#32;=&#32;<link linkend="_namespace_valve_1_1_v_r_1aecd07a81fe79a9f96c6787513e2d98e4ae498749f3c42246d50b15c81c101d988">Application</link>.platform.ToString(),
+00045 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;platformid&#32;=&#32;(UInt32)<link linkend="_namespace_valve_1_1_v_r_1aecd07a81fe79a9f96c6787513e2d98e4ae498749f3c42246d50b15c81c101d988">Application</link>.platform,
+00046 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;sdk_ver&#32;=&#32;<link linkend="_namespace_valve_1_1_v_r_1aecd07a81fe79a9f96c6787513e2d98e4ae498749f3c42246d50b15c81c101d988">Application</link>.unityVersion,
+00047 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;debug_device&#32;=&#32;Debug.isDebugBuild,
+00048 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;deviceid&#32;=&#32;SystemInfo.deviceUniqueIdentifier,
+00049 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;plugin_ver&#32;=&#32;kVersionString
+00050 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;};
+00051 
+00052 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;postData;
+00053 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00054 
+00055 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">static</emphasis>&#32;<emphasis role="keywordtype">string</emphasis>&#32;GetUserAgent()
+00056 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00057 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;var&#32;message&#32;=&#32;<emphasis role="stringliteral">&quot;UnityPlayer/{0}&#32;({1}/{2}{3}&#32;{4})&quot;</emphasis>;
+00058 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;String.Format(message,
+00059 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_namespace_valve_1_1_v_r_1aecd07a81fe79a9f96c6787513e2d98e4ae498749f3c42246d50b15c81c101d988">Application</link>.unityVersion,
+00060 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_namespace_valve_1_1_v_r_1aecd07a81fe79a9f96c6787513e2d98e4ae498749f3c42246d50b15c81c101d988">Application</link>.platform.ToString(),
+00061 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;(UInt32)<link linkend="_namespace_valve_1_1_v_r_1aecd07a81fe79a9f96c6787513e2d98e4ae498749f3c42246d50b15c81c101d988">Application</link>.platform,
+00062 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;Debug.isDebugBuild&#32;?&#32;<emphasis role="stringliteral">&quot;-dev&quot;</emphasis>&#32;:&#32;<emphasis role="stringliteral">&quot;&quot;</emphasis>,
+00063 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;kVersionString);
+00064 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00065 
+00066 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">static</emphasis>&#32;String&#32;getErrorString(UnityWebRequest&#32;www)
+00067 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00068 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;var&#32;json&#32;=&#32;www.downloadHandler.text;
+00069 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;var&#32;error&#32;=&#32;www.error;
+00070 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(String.IsNullOrEmpty(error))
+00071 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00072 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;5.5&#32;sometimes&#32;fails&#32;to&#32;parse&#32;an&#32;error&#32;response,&#32;and&#32;the&#32;only&#32;clue&#32;will&#32;be</emphasis>
+00073 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;in&#32;www.responseHeadersString,&#32;which&#32;isn&apos;t&#32;accessible.</emphasis>
+00074 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;error&#32;=&#32;<emphasis role="stringliteral">&quot;Empty&#32;response&quot;</emphasis>;
+00075 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00076 
+00077 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(!String.IsNullOrEmpty(json))
+00078 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00079 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;error&#32;+=&#32;<emphasis role="stringliteral">&quot;:&#32;&quot;</emphasis>&#32;+&#32;json;
+00080 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00081 
+00082 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;error;
+00083 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00084 
+00085 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keyword">static</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;FetchPrivacyUrl(Action&lt;string&gt;&#32;success,&#32;Action&lt;string&gt;&#32;failure&#32;=&#32;<emphasis role="keyword">null</emphasis>)
+00086 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00087 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordtype">string</emphasis>&#32;postJson&#32;=&#32;JsonUtility.ToJson(GetUserData());
+00088 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordtype">byte</emphasis>[]&#32;bytes&#32;=&#32;Encoding.UTF8.GetBytes(postJson);
+00089 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;var&#32;uploadHandler&#32;=&#32;<emphasis role="keyword">new</emphasis>&#32;UploadHandlerRaw(bytes);
+00090 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;uploadHandler.contentType&#32;=&#32;<emphasis role="stringliteral">&quot;application/json&quot;</emphasis>;
+00091 
+00092 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;var&#32;www&#32;=&#32;UnityWebRequest.Post(kTokenUrl,&#32;<emphasis role="stringliteral">&quot;&quot;</emphasis>);
+00093 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;www.uploadHandler&#32;=&#32;uploadHandler;
+00094 <emphasis role="preprocessor">#if&#32;!UNITY_WEBGL</emphasis>
+00095 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;www.SetRequestHeader(<emphasis role="stringliteral">&quot;User-Agent&quot;</emphasis>,&#32;GetUserAgent());
+00096 <emphasis role="preprocessor">#endif</emphasis>
+00097 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;var&#32;async&#32;=&#32;www.SendWebRequest();
+00098 
+00099 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;async.completed&#32;+=&#32;(AsyncOperation&#32;async2)&#32;=&gt;
+00100 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00101 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;var&#32;json&#32;=&#32;www.downloadHandler.text;
+00102 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(!String.IsNullOrEmpty(www.error)&#32;||&#32;String.IsNullOrEmpty(json))
+00103 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00104 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;var&#32;error&#32;=&#32;getErrorString(www);
+00105 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(failure&#32;!=&#32;<emphasis role="keyword">null</emphasis>)
+00106 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00107 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;failure(error);
+00108 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00109 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00110 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">else</emphasis>
+00111 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00112 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;TokenData&#32;tokenData;
+00113 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;tokenData.url&#32;=&#32;<emphasis role="stringliteral">&quot;&quot;</emphasis>;&#32;<emphasis role="comment">//&#32;Just&#32;to&#32;quell&#32;&quot;possibly&#32;unassigned&quot;&#32;error</emphasis>
+00114 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">try</emphasis>
+00115 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00116 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;tokenData&#32;=&#32;JsonUtility.FromJson&lt;TokenData&gt;(json);
+00117 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00118 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">catch</emphasis>&#32;(Exception&#32;e)
+00119 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00120 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(failure&#32;!=&#32;<emphasis role="keyword">null</emphasis>)
+00121 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00122 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;failure(e.ToString());
+00123 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00124 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00125 
+00126 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;success(tokenData.url);
+00127 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00128 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;};
+00129 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00130 &#32;&#32;&#32;&#32;}
+00131 }
+00132 <emphasis role="preprocessor">#endif&#32;//ENABLE_CLOUD_SERVICES_ANALYTICS</emphasis>
+</programlisting></section>

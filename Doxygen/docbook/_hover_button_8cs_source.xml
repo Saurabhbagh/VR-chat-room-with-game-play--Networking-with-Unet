@@ -1,0 +1,116 @@
+<?xml version='1.0' encoding='UTF-8' standalone='no'?>
+<section xmlns="http://docbook.org/ns/docbook" version="5.0" xmlns:xlink="http://www.w3.org/1999/xlink" xml:id="__hover_button_8cs_source">
+<title>HoverButton.cs</title>
+<indexterm><primary>O:/GitHUBMINIPRoject/Assets/SteamVR/InteractionSystem/Core/Scripts/HoverButton.cs</primary></indexterm>
+<programlisting>00001 <emphasis role="comment">//=======&#32;Copyright&#32;(c)&#32;Valve&#32;Corporation,&#32;All&#32;rights&#32;reserved.&#32;===============</emphasis>
+00002 <emphasis role="comment">//</emphasis>
+00003 <emphasis role="comment">//&#32;Purpose:&#32;Drives&#32;a&#32;linear&#32;mapping&#32;based&#32;on&#32;position&#32;between&#32;2&#32;positions</emphasis>
+00004 <emphasis role="comment">//</emphasis>
+00005 <emphasis role="comment">//=============================================================================</emphasis>
+00006 
+00007 <emphasis role="keyword">using</emphasis>&#32;<link linkend="__balloon_8cs_1a7d67e097df9376eb709b6a23aa3c7d23">UnityEngine</link>;
+00008 <emphasis role="keyword">using</emphasis>&#32;System.Collections;
+00009 <emphasis role="keyword">using</emphasis>&#32;<link linkend="_namespace_unity_engine">UnityEngine</link>.Events;
+00010 
+00011 <emphasis role="keyword">namespace&#32;</emphasis><link linkend="_namespace_valve_1_1_v_r_1_1_interaction_system">Valve.VR.InteractionSystem</link>
+00012 {
+00013 &#32;&#32;&#32;&#32;<emphasis role="comment">//-------------------------------------------------------------------------</emphasis>
+00014 &#32;&#32;&#32;&#32;[RequireComponent(typeof(Interactable))]
+<anchor xml:id="__hover_button_8cs_source_1l00015"/><link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_hover_button">00015</link> &#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keyword">class&#32;</emphasis><link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_hover_button">HoverButton</link>&#32;:&#32;MonoBehaviour
+00016 &#32;&#32;&#32;&#32;{
+<anchor xml:id="__hover_button_8cs_source_1l00017"/><link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_hover_button_1a512d12075389d4852d9aad92c12980d2">00017</link> &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;Transform&#32;<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_hover_button_1a512d12075389d4852d9aad92c12980d2">movingPart</link>;
+00018 
+<anchor xml:id="__hover_button_8cs_source_1l00019"/><link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_hover_button_1a4c0f3a4df1b5b288c48e133454a907dc">00019</link> &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;Vector3&#32;<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_hover_button_1a4c0f3a4df1b5b288c48e133454a907dc">localMoveDistance</link>&#32;=&#32;<emphasis role="keyword">new</emphasis>&#32;Vector3(0,&#32;-0.1f,&#32;0);
+00020 
+00021 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;[Range(0,&#32;1)]
+<anchor xml:id="__hover_button_8cs_source_1l00022"/><link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_hover_button_1acc32c85f52d4f348517aecde60fc9727">00022</link> &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keywordtype">float</emphasis>&#32;<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_hover_button_1acc32c85f52d4f348517aecde60fc9727">engageAtPercent</link>&#32;=&#32;0.95f;
+00023 
+00024 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;[Range(0,&#32;1)]
+<anchor xml:id="__hover_button_8cs_source_1l00025"/><link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_hover_button_1a6791c1abc045301ea1f1d7708c352a4d">00025</link> &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keywordtype">float</emphasis>&#32;<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_hover_button_1a6791c1abc045301ea1f1d7708c352a4d">disengageAtPercent</link>&#32;=&#32;0.9f;
+00026 
+<anchor xml:id="__hover_button_8cs_source_1l00027"/><link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_hover_button_1acb3cd0d38ff7a054b761c7e232817ec5">00027</link> &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_hand_event">HandEvent</link>&#32;<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_hover_button_1acb3cd0d38ff7a054b761c7e232817ec5">onButtonDown</link>;
+<anchor xml:id="__hover_button_8cs_source_1l00028"/><link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_hover_button_1ac1ed67633ae9ca279bff0f81ae8de35d">00028</link> &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_hand_event">HandEvent</link>&#32;<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_hover_button_1ac1ed67633ae9ca279bff0f81ae8de35d">onButtonUp</link>;
+<anchor xml:id="__hover_button_8cs_source_1l00029"/><link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_hover_button_1a34e71d3922347dc2d2e40953783f507d">00029</link> &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_hand_event">HandEvent</link>&#32;<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_hover_button_1a34e71d3922347dc2d2e40953783f507d">onButtonIsPressed</link>;
+00030 
+<anchor xml:id="__hover_button_8cs_source_1l00031"/><link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_hover_button_1a166d3835be5b4c2ec9996d7e82af0c25">00031</link> &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keywordtype">bool</emphasis>&#32;<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_hover_button_1a166d3835be5b4c2ec9996d7e82af0c25">engaged</link>&#32;=&#32;<emphasis role="keyword">false</emphasis>;
+<anchor xml:id="__hover_button_8cs_source_1l00032"/><link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_hover_button_1a61478fee1db23571294df50183cb9f91">00032</link> &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keywordtype">bool</emphasis>&#32;<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_hover_button_1a61478fee1db23571294df50183cb9f91">buttonDown</link>&#32;=&#32;<emphasis role="keyword">false</emphasis>;
+<anchor xml:id="__hover_button_8cs_source_1l00033"/><link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_hover_button_1a76e76b2f1b2f893627db0ba70d38c52a">00033</link> &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keywordtype">bool</emphasis>&#32;<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_hover_button_1a76e76b2f1b2f893627db0ba70d38c52a">buttonUp</link>&#32;=&#32;<emphasis role="keyword">false</emphasis>;
+00034 
+00035 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;Vector3&#32;startPosition;
+00036 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;Vector3&#32;endPosition;
+00037 
+00038 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;Vector3&#32;handEnteredPosition;
+00039 
+00040 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;<emphasis role="keywordtype">bool</emphasis>&#32;hovering;
+00041 
+00042 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_hand">Hand</link>&#32;lastHoveredHand;
+00043 
+00044 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;Start()
+00045 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00046 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_hover_button_1a512d12075389d4852d9aad92c12980d2">movingPart</link>&#32;==&#32;<emphasis role="keyword">null</emphasis>&#32;&amp;&amp;&#32;this.transform.childCount&#32;&gt;&#32;0)
+00047 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_hover_button_1a512d12075389d4852d9aad92c12980d2">movingPart</link>&#32;=&#32;this.transform.GetChild(0);
+00048 
+00049 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;startPosition&#32;=&#32;<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_hover_button_1a512d12075389d4852d9aad92c12980d2">movingPart</link>.localPosition;
+00050 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;endPosition&#32;=&#32;startPosition&#32;+&#32;<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_hover_button_1a4c0f3a4df1b5b288c48e133454a907dc">localMoveDistance</link>;
+00051 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;handEnteredPosition&#32;=&#32;endPosition;
+00052 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00053 
+00054 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;HandHoverUpdate(<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_hand">Hand</link>&#32;hand)
+00055 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00056 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;hovering&#32;=&#32;<emphasis role="keyword">true</emphasis>;
+00057 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;lastHoveredHand&#32;=&#32;hand;
+00058 
+00059 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordtype">bool</emphasis>&#32;wasEngaged&#32;=&#32;<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_hover_button_1a166d3835be5b4c2ec9996d7e82af0c25">engaged</link>;
+00060 
+00061 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordtype">float</emphasis>&#32;currentDistance&#32;=&#32;Vector3.Distance(<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_hover_button_1a512d12075389d4852d9aad92c12980d2">movingPart</link>.parent.InverseTransformPoint(hand.transform.position),&#32;endPosition);
+00062 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordtype">float</emphasis>&#32;enteredDistance&#32;=&#32;Vector3.Distance(handEnteredPosition,&#32;endPosition);
+00063 
+00064 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(currentDistance&#32;&gt;&#32;enteredDistance)
+00065 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00066 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;enteredDistance&#32;=&#32;currentDistance;
+00067 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;handEnteredPosition&#32;=&#32;<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_hover_button_1a512d12075389d4852d9aad92c12980d2">movingPart</link>.parent.InverseTransformPoint(hand.transform.position);
+00068 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00069 
+00070 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordtype">float</emphasis>&#32;distanceDifference&#32;=&#32;enteredDistance&#32;-&#32;currentDistance;
+00071 
+00072 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordtype">float</emphasis>&#32;lerp&#32;=&#32;Mathf.InverseLerp(0,&#32;<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_hover_button_1a4c0f3a4df1b5b288c48e133454a907dc">localMoveDistance</link>.magnitude,&#32;distanceDifference);
+00073 
+00074 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(lerp&#32;&gt;&#32;<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_hover_button_1acc32c85f52d4f348517aecde60fc9727">engageAtPercent</link>)
+00075 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_hover_button_1a166d3835be5b4c2ec9996d7e82af0c25">engaged</link>&#32;=&#32;<emphasis role="keyword">true</emphasis>;
+00076 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">else</emphasis>&#32;<emphasis role="keywordflow">if</emphasis>&#32;(lerp&#32;&lt;&#32;<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_hover_button_1a6791c1abc045301ea1f1d7708c352a4d">disengageAtPercent</link>)
+00077 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_hover_button_1a166d3835be5b4c2ec9996d7e82af0c25">engaged</link>&#32;=&#32;<emphasis role="keyword">false</emphasis>;
+00078 
+00079 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_hover_button_1a512d12075389d4852d9aad92c12980d2">movingPart</link>.localPosition&#32;=&#32;Vector3.Lerp(startPosition,&#32;endPosition,&#32;lerp);
+00080 
+00081 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;InvokeEvents(wasEngaged,&#32;<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_hover_button_1a166d3835be5b4c2ec9996d7e82af0c25">engaged</link>);
+00082 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00083 
+00084 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;LateUpdate()
+00085 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00086 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(hovering&#32;==&#32;<emphasis role="keyword">false</emphasis>)
+00087 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00088 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_hover_button_1a512d12075389d4852d9aad92c12980d2">movingPart</link>.localPosition&#32;=&#32;startPosition;
+00089 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;handEnteredPosition&#32;=&#32;endPosition;
+00090 
+00091 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;InvokeEvents(<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_hover_button_1a166d3835be5b4c2ec9996d7e82af0c25">engaged</link>,&#32;<emphasis role="keyword">false</emphasis>);
+00092 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_hover_button_1a166d3835be5b4c2ec9996d7e82af0c25">engaged</link>&#32;=&#32;<emphasis role="keyword">false</emphasis>;
+00093 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00094 
+00095 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;hovering&#32;=&#32;<emphasis role="keyword">false</emphasis>;
+00096 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00097 
+00098 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;InvokeEvents(<emphasis role="keywordtype">bool</emphasis>&#32;wasEngaged,&#32;<emphasis role="keywordtype">bool</emphasis>&#32;isEngaged)
+00099 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00100 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_hover_button_1a61478fee1db23571294df50183cb9f91">buttonDown</link>&#32;=&#32;wasEngaged&#32;==&#32;<emphasis role="keyword">false</emphasis>&#32;&amp;&amp;&#32;isEngaged&#32;==&#32;<emphasis role="keyword">true</emphasis>;
+00101 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_hover_button_1a76e76b2f1b2f893627db0ba70d38c52a">buttonUp</link>&#32;=&#32;wasEngaged&#32;==&#32;<emphasis role="keyword">true</emphasis>&#32;&amp;&amp;&#32;isEngaged&#32;==&#32;<emphasis role="keyword">false</emphasis>;
+00102 
+00103 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_hover_button_1a61478fee1db23571294df50183cb9f91">buttonDown</link>&#32;&amp;&amp;&#32;<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_hover_button_1acb3cd0d38ff7a054b761c7e232817ec5">onButtonDown</link>&#32;!=&#32;<emphasis role="keyword">null</emphasis>)
+00104 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_hover_button_1acb3cd0d38ff7a054b761c7e232817ec5">onButtonDown</link>.Invoke(lastHoveredHand);
+00105 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_hover_button_1a76e76b2f1b2f893627db0ba70d38c52a">buttonUp</link>&#32;&amp;&amp;&#32;<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_hover_button_1ac1ed67633ae9ca279bff0f81ae8de35d">onButtonUp</link>&#32;!=&#32;<emphasis role="keyword">null</emphasis>)
+00106 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_hover_button_1ac1ed67633ae9ca279bff0f81ae8de35d">onButtonUp</link>.Invoke(lastHoveredHand);
+00107 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(isEngaged&#32;&amp;&amp;&#32;<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_hover_button_1a34e71d3922347dc2d2e40953783f507d">onButtonIsPressed</link>&#32;!=&#32;<emphasis role="keyword">null</emphasis>)
+00108 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_hover_button_1a34e71d3922347dc2d2e40953783f507d">onButtonIsPressed</link>.Invoke(lastHoveredHand);
+00109 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00110 &#32;&#32;&#32;&#32;}
+00111 }
+</programlisting></section>

@@ -1,0 +1,370 @@
+<?xml version='1.0' encoding='UTF-8' standalone='no'?>
+<section xmlns="http://docbook.org/ns/docbook" version="5.0" xmlns:xlink="http://www.w3.org/1999/xlink" xml:id="__item_package_spawner_8cs_source">
+<title>ItemPackageSpawner.cs</title>
+<indexterm><primary>O:/GitHUBMINIPRoject/Assets/SteamVR/InteractionSystem/Core/Scripts/ItemPackageSpawner.cs</primary></indexterm>
+<programlisting>00001 <emphasis role="comment">//=======&#32;Copyright&#32;(c)&#32;Valve&#32;Corporation,&#32;All&#32;rights&#32;reserved.&#32;===============</emphasis>
+00002 <emphasis role="comment">//</emphasis>
+00003 <emphasis role="comment">//&#32;Purpose:&#32;Handles&#32;the&#32;spawning&#32;and&#32;returning&#32;of&#32;the&#32;ItemPackage</emphasis>
+00004 <emphasis role="comment">//</emphasis>
+00005 <emphasis role="comment">//=============================================================================</emphasis>
+00006 
+00007 <emphasis role="keyword">using</emphasis>&#32;<link linkend="__balloon_8cs_1a7d67e097df9376eb709b6a23aa3c7d23">UnityEngine</link>;
+00008 <emphasis role="keyword">using</emphasis>&#32;System.Collections;
+00009 <emphasis role="keyword">using</emphasis>&#32;System.Collections.Generic;
+00010 <emphasis role="keyword">using</emphasis>&#32;System.Collections.ObjectModel;
+00011 <emphasis role="keyword">using</emphasis>&#32;<link linkend="_namespace_unity_engine">UnityEngine</link>.Events;
+00012 <emphasis role="preprocessor">#if&#32;UNITY_EDITOR</emphasis>
+00013 <emphasis role="keyword">using</emphasis>&#32;<link linkend="_namespace_unity_editor">UnityEditor</link>;
+00014 <emphasis role="preprocessor">#endif</emphasis>
+00015 
+00016 <emphasis role="keyword">namespace&#32;</emphasis><link linkend="_namespace_valve_1_1_v_r_1_1_interaction_system">Valve.VR.InteractionSystem</link>
+00017 {
+00018 &#32;&#32;&#32;&#32;<emphasis role="comment">//-------------------------------------------------------------------------</emphasis>
+00019 &#32;&#32;&#32;&#32;[RequireComponent(&#32;typeof(&#32;Interactable&#32;)&#32;)]
+<anchor xml:id="__item_package_spawner_8cs_source_1l00020"/><link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_item_package_spawner">00020</link> &#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keyword">class&#32;</emphasis><link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_item_package_spawner">ItemPackageSpawner</link>&#32;:&#32;MonoBehaviour
+00021 &#32;&#32;&#32;&#32;{
+00022 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_item_package">ItemPackage</link>&#32;<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_item_package_spawner_1aac24719049cb41f6b3a553bb1add8714">itemPackage</link>
+<anchor xml:id="__item_package_spawner_8cs_source_1l00023"/><link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_item_package_spawner_1aac24719049cb41f6b3a553bb1add8714">00023</link> &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00024 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">get</emphasis>
+00025 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00026 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_item_package_spawner_1ac180c5e384db6629b334d6486e735d35">_itemPackage</link>;
+00027 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00028 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">set</emphasis>
+00029 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00030 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;CreatePreviewObject();
+00031 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00032 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00033 
+<anchor xml:id="__item_package_spawner_8cs_source_1l00034"/><link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_item_package_spawner_1ac180c5e384db6629b334d6486e735d35">00034</link> &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_item_package">ItemPackage</link>&#32;<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_item_package_spawner_1ac180c5e384db6629b334d6486e735d35">_itemPackage</link>;
+00035 
+00036 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;<emphasis role="keywordtype">bool</emphasis>&#32;useItemPackagePreview&#32;=&#32;<emphasis role="keyword">true</emphasis>;
+00037 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;<emphasis role="keywordtype">bool</emphasis>&#32;useFadedPreview&#32;=&#32;<emphasis role="keyword">false</emphasis>;
+00038 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;GameObject&#32;previewObject;
+00039 
+<anchor xml:id="__item_package_spawner_8cs_source_1l00040"/><link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_item_package_spawner_1a00584c7086c9ecf9c07d0fcb012058ac">00040</link> &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keywordtype">bool</emphasis>&#32;<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_item_package_spawner_1a00584c7086c9ecf9c07d0fcb012058ac">requireGrabActionToTake</link>&#32;=&#32;<emphasis role="keyword">false</emphasis>;
+<anchor xml:id="__item_package_spawner_8cs_source_1l00041"/><link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_item_package_spawner_1af4bd8f1d7a40de0808159fea06d25ff7">00041</link> &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keywordtype">bool</emphasis>&#32;<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_item_package_spawner_1af4bd8f1d7a40de0808159fea06d25ff7">requireReleaseActionToReturn</link>&#32;=&#32;<emphasis role="keyword">false</emphasis>;
+<anchor xml:id="__item_package_spawner_8cs_source_1l00042"/><link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_item_package_spawner_1ac5a26b402843f3584a1713aba51d6cf1">00042</link> &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keywordtype">bool</emphasis>&#32;<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_item_package_spawner_1ac5a26b402843f3584a1713aba51d6cf1">showTriggerHint</link>&#32;=&#32;<emphasis role="keyword">false</emphasis>;
+00043 
+00044 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;[<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_enum_flags">EnumFlags</link>]
+<anchor xml:id="__item_package_spawner_8cs_source_1l00045"/><link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_item_package_spawner_1af9263180785d93503cd8b0bc05d4c2ea">00045</link> &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_hand">Hand</link>.<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_hand_1a61701f82b8f3fac8818954ec71804cb5">AttachmentFlags</link>&#32;<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_item_package_spawner_1af9263180785d93503cd8b0bc05d4c2ea">attachmentFlags</link>&#32;=&#32;<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_hand">Hand</link>.<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_hand_1a836a6cb55d2514dbed680981dfcc5505">defaultAttachmentFlags</link>;
+00046 
+<anchor xml:id="__item_package_spawner_8cs_source_1l00047"/><link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_item_package_spawner_1aefc74e62c39dfc6c5fd646dd8d18da61">00047</link> &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keywordtype">bool</emphasis>&#32;<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_item_package_spawner_1aefc74e62c39dfc6c5fd646dd8d18da61">takeBackItem</link>&#32;=&#32;<emphasis role="keyword">false</emphasis>;&#32;<emphasis role="comment">//&#32;if&#32;a&#32;hand&#32;enters&#32;this&#32;trigger&#32;and&#32;has&#32;the&#32;item&#32;this&#32;spawner&#32;dispenses&#32;at&#32;the&#32;top&#32;of&#32;the&#32;stack,&#32;remove&#32;it&#32;from&#32;the&#32;stack</emphasis>
+00048 
+<anchor xml:id="__item_package_spawner_8cs_source_1l00049"/><link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_item_package_spawner_1a882bfe6110001f43a76f2d35ffedb47f">00049</link> &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keywordtype">bool</emphasis>&#32;<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_item_package_spawner_1a882bfe6110001f43a76f2d35ffedb47f">acceptDifferentItems</link>&#32;=&#32;<emphasis role="keyword">false</emphasis>;
+00050 
+00051 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;GameObject&#32;spawnedItem;
+00052 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;<emphasis role="keywordtype">bool</emphasis>&#32;itemIsSpawned&#32;=&#32;<emphasis role="keyword">false</emphasis>;
+00053 
+<anchor xml:id="__item_package_spawner_8cs_source_1l00054"/><link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_item_package_spawner_1a5763bfcaa5ba69f9f0d178dde7cf11c8">00054</link> &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;UnityEvent&#32;<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_item_package_spawner_1a5763bfcaa5ba69f9f0d178dde7cf11c8">pickupEvent</link>;
+<anchor xml:id="__item_package_spawner_8cs_source_1l00055"/><link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_item_package_spawner_1adffe0a0db412218c6f2809234b4a2569">00055</link> &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;UnityEvent&#32;<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_item_package_spawner_1adffe0a0db412218c6f2809234b4a2569">dropEvent</link>;
+00056 
+<anchor xml:id="__item_package_spawner_8cs_source_1l00057"/><link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_item_package_spawner_1a32ac8e835d0264a34aecddee4c52f3d4">00057</link> &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keywordtype">bool</emphasis>&#32;<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_item_package_spawner_1a32ac8e835d0264a34aecddee4c52f3d4">justPickedUpItem</link>&#32;=&#32;<emphasis role="keyword">false</emphasis>;
+00058 
+00059 
+00060 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//-------------------------------------------------</emphasis>
+00061 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;CreatePreviewObject()
+00062 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00063 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(&#32;!useItemPackagePreview&#32;)
+00064 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00065 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>;
+00066 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00067 
+00068 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;ClearPreview();
+00069 
+00070 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(&#32;useItemPackagePreview&#32;)
+00071 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00072 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(&#32;<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_item_package_spawner_1aac24719049cb41f6b3a553bb1add8714">itemPackage</link>&#32;==&#32;<emphasis role="keyword">null</emphasis>&#32;)
+00073 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00074 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>;
+00075 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00076 
+00077 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(&#32;useFadedPreview&#32;==&#32;<emphasis role="keyword">false</emphasis>&#32;)&#32;<emphasis role="comment">//&#32;if&#32;we&#32;don&apos;t&#32;have&#32;a&#32;spawned&#32;item&#32;out&#32;there,&#32;use&#32;the&#32;regular&#32;preview</emphasis>
+00078 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00079 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(&#32;<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_item_package_spawner_1aac24719049cb41f6b3a553bb1add8714">itemPackage</link>.<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_item_package_1acb818fd48d980318ce81d8116a05b116">previewPrefab</link>&#32;!=&#32;<emphasis role="keyword">null</emphasis>&#32;)
+00080 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00081 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;previewObject&#32;=&#32;Instantiate(&#32;<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_item_package_spawner_1aac24719049cb41f6b3a553bb1add8714">itemPackage</link>.<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_item_package_1acb818fd48d980318ce81d8116a05b116">previewPrefab</link>,&#32;transform.position,&#32;Quaternion.identity&#32;)&#32;as&#32;GameObject;
+00082 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;previewObject.transform.parent&#32;=&#32;transform;
+00083 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;previewObject.transform.localRotation&#32;=&#32;Quaternion.identity;
+00084 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00085 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00086 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">else</emphasis>&#32;<emphasis role="comment">//&#32;there&apos;s&#32;a&#32;spawned&#32;item&#32;out&#32;there.&#32;Use&#32;the&#32;faded&#32;preview</emphasis>
+00087 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00088 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(&#32;<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_item_package_spawner_1aac24719049cb41f6b3a553bb1add8714">itemPackage</link>.<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_item_package_1af4a8d4ffaa214fee768ffee371483cba">fadedPreviewPrefab</link>&#32;!=&#32;<emphasis role="keyword">null</emphasis>&#32;)
+00089 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00090 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;previewObject&#32;=&#32;Instantiate(&#32;<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_item_package_spawner_1aac24719049cb41f6b3a553bb1add8714">itemPackage</link>.<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_item_package_1af4a8d4ffaa214fee768ffee371483cba">fadedPreviewPrefab</link>,&#32;transform.position,&#32;Quaternion.identity&#32;)&#32;as&#32;GameObject;
+00091 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;previewObject.transform.parent&#32;=&#32;transform;
+00092 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;previewObject.transform.localRotation&#32;=&#32;Quaternion.identity;
+00093 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00094 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00095 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00096 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00097 
+00098 
+00099 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//-------------------------------------------------</emphasis>
+00100 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordtype">void</emphasis>&#32;Start()
+00101 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00102 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;VerifyItemPackage();
+00103 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00104 
+00105 
+00106 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//-------------------------------------------------</emphasis>
+00107 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;VerifyItemPackage()
+00108 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00109 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(&#32;<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_item_package_spawner_1aac24719049cb41f6b3a553bb1add8714">itemPackage</link>&#32;==&#32;<emphasis role="keyword">null</emphasis>&#32;)
+00110 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00111 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;ItemPackageNotValid();
+00112 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00113 
+00114 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(&#32;<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_item_package_spawner_1aac24719049cb41f6b3a553bb1add8714">itemPackage</link>.<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_item_package_1af195c042577d09ed6b10a6feb05dff08">itemPrefab</link>&#32;==&#32;<emphasis role="keyword">null</emphasis>&#32;)
+00115 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00116 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;ItemPackageNotValid();
+00117 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00118 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00119 
+00120 
+00121 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//-------------------------------------------------</emphasis>
+00122 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;ItemPackageNotValid()
+00123 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00124 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;Debug.LogError(<emphasis role="stringliteral">&quot;&lt;b&gt;[SteamVR&#32;Interaction]&lt;/b&gt;&#32;ItemPackage&#32;assigned&#32;to&#32;&quot;</emphasis>&#32;+&#32;gameObject.name&#32;+&#32;<emphasis role="stringliteral">&quot;&#32;is&#32;not&#32;valid.&#32;Destroying&#32;this&#32;game&#32;object.&quot;</emphasis>&#32;);
+00125 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;Destroy(&#32;gameObject&#32;);
+00126 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00127 
+00128 
+00129 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//-------------------------------------------------</emphasis>
+00130 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;ClearPreview()
+00131 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00132 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">foreach</emphasis>&#32;(&#32;Transform&#32;child&#32;<emphasis role="keywordflow">in</emphasis>&#32;transform&#32;)
+00133 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00134 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(&#32;Time.time&#32;&gt;&#32;0&#32;)
+00135 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00136 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;GameObject.Destroy(&#32;child.gameObject&#32;);
+00137 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00138 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">else</emphasis>
+00139 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00140 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;GameObject.DestroyImmediate(&#32;child.gameObject&#32;);
+00141 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00142 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00143 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00144 
+00145 
+00146 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//-------------------------------------------------</emphasis>
+00147 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordtype">void</emphasis>&#32;Update()
+00148 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00149 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(&#32;(&#32;itemIsSpawned&#32;==&#32;<emphasis role="keyword">true</emphasis>&#32;)&#32;&amp;&amp;&#32;(&#32;spawnedItem&#32;==&#32;<emphasis role="keyword">null</emphasis>&#32;)&#32;)
+00150 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00151 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;itemIsSpawned&#32;=&#32;<emphasis role="keyword">false</emphasis>;
+00152 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;useFadedPreview&#32;=&#32;<emphasis role="keyword">false</emphasis>;
+00153 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_item_package_spawner_1adffe0a0db412218c6f2809234b4a2569">dropEvent</link>.Invoke();
+00154 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;CreatePreviewObject();
+00155 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00156 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00157 
+00158 
+00159 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//-------------------------------------------------</emphasis>
+00160 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;OnHandHoverBegin(&#32;Hand&#32;hand&#32;)
+00161 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00162 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;ItemPackage&#32;currentAttachedItemPackage&#32;=&#32;GetAttachedItemPackage(&#32;hand&#32;);
+00163 
+00164 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(&#32;currentAttachedItemPackage&#32;==&#32;<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_item_package_spawner_1aac24719049cb41f6b3a553bb1add8714">itemPackage</link>&#32;)&#32;<emphasis role="comment">//&#32;the&#32;item&#32;at&#32;the&#32;top&#32;of&#32;the&#32;hand&apos;s&#32;stack&#32;has&#32;an&#32;associated&#32;ItemPackage</emphasis>
+00165 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00166 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(&#32;<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_item_package_spawner_1aefc74e62c39dfc6c5fd646dd8d18da61">takeBackItem</link>&#32;&amp;&amp;&#32;!<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_item_package_spawner_1af4bd8f1d7a40de0808159fea06d25ff7">requireReleaseActionToReturn</link>&#32;)&#32;<emphasis role="comment">//&#32;if&#32;we&#32;want&#32;to&#32;take&#32;back&#32;matching&#32;items&#32;and&#32;aren&apos;t&#32;waiting&#32;for&#32;a&#32;trigger&#32;press</emphasis>
+00167 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00168 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;TakeBackItem(&#32;hand&#32;);
+00169 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00170 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00171 
+00172 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(!<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_item_package_spawner_1a00584c7086c9ecf9c07d0fcb012058ac">requireGrabActionToTake</link>)&#32;<emphasis role="comment">//&#32;we&#32;don&apos;t&#32;require&#32;trigger&#32;press&#32;for&#32;pickup.&#32;Spawn&#32;and&#32;attach&#32;object.</emphasis>
+00173 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00174 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;SpawnAndAttachObject(&#32;hand,&#32;<link linkend="_namespace_valve_1_1_v_r_1_1_interaction_system_1ae03ab84d315f5997fd000817bfb96a0f">GrabTypes</link>.Scripted&#32;);
+00175 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00176 
+00177 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_item_package_spawner_1a00584c7086c9ecf9c07d0fcb012058ac">requireGrabActionToTake</link>&#32;&amp;&amp;&#32;<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_item_package_spawner_1ac5a26b402843f3584a1713aba51d6cf1">showTriggerHint</link>&#32;)
+00178 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00179 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;hand.ShowGrabHint(<emphasis role="stringliteral">&quot;PickUp&quot;</emphasis>);
+00180 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00181 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00182 
+00183 
+00184 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//-------------------------------------------------</emphasis>
+00185 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;TakeBackItem(&#32;Hand&#32;hand&#32;)
+00186 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00187 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;RemoveMatchingItemsFromHandStack(&#32;<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_item_package_spawner_1aac24719049cb41f6b3a553bb1add8714">itemPackage</link>,&#32;hand&#32;);
+00188 
+00189 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(&#32;<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_item_package_spawner_1aac24719049cb41f6b3a553bb1add8714">itemPackage</link>.<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_item_package_1a2e9d3726fe44f4f2fc5a9fa9a906868b">packageType</link>&#32;==&#32;ItemPackage.ItemPackageType.TwoHanded&#32;)
+00190 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00191 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;RemoveMatchingItemsFromHandStack(&#32;<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_item_package_spawner_1aac24719049cb41f6b3a553bb1add8714">itemPackage</link>,&#32;hand.otherHand&#32;);
+00192 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00193 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00194 
+00195 
+00196 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//-------------------------------------------------</emphasis>
+00197 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;ItemPackage&#32;GetAttachedItemPackage(&#32;Hand&#32;hand&#32;)
+00198 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00199 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;GameObject&#32;currentAttachedObject&#32;=&#32;hand.currentAttachedObject;
+00200 
+00201 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(&#32;currentAttachedObject&#32;==&#32;<emphasis role="keyword">null</emphasis>&#32;)&#32;<emphasis role="comment">//&#32;verify&#32;the&#32;hand&#32;is&#32;holding&#32;something</emphasis>
+00202 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00203 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;<emphasis role="keyword">null</emphasis>;
+00204 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00205 
+00206 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;ItemPackageReference&#32;packageReference&#32;=&#32;hand.currentAttachedObject.GetComponent&lt;ItemPackageReference&gt;();
+00207 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(&#32;packageReference&#32;==&#32;<emphasis role="keyword">null</emphasis>&#32;)&#32;<emphasis role="comment">//&#32;verify&#32;the&#32;item&#32;in&#32;the&#32;hand&#32;is&#32;matchable</emphasis>
+00208 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00209 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;<emphasis role="keyword">null</emphasis>;
+00210 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00211 
+00212 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;ItemPackage&#32;attachedItemPackage&#32;=&#32;packageReference.itemPackage;&#32;<emphasis role="comment">//&#32;return&#32;the&#32;ItemPackage&#32;reference&#32;we&#32;find.</emphasis>
+00213 
+00214 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;attachedItemPackage;
+00215 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00216 
+00217 
+00218 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//-------------------------------------------------</emphasis>
+00219 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;HandHoverUpdate(&#32;Hand&#32;hand&#32;)
+00220 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00221 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(&#32;<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_item_package_spawner_1aefc74e62c39dfc6c5fd646dd8d18da61">takeBackItem</link>&#32;&amp;&amp;&#32;<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_item_package_spawner_1af4bd8f1d7a40de0808159fea06d25ff7">requireReleaseActionToReturn</link>&#32;)
+00222 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00223 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(hand.isActive)
+00224 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00225 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;ItemPackage&#32;currentAttachedItemPackage&#32;=&#32;GetAttachedItemPackage(&#32;hand&#32;);
+00226 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(currentAttachedItemPackage&#32;==&#32;<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_item_package_spawner_1aac24719049cb41f6b3a553bb1add8714">itemPackage</link>&#32;&amp;&amp;&#32;hand.IsGrabEnding(currentAttachedItemPackage.gameObject))
+00227 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00228 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;TakeBackItem(&#32;hand&#32;);
+00229 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>;&#32;<emphasis role="comment">//&#32;So&#32;that&#32;we&#32;don&apos;t&#32;pick&#32;up&#32;an&#32;ItemPackage&#32;the&#32;same&#32;frame&#32;that&#32;we&#32;return&#32;it</emphasis>
+00230 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00231 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00232 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00233 
+00234 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(&#32;<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_item_package_spawner_1a00584c7086c9ecf9c07d0fcb012058ac">requireGrabActionToTake</link>&#32;)
+00235 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00236 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_namespace_valve_1_1_v_r_1_1_interaction_system_1ae03ab84d315f5997fd000817bfb96a0f">GrabTypes</link>&#32;startingGrab&#32;=&#32;hand.GetGrabStarting();
+00237 
+00238 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(startingGrab&#32;!=&#32;<link linkend="_namespace_valve_1_1_v_r_1_1_interaction_system_1ae03ab84d315f5997fd000817bfb96a0f">GrabTypes</link>.None)
+00239 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00240 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;SpawnAndAttachObject(&#32;hand,&#32;<link linkend="_namespace_valve_1_1_v_r_1_1_interaction_system_1ae03ab84d315f5997fd000817bfb96a0f">GrabTypes</link>.Scripted);
+00241 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00242 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00243 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00244 
+00245 
+00246 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//-------------------------------------------------</emphasis>
+00247 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;OnHandHoverEnd(&#32;Hand&#32;hand&#32;)
+00248 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00249 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(&#32;!<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_item_package_spawner_1a32ac8e835d0264a34aecddee4c52f3d4">justPickedUpItem</link>&#32;&amp;&amp;&#32;<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_item_package_spawner_1a00584c7086c9ecf9c07d0fcb012058ac">requireGrabActionToTake</link>&#32;&amp;&amp;&#32;<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_item_package_spawner_1ac5a26b402843f3584a1713aba51d6cf1">showTriggerHint</link>&#32;)
+00250 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00251 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;hand.HideGrabHint();
+00252 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00253 
+00254 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_item_package_spawner_1a32ac8e835d0264a34aecddee4c52f3d4">justPickedUpItem</link>&#32;=&#32;<emphasis role="keyword">false</emphasis>;
+00255 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00256 
+00257 
+00258 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//-------------------------------------------------</emphasis>
+00259 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;RemoveMatchingItemsFromHandStack(&#32;ItemPackage&#32;package,&#32;Hand&#32;hand&#32;)
+00260 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00261 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(hand&#32;==&#32;<emphasis role="keyword">null</emphasis>)
+00262 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>;
+00263 
+00264 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">for</emphasis>&#32;(&#32;<emphasis role="keywordtype">int</emphasis>&#32;i&#32;=&#32;0;&#32;i&#32;&lt;&#32;hand.AttachedObjects.Count;&#32;i++&#32;)
+00265 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00266 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;ItemPackageReference&#32;packageReference&#32;=&#32;hand.AttachedObjects[i].attachedObject.GetComponent&lt;ItemPackageReference&gt;();
+00267 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(&#32;packageReference&#32;!=&#32;<emphasis role="keyword">null</emphasis>&#32;)
+00268 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00269 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;ItemPackage&#32;attachedObjectItemPackage&#32;=&#32;packageReference.itemPackage;
+00270 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(&#32;(&#32;attachedObjectItemPackage&#32;!=&#32;<emphasis role="keyword">null</emphasis>&#32;)&#32;&amp;&amp;&#32;(&#32;attachedObjectItemPackage&#32;==&#32;package&#32;)&#32;)
+00271 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00272 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;GameObject&#32;detachedItem&#32;=&#32;hand.AttachedObjects[i].attachedObject;
+00273 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;hand.DetachObject(&#32;detachedItem&#32;);
+00274 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00275 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00276 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00277 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00278 
+00279 
+00280 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//-------------------------------------------------</emphasis>
+00281 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;RemoveMatchingItemTypesFromHand(&#32;ItemPackage.ItemPackageType&#32;packageType,&#32;Hand&#32;hand&#32;)
+00282 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00283 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">for</emphasis>&#32;(&#32;<emphasis role="keywordtype">int</emphasis>&#32;i&#32;=&#32;0;&#32;i&#32;&lt;&#32;hand.AttachedObjects.Count;&#32;i++&#32;)
+00284 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00285 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;ItemPackageReference&#32;packageReference&#32;=&#32;hand.AttachedObjects[i].attachedObject.GetComponent&lt;ItemPackageReference&gt;();
+00286 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(&#32;packageReference&#32;!=&#32;<emphasis role="keyword">null</emphasis>&#32;)
+00287 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00288 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(&#32;packageReference.itemPackage.packageType&#32;==&#32;packageType&#32;)
+00289 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00290 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;GameObject&#32;detachedItem&#32;=&#32;hand.AttachedObjects[i].attachedObject;
+00291 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;hand.DetachObject(&#32;detachedItem&#32;);
+00292 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00293 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00294 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00295 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00296 
+00297 
+00298 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//-------------------------------------------------</emphasis>
+00299 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;SpawnAndAttachObject(&#32;Hand&#32;hand,&#32;<link linkend="_namespace_valve_1_1_v_r_1_1_interaction_system_1ae03ab84d315f5997fd000817bfb96a0f">GrabTypes</link>&#32;grabType&#32;)
+00300 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00301 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(&#32;hand.otherHand&#32;!=&#32;<emphasis role="keyword">null</emphasis>&#32;)
+00302 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00303 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//If&#32;the&#32;other&#32;hand&#32;has&#32;this&#32;item&#32;package,&#32;take&#32;it&#32;back&#32;from&#32;the&#32;other&#32;hand</emphasis>
+00304 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;ItemPackage&#32;otherHandItemPackage&#32;=&#32;GetAttachedItemPackage(&#32;hand.otherHand&#32;);
+00305 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(&#32;otherHandItemPackage&#32;==&#32;<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_item_package_spawner_1aac24719049cb41f6b3a553bb1add8714">itemPackage</link>&#32;)
+00306 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00307 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;TakeBackItem(&#32;hand.otherHand&#32;);
+00308 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00309 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00310 
+00311 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(&#32;<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_item_package_spawner_1ac5a26b402843f3584a1713aba51d6cf1">showTriggerHint</link>&#32;)
+00312 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00313 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;hand.HideGrabHint();
+00314 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00315 
+00316 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(&#32;<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_item_package_spawner_1aac24719049cb41f6b3a553bb1add8714">itemPackage</link>.<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_item_package_1ae44ffa29d6e137f6dadc09a359ae91b4">otherHandItemPrefab</link>&#32;!=&#32;<emphasis role="keyword">null</emphasis>&#32;)
+00317 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00318 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(&#32;hand.otherHand.hoverLocked&#32;)
+00319 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00320 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;Debug.Log(&#32;<emphasis role="stringliteral">&quot;&lt;b&gt;[SteamVR&#32;Interaction]&lt;/b&gt;&#32;Not&#32;attaching&#32;objects&#32;because&#32;other&#32;hand&#32;is&#32;hoverlocked&#32;and&#32;we&#32;can&apos;t&#32;deliver&#32;both&#32;items.&quot;</emphasis>&#32;);
+00321 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>;
+00322 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00323 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00324 
+00325 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;if&#32;we&apos;re&#32;trying&#32;to&#32;spawn&#32;a&#32;one-handed&#32;item,&#32;remove&#32;one&#32;and&#32;two-handed&#32;items&#32;from&#32;this&#32;hand&#32;and&#32;two-handed&#32;items&#32;from&#32;both&#32;hands</emphasis>
+00326 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(&#32;<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_item_package_spawner_1aac24719049cb41f6b3a553bb1add8714">itemPackage</link>.<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_item_package_1a2e9d3726fe44f4f2fc5a9fa9a906868b">packageType</link>&#32;==&#32;ItemPackage.ItemPackageType.OneHanded&#32;)
+00327 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00328 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;RemoveMatchingItemTypesFromHand(&#32;ItemPackage.ItemPackageType.OneHanded,&#32;hand&#32;);
+00329 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;RemoveMatchingItemTypesFromHand(&#32;ItemPackage.ItemPackageType.TwoHanded,&#32;hand&#32;);
+00330 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;RemoveMatchingItemTypesFromHand(&#32;ItemPackage.ItemPackageType.TwoHanded,&#32;hand.otherHand&#32;);
+00331 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00332 
+00333 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;if&#32;we&apos;re&#32;trying&#32;to&#32;spawn&#32;a&#32;two-handed&#32;item,&#32;remove&#32;one&#32;and&#32;two-handed&#32;items&#32;from&#32;both&#32;hands</emphasis>
+00334 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(&#32;<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_item_package_spawner_1aac24719049cb41f6b3a553bb1add8714">itemPackage</link>.<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_item_package_1a2e9d3726fe44f4f2fc5a9fa9a906868b">packageType</link>&#32;==&#32;ItemPackage.ItemPackageType.TwoHanded&#32;)
+00335 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00336 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;RemoveMatchingItemTypesFromHand(&#32;ItemPackage.ItemPackageType.OneHanded,&#32;hand&#32;);
+00337 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;RemoveMatchingItemTypesFromHand(&#32;ItemPackage.ItemPackageType.OneHanded,&#32;hand.otherHand&#32;);
+00338 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;RemoveMatchingItemTypesFromHand(&#32;ItemPackage.ItemPackageType.TwoHanded,&#32;hand&#32;);
+00339 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;RemoveMatchingItemTypesFromHand(&#32;ItemPackage.ItemPackageType.TwoHanded,&#32;hand.otherHand&#32;);
+00340 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00341 
+00342 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;spawnedItem&#32;=&#32;GameObject.Instantiate(&#32;<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_item_package_spawner_1aac24719049cb41f6b3a553bb1add8714">itemPackage</link>.<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_item_package_1af195c042577d09ed6b10a6feb05dff08">itemPrefab</link>&#32;);
+00343 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;spawnedItem.SetActive(&#32;<emphasis role="keyword">true</emphasis>&#32;);
+00344 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;hand.AttachObject(&#32;spawnedItem,&#32;grabType,&#32;<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_item_package_spawner_1af9263180785d93503cd8b0bc05d4c2ea">attachmentFlags</link>&#32;);
+00345 
+00346 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(&#32;(&#32;<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_item_package_spawner_1aac24719049cb41f6b3a553bb1add8714">itemPackage</link>.<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_item_package_1ae44ffa29d6e137f6dadc09a359ae91b4">otherHandItemPrefab</link>&#32;!=&#32;<emphasis role="keyword">null</emphasis>&#32;)&#32;&amp;&amp;&#32;(&#32;hand.otherHand.isActive&#32;)&#32;)
+00347 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00348 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;GameObject&#32;otherHandObjectToAttach&#32;=&#32;GameObject.Instantiate(&#32;<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_item_package_spawner_1aac24719049cb41f6b3a553bb1add8714">itemPackage</link>.<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_item_package_1ae44ffa29d6e137f6dadc09a359ae91b4">otherHandItemPrefab</link>&#32;);
+00349 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;otherHandObjectToAttach.SetActive(&#32;<emphasis role="keyword">true</emphasis>&#32;);
+00350 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;hand.otherHand.AttachObject(&#32;otherHandObjectToAttach,&#32;grabType,&#32;<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_item_package_spawner_1af9263180785d93503cd8b0bc05d4c2ea">attachmentFlags</link>&#32;);
+00351 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00352 
+00353 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;itemIsSpawned&#32;=&#32;<emphasis role="keyword">true</emphasis>;
+00354 
+00355 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_item_package_spawner_1a32ac8e835d0264a34aecddee4c52f3d4">justPickedUpItem</link>&#32;=&#32;<emphasis role="keyword">true</emphasis>;
+00356 
+00357 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(&#32;<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_item_package_spawner_1aefc74e62c39dfc6c5fd646dd8d18da61">takeBackItem</link>&#32;)
+00358 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00359 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;useFadedPreview&#32;=&#32;<emphasis role="keyword">true</emphasis>;
+00360 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_item_package_spawner_1a5763bfcaa5ba69f9f0d178dde7cf11c8">pickupEvent</link>.Invoke();
+00361 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;CreatePreviewObject();
+00362 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00363 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00364 &#32;&#32;&#32;&#32;}
+00365 }
+</programlisting></section>

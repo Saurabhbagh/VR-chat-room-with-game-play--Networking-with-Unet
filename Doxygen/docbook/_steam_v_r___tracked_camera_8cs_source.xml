@@ -1,0 +1,225 @@
+<?xml version='1.0' encoding='UTF-8' standalone='no'?>
+<section xmlns="http://docbook.org/ns/docbook" version="5.0" xmlns:xlink="http://www.w3.org/1999/xlink" xml:id="__steam_v_r___tracked_camera_8cs_source">
+<title>SteamVR_TrackedCamera.cs</title>
+<indexterm><primary>O:/GitHUBMINIPRoject/Assets/SteamVR/Scripts/SteamVR_TrackedCamera.cs</primary></indexterm>
+<programlisting>00001 <emphasis role="comment">//=======&#32;Copyright&#32;(c)&#32;Valve&#32;Corporation,&#32;All&#32;rights&#32;reserved.&#32;===============</emphasis>
+00002 <emphasis role="comment">//</emphasis>
+00003 <emphasis role="comment">//&#32;Purpose:&#32;Provides&#32;access&#32;to&#32;video&#32;feed&#32;and&#32;poses&#32;of&#32;tracked&#32;cameras.</emphasis>
+00004 <emphasis role="comment">//</emphasis>
+00005 <emphasis role="comment">//&#32;Usage:</emphasis>
+00006 <emphasis role="comment">//&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;var&#32;source&#32;=&#32;SteamVR_TrackedCamera.Distorted();</emphasis>
+00007 <emphasis role="comment">//&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;var&#32;source&#32;=&#32;SteamVR_TrackedCamera.Undistorted();</emphasis>
+00008 <emphasis role="comment">//&#32;or</emphasis>
+00009 <emphasis role="comment">//&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;var&#32;undistorted&#32;=&#32;true;&#32;//&#32;or&#32;false</emphasis>
+00010 <emphasis role="comment">//&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;var&#32;source&#32;=&#32;SteamVR_TrackedCamera.Source(undistorted);</emphasis>
+00011 <emphasis role="comment">//</emphasis>
+00012 <emphasis role="comment">//&#32;-&#32;Distorted&#32;feeds&#32;are&#32;the&#32;decoded&#32;images&#32;from&#32;the&#32;camera.</emphasis>
+00013 <emphasis role="comment">//&#32;-&#32;Undistorted&#32;feeds&#32;correct&#32;for&#32;the&#32;camera&#32;lens&#32;distortion&#32;(a.k.a.&#32;fisheye)</emphasis>
+00014 <emphasis role="comment">//&#32;&#32;&#32;to&#32;make&#32;straight&#32;lines&#32;straight.</emphasis>
+00015 <emphasis role="comment">//</emphasis>
+00016 <emphasis role="comment">//&#32;VideoStreamTexture&#32;objects&#32;must&#32;be&#32;symmetrically&#32;Acquired&#32;and&#32;Released&#32;to</emphasis>
+00017 <emphasis role="comment">//&#32;ensure&#32;the&#32;video&#32;stream&#32;is&#32;activated,&#32;and&#32;shutdown&#32;properly&#32;once&#32;there&#32;are</emphasis>
+00018 <emphasis role="comment">//&#32;no&#32;more&#32;consumers.&#32;&#32;You&#32;only&#32;need&#32;to&#32;Acquire&#32;once&#32;when&#32;starting&#32;to&#32;use&#32;a</emphasis>
+00019 <emphasis role="comment">//&#32;stream,&#32;and&#32;Release&#32;when&#32;you&#32;are&#32;done&#32;using&#32;it&#32;(as&#32;opposed&#32;to&#32;every&#32;frame).</emphasis>
+00020 <emphasis role="comment">//</emphasis>
+00021 <emphasis role="comment">//=============================================================================</emphasis>
+00022 
+00023 <emphasis role="keyword">using</emphasis>&#32;<link linkend="__balloon_8cs_1a7d67e097df9376eb709b6a23aa3c7d23">UnityEngine</link>;
+00024 <emphasis role="keyword">using</emphasis>&#32;<link linkend="_namespace_valve">Valve</link>.<link linkend="_namespace_valve_1_1_v_r">VR</link>;
+00025 
+00026 <emphasis role="keyword">namespace&#32;</emphasis><link linkend="_namespace_valve_1_1_v_r">Valve.VR</link>
+00027 {
+<anchor xml:id="__steam_v_r___tracked_camera_8cs_source_1l00028"/><link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___tracked_camera">00028</link> &#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keyword">class&#32;</emphasis><link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___tracked_camera">SteamVR_TrackedCamera</link>
+00029 &#32;&#32;&#32;&#32;{
+<anchor xml:id="__steam_v_r___tracked_camera_8cs_source_1l00030"/><link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___tracked_camera_1_1_video_stream_texture">00030</link> &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keyword">class&#32;</emphasis><link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___tracked_camera_1_1_video_stream_texture">VideoStreamTexture</link>
+00031 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+<anchor xml:id="__steam_v_r___tracked_camera_8cs_source_1l00032"/><link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___tracked_camera_1_1_video_stream_texture_1a3698416efc663ab4a07bdf2c7778a235">00032</link> &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___tracked_camera_1_1_video_stream_texture_1a3698416efc663ab4a07bdf2c7778a235">VideoStreamTexture</link>(uint&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___tracked_camera_1_1_video_stream_texture_1a6ea68ffe28dad910b43405c79984322a">deviceIndex</link>,&#32;<emphasis role="keywordtype">bool</emphasis>&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___tracked_camera_1_1_video_stream_texture_1a56cd0bedd92d337384c2639142df95cd">undistorted</link>)
+00033 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00034 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;this.undistorted&#32;=&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___tracked_camera_1_1_video_stream_texture_1a56cd0bedd92d337384c2639142df95cd">undistorted</link>;
+00035 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;videostream&#32;=&#32;Stream(<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___tracked_camera_1_1_video_stream_texture_1a6ea68ffe28dad910b43405c79984322a">deviceIndex</link>);
+00036 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+<anchor xml:id="__steam_v_r___tracked_camera_8cs_source_1l00037"/><link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___tracked_camera_1_1_video_stream_texture_1a56cd0bedd92d337384c2639142df95cd">00037</link> &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keywordtype">bool</emphasis>&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___tracked_camera_1_1_video_stream_texture_1a56cd0bedd92d337384c2639142df95cd">undistorted</link>&#32;{&#32;<emphasis role="keyword">get</emphasis>;&#32;<emphasis role="keyword">private</emphasis>&#32;<emphasis role="keyword">set</emphasis>;&#32;}
+<anchor xml:id="__steam_v_r___tracked_camera_8cs_source_1l00038"/><link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___tracked_camera_1_1_video_stream_texture_1a6ea68ffe28dad910b43405c79984322a">00038</link> &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;uint&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___tracked_camera_1_1_video_stream_texture_1a6ea68ffe28dad910b43405c79984322a">deviceIndex</link>&#32;{&#32;<emphasis role="keyword">get</emphasis>&#32;{&#32;<emphasis role="keywordflow">return</emphasis>&#32;videostream.deviceIndex;&#32;}&#32;}
+<anchor xml:id="__steam_v_r___tracked_camera_8cs_source_1l00039"/><link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___tracked_camera_1_1_video_stream_texture_1a8fd8e16114a8681647aeb2964909315c">00039</link> &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keywordtype">bool</emphasis>&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___tracked_camera_1_1_video_stream_texture_1a8fd8e16114a8681647aeb2964909315c">hasCamera</link>&#32;{&#32;<emphasis role="keyword">get</emphasis>&#32;{&#32;<emphasis role="keywordflow">return</emphasis>&#32;videostream.hasCamera;&#32;}&#32;}
+<anchor xml:id="__steam_v_r___tracked_camera_8cs_source_1l00040"/><link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___tracked_camera_1_1_video_stream_texture_1ac8281d66d7d4493e2f5d609b8941af96">00040</link> &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keywordtype">bool</emphasis>&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___tracked_camera_1_1_video_stream_texture_1ac8281d66d7d4493e2f5d609b8941af96">hasTracking</link>&#32;{&#32;<emphasis role="keyword">get</emphasis>&#32;{&#32;Update();&#32;<emphasis role="keywordflow">return</emphasis>&#32;header.<link linkend="_struct_valve_1_1_v_r_1_1_camera_video_stream_frame_header__t_1a21d66f9ef4a4ad7238f9a0e6fec91d17">standingTrackedDevicePose</link>.<link linkend="_struct_valve_1_1_v_r_1_1_tracked_device_pose__t_1a369a8189315516667d0c1cd457b04a81">bPoseIsValid</link>;&#32;}&#32;}
+<anchor xml:id="__steam_v_r___tracked_camera_8cs_source_1l00041"/><link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___tracked_camera_1_1_video_stream_texture_1ad013fa644d9e02a03ccdeadd80be453b">00041</link> &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;uint&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___tracked_camera_1_1_video_stream_texture_1ad013fa644d9e02a03ccdeadd80be453b">frameId</link>&#32;{&#32;<emphasis role="keyword">get</emphasis>&#32;{&#32;Update();&#32;<emphasis role="keywordflow">return</emphasis>&#32;header.<link linkend="_struct_valve_1_1_v_r_1_1_camera_video_stream_frame_header__t_1a1e230fc8d6d95a9ff0ed6980993abff9">nFrameSequence</link>;&#32;}&#32;}
+<anchor xml:id="__steam_v_r___tracked_camera_8cs_source_1l00042"/><link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___tracked_camera_1_1_video_stream_texture_1a675f3adde27a60678ca35599c4b9d416">00042</link> &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<link linkend="_struct_valve_1_1_v_r_1_1_v_r_texture_bounds__t">VRTextureBounds_t</link>&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___tracked_camera_1_1_video_stream_texture_1a675f3adde27a60678ca35599c4b9d416">frameBounds</link>&#32;{&#32;<emphasis role="keyword">get</emphasis>;&#32;<emphasis role="keyword">private</emphasis>&#32;<emphasis role="keyword">set</emphasis>;&#32;}
+<anchor xml:id="__steam_v_r___tracked_camera_8cs_source_1l00043"/><link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___tracked_camera_1_1_video_stream_texture_1a0571a50693bd722c576c14cd0f09c329">00043</link> &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<link linkend="_namespace_valve_1_1_v_r_1a9962211bc3fe98c2683db188c12c9afd">EVRTrackedCameraFrameType</link>&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___tracked_camera_1_1_video_stream_texture_1a0571a50693bd722c576c14cd0f09c329">frameType</link>&#32;{&#32;<emphasis role="keyword">get</emphasis>&#32;{&#32;<emphasis role="keywordflow">return</emphasis>&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___tracked_camera_1_1_video_stream_texture_1a56cd0bedd92d337384c2639142df95cd">undistorted</link>&#32;?&#32;<link linkend="_namespace_valve_1_1_v_r_1a9962211bc3fe98c2683db188c12c9afd">EVRTrackedCameraFrameType</link>.Undistorted&#32;:&#32;<link linkend="_namespace_valve_1_1_v_r_1a9962211bc3fe98c2683db188c12c9afd">EVRTrackedCameraFrameType</link>.Distorted;&#32;}&#32;}
+00044 
+00045 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;Texture2D&#32;_texture;
+<anchor xml:id="__steam_v_r___tracked_camera_8cs_source_1l00046"/><link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___tracked_camera_1_1_video_stream_texture_1aac563079d0750582456a1b4c033296e5">00046</link> &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;Texture2D&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___tracked_camera_1_1_video_stream_texture_1aac563079d0750582456a1b4c033296e5">texture</link>&#32;{&#32;<emphasis role="keyword">get</emphasis>&#32;{&#32;Update();&#32;<emphasis role="keywordflow">return</emphasis>&#32;_texture;&#32;}&#32;}
+00047 
+<anchor xml:id="__steam_v_r___tracked_camera_8cs_source_1l00048"/><link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___tracked_camera_1_1_video_stream_texture_1ab7ec00ab97aa0173682d74f9dc9731e7">00048</link> &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;SteamVR_Utils.RigidTransform&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___tracked_camera_1_1_video_stream_texture_1ab7ec00ab97aa0173682d74f9dc9731e7">transform</link>&#32;{&#32;<emphasis role="keyword">get</emphasis>&#32;{&#32;Update();&#32;<emphasis role="keywordflow">return</emphasis>&#32;<emphasis role="keyword">new</emphasis>&#32;SteamVR_Utils.RigidTransform(header.<link linkend="_struct_valve_1_1_v_r_1_1_camera_video_stream_frame_header__t_1a21d66f9ef4a4ad7238f9a0e6fec91d17">standingTrackedDevicePose</link>.<link linkend="_struct_valve_1_1_v_r_1_1_tracked_device_pose__t_1a5508777d938e49d47c51f8d98c7bdf1f">mDeviceToAbsoluteTracking</link>);&#32;}&#32;}
+<anchor xml:id="__steam_v_r___tracked_camera_8cs_source_1l00049"/><link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___tracked_camera_1_1_video_stream_texture_1af0f569f63ee5e5dedbe5e0e28ac8388e">00049</link> &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;Vector3&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___tracked_camera_1_1_video_stream_texture_1af0f569f63ee5e5dedbe5e0e28ac8388e">velocity</link>&#32;{&#32;<emphasis role="keyword">get</emphasis>&#32;{&#32;Update();&#32;var&#32;pose&#32;=&#32;header.<link linkend="_struct_valve_1_1_v_r_1_1_camera_video_stream_frame_header__t_1a21d66f9ef4a4ad7238f9a0e6fec91d17">standingTrackedDevicePose</link>;&#32;<emphasis role="keywordflow">return</emphasis>&#32;<emphasis role="keyword">new</emphasis>&#32;Vector3(pose.vVelocity.v0,&#32;pose.vVelocity.v1,&#32;-pose.vVelocity.v2);&#32;}&#32;}
+<anchor xml:id="__steam_v_r___tracked_camera_8cs_source_1l00050"/><link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___tracked_camera_1_1_video_stream_texture_1a442e62b0ad11af50d02a113036871326">00050</link> &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;Vector3&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___tracked_camera_1_1_video_stream_texture_1a442e62b0ad11af50d02a113036871326">angularVelocity</link>&#32;{&#32;<emphasis role="keyword">get</emphasis>&#32;{&#32;Update();&#32;var&#32;pose&#32;=&#32;header.<link linkend="_struct_valve_1_1_v_r_1_1_camera_video_stream_frame_header__t_1a21d66f9ef4a4ad7238f9a0e6fec91d17">standingTrackedDevicePose</link>;&#32;<emphasis role="keywordflow">return</emphasis>&#32;<emphasis role="keyword">new</emphasis>&#32;Vector3(-pose.vAngularVelocity.v0,&#32;-pose.vAngularVelocity.v1,&#32;pose.vAngularVelocity.v2);&#32;}&#32;}
+00051 
+<anchor xml:id="__steam_v_r___tracked_camera_8cs_source_1l00052"/><link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___tracked_camera_1_1_video_stream_texture_1ab7d12d609974b8a51eed40528a98fad8">00052</link> &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<link linkend="_struct_valve_1_1_v_r_1_1_tracked_device_pose__t">TrackedDevicePose_t</link>&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___tracked_camera_1_1_video_stream_texture_1ab7d12d609974b8a51eed40528a98fad8">GetPose</link>()&#32;{&#32;Update();&#32;<emphasis role="keywordflow">return</emphasis>&#32;header.<link linkend="_struct_valve_1_1_v_r_1_1_camera_video_stream_frame_header__t_1a21d66f9ef4a4ad7238f9a0e6fec91d17">standingTrackedDevicePose</link>;&#32;}
+00053 
+<anchor xml:id="__steam_v_r___tracked_camera_8cs_source_1l00054"/><link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___tracked_camera_1_1_video_stream_texture_1a6a66f017f4f3287adb4d8c13cceef21f">00054</link> &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;ulong&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___tracked_camera_1_1_video_stream_texture_1a6a66f017f4f3287adb4d8c13cceef21f">Acquire</link>()
+00055 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00056 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;videostream.Acquire();
+00057 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+<anchor xml:id="__steam_v_r___tracked_camera_8cs_source_1l00058"/><link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___tracked_camera_1_1_video_stream_texture_1a0facad167caddd1d7c44f71ffb616922">00058</link> &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;ulong&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___tracked_camera_1_1_video_stream_texture_1a0facad167caddd1d7c44f71ffb616922">Release</link>()
+00059 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00060 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;var&#32;result&#32;=&#32;videostream.Release();
+00061 
+00062 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(videostream.handle&#32;==&#32;0)
+00063 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00064 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="__t_m_pro___font_asset_creator_window_8cs_1aef19bab18b9814edeef255c43e4f6bbc">Object</link>.Destroy(_texture);
+00065 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;_texture&#32;=&#32;<emphasis role="keyword">null</emphasis>;
+00066 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00067 
+00068 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;result;
+00069 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00070 
+00071 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordtype">int</emphasis>&#32;prevFrameCount&#32;=&#32;-1;
+00072 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordtype">void</emphasis>&#32;Update()
+00073 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00074 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(Time.frameCount&#32;==&#32;prevFrameCount)
+00075 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>;
+00076 
+00077 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;prevFrameCount&#32;=&#32;Time.frameCount;
+00078 
+00079 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(videostream.handle&#32;==&#32;0)
+00080 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>;
+00081 
+00082 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;var&#32;vr&#32;=&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r">SteamVR</link>.<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r_1af374389920329f77814037a571f6bf2f">instance</link>;
+00083 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(vr&#32;==&#32;<emphasis role="keyword">null</emphasis>)
+00084 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>;
+00085 
+00086 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;var&#32;trackedCamera&#32;=&#32;<link linkend="_class_valve_1_1_v_r_1_1_open_v_r">OpenVR</link>.<link linkend="_class_valve_1_1_v_r_1_1_open_v_r_1a5ea08ced399257a11cd8ebc9efebfa1f">TrackedCamera</link>;
+00087 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(trackedCamera&#32;==&#32;<emphasis role="keyword">null</emphasis>)
+00088 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>;
+00089 
+00090 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;var&#32;nativeTex&#32;=&#32;System.IntPtr.Zero;
+00091 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;var&#32;deviceTexture&#32;=&#32;(_texture&#32;!=&#32;<emphasis role="keyword">null</emphasis>)&#32;?&#32;_texture&#32;:&#32;<emphasis role="keyword">new</emphasis>&#32;Texture2D(2,&#32;2);
+00092 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;var&#32;headerSize&#32;=&#32;(uint)System.Runtime.InteropServices.Marshal.SizeOf(header.GetType());
+00093 
+00094 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(vr.textureType&#32;==&#32;<link linkend="_namespace_valve_1_1_v_r_1a9481de640e411eef49c2f3fdca82eaa3">ETextureType</link>.OpenGL)
+00095 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00096 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(glTextureId&#32;!=&#32;0)
+00097 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;trackedCamera.<link linkend="_class_valve_1_1_v_r_1_1_c_v_r_tracked_camera_1af058ef5a3335e96a1b4510c7bc7745ad">ReleaseVideoStreamTextureGL</link>(videostream.handle,&#32;glTextureId);
+00098 
+00099 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(trackedCamera.GetVideoStreamTextureGL(videostream.handle,&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___tracked_camera_1_1_video_stream_texture_1a0571a50693bd722c576c14cd0f09c329">frameType</link>,&#32;ref&#32;glTextureId,&#32;ref&#32;header,&#32;headerSize)&#32;!=&#32;<link linkend="_namespace_valve_1_1_v_r_1ad0e012e846f5d93848783c044614cfd3">EVRTrackedCameraError</link>.None)
+00100 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>;
+00101 
+00102 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;nativeTex&#32;=&#32;(System.IntPtr)glTextureId;
+00103 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00104 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">else</emphasis>&#32;<emphasis role="keywordflow">if</emphasis>&#32;(vr.textureType&#32;==&#32;<link linkend="_namespace_valve_1_1_v_r_1a9481de640e411eef49c2f3fdca82eaa3">ETextureType</link>.DirectX)
+00105 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00106 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(trackedCamera.GetVideoStreamTextureD3D11(videostream.handle,&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___tracked_camera_1_1_video_stream_texture_1a0571a50693bd722c576c14cd0f09c329">frameType</link>,&#32;deviceTexture.GetNativeTexturePtr(),&#32;ref&#32;nativeTex,&#32;ref&#32;header,&#32;headerSize)&#32;!=&#32;<link linkend="_namespace_valve_1_1_v_r_1ad0e012e846f5d93848783c044614cfd3">EVRTrackedCameraError</link>.None)
+00107 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>;
+00108 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00109 
+00110 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(_texture&#32;==&#32;<emphasis role="keyword">null</emphasis>)
+00111 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00112 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;_texture&#32;=&#32;Texture2D.CreateExternalTexture((<emphasis role="keywordtype">int</emphasis>)header.<link linkend="_struct_valve_1_1_v_r_1_1_camera_video_stream_frame_header__t_1a7fd61b31649bf10e1aec2b1b916a23e5">nWidth</link>,&#32;(<emphasis role="keywordtype">int</emphasis>)header.<link linkend="_struct_valve_1_1_v_r_1_1_camera_video_stream_frame_header__t_1ae5f4a7affc7cb01bbef60354dd8836a5">nHeight</link>,&#32;TextureFormat.RGBA32,&#32;<emphasis role="keyword">false</emphasis>,&#32;<emphasis role="keyword">false</emphasis>,&#32;nativeTex);
+00113 
+00114 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;uint&#32;width&#32;=&#32;0,&#32;height&#32;=&#32;0;
+00115 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;var&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___tracked_camera_1_1_video_stream_texture_1a675f3adde27a60678ca35599c4b9d416">frameBounds</link>&#32;=&#32;<emphasis role="keyword">new</emphasis>&#32;<link linkend="_struct_valve_1_1_v_r_1_1_v_r_texture_bounds__t">VRTextureBounds_t</link>();
+00116 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(trackedCamera.GetVideoStreamTextureSize(<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___tracked_camera_1_1_video_stream_texture_1a6ea68ffe28dad910b43405c79984322a">deviceIndex</link>,&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___tracked_camera_1_1_video_stream_texture_1a0571a50693bd722c576c14cd0f09c329">frameType</link>,&#32;ref&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___tracked_camera_1_1_video_stream_texture_1a675f3adde27a60678ca35599c4b9d416">frameBounds</link>,&#32;ref&#32;width,&#32;ref&#32;height)&#32;==&#32;<link linkend="_namespace_valve_1_1_v_r_1ad0e012e846f5d93848783c044614cfd3">EVRTrackedCameraError</link>.None)
+00117 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00118 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;Account&#32;for&#32;textures&#32;being&#32;upside-down&#32;in&#32;Unity.</emphasis>
+00119 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___tracked_camera_1_1_video_stream_texture_1a675f3adde27a60678ca35599c4b9d416">frameBounds</link>.<link linkend="_struct_valve_1_1_v_r_1_1_v_r_texture_bounds__t_1a88fbc926a5f11015254789bc4cc3c25e">vMin</link>&#32;=&#32;1.0f&#32;-&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___tracked_camera_1_1_video_stream_texture_1a675f3adde27a60678ca35599c4b9d416">frameBounds</link>.<link linkend="_struct_valve_1_1_v_r_1_1_v_r_texture_bounds__t_1a88fbc926a5f11015254789bc4cc3c25e">vMin</link>;
+00120 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___tracked_camera_1_1_video_stream_texture_1a675f3adde27a60678ca35599c4b9d416">frameBounds</link>.<link linkend="_struct_valve_1_1_v_r_1_1_v_r_texture_bounds__t_1ae807c9a10740b68fbcef3fca1de3ad30">vMax</link>&#32;=&#32;1.0f&#32;-&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___tracked_camera_1_1_video_stream_texture_1a675f3adde27a60678ca35599c4b9d416">frameBounds</link>.<link linkend="_struct_valve_1_1_v_r_1_1_v_r_texture_bounds__t_1ae807c9a10740b68fbcef3fca1de3ad30">vMax</link>;
+00121 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;this.frameBounds&#32;=&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___tracked_camera_1_1_video_stream_texture_1a675f3adde27a60678ca35599c4b9d416">frameBounds</link>;
+00122 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00123 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00124 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">else</emphasis>
+00125 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00126 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;_texture.UpdateExternalTexture(nativeTex);
+00127 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00128 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00129 
+00130 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;uint&#32;glTextureId;
+00131 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;VideoStream&#32;videostream;
+00132 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_struct_valve_1_1_v_r_1_1_camera_video_stream_frame_header__t">CameraVideoStreamFrameHeader_t</link>&#32;header;
+00133 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00134 
+00135 <emphasis role="preprocessor">&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;#region&#32;Top&#32;level&#32;accessors.</emphasis>
+00136 
+<anchor xml:id="__steam_v_r___tracked_camera_8cs_source_1l00137"/><link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___tracked_camera_1af614d0ab93dbc37820059511bc5a838a">00137</link> &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keyword">static</emphasis>&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___tracked_camera_1_1_video_stream_texture">VideoStreamTexture</link>&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___tracked_camera_1af614d0ab93dbc37820059511bc5a838a">Distorted</link>(<emphasis role="keywordtype">int</emphasis>&#32;deviceIndex&#32;=&#32;(<emphasis role="keywordtype">int</emphasis>)<link linkend="_class_valve_1_1_v_r_1_1_open_v_r">OpenVR</link>.<link linkend="_class_valve_1_1_v_r_1_1_open_v_r_1ae12d105c6f832aa4524e2608b26896e0">k_unTrackedDeviceIndex_Hmd</link>)
+00138 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00139 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(distorted&#32;==&#32;<emphasis role="keyword">null</emphasis>)
+00140 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;distorted&#32;=&#32;<emphasis role="keyword">new</emphasis>&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___tracked_camera_1_1_video_stream_texture">VideoStreamTexture</link>[<link linkend="_class_valve_1_1_v_r_1_1_open_v_r">OpenVR</link>.<link linkend="_class_valve_1_1_v_r_1_1_open_v_r_1aec52ee031bff706f1b96c7f2c8ebc0ac">k_unMaxTrackedDeviceCount</link>];
+00141 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(distorted[deviceIndex]&#32;==&#32;<emphasis role="keyword">null</emphasis>)
+00142 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;distorted[deviceIndex]&#32;=&#32;<emphasis role="keyword">new</emphasis>&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___tracked_camera_1_1_video_stream_texture">VideoStreamTexture</link>((uint)deviceIndex,&#32;<emphasis role="keyword">false</emphasis>);
+00143 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;distorted[deviceIndex];
+00144 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00145 
+<anchor xml:id="__steam_v_r___tracked_camera_8cs_source_1l00146"/><link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___tracked_camera_1aa00f26ee2d0be48d102d08fcca88f238">00146</link> &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keyword">static</emphasis>&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___tracked_camera_1_1_video_stream_texture">VideoStreamTexture</link>&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___tracked_camera_1aa00f26ee2d0be48d102d08fcca88f238">Undistorted</link>(<emphasis role="keywordtype">int</emphasis>&#32;deviceIndex&#32;=&#32;(<emphasis role="keywordtype">int</emphasis>)<link linkend="_class_valve_1_1_v_r_1_1_open_v_r">OpenVR</link>.<link linkend="_class_valve_1_1_v_r_1_1_open_v_r_1ae12d105c6f832aa4524e2608b26896e0">k_unTrackedDeviceIndex_Hmd</link>)
+00147 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00148 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(undistorted&#32;==&#32;<emphasis role="keyword">null</emphasis>)
+00149 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;undistorted&#32;=&#32;<emphasis role="keyword">new</emphasis>&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___tracked_camera_1_1_video_stream_texture">VideoStreamTexture</link>[<link linkend="_class_valve_1_1_v_r_1_1_open_v_r">OpenVR</link>.<link linkend="_class_valve_1_1_v_r_1_1_open_v_r_1aec52ee031bff706f1b96c7f2c8ebc0ac">k_unMaxTrackedDeviceCount</link>];
+00150 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(undistorted[deviceIndex]&#32;==&#32;<emphasis role="keyword">null</emphasis>)
+00151 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;undistorted[deviceIndex]&#32;=&#32;<emphasis role="keyword">new</emphasis>&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___tracked_camera_1_1_video_stream_texture">VideoStreamTexture</link>((uint)deviceIndex,&#32;<emphasis role="keyword">true</emphasis>);
+00152 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;undistorted[deviceIndex];
+00153 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00154 
+<anchor xml:id="__steam_v_r___tracked_camera_8cs_source_1l00155"/><link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___tracked_camera_1a474c92d43ed5f58a47164e04fa1d738d">00155</link> &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keyword">static</emphasis>&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___tracked_camera_1_1_video_stream_texture">VideoStreamTexture</link>&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___tracked_camera_1a474c92d43ed5f58a47164e04fa1d738d">Source</link>(<emphasis role="keywordtype">bool</emphasis>&#32;undistorted,&#32;<emphasis role="keywordtype">int</emphasis>&#32;deviceIndex&#32;=&#32;(<emphasis role="keywordtype">int</emphasis>)<link linkend="_class_valve_1_1_v_r_1_1_open_v_r">OpenVR</link>.<link linkend="_class_valve_1_1_v_r_1_1_open_v_r_1ae12d105c6f832aa4524e2608b26896e0">k_unTrackedDeviceIndex_Hmd</link>)
+00156 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00157 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;undistorted&#32;?&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___tracked_camera_1aa00f26ee2d0be48d102d08fcca88f238">Undistorted</link>(deviceIndex)&#32;:&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___tracked_camera_1af614d0ab93dbc37820059511bc5a838a">Distorted</link>(deviceIndex);
+00158 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00159 
+00160 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;<emphasis role="keyword">static</emphasis>&#32;VideoStreamTexture[]&#32;distorted,&#32;undistorted;
+00161 
+00162 <emphasis role="preprocessor">&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;#endregion</emphasis>
+00163 
+00164 <emphasis role="preprocessor">&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;#region&#32;Internal&#32;class&#32;to&#32;manage&#32;lifetime&#32;of&#32;video&#32;streams&#32;(per&#32;device).</emphasis>
+00165 
+00166 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">class&#32;</emphasis>VideoStream
+00167 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00168 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;VideoStream(uint&#32;deviceIndex)
+00169 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00170 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;this.deviceIndex&#32;=&#32;deviceIndex;
+00171 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;var&#32;trackedCamera&#32;=&#32;<link linkend="_class_valve_1_1_v_r_1_1_open_v_r">OpenVR</link>.<link linkend="_class_valve_1_1_v_r_1_1_open_v_r_1a5ea08ced399257a11cd8ebc9efebfa1f">TrackedCamera</link>;
+00172 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(trackedCamera&#32;!=&#32;<emphasis role="keyword">null</emphasis>)
+00173 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;trackedCamera.<link linkend="_class_valve_1_1_v_r_1_1_c_v_r_tracked_camera_1acfbdc354ce7283a9b3059361037229ce">HasCamera</link>(deviceIndex,&#32;ref&#32;_hasCamera);
+00174 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00175 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;uint&#32;deviceIndex&#32;{&#32;<emphasis role="keyword">get</emphasis>;&#32;<emphasis role="keyword">private</emphasis>&#32;<emphasis role="keyword">set</emphasis>;&#32;}
+00176 
+00177 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;ulong&#32;_handle;
+00178 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;ulong&#32;handle&#32;{&#32;<emphasis role="keyword">get</emphasis>&#32;{&#32;<emphasis role="keywordflow">return</emphasis>&#32;_handle;&#32;}&#32;}
+00179 
+00180 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordtype">bool</emphasis>&#32;_hasCamera;
+00181 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keywordtype">bool</emphasis>&#32;hasCamera&#32;{&#32;<emphasis role="keyword">get</emphasis>&#32;{&#32;<emphasis role="keywordflow">return</emphasis>&#32;_hasCamera;&#32;}&#32;}
+00182 
+00183 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;ulong&#32;refCount;
+00184 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;ulong&#32;Acquire()
+00185 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00186 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(_handle&#32;==&#32;0&#32;&amp;&amp;&#32;hasCamera)
+00187 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00188 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;var&#32;trackedCamera&#32;=&#32;<link linkend="_class_valve_1_1_v_r_1_1_open_v_r">OpenVR</link>.<link linkend="_class_valve_1_1_v_r_1_1_open_v_r_1a5ea08ced399257a11cd8ebc9efebfa1f">TrackedCamera</link>;
+00189 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(trackedCamera&#32;!=&#32;<emphasis role="keyword">null</emphasis>)
+00190 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;trackedCamera.<link linkend="_class_valve_1_1_v_r_1_1_c_v_r_tracked_camera_1a088e0575a1a1a133ae56608e4e244e62">AcquireVideoStreamingService</link>(deviceIndex,&#32;ref&#32;_handle);
+00191 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00192 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;++refCount;
+00193 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00194 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;ulong&#32;Release()
+00195 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00196 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(refCount&#32;&gt;&#32;0&#32;&amp;&amp;&#32;--refCount&#32;==&#32;0&#32;&amp;&amp;&#32;_handle&#32;!=&#32;0)
+00197 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00198 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;var&#32;trackedCamera&#32;=&#32;<link linkend="_class_valve_1_1_v_r_1_1_open_v_r">OpenVR</link>.<link linkend="_class_valve_1_1_v_r_1_1_open_v_r_1a5ea08ced399257a11cd8ebc9efebfa1f">TrackedCamera</link>;
+00199 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(trackedCamera&#32;!=&#32;<emphasis role="keyword">null</emphasis>)
+00200 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;trackedCamera.<link linkend="_class_valve_1_1_v_r_1_1_c_v_r_tracked_camera_1aee0ee9f7e4e1374a87b79139eba5ae2d">ReleaseVideoStreamingService</link>(_handle);
+00201 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;_handle&#32;=&#32;0;
+00202 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00203 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;refCount;
+00204 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00205 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00206 
+00207 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">static</emphasis>&#32;VideoStream&#32;Stream(uint&#32;deviceIndex)
+00208 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00209 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(videostreams&#32;==&#32;<emphasis role="keyword">null</emphasis>)
+00210 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;videostreams&#32;=&#32;<emphasis role="keyword">new</emphasis>&#32;VideoStream[<link linkend="_class_valve_1_1_v_r_1_1_open_v_r">OpenVR</link>.<link linkend="_class_valve_1_1_v_r_1_1_open_v_r_1aec52ee031bff706f1b96c7f2c8ebc0ac">k_unMaxTrackedDeviceCount</link>];
+00211 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(videostreams[deviceIndex]&#32;==&#32;<emphasis role="keyword">null</emphasis>)
+00212 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;videostreams[deviceIndex]&#32;=&#32;<emphasis role="keyword">new</emphasis>&#32;VideoStream(deviceIndex);
+00213 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;videostreams[deviceIndex];
+00214 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00215 
+00216 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">static</emphasis>&#32;VideoStream[]&#32;videostreams;
+00217 
+00218 <emphasis role="preprocessor">&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;#endregion</emphasis>
+00219 &#32;&#32;&#32;&#32;}
+00220 }
+</programlisting></section>

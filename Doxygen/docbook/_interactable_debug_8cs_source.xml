@@ -1,0 +1,206 @@
+<?xml version='1.0' encoding='UTF-8' standalone='no'?>
+<section xmlns="http://docbook.org/ns/docbook" version="5.0" xmlns:xlink="http://www.w3.org/1999/xlink" xml:id="__interactable_debug_8cs_source">
+<title>InteractableDebug.cs</title>
+<indexterm><primary>O:/GitHUBMINIPRoject/Assets/SteamVR/InteractionSystem/Core/Scripts/InteractableDebug.cs</primary></indexterm>
+<programlisting>00001 <emphasis role="comment">//=======&#32;Copyright&#32;(c)&#32;Valve&#32;Corporation,&#32;All&#32;rights&#32;reserved.&#32;===============</emphasis>
+00002 <emphasis role="comment">//</emphasis>
+00003 <emphasis role="comment">//&#32;Purpose:&#32;This&#32;object&#32;will&#32;get&#32;hover&#32;events&#32;and&#32;can&#32;be&#32;attached&#32;to&#32;the&#32;hands</emphasis>
+00004 <emphasis role="comment">//</emphasis>
+00005 <emphasis role="comment">//=============================================================================</emphasis>
+00006 
+00007 <emphasis role="keyword">using</emphasis>&#32;<link linkend="__balloon_8cs_1a7d67e097df9376eb709b6a23aa3c7d23">UnityEngine</link>;
+00008 <emphasis role="keyword">using</emphasis>&#32;<link linkend="_namespace_unity_engine">UnityEngine</link>.Events;
+00009 <emphasis role="keyword">using</emphasis>&#32;System.Collections;
+00010 <emphasis role="keyword">using</emphasis>&#32;System.Collections.Generic;
+00011 
+00012 <emphasis role="keyword">namespace&#32;</emphasis><link linkend="_namespace_valve_1_1_v_r_1_1_interaction_system">Valve.VR.InteractionSystem</link>
+00013 {
+00014 &#32;&#32;&#32;&#32;<emphasis role="comment">//-------------------------------------------------------------------------</emphasis>
+<anchor xml:id="__interactable_debug_8cs_source_1l00015"/><link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_interactable_debug">00015</link> &#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keyword">class&#32;</emphasis><link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_interactable_debug">InteractableDebug</link>&#32;:&#32;MonoBehaviour
+00016 &#32;&#32;&#32;&#32;{
+00017 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;[System.NonSerialized]
+<anchor xml:id="__interactable_debug_8cs_source_1l00018"/><link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_interactable_debug_1a89f2b0342f3c98791177ed99566e5c88">00018</link> &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_hand">Hand</link>&#32;<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_interactable_debug_1a89f2b0342f3c98791177ed99566e5c88">attachedToHand</link>;
+00019 
+<anchor xml:id="__interactable_debug_8cs_source_1l00020"/><link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_interactable_debug_1ab40b057c60b5c91520e3273e17c1732d">00020</link> &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keywordtype">float</emphasis>&#32;<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_interactable_debug_1ab40b057c60b5c91520e3273e17c1732d">simulateReleasesForXSecondsAroundRelease</link>&#32;=&#32;0;
+<anchor xml:id="__interactable_debug_8cs_source_1l00021"/><link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_interactable_debug_1a2185b00f434e9c48f50e54411cf23993">00021</link> &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keywordtype">float</emphasis>&#32;<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_interactable_debug_1a2185b00f434e9c48f50e54411cf23993">simulateReleasesEveryXSeconds</link>&#32;=&#32;0.005f;
+<anchor xml:id="__interactable_debug_8cs_source_1l00022"/><link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_interactable_debug_1a7bca5961581bec9fd84b41c6f7ea0c02">00022</link> &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keywordtype">bool</emphasis>&#32;<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_interactable_debug_1a7bca5961581bec9fd84b41c6f7ea0c02">setPositionsForSimulations</link>&#32;=&#32;<emphasis role="keyword">false</emphasis>;
+00023 
+00024 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;Renderer[]&#32;selfRenderers;
+00025 
+00026 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;Collider[]&#32;colliders;
+00027 
+00028 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;Color&#32;lastColor;
+00029 
+00030 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_throwable">Throwable</link>&#32;throwable;
+00031 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;<emphasis role="keywordtype">bool</emphasis>&#32;isThrowable&#32;{&#32;<emphasis role="keyword">get</emphasis>&#32;{&#32;<emphasis role="keywordflow">return</emphasis>&#32;throwable&#32;!=&#32;<emphasis role="keyword">null</emphasis>;&#32;}&#32;}
+00032 
+00033 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;<emphasis role="keyword">const</emphasis>&#32;<emphasis role="keywordtype">bool</emphasis>&#32;onlyColorOnChange&#32;=&#32;<emphasis role="keyword">true</emphasis>;
+00034 
+<anchor xml:id="__interactable_debug_8cs_source_1l00035"/><link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_interactable_debug_1a11dbe849c1a4f9781f2212ec41d7a7a3">00035</link> &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keyword">new</emphasis>&#32;Rigidbody&#32;<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_interactable_debug_1a11dbe849c1a4f9781f2212ec41d7a7a3">rigidbody</link>;
+00036 
+00037 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;Awake()
+00038 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00039 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;selfRenderers&#32;=&#32;this.GetComponentsInChildren&lt;Renderer&gt;();
+00040 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;throwable&#32;=&#32;this.GetComponent&lt;Throwable&gt;();
+00041 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_interactable_debug_1a11dbe849c1a4f9781f2212ec41d7a7a3">rigidbody</link>&#32;=&#32;this.GetComponent&lt;Rigidbody&gt;();
+00042 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;colliders&#32;=&#32;this.GetComponentsInChildren&lt;Collider&gt;();
+00043 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00044 
+00045 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;OnAttachedToHand(&#32;<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_hand">Hand</link>&#32;hand&#32;)
+00046 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00047 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_interactable_debug_1a89f2b0342f3c98791177ed99566e5c88">attachedToHand</link>&#32;=&#32;hand;
+00048 
+00049 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;CreateMarker(Color.green);
+00050 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00051 
+00052 
+<anchor xml:id="__interactable_debug_8cs_source_1l00053"/><link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_interactable_debug_1aa7b98fc955bae608d9563d305212ee62">00053</link> &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">protected</emphasis>&#32;<emphasis role="keyword">virtual</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_interactable_debug_1aa7b98fc955bae608d9563d305212ee62">HandAttachedUpdate</link>(<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_hand">Hand</link>&#32;hand)
+00054 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00055 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;Color&#32;grabbedColor;
+00056 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">switch</emphasis>&#32;(hand.<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_hand_1a2ba850f3dedb0fe8e2e32ac32e45e92d">currentAttachedObjectInfo</link>.Value.<link linkend="_struct_valve_1_1_v_r_1_1_interaction_system_1_1_hand_1_1_attached_object_1a3f16314626d46fb6fbbb9cdd8dcbfb68">grabbedWithType</link>)
+00057 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00058 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">case</emphasis>&#32;<link linkend="_namespace_valve_1_1_v_r_1_1_interaction_system_1ae03ab84d315f5997fd000817bfb96a0f">GrabTypes</link>.Grip:
+00059 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;grabbedColor&#32;=&#32;Color.blue;
+00060 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">break</emphasis>;
+00061 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">case</emphasis>&#32;<link linkend="_namespace_valve_1_1_v_r_1_1_interaction_system_1ae03ab84d315f5997fd000817bfb96a0f">GrabTypes</link>.Pinch:
+00062 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;grabbedColor&#32;=&#32;Color.green;
+00063 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">break</emphasis>;
+00064 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">case</emphasis>&#32;<link linkend="_namespace_valve_1_1_v_r_1_1_interaction_system_1ae03ab84d315f5997fd000817bfb96a0f">GrabTypes</link>.Trigger:
+00065 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;grabbedColor&#32;=&#32;Color.yellow;
+00066 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">break</emphasis>;
+00067 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">case</emphasis>&#32;<link linkend="_namespace_valve_1_1_v_r_1_1_interaction_system_1ae03ab84d315f5997fd000817bfb96a0f">GrabTypes</link>.Scripted:
+00068 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;grabbedColor&#32;=&#32;Color.red;
+00069 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">break</emphasis>;
+00070 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">case</emphasis>&#32;<link linkend="_namespace_valve_1_1_v_r_1_1_interaction_system_1ae03ab84d315f5997fd000817bfb96a0f">GrabTypes</link>.None:
+00071 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">default</emphasis>:
+00072 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;grabbedColor&#32;=&#32;Color.white;
+00073 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">break</emphasis>;
+00074 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00075 
+00076 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;((onlyColorOnChange&#32;&amp;&amp;&#32;grabbedColor&#32;!=&#32;lastColor)&#32;||&#32;onlyColorOnChange&#32;==&#32;<emphasis role="keyword">false</emphasis>)
+00077 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;ColorSelf(grabbedColor);
+00078 
+00079 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;lastColor&#32;=&#32;grabbedColor;
+00080 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00081 
+00082 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;
+00083 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;OnDetachedFromHand(&#32;<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_hand">Hand</link>&#32;hand&#32;)
+00084 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00085 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(isThrowable)
+00086 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00087 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;Vector3&#32;velocity;
+00088 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;Vector3&#32;angularVelocity;
+00089 
+00090 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;throwable.<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_throwable_1a8ecf0e0de4937d710e4e4d8a6a717246">GetReleaseVelocities</link>(hand,&#32;out&#32;velocity,&#32;out&#32;angularVelocity);
+00091 
+00092 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;CreateMarker(Color.cyan,&#32;velocity.normalized);
+00093 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00094 
+00095 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;CreateMarker(Color.red);
+00096 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_interactable_debug_1a89f2b0342f3c98791177ed99566e5c88">attachedToHand</link>&#32;=&#32;<emphasis role="keyword">null</emphasis>;
+00097 
+00098 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(isSimulation&#32;==&#32;<emphasis role="keyword">false</emphasis>&#32;&amp;&amp;&#32;<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_interactable_debug_1ab40b057c60b5c91520e3273e17c1732d">simulateReleasesForXSecondsAroundRelease</link>&#32;!=&#32;0)
+00099 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00100 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordtype">float</emphasis>&#32;startTime&#32;=&#32;-<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_interactable_debug_1ab40b057c60b5c91520e3273e17c1732d">simulateReleasesForXSecondsAroundRelease</link>;
+00101 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordtype">float</emphasis>&#32;endTime&#32;=&#32;<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_interactable_debug_1ab40b057c60b5c91520e3273e17c1732d">simulateReleasesForXSecondsAroundRelease</link>;
+00102 
+00103 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;List&lt;InteractableDebug&gt;&#32;list&#32;=&#32;<emphasis role="keyword">new</emphasis>&#32;List&lt;InteractableDebug&gt;();
+00104 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;list.Add(<emphasis role="keyword">this</emphasis>);
+00105 
+00106 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">for</emphasis>&#32;(<emphasis role="keywordtype">float</emphasis>&#32;offset&#32;=&#32;startTime;&#32;offset&#32;&lt;=&#32;endTime;&#32;offset&#32;+=&#32;<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_interactable_debug_1a2185b00f434e9c48f50e54411cf23993">simulateReleasesEveryXSeconds</link>)
+00107 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00108 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordtype">float</emphasis>&#32;lerp&#32;=&#32;Mathf.InverseLerp(startTime,&#32;endTime,&#32;offset);
+00109 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;InteractableDebug&#32;copy&#32;=&#32;CreateSimulation(hand,&#32;offset,&#32;Color.Lerp(Color.red,&#32;Color.green,&#32;lerp));
+00110 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;list.Add(copy);
+00111 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00112 
+00113 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">for</emphasis>&#32;(<emphasis role="keywordtype">int</emphasis>&#32;index&#32;=&#32;0;&#32;index&#32;&lt;&#32;list.Count;&#32;index++)
+00114 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00115 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">for</emphasis>&#32;(<emphasis role="keywordtype">int</emphasis>&#32;otherIndex&#32;=&#32;0;&#32;otherIndex&#32;&lt;&#32;list.Count;&#32;otherIndex++)
+00116 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00117 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;list[index].<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_interactable_debug_1a76540719a87638bb596e44730f48ea1b">IgnoreObject</link>(list[otherIndex]);
+00118 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00119 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00120 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00121 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00122 
+<anchor xml:id="__interactable_debug_8cs_source_1l00123"/><link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_interactable_debug_1a0296a0694c187eafba022c9e92424f52">00123</link> &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;Collider[]&#32;<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_interactable_debug_1a0296a0694c187eafba022c9e92424f52">GetColliders</link>()
+00124 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00125 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;colliders;
+00126 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00127 
+<anchor xml:id="__interactable_debug_8cs_source_1l00128"/><link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_interactable_debug_1a76540719a87638bb596e44730f48ea1b">00128</link> &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_interactable_debug_1a76540719a87638bb596e44730f48ea1b">IgnoreObject</link>(<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_interactable_debug">InteractableDebug</link>&#32;otherInteractable)
+00129 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00130 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;Collider[]&#32;otherColliders&#32;=&#32;otherInteractable.<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_interactable_debug_1a0296a0694c187eafba022c9e92424f52">GetColliders</link>();
+00131 
+00132 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">for</emphasis>&#32;(<emphasis role="keywordtype">int</emphasis>&#32;myIndex&#32;=&#32;0;&#32;myIndex&#32;&lt;&#32;colliders.Length;&#32;myIndex++)
+00133 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00134 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">for</emphasis>&#32;(<emphasis role="keywordtype">int</emphasis>&#32;otherIndex&#32;=&#32;0;&#32;otherIndex&#32;&lt;&#32;otherColliders.Length;&#32;otherIndex++)
+00135 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00136 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;Physics.IgnoreCollision(colliders[myIndex],&#32;otherColliders[otherIndex]);
+00137 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00138 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00139 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00140 
+00141 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;<emphasis role="keywordtype">bool</emphasis>&#32;isSimulation&#32;=&#32;<emphasis role="keyword">false</emphasis>;
+<anchor xml:id="__interactable_debug_8cs_source_1l00142"/><link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_interactable_debug_1a4be20dc8a66f6827ae70718d670992e2">00142</link> &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_interactable_debug_1a4be20dc8a66f6827ae70718d670992e2">SetIsSimulation</link>()
+00143 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00144 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;isSimulation&#32;=&#32;<emphasis role="keyword">true</emphasis>;
+00145 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00146 
+00147 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_interactable_debug">InteractableDebug</link>&#32;CreateSimulation(<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_hand">Hand</link>&#32;fromHand,&#32;<emphasis role="keywordtype">float</emphasis>&#32;timeOffset,&#32;Color&#32;copyColor)
+00148 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00149 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;GameObject&#32;copy&#32;=&#32;GameObject.Instantiate(this.gameObject);
+00150 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_interactable_debug">InteractableDebug</link>&#32;debugCopy&#32;=&#32;copy.GetComponent&lt;<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_interactable_debug">InteractableDebug</link>&gt;();
+00151 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;debugCopy.<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_interactable_debug_1a4be20dc8a66f6827ae70718d670992e2">SetIsSimulation</link>();
+00152 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;debugCopy.ColorSelf(copyColor);
+00153 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;copy.name&#32;=&#32;<emphasis role="keywordtype">string</emphasis>.Format(<emphasis role="stringliteral">&quot;{0}&#32;[offset:&#32;{1:0.000}]&quot;</emphasis>,&#32;copy.name,&#32;timeOffset);
+00154 
+00155 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;Vector3&#32;velocity&#32;=&#32;fromHand.<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_hand_1a128de24fb785ca4bfdb3e5516e20573e">GetTrackedObjectVelocity</link>(timeOffset);
+00156 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;velocity&#32;*=&#32;throwable.<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_throwable_1a0f4aa8b227aa10ddb50a23314a7a55a1">scaleReleaseVelocity</link>;
+00157 
+00158 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;debugCopy.<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_interactable_debug_1a11dbe849c1a4f9781f2212ec41d7a7a3">rigidbody</link>.velocity&#32;=&#32;velocity;
+00159 
+00160 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;debugCopy;
+00161 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00162 
+00163 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;CreateMarker(Color&#32;markerColor,&#32;<emphasis role="keywordtype">float</emphasis>&#32;destroyAfter&#32;=&#32;10)
+00164 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00165 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;CreateMarker(markerColor,&#32;<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_interactable_debug_1a89f2b0342f3c98791177ed99566e5c88">attachedToHand</link>.<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_hand_1a128de24fb785ca4bfdb3e5516e20573e">GetTrackedObjectVelocity</link>().normalized,&#32;destroyAfter);
+00166 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00167 
+00168 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;CreateMarker(Color&#32;markerColor,&#32;Vector3&#32;forward,&#32;<emphasis role="keywordtype">float</emphasis>&#32;destroyAfter&#32;=&#32;10)
+00169 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00170 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;GameObject&#32;baseMarker&#32;=&#32;GameObject.CreatePrimitive(PrimitiveType.Cube);
+00171 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;DestroyImmediate(baseMarker.GetComponent&lt;Collider&gt;());
+00172 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;baseMarker.transform.localScale&#32;=&#32;<emphasis role="keyword">new</emphasis>&#32;Vector3(0.02f,&#32;0.02f,&#32;0.02f);
+00173 
+00174 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;GameObject&#32;line&#32;=&#32;GameObject.Instantiate(baseMarker);
+00175 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;line.transform.localScale&#32;=&#32;<emphasis role="keyword">new</emphasis>&#32;Vector3(0.01f,&#32;0.01f,&#32;0.25f);
+00176 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;line.transform.parent&#32;=&#32;baseMarker.transform;
+00177 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;line.transform.localPosition&#32;=&#32;<emphasis role="keyword">new</emphasis>&#32;Vector3(0,&#32;0,&#32;line.transform.localScale.z&#32;/&#32;2f);
+00178 
+00179 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;baseMarker.transform.position&#32;=&#32;<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_interactable_debug_1a89f2b0342f3c98791177ed99566e5c88">attachedToHand</link>.transform.position;
+00180 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;baseMarker.transform.forward&#32;=&#32;forward;
+00181 
+00182 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;ColorThing(markerColor,&#32;baseMarker.GetComponentsInChildren&lt;Renderer&gt;());
+00183 
+00184 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(destroyAfter&#32;&gt;&#32;0)
+00185 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;Destroy(baseMarker,&#32;destroyAfter);
+00186 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00187 
+00188 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;ColorSelf(Color&#32;newColor)
+00189 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00190 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;ColorThing(newColor,&#32;selfRenderers);
+00191 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00192 
+00193 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;ColorThing(Color&#32;newColor,&#32;Renderer[]&#32;renderers)
+00194 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00195 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">for</emphasis>&#32;(<emphasis role="keywordtype">int</emphasis>&#32;rendererIndex&#32;=&#32;0;&#32;rendererIndex&#32;&lt;&#32;renderers.Length;&#32;rendererIndex++)
+00196 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00197 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;renderers[rendererIndex].material.color&#32;=&#32;newColor;
+00198 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00199 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00200 &#32;&#32;&#32;&#32;}
+00201 }
+</programlisting></section>

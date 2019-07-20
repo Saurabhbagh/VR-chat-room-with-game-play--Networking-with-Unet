@@ -1,0 +1,81 @@
+<?xml version='1.0' encoding='UTF-8' standalone='no'?>
+<section xmlns="http://docbook.org/ns/docbook" version="5.0" xmlns:xlink="http://www.w3.org/1999/xlink" xml:id="__t_m_p___mesh_renderer_editor_8cs_source">
+<title>TMP_MeshRendererEditor.cs</title>
+<indexterm><primary>O:/GitHUBMINIPRoject/Library/PackageCache/com.unity.textmeshpro@1.3.0/Scripts/Editor/TMP_MeshRendererEditor.cs</primary></indexterm>
+<programlisting>00001 <emphasis role="comment">//&#32;When&#32;enabled,&#32;allows&#32;setting&#32;the&#32;material&#32;by&#32;dropping&#32;a&#32;material&#32;onto&#32;the&#32;MeshRenderer&#32;inspector&#32;component.&#32;</emphasis>
+00002 <emphasis role="comment">//&#32;The&#32;drawback&#32;is&#32;that&#32;the&#32;MeshRenderer&#32;inspector&#32;will&#32;not&#32;have&#32;properties&#32;for&#32;light&#32;probes,&#32;so&#32;if&#32;you&#32;need&#32;light&#32;probe&#32;support,&#32;do&#32;not&#32;enable&#32;this.</emphasis>
+00003 <emphasis role="comment">//#define&#32;ALLOW_MESHRENDERER_MATERIAL_DRAG_N_DROP</emphasis>
+00004 
+00005 <emphasis role="keyword">using</emphasis>&#32;<link linkend="__balloon_8cs_1a7d67e097df9376eb709b6a23aa3c7d23">UnityEngine</link>;
+00006 <emphasis role="keyword">using</emphasis>&#32;<link linkend="_namespace_unity_editor">UnityEditor</link>;
+00007 <emphasis role="keyword">using</emphasis>&#32;System.Collections;
+00008 
+00009 
+00010 <emphasis role="keyword">namespace&#32;</emphasis><link linkend="_namespace_t_m_pro_1_1_editor_utilities">TMPro.EditorUtilities</link>
+00011 {
+00012 &#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;Disabled&#32;for&#32;compatibility&#32;reason&#32;as&#32;lightprobe&#32;setup&#32;isn&apos;t&#32;supported&#32;due&#32;to&#32;inability&#32;to&#32;inherit&#32;from&#32;MeshRendererEditor&#32;class</emphasis>
+00013 <emphasis role="preprocessor">#if&#32;ALLOW_MESHRENDERER_MATERIAL_DRAG_N_DROP</emphasis>
+00014 &#32;&#32;&#32;&#32;[CanEditMultipleObjects]
+00015 &#32;&#32;&#32;&#32;[CustomEditor(typeof(MeshRenderer))]
+00016 &#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keyword">class&#32;</emphasis>TMP_MeshRendererEditor&#32;:&#32;Editor
+00017 &#32;&#32;&#32;&#32;{
+00018 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;SerializedProperty&#32;m_Materials;
+00019 
+00020 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordtype">void</emphasis>&#32;OnEnable()
+00021 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00022 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;m_Materials&#32;=&#32;serializedObject.FindProperty(<emphasis role="stringliteral">&quot;m_Materials&quot;</emphasis>);
+00023 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00024 
+00025 
+00026 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keyword">override</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;OnInspectorGUI()
+00027 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00028 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;serializedObject.Update();
+00029 
+00030 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;Get&#32;a&#32;reference&#32;to&#32;the&#32;current&#32;material.</emphasis>
+00031 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;SerializedProperty&#32;material_prop&#32;=&#32;m_Materials.GetArrayElementAtIndex(0);
+00032 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;Material&#32;currentMaterial&#32;=&#32;material_prop.objectReferenceValue&#32;as&#32;Material;
+00033 
+00034 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;EditorGUI.BeginChangeCheck();
+00035 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;base.OnInspectorGUI();
+00036 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(EditorGUI.EndChangeCheck())
+00037 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00038 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;material_prop&#32;=&#32;m_Materials.GetArrayElementAtIndex(0);
+00039 
+00040 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;TMP_FontAsset&#32;newFontAsset&#32;=&#32;<emphasis role="keyword">null</emphasis>;
+00041 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;Material&#32;newMaterial&#32;=&#32;<emphasis role="keyword">null</emphasis>;
+00042 
+00043 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(material_prop&#32;!=&#32;<emphasis role="keyword">null</emphasis>)
+00044 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;newMaterial&#32;=&#32;material_prop.objectReferenceValue&#32;as&#32;Material;
+00045 
+00046 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;Check&#32;if&#32;the&#32;new&#32;material&#32;is&#32;referencing&#32;a&#32;different&#32;font&#32;atlas&#32;texture.</emphasis>
+00047 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(newMaterial&#32;!=&#32;<emphasis role="keyword">null</emphasis>&#32;&amp;&amp;&#32;currentMaterial.GetInstanceID()&#32;!=&#32;newMaterial.GetInstanceID())
+00048 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00049 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;Search&#32;for&#32;the&#32;Font&#32;Asset&#32;matching&#32;the&#32;new&#32;font&#32;atlas&#32;texture.</emphasis>
+00050 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;newFontAsset&#32;=&#32;TMP_EditorUtility.FindMatchingFontAsset(newMaterial);
+00051 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00052 
+00053 
+00054 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;GameObject[]&#32;objects&#32;=&#32;Selection.gameObjects;
+00055 
+00056 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">for</emphasis>&#32;(<emphasis role="keywordtype">int</emphasis>&#32;i&#32;=&#32;0;&#32;i&#32;&lt;&#32;objects.Length;&#32;i++)
+00057 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00058 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;Assign&#32;new&#32;font&#32;asset</emphasis>
+00059 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(newFontAsset&#32;!=&#32;<emphasis role="keyword">null</emphasis>)
+00060 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00061 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;TMP_Text&#32;textComponent&#32;=&#32;objects[i].GetComponent&lt;TMP_Text&gt;();
+00062 
+00063 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(textComponent&#32;!=&#32;<emphasis role="keyword">null</emphasis>)
+00064 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00065 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;Undo.RecordObject(textComponent,&#32;<emphasis role="stringliteral">&quot;Font&#32;Asset&#32;Change&quot;</emphasis>);
+00066 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;textComponent.font&#32;=&#32;newFontAsset;
+00067 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00068 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00069 
+00070 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;TMPro_EventManager.ON_DRAG_AND_DROP_MATERIAL_CHANGED(objects[i],&#32;currentMaterial,&#32;newMaterial);
+00071 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00072 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00073 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00074 &#32;&#32;&#32;&#32;}
+00075 <emphasis role="preprocessor">#endif</emphasis>
+00076 }
+</programlisting></section>

@@ -1,0 +1,495 @@
+<?xml version='1.0' encoding='UTF-8' standalone='no'?>
+<section xmlns="http://docbook.org/ns/docbook" version="5.0" xmlns:xlink="http://www.w3.org/1999/xlink" xml:id="__leap_service_provider_8cs_source">
+<title>LeapServiceProvider.cs</title>
+<indexterm><primary>O:/GitHUBMINIPRoject/Assets/LeapMotion/Core/Scripts/LeapServiceProvider.cs</primary></indexterm>
+<programlisting>00001 <emphasis role="comment">/******************************************************************************</emphasis>
+00002 <emphasis role="comment">&#32;*&#32;Copyright&#32;(C)&#32;Leap&#32;Motion,&#32;Inc.&#32;2011-2018.&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;*</emphasis>
+00003 <emphasis role="comment">&#32;*&#32;Leap&#32;Motion&#32;proprietary&#32;and&#32;confidential.&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;*</emphasis>
+00004 <emphasis role="comment">&#32;*&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;*</emphasis>
+00005 <emphasis role="comment">&#32;*&#32;Use&#32;subject&#32;to&#32;the&#32;terms&#32;of&#32;the&#32;Leap&#32;Motion&#32;SDK&#32;Agreement&#32;available&#32;at&#32;&#32;&#32;&#32;&#32;*</emphasis>
+00006 <emphasis role="comment">&#32;*&#32;https://developer.leapmotion.com/sdk_agreement,&#32;or&#32;another&#32;agreement&#32;&#32;&#32;&#32;&#32;&#32;&#32;*</emphasis>
+00007 <emphasis role="comment">&#32;*&#32;between&#32;Leap&#32;Motion&#32;and&#32;you,&#32;your&#32;company&#32;or&#32;other&#32;organization.&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;*</emphasis>
+00008 <emphasis role="comment">&#32;******************************************************************************/</emphasis>
+00009 
+00010 <emphasis role="keyword">using</emphasis>&#32;System;
+00011 <emphasis role="keyword">using</emphasis>&#32;System.Collections.Generic;
+00012 <emphasis role="keyword">using</emphasis>&#32;<link linkend="__balloon_8cs_1a7d67e097df9376eb709b6a23aa3c7d23">UnityEngine</link>;
+00013 
+00014 <emphasis role="keyword">namespace&#32;</emphasis><link linkend="_namespace_leap_1_1_unity">Leap.Unity</link>&#32;{
+00015 &#32;&#32;<emphasis role="keyword">using</emphasis>&#32;Attributes;
+00016 
+<anchor xml:id="__leap_service_provider_8cs_source_1l00021"/><link linkend="_class_leap_1_1_unity_1_1_leap_service_provider">00021</link> &#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keyword">class&#32;</emphasis><link linkend="_class_leap_1_1_unity_1_1_leap_service_provider">LeapServiceProvider</link>&#32;:&#32;<link linkend="_class_leap_1_1_unity_1_1_leap_provider">LeapProvider</link>&#32;{
+00022 
+00023 <emphasis role="preprocessor">&#32;&#32;&#32;&#32;#region&#32;Constants</emphasis>
+00024 
+<anchor xml:id="__leap_service_provider_8cs_source_1l00028"/><link linkend="_class_leap_1_1_unity_1_1_leap_service_provider_1aa3d28ca766e114835e7571397a97c865">00028</link> &#32;&#32;&#32;&#32;<emphasis role="keyword">protected</emphasis>&#32;<emphasis role="keyword">const</emphasis>&#32;<emphasis role="keywordtype">double</emphasis>&#32;<link linkend="_class_leap_1_1_unity_1_1_leap_service_provider_1aa3d28ca766e114835e7571397a97c865">NS_TO_S</link>&#32;=&#32;1e-6;
+00029 
+<anchor xml:id="__leap_service_provider_8cs_source_1l00033"/><link linkend="_class_leap_1_1_unity_1_1_leap_service_provider_1a0baaa02c5e7d4a148ec737876b7b388b">00033</link> &#32;&#32;&#32;&#32;<emphasis role="keyword">protected</emphasis>&#32;<emphasis role="keyword">const</emphasis>&#32;<emphasis role="keywordtype">double</emphasis>&#32;<link linkend="_class_leap_1_1_unity_1_1_leap_service_provider_1a0baaa02c5e7d4a148ec737876b7b388b">S_TO_NS</link>&#32;=&#32;1e6;
+00034 
+<anchor xml:id="__leap_service_provider_8cs_source_1l00038"/><link linkend="_class_leap_1_1_unity_1_1_leap_service_provider_1ad8198649c99ee41eaba597cae378815b">00038</link> &#32;&#32;&#32;&#32;<emphasis role="keyword">protected</emphasis>&#32;<emphasis role="keyword">const</emphasis>&#32;<emphasis role="keywordtype">string</emphasis>&#32;<link linkend="_class_leap_1_1_unity_1_1_leap_service_provider_1ad8198649c99ee41eaba597cae378815b">HAND_ARRAY_GLOBAL_NAME</link>&#32;=&#32;<emphasis role="stringliteral">&quot;_LeapHandTransforms&quot;</emphasis>;
+00039 
+<anchor xml:id="__leap_service_provider_8cs_source_1l00044"/><link linkend="_class_leap_1_1_unity_1_1_leap_service_provider_1afadff6ce55b5f50f4f0b28fbe0b1fa1d">00044</link> &#32;&#32;&#32;&#32;<emphasis role="keyword">protected</emphasis>&#32;<emphasis role="keyword">const</emphasis>&#32;<emphasis role="keywordtype">int</emphasis>&#32;<link linkend="_class_leap_1_1_unity_1_1_leap_service_provider_1afadff6ce55b5f50f4f0b28fbe0b1fa1d">MAX_RECONNECTION_ATTEMPTS</link>&#32;=&#32;5;
+00045 
+<anchor xml:id="__leap_service_provider_8cs_source_1l00050"/><link linkend="_class_leap_1_1_unity_1_1_leap_service_provider_1a4ecb0067ea35eec0a76e7f839547e9b0">00050</link> &#32;&#32;&#32;&#32;<emphasis role="keyword">protected</emphasis>&#32;<emphasis role="keyword">const</emphasis>&#32;<emphasis role="keywordtype">int</emphasis>&#32;<link linkend="_class_leap_1_1_unity_1_1_leap_service_provider_1a4ecb0067ea35eec0a76e7f839547e9b0">RECONNECTION_INTERVAL</link>&#32;=&#32;180;
+00051 
+00052 <emphasis role="preprocessor">&#32;&#32;&#32;&#32;#endregion</emphasis>
+00053 
+00054 <emphasis role="preprocessor">&#32;&#32;&#32;&#32;#region&#32;Inspector</emphasis>
+00055 
+<anchor xml:id="__leap_service_provider_8cs_source_1l00056"/><link linkend="_class_leap_1_1_unity_1_1_leap_service_provider_1aded29faa9adf0b09e63a1659e5b0f82d">00056</link> &#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keyword">enum</emphasis>&#32;<link linkend="_class_leap_1_1_unity_1_1_leap_service_provider_1aded29faa9adf0b09e63a1659e5b0f82d">FrameOptimizationMode</link>&#32;{
+00057 &#32;&#32;&#32;&#32;&#32;&#32;None,
+00058 &#32;&#32;&#32;&#32;&#32;&#32;ReuseUpdateForPhysics,
+00059 &#32;&#32;&#32;&#32;&#32;&#32;ReusePhysicsForUpdate,
+00060 &#32;&#32;&#32;&#32;}
+00061 &#32;&#32;&#32;&#32;[Tooltip(<emphasis role="stringliteral">&quot;When&#32;enabled,&#32;the&#32;provider&#32;will&#32;only&#32;calculate&#32;one&#32;leap&#32;frame&#32;instead&#32;of&#32;two.&quot;</emphasis>)]
+00062 &#32;&#32;&#32;&#32;[SerializeField]
+<anchor xml:id="__leap_service_provider_8cs_source_1l00063"/><link linkend="_class_leap_1_1_unity_1_1_leap_service_provider_1a58ab122b5e6430d5fb98fccf7e600e54">00063</link> &#32;&#32;&#32;&#32;<emphasis role="keyword">protected</emphasis>&#32;<link linkend="_class_leap_1_1_unity_1_1_leap_service_provider_1aded29faa9adf0b09e63a1659e5b0f82d">FrameOptimizationMode</link>&#32;<link linkend="_class_leap_1_1_unity_1_1_leap_service_provider_1a58ab122b5e6430d5fb98fccf7e600e54">_frameOptimization</link>&#32;=&#32;<link linkend="_class_leap_1_1_unity_1_1_leap_service_provider_1aded29faa9adf0b09e63a1659e5b0f82d">FrameOptimizationMode</link>.None;
+00064 
+<anchor xml:id="__leap_service_provider_8cs_source_1l00065"/><link linkend="_class_leap_1_1_unity_1_1_leap_service_provider_1a2ce142abf998f86ac23b3d30032ea82e">00065</link> &#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keyword">enum</emphasis>&#32;<link linkend="_class_leap_1_1_unity_1_1_leap_service_provider_1a2ce142abf998f86ac23b3d30032ea82e">PhysicsExtrapolationMode</link>&#32;{
+00066 &#32;&#32;&#32;&#32;&#32;&#32;None,
+00067 &#32;&#32;&#32;&#32;&#32;&#32;Auto,
+00068 &#32;&#32;&#32;&#32;&#32;&#32;Manual
+00069 &#32;&#32;&#32;&#32;}
+00070 &#32;&#32;&#32;&#32;[Tooltip(<emphasis role="stringliteral">&quot;The&#32;mode&#32;to&#32;use&#32;when&#32;extrapolating&#32;physics.\n&quot;</emphasis>&#32;+
+00071 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="stringliteral">&quot;&#32;None&#32;-&#32;No&#32;extrapolation&#32;is&#32;used&#32;at&#32;all.\n&quot;</emphasis>&#32;+
+00072 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="stringliteral">&quot;&#32;Auto&#32;-&#32;Extrapolation&#32;is&#32;chosen&#32;based&#32;on&#32;the&#32;fixed&#32;timestep.\n&quot;</emphasis>&#32;+
+00073 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="stringliteral">&quot;&#32;Manual&#32;-&#32;Extrapolation&#32;time&#32;is&#32;chosen&#32;manually&#32;by&#32;the&#32;user.&quot;</emphasis>)]
+00074 &#32;&#32;&#32;&#32;[SerializeField]
+<anchor xml:id="__leap_service_provider_8cs_source_1l00075"/><link linkend="_class_leap_1_1_unity_1_1_leap_service_provider_1ad27fe97e7347f34807b34374b0cea29c">00075</link> &#32;&#32;&#32;&#32;<emphasis role="keyword">protected</emphasis>&#32;<link linkend="_class_leap_1_1_unity_1_1_leap_service_provider_1a2ce142abf998f86ac23b3d30032ea82e">PhysicsExtrapolationMode</link>&#32;<link linkend="_class_leap_1_1_unity_1_1_leap_service_provider_1ad27fe97e7347f34807b34374b0cea29c">_physicsExtrapolation</link>&#32;=&#32;<link linkend="_class_leap_1_1_unity_1_1_leap_service_provider_1a2ce142abf998f86ac23b3d30032ea82e">PhysicsExtrapolationMode</link>.Auto;
+00076 
+00077 &#32;&#32;&#32;&#32;[Tooltip(<emphasis role="stringliteral">&quot;The&#32;amount&#32;of&#32;time&#32;(in&#32;seconds)&#32;to&#32;extrapolate&#32;the&#32;physics&#32;data&#32;by.&quot;</emphasis>)]
+00078 &#32;&#32;&#32;&#32;[SerializeField]
+<anchor xml:id="__leap_service_provider_8cs_source_1l00079"/><link linkend="_class_leap_1_1_unity_1_1_leap_service_provider_1a5233916e10a6d00759deab7e5d4151a0">00079</link> &#32;&#32;&#32;&#32;<emphasis role="keyword">protected</emphasis>&#32;<emphasis role="keywordtype">float</emphasis>&#32;<link linkend="_class_leap_1_1_unity_1_1_leap_service_provider_1a5233916e10a6d00759deab7e5d4151a0">_physicsExtrapolationTime</link>&#32;=&#32;1.0f&#32;/&#32;90.0f;
+00080 
+00081 <emphasis role="preprocessor">#if&#32;UNITY_2017_3_OR_NEWER</emphasis>
+00082 &#32;&#32;&#32;&#32;[Tooltip(<emphasis role="stringliteral">&quot;When&#32;checked,&#32;profiling&#32;data&#32;from&#32;the&#32;LeapCSharp&#32;worker&#32;thread&#32;will&#32;be&#32;used&#32;to&#32;populate&#32;the&#32;UnityProfiler.&quot;</emphasis>)]
+00083 &#32;&#32;&#32;&#32;[<link linkend="_class_leap_1_1_unity_1_1_attributes_1_1_edit_time_only">EditTimeOnly</link>]
+00084 <emphasis role="preprocessor">#else</emphasis>
+00085 &#32;&#32;&#32;&#32;[Tooltip(<emphasis role="stringliteral">&quot;Worker&#32;thread&#32;profiling&#32;requires&#32;a&#32;Unity&#32;version&#32;of&#32;2017.3&#32;or&#32;greater.&quot;</emphasis>)]
+00086 &#32;&#32;&#32;&#32;[Disable]
+00087 <emphasis role="preprocessor">#endif</emphasis>
+00088 &#32;&#32;&#32;&#32;[SerializeField]
+<anchor xml:id="__leap_service_provider_8cs_source_1l00089"/><link linkend="_class_leap_1_1_unity_1_1_leap_service_provider_1a509baa1d3527f6417e9861925d2bd447">00089</link> &#32;&#32;&#32;&#32;<emphasis role="keyword">protected</emphasis>&#32;<emphasis role="keywordtype">bool</emphasis>&#32;<link linkend="_class_leap_1_1_unity_1_1_leap_service_provider_1a509baa1d3527f6417e9861925d2bd447">_workerThreadProfiling</link>&#32;=&#32;<emphasis role="keyword">false</emphasis>;
+00090 
+00091 <emphasis role="preprocessor">&#32;&#32;&#32;&#32;#endregion</emphasis>
+00092 
+00093 <emphasis role="preprocessor">&#32;&#32;&#32;&#32;#region&#32;Internal&#32;Settings&#32;&amp;&#32;Memory</emphasis>
+<anchor xml:id="__leap_service_provider_8cs_source_1l00094"/><link linkend="_class_leap_1_1_unity_1_1_leap_service_provider_1a9d65f610510fdc7bb299d5f9b6bbdd29">00094</link> &#32;&#32;&#32;&#32;<emphasis role="keyword">protected</emphasis>&#32;<emphasis role="keywordtype">bool</emphasis>&#32;<link linkend="_class_leap_1_1_unity_1_1_leap_service_provider_1a9d65f610510fdc7bb299d5f9b6bbdd29">_useInterpolation</link>&#32;=&#32;<emphasis role="keyword">true</emphasis>;
+00095 
+00096 &#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;Extrapolate&#32;on&#32;Android&#32;to&#32;compensate&#32;for&#32;the&#32;latency&#32;introduced&#32;by&#32;its&#32;graphics</emphasis>
+00097 &#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;pipeline.</emphasis>
+00098 <emphasis role="preprocessor">#if&#32;UNITY_ANDROID&#32;&amp;&amp;&#32;!UNITY_EDITOR</emphasis>
+00099 &#32;&#32;&#32;&#32;<emphasis role="keyword">protected</emphasis>&#32;<emphasis role="keywordtype">int</emphasis>&#32;<link linkend="_class_leap_1_1_unity_1_1_leap_service_provider_1ab8edf176edaa9cddcc300f170f61c55e">ExtrapolationAmount</link>&#32;=&#32;15;
+00100 &#32;&#32;&#32;&#32;<emphasis role="keyword">protected</emphasis>&#32;<emphasis role="keywordtype">int</emphasis>&#32;<link linkend="_class_leap_1_1_unity_1_1_leap_service_provider_1a7ce59365ab427558123780fa15ca50fd">BounceAmount</link>&#32;=&#32;70;
+00101 <emphasis role="preprocessor">#else</emphasis>
+<anchor xml:id="__leap_service_provider_8cs_source_1l00102"/><link linkend="_class_leap_1_1_unity_1_1_leap_service_provider_1ab8edf176edaa9cddcc300f170f61c55e">00102</link> &#32;&#32;&#32;&#32;<emphasis role="keyword">protected</emphasis>&#32;<emphasis role="keywordtype">int</emphasis>&#32;<link linkend="_class_leap_1_1_unity_1_1_leap_service_provider_1ab8edf176edaa9cddcc300f170f61c55e">ExtrapolationAmount</link>&#32;=&#32;0;
+<anchor xml:id="__leap_service_provider_8cs_source_1l00103"/><link linkend="_class_leap_1_1_unity_1_1_leap_service_provider_1a7ce59365ab427558123780fa15ca50fd">00103</link> &#32;&#32;&#32;&#32;<emphasis role="keyword">protected</emphasis>&#32;<emphasis role="keywordtype">int</emphasis>&#32;<link linkend="_class_leap_1_1_unity_1_1_leap_service_provider_1a7ce59365ab427558123780fa15ca50fd">BounceAmount</link>&#32;=&#32;0;
+00104 <emphasis role="preprocessor">#endif</emphasis>
+00105 
+<anchor xml:id="__leap_service_provider_8cs_source_1l00106"/><link linkend="_class_leap_1_1_unity_1_1_leap_service_provider_1a81109a7f1bd8d6fb195fb31e5c85fad3">00106</link> &#32;&#32;&#32;&#32;<emphasis role="keyword">protected</emphasis>&#32;<link linkend="_class_leap_1_1_controller">Controller</link>&#32;<link linkend="_class_leap_1_1_unity_1_1_leap_service_provider_1a81109a7f1bd8d6fb195fb31e5c85fad3">_leapController</link>;
+<anchor xml:id="__leap_service_provider_8cs_source_1l00107"/><link linkend="_class_leap_1_1_unity_1_1_leap_service_provider_1a8e1a44556c88725caaaafa35e0991d78">00107</link> &#32;&#32;&#32;&#32;<emphasis role="keyword">protected</emphasis>&#32;<emphasis role="keywordtype">bool</emphasis>&#32;<link linkend="_class_leap_1_1_unity_1_1_leap_service_provider_1a8e1a44556c88725caaaafa35e0991d78">_isDestroyed</link>;
+00108 
+<anchor xml:id="__leap_service_provider_8cs_source_1l00109"/><link linkend="_class_leap_1_1_unity_1_1_leap_service_provider_1acc5d58cd24f2c8e6fdcfe3055b11c236">00109</link> &#32;&#32;&#32;&#32;<emphasis role="keyword">protected</emphasis>&#32;<link linkend="_class_leap_1_1_unity_1_1_smoothed_float">SmoothedFloat</link>&#32;<link linkend="_class_leap_1_1_unity_1_1_leap_service_provider_1acc5d58cd24f2c8e6fdcfe3055b11c236">_fixedOffset</link>&#32;=&#32;<emphasis role="keyword">new</emphasis>&#32;<link linkend="_class_leap_1_1_unity_1_1_smoothed_float">SmoothedFloat</link>();
+<anchor xml:id="__leap_service_provider_8cs_source_1l00110"/><link linkend="_class_leap_1_1_unity_1_1_leap_service_provider_1a03a08f2d279d9884cb6d754ce4412ac2">00110</link> &#32;&#32;&#32;&#32;<emphasis role="keyword">protected</emphasis>&#32;<link linkend="_class_leap_1_1_unity_1_1_smoothed_float">SmoothedFloat</link>&#32;<link linkend="_class_leap_1_1_unity_1_1_leap_service_provider_1a03a08f2d279d9884cb6d754ce4412ac2">_smoothedTrackingLatency</link>&#32;=&#32;<emphasis role="keyword">new</emphasis>&#32;<link linkend="_class_leap_1_1_unity_1_1_smoothed_float">SmoothedFloat</link>();
+<anchor xml:id="__leap_service_provider_8cs_source_1l00111"/><link linkend="_class_leap_1_1_unity_1_1_leap_service_provider_1a7900d6d7021d9283515d8d42bd5984ad">00111</link> &#32;&#32;&#32;&#32;<emphasis role="keyword">protected</emphasis>&#32;<emphasis role="keywordtype">long</emphasis>&#32;<link linkend="_class_leap_1_1_unity_1_1_leap_service_provider_1a7900d6d7021d9283515d8d42bd5984ad">_unityToLeapOffset</link>;
+00112 
+<anchor xml:id="__leap_service_provider_8cs_source_1l00113"/><link linkend="_class_leap_1_1_unity_1_1_leap_service_provider_1a755ed665a53e5ea05559aad7704179d4">00113</link> &#32;&#32;&#32;&#32;<emphasis role="keyword">protected</emphasis>&#32;<link linkend="_class_leap_1_1_frame">Frame</link>&#32;<link linkend="_class_leap_1_1_unity_1_1_leap_service_provider_1a755ed665a53e5ea05559aad7704179d4">_untransformedUpdateFrame</link>;
+<anchor xml:id="__leap_service_provider_8cs_source_1l00114"/><link linkend="_class_leap_1_1_unity_1_1_leap_service_provider_1ac15ba4ed3804cbef57d8415dcae4fe42">00114</link> &#32;&#32;&#32;&#32;<emphasis role="keyword">protected</emphasis>&#32;<link linkend="_class_leap_1_1_frame">Frame</link>&#32;<link linkend="_class_leap_1_1_unity_1_1_leap_service_provider_1ac15ba4ed3804cbef57d8415dcae4fe42">_transformedUpdateFrame</link>;
+<anchor xml:id="__leap_service_provider_8cs_source_1l00115"/><link linkend="_class_leap_1_1_unity_1_1_leap_service_provider_1a98ea79a3b9e6c2d51ff87ae797ea96c1">00115</link> &#32;&#32;&#32;&#32;<emphasis role="keyword">protected</emphasis>&#32;<link linkend="_class_leap_1_1_frame">Frame</link>&#32;<link linkend="_class_leap_1_1_unity_1_1_leap_service_provider_1a98ea79a3b9e6c2d51ff87ae797ea96c1">_untransformedFixedFrame</link>;
+<anchor xml:id="__leap_service_provider_8cs_source_1l00116"/><link linkend="_class_leap_1_1_unity_1_1_leap_service_provider_1a59d1141c5d960ef97315934118fb4afd">00116</link> &#32;&#32;&#32;&#32;<emphasis role="keyword">protected</emphasis>&#32;<link linkend="_class_leap_1_1_frame">Frame</link>&#32;<link linkend="_class_leap_1_1_unity_1_1_leap_service_provider_1a59d1141c5d960ef97315934118fb4afd">_transformedFixedFrame</link>;
+00117 
+00118 <emphasis role="preprocessor">&#32;&#32;&#32;&#32;#endregion</emphasis>
+00119 
+00120 <emphasis role="preprocessor">&#32;&#32;&#32;&#32;#region&#32;Edit-time&#32;Frame&#32;Data</emphasis>
+00121 &#32;&#32;&#32;&#32;
+00122 &#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;Action&lt;Device&gt;&#32;_onDeviceSafe;
+<anchor xml:id="__leap_service_provider_8cs_source_1l00130"/><link linkend="_class_leap_1_1_unity_1_1_leap_service_provider_1a3d7b925adafada59a54fd28c53a7f86d">00130</link> &#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keyword">event</emphasis>&#32;Action&lt;Device&gt;&#32;<link linkend="_class_leap_1_1_unity_1_1_leap_service_provider_1a3d7b925adafada59a54fd28c53a7f86d">OnDeviceSafe</link>&#32;{
+00131 &#32;&#32;&#32;&#32;&#32;&#32;add&#32;{
+00132 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(<link linkend="_class_leap_1_1_unity_1_1_leap_service_provider_1a81109a7f1bd8d6fb195fb31e5c85fad3">_leapController</link>&#32;!=&#32;<emphasis role="keyword">null</emphasis>&#32;&amp;&amp;&#32;<link linkend="_class_leap_1_1_unity_1_1_leap_service_provider_1a81109a7f1bd8d6fb195fb31e5c85fad3">_leapController</link>.<link linkend="_class_leap_1_1_controller_1aac7cccf354ef1a6f1f01222a9b63d8bd">IsConnected</link>)&#32;{
+00133 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">foreach</emphasis>&#32;(var&#32;device&#32;<emphasis role="keywordflow">in</emphasis>&#32;<link linkend="_class_leap_1_1_unity_1_1_leap_service_provider_1a81109a7f1bd8d6fb195fb31e5c85fad3">_leapController</link>.<link linkend="_class_leap_1_1_controller_1aa5e641f54418e5194161ac45dc15c7fb">Devices</link>)&#32;{
+00134 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;value(device);
+00135 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00136 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00137 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;_onDeviceSafe&#32;+=&#32;value;
+00138 &#32;&#32;&#32;&#32;&#32;&#32;}
+00139 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">remove</emphasis>&#32;{
+00140 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;_onDeviceSafe&#32;-=&#32;value;
+00141 &#32;&#32;&#32;&#32;&#32;&#32;}
+00142 &#32;&#32;&#32;&#32;}
+00143 
+00144 <emphasis role="preprocessor">&#32;&#32;&#32;&#32;#if&#32;UNITY_EDITOR</emphasis>
+00145 &#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;<link linkend="_class_leap_1_1_frame">Frame</link>&#32;_backingUntransformedEditTimeFrame&#32;=&#32;<emphasis role="keyword">null</emphasis>;
+00146 &#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;<link linkend="_class_leap_1_1_frame">Frame</link>&#32;_untransformedEditTimeFrame&#32;{
+00147 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">get</emphasis>&#32;{
+00148 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(_backingUntransformedEditTimeFrame&#32;==&#32;<emphasis role="keyword">null</emphasis>)&#32;{
+00149 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;_backingUntransformedEditTimeFrame&#32;=&#32;<emphasis role="keyword">new</emphasis>&#32;<link linkend="_class_leap_1_1_frame">Frame</link>();
+00150 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00151 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;_backingUntransformedEditTimeFrame;
+00152 &#32;&#32;&#32;&#32;&#32;&#32;}
+00153 &#32;&#32;&#32;&#32;}
+00154 &#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;Frame&#32;_backingEditTimeFrame&#32;=&#32;<emphasis role="keyword">null</emphasis>;
+00155 &#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;Frame&#32;_editTimeFrame&#32;{
+00156 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">get</emphasis>&#32;{
+00157 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(_backingEditTimeFrame&#32;==&#32;<emphasis role="keyword">null</emphasis>)&#32;{
+00158 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;_backingEditTimeFrame&#32;=&#32;<emphasis role="keyword">new</emphasis>&#32;Frame();
+00159 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00160 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;_backingEditTimeFrame;
+00161 &#32;&#32;&#32;&#32;&#32;&#32;}
+00162 &#32;&#32;&#32;&#32;}
+00163 
+00164 &#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;Dictionary&lt;TestHandFactory.TestHandPose,&#32;<link linkend="_namespace_leap_1_1_unity_1_1_interaction_1a9752eb3e2905e8ebd134fff20c155e6baa78b1ac16c0cd02168097fc9a9bd7604">Hand</link>&gt;&#32;_cachedLeftHands
+00165 &#32;&#32;&#32;&#32;&#32;&#32;=&#32;<emphasis role="keyword">new</emphasis>&#32;Dictionary&lt;TestHandFactory.TestHandPose,&#32;<link linkend="_namespace_leap_1_1_unity_1_1_interaction_1a9752eb3e2905e8ebd134fff20c155e6baa78b1ac16c0cd02168097fc9a9bd7604">Hand</link>&gt;();
+00166 &#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;<link linkend="_namespace_leap_1_1_unity_1_1_interaction_1a9752eb3e2905e8ebd134fff20c155e6baa78b1ac16c0cd02168097fc9a9bd7604">Hand</link>&#32;_editTimeLeftHand&#32;{
+00167 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">get</emphasis>&#32;{
+00168 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_namespace_leap_1_1_unity_1_1_interaction_1a9752eb3e2905e8ebd134fff20c155e6baa78b1ac16c0cd02168097fc9a9bd7604">Hand</link>&#32;cachedHand;
+00169 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(_cachedLeftHands.TryGetValue(<link linkend="_class_leap_1_1_unity_1_1_leap_provider_1a80150ace9cb1c6681fb2d41792ede8f3">editTimePose</link>,&#32;out&#32;cachedHand))&#32;{
+00170 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;cachedHand;
+00171 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00172 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">else</emphasis>&#32;{
+00173 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;cachedHand&#32;=&#32;TestHandFactory.MakeTestHand(isLeft:&#32;<emphasis role="keyword">true</emphasis>,&#32;pose:&#32;<link linkend="_class_leap_1_1_unity_1_1_leap_provider_1a80150ace9cb1c6681fb2d41792ede8f3">editTimePose</link>);
+00174 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;_cachedLeftHands[<link linkend="_class_leap_1_1_unity_1_1_leap_provider_1a80150ace9cb1c6681fb2d41792ede8f3">editTimePose</link>]&#32;=&#32;cachedHand;
+00175 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;cachedHand;
+00176 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00177 &#32;&#32;&#32;&#32;&#32;&#32;}
+00178 &#32;&#32;&#32;&#32;}
+00179 
+00180 &#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;Dictionary&lt;TestHandFactory.TestHandPose,&#32;<link linkend="_namespace_leap_1_1_unity_1_1_interaction_1a9752eb3e2905e8ebd134fff20c155e6baa78b1ac16c0cd02168097fc9a9bd7604">Hand</link>&gt;&#32;_cachedRightHands
+00181 &#32;&#32;&#32;&#32;&#32;&#32;=&#32;<emphasis role="keyword">new</emphasis>&#32;Dictionary&lt;TestHandFactory.TestHandPose,&#32;<link linkend="_namespace_leap_1_1_unity_1_1_interaction_1a9752eb3e2905e8ebd134fff20c155e6baa78b1ac16c0cd02168097fc9a9bd7604">Hand</link>&gt;();
+00182 &#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;<link linkend="_namespace_leap_1_1_unity_1_1_interaction_1a9752eb3e2905e8ebd134fff20c155e6baa78b1ac16c0cd02168097fc9a9bd7604">Hand</link>&#32;_editTimeRightHand&#32;{
+00183 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">get</emphasis>&#32;{
+00184 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_namespace_leap_1_1_unity_1_1_interaction_1a9752eb3e2905e8ebd134fff20c155e6baa78b1ac16c0cd02168097fc9a9bd7604">Hand</link>&#32;cachedHand;
+00185 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(_cachedRightHands.TryGetValue(<link linkend="_class_leap_1_1_unity_1_1_leap_provider_1a80150ace9cb1c6681fb2d41792ede8f3">editTimePose</link>,&#32;out&#32;cachedHand))&#32;{
+00186 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;cachedHand;
+00187 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00188 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">else</emphasis>&#32;{
+00189 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;cachedHand&#32;=&#32;TestHandFactory.MakeTestHand(isLeft:&#32;<emphasis role="keyword">false</emphasis>,&#32;pose:&#32;<link linkend="_class_leap_1_1_unity_1_1_leap_provider_1a80150ace9cb1c6681fb2d41792ede8f3">editTimePose</link>);
+00190 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;_cachedRightHands[<link linkend="_class_leap_1_1_unity_1_1_leap_provider_1a80150ace9cb1c6681fb2d41792ede8f3">editTimePose</link>]&#32;=&#32;cachedHand;
+00191 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;cachedHand;
+00192 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00193 &#32;&#32;&#32;&#32;&#32;&#32;}
+00194 &#32;&#32;&#32;&#32;}
+00195 
+00196 <emphasis role="preprocessor">&#32;&#32;&#32;&#32;#endif</emphasis>
+00197 
+00198 <emphasis role="preprocessor">&#32;&#32;&#32;&#32;#endregion</emphasis>
+00199 
+00200 <emphasis role="preprocessor">&#32;&#32;&#32;&#32;#region&#32;LeapProvider&#32;Implementation</emphasis>
+00201 
+<anchor xml:id="__leap_service_provider_8cs_source_1l00202"/><link linkend="_class_leap_1_1_unity_1_1_leap_service_provider_1ad651609e570c614c6d99de319ad990cd">00202</link> &#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keyword">override</emphasis>&#32;<link linkend="_class_leap_1_1_frame">Frame</link>&#32;<link linkend="_class_leap_1_1_unity_1_1_leap_service_provider_1ad651609e570c614c6d99de319ad990cd">CurrentFrame</link>&#32;{
+00203 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">get</emphasis>&#32;{
+00204 <emphasis role="preprocessor">&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;#if&#32;UNITY_EDITOR</emphasis>
+00205 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(!Application.isPlaying)&#32;{
+00206 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;_editTimeFrame.<link linkend="_class_leap_1_1_frame_1af0281471fb3831307b40a1124565d069">Hands</link>.Clear();
+00207 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;_untransformedEditTimeFrame.Hands.Clear();
+00208 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;_untransformedEditTimeFrame.Hands.Add(_editTimeLeftHand);
+00209 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;_untransformedEditTimeFrame.Hands.Add(_editTimeRightHand);
+00210 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_leap_1_1_unity_1_1_leap_service_provider_1a019689a8ce8bc22f6c0effa7010ec215">transformFrame</link>(_untransformedEditTimeFrame,&#32;_editTimeFrame);
+00211 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;_editTimeFrame;
+00212 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00213 <emphasis role="preprocessor">&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;#endif</emphasis>
+00214 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(<link linkend="_class_leap_1_1_unity_1_1_leap_service_provider_1a58ab122b5e6430d5fb98fccf7e600e54">_frameOptimization</link>&#32;==&#32;<link linkend="_class_leap_1_1_unity_1_1_leap_service_provider_1aded29faa9adf0b09e63a1659e5b0f82d">FrameOptimizationMode</link>.ReusePhysicsForUpdate)&#32;{
+00215 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;<link linkend="_class_leap_1_1_unity_1_1_leap_service_provider_1a59d1141c5d960ef97315934118fb4afd">_transformedFixedFrame</link>;
+00216 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}&#32;<emphasis role="keywordflow">else</emphasis>&#32;{
+00217 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;<link linkend="_class_leap_1_1_unity_1_1_leap_service_provider_1ac15ba4ed3804cbef57d8415dcae4fe42">_transformedUpdateFrame</link>;
+00218 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00219 &#32;&#32;&#32;&#32;&#32;&#32;}
+00220 &#32;&#32;&#32;&#32;}
+00221 
+<anchor xml:id="__leap_service_provider_8cs_source_1l00222"/><link linkend="_class_leap_1_1_unity_1_1_leap_service_provider_1a702f0ea7c9a82cdc65738b8545235d60">00222</link> &#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keyword">override</emphasis>&#32;<link linkend="_class_leap_1_1_frame">Frame</link>&#32;<link linkend="_class_leap_1_1_unity_1_1_leap_service_provider_1a702f0ea7c9a82cdc65738b8545235d60">CurrentFixedFrame</link>&#32;{
+00223 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">get</emphasis>&#32;{
+00224 <emphasis role="preprocessor">&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;#if&#32;UNITY_EDITOR</emphasis>
+00225 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(!Application.isPlaying)&#32;{
+00226 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;_editTimeFrame.<link linkend="_class_leap_1_1_frame_1af0281471fb3831307b40a1124565d069">Hands</link>.Clear();
+00227 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;_untransformedEditTimeFrame.Hands.Clear();
+00228 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;_untransformedEditTimeFrame.Hands.Add(_editTimeLeftHand);
+00229 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;_untransformedEditTimeFrame.Hands.Add(_editTimeRightHand);
+00230 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_leap_1_1_unity_1_1_leap_service_provider_1a019689a8ce8bc22f6c0effa7010ec215">transformFrame</link>(_untransformedEditTimeFrame,&#32;_editTimeFrame);
+00231 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;_editTimeFrame;
+00232 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00233 <emphasis role="preprocessor">&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;#endif</emphasis>
+00234 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(<link linkend="_class_leap_1_1_unity_1_1_leap_service_provider_1a58ab122b5e6430d5fb98fccf7e600e54">_frameOptimization</link>&#32;==&#32;<link linkend="_class_leap_1_1_unity_1_1_leap_service_provider_1aded29faa9adf0b09e63a1659e5b0f82d">FrameOptimizationMode</link>.ReuseUpdateForPhysics)&#32;{
+00235 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;<link linkend="_class_leap_1_1_unity_1_1_leap_service_provider_1ac15ba4ed3804cbef57d8415dcae4fe42">_transformedUpdateFrame</link>;
+00236 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}&#32;<emphasis role="keywordflow">else</emphasis>&#32;{
+00237 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;<link linkend="_class_leap_1_1_unity_1_1_leap_service_provider_1a59d1141c5d960ef97315934118fb4afd">_transformedFixedFrame</link>;
+00238 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00239 &#32;&#32;&#32;&#32;&#32;&#32;}
+00240 &#32;&#32;&#32;&#32;}
+00241 
+00242 <emphasis role="preprocessor">&#32;&#32;&#32;&#32;#endregion</emphasis>
+00243 
+00244 <emphasis role="preprocessor">&#32;&#32;&#32;&#32;#region&#32;Unity&#32;Events</emphasis>
+00245 
+<anchor xml:id="__leap_service_provider_8cs_source_1l00246"/><link linkend="_class_leap_1_1_unity_1_1_leap_service_provider_1af249b412176e1018f24d4628cb476316">00246</link> &#32;&#32;&#32;&#32;<emphasis role="keyword">protected</emphasis>&#32;<emphasis role="keyword">virtual</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;<link linkend="_class_leap_1_1_unity_1_1_leap_service_provider_1af249b412176e1018f24d4628cb476316">Reset</link>()&#32;{
+00247 &#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_leap_1_1_unity_1_1_leap_provider_1a80150ace9cb1c6681fb2d41792ede8f3">editTimePose</link>&#32;=&#32;TestHandFactory.TestHandPose.DesktopModeA;
+00248 &#32;&#32;&#32;&#32;}
+00249 
+<anchor xml:id="__leap_service_provider_8cs_source_1l00250"/><link linkend="_class_leap_1_1_unity_1_1_leap_service_provider_1a0dbd5c42d7a531d4dab5f2db44035966">00250</link> &#32;&#32;&#32;&#32;<emphasis role="keyword">protected</emphasis>&#32;<emphasis role="keyword">virtual</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;<link linkend="_class_leap_1_1_unity_1_1_leap_service_provider_1a0dbd5c42d7a531d4dab5f2db44035966">Awake</link>()&#32;{
+00251 &#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_leap_1_1_unity_1_1_leap_service_provider_1acc5d58cd24f2c8e6fdcfe3055b11c236">_fixedOffset</link>.<link linkend="_class_leap_1_1_unity_1_1_smoothed_float_1a5cd6d4133c91fa19fd4599f446f3d7f5">delay</link>&#32;=&#32;0.4f;
+00252 &#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_leap_1_1_unity_1_1_leap_service_provider_1a03a08f2d279d9884cb6d754ce4412ac2">_smoothedTrackingLatency</link>.<link linkend="_class_leap_1_1_unity_1_1_smoothed_float_1a2c8704ac663800cb27c38cc6377bba06">SetBlend</link>(0.99f,&#32;0.0111f);
+00253 &#32;&#32;&#32;&#32;}
+00254 
+<anchor xml:id="__leap_service_provider_8cs_source_1l00255"/><link linkend="_class_leap_1_1_unity_1_1_leap_service_provider_1aee7af248182bf0df5767cf27f55ec1ca">00255</link> &#32;&#32;&#32;&#32;<emphasis role="keyword">protected</emphasis>&#32;<emphasis role="keyword">virtual</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;<link linkend="_class_leap_1_1_unity_1_1_leap_service_provider_1aee7af248182bf0df5767cf27f55ec1ca">Start</link>()&#32;{
+00256 &#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_leap_1_1_unity_1_1_leap_service_provider_1ac79f148cc55c9680e605c48e744971c7">createController</link>();
+00257 &#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_leap_1_1_unity_1_1_leap_service_provider_1ac15ba4ed3804cbef57d8415dcae4fe42">_transformedUpdateFrame</link>&#32;=&#32;<emphasis role="keyword">new</emphasis>&#32;<link linkend="_class_leap_1_1_frame">Frame</link>();
+00258 &#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_leap_1_1_unity_1_1_leap_service_provider_1a59d1141c5d960ef97315934118fb4afd">_transformedFixedFrame</link>&#32;=&#32;<emphasis role="keyword">new</emphasis>&#32;<link linkend="_class_leap_1_1_frame">Frame</link>();
+00259 &#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_leap_1_1_unity_1_1_leap_service_provider_1a755ed665a53e5ea05559aad7704179d4">_untransformedUpdateFrame</link>&#32;=&#32;<emphasis role="keyword">new</emphasis>&#32;<link linkend="_class_leap_1_1_frame">Frame</link>();
+00260 &#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_leap_1_1_unity_1_1_leap_service_provider_1a98ea79a3b9e6c2d51ff87ae797ea96c1">_untransformedFixedFrame</link>&#32;=&#32;<emphasis role="keyword">new</emphasis>&#32;<link linkend="_class_leap_1_1_frame">Frame</link>();
+00261 &#32;&#32;&#32;&#32;}
+00262 
+<anchor xml:id="__leap_service_provider_8cs_source_1l00263"/><link linkend="_class_leap_1_1_unity_1_1_leap_service_provider_1a8823a3e4e7c2c5f1d71dbe9a9fb937f4">00263</link> &#32;&#32;&#32;&#32;<emphasis role="keyword">protected</emphasis>&#32;<emphasis role="keyword">virtual</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;<link linkend="_class_leap_1_1_unity_1_1_leap_service_provider_1a8823a3e4e7c2c5f1d71dbe9a9fb937f4">Update</link>()&#32;{
+00264 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(<link linkend="_class_leap_1_1_unity_1_1_leap_service_provider_1a509baa1d3527f6417e9861925d2bd447">_workerThreadProfiling</link>)&#32;{
+00265 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;LeapProfiling.Update();
+00266 &#32;&#32;&#32;&#32;&#32;&#32;}
+00267 
+00268 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(!<link linkend="_class_leap_1_1_unity_1_1_leap_service_provider_1af943038b16006eb527d6e2a0dccc84c9">checkConnectionIntegrity</link>())&#32;{&#32;<emphasis role="keywordflow">return</emphasis>;&#32;}
+00269 
+00270 <emphasis role="preprocessor">#if&#32;UNITY_EDITOR</emphasis>
+00271 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(<link linkend="_namespace_unity_editor">UnityEditor</link>.EditorApplication.isCompiling)&#32;{
+00272 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_namespace_unity_editor">UnityEditor</link>.EditorApplication.isPlaying&#32;=&#32;<emphasis role="keyword">false</emphasis>;
+00273 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;Debug.LogWarning(<emphasis role="stringliteral">&quot;Unity&#32;hot&#32;reloading&#32;not&#32;currently&#32;supported.&#32;Stopping&#32;Editor&#32;Playback.&quot;</emphasis>);
+00274 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>;
+00275 &#32;&#32;&#32;&#32;&#32;&#32;}
+00276 <emphasis role="preprocessor">#endif</emphasis>
+00277 
+00278 &#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_leap_1_1_unity_1_1_leap_service_provider_1acc5d58cd24f2c8e6fdcfe3055b11c236">_fixedOffset</link>.<link linkend="_class_leap_1_1_unity_1_1_smoothed_float_1ad83fc14468793a846eb227919002fed0">Update</link>(Time.time&#32;-&#32;Time.fixedTime,&#32;Time.deltaTime);
+00279 
+00280 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(<link linkend="_class_leap_1_1_unity_1_1_leap_service_provider_1a58ab122b5e6430d5fb98fccf7e600e54">_frameOptimization</link>&#32;==&#32;<link linkend="_class_leap_1_1_unity_1_1_leap_service_provider_1aded29faa9adf0b09e63a1659e5b0f82d">FrameOptimizationMode</link>.ReusePhysicsForUpdate)&#32;{
+00281 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_leap_1_1_unity_1_1_leap_provider_1a2b90958e448e8f556d2b9c9af4a9547c">DispatchUpdateFrameEvent</link>(<link linkend="_class_leap_1_1_unity_1_1_leap_service_provider_1a59d1141c5d960ef97315934118fb4afd">_transformedFixedFrame</link>);
+00282 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>;
+00283 &#32;&#32;&#32;&#32;&#32;&#32;}
+00284 
+00285 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(<link linkend="_class_leap_1_1_unity_1_1_leap_service_provider_1a9d65f610510fdc7bb299d5f9b6bbdd29">_useInterpolation</link>)&#32;{
+00286 <emphasis role="preprocessor">#if&#32;!UNITY_ANDROID&#32;||&#32;UNITY_EDITOR</emphasis>
+00287 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_leap_1_1_unity_1_1_leap_service_provider_1a03a08f2d279d9884cb6d754ce4412ac2">_smoothedTrackingLatency</link>.<link linkend="_class_leap_1_1_unity_1_1_smoothed_float_1a1fdf3ee4ae067a5ccb975320829a4327">value</link>&#32;=&#32;Mathf.Min(<link linkend="_class_leap_1_1_unity_1_1_leap_service_provider_1a03a08f2d279d9884cb6d754ce4412ac2">_smoothedTrackingLatency</link>.<link linkend="_class_leap_1_1_unity_1_1_smoothed_float_1a1fdf3ee4ae067a5ccb975320829a4327">value</link>,&#32;30000f);
+00288 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_leap_1_1_unity_1_1_leap_service_provider_1a03a08f2d279d9884cb6d754ce4412ac2">_smoothedTrackingLatency</link>.<link linkend="_class_leap_1_1_unity_1_1_smoothed_float_1ad83fc14468793a846eb227919002fed0">Update</link>((<emphasis role="keywordtype">float</emphasis>)(<link linkend="_class_leap_1_1_unity_1_1_leap_service_provider_1a81109a7f1bd8d6fb195fb31e5c85fad3">_leapController</link>.<link linkend="_class_leap_1_1_controller_1a57650944fa868adcfe4cea8608af5a03">Now</link>()&#32;-&#32;<link linkend="_class_leap_1_1_unity_1_1_leap_service_provider_1a81109a7f1bd8d6fb195fb31e5c85fad3">_leapController</link>.<link linkend="_class_leap_1_1_controller_1a3babd82558546e8bc5de90fb80d201ec">FrameTimestamp</link>()),&#32;Time.deltaTime);
+00289 <emphasis role="preprocessor">#endif</emphasis>
+00290 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordtype">long</emphasis>&#32;timestamp&#32;=&#32;<link linkend="_class_leap_1_1_unity_1_1_leap_service_provider_1a54a106ef4054e95402df75c45a7bc321">CalculateInterpolationTime</link>()&#32;+&#32;(<link linkend="_class_leap_1_1_unity_1_1_leap_service_provider_1ab8edf176edaa9cddcc300f170f61c55e">ExtrapolationAmount</link>&#32;*&#32;1000);
+00291 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_leap_1_1_unity_1_1_leap_service_provider_1a7900d6d7021d9283515d8d42bd5984ad">_unityToLeapOffset</link>&#32;=&#32;timestamp&#32;-&#32;(long)(Time.time&#32;*&#32;<link linkend="_class_leap_1_1_unity_1_1_leap_service_provider_1a0baaa02c5e7d4a148ec737876b7b388b">S_TO_NS</link>);
+00292 
+00293 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_leap_1_1_unity_1_1_leap_service_provider_1a81109a7f1bd8d6fb195fb31e5c85fad3">_leapController</link>.<link linkend="_class_leap_1_1_controller_1ae025d7fd3e26a385907af50732d5cf6f">GetInterpolatedFrameFromTime</link>(<link linkend="_class_leap_1_1_unity_1_1_leap_service_provider_1a755ed665a53e5ea05559aad7704179d4">_untransformedUpdateFrame</link>,&#32;timestamp,&#32;<link linkend="_class_leap_1_1_unity_1_1_leap_service_provider_1a54a106ef4054e95402df75c45a7bc321">CalculateInterpolationTime</link>()&#32;-&#32;(<link linkend="_class_leap_1_1_unity_1_1_leap_service_provider_1a7ce59365ab427558123780fa15ca50fd">BounceAmount</link>&#32;*&#32;1000));
+00294 &#32;&#32;&#32;&#32;&#32;&#32;}
+00295 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">else</emphasis>&#32;{
+00296 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_leap_1_1_unity_1_1_leap_service_provider_1a81109a7f1bd8d6fb195fb31e5c85fad3">_leapController</link>.<link linkend="_class_leap_1_1_controller_1ac41dc9c50a3bd2a892cc44af0859ef0d">Frame</link>(<link linkend="_class_leap_1_1_unity_1_1_leap_service_provider_1a755ed665a53e5ea05559aad7704179d4">_untransformedUpdateFrame</link>);
+00297 &#32;&#32;&#32;&#32;&#32;&#32;}
+00298 
+00299 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(<link linkend="_class_leap_1_1_unity_1_1_leap_service_provider_1a755ed665a53e5ea05559aad7704179d4">_untransformedUpdateFrame</link>&#32;!=&#32;<emphasis role="keyword">null</emphasis>)&#32;{
+00300 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_leap_1_1_unity_1_1_leap_service_provider_1a019689a8ce8bc22f6c0effa7010ec215">transformFrame</link>(<link linkend="_class_leap_1_1_unity_1_1_leap_service_provider_1a755ed665a53e5ea05559aad7704179d4">_untransformedUpdateFrame</link>,&#32;<link linkend="_class_leap_1_1_unity_1_1_leap_service_provider_1ac15ba4ed3804cbef57d8415dcae4fe42">_transformedUpdateFrame</link>);
+00301 
+00302 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_leap_1_1_unity_1_1_leap_provider_1a2b90958e448e8f556d2b9c9af4a9547c">DispatchUpdateFrameEvent</link>(<link linkend="_class_leap_1_1_unity_1_1_leap_service_provider_1ac15ba4ed3804cbef57d8415dcae4fe42">_transformedUpdateFrame</link>);
+00303 &#32;&#32;&#32;&#32;&#32;&#32;}
+00304 &#32;&#32;&#32;&#32;}
+00305 
+<anchor xml:id="__leap_service_provider_8cs_source_1l00306"/><link linkend="_class_leap_1_1_unity_1_1_leap_service_provider_1a98629de6c901a83829c2210e45b4a41a">00306</link> &#32;&#32;&#32;&#32;<emphasis role="keyword">protected</emphasis>&#32;<emphasis role="keyword">virtual</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;<link linkend="_class_leap_1_1_unity_1_1_leap_service_provider_1a98629de6c901a83829c2210e45b4a41a">FixedUpdate</link>()&#32;{
+00307 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(<link linkend="_class_leap_1_1_unity_1_1_leap_service_provider_1a58ab122b5e6430d5fb98fccf7e600e54">_frameOptimization</link>&#32;==&#32;<link linkend="_class_leap_1_1_unity_1_1_leap_service_provider_1aded29faa9adf0b09e63a1659e5b0f82d">FrameOptimizationMode</link>.ReuseUpdateForPhysics)&#32;{
+00308 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_leap_1_1_unity_1_1_leap_provider_1af7fdbc4bae6cb0508424b8c3bdbb4ce1">DispatchFixedFrameEvent</link>(<link linkend="_class_leap_1_1_unity_1_1_leap_service_provider_1ac15ba4ed3804cbef57d8415dcae4fe42">_transformedUpdateFrame</link>);
+00309 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>;
+00310 &#32;&#32;&#32;&#32;&#32;&#32;}
+00311 
+00312 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(<link linkend="_class_leap_1_1_unity_1_1_leap_service_provider_1a9d65f610510fdc7bb299d5f9b6bbdd29">_useInterpolation</link>)&#32;{
+00313 
+00314 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordtype">long</emphasis>&#32;timestamp;
+00315 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">switch</emphasis>&#32;(<link linkend="_class_leap_1_1_unity_1_1_leap_service_provider_1a58ab122b5e6430d5fb98fccf7e600e54">_frameOptimization</link>)&#32;{
+00316 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">case</emphasis>&#32;<link linkend="_class_leap_1_1_unity_1_1_leap_service_provider_1aded29faa9adf0b09e63a1659e5b0f82d">FrameOptimizationMode</link>.None:
+00317 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;By&#32;default&#32;we&#32;use&#32;Time.fixedTime&#32;to&#32;ensure&#32;that&#32;our&#32;hands&#32;are&#32;on&#32;the&#32;same</emphasis>
+00318 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;timeline&#32;as&#32;Update.&#32;&#32;We&#32;add&#32;an&#32;extrapolation&#32;value&#32;to&#32;help&#32;compensate</emphasis>
+00319 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;for&#32;latency.</emphasis>
+00320 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordtype">float</emphasis>&#32;extrapolatedTime&#32;=&#32;Time.fixedTime&#32;+&#32;<link linkend="_class_leap_1_1_unity_1_1_leap_service_provider_1ad930af3ae3d63279248bd7f41ab58671">CalculatePhysicsExtrapolation</link>();
+00321 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;timestamp&#32;=&#32;(long)(extrapolatedTime&#32;*&#32;<link linkend="_class_leap_1_1_unity_1_1_leap_service_provider_1a0baaa02c5e7d4a148ec737876b7b388b">S_TO_NS</link>)&#32;+&#32;<link linkend="_class_leap_1_1_unity_1_1_leap_service_provider_1a7900d6d7021d9283515d8d42bd5984ad">_unityToLeapOffset</link>;
+00322 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">break</emphasis>;
+00323 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">case</emphasis>&#32;<link linkend="_class_leap_1_1_unity_1_1_leap_service_provider_1aded29faa9adf0b09e63a1659e5b0f82d">FrameOptimizationMode</link>.ReusePhysicsForUpdate:
+00324 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;If&#32;we&#32;are&#32;re-using&#32;physics&#32;frames&#32;for&#32;update,&#32;we&#32;don&apos;t&#32;even&#32;want&#32;to&#32;care</emphasis>
+00325 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;about&#32;Time.fixedTime,&#32;just&#32;grab&#32;the&#32;most&#32;recent&#32;interpolated&#32;timestamp</emphasis>
+00326 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;like&#32;we&#32;are&#32;in&#32;Update.</emphasis>
+00327 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;timestamp&#32;=&#32;<link linkend="_class_leap_1_1_unity_1_1_leap_service_provider_1a54a106ef4054e95402df75c45a7bc321">CalculateInterpolationTime</link>()&#32;+&#32;(<link linkend="_class_leap_1_1_unity_1_1_leap_service_provider_1ab8edf176edaa9cddcc300f170f61c55e">ExtrapolationAmount</link>&#32;*&#32;1000);
+00328 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">break</emphasis>;
+00329 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">default</emphasis>:
+00330 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">throw</emphasis>&#32;<emphasis role="keyword">new</emphasis>&#32;System.InvalidOperationException(
+00331 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="stringliteral">&quot;Unexpected&#32;frame&#32;optimization&#32;mode:&#32;&quot;</emphasis>&#32;+&#32;<link linkend="_class_leap_1_1_unity_1_1_leap_service_provider_1a58ab122b5e6430d5fb98fccf7e600e54">_frameOptimization</link>);
+00332 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00333 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_leap_1_1_unity_1_1_leap_service_provider_1a81109a7f1bd8d6fb195fb31e5c85fad3">_leapController</link>.<link linkend="_class_leap_1_1_controller_1aa99cf433f25105c63083d9b6f6ded2e9">GetInterpolatedFrame</link>(<link linkend="_class_leap_1_1_unity_1_1_leap_service_provider_1a98ea79a3b9e6c2d51ff87ae797ea96c1">_untransformedFixedFrame</link>,&#32;timestamp);
+00334 
+00335 &#32;&#32;&#32;&#32;&#32;&#32;}
+00336 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">else</emphasis>&#32;{
+00337 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_leap_1_1_unity_1_1_leap_service_provider_1a81109a7f1bd8d6fb195fb31e5c85fad3">_leapController</link>.<link linkend="_class_leap_1_1_controller_1ac41dc9c50a3bd2a892cc44af0859ef0d">Frame</link>(<link linkend="_class_leap_1_1_unity_1_1_leap_service_provider_1a98ea79a3b9e6c2d51ff87ae797ea96c1">_untransformedFixedFrame</link>);
+00338 &#32;&#32;&#32;&#32;&#32;&#32;}
+00339 
+00340 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(<link linkend="_class_leap_1_1_unity_1_1_leap_service_provider_1a98ea79a3b9e6c2d51ff87ae797ea96c1">_untransformedFixedFrame</link>&#32;!=&#32;<emphasis role="keyword">null</emphasis>)&#32;{
+00341 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_leap_1_1_unity_1_1_leap_service_provider_1a019689a8ce8bc22f6c0effa7010ec215">transformFrame</link>(<link linkend="_class_leap_1_1_unity_1_1_leap_service_provider_1a98ea79a3b9e6c2d51ff87ae797ea96c1">_untransformedFixedFrame</link>,&#32;<link linkend="_class_leap_1_1_unity_1_1_leap_service_provider_1a59d1141c5d960ef97315934118fb4afd">_transformedFixedFrame</link>);
+00342 
+00343 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_leap_1_1_unity_1_1_leap_provider_1af7fdbc4bae6cb0508424b8c3bdbb4ce1">DispatchFixedFrameEvent</link>(<link linkend="_class_leap_1_1_unity_1_1_leap_service_provider_1a59d1141c5d960ef97315934118fb4afd">_transformedFixedFrame</link>);
+00344 &#32;&#32;&#32;&#32;&#32;&#32;}
+00345 &#32;&#32;&#32;&#32;}
+00346 
+<anchor xml:id="__leap_service_provider_8cs_source_1l00347"/><link linkend="_class_leap_1_1_unity_1_1_leap_service_provider_1ae5dc9fe551328a3d46cf7700777124cb">00347</link> &#32;&#32;&#32;&#32;<emphasis role="keyword">protected</emphasis>&#32;<emphasis role="keyword">virtual</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;<link linkend="_class_leap_1_1_unity_1_1_leap_service_provider_1ae5dc9fe551328a3d46cf7700777124cb">OnDestroy</link>()&#32;{
+00348 &#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_leap_1_1_unity_1_1_leap_service_provider_1aaae9cfba0cd9335579e18dab63c508b0">destroyController</link>();
+00349 &#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_leap_1_1_unity_1_1_leap_service_provider_1a8e1a44556c88725caaaafa35e0991d78">_isDestroyed</link>&#32;=&#32;<emphasis role="keyword">true</emphasis>;
+00350 &#32;&#32;&#32;&#32;}
+00351 
+<anchor xml:id="__leap_service_provider_8cs_source_1l00352"/><link linkend="_class_leap_1_1_unity_1_1_leap_service_provider_1a13467308ac2863f83e081b2e4ca10cb7">00352</link> &#32;&#32;&#32;&#32;<emphasis role="keyword">protected</emphasis>&#32;<emphasis role="keyword">virtual</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;<link linkend="_class_leap_1_1_unity_1_1_leap_service_provider_1a13467308ac2863f83e081b2e4ca10cb7">OnApplicationPause</link>(<emphasis role="keywordtype">bool</emphasis>&#32;isPaused)&#32;{
+00353 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(<link linkend="_class_leap_1_1_unity_1_1_leap_service_provider_1a81109a7f1bd8d6fb195fb31e5c85fad3">_leapController</link>&#32;!=&#32;<emphasis role="keyword">null</emphasis>)&#32;{
+00354 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(isPaused)&#32;{
+00355 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_leap_1_1_unity_1_1_leap_service_provider_1a81109a7f1bd8d6fb195fb31e5c85fad3">_leapController</link>.<link linkend="_class_leap_1_1_controller_1a08c17e46012a2774afe1b5901e82ce6a">StopConnection</link>();
+00356 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00357 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">else</emphasis>&#32;{
+00358 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_leap_1_1_unity_1_1_leap_service_provider_1a81109a7f1bd8d6fb195fb31e5c85fad3">_leapController</link>.<link linkend="_class_leap_1_1_controller_1a3e1e2694a23c62c79f9592217529e860">StartConnection</link>();
+00359 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00360 &#32;&#32;&#32;&#32;&#32;&#32;}
+00361 &#32;&#32;&#32;&#32;}
+00362 
+<anchor xml:id="__leap_service_provider_8cs_source_1l00363"/><link linkend="_class_leap_1_1_unity_1_1_leap_service_provider_1a7843e839d89d0dccdd0ac7e5bcc5f5ce">00363</link> &#32;&#32;&#32;&#32;<emphasis role="keyword">protected</emphasis>&#32;<emphasis role="keyword">virtual</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;<link linkend="_class_leap_1_1_unity_1_1_leap_service_provider_1a7843e839d89d0dccdd0ac7e5bcc5f5ce">OnApplicationQuit</link>()&#32;{
+00364 &#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_leap_1_1_unity_1_1_leap_service_provider_1aaae9cfba0cd9335579e18dab63c508b0">destroyController</link>();
+00365 &#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_leap_1_1_unity_1_1_leap_service_provider_1a8e1a44556c88725caaaafa35e0991d78">_isDestroyed</link>&#32;=&#32;<emphasis role="keyword">true</emphasis>;
+00366 &#32;&#32;&#32;&#32;}
+00367 
+<anchor xml:id="__leap_service_provider_8cs_source_1l00368"/><link linkend="_class_leap_1_1_unity_1_1_leap_service_provider_1ad930af3ae3d63279248bd7f41ab58671">00368</link> &#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keywordtype">float</emphasis>&#32;<link linkend="_class_leap_1_1_unity_1_1_leap_service_provider_1ad930af3ae3d63279248bd7f41ab58671">CalculatePhysicsExtrapolation</link>()&#32;{
+00369 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">switch</emphasis>&#32;(<link linkend="_class_leap_1_1_unity_1_1_leap_service_provider_1ad27fe97e7347f34807b34374b0cea29c">_physicsExtrapolation</link>)&#32;{
+00370 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">case</emphasis>&#32;<link linkend="_class_leap_1_1_unity_1_1_leap_service_provider_1a2ce142abf998f86ac23b3d30032ea82e">PhysicsExtrapolationMode</link>.None:
+00371 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;0;
+00372 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">case</emphasis>&#32;<link linkend="_class_leap_1_1_unity_1_1_leap_service_provider_1a2ce142abf998f86ac23b3d30032ea82e">PhysicsExtrapolationMode</link>.Auto:
+00373 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;Time.fixedDeltaTime;
+00374 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">case</emphasis>&#32;<link linkend="_class_leap_1_1_unity_1_1_leap_service_provider_1a2ce142abf998f86ac23b3d30032ea82e">PhysicsExtrapolationMode</link>.Manual:
+00375 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;<link linkend="_class_leap_1_1_unity_1_1_leap_service_provider_1a5233916e10a6d00759deab7e5d4151a0">_physicsExtrapolationTime</link>;
+00376 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">default</emphasis>:
+00377 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">throw</emphasis>&#32;<emphasis role="keyword">new</emphasis>&#32;System.InvalidOperationException(
+00378 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="stringliteral">&quot;Unexpected&#32;physics&#32;extrapolation&#32;mode:&#32;&quot;</emphasis>&#32;+&#32;<link linkend="_class_leap_1_1_unity_1_1_leap_service_provider_1ad27fe97e7347f34807b34374b0cea29c">_physicsExtrapolation</link>);
+00379 &#32;&#32;&#32;&#32;&#32;&#32;}
+00380 &#32;&#32;&#32;&#32;}
+00381 
+00382 <emphasis role="preprocessor">&#32;&#32;&#32;&#32;#endregion</emphasis>
+00383 
+00384 <emphasis role="preprocessor">&#32;&#32;&#32;&#32;#region&#32;Public&#32;API</emphasis>
+00385 
+<anchor xml:id="__leap_service_provider_8cs_source_1l00389"/><link linkend="_class_leap_1_1_unity_1_1_leap_service_provider_1aa146d4e24722ff4b68adeb23e6a1c24e">00389</link> &#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<link linkend="_class_leap_1_1_controller">Controller</link>&#32;<link linkend="_class_leap_1_1_unity_1_1_leap_service_provider_1aa146d4e24722ff4b68adeb23e6a1c24e">GetLeapController</link>()&#32;{
+00390 <emphasis role="preprocessor">&#32;&#32;&#32;&#32;&#32;&#32;#if&#32;UNITY_EDITOR</emphasis>
+00391 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;Null&#32;check&#32;to&#32;deal&#32;with&#32;hot&#32;reloading.</emphasis>
+00392 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(!<link linkend="_class_leap_1_1_unity_1_1_leap_service_provider_1a8e1a44556c88725caaaafa35e0991d78">_isDestroyed</link>&#32;&amp;&amp;&#32;<link linkend="_class_leap_1_1_unity_1_1_leap_service_provider_1a81109a7f1bd8d6fb195fb31e5c85fad3">_leapController</link>&#32;==&#32;<emphasis role="keyword">null</emphasis>)&#32;{
+00393 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_leap_1_1_unity_1_1_leap_service_provider_1ac79f148cc55c9680e605c48e744971c7">createController</link>();
+00394 &#32;&#32;&#32;&#32;&#32;&#32;}
+00395 <emphasis role="preprocessor">&#32;&#32;&#32;&#32;&#32;&#32;#endif</emphasis>
+00396 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;<link linkend="_class_leap_1_1_unity_1_1_leap_service_provider_1a81109a7f1bd8d6fb195fb31e5c85fad3">_leapController</link>;
+00397 &#32;&#32;&#32;&#32;}
+00398 
+<anchor xml:id="__leap_service_provider_8cs_source_1l00403"/><link linkend="_class_leap_1_1_unity_1_1_leap_service_provider_1aeee4a41aefc20b7268f284340b6f793a">00403</link> &#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keywordtype">bool</emphasis>&#32;<link linkend="_class_leap_1_1_unity_1_1_leap_service_provider_1aeee4a41aefc20b7268f284340b6f793a">IsConnected</link>()&#32;{
+00404 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;<link linkend="_class_leap_1_1_unity_1_1_leap_service_provider_1aa146d4e24722ff4b68adeb23e6a1c24e">GetLeapController</link>().<link linkend="_class_leap_1_1_controller_1aac7cccf354ef1a6f1f01222a9b63d8bd">IsConnected</link>;
+00405 &#32;&#32;&#32;&#32;}
+00406 
+<anchor xml:id="__leap_service_provider_8cs_source_1l00412"/><link linkend="_class_leap_1_1_unity_1_1_leap_service_provider_1a8e864272647ed7001524df393505ddf3">00412</link> &#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;<link linkend="_class_leap_1_1_unity_1_1_leap_service_provider_1a8e864272647ed7001524df393505ddf3">RetransformFrames</link>()&#32;{
+00413 &#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_leap_1_1_unity_1_1_leap_service_provider_1a019689a8ce8bc22f6c0effa7010ec215">transformFrame</link>(<link linkend="_class_leap_1_1_unity_1_1_leap_service_provider_1a755ed665a53e5ea05559aad7704179d4">_untransformedUpdateFrame</link>,&#32;<link linkend="_class_leap_1_1_unity_1_1_leap_service_provider_1ac15ba4ed3804cbef57d8415dcae4fe42">_transformedUpdateFrame</link>);
+00414 &#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_leap_1_1_unity_1_1_leap_service_provider_1a019689a8ce8bc22f6c0effa7010ec215">transformFrame</link>(<link linkend="_class_leap_1_1_unity_1_1_leap_service_provider_1a98ea79a3b9e6c2d51ff87ae797ea96c1">_untransformedFixedFrame</link>,&#32;<link linkend="_class_leap_1_1_unity_1_1_leap_service_provider_1a59d1141c5d960ef97315934118fb4afd">_transformedFixedFrame</link>);
+00415 &#32;&#32;&#32;&#32;}
+00416 
+<anchor xml:id="__leap_service_provider_8cs_source_1l00422"/><link linkend="_class_leap_1_1_unity_1_1_leap_service_provider_1ada1aaf6421decbb20a418c412193033c">00422</link> &#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;<link linkend="_class_leap_1_1_unity_1_1_leap_service_provider_1ada1aaf6421decbb20a418c412193033c">CopySettingsToLeapXRServiceProvider</link>(
+00423 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_leap_1_1_unity_1_1_leap_x_r_service_provider">LeapXRServiceProvider</link>&#32;leapXRServiceProvider)&#32;{
+00424 &#32;&#32;&#32;&#32;&#32;&#32;leapXRServiceProvider.<link linkend="_class_leap_1_1_unity_1_1_leap_service_provider_1a58ab122b5e6430d5fb98fccf7e600e54">_frameOptimization</link>&#32;=&#32;<link linkend="_class_leap_1_1_unity_1_1_leap_service_provider_1a58ab122b5e6430d5fb98fccf7e600e54">_frameOptimization</link>;
+00425 &#32;&#32;&#32;&#32;&#32;&#32;leapXRServiceProvider.<link linkend="_class_leap_1_1_unity_1_1_leap_service_provider_1ad27fe97e7347f34807b34374b0cea29c">_physicsExtrapolation</link>&#32;=&#32;<link linkend="_class_leap_1_1_unity_1_1_leap_service_provider_1ad27fe97e7347f34807b34374b0cea29c">_physicsExtrapolation</link>;
+00426 &#32;&#32;&#32;&#32;&#32;&#32;leapXRServiceProvider.<link linkend="_class_leap_1_1_unity_1_1_leap_service_provider_1a5233916e10a6d00759deab7e5d4151a0">_physicsExtrapolationTime</link>&#32;=&#32;<link linkend="_class_leap_1_1_unity_1_1_leap_service_provider_1a5233916e10a6d00759deab7e5d4151a0">_physicsExtrapolationTime</link>;
+00427 &#32;&#32;&#32;&#32;&#32;&#32;leapXRServiceProvider.<link linkend="_class_leap_1_1_unity_1_1_leap_service_provider_1a509baa1d3527f6417e9861925d2bd447">_workerThreadProfiling</link>&#32;=&#32;<link linkend="_class_leap_1_1_unity_1_1_leap_service_provider_1a509baa1d3527f6417e9861925d2bd447">_workerThreadProfiling</link>;
+00428 &#32;&#32;&#32;&#32;}
+00429 
+00430 <emphasis role="preprocessor">&#32;&#32;&#32;&#32;#endregion</emphasis>
+00431 
+00432 <emphasis role="preprocessor">&#32;&#32;&#32;&#32;#region&#32;Internal&#32;Methods</emphasis>
+00433 
+<anchor xml:id="__leap_service_provider_8cs_source_1l00434"/><link linkend="_class_leap_1_1_unity_1_1_leap_service_provider_1a54a106ef4054e95402df75c45a7bc321">00434</link> &#32;&#32;&#32;&#32;<emphasis role="keyword">protected</emphasis>&#32;<emphasis role="keyword">virtual</emphasis>&#32;<emphasis role="keywordtype">long</emphasis>&#32;<link linkend="_class_leap_1_1_unity_1_1_leap_service_provider_1a54a106ef4054e95402df75c45a7bc321">CalculateInterpolationTime</link>(<emphasis role="keywordtype">bool</emphasis>&#32;endOfFrame&#32;=&#32;<emphasis role="keyword">false</emphasis>)&#32;{
+00435 <emphasis role="preprocessor">&#32;&#32;&#32;&#32;&#32;&#32;#if&#32;UNITY_ANDROID&#32;&amp;&amp;&#32;!UNITY_EDITOR</emphasis>
+00436 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;<link linkend="_class_leap_1_1_unity_1_1_leap_service_provider_1a81109a7f1bd8d6fb195fb31e5c85fad3">_leapController</link>.<link linkend="_class_leap_1_1_controller_1a57650944fa868adcfe4cea8608af5a03">Now</link>()&#32;-&#32;16000;
+00437 <emphasis role="preprocessor">&#32;&#32;&#32;&#32;&#32;&#32;#else</emphasis>
+00438 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(<link linkend="_class_leap_1_1_unity_1_1_leap_service_provider_1a81109a7f1bd8d6fb195fb31e5c85fad3">_leapController</link>&#32;!=&#32;<emphasis role="keyword">null</emphasis>)&#32;{
+00439 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;<link linkend="_class_leap_1_1_unity_1_1_leap_service_provider_1a81109a7f1bd8d6fb195fb31e5c85fad3">_leapController</link>.<link linkend="_class_leap_1_1_controller_1a57650944fa868adcfe4cea8608af5a03">Now</link>()&#32;-&#32;(long)<link linkend="_class_leap_1_1_unity_1_1_leap_service_provider_1a03a08f2d279d9884cb6d754ce4412ac2">_smoothedTrackingLatency</link>.<link linkend="_class_leap_1_1_unity_1_1_smoothed_float_1a1fdf3ee4ae067a5ccb975320829a4327">value</link>;
+00440 &#32;&#32;&#32;&#32;&#32;&#32;}&#32;<emphasis role="keywordflow">else</emphasis>&#32;{
+00441 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;0;
+00442 &#32;&#32;&#32;&#32;&#32;&#32;}
+00443 <emphasis role="preprocessor">&#32;&#32;&#32;&#32;&#32;&#32;#endif</emphasis>
+00444 &#32;&#32;&#32;&#32;}
+00445 &#32;&#32;&#32;&#32;
+<anchor xml:id="__leap_service_provider_8cs_source_1l00449"/><link linkend="_class_leap_1_1_unity_1_1_leap_service_provider_1ac6ec54a97c1d2e1bbbe663822b458140">00449</link> &#32;&#32;&#32;&#32;<emphasis role="keyword">protected</emphasis>&#32;<emphasis role="keyword">virtual</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;<link linkend="_class_leap_1_1_unity_1_1_leap_service_provider_1ac6ec54a97c1d2e1bbbe663822b458140">initializeFlags</link>()&#32;{
+00450 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(<link linkend="_class_leap_1_1_unity_1_1_leap_service_provider_1a81109a7f1bd8d6fb195fb31e5c85fad3">_leapController</link>&#32;==&#32;<emphasis role="keyword">null</emphasis>)&#32;{
+00451 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>;
+00452 &#32;&#32;&#32;&#32;&#32;&#32;}
+00453 
+00454 &#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_leap_1_1_unity_1_1_leap_service_provider_1a81109a7f1bd8d6fb195fb31e5c85fad3">_leapController</link>.<link linkend="_class_leap_1_1_controller_1a78edc0a692fa7200a07eee4b651012a4">ClearPolicy</link>(<link linkend="_class_leap_1_1_controller">Controller</link>.<link linkend="_class_leap_1_1_controller_1a0bdb49fa94aa2da8b098c1ac296528d6">PolicyFlag</link>.POLICY_DEFAULT);
+00455 &#32;&#32;&#32;&#32;}
+00456 
+<anchor xml:id="__leap_service_provider_8cs_source_1l00461"/><link linkend="_class_leap_1_1_unity_1_1_leap_service_provider_1ac79f148cc55c9680e605c48e744971c7">00461</link> &#32;&#32;&#32;&#32;<emphasis role="keyword">protected</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;<link linkend="_class_leap_1_1_unity_1_1_leap_service_provider_1ac79f148cc55c9680e605c48e744971c7">createController</link>()&#32;{
+00462 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(<link linkend="_class_leap_1_1_unity_1_1_leap_service_provider_1a81109a7f1bd8d6fb195fb31e5c85fad3">_leapController</link>&#32;!=&#32;<emphasis role="keyword">null</emphasis>)&#32;{
+00463 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>;
+00464 &#32;&#32;&#32;&#32;&#32;&#32;}
+00465 
+00466 &#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_leap_1_1_unity_1_1_leap_service_provider_1a81109a7f1bd8d6fb195fb31e5c85fad3">_leapController</link>&#32;=&#32;<emphasis role="keyword">new</emphasis>&#32;<link linkend="_class_leap_1_1_controller">Controller</link>();
+00467 &#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_leap_1_1_unity_1_1_leap_service_provider_1a81109a7f1bd8d6fb195fb31e5c85fad3">_leapController</link>.<link linkend="_class_leap_1_1_controller_1ac9a2f80c418e12b42b8331c0d5b116b1">Device</link>&#32;+=&#32;(s,&#32;e)&#32;=&gt;&#32;{
+00468 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(_onDeviceSafe&#32;!=&#32;<emphasis role="keyword">null</emphasis>)&#32;{
+00469 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;_onDeviceSafe(e.Device);
+00470 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00471 &#32;&#32;&#32;&#32;&#32;&#32;};
+00472 
+00473 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(<link linkend="_class_leap_1_1_unity_1_1_leap_service_provider_1a81109a7f1bd8d6fb195fb31e5c85fad3">_leapController</link>.<link linkend="_class_leap_1_1_controller_1aac7cccf354ef1a6f1f01222a9b63d8bd">IsConnected</link>)&#32;{
+00474 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_leap_1_1_unity_1_1_leap_service_provider_1ac6ec54a97c1d2e1bbbe663822b458140">initializeFlags</link>();
+00475 &#32;&#32;&#32;&#32;&#32;&#32;}&#32;<emphasis role="keywordflow">else</emphasis>&#32;{
+00476 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_leap_1_1_unity_1_1_leap_service_provider_1a81109a7f1bd8d6fb195fb31e5c85fad3">_leapController</link>.<link linkend="_class_leap_1_1_controller_1ac9a2f80c418e12b42b8331c0d5b116b1">Device</link>&#32;+=&#32;<link linkend="_class_leap_1_1_unity_1_1_leap_service_provider_1aa5658f3913410c8e03b5cc954f8754e6">onHandControllerConnect</link>;
+00477 &#32;&#32;&#32;&#32;&#32;&#32;}
+00478 
+00479 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(<link linkend="_class_leap_1_1_unity_1_1_leap_service_provider_1a509baa1d3527f6417e9861925d2bd447">_workerThreadProfiling</link>)&#32;{
+00480 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//A&#32;controller&#32;will&#32;report&#32;profiling&#32;statistics&#32;for&#32;the&#32;duration&#32;of&#32;it&apos;s&#32;lifetime</emphasis>
+00481 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//so&#32;these&#32;events&#32;will&#32;never&#32;be&#32;unsubscribed&#32;from.</emphasis>
+00482 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_leap_1_1_unity_1_1_leap_service_provider_1a81109a7f1bd8d6fb195fb31e5c85fad3">_leapController</link>.<link linkend="_class_leap_1_1_controller_1a47514a57487eb7543323ef7ca8f197e3">EndProfilingBlock</link>&#32;+=&#32;LeapProfiling.EndProfilingBlock;
+00483 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_leap_1_1_unity_1_1_leap_service_provider_1a81109a7f1bd8d6fb195fb31e5c85fad3">_leapController</link>.<link linkend="_class_leap_1_1_controller_1a6195a732f3ce5a94f41bda37fecca548">BeginProfilingBlock</link>&#32;+=&#32;LeapProfiling.BeginProfilingBlock;
+00484 
+00485 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_leap_1_1_unity_1_1_leap_service_provider_1a81109a7f1bd8d6fb195fb31e5c85fad3">_leapController</link>.<link linkend="_class_leap_1_1_controller_1a29354296ef9a6de70e2ce06db251c16b">EndProfilingForThread</link>&#32;+=&#32;LeapProfiling.EndProfilingForThread;
+00486 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_leap_1_1_unity_1_1_leap_service_provider_1a81109a7f1bd8d6fb195fb31e5c85fad3">_leapController</link>.<link linkend="_class_leap_1_1_controller_1a483c1f8ff0a5557ee0a609bfe242f01c">BeginProfilingForThread</link>&#32;+=&#32;LeapProfiling.BeginProfilingForThread;
+00487 &#32;&#32;&#32;&#32;&#32;&#32;}
+00488 &#32;&#32;&#32;&#32;}
+00489 &#32;&#32;&#32;&#32;
+<anchor xml:id="__leap_service_provider_8cs_source_1l00494"/><link linkend="_class_leap_1_1_unity_1_1_leap_service_provider_1aaae9cfba0cd9335579e18dab63c508b0">00494</link> &#32;&#32;&#32;&#32;<emphasis role="keyword">protected</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;<link linkend="_class_leap_1_1_unity_1_1_leap_service_provider_1aaae9cfba0cd9335579e18dab63c508b0">destroyController</link>()&#32;{
+00495 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(<link linkend="_class_leap_1_1_unity_1_1_leap_service_provider_1a81109a7f1bd8d6fb195fb31e5c85fad3">_leapController</link>&#32;!=&#32;<emphasis role="keyword">null</emphasis>)&#32;{
+00496 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(<link linkend="_class_leap_1_1_unity_1_1_leap_service_provider_1a81109a7f1bd8d6fb195fb31e5c85fad3">_leapController</link>.<link linkend="_class_leap_1_1_controller_1aac7cccf354ef1a6f1f01222a9b63d8bd">IsConnected</link>)&#32;{
+00497 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_leap_1_1_unity_1_1_leap_service_provider_1a81109a7f1bd8d6fb195fb31e5c85fad3">_leapController</link>.<link linkend="_class_leap_1_1_controller_1a78edc0a692fa7200a07eee4b651012a4">ClearPolicy</link>(<link linkend="_class_leap_1_1_controller">Controller</link>.<link linkend="_class_leap_1_1_controller_1a0bdb49fa94aa2da8b098c1ac296528d6">PolicyFlag</link>.POLICY_OPTIMIZE_HMD);
+00498 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00499 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_leap_1_1_unity_1_1_leap_service_provider_1a81109a7f1bd8d6fb195fb31e5c85fad3">_leapController</link>.<link linkend="_class_leap_1_1_controller_1a08c17e46012a2774afe1b5901e82ce6a">StopConnection</link>();
+00500 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_leap_1_1_unity_1_1_leap_service_provider_1a81109a7f1bd8d6fb195fb31e5c85fad3">_leapController</link>&#32;=&#32;<emphasis role="keyword">null</emphasis>;
+00501 &#32;&#32;&#32;&#32;&#32;&#32;}
+00502 &#32;&#32;&#32;&#32;}
+00503 
+00504 &#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;<emphasis role="keywordtype">int</emphasis>&#32;_framesSinceServiceConnectionChecked&#32;=&#32;0;
+00505 &#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;<emphasis role="keywordtype">int</emphasis>&#32;_numberOfReconnectionAttempts&#32;=&#32;0;
+<anchor xml:id="__leap_service_provider_8cs_source_1l00511"/><link linkend="_class_leap_1_1_unity_1_1_leap_service_provider_1af943038b16006eb527d6e2a0dccc84c9">00511</link> &#32;&#32;&#32;&#32;<emphasis role="keyword">protected</emphasis>&#32;<emphasis role="keywordtype">bool</emphasis>&#32;<link linkend="_class_leap_1_1_unity_1_1_leap_service_provider_1af943038b16006eb527d6e2a0dccc84c9">checkConnectionIntegrity</link>()&#32;{
+00512 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(<link linkend="_class_leap_1_1_unity_1_1_leap_service_provider_1a81109a7f1bd8d6fb195fb31e5c85fad3">_leapController</link>.<link linkend="_class_leap_1_1_controller_1a8ecf0fd02e617da823b46b5f73b38eb0">IsServiceConnected</link>)&#32;{
+00513 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;_framesSinceServiceConnectionChecked&#32;=&#32;0;
+00514 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;_numberOfReconnectionAttempts&#32;=&#32;0;
+00515 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;<emphasis role="keyword">true</emphasis>;
+00516 &#32;&#32;&#32;&#32;&#32;&#32;}&#32;<emphasis role="keywordflow">else</emphasis>&#32;<emphasis role="keywordflow">if</emphasis>&#32;(_numberOfReconnectionAttempts&#32;&lt;&#32;<link linkend="_class_leap_1_1_unity_1_1_leap_service_provider_1afadff6ce55b5f50f4f0b28fbe0b1fa1d">MAX_RECONNECTION_ATTEMPTS</link>)&#32;{
+00517 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;_framesSinceServiceConnectionChecked&#32;++;
+00518 
+00519 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(_framesSinceServiceConnectionChecked&#32;&gt;&#32;<link linkend="_class_leap_1_1_unity_1_1_leap_service_provider_1a4ecb0067ea35eec0a76e7f839547e9b0">RECONNECTION_INTERVAL</link>)&#32;{
+00520 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;_framesSinceServiceConnectionChecked&#32;=&#32;0;
+00521 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;_numberOfReconnectionAttempts++;
+00522 
+00523 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;Debug.LogWarning(<emphasis role="stringliteral">&quot;Leap&#32;Service&#32;not&#32;connected;&#32;attempting&#32;to&#32;reconnect&#32;for&#32;try&#32;&quot;</emphasis>&#32;+
+00524 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;_numberOfReconnectionAttempts&#32;+&#32;<emphasis role="stringliteral">&quot;/&quot;</emphasis>&#32;+&#32;<link linkend="_class_leap_1_1_unity_1_1_leap_service_provider_1afadff6ce55b5f50f4f0b28fbe0b1fa1d">MAX_RECONNECTION_ATTEMPTS</link>&#32;+
+00525 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="stringliteral">&quot;...&quot;</emphasis>,&#32;<emphasis role="keyword">this</emphasis>);
+00526 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">using</emphasis>&#32;(<emphasis role="keyword">new</emphasis>&#32;<link linkend="_struct_leap_1_1_unity_1_1_profiler_sample">ProfilerSample</link>(<emphasis role="stringliteral">&quot;Reconnection&#32;Attempt&quot;</emphasis>))&#32;{
+00527 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_leap_1_1_unity_1_1_leap_service_provider_1aaae9cfba0cd9335579e18dab63c508b0">destroyController</link>();
+00528 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_leap_1_1_unity_1_1_leap_service_provider_1ac79f148cc55c9680e605c48e744971c7">createController</link>();
+00529 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00530 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00531 &#32;&#32;&#32;&#32;&#32;&#32;}
+00532 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;<emphasis role="keyword">false</emphasis>;
+00533 &#32;&#32;&#32;&#32;}
+00534 
+<anchor xml:id="__leap_service_provider_8cs_source_1l00535"/><link linkend="_class_leap_1_1_unity_1_1_leap_service_provider_1aa5658f3913410c8e03b5cc954f8754e6">00535</link> &#32;&#32;&#32;&#32;<emphasis role="keyword">protected</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;<link linkend="_class_leap_1_1_unity_1_1_leap_service_provider_1aa5658f3913410c8e03b5cc954f8754e6">onHandControllerConnect</link>(<emphasis role="keywordtype">object</emphasis>&#32;sender,&#32;<link linkend="_class_leap_1_1_leap_event_args">LeapEventArgs</link>&#32;args)&#32;{
+00536 &#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_leap_1_1_unity_1_1_leap_service_provider_1ac6ec54a97c1d2e1bbbe663822b458140">initializeFlags</link>();
+00537 
+00538 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(<link linkend="_class_leap_1_1_unity_1_1_leap_service_provider_1a81109a7f1bd8d6fb195fb31e5c85fad3">_leapController</link>&#32;!=&#32;<emphasis role="keyword">null</emphasis>)&#32;{
+00539 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_leap_1_1_unity_1_1_leap_service_provider_1a81109a7f1bd8d6fb195fb31e5c85fad3">_leapController</link>.<link linkend="_class_leap_1_1_controller_1ac9a2f80c418e12b42b8331c0d5b116b1">Device</link>&#32;-=&#32;<link linkend="_class_leap_1_1_unity_1_1_leap_service_provider_1aa5658f3913410c8e03b5cc954f8754e6">onHandControllerConnect</link>;
+00540 &#32;&#32;&#32;&#32;&#32;&#32;}
+00541 &#32;&#32;&#32;&#32;}
+00542 
+<anchor xml:id="__leap_service_provider_8cs_source_1l00543"/><link linkend="_class_leap_1_1_unity_1_1_leap_service_provider_1a019689a8ce8bc22f6c0effa7010ec215">00543</link> &#32;&#32;&#32;&#32;<emphasis role="keyword">protected</emphasis>&#32;<emphasis role="keyword">virtual</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;<link linkend="_class_leap_1_1_unity_1_1_leap_service_provider_1a019689a8ce8bc22f6c0effa7010ec215">transformFrame</link>(<link linkend="_class_leap_1_1_frame">Frame</link>&#32;source,&#32;<link linkend="_class_leap_1_1_frame">Frame</link>&#32;dest)&#32;{
+00544 &#32;&#32;&#32;&#32;&#32;&#32;dest.CopyFrom(source).Transform(transform.GetLeapMatrix());
+00545 &#32;&#32;&#32;&#32;}
+00546 
+00547 <emphasis role="preprocessor">&#32;&#32;&#32;&#32;#endregion</emphasis>
+00548 
+00549 &#32;&#32;}
+00550 
+00551 }
+</programlisting></section>

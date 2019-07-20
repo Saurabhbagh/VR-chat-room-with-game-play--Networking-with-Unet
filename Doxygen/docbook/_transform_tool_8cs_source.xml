@@ -1,0 +1,229 @@
+<?xml version='1.0' encoding='UTF-8' standalone='no'?>
+<section xmlns="http://docbook.org/ns/docbook" version="5.0" xmlns:xlink="http://www.w3.org/1999/xlink" xml:id="__transform_tool_8cs_source">
+<title>TransformTool.cs</title>
+<indexterm><primary>O:/GitHUBMINIPRoject/Assets/LeapMotion/Modules/InteractionEngine/Examples/3. Interaction Callbacks/Scripts/TransformTool.cs</primary></indexterm>
+<programlisting>00001 <emphasis role="comment">/******************************************************************************</emphasis>
+00002 <emphasis role="comment">&#32;*&#32;Copyright&#32;(C)&#32;Leap&#32;Motion,&#32;Inc.&#32;2011-2018.&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;*</emphasis>
+00003 <emphasis role="comment">&#32;*&#32;Leap&#32;Motion&#32;proprietary&#32;and&#32;confidential.&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;*</emphasis>
+00004 <emphasis role="comment">&#32;*&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;*</emphasis>
+00005 <emphasis role="comment">&#32;*&#32;Use&#32;subject&#32;to&#32;the&#32;terms&#32;of&#32;the&#32;Leap&#32;Motion&#32;SDK&#32;Agreement&#32;available&#32;at&#32;&#32;&#32;&#32;&#32;*</emphasis>
+00006 <emphasis role="comment">&#32;*&#32;https://developer.leapmotion.com/sdk_agreement,&#32;or&#32;another&#32;agreement&#32;&#32;&#32;&#32;&#32;&#32;&#32;*</emphasis>
+00007 <emphasis role="comment">&#32;*&#32;between&#32;Leap&#32;Motion&#32;and&#32;you,&#32;your&#32;company&#32;or&#32;other&#32;organization.&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;*</emphasis>
+00008 <emphasis role="comment">&#32;******************************************************************************/</emphasis>
+00009 
+<anchor xml:id="__transform_tool_8cs_source_1l00010"/><link linkend="__transform_tool_8cs_1aa8acd41d065fa060337bec629678692e">00010</link> ﻿using&#32;<link linkend="_namespace_leap">Leap</link>.<link linkend="_namespace_leap_1_1_unity">Unity</link>.<link linkend="_namespace_leap_1_1_unity_1_1_interaction">Interaction</link>;
+00011 <emphasis role="keyword">using</emphasis>&#32;<link linkend="_namespace_leap">Leap</link>.<link linkend="_namespace_leap_1_1_unity">Unity</link>.<link linkend="_namespace_leap_1_1_unity_1_1_query">Query</link>;
+00012 <emphasis role="keyword">using</emphasis>&#32;System;
+00013 <emphasis role="keyword">using</emphasis>&#32;System.Collections;
+00014 <emphasis role="keyword">using</emphasis>&#32;System.Collections.Generic;
+00015 <emphasis role="keyword">using</emphasis>&#32;<link linkend="__balloon_8cs_1a7d67e097df9376eb709b6a23aa3c7d23">UnityEngine</link>;
+00016 
+00017 <emphasis role="keyword">namespace&#32;</emphasis><link linkend="_namespace_leap_1_1_unity_1_1_examples">Leap.Unity.Examples</link>&#32;{
+00018 
+00019 &#32;&#32;[AddComponentMenu(<emphasis role="stringliteral">&quot;&quot;</emphasis>)]
+<anchor xml:id="__transform_tool_8cs_source_1l00020"/><link linkend="_class_leap_1_1_unity_1_1_examples_1_1_transform_tool">00020</link> &#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keyword">class&#32;</emphasis><link linkend="_class_leap_1_1_unity_1_1_examples_1_1_transform_tool">TransformTool</link>&#32;:&#32;MonoBehaviour&#32;{
+00021 
+00022 &#32;&#32;&#32;&#32;[Tooltip(<emphasis role="stringliteral">&quot;The&#32;scene&apos;s&#32;InteractionManager,&#32;used&#32;to&#32;get&#32;InteractionControllers&#32;and&#32;&quot;</emphasis>
+00023 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;+&#32;<emphasis role="stringliteral">&quot;manage&#32;handle&#32;state.&quot;</emphasis>)]
+<anchor xml:id="__transform_tool_8cs_source_1l00024"/><link linkend="_class_leap_1_1_unity_1_1_examples_1_1_transform_tool_1a1f8ec4a33ca6ea96981de9df4eaa2088">00024</link> &#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;InteractionManager&#32;<link linkend="_class_leap_1_1_unity_1_1_examples_1_1_transform_tool_1a1f8ec4a33ca6ea96981de9df4eaa2088">interactionManager</link>;
+00025 
+00026 &#32;&#32;&#32;&#32;[Tooltip(<emphasis role="stringliteral">&quot;The&#32;target&#32;object&#32;to&#32;be&#32;moved&#32;by&#32;this&#32;tool.&quot;</emphasis>)]
+<anchor xml:id="__transform_tool_8cs_source_1l00027"/><link linkend="_class_leap_1_1_unity_1_1_examples_1_1_transform_tool_1a51bd483e751697c0141bb388a254f655">00027</link> &#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;Transform&#32;<link linkend="_class_leap_1_1_unity_1_1_examples_1_1_transform_tool_1a51bd483e751697c0141bb388a254f655">target</link>;
+00028 
+00029 &#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;Vector3&#32;&#32;&#32;&#32;_moveBuffer&#32;=&#32;Vector3.zero;
+00030 &#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;Quaternion&#32;_rotateBuffer&#32;=&#32;Quaternion.identity;
+00031 
+00032 &#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;HashSet&lt;TransformHandle&gt;&#32;_transformHandles&#32;=&#32;<emphasis role="keyword">new</emphasis>&#32;HashSet&lt;TransformHandle&gt;();
+00033 
+00034 &#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;<emphasis role="keyword">enum</emphasis>&#32;ToolState&#32;{&#32;Idle,&#32;Translating,&#32;Rotating&#32;}
+00035 &#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;ToolState&#32;_toolState&#32;=&#32;ToolState.Idle;
+00036 &#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;HashSet&lt;TransformHandle&gt;&#32;_activeHandles&#32;=&#32;<emphasis role="keyword">new</emphasis>&#32;HashSet&lt;TransformHandle&gt;();
+00037 
+00038 &#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;HashSet&lt;TranslationAxis&gt;&#32;_activeTranslationAxes&#32;=&#32;<emphasis role="keyword">new</emphasis>&#32;HashSet&lt;TranslationAxis&gt;();
+00039 
+00040 &#32;&#32;&#32;&#32;<emphasis role="keywordtype">void</emphasis>&#32;Start()&#32;{
+00041 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(<link linkend="_class_leap_1_1_unity_1_1_examples_1_1_transform_tool_1a1f8ec4a33ca6ea96981de9df4eaa2088">interactionManager</link>&#32;==&#32;<emphasis role="keyword">null</emphasis>)&#32;{
+00042 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_leap_1_1_unity_1_1_examples_1_1_transform_tool_1a1f8ec4a33ca6ea96981de9df4eaa2088">interactionManager</link>&#32;=&#32;InteractionManager.instance;
+00043 &#32;&#32;&#32;&#32;&#32;&#32;}
+00044 
+00045 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">foreach</emphasis>&#32;(var&#32;handle&#32;<emphasis role="keywordflow">in</emphasis>&#32;GetComponentsInChildren&lt;TransformHandle&gt;())&#32;{
+00046 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;_transformHandles.Add(handle);
+00047 &#32;&#32;&#32;&#32;&#32;&#32;}
+00048 
+00049 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;PhysicsCallbacks&#32;is&#32;useful&#32;for&#32;creating&#32;explicit&#32;pre-physics&#32;and&#32;post-physics</emphasis>
+00050 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;behaviour.</emphasis>
+00051 &#32;&#32;&#32;&#32;&#32;&#32;PhysicsCallbacks.OnPostPhysics&#32;+=&#32;onPostPhysics;
+00052 &#32;&#32;&#32;&#32;}
+00053 
+00054 &#32;&#32;&#32;&#32;<emphasis role="keywordtype">void</emphasis>&#32;Update()&#32;{
+00055 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;Enable&#32;or&#32;disable&#32;handles&#32;based&#32;on&#32;hand&#32;proximity&#32;and&#32;tool&#32;state.</emphasis>
+00056 &#32;&#32;&#32;&#32;&#32;&#32;updateHandles();
+00057 &#32;&#32;&#32;&#32;}
+00058 
+00059 <emphasis role="preprocessor">&#32;&#32;&#32;&#32;#region&#32;Handle&#32;Movement&#32;/&#32;Rotation</emphasis>
+00060 
+<anchor xml:id="__transform_tool_8cs_source_1l00065"/><link linkend="_class_leap_1_1_unity_1_1_examples_1_1_transform_tool_1a96a30f1c6f857af4f841608a41e5488d">00065</link> &#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;<link linkend="_class_leap_1_1_unity_1_1_examples_1_1_transform_tool_1a96a30f1c6f857af4f841608a41e5488d">NotifyHandleMovement</link>(Vector3&#32;deltaPosition)&#32;{
+00066 &#32;&#32;&#32;&#32;&#32;&#32;_moveBuffer&#32;+=&#32;deltaPosition;
+00067 &#32;&#32;&#32;&#32;}
+00068 
+<anchor xml:id="__transform_tool_8cs_source_1l00073"/><link linkend="_class_leap_1_1_unity_1_1_examples_1_1_transform_tool_1a3c43fb470f2e6fcaadfbf05aba33d8ca">00073</link> &#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;<link linkend="_class_leap_1_1_unity_1_1_examples_1_1_transform_tool_1a3c43fb470f2e6fcaadfbf05aba33d8ca">NotifyHandleRotation</link>(Quaternion&#32;deltaRotation)&#32;{
+00074 &#32;&#32;&#32;&#32;&#32;&#32;_rotateBuffer&#32;=&#32;deltaRotation&#32;*&#32;_rotateBuffer;
+00075 &#32;&#32;&#32;&#32;}
+00076 
+00077 &#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;onPostPhysics()&#32;{
+00078 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;Hooked&#32;up&#32;via&#32;PhysicsCallbacks&#32;in&#32;Start(),&#32;this&#32;method&#32;will&#32;run&#32;after</emphasis>
+00079 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;FixedUpdate&#32;and&#32;after&#32;PhysX&#32;has&#32;run.&#32;We&#32;take&#32;the&#32;opportunity&#32;to&#32;immediately</emphasis>
+00080 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;manipulate&#32;the&#32;target&#32;object&apos;s&#32;and&#32;this&#32;object&apos;s&#32;transforms&#32;using&#32;the</emphasis>
+00081 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;accumulated&#32;information&#32;about&#32;movement&#32;and&#32;rotation&#32;from&#32;the&#32;Transform&#32;Handles.</emphasis>
+00082 
+00083 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;Apply&#32;accumulated&#32;movement&#32;and&#32;rotation&#32;to&#32;target&#32;object.</emphasis>
+00084 &#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_leap_1_1_unity_1_1_examples_1_1_transform_tool_1a51bd483e751697c0141bb388a254f655">target</link>.transform.rotation&#32;=&#32;_rotateBuffer&#32;*&#32;<link linkend="_class_leap_1_1_unity_1_1_examples_1_1_transform_tool_1a51bd483e751697c0141bb388a254f655">target</link>.transform.rotation;
+00085 &#32;&#32;&#32;&#32;&#32;&#32;this.transform.rotation&#32;=&#32;<link linkend="_class_leap_1_1_unity_1_1_examples_1_1_transform_tool_1a51bd483e751697c0141bb388a254f655">target</link>.transform.rotation;
+00086 
+00087 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;Match&#32;this&#32;transform&#32;with&#32;the&#32;target&#32;object&apos;s&#32;(this&#32;will&#32;move&#32;child</emphasis>
+00088 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;TransformHandles&apos;&#32;transforms).</emphasis>
+00089 &#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_leap_1_1_unity_1_1_examples_1_1_transform_tool_1a51bd483e751697c0141bb388a254f655">target</link>.transform.position&#32;+=&#32;_moveBuffer;
+00090 &#32;&#32;&#32;&#32;&#32;&#32;this.transform.position&#32;=&#32;<link linkend="_class_leap_1_1_unity_1_1_examples_1_1_transform_tool_1a51bd483e751697c0141bb388a254f655">target</link>.transform.position;
+00091 
+00092 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;Explicitly&#32;sync&#32;TransformHandles&apos;&#32;rigidbodies&#32;with&#32;their&#32;transforms,</emphasis>
+00093 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;which&#32;moved&#32;along&#32;with&#32;this&#32;object&apos;s&#32;transform&#32;because&#32;they&#32;are&#32;children&#32;of&#32;it.</emphasis>
+00094 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">foreach</emphasis>&#32;(var&#32;handle&#32;<emphasis role="keywordflow">in</emphasis>&#32;_transformHandles)&#32;{
+00095 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;handle.syncRigidbodyWithTransform();
+00096 &#32;&#32;&#32;&#32;&#32;&#32;}
+00097 
+00098 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;Reset&#32;movement&#32;and&#32;rotation&#32;buffers.</emphasis>
+00099 &#32;&#32;&#32;&#32;&#32;&#32;_moveBuffer&#32;=&#32;Vector3.zero;
+00100 &#32;&#32;&#32;&#32;&#32;&#32;_rotateBuffer&#32;=&#32;Quaternion.identity;
+00101 &#32;&#32;&#32;&#32;}
+00102 
+00103 <emphasis role="preprocessor">&#32;&#32;&#32;&#32;#endregion</emphasis>
+00104 
+00105 <emphasis role="preprocessor">&#32;&#32;&#32;&#32;#region&#32;Handle&#32;Visibility</emphasis>
+00106 
+00107 &#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;updateHandles()&#32;{
+00108 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">switch</emphasis>&#32;(_toolState)&#32;{
+00109 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">case</emphasis>&#32;ToolState.Idle:
+00110 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;Find&#32;the&#32;closest&#32;handle&#32;to&#32;any&#32;InteractionHand.</emphasis>
+00111 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;TransformHandle&#32;closestHandleToAnyHand&#32;=&#32;<emphasis role="keyword">null</emphasis>;
+00112 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordtype">float</emphasis>&#32;closestHandleDist&#32;=&#32;<emphasis role="keywordtype">float</emphasis>.PositiveInfinity;
+00113 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">foreach</emphasis>&#32;(var&#32;intController&#32;<emphasis role="keywordflow">in</emphasis>&#32;<link linkend="_class_leap_1_1_unity_1_1_examples_1_1_transform_tool_1a1f8ec4a33ca6ea96981de9df4eaa2088">interactionManager</link>.interactionControllers
+00114 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;.Query()
+00115 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;.Where(controller&#32;=&gt;&#32;controller.isTracked))&#32;{
+00116 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(!intController.isPrimaryHovering)&#32;<emphasis role="keywordflow">continue</emphasis>;
+00117 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;TransformHandle&#32;testHandle&#32;=&#32;intController.primaryHoveredObject
+00118 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;.gameObject
+00119 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;.GetComponent&lt;TransformHandle&gt;();
+00120 
+00121 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(testHandle&#32;==&#32;<emphasis role="keyword">null</emphasis>&#32;||&#32;!_transformHandles.Contains(testHandle))&#32;<emphasis role="keywordflow">continue</emphasis>;
+00122 
+00123 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordtype">float</emphasis>&#32;testDist&#32;=&#32;intController.primaryHoverDistance;
+00124 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(testDist&#32;&lt;&#32;closestHandleDist)&#32;{
+00125 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;closestHandleToAnyHand&#32;=&#32;testHandle;
+00126 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;closestHandleDist&#32;=&#32;testDist;
+00127 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00128 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00129 
+00130 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;While&#32;idle,&#32;only&#32;show&#32;the&#32;closest&#32;handle&#32;to&#32;any&#32;hand,&#32;hide&#32;other&#32;handles.</emphasis>
+00131 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">foreach</emphasis>&#32;(var&#32;handle&#32;<emphasis role="keywordflow">in</emphasis>&#32;_transformHandles)&#32;{
+00132 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(closestHandleToAnyHand&#32;!=&#32;<emphasis role="keyword">null</emphasis>&#32;&amp;&amp;&#32;handle&#32;==&#32;closestHandleToAnyHand)&#32;{
+00133 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;handle.EnsureVisible();
+00134 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00135 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">else</emphasis>&#32;{
+00136 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;handle.EnsureHidden();
+00137 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00138 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00139 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">break</emphasis>;
+00140 
+00141 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">case</emphasis>&#32;ToolState.Translating:
+00142 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;While&#32;translating,&#32;show&#32;all&#32;translation&#32;handles&#32;except&#32;the&#32;other&#32;handle</emphasis>
+00143 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;on&#32;the&#32;same&#32;axis,&#32;and&#32;hide&#32;rotation&#32;handles.</emphasis>
+00144 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">foreach</emphasis>&#32;(var&#32;handle&#32;<emphasis role="keywordflow">in</emphasis>&#32;_transformHandles)&#32;{
+00145 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(handle&#32;is&#32;TransformTranslationHandle)&#32;{
+00146 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;var&#32;translateHandle&#32;=&#32;handle&#32;as&#32;TransformTranslationHandle;
+00147 
+00148 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(!_activeHandles.Contains(translateHandle)
+00149 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&amp;&amp;&#32;_activeTranslationAxes.Contains(translateHandle.axis))&#32;{
+00150 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;handle.EnsureHidden();
+00151 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00152 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">else</emphasis>&#32;{
+00153 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;handle.EnsureVisible();
+00154 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00155 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00156 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">else</emphasis>&#32;{
+00157 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;handle.EnsureHidden();
+00158 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00159 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00160 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">break</emphasis>;
+00161 
+00162 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">case</emphasis>&#32;ToolState.Rotating:
+00163 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;While&#32;rotating,&#32;only&#32;show&#32;the&#32;active&#32;rotating&#32;handle.</emphasis>
+00164 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">foreach</emphasis>&#32;(var&#32;handle&#32;<emphasis role="keywordflow">in</emphasis>&#32;_transformHandles)&#32;{
+00165 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(_activeHandles.Contains(handle))&#32;{
+00166 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;handle.EnsureVisible();
+00167 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00168 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">else</emphasis>&#32;{
+00169 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;handle.EnsureHidden();
+00170 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00171 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00172 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">break</emphasis>;
+00173 &#32;&#32;&#32;&#32;&#32;&#32;}
+00174 &#32;&#32;&#32;&#32;}
+00175 
+<anchor xml:id="__transform_tool_8cs_source_1l00180"/><link linkend="_class_leap_1_1_unity_1_1_examples_1_1_transform_tool_1ad4aa45ec03040ccc6d3b8006c65d212b">00180</link> &#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;<link linkend="_class_leap_1_1_unity_1_1_examples_1_1_transform_tool_1ad4aa45ec03040ccc6d3b8006c65d212b">NotifyHandleActivated</link>(<link linkend="_class_leap_1_1_unity_1_1_examples_1_1_transform_handle">TransformHandle</link>&#32;handle)&#32;{
+00181 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">switch</emphasis>&#32;(_toolState)&#32;{
+00182 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">case</emphasis>&#32;ToolState.Idle:
+00183 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;_activeHandles.Add(handle);
+00184 
+00185 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(handle&#32;is&#32;<link linkend="_class_leap_1_1_unity_1_1_examples_1_1_transform_translation_handle">TransformTranslationHandle</link>)&#32;{
+00186 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;_toolState&#32;=&#32;ToolState.Translating;
+00187 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;_activeTranslationAxes.Add(((<link linkend="_class_leap_1_1_unity_1_1_examples_1_1_transform_translation_handle">TransformTranslationHandle</link>)handle).axis);
+00188 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00189 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">else</emphasis>&#32;{
+00190 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;_toolState&#32;=&#32;ToolState.Rotating;
+00191 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00192 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">break</emphasis>;
+00193 
+00194 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">case</emphasis>&#32;ToolState.Translating:
+00195 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(handle&#32;is&#32;<link linkend="_class_leap_1_1_unity_1_1_examples_1_1_transform_rotation_handle">TransformRotationHandle</link>)&#32;{
+00196 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;Debug.LogError(<emphasis role="stringliteral">&quot;Error:&#32;Can&apos;t&#32;rotate&#32;a&#32;transform&#32;while&#32;it&#32;is&#32;already&#32;being&#32;&quot;</emphasis>
+00197 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;+&#32;<emphasis role="stringliteral">&quot;translated.&quot;</emphasis>);
+00198 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00199 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">else</emphasis>&#32;{
+00200 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;_activeHandles.Add(handle);
+00201 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;_activeTranslationAxes.Add(((<link linkend="_class_leap_1_1_unity_1_1_examples_1_1_transform_translation_handle">TransformTranslationHandle</link>)handle).axis);
+00202 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00203 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">break</emphasis>;
+00204 
+00205 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">case</emphasis>&#32;ToolState.Rotating:
+00206 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;Debug.LogError(<emphasis role="stringliteral">&quot;Error:&#32;Only&#32;one&#32;handle&#32;can&#32;be&#32;active&#32;while&#32;a&#32;transform&#32;is&#32;being&#32;&quot;</emphasis>
+00207 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;+&#32;<emphasis role="stringliteral">&quot;rotated.&quot;</emphasis>);
+00208 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">break</emphasis>;
+00209 &#32;&#32;&#32;&#32;&#32;&#32;}
+00210 &#32;&#32;&#32;&#32;}
+00211 
+<anchor xml:id="__transform_tool_8cs_source_1l00215"/><link linkend="_class_leap_1_1_unity_1_1_examples_1_1_transform_tool_1a87a50c5f1fe21f8f9d28caa545256366">00215</link> &#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;<link linkend="_class_leap_1_1_unity_1_1_examples_1_1_transform_tool_1a87a50c5f1fe21f8f9d28caa545256366">NotifyHandleDeactivated</link>(<link linkend="_class_leap_1_1_unity_1_1_examples_1_1_transform_handle">TransformHandle</link>&#32;handle)&#32;{
+00216 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(handle&#32;is&#32;<link linkend="_class_leap_1_1_unity_1_1_examples_1_1_transform_translation_handle">TransformTranslationHandle</link>)&#32;{
+00217 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;_activeTranslationAxes.Remove(((<link linkend="_class_leap_1_1_unity_1_1_examples_1_1_transform_translation_handle">TransformTranslationHandle</link>)handle).axis);
+00218 &#32;&#32;&#32;&#32;&#32;&#32;}
+00219 
+00220 &#32;&#32;&#32;&#32;&#32;&#32;_activeHandles.Remove(handle);
+00221 
+00222 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">switch</emphasis>&#32;(_toolState)&#32;{
+00223 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">case</emphasis>&#32;ToolState.Idle:
+00224 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;Debug.LogWarning(<emphasis role="stringliteral">&quot;Warning:&#32;Handle&#32;was&#32;deactived&#32;while&#32;Tool&#32;was&#32;already&#32;idle.&quot;</emphasis>);
+00225 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">break</emphasis>;
+00226 
+00227 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">default</emphasis>:
+00228 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(_activeHandles.Count&#32;==&#32;0)&#32;{
+00229 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;_toolState&#32;=&#32;ToolState.Idle;
+00230 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00231 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">break</emphasis>;
+00232 &#32;&#32;&#32;&#32;&#32;&#32;}
+00233 &#32;&#32;&#32;&#32;}
+00234 
+00235 <emphasis role="preprocessor">&#32;&#32;&#32;&#32;#endregion</emphasis>
+00236 
+00237 &#32;&#32;}
+00238 
+00239 }
+</programlisting></section>

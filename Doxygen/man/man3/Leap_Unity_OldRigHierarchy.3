@@ -1,0 +1,190 @@
+.TH "Leap.Unity.OldRigHierarchy" 3 "Sat Jul 20 2019" "Version https://github.com/Saurabhbagh/Multi-User-VR-Viewer--10th-July/" "Multi User Vr Viewer" \" -*- nroff -*-
+.ad l
+.nh
+.SH NAME
+Leap.Unity.OldRigHierarchy \- Description of an old \fBLeap\fP VR rig from before Core version 4\&.4\&.  
+
+.SH SYNOPSIS
+.br
+.PP
+.SS "Classes"
+
+.in +1c
+.ti -1c
+.RI "class \fBImageRigData\fP"
+.br
+.ti -1c
+.RI "class \fBOldCameraData\fP"
+.br
+.RI "Old camera objects that weren't modified at all would have had a \fBLeapEyeDislocator\fP (formerly LeapVRCameraControl), a Camera component, and an \fBEnableDepthBuffer\fP component\&. "
+.ti -1c
+.RI "class \fBOldLeapHandControllerData\fP"
+.br
+.ti -1c
+.RI "class \fBOldLeapSpaceData\fP"
+.br
+.ti -1c
+.RI "class \fBUpgradeOptions\fP"
+.br
+.in -1c
+.SS "Public Member Functions"
+
+.in +1c
+.ti -1c
+.RI "void \fBUpgrade\fP (\fBUpgradeOptions\fP options)"
+.br
+.in -1c
+.SS "Static Public Member Functions"
+
+.in +1c
+.ti -1c
+.RI "static bool \fBDetectFor\fP (Transform transform, \fBOldRigHierarchy\fP toFill)"
+.br
+.RI "Detects if the argument Transform is the \fIrig root\fP of an old \fBLeap\fP rig, modifying the passed-in old rig hierarchy description\&. Returns true if the rig was detected as an old rig, false otherwise\&. "
+.ti -1c
+.RI "static \fBOldRigHierarchy\fP \fBDetectFor\fP (Transform transform)"
+.br
+.RI "Detects if the argument Transform is the \fIrig root\fP of an old \fBLeap\fP rig, in which case an \fBOldRigHierarchy\fP description is returned, otherwise this method returns null\&. "
+.in -1c
+.SS "Public Attributes"
+
+.in +1c
+.ti -1c
+.RI "bool \fBisUpgradeableOldRig\fP = false"
+.br
+.RI "Whether this rig can be upgraded\&. Set after a DetectFor(transform) call\&. "
+.ti -1c
+.RI "bool \fBdetectedAsPotentialRig\fP = false"
+.br
+.RI "Whether the scan data indicates the scanned transform is potentially an old \fBLeap\fP rig\&. Set after a DetectFor(transform) call\&. "
+.ti -1c
+.RI "string \fBreasonRigCannotBeUpgraded\fP"
+.br
+.RI "If the rig was detected as a potential rig but not upgradeable, this is the reason the rig cannot be upgraded\&. Set after a DetectFor(transform) call\&. "
+.ti -1c
+.RI "Transform \fBrigTransform\fP"
+.br
+.RI "The root transform of the old rig hierarchy\&. "
+.ti -1c
+.RI "Transform \fBhandModelParentTransform\fP"
+.br
+.RI "The parent of hand models in this rig that will receive the \fBHandModelManager\fP\&. "
+.ti -1c
+.RI "\fBOldCameraData\fP \fBcameraData\fP"
+.br
+.RI "The driven camera transform and component info of the rig hierarchy, or that of the LEFT eye if this rig was an IR viewer rig specifically\&. "
+.ti -1c
+.RI "\fBOldLeapSpaceData\fP \fBleapSpaceData\fP"
+.br
+.ti -1c
+.RI "\fBOldLeapHandControllerData\fP \fBlhcData\fP"
+.br
+.ti -1c
+.RI "\fBImageRigData\fP \fBimageRigData\fP"
+.br
+.in -1c
+.SS "Properties"
+
+.in +1c
+.ti -1c
+.RI "bool \fBisImageRig\fP\fC [get]\fP"
+.br
+.in -1c
+.SH "Detailed Description"
+.PP 
+Description of an old \fBLeap\fP VR rig from before Core version 4\&.4\&. 
+
+Use DetectFor(transform) to attempt to detect an instance of an old \fBLeap\fP rig with its root at that Transform\&. If the rig is detected and upgradeable, also provides a call to upgrade the rig in an Undo-able way\&. 
+.PP
+This is essentially the hierarchy that we're matching to build this object:
+.PP
+Standard VR rig (old) 'LMHeadMountedRig' - soft-contain VRHeightOffset -> \fBXRHeightOffset\fP (automatic) | |- 'CenterEyeAnchor' - soft-contain LeapVRCameraControl -> \fBLeapEyeDislocator\fP, | | soft-contain Camera, | | soft-contain \fBEnableDepthBuffer\fP -> remove | | | `- 'LeapSpace' - soft-contain LeapVRTemporalWarping -> Missing Script | | | `- 'LeapHandController' - contain LeapHandController -> Missing Script, | contain \fBLeapServiceProvider\fP, | soft-contain \fBHand\fP Model Manager `- 'HandModels' | `- X handModelTransforms, unmodified\&.
+.PP
+Alternatively, the old rig could be an old pass-through camera rig, which is more complicated because it has \fItwo\fP separate eye cameras:
+.PP
+Standard pass-through rig (old) 'LMHeadMountedRig' - soft-contain VRHeightOffset -> \fBXRHeightOffset\fP (automatic) | |- 'LeftEyeAnchor' - soft-contain LeapVRCameraControl -> \fBLeapEyeDislocator\fP, | | soft-contain Camera, | | soft-contain \fBEnableDepthBuffer\fP -> remove, | | contain \fBLeapImageRetriever\fP | | | `- 'LeapSpace' - soft-contain TempWarp -> Missing Script | | | |- 'LeapHandController' - contain LeapHandController -> Missing Script, | | contain \fBLeapServiceProvider\fP | | soft-contain \fBHand\fP Pool | `- 'QuadBackground' -> as 'extra' Transform, moved to child of Camera\&. | |- 'RightEyeAnchor' - contain LeapVRCameraControl -> \fBLeapEyeDislocator\fP | ^- this on a sibling of the \fBLeap\fP \fBImage\fP Retriever | indicates extremely high certainty of \fBImage\fP Rig\&. | soft-contain Camera, | soft-contain Enable Depth Buffer -> Missing Script | `- 'HandModels' | `- X handModelTransforms, unmodified\&.
+.PP
+Definition at line 593 of file LeapRigUpgrader\&.cs\&.
+.SH "Member Function Documentation"
+.PP 
+.SS "static bool Leap\&.Unity\&.OldRigHierarchy\&.DetectFor (Transform transform, \fBOldRigHierarchy\fP toFill)\fC [static]\fP"
+
+.PP
+Detects if the argument Transform is the \fIrig root\fP of an old \fBLeap\fP rig, modifying the passed-in old rig hierarchy description\&. Returns true if the rig was detected as an old rig, false otherwise\&. 
+.PP
+Definition at line 691 of file LeapRigUpgrader\&.cs\&.
+.SS "static \fBOldRigHierarchy\fP Leap\&.Unity\&.OldRigHierarchy\&.DetectFor (Transform transform)\fC [static]\fP"
+
+.PP
+Detects if the argument Transform is the \fIrig root\fP of an old \fBLeap\fP rig, in which case an \fBOldRigHierarchy\fP description is returned, otherwise this method returns null\&. 
+.PP
+Definition at line 940 of file LeapRigUpgrader\&.cs\&.
+.SS "void Leap\&.Unity\&.OldRigHierarchy\&.Upgrade (\fBUpgradeOptions\fP options)"
+
+.PP
+Definition at line 973 of file LeapRigUpgrader\&.cs\&.
+.SH "Member Data Documentation"
+.PP 
+.SS "\fBOldCameraData\fP Leap\&.Unity\&.OldRigHierarchy\&.cameraData"
+
+.PP
+The driven camera transform and component info of the rig hierarchy, or that of the LEFT eye if this rig was an IR viewer rig specifically\&. 
+.PP
+Definition at line 647 of file LeapRigUpgrader\&.cs\&.
+.SS "bool Leap\&.Unity\&.OldRigHierarchy\&.detectedAsPotentialRig = false"
+
+.PP
+Whether the scan data indicates the scanned transform is potentially an old \fBLeap\fP rig\&. Set after a DetectFor(transform) call\&. 
+.PP
+Definition at line 606 of file LeapRigUpgrader\&.cs\&.
+.SS "Transform Leap\&.Unity\&.OldRigHierarchy\&.handModelParentTransform"
+
+.PP
+The parent of hand models in this rig that will receive the \fBHandModelManager\fP\&. 
+.PP
+Definition at line 626 of file LeapRigUpgrader\&.cs\&.
+.SS "\fBImageRigData\fP Leap\&.Unity\&.OldRigHierarchy\&.imageRigData"
+
+.PP
+Definition at line 677 of file LeapRigUpgrader\&.cs\&.
+.SS "bool Leap\&.Unity\&.OldRigHierarchy\&.isUpgradeableOldRig = false"
+
+.PP
+Whether this rig can be upgraded\&. Set after a DetectFor(transform) call\&. 
+.PP
+Definition at line 600 of file LeapRigUpgrader\&.cs\&.
+.SS "\fBOldLeapSpaceData\fP Leap\&.Unity\&.OldRigHierarchy\&.leapSpaceData"
+
+.PP
+Definition at line 663 of file LeapRigUpgrader\&.cs\&.
+.SS "\fBOldLeapHandControllerData\fP Leap\&.Unity\&.OldRigHierarchy\&.lhcData"
+
+.PP
+Definition at line 672 of file LeapRigUpgrader\&.cs\&.
+.SS "string Leap\&.Unity\&.OldRigHierarchy\&.reasonRigCannotBeUpgraded"
+\fBInitial value:\fP
+.PP
+.nf
+= "Rig data has not been collected\&. Call OldRigHierarchy\&.DetectFor(transform) to "
+        + "scan\&."
+.fi
+.PP
+If the rig was detected as a potential rig but not upgradeable, this is the reason the rig cannot be upgraded\&. Set after a DetectFor(transform) call\&. 
+.PP
+Definition at line 613 of file LeapRigUpgrader\&.cs\&.
+.SS "Transform Leap\&.Unity\&.OldRigHierarchy\&.rigTransform"
+
+.PP
+The root transform of the old rig hierarchy\&. 
+.PP
+Definition at line 621 of file LeapRigUpgrader\&.cs\&.
+.SH "Property Documentation"
+.PP 
+.SS "bool Leap\&.Unity\&.OldRigHierarchy\&.isImageRig\fC [get]\fP"
+
+.PP
+Definition at line 678 of file LeapRigUpgrader\&.cs\&.
+
+.SH "Author"
+.PP 
+Generated automatically by Doxygen for Multi User Vr Viewer from the source code\&.

@@ -1,0 +1,419 @@
+<?xml version='1.0' encoding='UTF-8' standalone='no'?>
+<section xmlns="http://docbook.org/ns/docbook" version="5.0" xmlns:xlink="http://www.w3.org/1999/xlink" xml:id="__steam_v_r___render_8cs_source">
+<title>SteamVR_Render.cs</title>
+<indexterm><primary>O:/GitHUBMINIPRoject/Assets/SteamVR/Scripts/SteamVR_Render.cs</primary></indexterm>
+<programlisting>00001 <emphasis role="comment">//=======&#32;Copyright&#32;(c)&#32;Valve&#32;Corporation,&#32;All&#32;rights&#32;reserved.&#32;===============</emphasis>
+00002 <emphasis role="comment">//</emphasis>
+00003 <emphasis role="comment">//&#32;Purpose:&#32;Handles&#32;rendering&#32;of&#32;all&#32;SteamVR_Cameras</emphasis>
+00004 <emphasis role="comment">//</emphasis>
+00005 <emphasis role="comment">//=============================================================================</emphasis>
+00006 
+00007 <emphasis role="keyword">using</emphasis>&#32;<link linkend="__balloon_8cs_1a7d67e097df9376eb709b6a23aa3c7d23">UnityEngine</link>;
+00008 <emphasis role="keyword">using</emphasis>&#32;System.Collections;
+00009 <emphasis role="keyword">using</emphasis>&#32;<link linkend="_namespace_valve">Valve</link>.<link linkend="_namespace_valve_1_1_v_r">VR</link>;
+00010 
+00011 
+00012 <emphasis role="keyword">namespace&#32;</emphasis><link linkend="_namespace_valve_1_1_v_r">Valve.VR</link>
+00013 {
+<anchor xml:id="__steam_v_r___render_8cs_source_1l00014"/><link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___render">00014</link> &#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keyword">class&#32;</emphasis><link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___render">SteamVR_Render</link>&#32;:&#32;MonoBehaviour
+00015 &#32;&#32;&#32;&#32;{
+<anchor xml:id="__steam_v_r___render_8cs_source_1l00016"/><link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___render_1a301435a8700bd2f01ae860c3b89bac75">00016</link> &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___external_camera">SteamVR_ExternalCamera</link>&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___render_1a301435a8700bd2f01ae860c3b89bac75">externalCamera</link>;
+<anchor xml:id="__steam_v_r___render_8cs_source_1l00017"/><link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___render_1afed0f382e294bc9455e6438fa8963b98">00017</link> &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keywordtype">string</emphasis>&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___render_1afed0f382e294bc9455e6438fa8963b98">externalCameraConfigPath</link>&#32;=&#32;<emphasis role="stringliteral">&quot;externalcamera.cfg&quot;</emphasis>;
+00018 
+<anchor xml:id="__steam_v_r___render_8cs_source_1l00019"/><link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___render_1a2cddcf3b055e3c6323ebc41586f78d2c">00019</link> &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keyword">static</emphasis>&#32;<link linkend="_namespace_valve_1_1_v_r_1a8153d4a3e627e1cede046327087c1880">EVREye</link>&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___render_1a2cddcf3b055e3c6323ebc41586f78d2c">eye</link>&#32;{&#32;<emphasis role="keyword">get</emphasis>;&#32;<emphasis role="keyword">private</emphasis>&#32;<emphasis role="keyword">set</emphasis>;&#32;}
+00020 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;
+<anchor xml:id="__steam_v_r___render_8cs_source_1l00021"/><link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___render_1afa00f388fb9bbd9a90773d319b079211">00021</link> &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keyword">static</emphasis>&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___render">SteamVR_Render</link>&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___render_1afa00f388fb9bbd9a90773d319b079211">instance</link>&#32;{&#32;<emphasis role="keyword">get</emphasis>&#32;{&#32;<emphasis role="keywordflow">return</emphasis>&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___behaviour">SteamVR_Behaviour</link>.<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___behaviour_1ac8b8a5b3919713bd071703b1043d97ab">instance</link>.<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___behaviour_1a03d34792871c3e0aa336088e306257dd">steamvr_render</link>;&#32;}&#32;}
+00022 
+00023 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">static</emphasis>&#32;<emphasis role="keyword">private</emphasis>&#32;<emphasis role="keywordtype">bool</emphasis>&#32;isQuitting;
+00024 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordtype">void</emphasis>&#32;OnApplicationQuit()
+00025 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00026 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;isQuitting&#32;=&#32;<emphasis role="keyword">true</emphasis>;
+00027 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r">SteamVR</link>.<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r_1a05fdc10324d14933a6826c40e1106a10">SafeDispose</link>();
+00028 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00029 
+<anchor xml:id="__steam_v_r___render_8cs_source_1l00030"/><link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___render_1a7ea09b18f7b096dca11e1ca1d66ea869">00030</link> &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">static</emphasis>&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___render_1a7ea09b18f7b096dca11e1ca1d66ea869">Add</link>(<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___camera">SteamVR_Camera</link>&#32;vrcam)
+00031 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00032 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(!isQuitting)
+00033 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___render_1afa00f388fb9bbd9a90773d319b079211">instance</link>.AddInternal(vrcam);
+00034 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00035 
+<anchor xml:id="__steam_v_r___render_8cs_source_1l00036"/><link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___render_1a3c9d43d12a9793294f79f5022223e0f5">00036</link> &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">static</emphasis>&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___render_1a3c9d43d12a9793294f79f5022223e0f5">Remove</link>(<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___camera">SteamVR_Camera</link>&#32;vrcam)
+00037 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00038 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(!isQuitting&#32;&amp;&amp;&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___render_1afa00f388fb9bbd9a90773d319b079211">instance</link>&#32;!=&#32;<emphasis role="keyword">null</emphasis>)
+00039 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___render_1afa00f388fb9bbd9a90773d319b079211">instance</link>.RemoveInternal(vrcam);
+00040 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00041 
+<anchor xml:id="__steam_v_r___render_8cs_source_1l00042"/><link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___render_1a4fae36331a03674fa212cfc38aa18358">00042</link> &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">static</emphasis>&#32;<emphasis role="keyword">public</emphasis>&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___camera">SteamVR_Camera</link>&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___render_1a4fae36331a03674fa212cfc38aa18358">Top</link>()
+00043 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00044 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(!isQuitting)
+00045 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___render_1afa00f388fb9bbd9a90773d319b079211">instance</link>.TopInternal();
+00046 
+00047 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;<emphasis role="keyword">null</emphasis>;
+00048 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00049 
+00050 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___camera">SteamVR_Camera</link>[]&#32;cameras&#32;=&#32;<emphasis role="keyword">new</emphasis>&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___camera">SteamVR_Camera</link>[0];
+00051 
+00052 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordtype">void</emphasis>&#32;AddInternal(<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___camera">SteamVR_Camera</link>&#32;vrcam)
+00053 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00054 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;var&#32;camera&#32;=&#32;vrcam.GetComponent&lt;<link linkend="_namespace_valve_1_1_v_r_1a82e5bf501cc3aa155444ee3f0662853fa967d35e40f3f95b1f538bd248640bf3b">Camera</link>&gt;();
+00055 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;var&#32;length&#32;=&#32;cameras.Length;
+00056 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;var&#32;sorted&#32;=&#32;<emphasis role="keyword">new</emphasis>&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___camera">SteamVR_Camera</link>[length&#32;+&#32;1];
+00057 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordtype">int</emphasis>&#32;insert&#32;=&#32;0;
+00058 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">for</emphasis>&#32;(<emphasis role="keywordtype">int</emphasis>&#32;i&#32;=&#32;0;&#32;i&#32;&lt;&#32;length;&#32;i++)
+00059 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00060 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;var&#32;c&#32;=&#32;cameras[i].GetComponent&lt;<link linkend="_namespace_valve_1_1_v_r_1a82e5bf501cc3aa155444ee3f0662853fa967d35e40f3f95b1f538bd248640bf3b">Camera</link>&gt;();
+00061 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(i&#32;==&#32;insert&#32;&amp;&amp;&#32;c.depth&#32;&gt;&#32;camera.depth)
+00062 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;sorted[insert++]&#32;=&#32;vrcam;
+00063 
+00064 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;sorted[insert++]&#32;=&#32;cameras[i];
+00065 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00066 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(insert&#32;==&#32;length)
+00067 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;sorted[insert]&#32;=&#32;vrcam;
+00068 
+00069 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;cameras&#32;=&#32;sorted;
+00070 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00071 
+00072 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordtype">void</emphasis>&#32;RemoveInternal(<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___camera">SteamVR_Camera</link>&#32;vrcam)
+00073 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00074 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;var&#32;length&#32;=&#32;cameras.Length;
+00075 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordtype">int</emphasis>&#32;count&#32;=&#32;0;
+00076 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">for</emphasis>&#32;(<emphasis role="keywordtype">int</emphasis>&#32;i&#32;=&#32;0;&#32;i&#32;&lt;&#32;length;&#32;i++)
+00077 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00078 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;var&#32;c&#32;=&#32;cameras[i];
+00079 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(c&#32;==&#32;vrcam)
+00080 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;++count;
+00081 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00082 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(count&#32;==&#32;0)
+00083 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>;
+00084 
+00085 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;var&#32;sorted&#32;=&#32;<emphasis role="keyword">new</emphasis>&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___camera">SteamVR_Camera</link>[length&#32;-&#32;count];
+00086 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordtype">int</emphasis>&#32;insert&#32;=&#32;0;
+00087 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">for</emphasis>&#32;(<emphasis role="keywordtype">int</emphasis>&#32;i&#32;=&#32;0;&#32;i&#32;&lt;&#32;length;&#32;i++)
+00088 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00089 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;var&#32;c&#32;=&#32;cameras[i];
+00090 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(c&#32;!=&#32;vrcam)
+00091 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;sorted[insert++]&#32;=&#32;c;
+00092 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00093 
+00094 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;cameras&#32;=&#32;sorted;
+00095 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00096 
+00097 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___camera">SteamVR_Camera</link>&#32;TopInternal()
+00098 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00099 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(cameras.Length&#32;&gt;&#32;0)
+00100 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;cameras[cameras.Length&#32;-&#32;1];
+00101 
+00102 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;<emphasis role="keyword">null</emphasis>;
+00103 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00104 
+<anchor xml:id="__steam_v_r___render_8cs_source_1l00105"/><link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___render_1a38d4e5717b82b2be834d1876b2de0ac7">00105</link> &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<link linkend="_struct_valve_1_1_v_r_1_1_tracked_device_pose__t">TrackedDevicePose_t</link>[]&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___render_1a38d4e5717b82b2be834d1876b2de0ac7">poses</link>&#32;=&#32;<emphasis role="keyword">new</emphasis>&#32;<link linkend="_struct_valve_1_1_v_r_1_1_tracked_device_pose__t">TrackedDevicePose_t</link>[<link linkend="_class_valve_1_1_v_r_1_1_open_v_r">OpenVR</link>.<link linkend="_class_valve_1_1_v_r_1_1_open_v_r_1aec52ee031bff706f1b96c7f2c8ebc0ac">k_unMaxTrackedDeviceCount</link>];
+<anchor xml:id="__steam_v_r___render_8cs_source_1l00106"/><link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___render_1a7c0cb20648b0e298cefe9ccd60ec3a27">00106</link> &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<link linkend="_struct_valve_1_1_v_r_1_1_tracked_device_pose__t">TrackedDevicePose_t</link>[]&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___render_1a7c0cb20648b0e298cefe9ccd60ec3a27">gamePoses</link>&#32;=&#32;<emphasis role="keyword">new</emphasis>&#32;<link linkend="_struct_valve_1_1_v_r_1_1_tracked_device_pose__t">TrackedDevicePose_t</link>[0];
+00107 
+00108 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">static</emphasis>&#32;<emphasis role="keyword">private</emphasis>&#32;<emphasis role="keywordtype">bool</emphasis>&#32;_pauseRendering;
+00109 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">static</emphasis>&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keywordtype">bool</emphasis>&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___render_1ad0d6a11827b9c94df738a6e3669a0e70">pauseRendering</link>
+<anchor xml:id="__steam_v_r___render_8cs_source_1l00110"/><link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___render_1ad0d6a11827b9c94df738a6e3669a0e70">00110</link> &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00111 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">get</emphasis>&#32;{&#32;<emphasis role="keywordflow">return</emphasis>&#32;_pauseRendering;&#32;}
+00112 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">set</emphasis>
+00113 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00114 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;_pauseRendering&#32;=&#32;value;
+00115 
+00116 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;var&#32;compositor&#32;=&#32;<link linkend="_class_valve_1_1_v_r_1_1_open_v_r">OpenVR</link>.<link linkend="_class_valve_1_1_v_r_1_1_open_v_r_1a398bc817d8516416f480aed933599ac5">Compositor</link>;
+00117 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(compositor&#32;!=&#32;<emphasis role="keyword">null</emphasis>)
+00118 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;compositor.<link linkend="_class_valve_1_1_v_r_1_1_c_v_r_compositor_1a1fa8f68ecca3092ff6bb5262dddb7d16">SuspendRendering</link>(value);
+00119 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00120 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00121 
+00122 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;WaitForEndOfFrame&#32;waitForEndOfFrame&#32;=&#32;<emphasis role="keyword">new</emphasis>&#32;WaitForEndOfFrame();
+00123 
+00124 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;IEnumerator&#32;RenderLoop()
+00125 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00126 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">while</emphasis>&#32;(<link linkend="_namespace_valve_1_1_v_r_1aecd07a81fe79a9f96c6787513e2d98e4ae498749f3c42246d50b15c81c101d988">Application</link>.isPlaying)
+00127 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00128 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;yield&#32;<emphasis role="keywordflow">return</emphasis>&#32;waitForEndOfFrame;
+00129 
+00130 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___render_1ad0d6a11827b9c94df738a6e3669a0e70">pauseRendering</link>)
+00131 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">continue</emphasis>;
+00132 
+00133 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;var&#32;compositor&#32;=&#32;<link linkend="_class_valve_1_1_v_r_1_1_open_v_r">OpenVR</link>.<link linkend="_class_valve_1_1_v_r_1_1_open_v_r_1a398bc817d8516416f480aed933599ac5">Compositor</link>;
+00134 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(compositor&#32;!=&#32;<emphasis role="keyword">null</emphasis>)
+00135 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00136 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(!compositor.CanRenderScene())
+00137 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">continue</emphasis>;
+00138 
+00139 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;compositor.<link linkend="_class_valve_1_1_v_r_1_1_c_v_r_compositor_1a6449a49b452246bc9275562c06ff98c6">SetTrackingSpace</link>(<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r">SteamVR</link>.<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r_1a8d2a06793f921d45801b50af18f0c413">settings</link>.<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___settings_1a915da3507ad2861be45ad3d957cece37">trackingSpace</link>);
+00140 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00141 
+00142 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;var&#32;overlay&#32;=&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___overlay">SteamVR_Overlay</link>.<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___overlay_1aad1019110da831b03ec485056f846822">instance</link>;
+00143 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(overlay&#32;!=&#32;<emphasis role="keyword">null</emphasis>)
+00144 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;overlay.<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___overlay_1a5d158d89f29b8460a23252ae76957ef1">UpdateOverlay</link>();
+00145 
+00146 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;RenderExternalCamera();
+00147 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00148 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00149 
+00150 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordtype">void</emphasis>&#32;RenderExternalCamera()
+00151 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00152 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___render_1a301435a8700bd2f01ae860c3b89bac75">externalCamera</link>&#32;==&#32;<emphasis role="keyword">null</emphasis>)
+00153 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>;
+00154 
+00155 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(!<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___render_1a301435a8700bd2f01ae860c3b89bac75">externalCamera</link>.gameObject.activeInHierarchy)
+00156 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>;
+00157 
+00158 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;var&#32;frameSkip&#32;=&#32;(int)Mathf.Max(<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___render_1a301435a8700bd2f01ae860c3b89bac75">externalCamera</link>.<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___external_camera_1a62a9d8567c47f62e620191b404abc47f">config</link>.<link linkend="_struct_valve_1_1_v_r_1_1_steam_v_r___external_camera_1_1_config_1a8bd467f8847a89ca6e863792d7d88b45">frameSkip</link>,&#32;0.0f);
+00159 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(Time.frameCount&#32;%&#32;(frameSkip&#32;+&#32;1)&#32;!=&#32;0)
+00160 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>;
+00161 
+00162 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;Keep&#32;external&#32;camera&#32;relative&#32;to&#32;the&#32;most&#32;relevant&#32;vr&#32;camera.</emphasis>
+00163 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___render_1a301435a8700bd2f01ae860c3b89bac75">externalCamera</link>.<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___external_camera_1a9543c9deb4f7e3ac929dc2e5fa4064c6">AttachToCamera</link>(TopInternal());
+00164 
+00165 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___render_1a301435a8700bd2f01ae860c3b89bac75">externalCamera</link>.<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___external_camera_1acd7554ee85545ac5dd5fda38ecc653b6">RenderNear</link>();
+00166 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___render_1a301435a8700bd2f01ae860c3b89bac75">externalCamera</link>.<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___external_camera_1a18c262f33f101852d9d549894059b018">RenderFar</link>();
+00167 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00168 
+00169 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordtype">float</emphasis>&#32;sceneResolutionScale&#32;=&#32;1.0f,&#32;timeScale&#32;=&#32;1.0f;
+00170 
+00171 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;OnInputFocus(<emphasis role="keywordtype">bool</emphasis>&#32;hasFocus)
+00172 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00173 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r">SteamVR</link>.<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r_1ad98d1d8dafb84740b3a005d435da62a5">active</link>&#32;==&#32;<emphasis role="keyword">false</emphasis>)
+00174 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>;
+00175 
+00176 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(hasFocus)
+00177 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00178 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r">SteamVR</link>.<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r_1a8d2a06793f921d45801b50af18f0c413">settings</link>.<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___settings_1a514e6804f03bf72db516ee2e0cac8dec">pauseGameWhenDashboardVisible</link>)
+00179 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00180 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;Time.timeScale&#32;=&#32;timeScale;
+00181 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00182 
+00183 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___camera">SteamVR_Camera</link>.<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___camera_1a15bffee48af1ca15135cf48e33622e56">sceneResolutionScale</link>&#32;=&#32;sceneResolutionScale;
+00184 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00185 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">else</emphasis>
+00186 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00187 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r">SteamVR</link>.<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r_1a8d2a06793f921d45801b50af18f0c413">settings</link>.<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___settings_1a514e6804f03bf72db516ee2e0cac8dec">pauseGameWhenDashboardVisible</link>)
+00188 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00189 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;timeScale&#32;=&#32;Time.timeScale;
+00190 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;Time.timeScale&#32;=&#32;0.0f;
+00191 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00192 
+00193 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;sceneResolutionScale&#32;=&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___camera">SteamVR_Camera</link>.<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___camera_1a15bffee48af1ca15135cf48e33622e56">sceneResolutionScale</link>;
+00194 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___camera">SteamVR_Camera</link>.<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___camera_1a15bffee48af1ca15135cf48e33622e56">sceneResolutionScale</link>&#32;=&#32;0.5f;
+00195 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00196 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00197 
+00198 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;<emphasis role="keywordtype">string</emphasis>&#32;GetScreenshotFilename(uint&#32;screenshotHandle,&#32;<link linkend="_namespace_valve_1_1_v_r_1a5a78926aed6b08da8e0e0b8f79911e34">EVRScreenshotPropertyFilenames</link>&#32;screenshotPropertyFilename)
+00199 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00200 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;var&#32;error&#32;=&#32;<link linkend="_namespace_valve_1_1_v_r_1ac73c6dcb1af8fe045a626296a21e226b">EVRScreenshotError</link>.None;
+00201 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;var&#32;capacity&#32;=&#32;<link linkend="_class_valve_1_1_v_r_1_1_open_v_r">OpenVR</link>.<link linkend="_class_valve_1_1_v_r_1_1_open_v_r_1aba4df8c153a4f1ac4b8016672df826aa">Screenshots</link>.<link linkend="_class_valve_1_1_v_r_1_1_c_v_r_screenshots_1a16edbbb8fd1c87e355df924682eb407b">GetScreenshotPropertyFilename</link>(screenshotHandle,&#32;screenshotPropertyFilename,&#32;<emphasis role="keyword">null</emphasis>,&#32;0,&#32;ref&#32;error);
+00202 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(error&#32;!=&#32;<link linkend="_namespace_valve_1_1_v_r_1ac73c6dcb1af8fe045a626296a21e226b">EVRScreenshotError</link>.None&#32;&amp;&amp;&#32;error&#32;!=&#32;<link linkend="_namespace_valve_1_1_v_r_1ac73c6dcb1af8fe045a626296a21e226b">EVRScreenshotError</link>.BufferTooSmall)
+00203 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;<emphasis role="keyword">null</emphasis>;
+00204 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(capacity&#32;&gt;&#32;1)
+00205 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00206 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;var&#32;result&#32;=&#32;<emphasis role="keyword">new</emphasis>&#32;System.Text.StringBuilder((<emphasis role="keywordtype">int</emphasis>)capacity);
+00207 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_valve_1_1_v_r_1_1_open_v_r">OpenVR</link>.<link linkend="_class_valve_1_1_v_r_1_1_open_v_r_1aba4df8c153a4f1ac4b8016672df826aa">Screenshots</link>.<link linkend="_class_valve_1_1_v_r_1_1_c_v_r_screenshots_1a16edbbb8fd1c87e355df924682eb407b">GetScreenshotPropertyFilename</link>(screenshotHandle,&#32;screenshotPropertyFilename,&#32;result,&#32;capacity,&#32;ref&#32;error);
+00208 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(error&#32;!=&#32;<link linkend="_namespace_valve_1_1_v_r_1ac73c6dcb1af8fe045a626296a21e226b">EVRScreenshotError</link>.None)
+00209 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;<emphasis role="keyword">null</emphasis>;
+00210 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;result.ToString();
+00211 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00212 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;<emphasis role="keyword">null</emphasis>;
+00213 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00214 
+00215 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;OnRequestScreenshot(<link linkend="_struct_valve_1_1_v_r_1_1_v_r_event__t">VREvent_t</link>&#32;vrEvent)
+00216 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00217 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;var&#32;screenshotHandle&#32;=&#32;vrEvent.<link linkend="_struct_valve_1_1_v_r_1_1_v_r_event__t_1af45efaec7d202da67c2cce7b492bcdb1">data</link>.<link linkend="_struct_valve_1_1_v_r_1_1_v_r_event___data__t_1a31bf248e4356b6f41d4148bdea4c520a">screenshot</link>.<link linkend="_struct_valve_1_1_v_r_1_1_v_r_event___screenshot__t_1a3ebab877ca680d62892926ff21ef7a90">handle</link>;
+00218 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;var&#32;screenshotType&#32;=&#32;(<link linkend="_namespace_valve_1_1_v_r_1a033ac579445f0992130b11ba62c9b7ae">EVRScreenshotType</link>)vrEvent.<link linkend="_struct_valve_1_1_v_r_1_1_v_r_event__t_1af45efaec7d202da67c2cce7b492bcdb1">data</link>.<link linkend="_struct_valve_1_1_v_r_1_1_v_r_event___data__t_1a31bf248e4356b6f41d4148bdea4c520a">screenshot</link>.<link linkend="_struct_valve_1_1_v_r_1_1_v_r_event___screenshot__t_1af6ed77a2586c54d729764bd7d876ef9a">type</link>;
+00219 
+00220 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;if&#32;(screenshotType&#32;==&#32;<link linkend="_namespace_valve_1_1_v_r_1a033ac579445f0992130b11ba62c9b7ae">EVRScreenshotType</link>.StereoPanorama)
+00221 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00222 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordtype">string</emphasis>&#32;previewFilename&#32;=&#32;GetScreenshotFilename(screenshotHandle,&#32;<link linkend="_namespace_valve_1_1_v_r_1a5a78926aed6b08da8e0e0b8f79911e34">EVRScreenshotPropertyFilenames</link>.Preview);
+00223 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordtype">string</emphasis>&#32;VRFilename&#32;=&#32;GetScreenshotFilename(screenshotHandle,&#32;<link linkend="_namespace_valve_1_1_v_r_1a5a78926aed6b08da8e0e0b8f79911e34">EVRScreenshotPropertyFilenames</link>.VR);
+00224 
+00225 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(previewFilename&#32;==&#32;<emphasis role="keyword">null</emphasis>&#32;||&#32;VRFilename&#32;==&#32;<emphasis role="keyword">null</emphasis>)
+00226 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>;
+00227 
+00228 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;Do&#32;the&#32;stereo&#32;panorama&#32;screenshot</emphasis>
+00229 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;Figure&#32;out&#32;where&#32;the&#32;view&#32;is</emphasis>
+00230 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;GameObject&#32;screenshotPosition&#32;=&#32;<emphasis role="keyword">new</emphasis>&#32;GameObject(<emphasis role="stringliteral">&quot;screenshotPosition&quot;</emphasis>);
+00231 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;screenshotPosition.transform.position&#32;=&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___render">SteamVR_Render</link>.<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___render_1a4fae36331a03674fa212cfc38aa18358">Top</link>().transform.position;
+00232 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;screenshotPosition.transform.rotation&#32;=&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___render">SteamVR_Render</link>.<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___render_1a4fae36331a03674fa212cfc38aa18358">Top</link>().transform.rotation;
+00233 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;screenshotPosition.transform.localScale&#32;=&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___render">SteamVR_Render</link>.<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___render_1a4fae36331a03674fa212cfc38aa18358">Top</link>().transform.lossyScale;
+00234 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;SteamVR_Utils.TakeStereoScreenshot(screenshotHandle,&#32;screenshotPosition,&#32;32,&#32;0.064f,&#32;ref&#32;previewFilename,&#32;ref&#32;VRFilename);
+00235 
+00236 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;and&#32;submit&#32;it</emphasis>
+00237 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_valve_1_1_v_r_1_1_open_v_r">OpenVR</link>.<link linkend="_class_valve_1_1_v_r_1_1_open_v_r_1aba4df8c153a4f1ac4b8016672df826aa">Screenshots</link>.<link linkend="_class_valve_1_1_v_r_1_1_c_v_r_screenshots_1a0da676537255072488496df5f668df07">SubmitScreenshot</link>(screenshotHandle,&#32;screenshotType,&#32;previewFilename,&#32;VRFilename);
+00238 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00239 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00240 
+00241 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;<link linkend="_namespace_valve_1_1_v_r_1a033ac579445f0992130b11ba62c9b7ae">EVRScreenshotType</link>[]&#32;screenshotTypes&#32;=&#32;<emphasis role="keyword">new</emphasis>&#32;<link linkend="_namespace_valve_1_1_v_r_1a033ac579445f0992130b11ba62c9b7ae">EVRScreenshotType</link>[]&#32;{&#32;<link linkend="_namespace_valve_1_1_v_r_1a033ac579445f0992130b11ba62c9b7ae">EVRScreenshotType</link>.StereoPanorama&#32;};
+00242 
+00243 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;OnEnable()
+00244 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00245 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;StartCoroutine(RenderLoop());
+00246 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;SteamVR_Events.InputFocus.Listen(OnInputFocus);
+00247 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;SteamVR_Events.System(<link linkend="_namespace_valve_1_1_v_r_1afe3398b9e5cb1ea06335142d1b9289f3">EVREventType</link>.VREvent_RequestScreenshot).Listen(OnRequestScreenshot);
+00248 
+00249 <emphasis role="preprocessor">#if&#32;UNITY_2017_1_OR_NEWER</emphasis>
+00250 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_namespace_valve_1_1_v_r_1aecd07a81fe79a9f96c6787513e2d98e4ae498749f3c42246d50b15c81c101d988">Application</link>.onBeforeRender&#32;+=&#32;OnBeforeRender;
+00251 <emphasis role="preprocessor">#else</emphasis>
+00252 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_namespace_valve_1_1_v_r_1a82e5bf501cc3aa155444ee3f0662853fa967d35e40f3f95b1f538bd248640bf3b">Camera</link>.onPreCull&#32;+=&#32;OnCameraPreCull;
+00253 <emphasis role="preprocessor">#endif</emphasis>
+00254 
+00255 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r">SteamVR</link>.<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r_1aebdf879d97763960970090cfff20a8a7">initializedState</link>&#32;==&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r">SteamVR</link>.<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r_1a09db867d75bbc654801bb318dd85a5e3">InitializedStates</link>.InitializeSuccess)
+00256 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_valve_1_1_v_r_1_1_open_v_r">OpenVR</link>.<link linkend="_class_valve_1_1_v_r_1_1_open_v_r_1aba4df8c153a4f1ac4b8016672df826aa">Screenshots</link>.<link linkend="_class_valve_1_1_v_r_1_1_c_v_r_screenshots_1a83f44065529a466aa653c14c6a67cfc3">HookScreenshot</link>(screenshotTypes);
+00257 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">else</emphasis>
+00258 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;SteamVR_Events.Initialized.AddListener(OnSteamVRInitialized);
+00259 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00260 
+00261 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;OnSteamVRInitialized(<emphasis role="keywordtype">bool</emphasis>&#32;success)
+00262 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00263 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(success)
+00264 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_valve_1_1_v_r_1_1_open_v_r">OpenVR</link>.<link linkend="_class_valve_1_1_v_r_1_1_open_v_r_1aba4df8c153a4f1ac4b8016672df826aa">Screenshots</link>.<link linkend="_class_valve_1_1_v_r_1_1_c_v_r_screenshots_1a83f44065529a466aa653c14c6a67cfc3">HookScreenshot</link>(screenshotTypes);
+00265 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00266 
+00267 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;OnDisable()
+00268 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00269 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;StopAllCoroutines();
+00270 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;SteamVR_Events.InputFocus.Remove(OnInputFocus);
+00271 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;SteamVR_Events.System(<link linkend="_namespace_valve_1_1_v_r_1afe3398b9e5cb1ea06335142d1b9289f3">EVREventType</link>.VREvent_RequestScreenshot).Remove(OnRequestScreenshot);
+00272 
+00273 <emphasis role="preprocessor">#if&#32;UNITY_2017_1_OR_NEWER</emphasis>
+00274 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_namespace_valve_1_1_v_r_1aecd07a81fe79a9f96c6787513e2d98e4ae498749f3c42246d50b15c81c101d988">Application</link>.onBeforeRender&#32;-=&#32;OnBeforeRender;
+00275 <emphasis role="preprocessor">#else</emphasis>
+00276 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_namespace_valve_1_1_v_r_1a82e5bf501cc3aa155444ee3f0662853fa967d35e40f3f95b1f538bd248640bf3b">Camera</link>.onPreCull&#32;-=&#32;OnCameraPreCull;
+00277 <emphasis role="preprocessor">#endif</emphasis>
+00278 
+00279 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r">SteamVR</link>.<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r_1aebdf879d97763960970090cfff20a8a7">initializedState</link>&#32;!=&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r">SteamVR</link>.<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r_1a09db867d75bbc654801bb318dd85a5e3">InitializedStates</link>.InitializeSuccess)
+00280 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;SteamVR_Events.Initialized.RemoveListener(OnSteamVRInitialized);
+00281 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00282 
+00283 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;Awake()
+00284 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00285 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___render_1a301435a8700bd2f01ae860c3b89bac75">externalCamera</link>&#32;==&#32;<emphasis role="keyword">null</emphasis>&#32;&amp;&amp;&#32;System.IO.File.Exists(<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___render_1afed0f382e294bc9455e6438fa8963b98">externalCameraConfigPath</link>))
+00286 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00287 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;var&#32;prefab&#32;=&#32;Resources.Load&lt;GameObject&gt;(<emphasis role="stringliteral">&quot;SteamVR_ExternalCamera&quot;</emphasis>);
+00288 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;var&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___render_1afa00f388fb9bbd9a90773d319b079211">instance</link>&#32;=&#32;Instantiate(prefab);
+00289 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___render_1afa00f388fb9bbd9a90773d319b079211">instance</link>.gameObject.name&#32;=&#32;<emphasis role="stringliteral">&quot;External&#32;Camera&quot;</emphasis>;
+00290 
+00291 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___render_1a301435a8700bd2f01ae860c3b89bac75">externalCamera</link>&#32;=&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___render_1afa00f388fb9bbd9a90773d319b079211">instance</link>.transform.GetChild(0).GetComponent&lt;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___external_camera">SteamVR_ExternalCamera</link>&gt;();
+00292 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___render_1a301435a8700bd2f01ae860c3b89bac75">externalCamera</link>.<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___external_camera_1a9d7064ad5953dceb33901e1e03140b2a">configPath</link>&#32;=&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___render_1afed0f382e294bc9455e6438fa8963b98">externalCameraConfigPath</link>;
+00293 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___render_1a301435a8700bd2f01ae860c3b89bac75">externalCamera</link>.<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___external_camera_1ad7cf6593d79e674294e5a8c47a7589e5">ReadConfig</link>();
+00294 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00295 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00296 
+<anchor xml:id="__steam_v_r___render_8cs_source_1l00297"/><link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___render_1a1900b379063ebffa468304110fe4d0fe">00297</link> &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___render_1a1900b379063ebffa468304110fe4d0fe">UpdatePoses</link>()
+00298 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00299 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;var&#32;compositor&#32;=&#32;<link linkend="_class_valve_1_1_v_r_1_1_open_v_r">OpenVR</link>.<link linkend="_class_valve_1_1_v_r_1_1_open_v_r_1a398bc817d8516416f480aed933599ac5">Compositor</link>;
+00300 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(compositor&#32;!=&#32;<emphasis role="keyword">null</emphasis>)
+00301 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00302 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;compositor.<link linkend="_class_valve_1_1_v_r_1_1_c_v_r_compositor_1a6d410c16e1f6335e331b5610ded87500">GetLastPoses</link>(<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___render_1a38d4e5717b82b2be834d1876b2de0ac7">poses</link>,&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___render_1a7c0cb20648b0e298cefe9ccd60ec3a27">gamePoses</link>);
+00303 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;SteamVR_Events.NewPoses.Send(<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___render_1a38d4e5717b82b2be834d1876b2de0ac7">poses</link>);
+00304 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;SteamVR_Events.NewPosesApplied.Send();
+00305 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00306 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00307 
+00308 <emphasis role="preprocessor">#if&#32;UNITY_2017_1_OR_NEWER</emphasis>
+00309 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordtype">void</emphasis>&#32;OnBeforeRender()&#32;
+00310 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{&#32;
+00311 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r">SteamVR</link>.<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r_1ad98d1d8dafb84740b3a005d435da62a5">active</link>&#32;==&#32;<emphasis role="keyword">false</emphasis>)
+00312 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>;
+00313 
+00314 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r">SteamVR</link>.<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r_1a8d2a06793f921d45801b50af18f0c413">settings</link>.<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___settings_1a08a595b4924289a51e30bfe4e157c6e5">IsPoseUpdateMode</link>(<link linkend="_namespace_valve_1_1_v_r_1ac8b0fe3bc9754b0fb9f1351ae3444ac6">SteamVR_UpdateModes</link>.OnPreCull))
+00315 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00316 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___render_1a1900b379063ebffa468304110fe4d0fe">UpdatePoses</link>();
+00317 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00318 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00319 <emphasis role="preprocessor">#else</emphasis>
+00320 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordtype">void</emphasis>&#32;OnCameraPreCull(<link linkend="_namespace_valve_1_1_v_r_1a82e5bf501cc3aa155444ee3f0662853fa967d35e40f3f95b1f538bd248640bf3b">Camera</link>&#32;cam)
+00321 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00322 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r">SteamVR</link>.<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r_1ad98d1d8dafb84740b3a005d435da62a5">active</link>&#32;==&#32;<emphasis role="keyword">false</emphasis>)
+00323 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>;
+00324 
+00325 <emphasis role="preprocessor">#if&#32;UNITY_2017_1_OR_NEWER</emphasis>
+00326 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(cam.cameraType&#32;!=&#32;CameraType.VR)
+00327 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>;
+00328 <emphasis role="preprocessor">#else</emphasis>
+00329 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//custom&#32;code</emphasis>
+00330 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(!cam.stereoEnabled)&#32;<emphasis role="comment">//if&#32;not&#32;main&#32;camera&#32;(stereoEnabled&#32;isn&apos;t&#32;perfect,&#32;but&#32;it&#32;is&#32;the&#32;fast/easiest&#32;way&#32;to&#32;check&#32;this&#32;in&#32;Unity&#32;5.4)</emphasis>
+00331 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00332 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>;
+00333 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00334 <emphasis role="preprocessor">#endif</emphasis>
+00335 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;Only&#32;update&#32;poses&#32;on&#32;the&#32;first&#32;camera&#32;per&#32;frame.</emphasis>
+00336 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(Time.frameCount&#32;!=&#32;lastFrameCount)
+00337 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00338 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;lastFrameCount&#32;=&#32;Time.frameCount;
+00339 
+00340 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r">SteamVR</link>.<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r_1a8d2a06793f921d45801b50af18f0c413">settings</link>.<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___settings_1a08a595b4924289a51e30bfe4e157c6e5">IsPoseUpdateMode</link>(<link linkend="_namespace_valve_1_1_v_r_1ac8b0fe3bc9754b0fb9f1351ae3444ac6">SteamVR_UpdateModes</link>.OnPreCull))
+00341 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00342 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___render_1a1900b379063ebffa468304110fe4d0fe">UpdatePoses</link>();
+00343 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00344 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00345 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00346 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">static</emphasis>&#32;<emphasis role="keywordtype">int</emphasis>&#32;lastFrameCount&#32;=&#32;-1;
+00347 <emphasis role="preprocessor">#endif</emphasis>
+00348 
+00349 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordtype">void</emphasis>&#32;Update()
+00350 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00351 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r">SteamVR</link>.<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r_1ad98d1d8dafb84740b3a005d435da62a5">active</link>&#32;==&#32;<emphasis role="keyword">false</emphasis>)
+00352 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>;
+00353 
+00354 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___render_1a1900b379063ebffa468304110fe4d0fe">UpdatePoses</link>();
+00355 
+00356 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;Dispatch&#32;any&#32;OpenVR&#32;events.</emphasis>
+00357 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;var&#32;system&#32;=&#32;<link linkend="_class_valve_1_1_v_r_1_1_open_v_r">OpenVR</link>.<link linkend="_class_valve_1_1_v_r_1_1_open_v_r_1a6aafa4a25425620225098ded82a045c0">System</link>;
+00358 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(system&#32;!=&#32;<emphasis role="keyword">null</emphasis>)
+00359 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00360 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;var&#32;vrEvent&#32;=&#32;<emphasis role="keyword">new</emphasis>&#32;<link linkend="_struct_valve_1_1_v_r_1_1_v_r_event__t">VREvent_t</link>();
+00361 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;var&#32;size&#32;=&#32;(uint)System.Runtime.InteropServices.Marshal.SizeOf(typeof(<link linkend="_struct_valve_1_1_v_r_1_1_v_r_event__t">VREvent_t</link>));
+00362 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">for</emphasis>&#32;(<emphasis role="keywordtype">int</emphasis>&#32;i&#32;=&#32;0;&#32;i&#32;&lt;&#32;64;&#32;i++)
+00363 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00364 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(!system.PollNextEvent(ref&#32;vrEvent,&#32;size))
+00365 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">break</emphasis>;
+00366 
+00367 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">switch</emphasis>&#32;((<link linkend="_namespace_valve_1_1_v_r_1afe3398b9e5cb1ea06335142d1b9289f3">EVREventType</link>)vrEvent.eventType)
+00368 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00369 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">case</emphasis>&#32;<link linkend="_namespace_valve_1_1_v_r_1afe3398b9e5cb1ea06335142d1b9289f3">EVREventType</link>.VREvent_InputFocusCaptured:&#32;<emphasis role="comment">//&#32;another&#32;app&#32;has&#32;taken&#32;focus&#32;(likely&#32;dashboard)</emphasis>
+00370 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(vrEvent.data.process.oldPid&#32;==&#32;0)
+00371 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00372 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;SteamVR_Events.InputFocus.Send(<emphasis role="keyword">false</emphasis>);
+00373 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00374 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">break</emphasis>;
+00375 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">case</emphasis>&#32;<link linkend="_namespace_valve_1_1_v_r_1afe3398b9e5cb1ea06335142d1b9289f3">EVREventType</link>.VREvent_InputFocusReleased:&#32;<emphasis role="comment">//&#32;that&#32;app&#32;has&#32;released&#32;input&#32;focus</emphasis>
+00376 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(vrEvent.data.process.pid&#32;==&#32;0)
+00377 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00378 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;SteamVR_Events.InputFocus.Send(<emphasis role="keyword">true</emphasis>);
+00379 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00380 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">break</emphasis>;
+00381 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">case</emphasis>&#32;<link linkend="_namespace_valve_1_1_v_r_1afe3398b9e5cb1ea06335142d1b9289f3">EVREventType</link>.VREvent_ShowRenderModels:
+00382 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;SteamVR_Events.HideRenderModels.Send(<emphasis role="keyword">false</emphasis>);
+00383 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">break</emphasis>;
+00384 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">case</emphasis>&#32;<link linkend="_namespace_valve_1_1_v_r_1afe3398b9e5cb1ea06335142d1b9289f3">EVREventType</link>.VREvent_HideRenderModels:
+00385 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;SteamVR_Events.HideRenderModels.Send(<emphasis role="keyword">true</emphasis>);
+00386 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">break</emphasis>;
+00387 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">default</emphasis>:
+00388 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;SteamVR_Events.System((<link linkend="_namespace_valve_1_1_v_r_1afe3398b9e5cb1ea06335142d1b9289f3">EVREventType</link>)vrEvent.eventType).Send(vrEvent);
+00389 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">break</emphasis>;
+00390 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00391 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00392 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00393 
+00394 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;Ensure&#32;various&#32;settings&#32;to&#32;minimize&#32;latency.</emphasis>
+00395 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_namespace_valve_1_1_v_r_1aecd07a81fe79a9f96c6787513e2d98e4ae498749f3c42246d50b15c81c101d988">Application</link>.targetFrameRate&#32;=&#32;-1;
+00396 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_namespace_valve_1_1_v_r_1aecd07a81fe79a9f96c6787513e2d98e4ae498749f3c42246d50b15c81c101d988">Application</link>.runInBackground&#32;=&#32;<emphasis role="keyword">true</emphasis>;&#32;<emphasis role="comment">//&#32;don&apos;t&#32;require&#32;companion&#32;window&#32;focus</emphasis>
+00397 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;QualitySettings.maxQueuedFrames&#32;=&#32;-1;
+00398 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;QualitySettings.vSyncCount&#32;=&#32;0;&#32;<emphasis role="comment">//&#32;this&#32;applies&#32;to&#32;the&#32;companion&#32;window</emphasis>
+00399 
+00400 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r">SteamVR</link>.<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r_1a8d2a06793f921d45801b50af18f0c413">settings</link>.<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___settings_1ae16e224584b00f3f29df72eb6a05954a">lockPhysicsUpdateRateToRenderFrequency</link>&#32;&amp;&amp;&#32;Time.timeScale&#32;&gt;&#32;0.0f)
+00401 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00402 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;var&#32;vr&#32;=&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r">SteamVR</link>.<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r_1af374389920329f77814037a571f6bf2f">instance</link>;
+00403 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(vr&#32;!=&#32;<emphasis role="keyword">null</emphasis>)
+00404 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00405 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;var&#32;timing&#32;=&#32;<emphasis role="keyword">new</emphasis>&#32;<link linkend="_struct_valve_1_1_v_r_1_1_compositor___frame_timing">Compositor_FrameTiming</link>();
+00406 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;timing.m_nSize&#32;=&#32;(uint)System.Runtime.InteropServices.Marshal.SizeOf(typeof(<link linkend="_struct_valve_1_1_v_r_1_1_compositor___frame_timing">Compositor_FrameTiming</link>));
+00407 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;vr.compositor.GetFrameTiming(ref&#32;timing,&#32;0);
+00408 
+00409 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;Time.fixedDeltaTime&#32;=&#32;Time.timeScale&#32;/&#32;vr.hmd_DisplayFrequency;
+00410 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00411 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00412 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00413 &#32;&#32;&#32;&#32;}
+00414 }
+</programlisting></section>

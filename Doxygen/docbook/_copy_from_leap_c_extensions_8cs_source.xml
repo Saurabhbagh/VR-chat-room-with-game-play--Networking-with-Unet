@@ -1,0 +1,112 @@
+<?xml version='1.0' encoding='UTF-8' standalone='no'?>
+<section xmlns="http://docbook.org/ns/docbook" version="5.0" xmlns:xlink="http://www.w3.org/1999/xlink" xml:id="__copy_from_leap_c_extensions_8cs_source">
+<title>CopyFromLeapCExtensions.cs</title>
+<indexterm><primary>O:/GitHUBMINIPRoject/Assets/LeapMotion/Core/Plugins/LeapCSharp/CopyFromLeapCExtensions.cs</primary></indexterm>
+<programlisting>00001 <emphasis role="comment">/******************************************************************************</emphasis>
+00002 <emphasis role="comment">&#32;*&#32;Copyright&#32;(C)&#32;Leap&#32;Motion,&#32;Inc.&#32;2011-2018.&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;*</emphasis>
+00003 <emphasis role="comment">&#32;*&#32;Leap&#32;Motion&#32;proprietary&#32;and&#32;confidential.&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;*</emphasis>
+00004 <emphasis role="comment">&#32;*&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;*</emphasis>
+00005 <emphasis role="comment">&#32;*&#32;Use&#32;subject&#32;to&#32;the&#32;terms&#32;of&#32;the&#32;Leap&#32;Motion&#32;SDK&#32;Agreement&#32;available&#32;at&#32;&#32;&#32;&#32;&#32;*</emphasis>
+00006 <emphasis role="comment">&#32;*&#32;https://developer.leapmotion.com/sdk_agreement,&#32;or&#32;another&#32;agreement&#32;&#32;&#32;&#32;&#32;&#32;&#32;*</emphasis>
+00007 <emphasis role="comment">&#32;*&#32;between&#32;Leap&#32;Motion&#32;and&#32;you,&#32;your&#32;company&#32;or&#32;other&#32;organization.&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;*</emphasis>
+00008 <emphasis role="comment">&#32;******************************************************************************/</emphasis>
+00009 
+00010 <emphasis role="keyword">namespace&#32;</emphasis><link linkend="_namespace_leap_internal">LeapInternal</link>&#32;{
+00011 &#32;&#32;<emphasis role="keyword">using</emphasis>&#32;<link linkend="_namespace_leap">Leap</link>;
+00012 
+00013 &#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keyword">static</emphasis>&#32;<emphasis role="keyword">class&#32;</emphasis>CopyFromLeapCExtensions&#32;{
+00014 
+00020 &#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keyword">static</emphasis>&#32;Frame&#32;CopyFrom(<emphasis role="keyword">this</emphasis>&#32;Frame&#32;frame,&#32;ref&#32;LEAP_TRACKING_EVENT&#32;trackingMsg)&#32;{
+00021 &#32;&#32;&#32;&#32;&#32;&#32;frame.Id&#32;=&#32;(long)trackingMsg.info.frame_id;
+00022 &#32;&#32;&#32;&#32;&#32;&#32;frame.Timestamp&#32;=&#32;(<emphasis role="keywordtype">long</emphasis>)trackingMsg.info.timestamp;
+00023 &#32;&#32;&#32;&#32;&#32;&#32;frame.CurrentFramesPerSecond&#32;=&#32;trackingMsg.framerate;
+00024 
+00025 &#32;&#32;&#32;&#32;&#32;&#32;frame.ResizeHandList((<emphasis role="keywordtype">int</emphasis>)trackingMsg.nHands);
+00026 
+00027 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">for</emphasis>&#32;(<emphasis role="keywordtype">int</emphasis>&#32;i&#32;=&#32;frame.Hands.Count;&#32;i--&#32;!=&#32;0;)&#32;{
+00028 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;LEAP_HAND&#32;hand;
+00029 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;StructMarshal&lt;LEAP_HAND&gt;.ArrayElementToStruct(trackingMsg.pHands,&#32;i,&#32;out&#32;hand);
+00030 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;frame.Hands[i].CopyFrom(ref&#32;hand,&#32;frame.Id);
+00031 &#32;&#32;&#32;&#32;&#32;&#32;}
+00032 
+00033 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;frame;
+00034 &#32;&#32;&#32;&#32;}
+00035 
+00042 &#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keyword">static</emphasis>&#32;<link linkend="_namespace_leap_1_1_unity_1_1_interaction_1a9752eb3e2905e8ebd134fff20c155e6baa78b1ac16c0cd02168097fc9a9bd7604">Hand</link>&#32;CopyFrom(<emphasis role="keyword">this</emphasis>&#32;Hand&#32;hand,&#32;ref&#32;LEAP_HAND&#32;leapHand,&#32;<emphasis role="keywordtype">long</emphasis>&#32;frameId)&#32;{
+00043 &#32;&#32;&#32;&#32;&#32;&#32;hand.FrameId&#32;=&#32;frameId;
+00044 &#32;&#32;&#32;&#32;&#32;&#32;hand.Id&#32;=&#32;(int)leapHand.id;
+00045 
+00046 &#32;&#32;&#32;&#32;&#32;&#32;hand.Arm.CopyFrom(leapHand.arm,&#32;Bone.BoneType.TYPE_INVALID);
+00047 
+00048 &#32;&#32;&#32;&#32;&#32;&#32;hand.Confidence&#32;=&#32;leapHand.confidence;
+00049 &#32;&#32;&#32;&#32;&#32;&#32;hand.GrabStrength&#32;=&#32;leapHand.grab_strength;
+00050 &#32;&#32;&#32;&#32;&#32;&#32;hand.GrabAngle&#32;=&#32;leapHand.grab_angle;
+00051 &#32;&#32;&#32;&#32;&#32;&#32;hand.PinchStrength&#32;=&#32;leapHand.pinch_strength;
+00052 &#32;&#32;&#32;&#32;&#32;&#32;hand.PinchDistance&#32;=&#32;leapHand.pinch_distance;
+00053 &#32;&#32;&#32;&#32;&#32;&#32;hand.PalmWidth&#32;=&#32;leapHand.palm.width;
+00054 &#32;&#32;&#32;&#32;&#32;&#32;hand.IsLeft&#32;=&#32;leapHand.type&#32;==&#32;<link linkend="_namespace_leap_internal_1a937dea95e06bb1e2723e0dbb486c9b34">eLeapHandType</link>.eLeapHandType_Left;
+00055 &#32;&#32;&#32;&#32;&#32;&#32;hand.TimeVisible&#32;=&#32;(float)(leapHand.visible_time&#32;*&#32;1e-6);
+00056 &#32;&#32;&#32;&#32;&#32;&#32;hand.PalmPosition&#32;=&#32;leapHand.palm.position.ToLeapVector();
+00057 &#32;&#32;&#32;&#32;&#32;&#32;hand.StabilizedPalmPosition&#32;=&#32;leapHand.palm.stabilized_position.ToLeapVector();
+00058 &#32;&#32;&#32;&#32;&#32;&#32;hand.PalmVelocity&#32;=&#32;leapHand.palm.velocity.ToLeapVector();
+00059 &#32;&#32;&#32;&#32;&#32;&#32;hand.PalmNormal&#32;=&#32;leapHand.palm.normal.ToLeapVector();
+00060 &#32;&#32;&#32;&#32;&#32;&#32;hand.Rotation&#32;=&#32;leapHand.palm.orientation.ToLeapQuaternion();
+00061 &#32;&#32;&#32;&#32;&#32;&#32;hand.Direction&#32;=&#32;leapHand.palm.direction.ToLeapVector();
+00062 &#32;&#32;&#32;&#32;&#32;&#32;hand.WristPosition&#32;=&#32;hand.Arm.NextJoint;
+00063 
+00064 &#32;&#32;&#32;&#32;&#32;&#32;hand.Fingers[0].CopyFrom(leapHand.thumb,&#32;<link linkend="_namespace_leap">Leap</link>.<link linkend="_class_leap_1_1_finger">Finger</link>.<link linkend="_class_leap_1_1_finger_1ae75e8d46a01aff0bd5c6d6fb99e2f2ba">FingerType</link>.TYPE_THUMB,&#32;hand.Id,&#32;hand.TimeVisible);
+00065 &#32;&#32;&#32;&#32;&#32;&#32;hand.Fingers[1].CopyFrom(leapHand.index,&#32;<link linkend="_namespace_leap">Leap</link>.<link linkend="_class_leap_1_1_finger">Finger</link>.<link linkend="_class_leap_1_1_finger_1ae75e8d46a01aff0bd5c6d6fb99e2f2ba">FingerType</link>.TYPE_INDEX,&#32;hand.Id,&#32;hand.TimeVisible);
+00066 &#32;&#32;&#32;&#32;&#32;&#32;hand.Fingers[2].CopyFrom(leapHand.middle,&#32;<link linkend="_namespace_leap">Leap</link>.<link linkend="_class_leap_1_1_finger">Finger</link>.<link linkend="_class_leap_1_1_finger_1ae75e8d46a01aff0bd5c6d6fb99e2f2ba">FingerType</link>.TYPE_MIDDLE,&#32;hand.Id,&#32;hand.TimeVisible);
+00067 &#32;&#32;&#32;&#32;&#32;&#32;hand.Fingers[3].CopyFrom(leapHand.ring,&#32;<link linkend="_namespace_leap">Leap</link>.<link linkend="_class_leap_1_1_finger">Finger</link>.<link linkend="_class_leap_1_1_finger_1ae75e8d46a01aff0bd5c6d6fb99e2f2ba">FingerType</link>.TYPE_RING,&#32;hand.Id,&#32;hand.TimeVisible);
+00068 &#32;&#32;&#32;&#32;&#32;&#32;hand.Fingers[4].CopyFrom(leapHand.pinky,&#32;<link linkend="_namespace_leap">Leap</link>.<link linkend="_class_leap_1_1_finger">Finger</link>.<link linkend="_class_leap_1_1_finger_1ae75e8d46a01aff0bd5c6d6fb99e2f2ba">FingerType</link>.TYPE_PINKY,&#32;hand.Id,&#32;hand.TimeVisible);
+00069 
+00070 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;hand;
+00071 &#32;&#32;&#32;&#32;}
+00072 
+00082 &#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keyword">static</emphasis>&#32;Finger&#32;CopyFrom(<emphasis role="keyword">this</emphasis>&#32;Finger&#32;finger,&#32;LEAP_DIGIT&#32;leapBone,&#32;Finger.FingerType&#32;type,&#32;<emphasis role="keywordtype">int</emphasis>&#32;handId,&#32;<emphasis role="keywordtype">float</emphasis>&#32;timeVisible)&#32;{
+00083 &#32;&#32;&#32;&#32;&#32;&#32;finger.Id&#32;=&#32;(handId&#32;*&#32;10)&#32;+&#32;leapBone.finger_id;
+00084 &#32;&#32;&#32;&#32;&#32;&#32;finger.HandId&#32;=&#32;handId;
+00085 &#32;&#32;&#32;&#32;&#32;&#32;finger.TimeVisible&#32;=&#32;timeVisible;
+00086 
+00087 &#32;&#32;&#32;&#32;&#32;&#32;Bone&#32;metacarpal&#32;=&#32;finger.bones[0];
+00088 &#32;&#32;&#32;&#32;&#32;&#32;Bone&#32;proximal&#32;=&#32;finger.bones[1];
+00089 &#32;&#32;&#32;&#32;&#32;&#32;Bone&#32;intermediate&#32;=&#32;finger.bones[2];
+00090 &#32;&#32;&#32;&#32;&#32;&#32;Bone&#32;distal&#32;=&#32;finger.bones[3];
+00091 
+00092 &#32;&#32;&#32;&#32;&#32;&#32;metacarpal.CopyFrom(leapBone.metacarpal,&#32;<link linkend="_namespace_leap">Leap</link>.<link linkend="_class_leap_1_1_bone">Bone</link>.<link linkend="_class_leap_1_1_bone_1a21054e31cefa7b75f25a026006fdbb1b">BoneType</link>.TYPE_METACARPAL);
+00093 &#32;&#32;&#32;&#32;&#32;&#32;proximal.CopyFrom(leapBone.proximal,&#32;<link linkend="_namespace_leap">Leap</link>.<link linkend="_class_leap_1_1_bone">Bone</link>.<link linkend="_class_leap_1_1_bone_1a21054e31cefa7b75f25a026006fdbb1b">BoneType</link>.TYPE_PROXIMAL);
+00094 &#32;&#32;&#32;&#32;&#32;&#32;intermediate.CopyFrom(leapBone.intermediate,&#32;<link linkend="_namespace_leap">Leap</link>.<link linkend="_class_leap_1_1_bone">Bone</link>.<link linkend="_class_leap_1_1_bone_1a21054e31cefa7b75f25a026006fdbb1b">BoneType</link>.TYPE_INTERMEDIATE);
+00095 &#32;&#32;&#32;&#32;&#32;&#32;distal.CopyFrom(leapBone.distal,&#32;<link linkend="_namespace_leap">Leap</link>.<link linkend="_class_leap_1_1_bone">Bone</link>.<link linkend="_class_leap_1_1_bone_1a21054e31cefa7b75f25a026006fdbb1b">BoneType</link>.TYPE_DISTAL);
+00096 
+00097 &#32;&#32;&#32;&#32;&#32;&#32;finger.TipPosition&#32;=&#32;distal.NextJoint;
+00098 &#32;&#32;&#32;&#32;&#32;&#32;finger.Direction&#32;=&#32;intermediate.Direction;
+00099 &#32;&#32;&#32;&#32;&#32;&#32;finger.Width&#32;=&#32;intermediate.Width;
+00100 &#32;&#32;&#32;&#32;&#32;&#32;finger.Length&#32;=&#32;(leapBone.finger_id&#32;==&#32;0&#32;?&#32;0.0f&#32;:&#32;0.5f&#32;*&#32;proximal.Length)&#32;+&#32;intermediate.Length&#32;+&#32;0.77f&#32;*&#32;distal.Length;&#32;<emphasis role="comment">//The&#32;values&#32;0.5&#32;for&#32;proximal&#32;and&#32;0.77&#32;for&#32;distal&#32;are&#32;used&#32;in&#32;platform&#32;code&#32;for&#32;this&#32;calculation</emphasis>
+00101 &#32;&#32;&#32;&#32;&#32;&#32;finger.IsExtended&#32;=&#32;leapBone.is_extended&#32;!=&#32;0;
+00102 &#32;&#32;&#32;&#32;&#32;&#32;finger.Type&#32;=&#32;type;
+00103 
+00104 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;finger;
+00105 &#32;&#32;&#32;&#32;}
+00106 
+00113 &#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keyword">static</emphasis>&#32;Bone&#32;CopyFrom(<emphasis role="keyword">this</emphasis>&#32;Bone&#32;bone,&#32;LEAP_BONE&#32;leapBone,&#32;Bone.BoneType&#32;type)&#32;{
+00114 &#32;&#32;&#32;&#32;&#32;&#32;bone.Type&#32;=&#32;type;
+00115 &#32;&#32;&#32;&#32;&#32;&#32;bone.PrevJoint&#32;=&#32;leapBone.prev_joint.ToLeapVector();
+00116 &#32;&#32;&#32;&#32;&#32;&#32;bone.NextJoint&#32;=&#32;leapBone.next_joint.ToLeapVector();
+00117 &#32;&#32;&#32;&#32;&#32;&#32;bone.Direction&#32;=&#32;(bone.NextJoint&#32;-&#32;bone.PrevJoint);
+00118 &#32;&#32;&#32;&#32;&#32;&#32;bone.Length&#32;=&#32;bone.Direction.Magnitude;
+00119 
+00120 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(bone.Length&#32;&lt;&#32;<emphasis role="keywordtype">float</emphasis>.Epsilon)&#32;{
+00121 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;bone.Direction&#32;=&#32;Vector.Zero;
+00122 &#32;&#32;&#32;&#32;&#32;&#32;}&#32;<emphasis role="keywordflow">else</emphasis>&#32;{
+00123 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;bone.Direction&#32;/=&#32;bone.Length;
+00124 &#32;&#32;&#32;&#32;&#32;&#32;}
+00125 
+00126 &#32;&#32;&#32;&#32;&#32;&#32;bone.Center&#32;=&#32;(bone.PrevJoint&#32;+&#32;bone.NextJoint)&#32;/&#32;2.0f;
+00127 &#32;&#32;&#32;&#32;&#32;&#32;bone.Rotation&#32;=&#32;leapBone.rotation.ToLeapQuaternion();
+00128 &#32;&#32;&#32;&#32;&#32;&#32;bone.Width&#32;=&#32;leapBone.width;
+00129 
+00130 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;bone;
+00131 &#32;&#32;&#32;&#32;}
+00132 &#32;&#32;}
+00133 }
+</programlisting></section>

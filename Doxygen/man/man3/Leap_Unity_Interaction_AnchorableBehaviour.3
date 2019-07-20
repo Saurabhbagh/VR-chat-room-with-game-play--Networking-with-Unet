@@ -1,0 +1,344 @@
+.TH "Leap.Unity.Interaction.AnchorableBehaviour" 3 "Sat Jul 20 2019" "Version https://github.com/Saurabhbagh/Multi-User-VR-Viewer--10th-July/" "Multi User Vr Viewer" \" -*- nroff -*-
+.ad l
+.nh
+.SH NAME
+Leap.Unity.Interaction.AnchorableBehaviour \- AnchorableBehaviours mix well with InteractionBehaviours you'd like to be able to pick up and place in specific locations, specified by other GameObjects with an \fBAnchor\fP component\&.  
+
+.SH SYNOPSIS
+.br
+.PP
+.PP
+Inherits MonoBehaviour\&.
+.SS "Public Types"
+
+.in +1c
+.ti -1c
+.RI "enum \fBEventType\fP { \fBEventType\&.OnAttachedToAnchor\fP = 100, \fBEventType\&.OnLockedToAnchor\fP = 105, \fBEventType\&.OnDetachedFromAnchor\fP = 110, \fBEventType\&.WhileAttachedToAnchor\fP = 120, \fBEventType\&.WhileLockedToAnchor\fP = 125, \fBEventType\&.OnPostTryAnchorOnGraspEnd\fP = 130 }"
+.br
+.in -1c
+.SS "Public Member Functions"
+
+.in +1c
+.ti -1c
+.RI "void \fBDetach\fP ()"
+.br
+.RI "Detaches this Anchorable object from its anchor\&. The anchor reference remains unchanged\&. Call \fBTryAttach()\fP to re-attach to this object's assigned anchor\&. "
+.ti -1c
+.RI "bool \fBIsValidAnchor\fP (\fBAnchor\fP \fBanchor\fP)"
+.br
+.RI "Returns whether the argument anchor is an acceptable anchor for this anchorable object; that is, whether the argument \fBAnchor\fP is within this behaviour's \fBAnchorGroup\fP if it has one, or if this behaviour has no \fBAnchorGroup\fP, returns true\&. "
+.ti -1c
+.RI "bool \fBIsWithinRange\fP (\fBAnchor\fP \fBanchor\fP)"
+.br
+.RI "Returns whether the specified anchor is within attachment range of this Anchorable object\&. "
+.ti -1c
+.RI "\fBAnchor\fP \fBFindPreferredAnchor\fP ()"
+.br
+.RI "Attempts to find and return the best anchor for this anchorable object to attach to based on its current configuration\&. If useTrajectory is enabled, the object will consider anchor proximity as well as its own trajectory towards a particular anchor, and may return null if the object is moving away from all of its possible anchors\&. Otherwise, the object will simply return the nearest valid anchor, or null if there is no valid anchor nearby\&. "
+.ti -1c
+.RI "List< \fBAnchor\fP > \fBGetNearbyValidAnchors\fP (bool requireAnchorHasSpace=true, bool requireAnchorActiveAndEnabled=true)"
+.br
+.RI "Returns all anchors within the max anchor range of this anchorable object\&. If this anchorable object has its anchorGroup property set, only anchors within that \fBAnchorGroup\fP will be returned\&. By default, this method will only return anchors that have space for an object to attach to it\&. "
+.ti -1c
+.RI "\fBAnchor\fP \fBGetNearestValidAnchor\fP (bool requireWithinRange=true, bool requireAnchorHasSpace=true, bool requireAnchorActiveAndEnabled=true)"
+.br
+.RI "Returns the nearest valid anchor to this Anchorable object\&. If this anchorable object has its anchorGroup property set, all anchors within that \fBAnchorGroup\fP are valid to be this object's anchor\&. If there is no valid anchor within range, returns null\&. By default, this method will only return anchors that are within the max anchor range of this object and that have space for an object to attach to it\&. "
+.ti -1c
+.RI "bool \fBTryAttach\fP (bool ignoreRange=false)"
+.br
+.RI "Attempts to attach to this Anchorable object's currently specified anchor\&. The attempt may fail if this anchor is out of range\&. Optionally, the range requirement can be ignored\&. "
+.ti -1c
+.RI "bool \fBTryAttachToNearestAnchor\fP ()"
+.br
+.RI "Attempts to find and attach this anchorable object to the nearest valid anchor, or the most optimal nearby anchor based on proximity and the object's trajectory if useTrajectory is enabled\&. "
+.in -1c
+.SS "Static Public Member Functions"
+
+.in +1c
+.ti -1c
+.RI "static float \fBGetAnchorScore\fP (Vector3 anchObjPos, Vector3 anchObjVel, Vector3 anchorPos, float maxDistance, float nonDirectedMaxDistance, float minAngleProduct, float alwaysAttachDistance=0f)"
+.br
+.RI "Calculates and returns a score from 0 (non-valid anchor) to 1 (ideal anchor) based on the argument configuration, using an anchorable object's position and velocity, an anchor position, and distance/angle settings\&. A score of zero indicates an invalid anchor no matter what; a non-zero score indicates a possible anchor, with more optimal anchors receiving a score closer to 1\&. "
+.in -1c
+.SS "Public Attributes"
+
+.in +1c
+.ti -1c
+.RI "float \fBmaxAnchorRange\fP = 0\&.3F"
+.br
+.ti -1c
+.RI "bool \fBuseTrajectory\fP = true"
+.br
+.ti -1c
+.RI "bool \fBlockToAnchor\fP = false"
+.br
+.ti -1c
+.RI "bool \fBlockWhenAttached\fP = true"
+.br
+.ti -1c
+.RI "bool \fBmatchAnchorMotionWhileAttaching\fP = true"
+.br
+.ti -1c
+.RI "float \fBanchorLerpCoeffPerSec\fP = 20F"
+.br
+.ti -1c
+.RI "bool \fBanchorRotation\fP = false"
+.br
+.ti -1c
+.RI "\fBInteractionBehaviour\fP \fBinteractionBehaviour\fP"
+.br
+.ti -1c
+.RI "bool \fBdetachWhenGrasped\fP = true"
+.br
+.ti -1c
+.RI "bool \fBisAttractedByHand\fP = false"
+.br
+.ti -1c
+.RI "float \fBmaxAttractionReach\fP = 0\&.1F"
+.br
+.ti -1c
+.RI "AnimationCurve \fBattractionReachByDistance\fP"
+.br
+.ti -1c
+.RI "Action \fBOnAttachedToAnchor\fP = () => { }"
+.br
+.RI "Called when this \fBAnchorableBehaviour\fP attaches to an \fBAnchor\fP\&. "
+.ti -1c
+.RI "Action \fBOnLockedToAnchor\fP = () => { }"
+.br
+.RI "Called when this \fBAnchorableBehaviour\fP locks to an \fBAnchor\fP\&. "
+.ti -1c
+.RI "Action \fBOnDetachedFromAnchor\fP = () => { }"
+.br
+.RI "Called when this \fBAnchorableBehaviour\fP detaches from an \fBAnchor\fP\&. "
+.ti -1c
+.RI "Action \fBWhileAttachedToAnchor\fP = () => { }"
+.br
+.RI "Called during every Update() in which this \fBAnchorableBehaviour\fP is attached to an \fBAnchor\fP\&. "
+.ti -1c
+.RI "Action \fBWhileLockedToAnchor\fP = () => { }"
+.br
+.RI "Called during every Update() in which this \fBAnchorableBehaviour\fP is locked to an \fBAnchor\fP\&. "
+.ti -1c
+.RI "Action \fBOnPostTryAnchorOnGraspEnd\fP = () => { }"
+.br
+.RI "Called just after this anchorable behaviour's \fBInteractionBehaviour\fP OnObjectGraspEnd for this anchor\&. This callback will never fire if tryAttachAnchorOnGraspEnd is not enabled\&. "
+.in -1c
+.SS "Properties"
+
+.in +1c
+.ti -1c
+.RI "bool \fBisAttached\fP\fC [get, set]\fP"
+.br
+.ti -1c
+.RI "\fBAnchor\fP \fBanchor\fP\fC [get, set]\fP"
+.br
+.ti -1c
+.RI "\fBAnchorGroup\fP \fBanchorGroup\fP\fC [get, set]\fP"
+.br
+.ti -1c
+.RI "bool \fBtryAnchorNearestOnGraspEnd\fP\fC [get, set]\fP"
+.br
+.ti -1c
+.RI "\fBAnchor\fP \fBpreferredAnchor\fP\fC [get]\fP"
+.br
+.RI "Gets the anchor this \fBAnchorableBehaviour\fP would most prefer to attach to\&. This value is refreshed every Update() during which the \fBAnchorableBehaviour\fP has no anchor or is detached from its current anchor\&. "
+.in -1c
+.SH "Detailed Description"
+.PP 
+AnchorableBehaviours mix well with InteractionBehaviours you'd like to be able to pick up and place in specific locations, specified by other GameObjects with an \fBAnchor\fP component\&. 
+
+
+.PP
+Definition at line 25 of file AnchorableBehaviour\&.cs\&.
+.SH "Member Enumeration Documentation"
+.PP 
+.SS "enum \fBLeap\&.Unity\&.Interaction\&.AnchorableBehaviour\&.EventType\fP\fC [strong]\fP"
+
+.PP
+\fBEnumerator\fP
+.in +1c
+.TP
+\fB\fIOnAttachedToAnchor \fP\fP
+.TP
+\fB\fIOnLockedToAnchor \fP\fP
+.TP
+\fB\fIOnDetachedFromAnchor \fP\fP
+.TP
+\fB\fIWhileAttachedToAnchor \fP\fP
+.TP
+\fB\fIWhileLockedToAnchor \fP\fP
+.TP
+\fB\fIOnPostTryAnchorOnGraspEnd \fP\fP
+.PP
+Definition at line 809 of file AnchorableBehaviour\&.cs\&.
+.SH "Member Function Documentation"
+.PP 
+.SS "void Leap\&.Unity\&.Interaction\&.AnchorableBehaviour\&.Detach ()"
+
+.PP
+Detaches this Anchorable object from its anchor\&. The anchor reference remains unchanged\&. Call \fBTryAttach()\fP to re-attach to this object's assigned anchor\&. 
+.PP
+Definition at line 384 of file AnchorableBehaviour\&.cs\&.
+.SS "\fBAnchor\fP Leap\&.Unity\&.Interaction\&.AnchorableBehaviour\&.FindPreferredAnchor ()"
+
+.PP
+Attempts to find and return the best anchor for this anchorable object to attach to based on its current configuration\&. If useTrajectory is enabled, the object will consider anchor proximity as well as its own trajectory towards a particular anchor, and may return null if the object is moving away from all of its possible anchors\&. Otherwise, the object will simply return the nearest valid anchor, or null if there is no valid anchor nearby\&. This method is called every Update() automatically by anchorable objects, and its result is stored in preferredAnchor\&. Only call this if you need a new calculation\&. 
+.PP
+Definition at line 420 of file AnchorableBehaviour\&.cs\&.
+.SS "static float Leap\&.Unity\&.Interaction\&.AnchorableBehaviour\&.GetAnchorScore (Vector3 anchObjPos, Vector3 anchObjVel, Vector3 anchorPos, float maxDistance, float nonDirectedMaxDistance, float minAngleProduct, float alwaysAttachDistance = \fC0f\fP)\fC [static]\fP"
+
+.PP
+Calculates and returns a score from 0 (non-valid anchor) to 1 (ideal anchor) based on the argument configuration, using an anchorable object's position and velocity, an anchor position, and distance/angle settings\&. A score of zero indicates an invalid anchor no matter what; a non-zero score indicates a possible anchor, with more optimal anchors receiving a score closer to 1\&. 
+.PP
+Definition at line 586 of file AnchorableBehaviour\&.cs\&.
+.SS "List<\fBAnchor\fP> Leap\&.Unity\&.Interaction\&.AnchorableBehaviour\&.GetNearbyValidAnchors (bool requireAnchorHasSpace = \fCtrue\fP, bool requireAnchorActiveAndEnabled = \fCtrue\fP)"
+
+.PP
+Returns all anchors within the max anchor range of this anchorable object\&. If this anchorable object has its anchorGroup property set, only anchors within that \fBAnchorGroup\fP will be returned\&. By default, this method will only return anchors that have space for an object to attach to it\&. Warning: This method checks squared-distance for all anchors in teh scene if this \fBAnchorableBehaviour\fP has no \fBAnchorGroup\fP\&. 
+.PP
+Definition at line 458 of file AnchorableBehaviour\&.cs\&.
+.SS "\fBAnchor\fP Leap\&.Unity\&.Interaction\&.AnchorableBehaviour\&.GetNearestValidAnchor (bool requireWithinRange = \fCtrue\fP, bool requireAnchorHasSpace = \fCtrue\fP, bool requireAnchorActiveAndEnabled = \fCtrue\fP)"
+
+.PP
+Returns the nearest valid anchor to this Anchorable object\&. If this anchorable object has its anchorGroup property set, all anchors within that \fBAnchorGroup\fP are valid to be this object's anchor\&. If there is no valid anchor within range, returns null\&. By default, this method will only return anchors that are within the max anchor range of this object and that have space for an object to attach to it\&. Warning: This method checks squared-distance for all anchors in the scene if this \fBAnchorableBehaviour\fP has no \fBAnchorGroup\fP\&. 
+.PP
+Definition at line 492 of file AnchorableBehaviour\&.cs\&.
+.SS "bool Leap\&.Unity\&.Interaction\&.AnchorableBehaviour\&.IsValidAnchor (\fBAnchor\fP anchor)"
+
+.PP
+Returns whether the argument anchor is an acceptable anchor for this anchorable object; that is, whether the argument \fBAnchor\fP is within this behaviour's \fBAnchorGroup\fP if it has one, or if this behaviour has no \fBAnchorGroup\fP, returns true\&. 
+.PP
+Definition at line 393 of file AnchorableBehaviour\&.cs\&.
+.SS "bool Leap\&.Unity\&.Interaction\&.AnchorableBehaviour\&.IsWithinRange (\fBAnchor\fP anchor)"
+
+.PP
+Returns whether the specified anchor is within attachment range of this Anchorable object\&. 
+.PP
+Definition at line 405 of file AnchorableBehaviour\&.cs\&.
+.SS "bool Leap\&.Unity\&.Interaction\&.AnchorableBehaviour\&.TryAttach (bool ignoreRange = \fCfalse\fP)"
+
+.PP
+Attempts to attach to this Anchorable object's currently specified anchor\&. The attempt may fail if this anchor is out of range\&. Optionally, the range requirement can be ignored\&. 
+.PP
+Definition at line 540 of file AnchorableBehaviour\&.cs\&.
+.SS "bool Leap\&.Unity\&.Interaction\&.AnchorableBehaviour\&.TryAttachToNearestAnchor ()"
+
+.PP
+Attempts to find and attach this anchorable object to the nearest valid anchor, or the most optimal nearby anchor based on proximity and the object's trajectory if useTrajectory is enabled\&. 
+.PP
+Definition at line 555 of file AnchorableBehaviour\&.cs\&.
+.SH "Member Data Documentation"
+.PP 
+.SS "float Leap\&.Unity\&.Interaction\&.AnchorableBehaviour\&.anchorLerpCoeffPerSec = 20F"
+
+.PP
+Definition at line 178 of file AnchorableBehaviour\&.cs\&.
+.SS "bool Leap\&.Unity\&.Interaction\&.AnchorableBehaviour\&.anchorRotation = false"
+
+.PP
+Definition at line 184 of file AnchorableBehaviour\&.cs\&.
+.SS "AnimationCurve Leap\&.Unity\&.Interaction\&.AnchorableBehaviour\&.attractionReachByDistance"
+
+.PP
+Definition at line 230 of file AnchorableBehaviour\&.cs\&.
+.SS "bool Leap\&.Unity\&.Interaction\&.AnchorableBehaviour\&.detachWhenGrasped = true"
+
+.PP
+Definition at line 196 of file AnchorableBehaviour\&.cs\&.
+.SS "\fBInteractionBehaviour\fP Leap\&.Unity\&.Interaction\&.AnchorableBehaviour\&.interactionBehaviour"
+
+.PP
+Definition at line 190 of file AnchorableBehaviour\&.cs\&.
+.SS "bool Leap\&.Unity\&.Interaction\&.AnchorableBehaviour\&.isAttractedByHand = false"
+
+.PP
+Definition at line 222 of file AnchorableBehaviour\&.cs\&.
+.SS "bool Leap\&.Unity\&.Interaction\&.AnchorableBehaviour\&.lockToAnchor = false"
+
+.PP
+Definition at line 161 of file AnchorableBehaviour\&.cs\&.
+.SS "bool Leap\&.Unity\&.Interaction\&.AnchorableBehaviour\&.lockWhenAttached = true"
+
+.PP
+Definition at line 167 of file AnchorableBehaviour\&.cs\&.
+.SS "bool Leap\&.Unity\&.Interaction\&.AnchorableBehaviour\&.matchAnchorMotionWhileAttaching = true"
+
+.PP
+Definition at line 173 of file AnchorableBehaviour\&.cs\&.
+.SS "float Leap\&.Unity\&.Interaction\&.AnchorableBehaviour\&.maxAnchorRange = 0\&.3F"
+
+.PP
+Definition at line 127 of file AnchorableBehaviour\&.cs\&.
+.SS "float Leap\&.Unity\&.Interaction\&.AnchorableBehaviour\&.maxAttractionReach = 0\&.1F"
+
+.PP
+Definition at line 226 of file AnchorableBehaviour\&.cs\&.
+.SS "Action Leap\&.Unity\&.Interaction\&.AnchorableBehaviour\&.OnAttachedToAnchor = () => { }"
+
+.PP
+Called when this \fBAnchorableBehaviour\fP attaches to an \fBAnchor\fP\&. 
+.PP
+Definition at line 245 of file AnchorableBehaviour\&.cs\&.
+.SS "Action Leap\&.Unity\&.Interaction\&.AnchorableBehaviour\&.OnDetachedFromAnchor = () => { }"
+
+.PP
+Called when this \fBAnchorableBehaviour\fP detaches from an \fBAnchor\fP\&. 
+.PP
+Definition at line 255 of file AnchorableBehaviour\&.cs\&.
+.SS "Action Leap\&.Unity\&.Interaction\&.AnchorableBehaviour\&.OnLockedToAnchor = () => { }"
+
+.PP
+Called when this \fBAnchorableBehaviour\fP locks to an \fBAnchor\fP\&. 
+.PP
+Definition at line 250 of file AnchorableBehaviour\&.cs\&.
+.SS "Action Leap\&.Unity\&.Interaction\&.AnchorableBehaviour\&.OnPostTryAnchorOnGraspEnd = () => { }"
+
+.PP
+Called just after this anchorable behaviour's \fBInteractionBehaviour\fP OnObjectGraspEnd for this anchor\&. This callback will never fire if tryAttachAnchorOnGraspEnd is not enabled\&. If tryAttachAnchorOnGraspEnd is enabled, the anchor will be attached to an anchor only if its preferredAnchor property is non-null; otherwise, the attempt to anchor failed\&. 
+.PP
+Definition at line 275 of file AnchorableBehaviour\&.cs\&.
+.SS "bool Leap\&.Unity\&.Interaction\&.AnchorableBehaviour\&.useTrajectory = true"
+
+.PP
+Definition at line 133 of file AnchorableBehaviour\&.cs\&.
+.SS "Action Leap\&.Unity\&.Interaction\&.AnchorableBehaviour\&.WhileAttachedToAnchor = () => { }"
+
+.PP
+Called during every Update() in which this \fBAnchorableBehaviour\fP is attached to an \fBAnchor\fP\&. 
+.PP
+Definition at line 260 of file AnchorableBehaviour\&.cs\&.
+.SS "Action Leap\&.Unity\&.Interaction\&.AnchorableBehaviour\&.WhileLockedToAnchor = () => { }"
+
+.PP
+Called during every Update() in which this \fBAnchorableBehaviour\fP is locked to an \fBAnchor\fP\&. 
+.PP
+Definition at line 265 of file AnchorableBehaviour\&.cs\&.
+.SH "Property Documentation"
+.PP 
+.SS "\fBAnchor\fP Leap\&.Unity\&.Interaction\&.AnchorableBehaviour\&.anchor\fC [get]\fP, \fC [set]\fP"
+
+.PP
+Definition at line 73 of file AnchorableBehaviour\&.cs\&.
+.SS "\fBAnchorGroup\fP Leap\&.Unity\&.Interaction\&.AnchorableBehaviour\&.anchorGroup\fC [get]\fP, \fC [set]\fP"
+
+.PP
+Definition at line 109 of file AnchorableBehaviour\&.cs\&.
+.SS "bool Leap\&.Unity\&.Interaction\&.AnchorableBehaviour\&.isAttached\fC [get]\fP, \fC [set]\fP"
+
+.PP
+Definition at line 31 of file AnchorableBehaviour\&.cs\&.
+.SS "\fBAnchor\fP Leap\&.Unity\&.Interaction\&.AnchorableBehaviour\&.preferredAnchor\fC [get]\fP"
+
+.PP
+Gets the anchor this \fBAnchorableBehaviour\fP would most prefer to attach to\&. This value is refreshed every Update() during which the \fBAnchorableBehaviour\fP has no anchor or is detached from its current anchor\&. 
+.PP
+Definition at line 238 of file AnchorableBehaviour\&.cs\&.
+.SS "bool Leap\&.Unity\&.Interaction\&.AnchorableBehaviour\&.tryAnchorNearestOnGraspEnd\fC [get]\fP, \fC [set]\fP"
+
+.PP
+Definition at line 204 of file AnchorableBehaviour\&.cs\&.
+
+.SH "Author"
+.PP 
+Generated automatically by Doxygen for Multi User Vr Viewer from the source code\&.

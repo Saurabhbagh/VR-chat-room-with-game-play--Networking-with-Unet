@@ -1,0 +1,111 @@
+<?xml version='1.0' encoding='UTF-8' standalone='no'?>
+<section xmlns="http://docbook.org/ns/docbook" version="5.0" xmlns:xlink="http://www.w3.org/1999/xlink" xml:id="__steam_v_r___render_model_editor_8cs_source">
+<title>SteamVR_RenderModelEditor.cs</title>
+<indexterm><primary>O:/GitHUBMINIPRoject/Assets/SteamVR/Editor/SteamVR_RenderModelEditor.cs</primary></indexterm>
+<programlisting>00001 <emphasis role="comment">//=======&#32;Copyright&#32;(c)&#32;Valve&#32;Corporation,&#32;All&#32;rights&#32;reserved.&#32;===============</emphasis>
+00002 <emphasis role="comment">//</emphasis>
+00003 <emphasis role="comment">//&#32;Purpose:&#32;Custom&#32;inspector&#32;display&#32;for&#32;SteamVR_RenderModel</emphasis>
+00004 <emphasis role="comment">//</emphasis>
+00005 <emphasis role="comment">//=============================================================================</emphasis>
+00006 
+00007 <emphasis role="keyword">using</emphasis>&#32;<link linkend="__balloon_8cs_1a7d67e097df9376eb709b6a23aa3c7d23">UnityEngine</link>;
+00008 <emphasis role="keyword">using</emphasis>&#32;<link linkend="_namespace_unity_editor">UnityEditor</link>;
+00009 <emphasis role="keyword">using</emphasis>&#32;System.Text;
+00010 <emphasis role="keyword">using</emphasis>&#32;System.Collections.Generic;
+00011 
+00012 <emphasis role="keyword">namespace&#32;</emphasis><link linkend="_namespace_valve_1_1_v_r">Valve.VR</link>
+00013 {
+00014 &#32;&#32;&#32;&#32;[CustomEditor(typeof(SteamVR_RenderModel)),&#32;CanEditMultipleObjects]
+<anchor xml:id="__steam_v_r___render_model_editor_8cs_source_1l00015"/><link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___render_model_editor">00015</link> &#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keyword">class&#32;</emphasis><link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___render_model_editor">SteamVR_RenderModelEditor</link>&#32;:&#32;Editor
+00016 &#32;&#32;&#32;&#32;{
+00017 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;SerializedProperty&#32;script,&#32;index,&#32;modelOverride,&#32;shader,&#32;verbose,&#32;createComponents,&#32;updateDynamically;
+00018 
+00019 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">static</emphasis>&#32;<emphasis role="keywordtype">string</emphasis>[]&#32;renderModelNames;
+00020 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordtype">int</emphasis>&#32;renderModelIndex;
+00021 
+00022 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordtype">void</emphasis>&#32;OnEnable()
+00023 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00024 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;script&#32;=&#32;serializedObject.FindProperty(<emphasis role="stringliteral">&quot;m_Script&quot;</emphasis>);
+00025 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_namespace_valve_1_1_v_r_1ac40c4bdf0a3dcd6e69cad2d85f287c67a6a992d5529f459a44fee58c733255e86">index</link>&#32;=&#32;serializedObject.FindProperty(<emphasis role="stringliteral">&quot;index&quot;</emphasis>);
+00026 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;modelOverride&#32;=&#32;serializedObject.FindProperty(<emphasis role="stringliteral">&quot;modelOverride&quot;</emphasis>);
+00027 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;shader&#32;=&#32;serializedObject.FindProperty(<emphasis role="stringliteral">&quot;shader&quot;</emphasis>);
+00028 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;verbose&#32;=&#32;serializedObject.FindProperty(<emphasis role="stringliteral">&quot;verbose&quot;</emphasis>);
+00029 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;createComponents&#32;=&#32;serializedObject.FindProperty(<emphasis role="stringliteral">&quot;createComponents&quot;</emphasis>);
+00030 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;updateDynamically&#32;=&#32;serializedObject.FindProperty(<emphasis role="stringliteral">&quot;updateDynamically&quot;</emphasis>);
+00031 
+00032 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;Load&#32;render&#32;model&#32;names&#32;if&#32;necessary.</emphasis>
+00033 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(renderModelNames&#32;==&#32;<emphasis role="keyword">null</emphasis>)
+00034 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00035 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;renderModelNames&#32;=&#32;LoadRenderModelNames();
+00036 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00037 
+00038 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;Update&#32;renderModelIndex&#32;based&#32;on&#32;current&#32;modelOverride&#32;value.</emphasis>
+00039 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(modelOverride.stringValue&#32;!=&#32;<emphasis role="stringliteral">&quot;&quot;</emphasis>)
+00040 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00041 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">for</emphasis>&#32;(<emphasis role="keywordtype">int</emphasis>&#32;i&#32;=&#32;0;&#32;i&#32;&lt;&#32;renderModelNames.Length;&#32;i++)
+00042 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00043 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(modelOverride.stringValue&#32;==&#32;renderModelNames[i])
+00044 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00045 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;renderModelIndex&#32;=&#32;i;
+00046 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">break</emphasis>;
+00047 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00048 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00049 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00050 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00051 
+00052 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">static</emphasis>&#32;<emphasis role="keywordtype">string</emphasis>[]&#32;LoadRenderModelNames()
+00053 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00054 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;var&#32;results&#32;=&#32;<emphasis role="keyword">new</emphasis>&#32;List&lt;string&gt;();
+00055 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;results.Add(<emphasis role="stringliteral">&quot;None&quot;</emphasis>);
+00056 
+00057 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">using</emphasis>&#32;(var&#32;holder&#32;=&#32;<emphasis role="keyword">new</emphasis>&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___render_model">SteamVR_RenderModel</link>.<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___render_model_1_1_render_model_interface_holder">RenderModelInterfaceHolder</link>())
+00058 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00059 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;var&#32;renderModels&#32;=&#32;holder.instance;
+00060 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(renderModels&#32;!=&#32;<emphasis role="keyword">null</emphasis>)
+00061 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00062 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;uint&#32;count&#32;=&#32;renderModels.GetRenderModelCount();
+00063 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">for</emphasis>&#32;(uint&#32;i&#32;=&#32;0;&#32;i&#32;&lt;&#32;count;&#32;i++)
+00064 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00065 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;var&#32;buffer&#32;=&#32;<emphasis role="keyword">new</emphasis>&#32;StringBuilder();
+00066 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;var&#32;requiredSize&#32;=&#32;renderModels.GetRenderModelName(i,&#32;buffer,&#32;0);
+00067 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(requiredSize&#32;==&#32;0)
+00068 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">continue</emphasis>;
+00069 
+00070 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;buffer.EnsureCapacity((<emphasis role="keywordtype">int</emphasis>)requiredSize);
+00071 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;renderModels.GetRenderModelName(i,&#32;buffer,&#32;requiredSize);
+00072 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;results.Add(buffer.ToString());
+00073 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00074 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00075 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00076 
+00077 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;results.ToArray();
+00078 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00079 
+<anchor xml:id="__steam_v_r___render_model_editor_8cs_source_1l00080"/><link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___render_model_editor_1ad5b2cc7179ea0d7df2ac3e473ce181be">00080</link> &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keyword">override</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___render_model_editor_1ad5b2cc7179ea0d7df2ac3e473ce181be">OnInspectorGUI</link>()
+00081 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00082 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;serializedObject.Update();
+00083 
+00084 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;EditorGUILayout.PropertyField(script);
+00085 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;EditorGUILayout.PropertyField(<link linkend="_namespace_valve_1_1_v_r_1ac40c4bdf0a3dcd6e69cad2d85f287c67a6a992d5529f459a44fee58c733255e86">index</link>);
+00086 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//EditorGUILayout.PropertyField(modelOverride);</emphasis>
+00087 
+00088 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;GUILayout.BeginHorizontal();
+00089 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;GUILayout.Label(<emphasis role="keyword">new</emphasis>&#32;GUIContent(<emphasis role="stringliteral">&quot;Model&#32;Override&quot;</emphasis>,&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___render_model">SteamVR_RenderModel</link>.<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___render_model_1ab459a749b89d3f4f12339ef618177344">modelOverrideWarning</link>));
+00090 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;var&#32;selected&#32;=&#32;EditorGUILayout.Popup(renderModelIndex,&#32;renderModelNames);
+00091 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(selected&#32;!=&#32;renderModelIndex)
+00092 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00093 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;renderModelIndex&#32;=&#32;selected;
+00094 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;modelOverride.stringValue&#32;=&#32;(selected&#32;&gt;&#32;0)&#32;?&#32;renderModelNames[selected]&#32;:&#32;<emphasis role="stringliteral">&quot;&quot;</emphasis>;
+00095 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00096 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;GUILayout.EndHorizontal();
+00097 
+00098 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;EditorGUILayout.PropertyField(shader);
+00099 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;EditorGUILayout.PropertyField(verbose);
+00100 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;EditorGUILayout.PropertyField(createComponents);
+00101 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;EditorGUILayout.PropertyField(updateDynamically);
+00102 
+00103 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;serializedObject.ApplyModifiedProperties();
+00104 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00105 &#32;&#32;&#32;&#32;}
+00106 }
+</programlisting></section>

@@ -1,0 +1,130 @@
+<?xml version='1.0' encoding='UTF-8' standalone='no'?>
+<section xmlns="http://docbook.org/ns/docbook" version="5.0" xmlns:xlink="http://www.w3.org/1999/xlink" xml:id="__sliding_window_throw_8cs_source">
+<title>SlidingWindowThrow.cs</title>
+<indexterm><primary>O:/GitHUBMINIPRoject/Assets/LeapMotion/Modules/InteractionEngine/Scripts/Internal/SlidingWindowThrow.cs</primary></indexterm>
+<programlisting>00001 <emphasis role="comment">/******************************************************************************</emphasis>
+00002 <emphasis role="comment">&#32;*&#32;Copyright&#32;(C)&#32;Leap&#32;Motion,&#32;Inc.&#32;2011-2018.&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;*</emphasis>
+00003 <emphasis role="comment">&#32;*&#32;Leap&#32;Motion&#32;proprietary&#32;and&#32;confidential.&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;*</emphasis>
+00004 <emphasis role="comment">&#32;*&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;*</emphasis>
+00005 <emphasis role="comment">&#32;*&#32;Use&#32;subject&#32;to&#32;the&#32;terms&#32;of&#32;the&#32;Leap&#32;Motion&#32;SDK&#32;Agreement&#32;available&#32;at&#32;&#32;&#32;&#32;&#32;*</emphasis>
+00006 <emphasis role="comment">&#32;*&#32;https://developer.leapmotion.com/sdk_agreement,&#32;or&#32;another&#32;agreement&#32;&#32;&#32;&#32;&#32;&#32;&#32;*</emphasis>
+00007 <emphasis role="comment">&#32;*&#32;between&#32;Leap&#32;Motion&#32;and&#32;you,&#32;your&#32;company&#32;or&#32;other&#32;organization.&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;*</emphasis>
+00008 <emphasis role="comment">&#32;******************************************************************************/</emphasis>
+00009 
+00010 <emphasis role="keyword">using</emphasis>&#32;InteractionEngineUtility;
+00011 <emphasis role="keyword">using</emphasis>&#32;System.Collections;
+00012 <emphasis role="keyword">using</emphasis>&#32;System.Collections.Generic;
+00013 <emphasis role="keyword">using</emphasis>&#32;<link linkend="__balloon_8cs_1a7d67e097df9376eb709b6a23aa3c7d23">UnityEngine</link>;
+00014 
+00015 <emphasis role="keyword">namespace&#32;</emphasis><link linkend="_namespace_leap_1_1_unity_1_1_interaction">Leap.Unity.Interaction</link>&#32;{
+00016 
+<anchor xml:id="__sliding_window_throw_8cs_source_1l00023"/><link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_sliding_window_throw">00023</link> &#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keyword">class&#32;</emphasis><link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_sliding_window_throw">SlidingWindowThrow</link>&#32;:&#32;<link linkend="_interface_leap_1_1_unity_1_1_interaction_1_1_i_throw_handler">IThrowHandler</link>&#32;{
+00024 
+00028 &#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;<emphasis role="keywordtype">float</emphasis>&#32;_windowLength&#32;=&#32;0.05F;
+00029 
+00033 &#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;<emphasis role="keywordtype">float</emphasis>&#32;_windowDelay&#32;=&#32;0.02F;
+00034 
+00039 &#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;AnimationCurve&#32;_velocityMultiplierCurve&#32;=&#32;<emphasis role="keyword">new</emphasis>&#32;AnimationCurve(
+00040 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">new</emphasis>&#32;Keyframe(0.0F,&#32;1.0F,&#32;0,&#32;0),
+00041 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">new</emphasis>&#32;Keyframe(3.0F,&#32;1.5F,&#32;0,&#32;0));
+00042 
+00043 &#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;<emphasis role="keyword">struct&#32;</emphasis>VelocitySample&#32;{
+00044 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keywordtype">float</emphasis>&#32;time;
+00045 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;Vector3&#32;position;
+00046 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;Quaternion&#32;rotation;
+00047 
+00048 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;VelocitySample(Vector3&#32;position,&#32;Quaternion&#32;rotation,&#32;<emphasis role="keywordtype">float</emphasis>&#32;time)&#32;{
+00049 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;this.position&#32;=&#32;position;
+00050 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;this.rotation&#32;=&#32;rotation;
+00051 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;this.time&#32;=&#32;Time.fixedTime;
+00052 &#32;&#32;&#32;&#32;&#32;&#32;}
+00053 
+00054 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keyword">static</emphasis>&#32;VelocitySample&#32;Interpolate(VelocitySample&#32;a,&#32;VelocitySample&#32;b,&#32;<emphasis role="keywordtype">float</emphasis>&#32;time)&#32;{
+00055 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordtype">float</emphasis>&#32;alpha&#32;=&#32;Mathf.Clamp01(Mathf.InverseLerp(a.time,&#32;b.time,&#32;time));
+00056 
+00057 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;<emphasis role="keyword">new</emphasis>&#32;VelocitySample(Vector3.Lerp(a.position,&#32;b.position,&#32;alpha),
+00058 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;Quaternion.Slerp(a.rotation,&#32;b.rotation,&#32;alpha),
+00059 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;time);
+00060 &#32;&#32;&#32;&#32;&#32;&#32;}
+00061 &#32;&#32;&#32;&#32;}
+00062 
+00063 &#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;Queue&lt;VelocitySample&gt;&#32;_velocityQueue&#32;=&#32;<emphasis role="keyword">new</emphasis>&#32;Queue&lt;VelocitySample&gt;(64);
+00064 
+<anchor xml:id="__sliding_window_throw_8cs_source_1l00068"/><link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_sliding_window_throw_1ae0b88c5531628875477b51d107ba1c11">00068</link> &#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_sliding_window_throw_1ae0b88c5531628875477b51d107ba1c11">OnHold</link>(<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_behaviour">InteractionBehaviour</link>&#32;intObj,
+00069 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_struct_leap_1_1_unity_1_1_readonly_list">ReadonlyList&lt;InteractionController&gt;</link>&#32;controllers)&#32;{
+00070 &#32;&#32;&#32;&#32;&#32;&#32;_velocityQueue.Enqueue(<emphasis role="keyword">new</emphasis>&#32;VelocitySample(intObj.<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_behaviour_1a4f54f1794944882d8cf51bd641a5341c">rigidbody</link>.position,
+00071 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;intObj.<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_behaviour_1a4f54f1794944882d8cf51bd641a5341c">rigidbody</link>.rotation,
+00072 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;Time.fixedTime));
+00073 
+00074 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">while</emphasis>&#32;(<emphasis role="keyword">true</emphasis>)&#32;{
+00075 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;VelocitySample&#32;oldestVelocity&#32;=&#32;_velocityQueue.Peek();
+00076 
+00077 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;Dequeue&#32;conservatively&#32;if&#32;the&#32;oldest&#32;velocity&#32;is&#32;more&#32;than&#32;4&#32;frames&#32;later</emphasis>
+00078 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;than&#32;the&#32;start&#32;of&#32;the&#32;window.</emphasis>
+00079 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(oldestVelocity.time&#32;+&#32;(Time.fixedDeltaTime&#32;*&#32;4)&#32;&lt;&#32;Time.fixedTime
+00080 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;-&#32;_windowLength
+00081 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;-&#32;_windowDelay)&#32;{
+00082 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;_velocityQueue.Dequeue();
+00083 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00084 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">else</emphasis>&#32;{
+00085 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">break</emphasis>;
+00086 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00087 &#32;&#32;&#32;&#32;&#32;&#32;}
+00088 &#32;&#32;&#32;&#32;}
+00089 
+<anchor xml:id="__sliding_window_throw_8cs_source_1l00093"/><link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_sliding_window_throw_1adff33de5d0a761227c5e3ebd80e12e96">00093</link> &#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_sliding_window_throw_1adff33de5d0a761227c5e3ebd80e12e96">OnThrow</link>(<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_behaviour">InteractionBehaviour</link>&#32;intObj,&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_controller">InteractionController</link>&#32;throwingController)&#32;{
+00094 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(_velocityQueue.Count&#32;&lt;&#32;2)&#32;{
+00095 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;intObj.<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_behaviour_1a4f54f1794944882d8cf51bd641a5341c">rigidbody</link>.velocity&#32;=&#32;Vector3.zero;
+00096 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;intObj.<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_behaviour_1a4f54f1794944882d8cf51bd641a5341c">rigidbody</link>.angularVelocity&#32;=&#32;Vector3.zero;
+00097 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>;
+00098 &#32;&#32;&#32;&#32;&#32;&#32;}
+00099 
+00100 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordtype">float</emphasis>&#32;windowEnd&#32;=&#32;Time.fixedTime&#32;-&#32;_windowDelay;
+00101 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordtype">float</emphasis>&#32;windowStart&#32;=&#32;windowEnd&#32;-&#32;_windowLength;
+00102 
+00103 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;0&#32;occurs&#32;before&#32;1,</emphasis>
+00104 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;start&#32;occurs&#32;before&#32;end.</emphasis>
+00105 &#32;&#32;&#32;&#32;&#32;&#32;VelocitySample&#32;start0,&#32;start1;
+00106 &#32;&#32;&#32;&#32;&#32;&#32;VelocitySample&#32;end0,&#32;end1;
+00107 &#32;&#32;&#32;&#32;&#32;&#32;VelocitySample&#32;s0,&#32;s1;
+00108 
+00109 &#32;&#32;&#32;&#32;&#32;&#32;s0&#32;=&#32;s1&#32;=&#32;start0&#32;=&#32;start1&#32;=&#32;end0&#32;=&#32;end1&#32;=&#32;_velocityQueue.Dequeue();
+00110 
+00111 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">while</emphasis>&#32;(_velocityQueue.Count&#32;!=&#32;0)&#32;{
+00112 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;s0&#32;=&#32;s1;
+00113 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;s1&#32;=&#32;_velocityQueue.Dequeue();
+00114 
+00115 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(s0.time&#32;&lt;&#32;windowStart&#32;&amp;&amp;&#32;s1.time&#32;&gt;=&#32;windowStart)&#32;{
+00116 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;start0&#32;=&#32;s0;
+00117 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;start1&#32;=&#32;s1;
+00118 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00119 
+00120 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(s0.time&#32;&lt;&#32;windowEnd&#32;&amp;&amp;&#32;s1.time&#32;&gt;=&#32;windowEnd)&#32;{
+00121 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;end0&#32;=&#32;s0;
+00122 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;end1&#32;=&#32;s1;
+00123 
+00124 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;We&#32;have&#32;assigned&#32;both&#32;start&#32;and&#32;end&#32;and&#32;can&#32;break&#32;out&#32;of&#32;the&#32;loop.</emphasis>
+00125 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;_velocityQueue.Clear();
+00126 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">break</emphasis>;
+00127 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00128 &#32;&#32;&#32;&#32;&#32;&#32;}
+00129 
+00130 &#32;&#32;&#32;&#32;&#32;&#32;VelocitySample&#32;start&#32;=&#32;VelocitySample.Interpolate(start0,&#32;start1,&#32;windowStart);
+00131 &#32;&#32;&#32;&#32;&#32;&#32;VelocitySample&#32;end&#32;=&#32;VelocitySample.Interpolate(end0,&#32;end1,&#32;windowEnd);
+00132 
+00133 &#32;&#32;&#32;&#32;&#32;&#32;Vector3&#32;interpolatedVelocity&#32;=&#32;PhysicsUtility.ToLinearVelocity(start.position,
+00134 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;end.position,
+00135 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;_windowLength);
+00136 
+00137 &#32;&#32;&#32;&#32;&#32;&#32;intObj.<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_behaviour_1a4f54f1794944882d8cf51bd641a5341c">rigidbody</link>.velocity&#32;=&#32;interpolatedVelocity;
+00138 &#32;&#32;&#32;&#32;&#32;&#32;intObj.<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_behaviour_1a4f54f1794944882d8cf51bd641a5341c">rigidbody</link>.angularVelocity&#32;=&#32;PhysicsUtility.ToAngularVelocity(start.rotation,
+00139 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;end.rotation,
+00140 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;_windowLength);
+00141 
+00142 &#32;&#32;&#32;&#32;&#32;&#32;intObj.<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_behaviour_1a4f54f1794944882d8cf51bd641a5341c">rigidbody</link>.velocity&#32;*=&#32;_velocityMultiplierCurve.Evaluate(intObj.<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_behaviour_1a4f54f1794944882d8cf51bd641a5341c">rigidbody</link>.velocity.magnitude);
+00143 &#32;&#32;&#32;&#32;}
+00144 
+00145 &#32;&#32;}
+00146 
+00147 }
+</programlisting></section>

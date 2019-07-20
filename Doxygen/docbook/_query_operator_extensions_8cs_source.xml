@@ -1,0 +1,422 @@
+<?xml version='1.0' encoding='UTF-8' standalone='no'?>
+<section xmlns="http://docbook.org/ns/docbook" version="5.0" xmlns:xlink="http://www.w3.org/1999/xlink" xml:id="__query_operator_extensions_8cs_source">
+<title>QueryOperatorExtensions.cs</title>
+<indexterm><primary>O:/GitHUBMINIPRoject/Assets/LeapMotion/Core/Scripts/Query/QueryOperatorExtensions.cs</primary></indexterm>
+<programlisting>00001 <emphasis role="comment">/******************************************************************************</emphasis>
+00002 <emphasis role="comment">&#32;*&#32;Copyright&#32;(C)&#32;Leap&#32;Motion,&#32;Inc.&#32;2011-2018.&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;*</emphasis>
+00003 <emphasis role="comment">&#32;*&#32;Leap&#32;Motion&#32;proprietary&#32;and&#32;confidential.&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;*</emphasis>
+00004 <emphasis role="comment">&#32;*&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;*</emphasis>
+00005 <emphasis role="comment">&#32;*&#32;Use&#32;subject&#32;to&#32;the&#32;terms&#32;of&#32;the&#32;Leap&#32;Motion&#32;SDK&#32;Agreement&#32;available&#32;at&#32;&#32;&#32;&#32;&#32;*</emphasis>
+00006 <emphasis role="comment">&#32;*&#32;https://developer.leapmotion.com/sdk_agreement,&#32;or&#32;another&#32;agreement&#32;&#32;&#32;&#32;&#32;&#32;&#32;*</emphasis>
+00007 <emphasis role="comment">&#32;*&#32;between&#32;Leap&#32;Motion&#32;and&#32;you,&#32;your&#32;company&#32;or&#32;other&#32;organization.&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;*</emphasis>
+00008 <emphasis role="comment">&#32;******************************************************************************/</emphasis>
+00009 
+00010 <emphasis role="keyword">using</emphasis>&#32;System;
+00011 <emphasis role="keyword">using</emphasis>&#32;System.Collections.Generic;
+00012 <emphasis role="keyword">using</emphasis>&#32;<link linkend="__balloon_8cs_1a7d67e097df9376eb709b6a23aa3c7d23">UnityEngine</link>;
+00013 
+00014 <emphasis role="keyword">namespace&#32;</emphasis><link linkend="_namespace_leap_1_1_unity_1_1_query">Leap.Unity.Query</link>&#32;{
+00015 
+00021 &#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keyword">static</emphasis>&#32;<emphasis role="keyword">class&#32;</emphasis>QueryOperatorExtensions&#32;{
+00022 
+00032 &#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keyword">static</emphasis>&#32;Query&lt;T&gt;&#32;Concat&lt;T&gt;(<emphasis role="keyword">this</emphasis>&#32;Query&lt;T&gt;&#32;query,&#32;ICollection&lt;T&gt;&#32;collection)&#32;{
+00033 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">using</emphasis>&#32;(var&#32;slice&#32;=&#32;query.Deconstruct())&#32;{
+00034 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;var&#32;dstArray&#32;=&#32;ArrayPool&lt;T&gt;.Spawn(slice.Count&#32;+&#32;collection.Count);
+00035 
+00036 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;Array.Copy(slice.BackingArray,&#32;dstArray,&#32;slice.Count);
+00037 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;collection.CopyTo(dstArray,&#32;slice.Count);
+00038 
+00039 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;<emphasis role="keyword">new</emphasis>&#32;Query&lt;T&gt;(dstArray,&#32;slice.Count&#32;+&#32;collection.Count);
+00040 &#32;&#32;&#32;&#32;&#32;&#32;}
+00041 &#32;&#32;&#32;&#32;}
+00042 
+00052 &#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keyword">static</emphasis>&#32;Query&lt;T&gt;&#32;Concat&lt;T&gt;(<emphasis role="keyword">this</emphasis>&#32;Query&lt;T&gt;&#32;query,&#32;Query&lt;T&gt;&#32;other)&#32;{
+00053 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">using</emphasis>&#32;(var&#32;slice&#32;=&#32;query.Deconstruct())
+00054 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">using</emphasis>&#32;(var&#32;otherSlice&#32;=&#32;other.Deconstruct())&#32;{
+00055 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;var&#32;dstArray&#32;=&#32;ArrayPool&lt;T&gt;.Spawn(slice.Count&#32;+&#32;otherSlice.Count);
+00056 
+00057 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;Array.Copy(slice.BackingArray,&#32;dstArray,&#32;slice.Count);
+00058 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;Array.Copy(otherSlice.BackingArray,&#32;0,&#32;dstArray,&#32;slice.Count,&#32;otherSlice.Count);
+00059 
+00060 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;<emphasis role="keyword">new</emphasis>&#32;Query&lt;T&gt;(dstArray,&#32;slice.Count&#32;+&#32;otherSlice.Count);
+00061 &#32;&#32;&#32;&#32;&#32;&#32;}
+00062 &#32;&#32;&#32;&#32;}
+00063 
+00073 &#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keyword">static</emphasis>&#32;Query&lt;T&gt;&#32;Distinct&lt;T&gt;(<emphasis role="keyword">this</emphasis>&#32;Query&lt;T&gt;&#32;query)&#32;{
+00074 &#32;&#32;&#32;&#32;&#32;&#32;T[]&#32;array;
+00075 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordtype">int</emphasis>&#32;count;
+00076 &#32;&#32;&#32;&#32;&#32;&#32;query.Deconstruct(out&#32;array,&#32;out&#32;count);
+00077 
+00078 &#32;&#32;&#32;&#32;&#32;&#32;HashSet&lt;T&gt;&#32;<emphasis role="keyword">set</emphasis>&#32;=&#32;Pool&lt;HashSet&lt;T&gt;&gt;.Spawn();
+00079 
+00080 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">for</emphasis>&#32;(<emphasis role="keywordtype">int</emphasis>&#32;i&#32;=&#32;0;&#32;i&#32;&lt;&#32;count;&#32;i++)&#32;{
+00081 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">set</emphasis>.Add(array[i]);
+00082 &#32;&#32;&#32;&#32;&#32;&#32;}
+00083 
+00084 &#32;&#32;&#32;&#32;&#32;&#32;Array.Clear(array,&#32;0,&#32;array.Length);
+00085 &#32;&#32;&#32;&#32;&#32;&#32;count&#32;=&#32;0;
+00086 
+00087 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">foreach</emphasis>&#32;(var&#32;item&#32;<emphasis role="keywordflow">in</emphasis>&#32;<emphasis role="keyword">set</emphasis>)&#32;{
+00088 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;array[count++]&#32;=&#32;item;
+00089 &#32;&#32;&#32;&#32;&#32;&#32;}
+00090 
+00091 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">set</emphasis>.Clear();
+00092 &#32;&#32;&#32;&#32;&#32;&#32;Pool&lt;HashSet&lt;T&gt;&gt;.Recycle(<emphasis role="keyword">set</emphasis>);
+00093 
+00094 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;<emphasis role="keyword">new</emphasis>&#32;Query&lt;T&gt;(array,&#32;count);
+00095 &#32;&#32;&#32;&#32;}
+00096 
+00106 &#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keyword">static</emphasis>&#32;Query&lt;T&gt;&#32;OfType&lt;T&gt;(<emphasis role="keyword">this</emphasis>&#32;Query&lt;T&gt;&#32;query,&#32;Type&#32;type)&#32;{
+00107 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">using</emphasis>&#32;(var&#32;slice&#32;=&#32;query.Deconstruct())&#32;{
+00108 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;var&#32;dstArray&#32;=&#32;ArrayPool&lt;T&gt;.Spawn(slice.Count);
+00109 
+00110 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordtype">int</emphasis>&#32;dstCount&#32;=&#32;0;
+00111 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">for</emphasis>&#32;(<emphasis role="keywordtype">int</emphasis>&#32;i&#32;=&#32;0;&#32;i&#32;&lt;&#32;slice.Count;&#32;i++)&#32;{
+00112 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(slice[i]&#32;!=&#32;<emphasis role="keyword">null</emphasis>&#32;&amp;&amp;
+00113 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;type.IsAssignableFrom(slice[i].GetType()))&#32;{
+00114 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;dstArray[dstCount++]&#32;=&#32;slice[i];
+00115 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00116 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00117 
+00118 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;<emphasis role="keyword">new</emphasis>&#32;Query&lt;T&gt;(dstArray,&#32;dstCount);
+00119 &#32;&#32;&#32;&#32;&#32;&#32;}
+00120 &#32;&#32;&#32;&#32;}
+00121 
+00126 &#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keyword">static</emphasis>&#32;Query&lt;T&gt;&#32;OrderBy&lt;T,&#32;K&gt;(<emphasis role="keyword">this</emphasis>&#32;Query&lt;T&gt;&#32;query,&#32;Func&lt;T,&#32;K&gt;&#32;selector)&#32;where&#32;K&#32;:&#32;IComparable&lt;K&gt;&#32;{
+00127 &#32;&#32;&#32;&#32;&#32;&#32;T[]&#32;array;
+00128 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordtype">int</emphasis>&#32;count;
+00129 &#32;&#32;&#32;&#32;&#32;&#32;query.Deconstruct(out&#32;array,&#32;out&#32;count);
+00130 
+00131 &#32;&#32;&#32;&#32;&#32;&#32;var&#32;comparer&#32;=&#32;FunctorComparer&lt;T,&#32;K&gt;.Ascending(selector);
+00132 &#32;&#32;&#32;&#32;&#32;&#32;Array.Sort(array,&#32;0,&#32;count,&#32;comparer);
+00133 &#32;&#32;&#32;&#32;&#32;&#32;comparer.Clear();
+00134 
+00135 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;<emphasis role="keyword">new</emphasis>&#32;Query&lt;T&gt;(array,&#32;count);
+00136 &#32;&#32;&#32;&#32;}
+00137 
+00142 &#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keyword">static</emphasis>&#32;Query&lt;T&gt;&#32;OrderByDescending&lt;T,&#32;K&gt;(<emphasis role="keyword">this</emphasis>&#32;Query&lt;T&gt;&#32;query,&#32;Func&lt;T,&#32;K&gt;&#32;selector)&#32;where&#32;K&#32;:&#32;IComparable&lt;K&gt;&#32;{
+00143 &#32;&#32;&#32;&#32;&#32;&#32;T[]&#32;array;
+00144 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordtype">int</emphasis>&#32;count;
+00145 &#32;&#32;&#32;&#32;&#32;&#32;query.Deconstruct(out&#32;array,&#32;out&#32;count);
+00146 
+00147 &#32;&#32;&#32;&#32;&#32;&#32;var&#32;comparer&#32;=&#32;FunctorComparer&lt;T,&#32;K&gt;.Descending(selector);
+00148 &#32;&#32;&#32;&#32;&#32;&#32;Array.Sort(array,&#32;0,&#32;count,&#32;comparer);
+00149 &#32;&#32;&#32;&#32;&#32;&#32;comparer.Clear();
+00150 
+00151 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;<emphasis role="keyword">new</emphasis>&#32;Query&lt;T&gt;(array,&#32;count);
+00152 &#32;&#32;&#32;&#32;}
+00153 
+00163 &#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keyword">static</emphasis>&#32;Query&lt;T&gt;&#32;Repeat&lt;T&gt;(<emphasis role="keyword">this</emphasis>&#32;Query&lt;T&gt;&#32;query,&#32;<emphasis role="keywordtype">int</emphasis>&#32;times)&#32;{
+00164 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(times&#32;&lt;&#32;0)&#32;{
+00165 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">throw</emphasis>&#32;<emphasis role="keyword">new</emphasis>&#32;ArgumentException(<emphasis role="stringliteral">&quot;The&#32;repetition&#32;count&#32;must&#32;be&#32;non-negative.&quot;</emphasis>);
+00166 &#32;&#32;&#32;&#32;&#32;&#32;}
+00167 
+00168 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">using</emphasis>&#32;(var&#32;slice&#32;=&#32;query.Deconstruct())&#32;{
+00169 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;var&#32;dstArray&#32;=&#32;ArrayPool&lt;T&gt;.Spawn(slice.Count&#32;*&#32;times);
+00170 
+00171 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">for</emphasis>&#32;(<emphasis role="keywordtype">int</emphasis>&#32;i&#32;=&#32;0;&#32;i&#32;&lt;&#32;times;&#32;i++)&#32;{
+00172 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;Array.Copy(slice.BackingArray,&#32;0,&#32;dstArray,&#32;i&#32;*&#32;slice.Count,&#32;slice.Count);
+00173 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00174 
+00175 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;<emphasis role="keyword">new</emphasis>&#32;Query&lt;T&gt;(dstArray,&#32;slice.Count&#32;*&#32;times);
+00176 &#32;&#32;&#32;&#32;&#32;&#32;}
+00177 &#32;&#32;&#32;&#32;}
+00178 
+00187 &#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keyword">static</emphasis>&#32;Query&lt;T&gt;&#32;Reverse&lt;T&gt;(<emphasis role="keyword">this</emphasis>&#32;Query&lt;T&gt;&#32;query)&#32;{
+00188 &#32;&#32;&#32;&#32;&#32;&#32;T[]&#32;array;
+00189 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordtype">int</emphasis>&#32;count;
+00190 &#32;&#32;&#32;&#32;&#32;&#32;query.Deconstruct(out&#32;array,&#32;out&#32;count);
+00191 
+00192 &#32;&#32;&#32;&#32;&#32;&#32;Utils.Reverse(array,&#32;0,&#32;count);
+00193 
+00194 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;<emphasis role="keyword">new</emphasis>&#32;Query&lt;T&gt;(array,&#32;count);
+00195 &#32;&#32;&#32;&#32;}
+00196 
+00206 &#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keyword">static</emphasis>&#32;Query&lt;K&gt;&#32;Select&lt;T,&#32;K&gt;(<emphasis role="keyword">this</emphasis>&#32;Query&lt;T&gt;&#32;query,&#32;Func&lt;T,&#32;K&gt;&#32;selector)&#32;{
+00207 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">using</emphasis>&#32;(var&#32;slice&#32;=&#32;query.Deconstruct())&#32;{
+00208 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;var&#32;dstArray&#32;=&#32;ArrayPool&lt;K&gt;.Spawn(slice.Count);
+00209 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">for</emphasis>&#32;(<emphasis role="keywordtype">int</emphasis>&#32;i&#32;=&#32;0;&#32;i&#32;&lt;&#32;slice.Count;&#32;i++)&#32;{
+00210 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;dstArray[i]&#32;=&#32;selector(slice[i]);
+00211 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00212 
+00213 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;<emphasis role="keyword">new</emphasis>&#32;Query&lt;K&gt;(dstArray,&#32;slice.Count);
+00214 &#32;&#32;&#32;&#32;&#32;&#32;}
+00215 &#32;&#32;&#32;&#32;}
+00216 
+00227 &#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keyword">static</emphasis>&#32;Query&lt;K&gt;&#32;SelectMany&lt;T,&#32;K&gt;(<emphasis role="keyword">this</emphasis>&#32;Query&lt;T&gt;&#32;query,&#32;Func&lt;T,&#32;ICollection&lt;K&gt;&gt;&#32;selector)&#32;{
+00228 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">using</emphasis>&#32;(var&#32;slice&#32;=&#32;query.Deconstruct())&#32;{
+00229 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordtype">int</emphasis>&#32;totalCount&#32;=&#32;0;
+00230 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">for</emphasis>&#32;(<emphasis role="keywordtype">int</emphasis>&#32;i&#32;=&#32;0;&#32;i&#32;&lt;&#32;slice.Count;&#32;i++)&#32;{
+00231 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;totalCount&#32;+=&#32;selector(slice[i]).Count;
+00232 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00233 
+00234 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;var&#32;dstArray&#32;=&#32;ArrayPool&lt;K&gt;.Spawn(totalCount);
+00235 
+00236 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordtype">int</emphasis>&#32;targetIndex&#32;=&#32;0;
+00237 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">for</emphasis>&#32;(<emphasis role="keywordtype">int</emphasis>&#32;i&#32;=&#32;0;&#32;i&#32;&lt;&#32;slice.Count;&#32;i++)&#32;{
+00238 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;var&#32;collection&#32;=&#32;selector(slice[i]);
+00239 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;collection.CopyTo(dstArray,&#32;targetIndex);
+00240 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;targetIndex&#32;+=&#32;collection.Count;
+00241 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00242 
+00243 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;<emphasis role="keyword">new</emphasis>&#32;Query&lt;K&gt;(dstArray,&#32;totalCount);
+00244 &#32;&#32;&#32;&#32;&#32;&#32;}
+00245 &#32;&#32;&#32;&#32;}
+00246 
+00257 &#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keyword">static</emphasis>&#32;Query&lt;K&gt;&#32;SelectMany&lt;T,&#32;K&gt;(<emphasis role="keyword">this</emphasis>&#32;Query&lt;T&gt;&#32;query,&#32;Func&lt;T,&#32;Query&lt;K&gt;&gt;&#32;selector)&#32;{
+00258 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">using</emphasis>&#32;(var&#32;slice&#32;=&#32;query.Deconstruct())&#32;{
+00259 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;var&#32;slices&#32;=&#32;ArrayPool&lt;Query&lt;K&gt;.QuerySlice&gt;.Spawn(slice.Count);
+00260 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordtype">int</emphasis>&#32;totalCount&#32;=&#32;0;
+00261 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">for</emphasis>&#32;(<emphasis role="keywordtype">int</emphasis>&#32;i&#32;=&#32;0;&#32;i&#32;&lt;&#32;slice.Count;&#32;i++)&#32;{
+00262 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;slices[i]&#32;=&#32;selector(slice[i]).Deconstruct();
+00263 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;totalCount&#32;+=&#32;slices[i].Count;
+00264 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00265 
+00266 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;var&#32;dstArray&#32;=&#32;ArrayPool&lt;K&gt;.Spawn(totalCount);
+00267 
+00268 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordtype">int</emphasis>&#32;targetIndex&#32;=&#32;0;
+00269 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">for</emphasis>&#32;(<emphasis role="keywordtype">int</emphasis>&#32;i&#32;=&#32;0;&#32;i&#32;&lt;&#32;slice.Count;&#32;i++)&#32;{
+00270 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;Array.Copy(slices[i].BackingArray,&#32;0,&#32;dstArray,&#32;targetIndex,&#32;slices[i].Count);
+00271 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;targetIndex&#32;+=&#32;slices[i].Count;
+00272 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;slices[i].Dispose();
+00273 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00274 
+00275 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;ArrayPool&lt;Query&lt;K&gt;.QuerySlice&gt;.Recycle(slices);
+00276 
+00277 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;<emphasis role="keyword">new</emphasis>&#32;Query&lt;K&gt;(dstArray,&#32;totalCount);
+00278 &#32;&#32;&#32;&#32;&#32;&#32;}
+00279 &#32;&#32;&#32;&#32;}
+00280 
+00292 &#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keyword">static</emphasis>&#32;Query&lt;T&gt;&#32;Skip&lt;T&gt;(<emphasis role="keyword">this</emphasis>&#32;Query&lt;T&gt;&#32;query,&#32;<emphasis role="keywordtype">int</emphasis>&#32;toSkip)&#32;{
+00293 &#32;&#32;&#32;&#32;&#32;&#32;T[]&#32;array;
+00294 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordtype">int</emphasis>&#32;count;
+00295 &#32;&#32;&#32;&#32;&#32;&#32;query.Deconstruct(out&#32;array,&#32;out&#32;count);
+00296 
+00297 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordtype">int</emphasis>&#32;resultCount&#32;=&#32;Mathf.Max(count&#32;-&#32;toSkip,&#32;0);
+00298 &#32;&#32;&#32;&#32;&#32;&#32;toSkip&#32;=&#32;count&#32;-&#32;resultCount;
+00299 &#32;&#32;&#32;&#32;&#32;&#32;Array.Copy(array,&#32;toSkip,&#32;array,&#32;0,&#32;resultCount);
+00300 &#32;&#32;&#32;&#32;&#32;&#32;Array.Clear(array,&#32;resultCount,&#32;array.Length&#32;-&#32;resultCount);
+00301 
+00302 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;<emphasis role="keyword">new</emphasis>&#32;Query&lt;T&gt;(array,&#32;resultCount);
+00303 &#32;&#32;&#32;&#32;}
+00304 
+00315 &#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keyword">static</emphasis>&#32;Query&lt;T&gt;&#32;SkipWhile&lt;T&gt;(<emphasis role="keyword">this</emphasis>&#32;Query&lt;T&gt;&#32;query,&#32;Func&lt;T,&#32;bool&gt;&#32;predicate)&#32;{
+00316 &#32;&#32;&#32;&#32;&#32;&#32;T[]&#32;array;
+00317 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordtype">int</emphasis>&#32;count;
+00318 &#32;&#32;&#32;&#32;&#32;&#32;query.Deconstruct(out&#32;array,&#32;out&#32;count);
+00319 
+00320 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordtype">int</emphasis>&#32;toSkip&#32;=&#32;0;
+00321 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">while</emphasis>&#32;(toSkip&#32;&lt;&#32;count)&#32;{
+00322 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(predicate(array[toSkip]))&#32;{
+00323 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;toSkip++;
+00324 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}&#32;<emphasis role="keywordflow">else</emphasis>&#32;{
+00325 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">break</emphasis>;
+00326 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00327 &#32;&#32;&#32;&#32;&#32;&#32;}
+00328 
+00329 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordtype">int</emphasis>&#32;resultCount&#32;=&#32;count&#32;-&#32;toSkip;
+00330 &#32;&#32;&#32;&#32;&#32;&#32;Array.Copy(array,&#32;toSkip,&#32;array,&#32;0,&#32;resultCount);
+00331 &#32;&#32;&#32;&#32;&#32;&#32;Array.Clear(array,&#32;resultCount,&#32;array.Length&#32;-&#32;resultCount);
+00332 
+00333 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;<emphasis role="keyword">new</emphasis>&#32;Query&lt;T&gt;(array,&#32;resultCount);
+00334 &#32;&#32;&#32;&#32;}
+00335 
+00339 &#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keyword">static</emphasis>&#32;Query&lt;T&gt;&#32;Sort&lt;T&gt;(<emphasis role="keyword">this</emphasis>&#32;Query&lt;T&gt;&#32;query)&#32;where&#32;T&#32;:&#32;IComparable&lt;T&gt;&#32;{
+00340 &#32;&#32;&#32;&#32;&#32;&#32;T[]&#32;array;
+00341 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordtype">int</emphasis>&#32;count;
+00342 &#32;&#32;&#32;&#32;&#32;&#32;query.Deconstruct(out&#32;array,&#32;out&#32;count);
+00343 
+00344 &#32;&#32;&#32;&#32;&#32;&#32;Array.Sort(array,&#32;0,&#32;count);
+00345 
+00346 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;<emphasis role="keyword">new</emphasis>&#32;Query&lt;T&gt;(array,&#32;count);
+00347 &#32;&#32;&#32;&#32;}
+00348 
+00352 &#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keyword">static</emphasis>&#32;Query&lt;T&gt;&#32;SortDescending&lt;T&gt;(<emphasis role="keyword">this</emphasis>&#32;Query&lt;T&gt;&#32;query)&#32;where&#32;T&#32;:&#32;IComparable&lt;T&gt;&#32;{
+00353 &#32;&#32;&#32;&#32;&#32;&#32;T[]&#32;array;
+00354 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordtype">int</emphasis>&#32;count;
+00355 &#32;&#32;&#32;&#32;&#32;&#32;query.Deconstruct(out&#32;array,&#32;out&#32;count);
+00356 
+00357 &#32;&#32;&#32;&#32;&#32;&#32;Array.Sort(array,&#32;0,&#32;count);
+00358 &#32;&#32;&#32;&#32;&#32;&#32;Utils.Reverse(array,&#32;0,&#32;count);
+00359 
+00360 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;<emphasis role="keyword">new</emphasis>&#32;Query&lt;T&gt;(array,&#32;count);
+00361 &#32;&#32;&#32;&#32;}
+00362 
+00373 &#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keyword">static</emphasis>&#32;Query&lt;T&gt;&#32;Take&lt;T&gt;(<emphasis role="keyword">this</emphasis>&#32;Query&lt;T&gt;&#32;query,&#32;<emphasis role="keywordtype">int</emphasis>&#32;toTake)&#32;{
+00374 &#32;&#32;&#32;&#32;&#32;&#32;T[]&#32;array;
+00375 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordtype">int</emphasis>&#32;count;
+00376 &#32;&#32;&#32;&#32;&#32;&#32;query.Deconstruct(out&#32;array,&#32;out&#32;count);
+00377 
+00378 &#32;&#32;&#32;&#32;&#32;&#32;count&#32;=&#32;Mathf.Min(count,&#32;toTake);
+00379 &#32;&#32;&#32;&#32;&#32;&#32;Array.Clear(array,&#32;count,&#32;array.Length&#32;-&#32;count);
+00380 
+00381 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;<emphasis role="keyword">new</emphasis>&#32;Query&lt;T&gt;(array,&#32;count);
+00382 &#32;&#32;&#32;&#32;}
+00383 
+00394 &#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keyword">static</emphasis>&#32;Query&lt;T&gt;&#32;TakeWhile&lt;T&gt;(<emphasis role="keyword">this</emphasis>&#32;Query&lt;T&gt;&#32;query,&#32;Func&lt;T,&#32;bool&gt;&#32;predicate)&#32;{
+00395 &#32;&#32;&#32;&#32;&#32;&#32;T[]&#32;array;
+00396 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordtype">int</emphasis>&#32;count;
+00397 &#32;&#32;&#32;&#32;&#32;&#32;query.Deconstruct(out&#32;array,&#32;out&#32;count);
+00398 
+00399 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordtype">int</emphasis>&#32;takeCount;
+00400 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">for</emphasis>&#32;(takeCount&#32;=&#32;0;&#32;takeCount&#32;&lt;&#32;count;&#32;takeCount++)&#32;{
+00401 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(!predicate(array[takeCount]))&#32;{
+00402 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">break</emphasis>;
+00403 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00404 &#32;&#32;&#32;&#32;&#32;&#32;}
+00405 
+00406 &#32;&#32;&#32;&#32;&#32;&#32;Array.Clear(array,&#32;takeCount,&#32;array.Length&#32;-&#32;takeCount);
+00407 
+00408 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;<emphasis role="keyword">new</emphasis>&#32;Query&lt;T&gt;(array,&#32;takeCount);
+00409 &#32;&#32;&#32;&#32;}
+00410 
+00420 &#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keyword">static</emphasis>&#32;Query&lt;T&gt;&#32;Where&lt;T&gt;(<emphasis role="keyword">this</emphasis>&#32;Query&lt;T&gt;&#32;query,&#32;Func&lt;T,&#32;bool&gt;&#32;predicate)&#32;{
+00421 &#32;&#32;&#32;&#32;&#32;&#32;T[]&#32;array;
+00422 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordtype">int</emphasis>&#32;count;
+00423 &#32;&#32;&#32;&#32;&#32;&#32;query.Deconstruct(out&#32;array,&#32;out&#32;count);
+00424 
+00425 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordtype">int</emphasis>&#32;writeIndex&#32;=&#32;0;
+00426 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">for</emphasis>&#32;(<emphasis role="keywordtype">int</emphasis>&#32;i&#32;=&#32;0;&#32;i&#32;&lt;&#32;count;&#32;i++)&#32;{
+00427 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(predicate(array[i]))&#32;{
+00428 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;array[writeIndex++]&#32;=&#32;array[i];
+00429 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00430 &#32;&#32;&#32;&#32;&#32;&#32;}
+00431 
+00432 &#32;&#32;&#32;&#32;&#32;&#32;Array.Clear(array,&#32;writeIndex,&#32;array.Length&#32;-&#32;writeIndex);
+00433 
+00434 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;<emphasis role="keyword">new</emphasis>&#32;Query&lt;T&gt;(array,&#32;writeIndex);
+00435 &#32;&#32;&#32;&#32;}
+00436 
+00440 &#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keyword">static</emphasis>&#32;Query&lt;T&gt;&#32;ValidUnityObjs&lt;T&gt;(<emphasis role="keyword">this</emphasis>&#32;Query&lt;T&gt;&#32;query)&#32;where&#32;T&#32;:&#32;<link linkend="_namespace_unity_engine">UnityEngine</link>.Object&#32;{
+00441 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;query.Where(t&#32;=&gt;&#32;{
+00442 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_namespace_unity_engine">UnityEngine</link>.Object&#32;obj&#32;=&#32;t;
+00443 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;obj&#32;!=&#32;<emphasis role="keyword">null</emphasis>;
+00444 &#32;&#32;&#32;&#32;&#32;&#32;});
+00445 &#32;&#32;&#32;&#32;}
+00446 
+00457 &#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keyword">static</emphasis>&#32;Query&lt;IndexedValue&lt;T&gt;&gt;&#32;WithIndices&lt;T&gt;(<emphasis role="keyword">this</emphasis>&#32;Query&lt;T&gt;&#32;query)&#32;{
+00458 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">using</emphasis>&#32;(var&#32;slice&#32;=&#32;query.Deconstruct())&#32;{
+00459 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;var&#32;dstArray&#32;=&#32;ArrayPool&lt;IndexedValue&lt;T&gt;&gt;.Spawn(slice.Count);
+00460 
+00461 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">for</emphasis>&#32;(<emphasis role="keywordtype">int</emphasis>&#32;i&#32;=&#32;0;&#32;i&#32;&lt;&#32;slice.Count;&#32;i++)&#32;{
+00462 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;dstArray[i]&#32;=&#32;<emphasis role="keyword">new</emphasis>&#32;IndexedValue&lt;T&gt;()&#32;{
+00463 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_namespace_valve_1_1_v_r_1ac40c4bdf0a3dcd6e69cad2d85f287c67a6a992d5529f459a44fee58c733255e86">index</link>&#32;=&#32;i,
+00464 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;value&#32;=&#32;slice[i]
+00465 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;};
+00466 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00467 
+00468 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;<emphasis role="keyword">new</emphasis>&#32;Query&lt;IndexedValue&lt;T&gt;&gt;(dstArray,&#32;slice.Count);
+00469 &#32;&#32;&#32;&#32;&#32;&#32;}
+00470 &#32;&#32;&#32;&#32;}
+00471 
+00483 &#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keyword">static</emphasis>&#32;Query&lt;PrevPair&lt;T&gt;&gt;&#32;WithPrevious&lt;T&gt;(<emphasis role="keyword">this</emphasis>&#32;Query&lt;T&gt;&#32;query,&#32;<emphasis role="keywordtype">int</emphasis>&#32;offset&#32;=&#32;1,&#32;<emphasis role="keywordtype">bool</emphasis>&#32;includeStart&#32;=&#32;<emphasis role="keyword">false</emphasis>)&#32;{
+00484 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">using</emphasis>&#32;(var&#32;slice&#32;=&#32;query.Deconstruct())&#32;{
+00485 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordtype">int</emphasis>&#32;resultCount&#32;=&#32;includeStart&#32;?&#32;slice.Count&#32;:&#32;Mathf.Max(0,&#32;slice.Count&#32;-&#32;offset);
+00486 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;var&#32;dstArray&#32;=&#32;ArrayPool&lt;PrevPair&lt;T&gt;&gt;.Spawn(resultCount);
+00487 
+00488 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordtype">int</emphasis>&#32;dstIndex&#32;=&#32;0;
+00489 
+00490 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(includeStart)&#32;{
+00491 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">for</emphasis>&#32;(<emphasis role="keywordtype">int</emphasis>&#32;i&#32;=&#32;0;&#32;i&#32;&lt;&#32;Mathf.Min(slice.Count,&#32;offset);&#32;i++)&#32;{
+00492 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;dstArray[dstIndex++]&#32;=&#32;<emphasis role="keyword">new</emphasis>&#32;PrevPair&lt;T&gt;()&#32;{
+00493 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;value&#32;=&#32;slice[i],
+00494 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;prev&#32;=&#32;<emphasis role="keywordflow">default</emphasis>(T),
+00495 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;hasPrev&#32;=&#32;<emphasis role="keyword">false</emphasis>
+00496 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;};
+00497 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00498 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00499 
+00500 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">for</emphasis>&#32;(<emphasis role="keywordtype">int</emphasis>&#32;i&#32;=&#32;offset;&#32;i&#32;&lt;&#32;slice.Count;&#32;i++)&#32;{
+00501 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;dstArray[dstIndex++]&#32;=&#32;<emphasis role="keyword">new</emphasis>&#32;PrevPair&lt;T&gt;()&#32;{
+00502 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;value&#32;=&#32;slice[i],
+00503 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;prev&#32;=&#32;slice[i&#32;-&#32;offset],
+00504 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;hasPrev&#32;=&#32;<emphasis role="keyword">true</emphasis>
+00505 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;};
+00506 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00507 
+00508 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;<emphasis role="keyword">new</emphasis>&#32;Query&lt;PrevPair&lt;T&gt;&gt;(dstArray,&#32;resultCount);
+00509 &#32;&#32;&#32;&#32;&#32;&#32;}
+00510 &#32;&#32;&#32;&#32;}
+00511 
+00524 &#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keyword">static</emphasis>&#32;Query&lt;V&gt;&#32;Zip&lt;T,&#32;K,&#32;V&gt;(<emphasis role="keyword">this</emphasis>&#32;Query&lt;T&gt;&#32;query,&#32;ICollection&lt;K&gt;&#32;collection,&#32;Func&lt;T,&#32;K,&#32;V&gt;&#32;selector)&#32;{
+00525 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">using</emphasis>&#32;(var&#32;slice&#32;=&#32;query.Deconstruct())&#32;{
+00526 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordtype">int</emphasis>&#32;resultCount&#32;=&#32;Mathf.Min(slice.Count,&#32;collection.Count);
+00527 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;var&#32;resultArray&#32;=&#32;ArrayPool&lt;V&gt;.Spawn(resultCount);
+00528 
+00529 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;var&#32;tmpArray&#32;=&#32;ArrayPool&lt;K&gt;.Spawn(collection.Count);
+00530 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;collection.CopyTo(tmpArray,&#32;0);
+00531 
+00532 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">for</emphasis>&#32;(<emphasis role="keywordtype">int</emphasis>&#32;i&#32;=&#32;0;&#32;i&#32;&lt;&#32;resultCount;&#32;i++)&#32;{
+00533 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;resultArray[i]&#32;=&#32;selector(slice[i],&#32;tmpArray[i]);
+00534 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00535 
+00536 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;ArrayPool&lt;K&gt;.Recycle(tmpArray);
+00537 
+00538 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;<emphasis role="keyword">new</emphasis>&#32;Query&lt;V&gt;(resultArray,&#32;resultCount);
+00539 &#32;&#32;&#32;&#32;&#32;&#32;}
+00540 &#32;&#32;&#32;&#32;}
+00541 
+00554 &#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keyword">static</emphasis>&#32;Query&lt;V&gt;&#32;Zip&lt;T,&#32;K,&#32;V&gt;(<emphasis role="keyword">this</emphasis>&#32;Query&lt;T&gt;&#32;query,&#32;Query&lt;K&gt;&#32;otherQuery,&#32;Func&lt;T,&#32;K,&#32;V&gt;&#32;selector)&#32;{
+00555 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">using</emphasis>&#32;(var&#32;slice&#32;=&#32;query.Deconstruct())
+00556 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">using</emphasis>&#32;(var&#32;otherSlice&#32;=&#32;otherQuery.Deconstruct())&#32;{
+00557 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordtype">int</emphasis>&#32;resultCount&#32;=&#32;Mathf.Min(slice.Count,&#32;otherSlice.Count);
+00558 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;var&#32;resultArray&#32;=&#32;ArrayPool&lt;V&gt;.Spawn(resultCount);
+00559 
+00560 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">for</emphasis>&#32;(<emphasis role="keywordtype">int</emphasis>&#32;i&#32;=&#32;0;&#32;i&#32;&lt;&#32;resultCount;&#32;i++)&#32;{
+00561 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;resultArray[i]&#32;=&#32;selector(slice[i],&#32;otherSlice[i]);
+00562 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00563 
+00564 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;<emphasis role="keyword">new</emphasis>&#32;Query&lt;V&gt;(resultArray,&#32;resultCount);
+00565 &#32;&#32;&#32;&#32;&#32;&#32;}
+00566 &#32;&#32;&#32;&#32;}
+00567 
+<anchor xml:id="__query_operator_extensions_8cs_source_1l00568"/><link linkend="_struct_leap_1_1_unity_1_1_query_1_1_query_operator_extensions_1_1_prev_pair">00568</link> &#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keyword">struct&#32;</emphasis><link linkend="_struct_leap_1_1_unity_1_1_query_1_1_query_operator_extensions_1_1_prev_pair">PrevPair</link>&lt;T&gt;&#32;{
+<anchor xml:id="__query_operator_extensions_8cs_source_1l00572"/><link linkend="_struct_leap_1_1_unity_1_1_query_1_1_query_operator_extensions_1_1_prev_pair_1a01956bf6e655db87578d104e252986e8">00572</link> &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;T&#32;<link linkend="_struct_leap_1_1_unity_1_1_query_1_1_query_operator_extensions_1_1_prev_pair_1a01956bf6e655db87578d104e252986e8">value</link>;
+00573 
+<anchor xml:id="__query_operator_extensions_8cs_source_1l00577"/><link linkend="_struct_leap_1_1_unity_1_1_query_1_1_query_operator_extensions_1_1_prev_pair_1a6a09fdadcd8ead3c8050efe331b2117f">00577</link> &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;T&#32;<link linkend="_struct_leap_1_1_unity_1_1_query_1_1_query_operator_extensions_1_1_prev_pair_1a6a09fdadcd8ead3c8050efe331b2117f">prev</link>;
+00578 
+<anchor xml:id="__query_operator_extensions_8cs_source_1l00583"/><link linkend="_struct_leap_1_1_unity_1_1_query_1_1_query_operator_extensions_1_1_prev_pair_1abfcf170a9dc5649fe180b5e13255e0f6">00583</link> &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keywordtype">bool</emphasis>&#32;<link linkend="_struct_leap_1_1_unity_1_1_query_1_1_query_operator_extensions_1_1_prev_pair_1abfcf170a9dc5649fe180b5e13255e0f6">hasPrev</link>;
+00584 &#32;&#32;&#32;&#32;}
+00585 
+<anchor xml:id="__query_operator_extensions_8cs_source_1l00586"/><link linkend="_struct_leap_1_1_unity_1_1_query_1_1_query_operator_extensions_1_1_indexed_value">00586</link> &#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keyword">struct&#32;</emphasis><link linkend="_struct_leap_1_1_unity_1_1_query_1_1_query_operator_extensions_1_1_indexed_value">IndexedValue</link>&lt;T&gt;&#32;{
+<anchor xml:id="__query_operator_extensions_8cs_source_1l00587"/><link linkend="_struct_leap_1_1_unity_1_1_query_1_1_query_operator_extensions_1_1_indexed_value_1a1facfab341d18708629c2071d2c105ea">00587</link> &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keywordtype">int</emphasis>&#32;<link linkend="_struct_leap_1_1_unity_1_1_query_1_1_query_operator_extensions_1_1_indexed_value_1a1facfab341d18708629c2071d2c105ea">index</link>;
+<anchor xml:id="__query_operator_extensions_8cs_source_1l00588"/><link linkend="_struct_leap_1_1_unity_1_1_query_1_1_query_operator_extensions_1_1_indexed_value_1a004f3cc90fa8d564bf5d1fb2f0124fc0">00588</link> &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;T&#32;<link linkend="_struct_leap_1_1_unity_1_1_query_1_1_query_operator_extensions_1_1_indexed_value_1a004f3cc90fa8d564bf5d1fb2f0124fc0">value</link>;
+00589 &#32;&#32;&#32;&#32;}
+00590 
+00591 &#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;<emphasis role="keyword">class&#32;</emphasis>FunctorComparer&lt;T,&#32;K&gt;&#32;:&#32;IComparer&lt;T&gt;&#32;where&#32;K&#32;:&#32;IComparable&lt;K&gt;&#32;{
+00592 &#32;&#32;&#32;&#32;&#32;&#32;[ThreadStatic]
+00593 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;<emphasis role="keyword">static</emphasis>&#32;FunctorComparer&lt;T,&#32;K&gt;&#32;_single;
+00594 
+00595 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;Func&lt;T,&#32;K&gt;&#32;_functor;
+00596 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;<emphasis role="keywordtype">int</emphasis>&#32;_sign;
+00597 
+00598 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;FunctorComparer()&#32;{&#32;}
+00599 
+00600 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keyword">static</emphasis>&#32;FunctorComparer&lt;T,&#32;K&gt;&#32;Ascending(Func&lt;T,&#32;K&gt;&#32;functor)&#32;{
+00601 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;single(functor,&#32;1);
+00602 &#32;&#32;&#32;&#32;&#32;&#32;}
+00603 
+00604 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keyword">static</emphasis>&#32;FunctorComparer&lt;T,&#32;K&gt;&#32;Descending(Func&lt;T,&#32;K&gt;&#32;functor)&#32;{
+00605 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;single(functor,&#32;-1);
+00606 &#32;&#32;&#32;&#32;&#32;&#32;}
+00607 
+00608 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;<emphasis role="keyword">static</emphasis>&#32;FunctorComparer&lt;T,&#32;K&gt;&#32;single(Func&lt;T,&#32;K&gt;&#32;functor,&#32;<emphasis role="keywordtype">int</emphasis>&#32;sign)&#32;{
+00609 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(_single&#32;==&#32;<emphasis role="keyword">null</emphasis>)&#32;{
+00610 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;_single&#32;=&#32;<emphasis role="keyword">new</emphasis>&#32;FunctorComparer&lt;T,&#32;K&gt;();
+00611 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00612 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;_single._functor&#32;=&#32;functor;
+00613 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;_single._sign&#32;=&#32;sign;
+00614 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;_single;
+00615 &#32;&#32;&#32;&#32;&#32;&#32;}
+00616 
+00617 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;Clear()&#32;{
+00618 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;_functor&#32;=&#32;<emphasis role="keyword">null</emphasis>;
+00619 &#32;&#32;&#32;&#32;&#32;&#32;}
+00620 
+00621 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keywordtype">int</emphasis>&#32;Compare(T&#32;x,&#32;T&#32;y)&#32;{
+00622 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;_sign&#32;*&#32;_functor(x).CompareTo(_functor(y));
+00623 &#32;&#32;&#32;&#32;&#32;&#32;}
+00624 &#32;&#32;&#32;&#32;}
+00625 &#32;&#32;}
+00626 }
+</programlisting></section>

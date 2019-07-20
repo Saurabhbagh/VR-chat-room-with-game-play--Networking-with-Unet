@@ -1,0 +1,338 @@
+<?xml version='1.0' encoding='UTF-8' standalone='no'?>
+<section xmlns="http://docbook.org/ns/docbook" version="5.0" xmlns:xlink="http://www.w3.org/1999/xlink" xml:id="__steam_v_r___menu_8cs_source">
+<title>SteamVR_Menu.cs</title>
+<indexterm><primary>O:/GitHUBMINIPRoject/Assets/SteamVR/Scripts/SteamVR_Menu.cs</primary></indexterm>
+<programlisting>00001 <emphasis role="comment">//=======&#32;Copyright&#32;(c)&#32;Valve&#32;Corporation,&#32;All&#32;rights&#32;reserved.&#32;===============</emphasis>
+00002 <emphasis role="comment">//</emphasis>
+00003 <emphasis role="comment">//&#32;Purpose:&#32;Example&#32;menu&#32;using&#32;OnGUI&#32;with&#32;SteamVR_Camera&apos;s&#32;overlay&#32;support</emphasis>
+00004 <emphasis role="comment">//</emphasis>
+00005 <emphasis role="comment">//=============================================================================</emphasis>
+00006 
+00007 <emphasis role="keyword">using</emphasis>&#32;<link linkend="__balloon_8cs_1a7d67e097df9376eb709b6a23aa3c7d23">UnityEngine</link>;
+00008 <emphasis role="keyword">using</emphasis>&#32;<link linkend="_namespace_valve">Valve</link>.<link linkend="_namespace_valve_1_1_v_r">VR</link>;
+00009 
+00010 <emphasis role="keyword">namespace&#32;</emphasis><link linkend="_namespace_valve_1_1_v_r">Valve.VR</link>
+00011 {
+<anchor xml:id="__steam_v_r___menu_8cs_source_1l00012"/><link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___menu">00012</link> &#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keyword">class&#32;</emphasis><link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___menu">SteamVR_Menu</link>&#32;:&#32;MonoBehaviour
+00013 &#32;&#32;&#32;&#32;{
+<anchor xml:id="__steam_v_r___menu_8cs_source_1l00014"/><link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___menu_1a5735ce5c311eae97cd73bf74144c470e">00014</link> &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;Texture&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___menu_1a5735ce5c311eae97cd73bf74144c470e">cursor</link>,&#32;background,&#32;logo;
+<anchor xml:id="__steam_v_r___menu_8cs_source_1l00015"/><link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___menu_1a9b20d60f0e9b1aa1c35c4ab29035783f">00015</link> &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keywordtype">float</emphasis>&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___menu_1a9b20d60f0e9b1aa1c35c4ab29035783f">logoHeight</link>,&#32;menuOffset;
+00016 
+<anchor xml:id="__steam_v_r___menu_8cs_source_1l00017"/><link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___menu_1a4d51b869eec84902bdfbae283c838d9a">00017</link> &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;Vector2&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___menu_1a4d51b869eec84902bdfbae283c838d9a">scaleLimits</link>&#32;=&#32;<emphasis role="keyword">new</emphasis>&#32;Vector2(0.1f,&#32;5.0f);
+<anchor xml:id="__steam_v_r___menu_8cs_source_1l00018"/><link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___menu_1a3764ae548445b4ca2fb5a7bae4360174">00018</link> &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keywordtype">float</emphasis>&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___menu_1a3764ae548445b4ca2fb5a7bae4360174">scaleRate</link>&#32;=&#32;0.5f;
+00019 
+00020 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___overlay">SteamVR_Overlay</link>&#32;overlay;
+00021 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_namespace_valve_1_1_v_r_1a82e5bf501cc3aa155444ee3f0662853fa967d35e40f3f95b1f538bd248640bf3b">Camera</link>&#32;overlayCam;
+00022 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;Vector4&#32;uvOffset;
+00023 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordtype">float</emphasis>&#32;distance;
+00024 
+<anchor xml:id="__steam_v_r___menu_8cs_source_1l00025"/><link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___menu_1a4f4448df5c5bcf39301b4ac174192bc1">00025</link> &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;RenderTexture&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___menu_1a4f4448df5c5bcf39301b4ac174192bc1">texture</link>&#32;{&#32;<emphasis role="keyword">get</emphasis>&#32;{&#32;<emphasis role="keywordflow">return</emphasis>&#32;overlay&#32;?&#32;overlay.<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___overlay_1a13d7949fb63f9c40747ff9298bbffad3">texture</link>&#32;as&#32;RenderTexture&#32;:&#32;<emphasis role="keyword">null</emphasis>;&#32;}&#32;}
+<anchor xml:id="__steam_v_r___menu_8cs_source_1l00026"/><link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___menu_1a2dfe51b00cc718973cd71ff4a4d224b8">00026</link> &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keywordtype">float</emphasis>&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___menu_1a2dfe51b00cc718973cd71ff4a4d224b8">scale</link>&#32;{&#32;<emphasis role="keyword">get</emphasis>;&#32;<emphasis role="keyword">private</emphasis>&#32;<emphasis role="keyword">set</emphasis>;&#32;}
+00027 
+00028 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordtype">string</emphasis>&#32;scaleLimitX,&#32;scaleLimitY,&#32;scaleRateText;
+00029 
+00030 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;CursorLockMode&#32;savedCursorLockState;
+00031 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordtype">bool</emphasis>&#32;savedCursorVisible;
+00032 
+00033 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordtype">void</emphasis>&#32;Awake()
+00034 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00035 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;scaleLimitX&#32;=&#32;<emphasis role="keywordtype">string</emphasis>.Format(<emphasis role="stringliteral">&quot;{0:N1}&quot;</emphasis>,&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___menu_1a4d51b869eec84902bdfbae283c838d9a">scaleLimits</link>.x);
+00036 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;scaleLimitY&#32;=&#32;<emphasis role="keywordtype">string</emphasis>.Format(<emphasis role="stringliteral">&quot;{0:N1}&quot;</emphasis>,&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___menu_1a4d51b869eec84902bdfbae283c838d9a">scaleLimits</link>.y);
+00037 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;scaleRateText&#32;=&#32;<emphasis role="keywordtype">string</emphasis>.Format(<emphasis role="stringliteral">&quot;{0:N1}&quot;</emphasis>,&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___menu_1a3764ae548445b4ca2fb5a7bae4360174">scaleRate</link>);
+00038 
+00039 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;var&#32;overlay&#32;=&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___overlay">SteamVR_Overlay</link>.<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___overlay_1aad1019110da831b03ec485056f846822">instance</link>;
+00040 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(overlay&#32;!=&#32;<emphasis role="keyword">null</emphasis>)
+00041 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00042 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;uvOffset&#32;=&#32;overlay.<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___overlay_1a9ae56d401609af890ea24c0483bf892f">uvOffset</link>;
+00043 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;distance&#32;=&#32;overlay.distance;
+00044 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00045 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00046 
+00047 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordtype">void</emphasis>&#32;OnGUI()
+00048 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00049 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(overlay&#32;==&#32;<emphasis role="keyword">null</emphasis>)
+00050 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>;
+00051 
+00052 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;var&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___menu_1a4f4448df5c5bcf39301b4ac174192bc1">texture</link>&#32;=&#32;overlay.texture&#32;as&#32;RenderTexture;
+00053 
+00054 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;var&#32;prevActive&#32;=&#32;RenderTexture.active;
+00055 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;RenderTexture.active&#32;=&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___menu_1a4f4448df5c5bcf39301b4ac174192bc1">texture</link>;
+00056 
+00057 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(Event.current.type&#32;==&#32;EventType.Repaint)
+00058 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;GL.Clear(<emphasis role="keyword">false</emphasis>,&#32;<emphasis role="keyword">true</emphasis>,&#32;Color.clear);
+00059 
+00060 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;var&#32;area&#32;=&#32;<emphasis role="keyword">new</emphasis>&#32;Rect(0,&#32;0,&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___menu_1a4f4448df5c5bcf39301b4ac174192bc1">texture</link>.width,&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___menu_1a4f4448df5c5bcf39301b4ac174192bc1">texture</link>.height);
+00061 
+00062 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;Account&#32;for&#32;screen&#32;smaller&#32;than&#32;texture&#32;(since&#32;mouse&#32;position&#32;gets&#32;clamped)</emphasis>
+00063 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(Screen.width&#32;&lt;&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___menu_1a4f4448df5c5bcf39301b4ac174192bc1">texture</link>.width)
+00064 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00065 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;area.width&#32;=&#32;Screen.width;
+00066 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;overlay.uvOffset.x&#32;=&#32;-(float)(<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___menu_1a4f4448df5c5bcf39301b4ac174192bc1">texture</link>.width&#32;-&#32;Screen.width)&#32;/&#32;(2&#32;*&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___menu_1a4f4448df5c5bcf39301b4ac174192bc1">texture</link>.width);
+00067 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00068 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(Screen.height&#32;&lt;&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___menu_1a4f4448df5c5bcf39301b4ac174192bc1">texture</link>.height)
+00069 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00070 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;area.height&#32;=&#32;Screen.height;
+00071 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;overlay.uvOffset.y&#32;=&#32;(float)(<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___menu_1a4f4448df5c5bcf39301b4ac174192bc1">texture</link>.height&#32;-&#32;Screen.height)&#32;/&#32;(2&#32;*&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___menu_1a4f4448df5c5bcf39301b4ac174192bc1">texture</link>.height);
+00072 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00073 
+00074 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;GUILayout.BeginArea(area);
+00075 
+00076 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(background&#32;!=&#32;<emphasis role="keyword">null</emphasis>)
+00077 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00078 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;GUI.DrawTexture(<emphasis role="keyword">new</emphasis>&#32;Rect(
+00079 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;(area.width&#32;-&#32;background.width)&#32;/&#32;2,
+00080 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;(area.height&#32;-&#32;background.height)&#32;/&#32;2,
+00081 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;background.width,&#32;background.height),&#32;background);
+00082 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00083 
+00084 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;GUILayout.BeginHorizontal();
+00085 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;GUILayout.FlexibleSpace();
+00086 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;GUILayout.BeginVertical();
+00087 
+00088 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(logo&#32;!=&#32;<emphasis role="keyword">null</emphasis>)
+00089 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00090 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;GUILayout.Space(area.height&#32;/&#32;2&#32;-&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___menu_1a9b20d60f0e9b1aa1c35c4ab29035783f">logoHeight</link>);
+00091 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;GUILayout.Box(logo);
+00092 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00093 
+00094 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;GUILayout.Space(menuOffset);
+00095 
+00096 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordtype">bool</emphasis>&#32;bHideMenu&#32;=&#32;GUILayout.Button(<emphasis role="stringliteral">&quot;[Esc]&#32;-&#32;Close&#32;menu&quot;</emphasis>);
+00097 
+00098 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;GUILayout.BeginHorizontal();
+00099 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;GUILayout.Label(<emphasis role="keywordtype">string</emphasis>.Format(<emphasis role="stringliteral">&quot;Scale:&#32;{0:N4}&quot;</emphasis>,&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___menu_1a2dfe51b00cc718973cd71ff4a4d224b8">scale</link>));
+00100 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00101 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;var&#32;result&#32;=&#32;GUILayout.HorizontalSlider(<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___menu_1a2dfe51b00cc718973cd71ff4a4d224b8">scale</link>,&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___menu_1a4d51b869eec84902bdfbae283c838d9a">scaleLimits</link>.x,&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___menu_1a4d51b869eec84902bdfbae283c838d9a">scaleLimits</link>.y);
+00102 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(result&#32;!=&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___menu_1a2dfe51b00cc718973cd71ff4a4d224b8">scale</link>)
+00103 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00104 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;SetScale(result);
+00105 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00106 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00107 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;GUILayout.EndHorizontal();
+00108 
+00109 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;GUILayout.BeginHorizontal();
+00110 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;GUILayout.Label(<emphasis role="keywordtype">string</emphasis>.Format(<emphasis role="stringliteral">&quot;Scale&#32;limits:&quot;</emphasis>));
+00111 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00112 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;var&#32;result&#32;=&#32;GUILayout.TextField(scaleLimitX);
+00113 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(result&#32;!=&#32;scaleLimitX)
+00114 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00115 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(<emphasis role="keywordtype">float</emphasis>.TryParse(result,&#32;out&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___menu_1a4d51b869eec84902bdfbae283c838d9a">scaleLimits</link>.x))
+00116 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;scaleLimitX&#32;=&#32;result;
+00117 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00118 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00119 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00120 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;var&#32;result&#32;=&#32;GUILayout.TextField(scaleLimitY);
+00121 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(result&#32;!=&#32;scaleLimitY)
+00122 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00123 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(<emphasis role="keywordtype">float</emphasis>.TryParse(result,&#32;out&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___menu_1a4d51b869eec84902bdfbae283c838d9a">scaleLimits</link>.y))
+00124 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;scaleLimitY&#32;=&#32;result;
+00125 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00126 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00127 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;GUILayout.EndHorizontal();
+00128 
+00129 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;GUILayout.BeginHorizontal();
+00130 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;GUILayout.Label(<emphasis role="keywordtype">string</emphasis>.Format(<emphasis role="stringliteral">&quot;Scale&#32;rate:&quot;</emphasis>));
+00131 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00132 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;var&#32;result&#32;=&#32;GUILayout.TextField(scaleRateText);
+00133 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(result&#32;!=&#32;scaleRateText)
+00134 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00135 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(<emphasis role="keywordtype">float</emphasis>.TryParse(result,&#32;out&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___menu_1a3764ae548445b4ca2fb5a7bae4360174">scaleRate</link>))
+00136 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;scaleRateText&#32;=&#32;result;
+00137 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00138 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00139 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;GUILayout.EndHorizontal();
+00140 
+00141 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r">SteamVR</link>.<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r_1ad98d1d8dafb84740b3a005d435da62a5">active</link>)
+00142 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00143 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;var&#32;vr&#32;=&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r">SteamVR</link>.<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r_1af374389920329f77814037a571f6bf2f">instance</link>;
+00144 
+00145 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;GUILayout.BeginHorizontal();
+00146 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00147 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;var&#32;t&#32;=&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___camera">SteamVR_Camera</link>.<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___camera_1a15bffee48af1ca15135cf48e33622e56">sceneResolutionScale</link>;
+00148 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordtype">int</emphasis>&#32;w&#32;=&#32;(int)(vr.sceneWidth&#32;*&#32;t);
+00149 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordtype">int</emphasis>&#32;h&#32;=&#32;(int)(vr.sceneHeight&#32;*&#32;t);
+00150 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordtype">int</emphasis>&#32;pct&#32;=&#32;(int)(100.0f&#32;*&#32;t);
+00151 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;GUILayout.Label(<emphasis role="keywordtype">string</emphasis>.Format(<emphasis role="stringliteral">&quot;Scene&#32;quality:&#32;{0}x{1}&#32;({2}%)&quot;</emphasis>,&#32;w,&#32;h,&#32;pct));
+00152 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;var&#32;result&#32;=&#32;Mathf.RoundToInt(GUILayout.HorizontalSlider(pct,&#32;50,&#32;200));
+00153 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(result&#32;!=&#32;pct)
+00154 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00155 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___camera">SteamVR_Camera</link>.<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___camera_1a15bffee48af1ca15135cf48e33622e56">sceneResolutionScale</link>&#32;=&#32;(float)result&#32;/&#32;100.0f;
+00156 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00157 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00158 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;GUILayout.EndHorizontal();
+00159 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00160 
+00161 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;overlay.highquality&#32;=&#32;GUILayout.Toggle(overlay.highquality,&#32;<emphasis role="stringliteral">&quot;High&#32;quality&quot;</emphasis>);
+00162 
+00163 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(overlay.highquality)
+00164 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00165 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;overlay.curved&#32;=&#32;GUILayout.Toggle(overlay.curved,&#32;<emphasis role="stringliteral">&quot;Curved&#32;overlay&quot;</emphasis>);
+00166 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;overlay.antialias&#32;=&#32;GUILayout.Toggle(overlay.antialias,&#32;<emphasis role="stringliteral">&quot;Overlay&#32;RGSS(2x2)&quot;</emphasis>);
+00167 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00168 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">else</emphasis>
+00169 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00170 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;overlay.curved&#32;=&#32;<emphasis role="keyword">false</emphasis>;
+00171 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;overlay.antialias&#32;=&#32;<emphasis role="keyword">false</emphasis>;
+00172 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00173 
+00174 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;var&#32;tracker&#32;=&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___render">SteamVR_Render</link>.<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___render_1a4fae36331a03674fa212cfc38aa18358">Top</link>();
+00175 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(tracker&#32;!=&#32;<emphasis role="keyword">null</emphasis>)
+00176 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00177 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;tracker.<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___camera_1aa80e0ab2f8d29c70051bc23f7cef9937">wireframe</link>&#32;=&#32;GUILayout.Toggle(tracker.wireframe,&#32;<emphasis role="stringliteral">&quot;Wireframe&quot;</emphasis>);
+00178 
+00179 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r">SteamVR</link>.<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r_1a8d2a06793f921d45801b50af18f0c413">settings</link>.<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___settings_1a915da3507ad2861be45ad3d957cece37">trackingSpace</link>&#32;==&#32;<link linkend="_namespace_valve_1_1_v_r_1a29be99a3c2f780157bd490db06a7f12f">ETrackingUniverseOrigin</link>.TrackingUniverseSeated)
+00180 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00181 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(GUILayout.Button(<emphasis role="stringliteral">&quot;Switch&#32;to&#32;Standing&quot;</emphasis>))
+00182 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r">SteamVR</link>.<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r_1a8d2a06793f921d45801b50af18f0c413">settings</link>.<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___settings_1a915da3507ad2861be45ad3d957cece37">trackingSpace</link>&#32;=&#32;<link linkend="_namespace_valve_1_1_v_r_1a29be99a3c2f780157bd490db06a7f12f">ETrackingUniverseOrigin</link>.TrackingUniverseStanding;
+00183 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;if&#32;(GUILayout.Button(<emphasis role="stringliteral">&quot;Center&#32;View&quot;</emphasis>))
+00184 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00185 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;var&#32;system&#32;=&#32;<link linkend="_class_valve_1_1_v_r_1_1_open_v_r">OpenVR</link>.<link linkend="_class_valve_1_1_v_r_1_1_open_v_r_1a6aafa4a25425620225098ded82a045c0">System</link>;
+00186 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(system&#32;!=&#32;<emphasis role="keyword">null</emphasis>)
+00187 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;system.<link linkend="_class_valve_1_1_v_r_1_1_c_v_r_system_1af904b763d37e3fd62655183a9d2756ee">ResetSeatedZeroPose</link>();
+00188 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00189 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00190 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">else</emphasis>
+00191 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00192 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(GUILayout.Button(<emphasis role="stringliteral">&quot;Switch&#32;to&#32;Seated&quot;</emphasis>))
+00193 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r">SteamVR</link>.<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r_1a8d2a06793f921d45801b50af18f0c413">settings</link>.<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___settings_1a915da3507ad2861be45ad3d957cece37">trackingSpace</link>&#32;=&#32;<link linkend="_namespace_valve_1_1_v_r_1a29be99a3c2f780157bd490db06a7f12f">ETrackingUniverseOrigin</link>.TrackingUniverseSeated;
+00194 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00195 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00196 
+00197 <emphasis role="preprocessor">#if&#32;!UNITY_EDITOR</emphasis>
+00198 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(GUILayout.Button(<emphasis role="stringliteral">&quot;Exit&quot;</emphasis>))
+00199 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_namespace_valve_1_1_v_r_1aecd07a81fe79a9f96c6787513e2d98e4ae498749f3c42246d50b15c81c101d988">Application</link>.Quit();
+00200 <emphasis role="preprocessor">#endif</emphasis>
+00201 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;GUILayout.Space(menuOffset);
+00202 
+00203 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;var&#32;env&#32;=&#32;System.Environment.GetEnvironmentVariable(<emphasis role="stringliteral">&quot;VR_OVERRIDE&quot;</emphasis>);
+00204 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(env&#32;!=&#32;<emphasis role="keyword">null</emphasis>)
+00205 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00206 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;GUILayout.Label(<emphasis role="stringliteral">&quot;VR_OVERRIDE=&quot;</emphasis>&#32;+&#32;env);
+00207 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00208 
+00209 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;GUILayout.Label(<emphasis role="stringliteral">&quot;Graphics&#32;device:&#32;&quot;</emphasis>&#32;+&#32;SystemInfo.graphicsDeviceVersion);
+00210 
+00211 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;GUILayout.EndVertical();
+00212 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;GUILayout.FlexibleSpace();
+00213 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;GUILayout.EndHorizontal();
+00214 
+00215 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;GUILayout.EndArea();
+00216 
+00217 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___menu_1a5735ce5c311eae97cd73bf74144c470e">cursor</link>&#32;!=&#32;<emphasis role="keyword">null</emphasis>)
+00218 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00219 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordtype">float</emphasis>&#32;x&#32;=&#32;Input.mousePosition.x,&#32;y&#32;=&#32;Screen.height&#32;-&#32;Input.mousePosition.y;
+00220 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordtype">float</emphasis>&#32;w&#32;=&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___menu_1a5735ce5c311eae97cd73bf74144c470e">cursor</link>.width,&#32;h&#32;=&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___menu_1a5735ce5c311eae97cd73bf74144c470e">cursor</link>.height;
+00221 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;GUI.DrawTexture(<emphasis role="keyword">new</emphasis>&#32;Rect(x,&#32;y,&#32;w,&#32;h),&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___menu_1a5735ce5c311eae97cd73bf74144c470e">cursor</link>);
+00222 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00223 
+00224 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;RenderTexture.active&#32;=&#32;prevActive;
+00225 
+00226 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(bHideMenu)
+00227 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___menu_1ae2237ecbd2db4185cbe6339ee44bdd62">HideMenu</link>();
+00228 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00229 
+<anchor xml:id="__steam_v_r___menu_8cs_source_1l00230"/><link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___menu_1a4c23a751292b781004745d870d6157b6">00230</link> &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___menu_1a4c23a751292b781004745d870d6157b6">ShowMenu</link>()
+00231 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00232 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;var&#32;overlay&#32;=&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___overlay">SteamVR_Overlay</link>.<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___overlay_1aad1019110da831b03ec485056f846822">instance</link>;
+00233 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(overlay&#32;==&#32;<emphasis role="keyword">null</emphasis>)
+00234 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>;
+00235 
+00236 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;var&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___menu_1a4f4448df5c5bcf39301b4ac174192bc1">texture</link>&#32;=&#32;overlay.texture&#32;as&#32;RenderTexture;
+00237 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___menu_1a4f4448df5c5bcf39301b4ac174192bc1">texture</link>&#32;==&#32;<emphasis role="keyword">null</emphasis>)
+00238 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00239 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;Debug.LogError(<emphasis role="stringliteral">&quot;&lt;b&gt;[SteamVR]&lt;/b&gt;&#32;Menu&#32;requires&#32;overlay&#32;texture&#32;to&#32;be&#32;a&#32;render&#32;texture.&quot;</emphasis>);
+00240 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>;
+00241 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00242 
+00243 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;SaveCursorState();
+00244 
+00245 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;Cursor.visible&#32;=&#32;<emphasis role="keyword">true</emphasis>;
+00246 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;Cursor.lockState&#32;=&#32;CursorLockMode.None;
+00247 
+00248 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;this.overlay&#32;=&#32;overlay;
+00249 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;uvOffset&#32;=&#32;overlay.uvOffset;
+00250 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;distance&#32;=&#32;overlay.distance;
+00251 
+00252 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;If&#32;an&#32;existing&#32;camera&#32;is&#32;rendering&#32;into&#32;the&#32;overlay&#32;texture,&#32;we&#32;need</emphasis>
+00253 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;to&#32;temporarily&#32;disable&#32;it&#32;to&#32;keep&#32;it&#32;from&#32;clearing&#32;the&#32;texture&#32;on&#32;us.</emphasis>
+00254 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;var&#32;cameras&#32;=&#32;<link linkend="__t_m_pro___font_asset_creator_window_8cs_1aef19bab18b9814edeef255c43e4f6bbc">Object</link>.FindObjectsOfType(typeof(<link linkend="_namespace_valve_1_1_v_r_1a82e5bf501cc3aa155444ee3f0662853fa967d35e40f3f95b1f538bd248640bf3b">Camera</link>))&#32;as&#32;<link linkend="_namespace_valve_1_1_v_r_1a82e5bf501cc3aa155444ee3f0662853fa967d35e40f3f95b1f538bd248640bf3b">Camera</link>[];
+00255 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">foreach</emphasis>&#32;(var&#32;cam&#32;<emphasis role="keywordflow">in</emphasis>&#32;cameras)
+00256 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00257 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(cam.enabled&#32;&amp;&amp;&#32;cam.targetTexture&#32;==&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___menu_1a4f4448df5c5bcf39301b4ac174192bc1">texture</link>)
+00258 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00259 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;overlayCam&#32;=&#32;cam;
+00260 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;overlayCam.enabled&#32;=&#32;<emphasis role="keyword">false</emphasis>;
+00261 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">break</emphasis>;
+00262 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00263 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00264 
+00265 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;var&#32;tracker&#32;=&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___render">SteamVR_Render</link>.<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___render_1a4fae36331a03674fa212cfc38aa18358">Top</link>();
+00266 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(tracker&#32;!=&#32;<emphasis role="keyword">null</emphasis>)
+00267 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___menu_1a2dfe51b00cc718973cd71ff4a4d224b8">scale</link>&#32;=&#32;tracker.origin.localScale.x;
+00268 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00269 
+<anchor xml:id="__steam_v_r___menu_8cs_source_1l00270"/><link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___menu_1ae2237ecbd2db4185cbe6339ee44bdd62">00270</link> &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___menu_1ae2237ecbd2db4185cbe6339ee44bdd62">HideMenu</link>()
+00271 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00272 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;RestoreCursorState();
+00273 
+00274 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(overlayCam&#32;!=&#32;<emphasis role="keyword">null</emphasis>)
+00275 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;overlayCam.enabled&#32;=&#32;<emphasis role="keyword">true</emphasis>;
+00276 
+00277 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(overlay&#32;!=&#32;<emphasis role="keyword">null</emphasis>)
+00278 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00279 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;overlay.uvOffset&#32;=&#32;uvOffset;
+00280 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;overlay.distance&#32;=&#32;distance;
+00281 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;overlay&#32;=&#32;<emphasis role="keyword">null</emphasis>;
+00282 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00283 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00284 
+00285 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordtype">void</emphasis>&#32;Update()
+00286 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00287 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(Input.GetKeyDown(KeyCode.Escape)&#32;||&#32;Input.GetKeyDown(KeyCode.Joystick1Button7))
+00288 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00289 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(overlay&#32;==&#32;<emphasis role="keyword">null</emphasis>)
+00290 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00291 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___menu_1a4c23a751292b781004745d870d6157b6">ShowMenu</link>();
+00292 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00293 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">else</emphasis>
+00294 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00295 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___menu_1ae2237ecbd2db4185cbe6339ee44bdd62">HideMenu</link>();
+00296 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00297 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00298 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">else</emphasis>&#32;<emphasis role="keywordflow">if</emphasis>&#32;(Input.GetKeyDown(KeyCode.Home))
+00299 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00300 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;SetScale(1.0f);
+00301 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00302 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">else</emphasis>&#32;<emphasis role="keywordflow">if</emphasis>&#32;(Input.GetKey(KeyCode.PageUp))
+00303 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00304 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;SetScale(Mathf.Clamp(<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___menu_1a2dfe51b00cc718973cd71ff4a4d224b8">scale</link>&#32;+&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___menu_1a3764ae548445b4ca2fb5a7bae4360174">scaleRate</link>&#32;*&#32;Time.deltaTime,&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___menu_1a4d51b869eec84902bdfbae283c838d9a">scaleLimits</link>.x,&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___menu_1a4d51b869eec84902bdfbae283c838d9a">scaleLimits</link>.y));
+00305 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00306 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">else</emphasis>&#32;<emphasis role="keywordflow">if</emphasis>&#32;(Input.GetKey(KeyCode.PageDown))
+00307 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00308 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;SetScale(Mathf.Clamp(<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___menu_1a2dfe51b00cc718973cd71ff4a4d224b8">scale</link>&#32;-&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___menu_1a3764ae548445b4ca2fb5a7bae4360174">scaleRate</link>&#32;*&#32;Time.deltaTime,&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___menu_1a4d51b869eec84902bdfbae283c838d9a">scaleLimits</link>.x,&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___menu_1a4d51b869eec84902bdfbae283c838d9a">scaleLimits</link>.y));
+00309 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00310 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00311 
+00312 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordtype">void</emphasis>&#32;SetScale(<emphasis role="keywordtype">float</emphasis>&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___menu_1a2dfe51b00cc718973cd71ff4a4d224b8">scale</link>)
+00313 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00314 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;this.scale&#32;=&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___menu_1a2dfe51b00cc718973cd71ff4a4d224b8">scale</link>;
+00315 
+00316 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;var&#32;tracker&#32;=&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___render">SteamVR_Render</link>.<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___render_1a4fae36331a03674fa212cfc38aa18358">Top</link>();
+00317 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(tracker&#32;!=&#32;<emphasis role="keyword">null</emphasis>)
+00318 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;tracker.<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___camera_1a12fe684a54d4cade55c1ba7d693e38bd">origin</link>.localScale&#32;=&#32;<emphasis role="keyword">new</emphasis>&#32;Vector3(<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___menu_1a2dfe51b00cc718973cd71ff4a4d224b8">scale</link>,&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___menu_1a2dfe51b00cc718973cd71ff4a4d224b8">scale</link>,&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___menu_1a2dfe51b00cc718973cd71ff4a4d224b8">scale</link>);
+00319 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00320 
+00321 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordtype">void</emphasis>&#32;SaveCursorState()
+00322 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00323 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;savedCursorVisible&#32;=&#32;Cursor.visible;
+00324 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;savedCursorLockState&#32;=&#32;Cursor.lockState;
+00325 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00326 
+00327 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordtype">void</emphasis>&#32;RestoreCursorState()
+00328 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00329 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;Cursor.visible&#32;=&#32;savedCursorVisible;
+00330 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;Cursor.lockState&#32;=&#32;savedCursorLockState;
+00331 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00332 &#32;&#32;&#32;&#32;}
+00333 }
+</programlisting></section>

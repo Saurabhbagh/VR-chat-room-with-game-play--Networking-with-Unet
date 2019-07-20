@@ -1,0 +1,240 @@
+<?xml version='1.0' encoding='UTF-8' standalone='no'?>
+<section xmlns="http://docbook.org/ns/docbook" version="5.0" xmlns:xlink="http://www.w3.org/1999/xlink" xml:id="__combinable_property_drawer_8cs_source">
+<title>CombinablePropertyDrawer.cs</title>
+<indexterm><primary>O:/GitHUBMINIPRoject/Assets/LeapMotion/Core/Scripts/Attributes/Editor/CombinablePropertyDrawer.cs</primary></indexterm>
+<programlisting>00001 <emphasis role="comment">/******************************************************************************</emphasis>
+00002 <emphasis role="comment">&#32;*&#32;Copyright&#32;(C)&#32;Leap&#32;Motion,&#32;Inc.&#32;2011-2018.&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;*</emphasis>
+00003 <emphasis role="comment">&#32;*&#32;Leap&#32;Motion&#32;proprietary&#32;and&#32;confidential.&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;*</emphasis>
+00004 <emphasis role="comment">&#32;*&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;*</emphasis>
+00005 <emphasis role="comment">&#32;*&#32;Use&#32;subject&#32;to&#32;the&#32;terms&#32;of&#32;the&#32;Leap&#32;Motion&#32;SDK&#32;Agreement&#32;available&#32;at&#32;&#32;&#32;&#32;&#32;*</emphasis>
+00006 <emphasis role="comment">&#32;*&#32;https://developer.leapmotion.com/sdk_agreement,&#32;or&#32;another&#32;agreement&#32;&#32;&#32;&#32;&#32;&#32;&#32;*</emphasis>
+00007 <emphasis role="comment">&#32;*&#32;between&#32;Leap&#32;Motion&#32;and&#32;you,&#32;your&#32;company&#32;or&#32;other&#32;organization.&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;*</emphasis>
+00008 <emphasis role="comment">&#32;******************************************************************************/</emphasis>
+00009 
+00010 <emphasis role="keyword">using</emphasis>&#32;<link linkend="__balloon_8cs_1a7d67e097df9376eb709b6a23aa3c7d23">UnityEngine</link>;
+00011 <emphasis role="keyword">using</emphasis>&#32;<link linkend="_namespace_unity_editor">UnityEditor</link>;
+00012 <emphasis role="keyword">using</emphasis>&#32;System.Linq;
+00013 <emphasis role="keyword">using</emphasis>&#32;System.Reflection;
+00014 <emphasis role="keyword">using</emphasis>&#32;System.Collections.Generic;
+00015 <emphasis role="keyword">using</emphasis>&#32;<link linkend="_namespace_leap">Leap</link>.<link linkend="_namespace_leap_1_1_unity">Unity</link>.<link linkend="_namespace_leap_1_1_unity_1_1_query">Query</link>;
+00016 
+00017 <emphasis role="keyword">namespace&#32;</emphasis><link linkend="_namespace_leap_1_1_unity_1_1_attributes">Leap.Unity.Attributes</link>&#32;{
+00018 
+00019 &#32;&#32;[CustomPropertyDrawer(typeof(CombinablePropertyAttribute),&#32;<emphasis role="keyword">true</emphasis>)]
+<anchor xml:id="__combinable_property_drawer_8cs_source_1l00020"/><link linkend="_class_leap_1_1_unity_1_1_attributes_1_1_combinable_property_drawer">00020</link> &#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keyword">class&#32;</emphasis><link linkend="_class_leap_1_1_unity_1_1_attributes_1_1_combinable_property_drawer">CombinablePropertyDrawer</link>&#32;:&#32;PropertyDrawer&#32;{
+00021 
+00022 &#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;<emphasis role="keyword">static</emphasis>&#32;Dictionary&lt;FieldInfo,&#32;List&lt;CombinablePropertyAttribute&gt;&gt;&#32;_cachedAttributes&#32;=&#32;<emphasis role="keyword">new</emphasis>&#32;Dictionary&lt;FieldInfo,&#32;List&lt;CombinablePropertyAttribute&gt;&gt;();
+00023 
+00024 &#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;List&lt;CombinablePropertyAttribute&gt;&#32;attributes&#32;=&#32;<emphasis role="keyword">new</emphasis>&#32;List&lt;CombinablePropertyAttribute&gt;();
+00025 &#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;getAttributes(SerializedProperty&#32;property)&#32;{
+00026 &#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_leap_1_1_unity_1_1_attributes_1_1_combinable_property_drawer_1a05a2ce86dd3ec24fa832f44ecb7970a8">GetAttributes</link>(property,&#32;fieldInfo,&#32;out&#32;attributes);
+00027 &#32;&#32;&#32;&#32;}
+00028 
+<anchor xml:id="__combinable_property_drawer_8cs_source_1l00029"/><link linkend="_class_leap_1_1_unity_1_1_attributes_1_1_combinable_property_drawer_1a05a2ce86dd3ec24fa832f44ecb7970a8">00029</link> &#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keyword">static</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;<link linkend="_class_leap_1_1_unity_1_1_attributes_1_1_combinable_property_drawer_1a05a2ce86dd3ec24fa832f44ecb7970a8">GetAttributes</link>(SerializedProperty&#32;property,
+00030 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;FieldInfo&#32;fieldInfo,
+00031 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;out&#32;List&lt;CombinablePropertyAttribute&gt;&#32;outAttributes)&#32;{
+00032 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(!_cachedAttributes.TryGetValue(fieldInfo,&#32;out&#32;outAttributes))&#32;{
+00033 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;outAttributes&#32;=&#32;<emphasis role="keyword">new</emphasis>&#32;List&lt;CombinablePropertyAttribute&gt;();
+00034 
+00035 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">foreach</emphasis>&#32;(<emphasis role="keywordtype">object</emphasis>&#32;o&#32;<emphasis role="keywordflow">in</emphasis>&#32;fieldInfo.GetCustomAttributes(typeof(<link linkend="_class_leap_1_1_unity_1_1_attributes_1_1_combinable_property_attribute">CombinablePropertyAttribute</link>),&#32;<emphasis role="keyword">true</emphasis>))&#32;{
+00036 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_leap_1_1_unity_1_1_attributes_1_1_combinable_property_attribute">CombinablePropertyAttribute</link>&#32;combinableProperty&#32;=&#32;o&#32;as&#32;<link linkend="_class_leap_1_1_unity_1_1_attributes_1_1_combinable_property_attribute">CombinablePropertyAttribute</link>;
+00037 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(combinableProperty&#32;!=&#32;<emphasis role="keyword">null</emphasis>)&#32;{
+00038 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(combinableProperty.SupportedTypes.Count()&#32;!=&#32;0&#32;&amp;&amp;&#32;!combinableProperty.SupportedTypes.Contains(property.propertyType))&#32;{
+00039 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;Debug.LogError(<emphasis role="stringliteral">&quot;Property&#32;attribute&#32;&quot;</emphasis>&#32;+
+00040 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;combinableProperty.GetType().Name&#32;+
+00041 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="stringliteral">&quot;&#32;does&#32;not&#32;support&#32;property&#32;type&#32;&quot;</emphasis>&#32;+
+00042 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">property</emphasis>.propertyType&#32;+&#32;<emphasis role="stringliteral">&quot;.&quot;</emphasis>);
+00043 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">continue</emphasis>;
+00044 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00045 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;outAttributes.Add(combinableProperty);
+00046 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00047 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00048 
+00049 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;_cachedAttributes[fieldInfo]&#32;=&#32;outAttributes;
+00050 &#32;&#32;&#32;&#32;&#32;&#32;}
+00051 &#32;&#32;&#32;&#32;}
+00052 
+<anchor xml:id="__combinable_property_drawer_8cs_source_1l00053"/><link linkend="_class_leap_1_1_unity_1_1_attributes_1_1_combinable_property_drawer_1a87a909f9fd179e71752acfe6dda5762a">00053</link> &#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keyword">override</emphasis>&#32;<emphasis role="keywordtype">float</emphasis>&#32;<link linkend="_class_leap_1_1_unity_1_1_attributes_1_1_combinable_property_drawer_1a87a909f9fd179e71752acfe6dda5762a">GetPropertyHeight</link>(SerializedProperty&#32;property,&#32;GUIContent&#32;label)&#32;{
+00054 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;EditorGUI.GetPropertyHeight(property);
+00055 &#32;&#32;&#32;&#32;}
+00056 
+<anchor xml:id="__combinable_property_drawer_8cs_source_1l00057"/><link linkend="_class_leap_1_1_unity_1_1_attributes_1_1_combinable_property_drawer_1a8e71381312b2d09a68daa42fa49e7653">00057</link> &#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keyword">override</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;<link linkend="_class_leap_1_1_unity_1_1_attributes_1_1_combinable_property_drawer_1a8e71381312b2d09a68daa42fa49e7653">OnGUI</link>(Rect&#32;position,&#32;SerializedProperty&#32;property,&#32;GUIContent&#32;label)&#32;{
+00058 &#32;&#32;&#32;&#32;&#32;&#32;getAttributes(property);
+00059 
+00060 &#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_leap_1_1_unity_1_1_attributes_1_1_combinable_property_drawer">CombinablePropertyDrawer</link>.<link linkend="_class_leap_1_1_unity_1_1_attributes_1_1_combinable_property_drawer_1a8e71381312b2d09a68daa42fa49e7653">OnGUI</link>(this.attributes,&#32;this.fieldInfo,
+00061 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;position,&#32;property,&#32;label);
+00062 &#32;&#32;&#32;&#32;}
+00063 
+<anchor xml:id="__combinable_property_drawer_8cs_source_1l00064"/><link linkend="_class_leap_1_1_unity_1_1_attributes_1_1_combinable_property_drawer_1aa6d7097d50d005bc1f34562335bee772">00064</link> &#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keyword">static</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;<link linkend="_class_leap_1_1_unity_1_1_attributes_1_1_combinable_property_drawer_1aa6d7097d50d005bc1f34562335bee772">OnGUI</link>(List&lt;CombinablePropertyAttribute&gt;&#32;attributes,
+00065 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;FieldInfo&#32;fieldInfo,
+00066 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;Rect&#32;position,&#32;SerializedProperty&#32;property,&#32;GUIContent&#32;label)&#32;{
+00067 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordtype">float</emphasis>&#32;defaultLabelWidth&#32;=&#32;EditorGUIUtility.labelWidth;
+00068 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordtype">float</emphasis>&#32;fieldWidth&#32;=&#32;position.width&#32;-&#32;EditorGUIUtility.labelWidth;
+00069 
+00070 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordtype">bool</emphasis>&#32;canUseDefaultDrawer&#32;=&#32;<emphasis role="keyword">true</emphasis>;
+00071 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordtype">bool</emphasis>&#32;shouldDisable&#32;=&#32;<emphasis role="keyword">false</emphasis>;
+00072 
+00073 &#32;&#32;&#32;&#32;&#32;&#32;RangeAttribute&#32;rangeAttribute&#32;=&#32;<emphasis role="keyword">null</emphasis>;
+00074 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(fieldInfo&#32;!=&#32;<emphasis role="keyword">null</emphasis>)&#32;{
+00075 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;rangeAttribute&#32;=&#32;fieldInfo.GetCustomAttributes(typeof(RangeAttribute),&#32;<emphasis role="keyword">true</emphasis>).FirstOrDefault()&#32;as&#32;RangeAttribute;
+00076 &#32;&#32;&#32;&#32;&#32;&#32;}
+00077 
+00078 &#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_interface_leap_1_1_unity_1_1_attributes_1_1_i_support_drag_and_drop">ISupportDragAndDrop</link>&#32;dragAndDropSupport&#32;=&#32;<emphasis role="keyword">null</emphasis>;
+00079 
+00080 &#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_interface_leap_1_1_unity_1_1_attributes_1_1_i_full_property_drawer">IFullPropertyDrawer</link>&#32;fullPropertyDrawer&#32;=&#32;<emphasis role="keyword">null</emphasis>;
+00081 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">foreach</emphasis>&#32;(var&#32;a&#32;<emphasis role="keywordflow">in</emphasis>&#32;attributes)&#32;{
+00082 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;a.Init(fieldInfo,&#32;property.serializedObject.targetObjects);
+00083 
+00084 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(a&#32;is&#32;<link linkend="_interface_leap_1_1_unity_1_1_attributes_1_1_i_before_label_additive_drawer">IBeforeLabelAdditiveDrawer</link>)&#32;{
+00085 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;EditorGUIUtility.labelWidth&#32;-=&#32;(a&#32;as&#32;<link linkend="_interface_leap_1_1_unity_1_1_attributes_1_1_i_before_label_additive_drawer">IBeforeLabelAdditiveDrawer</link>).GetWidth();
+00086 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00087 
+00088 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(a&#32;is&#32;<link linkend="_interface_leap_1_1_unity_1_1_attributes_1_1_i_after_label_additive_drawer">IAfterLabelAdditiveDrawer</link>)&#32;{
+00089 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;EditorGUIUtility.labelWidth&#32;-=&#32;(a&#32;as&#32;<link linkend="_interface_leap_1_1_unity_1_1_attributes_1_1_i_after_label_additive_drawer">IAfterLabelAdditiveDrawer</link>).GetWidth();
+00090 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;canUseDefaultDrawer&#32;=&#32;<emphasis role="keyword">false</emphasis>;
+00091 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00092 
+00093 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(a&#32;is&#32;<link linkend="_interface_leap_1_1_unity_1_1_attributes_1_1_i_before_field_additive_drawer">IBeforeFieldAdditiveDrawer</link>)&#32;{
+00094 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;fieldWidth&#32;-=&#32;(a&#32;as&#32;<link linkend="_interface_leap_1_1_unity_1_1_attributes_1_1_i_before_field_additive_drawer">IBeforeFieldAdditiveDrawer</link>).GetWidth();
+00095 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;canUseDefaultDrawer&#32;=&#32;<emphasis role="keyword">false</emphasis>;
+00096 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00097 
+00098 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(a&#32;is&#32;<link linkend="_interface_leap_1_1_unity_1_1_attributes_1_1_i_after_field_additive_drawer">IAfterFieldAdditiveDrawer</link>)&#32;{
+00099 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;fieldWidth&#32;-=&#32;(a&#32;as&#32;<link linkend="_interface_leap_1_1_unity_1_1_attributes_1_1_i_after_field_additive_drawer">IAfterFieldAdditiveDrawer</link>).GetWidth();
+00100 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00101 
+00102 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(a&#32;is&#32;<link linkend="_interface_leap_1_1_unity_1_1_attributes_1_1_i_property_disabler">IPropertyDisabler</link>)&#32;{
+00103 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;shouldDisable&#32;|=&#32;(a&#32;as&#32;<link linkend="_interface_leap_1_1_unity_1_1_attributes_1_1_i_property_disabler">IPropertyDisabler</link>).ShouldDisable(property);
+00104 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00105 
+00106 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(a&#32;is&#32;<link linkend="_interface_leap_1_1_unity_1_1_attributes_1_1_i_full_property_drawer">IFullPropertyDrawer</link>)&#32;{
+00107 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(fullPropertyDrawer&#32;!=&#32;<emphasis role="keyword">null</emphasis>)&#32;{
+00108 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;Debug.LogError(<emphasis role="stringliteral">&quot;Cannot&#32;have&#32;2&#32;advanced&#32;attributes&#32;that&#32;both&#32;override&#32;the&#32;field&#32;drawing&quot;</emphasis>);
+00109 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>;
+00110 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00111 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;fullPropertyDrawer&#32;=&#32;a&#32;as&#32;<link linkend="_interface_leap_1_1_unity_1_1_attributes_1_1_i_full_property_drawer">IFullPropertyDrawer</link>;
+00112 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00113 
+00114 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(a&#32;is&#32;<link linkend="_interface_leap_1_1_unity_1_1_attributes_1_1_i_support_drag_and_drop">ISupportDragAndDrop</link>)&#32;{
+00115 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;dragAndDropSupport&#32;=&#32;(a&#32;as&#32;<link linkend="_interface_leap_1_1_unity_1_1_attributes_1_1_i_support_drag_and_drop">ISupportDragAndDrop</link>);
+00116 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00117 &#32;&#32;&#32;&#32;&#32;&#32;}
+00118 
+00119 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(fullPropertyDrawer&#32;!=&#32;<emphasis role="keyword">null</emphasis>&#32;&amp;&amp;&#32;!canUseDefaultDrawer)&#32;{
+00120 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;Debug.LogError(<emphasis role="stringliteral">&quot;Cannot&#32;have&#32;an&#32;advanced&#32;attribute&#32;drawer&#32;that&#32;draws&#32;a&#32;custom&#32;field,&#32;and&#32;also&#32;have&#32;an&#32;advanced&#32;attribute&#32;drawer&#32;that&#32;draws&#32;between&#32;label&#32;and&#32;field!&quot;</emphasis>);
+00121 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>;
+00122 &#32;&#32;&#32;&#32;&#32;&#32;}
+00123 
+00124 &#32;&#32;&#32;&#32;&#32;&#32;Rect&#32;r&#32;=&#32;position;
+00125 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(dragAndDropSupport&#32;!=&#32;<emphasis role="keyword">null</emphasis>)&#32;{
+00126 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;processDragAndDrop(dragAndDropSupport,&#32;ref&#32;r,&#32;property);
+00127 &#32;&#32;&#32;&#32;&#32;&#32;}
+00128 
+00129 &#32;&#32;&#32;&#32;&#32;&#32;EditorGUI.BeginChangeCheck();
+00130 &#32;&#32;&#32;&#32;&#32;&#32;EditorGUI.BeginDisabledGroup(shouldDisable);
+00131 
+00132 &#32;&#32;&#32;&#32;&#32;&#32;drawAdditive&lt;IBeforeLabelAdditiveDrawer&gt;(attributes,&#32;ref&#32;r,&#32;property);
+00133 
+00134 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(canUseDefaultDrawer)&#32;{
+00135 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;r.width&#32;=&#32;EditorGUIUtility.labelWidth&#32;+&#32;fieldWidth;
+00136 
+00137 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(fullPropertyDrawer&#32;!=&#32;<emphasis role="keyword">null</emphasis>)&#32;{
+00138 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;fullPropertyDrawer.DrawProperty(r,&#32;property,&#32;label);
+00139 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}&#32;<emphasis role="keywordflow">else</emphasis>&#32;{
+00140 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(rangeAttribute&#32;!=&#32;<emphasis role="keyword">null</emphasis>)&#32;{
+00141 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(property.propertyType&#32;==&#32;SerializedPropertyType.Integer)&#32;{
+00142 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">property</emphasis>.intValue&#32;=&#32;EditorGUI.IntSlider(r,&#32;label,&#32;property.intValue,&#32;(<emphasis role="keywordtype">int</emphasis>)rangeAttribute.min,&#32;(<emphasis role="keywordtype">int</emphasis>)rangeAttribute.max);
+00143 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}&#32;<emphasis role="keywordflow">else</emphasis>&#32;<emphasis role="keywordflow">if</emphasis>&#32;(property.propertyType&#32;==&#32;SerializedPropertyType.Float)&#32;{
+00144 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">property</emphasis>.floatValue&#32;=&#32;EditorGUI.Slider(r,&#32;label,&#32;property.floatValue,&#32;rangeAttribute.min,&#32;rangeAttribute.max);
+00145 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}&#32;<emphasis role="keywordflow">else</emphasis>&#32;{
+00146 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;EditorGUI.PropertyField(r,&#32;property,&#32;label);
+00147 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00148 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}&#32;<emphasis role="keywordflow">else</emphasis>&#32;{
+00149 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;EditorGUI.PropertyField(r,&#32;property,&#32;label);
+00150 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00151 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00152 
+00153 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;r.x&#32;+=&#32;r.width;
+00154 &#32;&#32;&#32;&#32;&#32;&#32;}&#32;<emphasis role="keywordflow">else</emphasis>&#32;{
+00155 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;r.width&#32;=&#32;EditorGUIUtility.labelWidth;
+00156 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;r&#32;=&#32;EditorGUI.PrefixLabel(r,&#32;label);
+00157 
+00158 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;drawAdditive&lt;IAfterLabelAdditiveDrawer&gt;(attributes,&#32;ref&#32;r,&#32;property);
+00159 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;drawAdditive&lt;IBeforeFieldAdditiveDrawer&gt;(attributes,&#32;ref&#32;r,&#32;property);
+00160 
+00161 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;r.width&#32;=&#32;fieldWidth;
+00162 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;EditorGUI.PropertyField(r,&#32;property,&#32;GUIContent.none);
+00163 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;r.x&#32;+=&#32;r.width;
+00164 &#32;&#32;&#32;&#32;&#32;&#32;}
+00165 
+00166 &#32;&#32;&#32;&#32;&#32;&#32;drawAdditive&lt;IAfterFieldAdditiveDrawer&gt;(attributes,&#32;ref&#32;r,&#32;property);
+00167 
+00168 &#32;&#32;&#32;&#32;&#32;&#32;EditorGUI.EndDisabledGroup();
+00169 
+00170 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordtype">bool</emphasis>&#32;didChange&#32;=&#32;EditorGUI.EndChangeCheck();
+00171 
+00172 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(didChange&#32;||&#32;!property.hasMultipleDifferentValues)&#32;{
+00173 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">foreach</emphasis>&#32;(var&#32;a&#32;<emphasis role="keywordflow">in</emphasis>&#32;attributes)&#32;{
+00174 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(a&#32;is&#32;<link linkend="_interface_leap_1_1_unity_1_1_attributes_1_1_i_property_constrainer">IPropertyConstrainer</link>)&#32;{
+00175 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;(a&#32;as&#32;<link linkend="_interface_leap_1_1_unity_1_1_attributes_1_1_i_property_constrainer">IPropertyConstrainer</link>).ConstrainValue(property);
+00176 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00177 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00178 &#32;&#32;&#32;&#32;&#32;&#32;}
+00179 
+00180 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(didChange)&#32;{
+00181 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">foreach</emphasis>&#32;(var&#32;a&#32;<emphasis role="keywordflow">in</emphasis>&#32;attributes)&#32;{
+00182 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;a.OnPropertyChanged(property);
+00183 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00184 &#32;&#32;&#32;&#32;&#32;&#32;}
+00185 
+00186 &#32;&#32;&#32;&#32;&#32;&#32;EditorGUIUtility.labelWidth&#32;=&#32;defaultLabelWidth;
+00187 &#32;&#32;&#32;&#32;}
+00188 
+00189 &#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;<emphasis role="keyword">static</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;drawAdditive&lt;T&gt;(List&lt;CombinablePropertyAttribute&gt;&#32;attributes,
+00190 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;ref&#32;Rect&#32;r,&#32;SerializedProperty&#32;property)
+00191 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;where&#32;T&#32;:&#32;<emphasis role="keyword">class</emphasis>,&#32;<link linkend="_interface_leap_1_1_unity_1_1_attributes_1_1_i_additive_drawer">IAdditiveDrawer</link>&#32;{
+00192 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">foreach</emphasis>&#32;(var&#32;a&#32;<emphasis role="keywordflow">in</emphasis>&#32;attributes)&#32;{
+00193 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(a&#32;is&#32;T)&#32;{
+00194 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;T&#32;t&#32;=&#32;a&#32;as&#32;T;
+00195 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;r.width&#32;=&#32;t.GetWidth();
+00196 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;t.Draw(r,&#32;property);
+00197 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;r.x&#32;+=&#32;r.width;
+00198 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00199 &#32;&#32;&#32;&#32;&#32;&#32;}
+00200 &#32;&#32;&#32;&#32;}
+00201 
+00202 &#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;<emphasis role="keyword">static</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;processDragAndDrop(ISupportDragAndDrop&#32;dragAndDropSupport,
+00203 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;ref&#32;Rect&#32;r,&#32;SerializedProperty&#32;property)&#32;{
+00204 &#32;&#32;&#32;&#32;&#32;&#32;Event&#32;curEvent&#32;=&#32;Event.current;
+00205 &#32;&#32;&#32;&#32;&#32;&#32;Rect&#32;dropArea&#32;=&#32;dragAndDropSupport.GetDropArea(r,&#32;property);
+00206 
+00207 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">switch</emphasis>&#32;(curEvent.type)&#32;{
+00208 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">case</emphasis>&#32;EventType.Repaint:
+00209 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">case</emphasis>&#32;EventType.DragUpdated:
+00210 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">case</emphasis>&#32;EventType.DragPerform:
+00211 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(!dropArea.Contains(curEvent.mousePosition,&#32;allowInverse:&#32;<emphasis role="keyword">true</emphasis>))&#32;{
+00212 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">break</emphasis>;
+00213 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00214 
+00215 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordtype">bool</emphasis>&#32;isValidDrop&#32;=&#32;dragAndDropSupport.IsDropValid(
+00216 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;DragAndDrop.objectReferences,&#32;property);
+00217 
+00218 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(isValidDrop)&#32;{
+00219 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;DragAndDrop.visualMode&#32;=&#32;DragAndDropVisualMode.Link;
+00220 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}&#32;<emphasis role="keywordflow">else</emphasis>&#32;{
+00221 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;DragAndDrop.visualMode&#32;=&#32;DragAndDropVisualMode.Rejected;
+00222 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00223 
+00224 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(curEvent.type&#32;==&#32;EventType.DragPerform&#32;&amp;&amp;&#32;isValidDrop)&#32;{
+00225 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;DragAndDrop.AcceptDrag();
+00226 
+00227 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;dragAndDropSupport.ProcessDroppedObjects(
+00228 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;DragAndDrop.objectReferences,&#32;property);
+00229 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00230 
+00231 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">break</emphasis>;
+00232 &#32;&#32;&#32;&#32;&#32;&#32;}
+00233 &#32;&#32;&#32;&#32;}
+00234 &#32;&#32;}
+00235 }
+</programlisting></section>

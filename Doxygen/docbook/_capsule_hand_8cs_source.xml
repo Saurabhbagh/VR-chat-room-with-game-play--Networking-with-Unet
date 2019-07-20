@@ -1,0 +1,296 @@
+<?xml version='1.0' encoding='UTF-8' standalone='no'?>
+<section xmlns="http://docbook.org/ns/docbook" version="5.0" xmlns:xlink="http://www.w3.org/1999/xlink" xml:id="__capsule_hand_8cs_source">
+<title>CapsuleHand.cs</title>
+<indexterm><primary>O:/GitHUBMINIPRoject/Assets/LeapMotion/Core/Scripts/Hands/CapsuleHand.cs</primary></indexterm>
+<programlisting>00001 <emphasis role="comment">/******************************************************************************</emphasis>
+00002 <emphasis role="comment">&#32;*&#32;Copyright&#32;(C)&#32;Leap&#32;Motion,&#32;Inc.&#32;2011-2018.&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;*</emphasis>
+00003 <emphasis role="comment">&#32;*&#32;Leap&#32;Motion&#32;proprietary&#32;and&#32;confidential.&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;*</emphasis>
+00004 <emphasis role="comment">&#32;*&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;*</emphasis>
+00005 <emphasis role="comment">&#32;*&#32;Use&#32;subject&#32;to&#32;the&#32;terms&#32;of&#32;the&#32;Leap&#32;Motion&#32;SDK&#32;Agreement&#32;available&#32;at&#32;&#32;&#32;&#32;&#32;*</emphasis>
+00006 <emphasis role="comment">&#32;*&#32;https://developer.leapmotion.com/sdk_agreement,&#32;or&#32;another&#32;agreement&#32;&#32;&#32;&#32;&#32;&#32;&#32;*</emphasis>
+00007 <emphasis role="comment">&#32;*&#32;between&#32;Leap&#32;Motion&#32;and&#32;you,&#32;your&#32;company&#32;or&#32;other&#32;organization.&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;*</emphasis>
+00008 <emphasis role="comment">&#32;******************************************************************************/</emphasis>
+00009 
+00010 <emphasis role="keyword">using</emphasis>&#32;<link linkend="__balloon_8cs_1a7d67e097df9376eb709b6a23aa3c7d23">UnityEngine</link>;
+00011 <emphasis role="keyword">using</emphasis>&#32;System.Collections;
+00012 <emphasis role="keyword">using</emphasis>&#32;System.Collections.Generic;
+00013 <emphasis role="keyword">using</emphasis>&#32;<link linkend="_namespace_leap">Leap</link>.<link linkend="_namespace_leap_1_1_unity">Unity</link>.<link linkend="_namespace_leap_1_1_unity_1_1_attributes">Attributes</link>;
+00014 
+00015 <emphasis role="keyword">namespace&#32;</emphasis><link linkend="_namespace_leap_1_1_unity">Leap.Unity</link>&#32;{
+<anchor xml:id="__capsule_hand_8cs_source_1l00017"/><link linkend="_class_leap_1_1_unity_1_1_capsule_hand">00017</link> &#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keyword">class&#32;</emphasis><link linkend="_class_leap_1_1_unity_1_1_capsule_hand">CapsuleHand</link>&#32;:&#32;<link linkend="_class_leap_1_1_unity_1_1_hand_model_base">HandModelBase</link>&#32;{
+00018 &#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;<emphasis role="keyword">const</emphasis>&#32;<emphasis role="keywordtype">int</emphasis>&#32;TOTAL_JOINT_COUNT&#32;=&#32;4&#32;*&#32;5;
+00019 &#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;<emphasis role="keyword">const</emphasis>&#32;<emphasis role="keywordtype">float</emphasis>&#32;CYLINDER_MESH_RESOLUTION&#32;=&#32;0.1f;&#32;<emphasis role="comment">//in&#32;centimeters,&#32;meshes&#32;within&#32;this&#32;resolution&#32;will&#32;be&#32;re-used</emphasis>
+00020 &#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;<emphasis role="keyword">const</emphasis>&#32;<emphasis role="keywordtype">int</emphasis>&#32;THUMB_BASE_INDEX&#32;=&#32;(int)<link linkend="_class_leap_1_1_finger">Finger</link>.<link linkend="_class_leap_1_1_finger_1ae75e8d46a01aff0bd5c6d6fb99e2f2ba">FingerType</link>.TYPE_THUMB&#32;*&#32;4;
+00021 &#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;<emphasis role="keyword">const</emphasis>&#32;<emphasis role="keywordtype">int</emphasis>&#32;PINKY_BASE_INDEX&#32;=&#32;(<emphasis role="keywordtype">int</emphasis>)<link linkend="_class_leap_1_1_finger">Finger</link>.<link linkend="_class_leap_1_1_finger_1ae75e8d46a01aff0bd5c6d6fb99e2f2ba">FingerType</link>.TYPE_PINKY&#32;*&#32;4;
+00022 
+00023 &#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;<emphasis role="keyword">static</emphasis>&#32;<emphasis role="keywordtype">int</emphasis>&#32;_leftColorIndex&#32;=&#32;0;
+00024 &#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;<emphasis role="keyword">static</emphasis>&#32;<emphasis role="keywordtype">int</emphasis>&#32;_rightColorIndex&#32;=&#32;0;
+00025 &#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;<emphasis role="keyword">static</emphasis>&#32;Color[]&#32;_leftColorList&#32;=&#32;{&#32;<emphasis role="keyword">new</emphasis>&#32;Color(0.0f,&#32;0.0f,&#32;1.0f),&#32;<emphasis role="keyword">new</emphasis>&#32;Color(0.2f,&#32;0.0f,&#32;0.4f),&#32;<emphasis role="keyword">new</emphasis>&#32;Color(0.0f,&#32;0.2f,&#32;0.2f)&#32;};
+00026 &#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;<emphasis role="keyword">static</emphasis>&#32;Color[]&#32;_rightColorList&#32;=&#32;{&#32;<emphasis role="keyword">new</emphasis>&#32;Color(1.0f,&#32;0.0f,&#32;0.0f),&#32;<emphasis role="keyword">new</emphasis>&#32;Color(1.0f,&#32;1.0f,&#32;0.0f),&#32;<emphasis role="keyword">new</emphasis>&#32;Color(1.0f,&#32;0.5f,&#32;0.0f)&#32;};
+00027 
+00028 &#32;&#32;&#32;&#32;[SerializeField]
+00029 &#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;<link linkend="_namespace_leap_1_1_unity_1a4d15adcf20ba121b2cd9c07f503b606f">Chirality</link>&#32;handedness;
+00030 
+00031 &#32;&#32;&#32;&#32;[SerializeField]
+00032 &#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;<emphasis role="keywordtype">bool</emphasis>&#32;_showArm&#32;=&#32;<emphasis role="keyword">true</emphasis>;
+00033 
+00034 &#32;&#32;&#32;&#32;[SerializeField]
+00035 &#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;<emphasis role="keywordtype">bool</emphasis>&#32;_castShadows&#32;=&#32;<emphasis role="keyword">true</emphasis>;
+00036 
+00037 &#32;&#32;&#32;&#32;[SerializeField]
+00038 &#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;Material&#32;_material;
+00039 
+00040 &#32;&#32;&#32;&#32;[SerializeField]
+00041 &#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;Mesh&#32;_sphereMesh;
+00042 
+00043 &#32;&#32;&#32;&#32;[<link linkend="_class_leap_1_1_unity_1_1_attributes_1_1_min_value">MinValue</link>(3)]
+00044 &#32;&#32;&#32;&#32;[SerializeField]
+00045 &#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;<emphasis role="keywordtype">int</emphasis>&#32;_cylinderResolution&#32;=&#32;12;
+00046 
+00047 &#32;&#32;&#32;&#32;[<link linkend="_class_leap_1_1_unity_1_1_attributes_1_1_min_value">MinValue</link>(0)]
+00048 &#32;&#32;&#32;&#32;[SerializeField]
+00049 &#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;<emphasis role="keywordtype">float</emphasis>&#32;_jointRadius&#32;=&#32;0.008f;
+00050 
+00051 &#32;&#32;&#32;&#32;[<link linkend="_class_leap_1_1_unity_1_1_attributes_1_1_min_value">MinValue</link>(0)]
+00052 &#32;&#32;&#32;&#32;[SerializeField]
+00053 &#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;<emphasis role="keywordtype">float</emphasis>&#32;_cylinderRadius&#32;=&#32;0.006f;
+00054 
+00055 &#32;&#32;&#32;&#32;[<link linkend="_class_leap_1_1_unity_1_1_attributes_1_1_min_value">MinValue</link>(0)]
+00056 &#32;&#32;&#32;&#32;[SerializeField]
+00057 &#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;<emphasis role="keywordtype">float</emphasis>&#32;_palmRadius&#32;=&#32;0.015f;
+00058 
+00059 &#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;Material&#32;_sphereMat;
+00060 &#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;<link linkend="_class_leap_1_1_hand">Hand</link>&#32;_hand;
+00061 &#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;Vector3[]&#32;_spherePositions;
+00062 
+<anchor xml:id="__capsule_hand_8cs_source_1l00063"/><link linkend="_class_leap_1_1_unity_1_1_capsule_hand_1ab52300f3cc5876781c6a481eb67a71ba">00063</link> &#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keyword">override</emphasis>&#32;<link linkend="_namespace_leap_1_1_unity_1a186e5eb0a2b743f1f6b79346f0ab8ad0">ModelType</link>&#32;<link linkend="_class_leap_1_1_unity_1_1_capsule_hand_1ab52300f3cc5876781c6a481eb67a71ba">HandModelType</link>&#32;{
+00064 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">get</emphasis>&#32;{
+00065 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;<link linkend="_namespace_leap_1_1_unity_1a186e5eb0a2b743f1f6b79346f0ab8ad0">ModelType</link>.Graphics;
+00066 &#32;&#32;&#32;&#32;&#32;&#32;}
+00067 &#32;&#32;&#32;&#32;}
+00068 
+<anchor xml:id="__capsule_hand_8cs_source_1l00069"/><link linkend="_class_leap_1_1_unity_1_1_capsule_hand_1a26d25d13c4d57f4425be3d7e771e1c93">00069</link> &#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keyword">override</emphasis>&#32;<link linkend="_namespace_leap_1_1_unity_1a4d15adcf20ba121b2cd9c07f503b606f">Chirality</link>&#32;<link linkend="_class_leap_1_1_unity_1_1_capsule_hand_1a26d25d13c4d57f4425be3d7e771e1c93">Handedness</link>&#32;{
+00070 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">get</emphasis>&#32;{
+00071 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;handedness;
+00072 &#32;&#32;&#32;&#32;&#32;&#32;}
+00073 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">set</emphasis>&#32;{&#32;}
+00074 &#32;&#32;&#32;&#32;}
+00075 
+<anchor xml:id="__capsule_hand_8cs_source_1l00076"/><link linkend="_class_leap_1_1_unity_1_1_capsule_hand_1ae914f49384f678f6613cd95f71eae24f">00076</link> &#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keyword">override</emphasis>&#32;<emphasis role="keywordtype">bool</emphasis>&#32;<link linkend="_class_leap_1_1_unity_1_1_capsule_hand_1ae914f49384f678f6613cd95f71eae24f">SupportsEditorPersistence</link>()&#32;{
+00077 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;<emphasis role="keyword">true</emphasis>;
+00078 &#32;&#32;&#32;&#32;}
+00079 
+<anchor xml:id="__capsule_hand_8cs_source_1l00080"/><link linkend="_class_leap_1_1_unity_1_1_capsule_hand_1a6e1d6a507332ba5577a1e2b17332039b">00080</link> &#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keyword">override</emphasis>&#32;<link linkend="_class_leap_1_1_hand">Hand</link>&#32;<link linkend="_class_leap_1_1_unity_1_1_capsule_hand_1a6e1d6a507332ba5577a1e2b17332039b">GetLeapHand</link>()&#32;{
+00081 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;_hand;
+00082 &#32;&#32;&#32;&#32;}
+00083 
+<anchor xml:id="__capsule_hand_8cs_source_1l00084"/><link linkend="_class_leap_1_1_unity_1_1_capsule_hand_1a36435c4a198b8fcf38560846141c15a5">00084</link> &#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keyword">override</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;<link linkend="_class_leap_1_1_unity_1_1_capsule_hand_1a36435c4a198b8fcf38560846141c15a5">SetLeapHand</link>(<link linkend="_class_leap_1_1_hand">Hand</link>&#32;hand)&#32;{
+00085 &#32;&#32;&#32;&#32;&#32;&#32;_hand&#32;=&#32;hand;
+00086 &#32;&#32;&#32;&#32;}
+00087 
+<anchor xml:id="__capsule_hand_8cs_source_1l00088"/><link linkend="_class_leap_1_1_unity_1_1_capsule_hand_1a1dc96b8ca5deda73cac12d70b46bc9c5">00088</link> &#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keyword">override</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;<link linkend="_class_leap_1_1_unity_1_1_capsule_hand_1a1dc96b8ca5deda73cac12d70b46bc9c5">InitHand</link>()&#32;{
+00089 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(_material&#32;!=&#32;<emphasis role="keyword">null</emphasis>)&#32;{
+00090 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;_sphereMat&#32;=&#32;<emphasis role="keyword">new</emphasis>&#32;Material(_material);
+00091 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;_sphereMat.hideFlags&#32;=&#32;HideFlags.DontSaveInEditor;
+00092 &#32;&#32;&#32;&#32;&#32;&#32;}
+00093 &#32;&#32;&#32;&#32;}
+00094 
+00095 &#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;OnValidate()&#32;{
+00096 &#32;&#32;&#32;&#32;&#32;&#32;_meshMap.Clear();
+00097 &#32;&#32;&#32;&#32;}
+00098 
+<anchor xml:id="__capsule_hand_8cs_source_1l00099"/><link linkend="_class_leap_1_1_unity_1_1_capsule_hand_1a7d7dc1487d108b421878276cc3747c52">00099</link> &#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keyword">override</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;<link linkend="_class_leap_1_1_unity_1_1_capsule_hand_1a7d7dc1487d108b421878276cc3747c52">BeginHand</link>()&#32;{
+00100 &#32;&#32;&#32;&#32;&#32;&#32;base.BeginHand();
+00101 
+00102 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(_hand.<link linkend="_class_leap_1_1_hand_1a783d6adaec7c3f3422e70bba4480b39d">IsLeft</link>)&#32;{
+00103 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;_sphereMat.color&#32;=&#32;_leftColorList[_leftColorIndex];
+00104 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;_leftColorIndex&#32;=&#32;(_leftColorIndex&#32;+&#32;1)&#32;%&#32;_leftColorList.Length;
+00105 &#32;&#32;&#32;&#32;&#32;&#32;}&#32;<emphasis role="keywordflow">else</emphasis>&#32;{
+00106 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;_sphereMat.color&#32;=&#32;_rightColorList[_rightColorIndex];
+00107 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;_rightColorIndex&#32;=&#32;(_rightColorIndex&#32;+&#32;1)&#32;%&#32;_rightColorList.Length;
+00108 &#32;&#32;&#32;&#32;&#32;&#32;}
+00109 &#32;&#32;&#32;&#32;}
+00110 
+<anchor xml:id="__capsule_hand_8cs_source_1l00111"/><link linkend="_class_leap_1_1_unity_1_1_capsule_hand_1a4a90f86a17e589ea462e29d99a2a51f9">00111</link> &#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keyword">override</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;<link linkend="_class_leap_1_1_unity_1_1_capsule_hand_1a4a90f86a17e589ea462e29d99a2a51f9">UpdateHand</link>()&#32;{
+00112 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(_spherePositions&#32;==&#32;<emphasis role="keyword">null</emphasis>&#32;||&#32;_spherePositions.Length&#32;!=&#32;TOTAL_JOINT_COUNT)&#32;{
+00113 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;_spherePositions&#32;=&#32;<emphasis role="keyword">new</emphasis>&#32;Vector3[TOTAL_JOINT_COUNT];
+00114 &#32;&#32;&#32;&#32;&#32;&#32;}
+00115 
+00116 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(_sphereMat&#32;==&#32;<emphasis role="keyword">null</emphasis>)&#32;{
+00117 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;_sphereMat&#32;=&#32;<emphasis role="keyword">new</emphasis>&#32;Material(_material);
+00118 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;_sphereMat.hideFlags&#32;=&#32;HideFlags.DontSaveInEditor;
+00119 &#32;&#32;&#32;&#32;&#32;&#32;}
+00120 
+00121 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//Update&#32;all&#32;joint&#32;spheres&#32;in&#32;the&#32;fingers</emphasis>
+00122 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">foreach</emphasis>&#32;(var&#32;finger&#32;<emphasis role="keywordflow">in</emphasis>&#32;_hand.<link linkend="_class_leap_1_1_hand_1ac9f68349507bfa13e3ac24738382bea6">Fingers</link>)&#32;{
+00123 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">for</emphasis>&#32;(<emphasis role="keywordtype">int</emphasis>&#32;j&#32;=&#32;0;&#32;j&#32;&lt;&#32;4;&#32;j++)&#32;{
+00124 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordtype">int</emphasis>&#32;key&#32;=&#32;getFingerJointIndex((<emphasis role="keywordtype">int</emphasis>)finger.Type,&#32;j);
+00125 
+00126 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;Vector3&#32;position&#32;=&#32;finger.Bone((<link linkend="_class_leap_1_1_bone">Bone</link>.<link linkend="_class_leap_1_1_bone_1a21054e31cefa7b75f25a026006fdbb1b">BoneType</link>)j).NextJoint.ToVector3();
+00127 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;_spherePositions[key]&#32;=&#32;position;
+00128 
+00129 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;drawSphere(position);
+00130 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00131 &#32;&#32;&#32;&#32;&#32;&#32;}
+00132 
+00133 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//Now&#32;we&#32;just&#32;have&#32;a&#32;few&#32;more&#32;spheres&#32;for&#32;the&#32;hands</emphasis>
+00134 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//PalmPos,&#32;WristPos,&#32;and&#32;mockThumbJointPos,&#32;which&#32;is&#32;derived&#32;and&#32;not&#32;taken&#32;from&#32;the&#32;frame&#32;obj</emphasis>
+00135 
+00136 &#32;&#32;&#32;&#32;&#32;&#32;Vector3&#32;palmPosition&#32;=&#32;_hand.<link linkend="_class_leap_1_1_hand_1aaf0940b9108e92c22e33b9c6cd32921a">PalmPosition</link>.ToVector3();
+00137 &#32;&#32;&#32;&#32;&#32;&#32;drawSphere(palmPosition,&#32;_palmRadius);
+00138 
+00139 &#32;&#32;&#32;&#32;&#32;&#32;Vector3&#32;thumbBaseToPalm&#32;=&#32;_spherePositions[THUMB_BASE_INDEX]&#32;-&#32;_hand.<link linkend="_class_leap_1_1_hand_1aaf0940b9108e92c22e33b9c6cd32921a">PalmPosition</link>.ToVector3();
+00140 &#32;&#32;&#32;&#32;&#32;&#32;Vector3&#32;mockThumbJointPos&#32;=&#32;_hand.<link linkend="_class_leap_1_1_hand_1aaf0940b9108e92c22e33b9c6cd32921a">PalmPosition</link>.ToVector3()&#32;+&#32;Vector3.Reflect(thumbBaseToPalm,&#32;_hand.<link linkend="_class_leap_1_1_hand_1a31cd466c474963af5727269c7c9d6b5a">Basis</link>.<link linkend="_struct_leap_1_1_leap_transform_1a8a67b81b7344f05e136048e2159ab663">xBasis</link>.ToVector3());
+00141 &#32;&#32;&#32;&#32;&#32;&#32;drawSphere(mockThumbJointPos);
+00142 
+00143 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//If&#32;we&#32;want&#32;to&#32;show&#32;the&#32;arm,&#32;do&#32;the&#32;calculations&#32;and&#32;display&#32;the&#32;meshes</emphasis>
+00144 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(_showArm)&#32;{
+00145 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;var&#32;arm&#32;=&#32;_hand.<link linkend="_class_leap_1_1_hand_1a929a9aae640b9e8de5b544d7faacd04a">Arm</link>;
+00146 
+00147 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;Vector3&#32;right&#32;=&#32;arm.<link linkend="_class_leap_1_1_bone_1a3918f3a7fe8406e54c4715aed7504ab9">Basis</link>.<link linkend="_struct_leap_1_1_leap_transform_1a8a67b81b7344f05e136048e2159ab663">xBasis</link>.ToVector3()&#32;*&#32;arm.Width&#32;*&#32;0.7f&#32;*&#32;0.5f;
+00148 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;Vector3&#32;wrist&#32;=&#32;arm.WristPosition.ToVector3();
+00149 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;Vector3&#32;elbow&#32;=&#32;arm.ElbowPosition.ToVector3();
+00150 
+00151 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordtype">float</emphasis>&#32;armLength&#32;=&#32;Vector3.Distance(wrist,&#32;elbow);
+00152 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;wrist&#32;-=&#32;arm.Direction.ToVector3()&#32;*&#32;armLength&#32;*&#32;0.05f;
+00153 
+00154 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;Vector3&#32;armFrontRight&#32;=&#32;wrist&#32;+&#32;right;
+00155 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;Vector3&#32;armFrontLeft&#32;=&#32;wrist&#32;-&#32;right;
+00156 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;Vector3&#32;armBackRight&#32;=&#32;elbow&#32;+&#32;right;
+00157 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;Vector3&#32;armBackLeft&#32;=&#32;elbow&#32;-&#32;right;
+00158 
+00159 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;drawSphere(armFrontRight);
+00160 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;drawSphere(armFrontLeft);
+00161 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;drawSphere(armBackLeft);
+00162 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;drawSphere(armBackRight);
+00163 
+00164 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;drawCylinder(armFrontLeft,&#32;armFrontRight);
+00165 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;drawCylinder(armBackLeft,&#32;armBackRight);
+00166 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;drawCylinder(armFrontLeft,&#32;armBackLeft);
+00167 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;drawCylinder(armFrontRight,&#32;armBackRight);
+00168 &#32;&#32;&#32;&#32;&#32;&#32;}
+00169 
+00170 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//Draw&#32;cylinders&#32;between&#32;finger&#32;joints</emphasis>
+00171 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">for</emphasis>&#32;(<emphasis role="keywordtype">int</emphasis>&#32;i&#32;=&#32;0;&#32;i&#32;&lt;&#32;5;&#32;i++)&#32;{
+00172 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">for</emphasis>&#32;(<emphasis role="keywordtype">int</emphasis>&#32;j&#32;=&#32;0;&#32;j&#32;&lt;&#32;3;&#32;j++)&#32;{
+00173 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordtype">int</emphasis>&#32;keyA&#32;=&#32;getFingerJointIndex(i,&#32;j);
+00174 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordtype">int</emphasis>&#32;keyB&#32;=&#32;getFingerJointIndex(i,&#32;j&#32;+&#32;1);
+00175 
+00176 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;Vector3&#32;posA&#32;=&#32;_spherePositions[keyA];
+00177 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;Vector3&#32;posB&#32;=&#32;_spherePositions[keyB];
+00178 
+00179 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;drawCylinder(posA,&#32;posB);
+00180 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00181 &#32;&#32;&#32;&#32;&#32;&#32;}
+00182 
+00183 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//Draw&#32;cylinders&#32;between&#32;finger&#32;knuckles</emphasis>
+00184 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">for</emphasis>&#32;(<emphasis role="keywordtype">int</emphasis>&#32;i&#32;=&#32;0;&#32;i&#32;&lt;&#32;4;&#32;i++)&#32;{
+00185 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordtype">int</emphasis>&#32;keyA&#32;=&#32;getFingerJointIndex(i,&#32;0);
+00186 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordtype">int</emphasis>&#32;keyB&#32;=&#32;getFingerJointIndex(i&#32;+&#32;1,&#32;0);
+00187 
+00188 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;Vector3&#32;posA&#32;=&#32;_spherePositions[keyA];
+00189 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;Vector3&#32;posB&#32;=&#32;_spherePositions[keyB];
+00190 
+00191 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;drawCylinder(posA,&#32;posB);
+00192 &#32;&#32;&#32;&#32;&#32;&#32;}
+00193 
+00194 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//Draw&#32;the&#32;rest&#32;of&#32;the&#32;hand</emphasis>
+00195 &#32;&#32;&#32;&#32;&#32;&#32;drawCylinder(mockThumbJointPos,&#32;THUMB_BASE_INDEX);
+00196 &#32;&#32;&#32;&#32;&#32;&#32;drawCylinder(mockThumbJointPos,&#32;PINKY_BASE_INDEX);
+00197 &#32;&#32;&#32;&#32;}
+00198 
+00199 &#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;drawSphere(Vector3&#32;position)&#32;{
+00200 &#32;&#32;&#32;&#32;&#32;&#32;drawSphere(position,&#32;_jointRadius);
+00201 &#32;&#32;&#32;&#32;}
+00202 
+00203 &#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;drawSphere(Vector3&#32;position,&#32;<emphasis role="keywordtype">float</emphasis>&#32;radius)&#32;{
+00204 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//multiply&#32;radius&#32;by&#32;2&#32;because&#32;the&#32;default&#32;unity&#32;sphere&#32;has&#32;a&#32;radius&#32;of&#32;0.5&#32;meters&#32;at&#32;scale&#32;1.</emphasis>
+00205 &#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_namespace_leap_1_1_unity_1a186e5eb0a2b743f1f6b79346f0ab8ad0ad334dfcea59127bedfcdbe0a3ee7f494">Graphics</link>.DrawMesh(_sphereMesh,&#32;
+00206 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;Matrix4x4.TRS(position,&#32;
+00207 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;Quaternion.identity,&#32;
+00208 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;Vector3.one&#32;*&#32;radius&#32;*&#32;2.0f&#32;*&#32;transform.lossyScale.x),&#32;
+00209 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;_sphereMat,&#32;0,&#32;
+00210 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">null</emphasis>,&#32;0,&#32;<emphasis role="keyword">null</emphasis>,&#32;_castShadows);
+00211 &#32;&#32;&#32;&#32;}
+00212 
+00213 &#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;drawCylinder(Vector3&#32;a,&#32;Vector3&#32;b)&#32;{
+00214 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordtype">float</emphasis>&#32;length&#32;=&#32;(a&#32;-&#32;b).magnitude;
+00215 
+00216 &#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_namespace_leap_1_1_unity_1a186e5eb0a2b743f1f6b79346f0ab8ad0ad334dfcea59127bedfcdbe0a3ee7f494">Graphics</link>.DrawMesh(getCylinderMesh(length),
+00217 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;Matrix4x4.TRS(a,&#32;
+00218 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;Quaternion.LookRotation(b&#32;-&#32;a),&#32;
+00219 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">new</emphasis>&#32;Vector3(transform.lossyScale.x,&#32;transform.lossyScale.x,&#32;1)),
+00220 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;_material,
+00221 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;gameObject.layer,&#32;
+00222 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">null</emphasis>,&#32;0,&#32;<emphasis role="keyword">null</emphasis>,&#32;_castShadows);
+00223 &#32;&#32;&#32;&#32;}
+00224 
+00225 &#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;drawCylinder(<emphasis role="keywordtype">int</emphasis>&#32;a,&#32;<emphasis role="keywordtype">int</emphasis>&#32;b)&#32;{
+00226 &#32;&#32;&#32;&#32;&#32;&#32;drawCylinder(_spherePositions[a],&#32;_spherePositions[b]);
+00227 &#32;&#32;&#32;&#32;}
+00228 
+00229 &#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;drawCylinder(Vector3&#32;a,&#32;<emphasis role="keywordtype">int</emphasis>&#32;b)&#32;{
+00230 &#32;&#32;&#32;&#32;&#32;&#32;drawCylinder(a,&#32;_spherePositions[b]);
+00231 &#32;&#32;&#32;&#32;}
+00232 
+00233 &#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;<emphasis role="keywordtype">int</emphasis>&#32;getFingerJointIndex(<emphasis role="keywordtype">int</emphasis>&#32;fingerIndex,&#32;<emphasis role="keywordtype">int</emphasis>&#32;jointIndex)&#32;{
+00234 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;fingerIndex&#32;*&#32;4&#32;+&#32;jointIndex;
+00235 &#32;&#32;&#32;&#32;}
+00236 
+00237 &#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;Dictionary&lt;int,&#32;Mesh&gt;&#32;_meshMap&#32;=&#32;<emphasis role="keyword">new</emphasis>&#32;Dictionary&lt;int,&#32;Mesh&gt;();
+00238 &#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;Mesh&#32;getCylinderMesh(<emphasis role="keywordtype">float</emphasis>&#32;length)&#32;{
+00239 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordtype">int</emphasis>&#32;lengthKey&#32;=&#32;Mathf.RoundToInt(length&#32;*&#32;100&#32;/&#32;CYLINDER_MESH_RESOLUTION);
+00240 
+00241 &#32;&#32;&#32;&#32;&#32;&#32;Mesh&#32;mesh;
+00242 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(_meshMap.TryGetValue(lengthKey,&#32;out&#32;mesh))&#32;{
+00243 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;mesh;
+00244 &#32;&#32;&#32;&#32;&#32;&#32;}
+00245 
+00246 &#32;&#32;&#32;&#32;&#32;&#32;mesh&#32;=&#32;<emphasis role="keyword">new</emphasis>&#32;Mesh();
+00247 &#32;&#32;&#32;&#32;&#32;&#32;mesh.name&#32;=&#32;<emphasis role="stringliteral">&quot;GeneratedCylinder&quot;</emphasis>;
+00248 &#32;&#32;&#32;&#32;&#32;&#32;mesh.hideFlags&#32;=&#32;HideFlags.DontSave;
+00249 
+00250 &#32;&#32;&#32;&#32;&#32;&#32;List&lt;Vector3&gt;&#32;verts&#32;=&#32;<emphasis role="keyword">new</emphasis>&#32;List&lt;Vector3&gt;();
+00251 &#32;&#32;&#32;&#32;&#32;&#32;List&lt;Color&gt;&#32;colors&#32;=&#32;<emphasis role="keyword">new</emphasis>&#32;List&lt;Color&gt;();
+00252 &#32;&#32;&#32;&#32;&#32;&#32;List&lt;int&gt;&#32;tris&#32;=&#32;<emphasis role="keyword">new</emphasis>&#32;List&lt;int&gt;();
+00253 
+00254 &#32;&#32;&#32;&#32;&#32;&#32;Vector3&#32;p0&#32;=&#32;Vector3.zero;
+00255 &#32;&#32;&#32;&#32;&#32;&#32;Vector3&#32;p1&#32;=&#32;Vector3.forward&#32;*&#32;length;
+00256 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">for</emphasis>&#32;(<emphasis role="keywordtype">int</emphasis>&#32;i&#32;=&#32;0;&#32;i&#32;&lt;&#32;_cylinderResolution;&#32;i++)&#32;{
+00257 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordtype">float</emphasis>&#32;angle&#32;=&#32;(Mathf.PI&#32;*&#32;2.0f&#32;*&#32;i)&#32;/&#32;_cylinderResolution;
+00258 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordtype">float</emphasis>&#32;dx&#32;=&#32;_cylinderRadius&#32;*&#32;Mathf.Cos(angle);
+00259 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordtype">float</emphasis>&#32;dy&#32;=&#32;_cylinderRadius&#32;*&#32;Mathf.Sin(angle);
+00260 
+00261 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;Vector3&#32;spoke&#32;=&#32;<emphasis role="keyword">new</emphasis>&#32;Vector3(dx,&#32;dy,&#32;0);
+00262 
+00263 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;verts.Add(p0&#32;+&#32;spoke);
+00264 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;verts.Add(p1&#32;+&#32;spoke);
+00265 
+00266 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;colors.Add(Color.white);
+00267 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;colors.Add(Color.white);
+00268 
+00269 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordtype">int</emphasis>&#32;triStart&#32;=&#32;verts.Count;
+00270 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordtype">int</emphasis>&#32;triCap&#32;=&#32;_cylinderResolution&#32;*&#32;2;
+00271 
+00272 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;tris.Add((triStart&#32;+&#32;0)&#32;%&#32;triCap);
+00273 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;tris.Add((triStart&#32;+&#32;2)&#32;%&#32;triCap);
+00274 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;tris.Add((triStart&#32;+&#32;1)&#32;%&#32;triCap);
+00275 
+00276 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;tris.Add((triStart&#32;+&#32;2)&#32;%&#32;triCap);
+00277 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;tris.Add((triStart&#32;+&#32;3)&#32;%&#32;triCap);
+00278 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;tris.Add((triStart&#32;+&#32;1)&#32;%&#32;triCap);
+00279 &#32;&#32;&#32;&#32;&#32;&#32;}
+00280 
+00281 &#32;&#32;&#32;&#32;&#32;&#32;mesh.SetVertices(verts);
+00282 &#32;&#32;&#32;&#32;&#32;&#32;mesh.SetIndices(tris.ToArray(),&#32;MeshTopology.Triangles,&#32;0);
+00283 &#32;&#32;&#32;&#32;&#32;&#32;mesh.RecalculateBounds();
+00284 &#32;&#32;&#32;&#32;&#32;&#32;mesh.RecalculateNormals();
+00285 &#32;&#32;&#32;&#32;&#32;&#32;mesh.UploadMeshData(<emphasis role="keyword">true</emphasis>);
+00286 
+00287 &#32;&#32;&#32;&#32;&#32;&#32;_meshMap[lengthKey]&#32;=&#32;mesh;
+00288 
+00289 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;mesh;
+00290 &#32;&#32;&#32;&#32;}
+00291 &#32;&#32;}
+00292 }
+</programlisting></section>

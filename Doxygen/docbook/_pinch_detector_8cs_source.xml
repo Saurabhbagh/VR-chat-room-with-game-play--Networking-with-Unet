@@ -1,0 +1,136 @@
+<?xml version='1.0' encoding='UTF-8' standalone='no'?>
+<section xmlns="http://docbook.org/ns/docbook" version="5.0" xmlns:xlink="http://www.w3.org/1999/xlink" xml:id="__pinch_detector_8cs_source">
+<title>PinchDetector.cs</title>
+<indexterm><primary>O:/GitHUBMINIPRoject/Assets/LeapMotion/Core/Scripts/DetectionUtilities/PinchDetector.cs</primary></indexterm>
+<programlisting>00001 <emphasis role="comment">/******************************************************************************</emphasis>
+00002 <emphasis role="comment">&#32;*&#32;Copyright&#32;(C)&#32;Leap&#32;Motion,&#32;Inc.&#32;2011-2018.&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;*</emphasis>
+00003 <emphasis role="comment">&#32;*&#32;Leap&#32;Motion&#32;proprietary&#32;and&#32;confidential.&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;*</emphasis>
+00004 <emphasis role="comment">&#32;*&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;*</emphasis>
+00005 <emphasis role="comment">&#32;*&#32;Use&#32;subject&#32;to&#32;the&#32;terms&#32;of&#32;the&#32;Leap&#32;Motion&#32;SDK&#32;Agreement&#32;available&#32;at&#32;&#32;&#32;&#32;&#32;*</emphasis>
+00006 <emphasis role="comment">&#32;*&#32;https://developer.leapmotion.com/sdk_agreement,&#32;or&#32;another&#32;agreement&#32;&#32;&#32;&#32;&#32;&#32;&#32;*</emphasis>
+00007 <emphasis role="comment">&#32;*&#32;between&#32;Leap&#32;Motion&#32;and&#32;you,&#32;your&#32;company&#32;or&#32;other&#32;organization.&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;*</emphasis>
+00008 <emphasis role="comment">&#32;******************************************************************************/</emphasis>
+00009 
+00010 <emphasis role="keyword">using</emphasis>&#32;<link linkend="__balloon_8cs_1a7d67e097df9376eb709b6a23aa3c7d23">UnityEngine</link>;
+00011 <emphasis role="keyword">using</emphasis>&#32;<link linkend="_namespace_leap">Leap</link>.<link linkend="_namespace_leap_1_1_unity">Unity</link>.<link linkend="_namespace_leap_1_1_unity_1_1_attributes">Attributes</link>;
+00012 <emphasis role="keyword">using</emphasis>&#32;<link linkend="_namespace_unity_engine">UnityEngine</link>.Serialization;
+00013 
+00014 <emphasis role="keyword">namespace&#32;</emphasis><link linkend="_namespace_leap_1_1_unity">Leap.Unity</link>&#32;{
+00015 
+<anchor xml:id="__pinch_detector_8cs_source_1l00020"/><link linkend="_class_leap_1_1_unity_1_1_pinch_detector">00020</link> &#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keyword">class&#32;</emphasis><link linkend="_class_leap_1_1_unity_1_1_pinch_detector">PinchDetector</link>&#32;:&#32;<link linkend="_class_leap_1_1_unity_1_1_abstract_hold_detector">AbstractHoldDetector</link>&#32;{
+<anchor xml:id="__pinch_detector_8cs_source_1l00021"/><link linkend="_class_leap_1_1_unity_1_1_pinch_detector_1a2df7a99e546ce93af87c8260c178081d">00021</link> &#32;&#32;&#32;&#32;<emphasis role="keyword">protected</emphasis>&#32;<emphasis role="keyword">const</emphasis>&#32;<emphasis role="keywordtype">float</emphasis>&#32;<link linkend="_class_leap_1_1_unity_1_1_pinch_detector_1a2df7a99e546ce93af87c8260c178081d">MM_TO_M</link>&#32;=&#32;0.001f;
+00022 
+00023 &#32;&#32;&#32;&#32;[Tooltip(<emphasis role="stringliteral">&quot;The&#32;distance&#32;at&#32;which&#32;to&#32;enter&#32;the&#32;pinching&#32;state.&quot;</emphasis>)]
+00024 &#32;&#32;&#32;&#32;[Header(<emphasis role="stringliteral">&quot;Distance&#32;Settings&quot;</emphasis>)]
+00025 &#32;&#32;&#32;&#32;[<link linkend="_class_leap_1_1_unity_1_1_attributes_1_1_min_value">MinValue</link>(0)]
+00026 &#32;&#32;&#32;&#32;[Units(<emphasis role="stringliteral">&quot;meters&quot;</emphasis>)]
+00027 &#32;&#32;&#32;&#32;[FormerlySerializedAs(<emphasis role="stringliteral">&quot;_activatePinchDist&quot;</emphasis>)]
+<anchor xml:id="__pinch_detector_8cs_source_1l00028"/><link linkend="_class_leap_1_1_unity_1_1_pinch_detector_1a375ceb2cb1fd8da24e4812bc45286264">00028</link> &#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keywordtype">float</emphasis>&#32;<link linkend="_class_leap_1_1_unity_1_1_pinch_detector_1a375ceb2cb1fd8da24e4812bc45286264">ActivateDistance</link>&#32;=&#32;.03f;&#32;<emphasis role="comment">//meters</emphasis>
+00029 &#32;&#32;&#32;&#32;[Tooltip(<emphasis role="stringliteral">&quot;The&#32;distance&#32;at&#32;which&#32;to&#32;leave&#32;the&#32;pinching&#32;state.&quot;</emphasis>)]
+00030 &#32;&#32;&#32;&#32;[<link linkend="_class_leap_1_1_unity_1_1_attributes_1_1_min_value">MinValue</link>(0)]
+00031 &#32;&#32;&#32;&#32;[Units(<emphasis role="stringliteral">&quot;meters&quot;</emphasis>)]
+00032 &#32;&#32;&#32;&#32;[FormerlySerializedAs(<emphasis role="stringliteral">&quot;_deactivatePinchDist&quot;</emphasis>)]
+<anchor xml:id="__pinch_detector_8cs_source_1l00033"/><link linkend="_class_leap_1_1_unity_1_1_pinch_detector_1ae5b59d436a188c81ca1a081ef64bf934">00033</link> &#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keywordtype">float</emphasis>&#32;<link linkend="_class_leap_1_1_unity_1_1_pinch_detector_1ae5b59d436a188c81ca1a081ef64bf934">DeactivateDistance</link>&#32;=&#32;.04f;&#32;<emphasis role="comment">//meters</emphasis>
+00034 
+<anchor xml:id="__pinch_detector_8cs_source_1l00035"/><link linkend="_class_leap_1_1_unity_1_1_pinch_detector_1a2e11562e55156374f77dea79fc53f07b">00035</link> &#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keywordtype">bool</emphasis>&#32;<link linkend="_class_leap_1_1_unity_1_1_pinch_detector_1a2e11562e55156374f77dea79fc53f07b">IsPinching</link>&#32;{&#32;<emphasis role="keyword">get</emphasis>&#32;{&#32;<emphasis role="keywordflow">return</emphasis>&#32;this.<link linkend="_class_leap_1_1_unity_1_1_abstract_hold_detector_1a90ae2a600e5d9183d4441035a2304846">IsHolding</link>;&#32;}&#32;}
+<anchor xml:id="__pinch_detector_8cs_source_1l00036"/><link linkend="_class_leap_1_1_unity_1_1_pinch_detector_1a39e19b50293ea310376018003c49d18e">00036</link> &#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keywordtype">bool</emphasis>&#32;<link linkend="_class_leap_1_1_unity_1_1_pinch_detector_1a39e19b50293ea310376018003c49d18e">DidStartPinch</link>&#32;{&#32;<emphasis role="keyword">get</emphasis>&#32;{&#32;<emphasis role="keywordflow">return</emphasis>&#32;this.<link linkend="_class_leap_1_1_unity_1_1_abstract_hold_detector_1abfd4857ecfa5343c3567ac14323f405c">DidStartHold</link>;&#32;}&#32;}
+<anchor xml:id="__pinch_detector_8cs_source_1l00037"/><link linkend="_class_leap_1_1_unity_1_1_pinch_detector_1a72688f6f521cf7614318f10ba2e52cd0">00037</link> &#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keywordtype">bool</emphasis>&#32;<link linkend="_class_leap_1_1_unity_1_1_pinch_detector_1a72688f6f521cf7614318f10ba2e52cd0">DidEndPinch</link>&#32;{&#32;<emphasis role="keyword">get</emphasis>&#32;{&#32;<emphasis role="keywordflow">return</emphasis>&#32;this.<link linkend="_class_leap_1_1_unity_1_1_abstract_hold_detector_1af7297ca8cb27686b12bef6632865a462">DidRelease</link>;&#32;}&#32;}
+00038 
+<anchor xml:id="__pinch_detector_8cs_source_1l00039"/><link linkend="_class_leap_1_1_unity_1_1_pinch_detector_1aca898b59c0f8efe5adf4dd45d01c9550">00039</link> &#32;&#32;&#32;&#32;<emphasis role="keyword">protected</emphasis>&#32;<emphasis role="keywordtype">bool</emphasis>&#32;<link linkend="_class_leap_1_1_unity_1_1_pinch_detector_1aca898b59c0f8efe5adf4dd45d01c9550">_isPinching</link>&#32;=&#32;<emphasis role="keyword">false</emphasis>;
+00040 
+<anchor xml:id="__pinch_detector_8cs_source_1l00041"/><link linkend="_class_leap_1_1_unity_1_1_pinch_detector_1aabb39619a5e4b5206ad9ef6ac6586b5f">00041</link> &#32;&#32;&#32;&#32;<emphasis role="keyword">protected</emphasis>&#32;<emphasis role="keywordtype">float</emphasis>&#32;<link linkend="_class_leap_1_1_unity_1_1_pinch_detector_1aabb39619a5e4b5206ad9ef6ac6586b5f">_lastPinchTime</link>&#32;=&#32;0.0f;
+<anchor xml:id="__pinch_detector_8cs_source_1l00042"/><link linkend="_class_leap_1_1_unity_1_1_pinch_detector_1aa3084c08805ef8a4e189ed5fa0e4d6fa">00042</link> &#32;&#32;&#32;&#32;<emphasis role="keyword">protected</emphasis>&#32;<emphasis role="keywordtype">float</emphasis>&#32;<link linkend="_class_leap_1_1_unity_1_1_pinch_detector_1aa3084c08805ef8a4e189ed5fa0e4d6fa">_lastUnpinchTime</link>&#32;=&#32;0.0f;
+00043 
+<anchor xml:id="__pinch_detector_8cs_source_1l00044"/><link linkend="_class_leap_1_1_unity_1_1_pinch_detector_1a819edd44c25cd99aa48276df6bca0609">00044</link> &#32;&#32;&#32;&#32;<emphasis role="keyword">protected</emphasis>&#32;Vector3&#32;<link linkend="_class_leap_1_1_unity_1_1_pinch_detector_1a819edd44c25cd99aa48276df6bca0609">_pinchPos</link>;
+<anchor xml:id="__pinch_detector_8cs_source_1l00045"/><link linkend="_class_leap_1_1_unity_1_1_pinch_detector_1a74bf54422503b751787d166ca278dab8">00045</link> &#32;&#32;&#32;&#32;<emphasis role="keyword">protected</emphasis>&#32;Quaternion&#32;<link linkend="_class_leap_1_1_unity_1_1_pinch_detector_1a74bf54422503b751787d166ca278dab8">_pinchRotation</link>;
+00046 
+<anchor xml:id="__pinch_detector_8cs_source_1l00047"/><link linkend="_class_leap_1_1_unity_1_1_pinch_detector_1a6631f57f4ca5742946d509f71e8b3c1c">00047</link> &#32;&#32;&#32;&#32;<emphasis role="keyword">protected</emphasis>&#32;<emphasis role="keyword">virtual</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;<link linkend="_class_leap_1_1_unity_1_1_pinch_detector_1a6631f57f4ca5742946d509f71e8b3c1c">OnValidate</link>()&#32;{
+00048 &#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_leap_1_1_unity_1_1_pinch_detector_1a375ceb2cb1fd8da24e4812bc45286264">ActivateDistance</link>&#32;=&#32;Mathf.Max(0,&#32;<link linkend="_class_leap_1_1_unity_1_1_pinch_detector_1a375ceb2cb1fd8da24e4812bc45286264">ActivateDistance</link>);
+00049 &#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_leap_1_1_unity_1_1_pinch_detector_1ae5b59d436a188c81ca1a081ef64bf934">DeactivateDistance</link>&#32;=&#32;Mathf.Max(0,&#32;<link linkend="_class_leap_1_1_unity_1_1_pinch_detector_1ae5b59d436a188c81ca1a081ef64bf934">DeactivateDistance</link>);
+00050 
+00051 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//Activate&#32;value&#32;cannot&#32;be&#32;less&#32;than&#32;deactivate&#32;value</emphasis>
+00052 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(<link linkend="_class_leap_1_1_unity_1_1_pinch_detector_1ae5b59d436a188c81ca1a081ef64bf934">DeactivateDistance</link>&#32;&lt;&#32;<link linkend="_class_leap_1_1_unity_1_1_pinch_detector_1a375ceb2cb1fd8da24e4812bc45286264">ActivateDistance</link>)&#32;{
+00053 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_leap_1_1_unity_1_1_pinch_detector_1ae5b59d436a188c81ca1a081ef64bf934">DeactivateDistance</link>&#32;=&#32;<link linkend="_class_leap_1_1_unity_1_1_pinch_detector_1a375ceb2cb1fd8da24e4812bc45286264">ActivateDistance</link>;
+00054 &#32;&#32;&#32;&#32;&#32;&#32;}
+00055 &#32;&#32;&#32;&#32;}
+00056 
+00057 &#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;<emphasis role="keywordtype">float</emphasis>&#32;GetPinchDistance(<link linkend="_class_leap_1_1_hand">Hand</link>&#32;hand)&#32;{
+00058 &#32;&#32;&#32;&#32;&#32;&#32;var&#32;indexTipPosition&#32;=&#32;hand.GetIndex().TipPosition.ToVector3();
+00059 &#32;&#32;&#32;&#32;&#32;&#32;var&#32;thumbTipPosition&#32;=&#32;hand.GetThumb().TipPosition.ToVector3();
+00060 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;Vector3.Distance(indexTipPosition,&#32;thumbTipPosition);
+00061 &#32;&#32;&#32;&#32;}
+00062 
+<anchor xml:id="__pinch_detector_8cs_source_1l00063"/><link linkend="_class_leap_1_1_unity_1_1_pinch_detector_1aeab820b0fd278c0b8c654e5fe172be79">00063</link> &#32;&#32;&#32;&#32;<emphasis role="keyword">protected</emphasis>&#32;<emphasis role="keyword">override</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;<link linkend="_class_leap_1_1_unity_1_1_pinch_detector_1aeab820b0fd278c0b8c654e5fe172be79">ensureUpToDate</link>()&#32;{
+00064 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(Time.frameCount&#32;==&#32;<link linkend="_class_leap_1_1_unity_1_1_abstract_hold_detector_1afe86c77b28a595f8bb36771c343493e9">_lastUpdateFrame</link>)&#32;{
+00065 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>;
+00066 &#32;&#32;&#32;&#32;&#32;&#32;}
+00067 &#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_leap_1_1_unity_1_1_abstract_hold_detector_1afe86c77b28a595f8bb36771c343493e9">_lastUpdateFrame</link>&#32;=&#32;Time.frameCount;
+00068 
+00069 &#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_leap_1_1_unity_1_1_abstract_hold_detector_1a046fe98d2014ccf437712773a4e02636">_didChange</link>&#32;=&#32;<emphasis role="keyword">false</emphasis>;
+00070 
+00071 &#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_leap_1_1_hand">Hand</link>&#32;hand&#32;=&#32;<link linkend="_class_leap_1_1_unity_1_1_abstract_hold_detector_1a53c79dbe961489aea5aaedcf13d8e14d">_handModel</link>.<link linkend="_class_leap_1_1_unity_1_1_hand_model_base_1aa24ca02bf4a64ba33b0370ad6da8731f">GetLeapHand</link>();
+00072 
+00073 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(hand&#32;==&#32;<emphasis role="keyword">null</emphasis>&#32;||&#32;!<link linkend="_class_leap_1_1_unity_1_1_abstract_hold_detector_1a53c79dbe961489aea5aaedcf13d8e14d">_handModel</link>.<link linkend="_class_leap_1_1_unity_1_1_hand_model_base_1a31704b6829e3d442133350b34a4a5a8a">IsTracked</link>)&#32;{
+00074 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_leap_1_1_unity_1_1_abstract_hold_detector_1a6bca8f8ac18c3ca93c3d4a5b9584477c">changeState</link>(<emphasis role="keyword">false</emphasis>);
+00075 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>;
+00076 &#32;&#32;&#32;&#32;&#32;&#32;}
+00077 
+00078 &#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_leap_1_1_unity_1_1_abstract_hold_detector_1abbf8d6c63e6e1168285cfb71762d347e">_distance</link>&#32;=&#32;GetPinchDistance(hand);
+00079 &#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_leap_1_1_unity_1_1_abstract_hold_detector_1a63319309ae711fe6f0f05b3e12a50e2e">_rotation</link>&#32;=&#32;hand.<link linkend="_class_leap_1_1_hand_1a31cd466c474963af5727269c7c9d6b5a">Basis</link>.CalculateRotation();
+00080 &#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_leap_1_1_unity_1_1_abstract_hold_detector_1a05bc59028bf8ea6e9b53de9e9a5698f4">_position</link>&#32;=&#32;((hand.<link linkend="_class_leap_1_1_hand_1ac9f68349507bfa13e3ac24738382bea6">Fingers</link>[0].TipPosition&#32;+&#32;hand.<link linkend="_class_leap_1_1_hand_1ac9f68349507bfa13e3ac24738382bea6">Fingers</link>[1].TipPosition)&#32;*&#32;.5f).ToVector3();
+00081 
+00082 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(<link linkend="_class_leap_1_1_unity_1_1_detector_1a89e15d17ea95587d9edf49c42473264d">IsActive</link>)&#32;{
+00083 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(<link linkend="_class_leap_1_1_unity_1_1_abstract_hold_detector_1abbf8d6c63e6e1168285cfb71762d347e">_distance</link>&#32;&gt;&#32;<link linkend="_class_leap_1_1_unity_1_1_pinch_detector_1ae5b59d436a188c81ca1a081ef64bf934">DeactivateDistance</link>)&#32;{
+00084 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_leap_1_1_unity_1_1_abstract_hold_detector_1a6bca8f8ac18c3ca93c3d4a5b9584477c">changeState</link>(<emphasis role="keyword">false</emphasis>);
+00085 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//return;</emphasis>
+00086 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00087 &#32;&#32;&#32;&#32;&#32;&#32;}&#32;<emphasis role="keywordflow">else</emphasis>&#32;{
+00088 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(<link linkend="_class_leap_1_1_unity_1_1_abstract_hold_detector_1abbf8d6c63e6e1168285cfb71762d347e">_distance</link>&#32;&lt;&#32;<link linkend="_class_leap_1_1_unity_1_1_pinch_detector_1a375ceb2cb1fd8da24e4812bc45286264">ActivateDistance</link>)&#32;{
+00089 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_leap_1_1_unity_1_1_abstract_hold_detector_1a6bca8f8ac18c3ca93c3d4a5b9584477c">changeState</link>(<emphasis role="keyword">true</emphasis>);
+00090 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00091 &#32;&#32;&#32;&#32;&#32;&#32;}
+00092 
+00093 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(<link linkend="_class_leap_1_1_unity_1_1_detector_1a89e15d17ea95587d9edf49c42473264d">IsActive</link>)&#32;{
+00094 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_leap_1_1_unity_1_1_abstract_hold_detector_1a2d0c692638c620f3fd9dca0e733c45f9">_lastPosition</link>&#32;=&#32;<link linkend="_class_leap_1_1_unity_1_1_abstract_hold_detector_1a05bc59028bf8ea6e9b53de9e9a5698f4">_position</link>;
+00095 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_leap_1_1_unity_1_1_abstract_hold_detector_1a8380b54364fbf480c8b7407fe939ec8d">_lastRotation</link>&#32;=&#32;<link linkend="_class_leap_1_1_unity_1_1_abstract_hold_detector_1a63319309ae711fe6f0f05b3e12a50e2e">_rotation</link>;
+00096 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_leap_1_1_unity_1_1_abstract_hold_detector_1a8e359ab6c40ef82efd0f5bfbdcc75058">_lastDistance</link>&#32;=&#32;<link linkend="_class_leap_1_1_unity_1_1_abstract_hold_detector_1abbf8d6c63e6e1168285cfb71762d347e">_distance</link>;
+00097 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_leap_1_1_unity_1_1_abstract_hold_detector_1a26945549e62d01c7788a61eb7bdd0e84">_lastDirection</link>&#32;=&#32;<link linkend="_class_leap_1_1_unity_1_1_abstract_hold_detector_1a81f689a33b434a9295eaccf53cba45c6">_direction</link>;
+00098 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_leap_1_1_unity_1_1_abstract_hold_detector_1a2fbdc9c2ca453d997cb2ba21f2eb0333">_lastNormal</link>&#32;=&#32;<link linkend="_class_leap_1_1_unity_1_1_abstract_hold_detector_1a6e2b3843cb6fd5412b695cd3f3ec8208">_normal</link>;
+00099 &#32;&#32;&#32;&#32;&#32;&#32;}
+00100 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(<link linkend="_class_leap_1_1_unity_1_1_abstract_hold_detector_1a2171bcb98c503c7f24fa3508895a99cc">ControlsTransform</link>)&#32;{
+00101 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;transform.position&#32;=&#32;<link linkend="_class_leap_1_1_unity_1_1_abstract_hold_detector_1a05bc59028bf8ea6e9b53de9e9a5698f4">_position</link>;
+00102 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;transform.rotation&#32;=&#32;<link linkend="_class_leap_1_1_unity_1_1_abstract_hold_detector_1a63319309ae711fe6f0f05b3e12a50e2e">_rotation</link>;
+00103 &#32;&#32;&#32;&#32;&#32;&#32;}
+00104 &#32;&#32;&#32;&#32;}
+00105 
+00106 <emphasis role="preprocessor">#if&#32;UNITY_EDITOR</emphasis>
+00107 &#32;&#32;&#32;&#32;<emphasis role="keyword">protected</emphasis>&#32;<emphasis role="keyword">override</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;OnDrawGizmos&#32;()&#32;{
+00108 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(<link linkend="_class_leap_1_1_unity_1_1_abstract_hold_detector_1a7dfb2c84323d68f8ab583deaec8bcef2">ShowGizmos</link>&#32;&amp;&amp;&#32;<link linkend="_class_leap_1_1_unity_1_1_abstract_hold_detector_1a53c79dbe961489aea5aaedcf13d8e14d">_handModel</link>&#32;!=&#32;<emphasis role="keyword">null</emphasis>&#32;&amp;&amp;&#32;<link linkend="_class_leap_1_1_unity_1_1_abstract_hold_detector_1a53c79dbe961489aea5aaedcf13d8e14d">_handModel</link>.<link linkend="_class_leap_1_1_unity_1_1_hand_model_base_1a31704b6829e3d442133350b34a4a5a8a">IsTracked</link>)&#32;{
+00109 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;Color&#32;centerColor&#32;=&#32;Color.clear;
+00110 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;Vector3&#32;centerPosition&#32;=&#32;Vector3.zero;
+00111 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;Quaternion&#32;circleRotation&#32;=&#32;Quaternion.identity;
+00112 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(<link linkend="_class_leap_1_1_unity_1_1_abstract_hold_detector_1a90ae2a600e5d9183d4441035a2304846">IsHolding</link>)&#32;{
+00113 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;centerColor&#32;=&#32;Color.green;
+00114 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;centerPosition&#32;=&#32;<link linkend="_class_leap_1_1_unity_1_1_abstract_hold_detector_1ab446401a8797499aaf287378f61aa08c">Position</link>;
+00115 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;circleRotation&#32;=&#32;<link linkend="_class_leap_1_1_unity_1_1_abstract_hold_detector_1adab4911135d0c091a66cbe7498dbeac5">Rotation</link>;
+00116 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}&#32;<emphasis role="keywordflow">else</emphasis>&#32;{
+00117 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_leap_1_1_hand">Hand</link>&#32;hand&#32;=&#32;<link linkend="_class_leap_1_1_unity_1_1_abstract_hold_detector_1a53c79dbe961489aea5aaedcf13d8e14d">_handModel</link>.<link linkend="_class_leap_1_1_unity_1_1_hand_model_base_1aa24ca02bf4a64ba33b0370ad6da8731f">GetLeapHand</link>();
+00118 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(hand&#32;!=&#32;<emphasis role="keyword">null</emphasis>)&#32;{
+00119 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_leap_1_1_finger">Finger</link>&#32;thumb&#32;=&#32;hand.<link linkend="_class_leap_1_1_hand_1ac9f68349507bfa13e3ac24738382bea6">Fingers</link>[0];
+00120 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_leap_1_1_finger">Finger</link>&#32;index&#32;=&#32;hand.<link linkend="_class_leap_1_1_hand_1ac9f68349507bfa13e3ac24738382bea6">Fingers</link>[1];
+00121 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;centerColor&#32;=&#32;Color.red;
+00122 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;centerPosition&#32;=&#32;((thumb.Bone(<link linkend="_class_leap_1_1_bone">Bone</link>.<link linkend="_class_leap_1_1_bone_1a21054e31cefa7b75f25a026006fdbb1b">BoneType</link>.TYPE_DISTAL).NextJoint&#32;+&#32;index.Bone(<link linkend="_class_leap_1_1_bone">Bone</link>.<link linkend="_class_leap_1_1_bone_1a21054e31cefa7b75f25a026006fdbb1b">BoneType</link>.TYPE_DISTAL).NextJoint)&#32;/&#32;2).ToVector3();
+00123 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;circleRotation&#32;=&#32;hand.<link linkend="_class_leap_1_1_hand_1a31cd466c474963af5727269c7c9d6b5a">Basis</link>.CalculateRotation();
+00124 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00125 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00126 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;Vector3&#32;axis;
+00127 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordtype">float</emphasis>&#32;angle;
+00128 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;circleRotation.ToAngleAxis(out&#32;angle,&#32;out&#32;axis);
+00129 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;Utils.DrawCircle(centerPosition,&#32;axis,&#32;<link linkend="_class_leap_1_1_unity_1_1_pinch_detector_1a375ceb2cb1fd8da24e4812bc45286264">ActivateDistance</link>&#32;/&#32;2,&#32;centerColor);
+00130 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;Utils.DrawCircle(centerPosition,&#32;axis,&#32;<link linkend="_class_leap_1_1_unity_1_1_pinch_detector_1ae5b59d436a188c81ca1a081ef64bf934">DeactivateDistance</link>&#32;/&#32;2,&#32;Color.blue);
+00131 &#32;&#32;&#32;&#32;&#32;&#32;}
+00132 &#32;&#32;&#32;&#32;}
+00133 <emphasis role="preprocessor">&#32;&#32;&#32;&#32;#endif</emphasis>
+00134 &#32;&#32;}
+00135 }
+</programlisting></section>

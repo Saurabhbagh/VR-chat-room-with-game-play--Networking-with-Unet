@@ -1,0 +1,375 @@
+<?xml version='1.0' encoding='UTF-8' standalone='no'?>
+<section xmlns="http://docbook.org/ns/docbook" version="5.0" xmlns:xlink="http://www.w3.org/1999/xlink" xml:id="__sem_version_8cs_source">
+<title>SemVersion.cs</title>
+<indexterm><primary>O:/GitHUBMINIPRoject/Library/PackageCache/com.unity.package-manager-ui@2.0.7/Editor/Sources/External/SemVersion.cs</primary></indexterm>
+<programlisting>00001 <emphasis role="comment">/*</emphasis>
+00002 <emphasis role="comment">Copyright&#32;(c)&#32;2013&#32;Max&#32;Hauser&#32;</emphasis>
+00003 <emphasis role="comment"></emphasis>
+00004 <emphasis role="comment">Permission&#32;is&#32;hereby&#32;granted,&#32;free&#32;of&#32;charge,&#32;to&#32;any&#32;person&#32;obtaining&#32;a&#32;copy</emphasis>
+00005 <emphasis role="comment">of&#32;this&#32;software&#32;and&#32;associated&#32;documentation&#32;files&#32;(the&#32;&quot;Software&quot;),&#32;to&#32;deal</emphasis>
+00006 <emphasis role="comment">in&#32;the&#32;Software&#32;without&#32;restriction,&#32;including&#32;without&#32;limitation&#32;the&#32;rights</emphasis>
+00007 <emphasis role="comment">to&#32;use,&#32;copy,&#32;modify,&#32;merge,&#32;publish,&#32;distribute,&#32;sublicense,&#32;and/or&#32;sell</emphasis>
+00008 <emphasis role="comment">copies&#32;of&#32;the&#32;Software,&#32;and&#32;to&#32;permit&#32;persons&#32;to&#32;whom&#32;the&#32;Software&#32;is</emphasis>
+00009 <emphasis role="comment">furnished&#32;to&#32;do&#32;so,&#32;subject&#32;to&#32;the&#32;following&#32;conditions:</emphasis>
+00010 <emphasis role="comment"></emphasis>
+00011 <emphasis role="comment">The&#32;above&#32;copyright&#32;notice&#32;and&#32;this&#32;permission&#32;notice&#32;shall&#32;be&#32;included&#32;in</emphasis>
+00012 <emphasis role="comment">all&#32;copies&#32;or&#32;substantial&#32;portions&#32;of&#32;the&#32;Software.</emphasis>
+00013 <emphasis role="comment"></emphasis>
+00014 <emphasis role="comment">THE&#32;SOFTWARE&#32;IS&#32;PROVIDED&#32;&quot;AS&#32;IS&quot;,&#32;WITHOUT&#32;WARRANTY&#32;OF&#32;ANY&#32;KIND,&#32;EXPRESS&#32;OR</emphasis>
+00015 <emphasis role="comment">IMPLIED,&#32;INCLUDING&#32;BUT&#32;NOT&#32;LIMITED&#32;TO&#32;THE&#32;WARRANTIES&#32;OF&#32;MERCHANTABILITY,</emphasis>
+00016 <emphasis role="comment">FITNESS&#32;FOR&#32;A&#32;PARTICULAR&#32;PURPOSE&#32;AND&#32;NONINFRINGEMENT.&#32;IN&#32;NO&#32;EVENT&#32;SHALL&#32;THE</emphasis>
+00017 <emphasis role="comment">AUTHORS&#32;OR&#32;COPYRIGHT&#32;HOLDERS&#32;BE&#32;LIABLE&#32;FOR&#32;ANY&#32;CLAIM,&#32;DAMAGES&#32;OR&#32;OTHER</emphasis>
+00018 <emphasis role="comment">LIABILITY,&#32;WHETHER&#32;IN&#32;AN&#32;ACTION&#32;OF&#32;CONTRACT,&#32;TORT&#32;OR&#32;OTHERWISE,&#32;ARISING&#32;FROM,</emphasis>
+00019 <emphasis role="comment">OUT&#32;OF&#32;OR&#32;IN&#32;CONNECTION&#32;WITH&#32;THE&#32;SOFTWARE&#32;OR&#32;THE&#32;USE&#32;OR&#32;OTHER&#32;DEALINGS&#32;IN</emphasis>
+00020 <emphasis role="comment">THE&#32;SOFTWARE.</emphasis>
+00021 <emphasis role="comment"></emphasis>
+00022 <emphasis role="comment">From:&#32;https://github.com/maxhauser/semver</emphasis>
+00023 <emphasis role="comment">*/</emphasis>
+00024 
+00025 <emphasis role="keyword">using</emphasis>&#32;System;
+00026 <emphasis role="preprocessor">#if&#32;!NETSTANDARD</emphasis>
+00027 <emphasis role="keyword">using</emphasis>&#32;System.Globalization;
+00028 <emphasis role="keyword">using</emphasis>&#32;System.Runtime.Serialization;
+00029 <emphasis role="keyword">using</emphasis>&#32;System.Security.Permissions;
+00030 <emphasis role="preprocessor">#endif</emphasis>
+00031 <emphasis role="keyword">using</emphasis>&#32;System.Text.RegularExpressions;
+00032 
+<anchor xml:id="__sem_version_8cs_source_1l00033"/><link linkend="_namespace_semver">00033</link> <emphasis role="keyword">namespace&#32;</emphasis><link linkend="_namespace_semver">Semver</link>
+00034 {
+00039 <emphasis role="preprocessor">#if&#32;NETSTANDARD</emphasis>
+00040 &#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;sealed&#32;<emphasis role="keyword">class&#32;</emphasis><link linkend="_class_semver_1_1_sem_version">SemVersion</link>&#32;:&#32;IComparable&lt;SemVersion&gt;,&#32;IComparable
+00041 <emphasis role="preprocessor">#else</emphasis>
+00042 &#32;&#32;&#32;&#32;[Serializable]
+<anchor xml:id="__sem_version_8cs_source_1l00043"/><link linkend="_class_semver_1_1_sem_version">00043</link> &#32;&#32;&#32;&#32;internal&#32;sealed&#32;class&#32;<link linkend="_class_semver_1_1_sem_version">SemVersion</link>&#32;:&#32;IComparable&lt;SemVersion&gt;,&#32;IComparable,&#32;ISerializable
+00044 <emphasis role="preprocessor">#endif</emphasis>
+00045 &#32;&#32;&#32;&#32;{
+00046 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">static</emphasis>&#32;Regex&#32;parseEx&#32;=
+00047 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">new</emphasis>&#32;Regex(<emphasis role="stringliteral">@&quot;^(?&lt;major&gt;\d+)&quot;</emphasis>&#32;+
+00048 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="stringliteral">@&quot;(\.(?&lt;minor&gt;\d+))?&quot;</emphasis>&#32;+
+00049 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="stringliteral">@&quot;(\.(?&lt;patch&gt;\d+))?&quot;</emphasis>&#32;+
+00050 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="stringliteral">@&quot;(\-(?&lt;pre&gt;[0-9A-Za-z\-\.]+))?&quot;</emphasis>&#32;+
+00051 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="stringliteral">@&quot;(\+(?&lt;build&gt;[0-9A-Za-z\-\.]+))?$&quot;</emphasis>,
+00052 #<emphasis role="keywordflow">if</emphasis>&#32;NETSTANDARD
+00053 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;RegexOptions.CultureInvariant&#32;|&#32;RegexOptions.ExplicitCapture);
+00054 <emphasis role="preprocessor">#else</emphasis>
+00055 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;RegexOptions.CultureInvariant&#32;|&#32;RegexOptions.Compiled&#32;|&#32;RegexOptions.ExplicitCapture);
+00056 <emphasis role="preprocessor">#endif</emphasis>
+00057 
+00058 <emphasis role="preprocessor">#if&#32;!NETSTANDARD</emphasis>
+00059 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;<link linkend="_class_semver_1_1_sem_version">SemVersion</link>(SerializationInfo&#32;info,&#32;StreamingContext&#32;context)
+00066 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00067 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(info&#32;==&#32;<emphasis role="keyword">null</emphasis>)&#32;<emphasis role="keywordflow">throw</emphasis>&#32;<emphasis role="keyword">new</emphasis>&#32;ArgumentNullException(<emphasis role="stringliteral">&quot;info&quot;</emphasis>);
+00068 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;var&#32;semVersion&#32;=&#32;<link linkend="_class_semver_1_1_sem_version_1a3928bdf405e6d854e400d2fbd5cd0164">Parse</link>(info.GetString(<emphasis role="stringliteral">&quot;SemVersion&quot;</emphasis>));
+00069 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_semver_1_1_sem_version_1a11294c417e3952d0429cbc7e398d0d49">Major</link>&#32;=&#32;semVersion.Major;
+00070 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_semver_1_1_sem_version_1a74229ba692723ce4079715c3cff26413">Minor</link>&#32;=&#32;semVersion.Minor;
+00071 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_semver_1_1_sem_version_1a03f77dd74e47eefff519ba00cd43db9a">Patch</link>&#32;=&#32;semVersion.Patch;
+00072 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_semver_1_1_sem_version_1a8bb1554a68d74cef681af7cc01d460ef">Prerelease</link>&#32;=&#32;semVersion.Prerelease;
+00073 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_semver_1_1_sem_version_1a665a136e947cb428968ebe21579ac0cf">Build</link>&#32;=&#32;semVersion.Build;
+00074 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00075 <emphasis role="preprocessor">#endif</emphasis>
+00076 
+<anchor xml:id="__sem_version_8cs_source_1l00085"/><link linkend="_class_semver_1_1_sem_version_1aa0c5f4dbdd36760ada7bd67a65030f7a">00085</link> &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<link linkend="_class_semver_1_1_sem_version_1aa0c5f4dbdd36760ada7bd67a65030f7a">SemVersion</link>(<emphasis role="keywordtype">int</emphasis>&#32;major,&#32;<emphasis role="keywordtype">int</emphasis>&#32;minor&#32;=&#32;0,&#32;<emphasis role="keywordtype">int</emphasis>&#32;patch&#32;=&#32;0,&#32;<emphasis role="keywordtype">string</emphasis>&#32;prerelease&#32;=&#32;<emphasis role="stringliteral">&quot;&quot;</emphasis>,&#32;<emphasis role="keywordtype">string</emphasis>&#32;build&#32;=&#32;<emphasis role="stringliteral">&quot;&quot;</emphasis>)
+00086 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00087 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;this.<link linkend="_class_semver_1_1_sem_version_1a11294c417e3952d0429cbc7e398d0d49">Major</link>&#32;=&#32;major;
+00088 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;this.<link linkend="_class_semver_1_1_sem_version_1a74229ba692723ce4079715c3cff26413">Minor</link>&#32;=&#32;minor;
+00089 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;this.<link linkend="_class_semver_1_1_sem_version_1a03f77dd74e47eefff519ba00cd43db9a">Patch</link>&#32;=&#32;patch;
+00090 
+00091 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;this.<link linkend="_class_semver_1_1_sem_version_1a8bb1554a68d74cef681af7cc01d460ef">Prerelease</link>&#32;=&#32;prerelease&#32;??&#32;<emphasis role="stringliteral">&quot;&quot;</emphasis>;
+00092 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;this.<link linkend="_class_semver_1_1_sem_version_1a665a136e947cb428968ebe21579ac0cf">Build</link>&#32;=&#32;build&#32;??&#32;<emphasis role="stringliteral">&quot;&quot;</emphasis>;
+00093 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00094 
+<anchor xml:id="__sem_version_8cs_source_1l00100"/><link linkend="_class_semver_1_1_sem_version_1aded2959db05983a3041020acf415eecb">00100</link> &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<link linkend="_class_semver_1_1_sem_version_1aded2959db05983a3041020acf415eecb">SemVersion</link>(Version&#32;version)
+00101 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00102 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(version&#32;==&#32;<emphasis role="keyword">null</emphasis>)
+00103 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">throw</emphasis>&#32;<emphasis role="keyword">new</emphasis>&#32;ArgumentNullException(<emphasis role="stringliteral">&quot;version&quot;</emphasis>);
+00104 
+00105 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;this.<link linkend="_class_semver_1_1_sem_version_1a11294c417e3952d0429cbc7e398d0d49">Major</link>&#32;=&#32;version.Major;
+00106 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;this.<link linkend="_class_semver_1_1_sem_version_1a74229ba692723ce4079715c3cff26413">Minor</link>&#32;=&#32;version.Minor;
+00107 
+00108 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(version.Revision&#32;&gt;=&#32;0)
+00109 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00110 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;this.<link linkend="_class_semver_1_1_sem_version_1a03f77dd74e47eefff519ba00cd43db9a">Patch</link>&#32;=&#32;version.Revision;
+00111 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00112 
+00113 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;this.<link linkend="_class_semver_1_1_sem_version_1a8bb1554a68d74cef681af7cc01d460ef">Prerelease</link>&#32;=&#32;String.Empty;
+00114 
+00115 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(version.Build&#32;&gt;&#32;0)
+00116 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00117 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;this.<link linkend="_class_semver_1_1_sem_version_1a665a136e947cb428968ebe21579ac0cf">Build</link>&#32;=&#32;version.Build.ToString();
+00118 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00119 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">else</emphasis>
+00120 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00121 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;this.<link linkend="_class_semver_1_1_sem_version_1a665a136e947cb428968ebe21579ac0cf">Build</link>&#32;=&#32;String.Empty;
+00122 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00123 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00124 
+<anchor xml:id="__sem_version_8cs_source_1l00132"/><link linkend="_class_semver_1_1_sem_version_1a3928bdf405e6d854e400d2fbd5cd0164">00132</link> &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keyword">static</emphasis>&#32;<link linkend="_class_semver_1_1_sem_version">SemVersion</link>&#32;<link linkend="_class_semver_1_1_sem_version_1a3928bdf405e6d854e400d2fbd5cd0164">Parse</link>(<emphasis role="keywordtype">string</emphasis>&#32;version,&#32;<emphasis role="keywordtype">bool</emphasis>&#32;strict&#32;=&#32;<emphasis role="keyword">false</emphasis>)
+00133 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00134 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;var&#32;match&#32;=&#32;parseEx.Match(version);
+00135 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(!match.Success)
+00136 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00137 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;<emphasis role="keyword">new</emphasis>&#32;<link linkend="_class_semver_1_1_sem_version">SemVersion</link>(0);
+00138 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00139 
+00140 <emphasis role="preprocessor">#if&#32;NETSTANDARD</emphasis>
+00141 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;var&#32;major&#32;=&#32;<emphasis role="keywordtype">int</emphasis>.Parse(match.Groups[<emphasis role="stringliteral">&quot;major&quot;</emphasis>].Value);
+00142 <emphasis role="preprocessor">#else</emphasis>
+00143 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;var&#32;major&#32;=&#32;<emphasis role="keywordtype">int</emphasis>.Parse(match.Groups[<emphasis role="stringliteral">&quot;major&quot;</emphasis>].Value,&#32;CultureInfo.InvariantCulture);
+00144 <emphasis role="preprocessor">#endif</emphasis>
+00145 
+00146 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;var&#32;minorMatch&#32;=&#32;match.Groups[<emphasis role="stringliteral">&quot;minor&quot;</emphasis>];
+00147 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordtype">int</emphasis>&#32;minor&#32;=&#32;0;
+00148 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(minorMatch.Success)&#32;
+00149 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00150 <emphasis role="preprocessor">#if&#32;NETSTANDARD</emphasis>
+00151 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;minor&#32;=&#32;<emphasis role="keywordtype">int</emphasis>.Parse(minorMatch.Value);
+00152 <emphasis role="preprocessor">#else</emphasis>
+00153 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;minor&#32;=&#32;<emphasis role="keywordtype">int</emphasis>.Parse(minorMatch.Value,&#32;CultureInfo.InvariantCulture);
+00154 <emphasis role="preprocessor">#endif</emphasis>
+00155 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00156 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">else</emphasis>&#32;<emphasis role="keywordflow">if</emphasis>&#32;(strict)
+00157 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00158 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">throw</emphasis>&#32;<emphasis role="keyword">new</emphasis>&#32;InvalidOperationException(<emphasis role="stringliteral">&quot;Invalid&#32;version&#32;(no&#32;minor&#32;version&#32;given&#32;in&#32;strict&#32;mode)&quot;</emphasis>);
+00159 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00160 
+00161 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;var&#32;patchMatch&#32;=&#32;match.Groups[<emphasis role="stringliteral">&quot;patch&quot;</emphasis>];
+00162 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordtype">int</emphasis>&#32;patch&#32;=&#32;0;
+00163 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(patchMatch.Success)
+00164 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00165 <emphasis role="preprocessor">#if&#32;NETSTANDARD</emphasis>
+00166 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;patch&#32;=&#32;<emphasis role="keywordtype">int</emphasis>.Parse(patchMatch.Value);
+00167 <emphasis role="preprocessor">#else</emphasis>
+00168 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;patch&#32;=&#32;<emphasis role="keywordtype">int</emphasis>.Parse(patchMatch.Value,&#32;CultureInfo.InvariantCulture);
+00169 <emphasis role="preprocessor">#endif</emphasis>
+00170 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00171 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">else</emphasis>&#32;<emphasis role="keywordflow">if</emphasis>&#32;(strict)&#32;
+00172 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00173 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">throw</emphasis>&#32;<emphasis role="keyword">new</emphasis>&#32;InvalidOperationException(<emphasis role="stringliteral">&quot;Invalid&#32;version&#32;(no&#32;patch&#32;version&#32;given&#32;in&#32;strict&#32;mode)&quot;</emphasis>);
+00174 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00175 
+00176 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;var&#32;prerelease&#32;=&#32;match.Groups[<emphasis role="stringliteral">&quot;pre&quot;</emphasis>].Value;
+00177 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;var&#32;build&#32;=&#32;match.Groups[<emphasis role="stringliteral">&quot;build&quot;</emphasis>].Value;
+00178 
+00179 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;<emphasis role="keyword">new</emphasis>&#32;<link linkend="_class_semver_1_1_sem_version">SemVersion</link>(major,&#32;minor,&#32;patch,&#32;prerelease,&#32;build);
+00180 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00181 
+<anchor xml:id="__sem_version_8cs_source_1l00191"/><link linkend="_class_semver_1_1_sem_version_1a1c84a5d72f5353be5149eb045827fd7b">00191</link> &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keyword">static</emphasis>&#32;<emphasis role="keywordtype">bool</emphasis>&#32;<link linkend="_class_semver_1_1_sem_version_1a1c84a5d72f5353be5149eb045827fd7b">TryParse</link>(<emphasis role="keywordtype">string</emphasis>&#32;version,&#32;out&#32;<link linkend="_class_semver_1_1_sem_version">SemVersion</link>&#32;semver,&#32;<emphasis role="keywordtype">bool</emphasis>&#32;strict&#32;=&#32;<emphasis role="keyword">false</emphasis>)
+00192 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00193 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">try</emphasis>
+00194 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00195 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;semver&#32;=&#32;<link linkend="_class_semver_1_1_sem_version_1a3928bdf405e6d854e400d2fbd5cd0164">Parse</link>(version,&#32;strict);
+00196 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;<emphasis role="keyword">true</emphasis>;
+00197 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00198 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">catch</emphasis>&#32;(Exception)
+00199 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00200 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;semver&#32;=&#32;<emphasis role="keyword">null</emphasis>;
+00201 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;<emphasis role="keyword">false</emphasis>;
+00202 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00203 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00204 
+<anchor xml:id="__sem_version_8cs_source_1l00211"/><link linkend="_class_semver_1_1_sem_version_1a6d469a3a2b0caf2d0edecda486f86464">00211</link> &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keyword">static</emphasis>&#32;<emphasis role="keywordtype">bool</emphasis>&#32;<link linkend="_class_semver_1_1_sem_version_1a6d469a3a2b0caf2d0edecda486f86464">Equals</link>(<link linkend="_class_semver_1_1_sem_version">SemVersion</link>&#32;versionA,&#32;<link linkend="_class_semver_1_1_sem_version">SemVersion</link>&#32;versionB)
+00212 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00213 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(ReferenceEquals(versionA,&#32;<emphasis role="keyword">null</emphasis>))
+00214 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;ReferenceEquals(versionB,&#32;<emphasis role="keyword">null</emphasis>);
+00215 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;versionA.<link linkend="_class_semver_1_1_sem_version_1a6d469a3a2b0caf2d0edecda486f86464">Equals</link>(versionB);
+00216 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00217 
+<anchor xml:id="__sem_version_8cs_source_1l00225"/><link linkend="_class_semver_1_1_sem_version_1a60f0e0c81e54b95ad9cd72526480f39b">00225</link> &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keyword">static</emphasis>&#32;<emphasis role="keywordtype">int</emphasis>&#32;<link linkend="_class_semver_1_1_sem_version_1a60f0e0c81e54b95ad9cd72526480f39b">Compare</link>(<link linkend="_class_semver_1_1_sem_version">SemVersion</link>&#32;versionA,&#32;<link linkend="_class_semver_1_1_sem_version">SemVersion</link>&#32;versionB)
+00226 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00227 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(ReferenceEquals(versionA,&#32;<emphasis role="keyword">null</emphasis>))
+00228 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;ReferenceEquals(versionB,&#32;<emphasis role="keyword">null</emphasis>)&#32;?&#32;0&#32;:&#32;-1;
+00229 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;versionA.<link linkend="_class_semver_1_1_sem_version_1aef2d58904fc4226c0f4688de353e8204">CompareTo</link>(versionB);
+00230 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00231 
+<anchor xml:id="__sem_version_8cs_source_1l00241"/><link linkend="_class_semver_1_1_sem_version_1a5d3a10589ea96a59aed64d65ab5f9c24">00241</link> &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<link linkend="_class_semver_1_1_sem_version">SemVersion</link>&#32;<link linkend="_class_semver_1_1_sem_version_1a5d3a10589ea96a59aed64d65ab5f9c24">Change</link>(<emphasis role="keywordtype">int</emphasis>?&#32;major&#32;=&#32;<emphasis role="keyword">null</emphasis>,&#32;<emphasis role="keywordtype">int</emphasis>?&#32;minor&#32;=&#32;<emphasis role="keyword">null</emphasis>,&#32;<emphasis role="keywordtype">int</emphasis>?&#32;patch&#32;=&#32;<emphasis role="keyword">null</emphasis>,
+00242 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordtype">string</emphasis>&#32;prerelease&#32;=&#32;<emphasis role="keyword">null</emphasis>,&#32;<emphasis role="keywordtype">string</emphasis>&#32;build&#32;=&#32;<emphasis role="keyword">null</emphasis>)
+00243 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00244 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;<emphasis role="keyword">new</emphasis>&#32;<link linkend="_class_semver_1_1_sem_version">SemVersion</link>(
+00245 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;major&#32;??&#32;this.<link linkend="_class_semver_1_1_sem_version_1a11294c417e3952d0429cbc7e398d0d49">Major</link>,
+00246 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;minor&#32;??&#32;this.<link linkend="_class_semver_1_1_sem_version_1a74229ba692723ce4079715c3cff26413">Minor</link>,
+00247 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;patch&#32;??&#32;this.<link linkend="_class_semver_1_1_sem_version_1a03f77dd74e47eefff519ba00cd43db9a">Patch</link>,
+00248 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;prerelease&#32;??&#32;this.<link linkend="_class_semver_1_1_sem_version_1a8bb1554a68d74cef681af7cc01d460ef">Prerelease</link>,
+00249 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;build&#32;??&#32;this.<link linkend="_class_semver_1_1_sem_version_1a665a136e947cb428968ebe21579ac0cf">Build</link>);
+00250 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00251 
+<anchor xml:id="__sem_version_8cs_source_1l00258"/><link linkend="_class_semver_1_1_sem_version_1a11294c417e3952d0429cbc7e398d0d49">00258</link> &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keywordtype">int</emphasis>&#32;<link linkend="_class_semver_1_1_sem_version_1a11294c417e3952d0429cbc7e398d0d49">Major</link>&#32;{&#32;<emphasis role="keyword">get</emphasis>;&#32;<emphasis role="keyword">private</emphasis>&#32;<emphasis role="keyword">set</emphasis>;&#32;}
+00259 
+<anchor xml:id="__sem_version_8cs_source_1l00266"/><link linkend="_class_semver_1_1_sem_version_1a74229ba692723ce4079715c3cff26413">00266</link> &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keywordtype">int</emphasis>&#32;<link linkend="_class_semver_1_1_sem_version_1a74229ba692723ce4079715c3cff26413">Minor</link>&#32;{&#32;<emphasis role="keyword">get</emphasis>;&#32;<emphasis role="keyword">private</emphasis>&#32;<emphasis role="keyword">set</emphasis>;&#32;}
+00267 
+<anchor xml:id="__sem_version_8cs_source_1l00274"/><link linkend="_class_semver_1_1_sem_version_1a03f77dd74e47eefff519ba00cd43db9a">00274</link> &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keywordtype">int</emphasis>&#32;<link linkend="_class_semver_1_1_sem_version_1a03f77dd74e47eefff519ba00cd43db9a">Patch</link>&#32;{&#32;<emphasis role="keyword">get</emphasis>;&#32;<emphasis role="keyword">private</emphasis>&#32;<emphasis role="keyword">set</emphasis>;&#32;}
+00275 
+<anchor xml:id="__sem_version_8cs_source_1l00282"/><link linkend="_class_semver_1_1_sem_version_1a8bb1554a68d74cef681af7cc01d460ef">00282</link> &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keywordtype">string</emphasis>&#32;<link linkend="_class_semver_1_1_sem_version_1a8bb1554a68d74cef681af7cc01d460ef">Prerelease</link>&#32;{&#32;<emphasis role="keyword">get</emphasis>;&#32;<emphasis role="keyword">private</emphasis>&#32;<emphasis role="keyword">set</emphasis>;&#32;}
+00283 
+<anchor xml:id="__sem_version_8cs_source_1l00290"/><link linkend="_class_semver_1_1_sem_version_1a665a136e947cb428968ebe21579ac0cf">00290</link> &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keywordtype">string</emphasis>&#32;<link linkend="_class_semver_1_1_sem_version_1a665a136e947cb428968ebe21579ac0cf">Build</link>&#32;{&#32;<emphasis role="keyword">get</emphasis>;&#32;<emphasis role="keyword">private</emphasis>&#32;<emphasis role="keyword">set</emphasis>;&#32;}
+00291 
+<anchor xml:id="__sem_version_8cs_source_1l00298"/><link linkend="_class_semver_1_1_sem_version_1a6a2cd954a8993437f925b94d1c54b59c">00298</link> &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keyword">override</emphasis>&#32;<emphasis role="keywordtype">string</emphasis>&#32;<link linkend="_class_semver_1_1_sem_version_1a6a2cd954a8993437f925b94d1c54b59c">ToString</link>()
+00299 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00300 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;var&#32;version&#32;=&#32;<emphasis role="stringliteral">&quot;&quot;</emphasis>&#32;+&#32;<link linkend="_class_semver_1_1_sem_version_1a11294c417e3952d0429cbc7e398d0d49">Major</link>&#32;+&#32;<emphasis role="stringliteral">&quot;.&quot;</emphasis>&#32;+&#32;<link linkend="_class_semver_1_1_sem_version_1a74229ba692723ce4079715c3cff26413">Minor</link>&#32;+&#32;<emphasis role="stringliteral">&quot;.&quot;</emphasis>&#32;+&#32;<link linkend="_class_semver_1_1_sem_version_1a03f77dd74e47eefff519ba00cd43db9a">Patch</link>;
+00301 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(!String.IsNullOrEmpty(<link linkend="_class_semver_1_1_sem_version_1a8bb1554a68d74cef681af7cc01d460ef">Prerelease</link>))
+00302 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;version&#32;+=&#32;<emphasis role="stringliteral">&quot;-&quot;</emphasis>&#32;+&#32;<link linkend="_class_semver_1_1_sem_version_1a8bb1554a68d74cef681af7cc01d460ef">Prerelease</link>;
+00303 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(!String.IsNullOrEmpty(<link linkend="_class_semver_1_1_sem_version_1a665a136e947cb428968ebe21579ac0cf">Build</link>))
+00304 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;version&#32;+=&#32;<emphasis role="stringliteral">&quot;+&quot;</emphasis>&#32;+&#32;<link linkend="_class_semver_1_1_sem_version_1a665a136e947cb428968ebe21579ac0cf">Build</link>;
+00305 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;version;
+00306 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00307 
+<anchor xml:id="__sem_version_8cs_source_1l00321"/><link linkend="_class_semver_1_1_sem_version_1aef2d58904fc4226c0f4688de353e8204">00321</link> &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keywordtype">int</emphasis>&#32;<link linkend="_class_semver_1_1_sem_version_1aef2d58904fc4226c0f4688de353e8204">CompareTo</link>(<emphasis role="keywordtype">object</emphasis>&#32;obj)
+00322 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00323 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;<link linkend="_class_semver_1_1_sem_version_1aef2d58904fc4226c0f4688de353e8204">CompareTo</link>((<link linkend="_class_semver_1_1_sem_version">SemVersion</link>)obj);
+00324 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00325 
+<anchor xml:id="__sem_version_8cs_source_1l00339"/><link linkend="_class_semver_1_1_sem_version_1ad72682b72071f1a8fef88c7a978db04c">00339</link> &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keywordtype">int</emphasis>&#32;<link linkend="_class_semver_1_1_sem_version_1ad72682b72071f1a8fef88c7a978db04c">CompareTo</link>(<link linkend="_class_semver_1_1_sem_version">SemVersion</link>&#32;other)
+00340 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00341 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(ReferenceEquals(other,&#32;<emphasis role="keyword">null</emphasis>))
+00342 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;1;
+00343 
+00344 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;var&#32;r&#32;=&#32;this.<link linkend="_class_semver_1_1_sem_version_1adabe1c3ea77ec1dae140cdc3aa4c60b1">CompareByPrecedence</link>(other);
+00345 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(r&#32;!=&#32;0)
+00346 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;r;
+00347 
+00348 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;r&#32;=&#32;CompareComponent(this.<link linkend="_class_semver_1_1_sem_version_1a665a136e947cb428968ebe21579ac0cf">Build</link>,&#32;other.<link linkend="_class_semver_1_1_sem_version_1a665a136e947cb428968ebe21579ac0cf">Build</link>);
+00349 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;r;
+00350 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00351 
+<anchor xml:id="__sem_version_8cs_source_1l00357"/><link linkend="_class_semver_1_1_sem_version_1a8a4c9fdc124a640e26a9d81e6b6ea257">00357</link> &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keywordtype">bool</emphasis>&#32;<link linkend="_class_semver_1_1_sem_version_1a8a4c9fdc124a640e26a9d81e6b6ea257">PrecedenceMatches</link>(<link linkend="_class_semver_1_1_sem_version">SemVersion</link>&#32;other)
+00358 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00359 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;<link linkend="_class_semver_1_1_sem_version_1adabe1c3ea77ec1dae140cdc3aa4c60b1">CompareByPrecedence</link>(other)&#32;==&#32;0;
+00360 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00361 
+<anchor xml:id="__sem_version_8cs_source_1l00373"/><link linkend="_class_semver_1_1_sem_version_1adabe1c3ea77ec1dae140cdc3aa4c60b1">00373</link> &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keywordtype">int</emphasis>&#32;<link linkend="_class_semver_1_1_sem_version_1adabe1c3ea77ec1dae140cdc3aa4c60b1">CompareByPrecedence</link>(<link linkend="_class_semver_1_1_sem_version">SemVersion</link>&#32;other)
+00374 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00375 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(ReferenceEquals(other,&#32;<emphasis role="keyword">null</emphasis>))
+00376 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;1;
+00377 
+00378 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;var&#32;r&#32;=&#32;this.<link linkend="_class_semver_1_1_sem_version_1a11294c417e3952d0429cbc7e398d0d49">Major</link>.CompareTo(other.<link linkend="_class_semver_1_1_sem_version_1a11294c417e3952d0429cbc7e398d0d49">Major</link>);
+00379 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(r&#32;!=&#32;0)&#32;<emphasis role="keywordflow">return</emphasis>&#32;r;
+00380 
+00381 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;r&#32;=&#32;this.<link linkend="_class_semver_1_1_sem_version_1a74229ba692723ce4079715c3cff26413">Minor</link>.CompareTo(other.<link linkend="_class_semver_1_1_sem_version_1a74229ba692723ce4079715c3cff26413">Minor</link>);
+00382 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(r&#32;!=&#32;0)&#32;<emphasis role="keywordflow">return</emphasis>&#32;r;
+00383 
+00384 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;r&#32;=&#32;this.<link linkend="_class_semver_1_1_sem_version_1a03f77dd74e47eefff519ba00cd43db9a">Patch</link>.CompareTo(other.<link linkend="_class_semver_1_1_sem_version_1a03f77dd74e47eefff519ba00cd43db9a">Patch</link>);
+00385 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(r&#32;!=&#32;0)&#32;<emphasis role="keywordflow">return</emphasis>&#32;r;
+00386 
+00387 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;r&#32;=&#32;CompareComponent(this.<link linkend="_class_semver_1_1_sem_version_1a8bb1554a68d74cef681af7cc01d460ef">Prerelease</link>,&#32;other.<link linkend="_class_semver_1_1_sem_version_1a8bb1554a68d74cef681af7cc01d460ef">Prerelease</link>,&#32;<emphasis role="keyword">true</emphasis>);
+00388 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;r;
+00389 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00390 
+00391 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">static</emphasis>&#32;<emphasis role="keywordtype">int</emphasis>&#32;CompareComponent(<emphasis role="keywordtype">string</emphasis>&#32;a,&#32;<emphasis role="keywordtype">string</emphasis>&#32;b,&#32;<emphasis role="keywordtype">bool</emphasis>&#32;lower&#32;=&#32;<emphasis role="keyword">false</emphasis>)
+00392 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00393 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;var&#32;aEmpty&#32;=&#32;String.IsNullOrEmpty(a);
+00394 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;var&#32;bEmpty&#32;=&#32;String.IsNullOrEmpty(b);
+00395 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(aEmpty&#32;&amp;&amp;&#32;bEmpty)
+00396 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;0;
+00397 
+00398 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(aEmpty)
+00399 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;lower&#32;?&#32;1&#32;:&#32;-1;
+00400 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(bEmpty)
+00401 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;lower&#32;?&#32;-1&#32;:&#32;1;
+00402 
+00403 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;var&#32;aComps&#32;=&#32;a.Split(<emphasis role="charliteral">&apos;.&apos;</emphasis>);
+00404 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;var&#32;bComps&#32;=&#32;b.Split(<emphasis role="charliteral">&apos;.&apos;</emphasis>);
+00405 
+00406 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;var&#32;minLen&#32;=&#32;Math.Min(aComps.Length,&#32;bComps.Length);
+00407 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">for</emphasis>&#32;(<emphasis role="keywordtype">int</emphasis>&#32;i&#32;=&#32;0;&#32;i&#32;&lt;&#32;minLen;&#32;i++)
+00408 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00409 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;var&#32;ac&#32;=&#32;aComps[i];
+00410 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;var&#32;bc&#32;=&#32;bComps[i];
+00411 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordtype">int</emphasis>&#32;anum,&#32;bnum;
+00412 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;var&#32;isanum&#32;=&#32;Int32.TryParse(ac,&#32;out&#32;anum);
+00413 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;var&#32;isbnum&#32;=&#32;Int32.TryParse(bc,&#32;out&#32;bnum);
+00414 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordtype">int</emphasis>&#32;r;
+00415 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(isanum&#32;&amp;&amp;&#32;isbnum)
+00416 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00417 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;r&#32;=&#32;anum.CompareTo(bnum);
+00418 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(r&#32;!=&#32;0)&#32;<emphasis role="keywordflow">return</emphasis>&#32;anum.CompareTo(bnum);
+00419 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00420 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">else</emphasis>
+00421 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00422 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(isanum)
+00423 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;-1;
+00424 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(isbnum)
+00425 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;1;
+00426 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;r&#32;=&#32;String.CompareOrdinal(ac,&#32;bc);
+00427 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(r&#32;!=&#32;0)
+00428 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;r;
+00429 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00430 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00431 
+00432 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;aComps.Length.CompareTo(bComps.Length);
+00433 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00434 
+<anchor xml:id="__sem_version_8cs_source_1l00442"/><link linkend="_class_semver_1_1_sem_version_1a32a7224158056561d19ee7b2973f4ce1">00442</link> &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keyword">override</emphasis>&#32;<emphasis role="keywordtype">bool</emphasis>&#32;<link linkend="_class_semver_1_1_sem_version_1a32a7224158056561d19ee7b2973f4ce1">Equals</link>(<emphasis role="keywordtype">object</emphasis>&#32;obj)
+00443 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00444 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(ReferenceEquals(obj,&#32;<emphasis role="keyword">null</emphasis>))
+00445 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;<emphasis role="keyword">false</emphasis>;
+00446 
+00447 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(ReferenceEquals(<emphasis role="keyword">this</emphasis>,&#32;obj))
+00448 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;<emphasis role="keyword">true</emphasis>;
+00449 
+00450 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;var&#32;other&#32;=&#32;(<link linkend="_class_semver_1_1_sem_version">SemVersion</link>)obj;
+00451 
+00452 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;this.<link linkend="_class_semver_1_1_sem_version_1a11294c417e3952d0429cbc7e398d0d49">Major</link>&#32;==&#32;other.Major&#32;&amp;&amp;
+00453 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;this.<link linkend="_class_semver_1_1_sem_version_1a74229ba692723ce4079715c3cff26413">Minor</link>&#32;==&#32;other.Minor&#32;&amp;&amp;
+00454 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;this.<link linkend="_class_semver_1_1_sem_version_1a03f77dd74e47eefff519ba00cd43db9a">Patch</link>&#32;==&#32;other.Patch&#32;&amp;&amp;
+00455 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordtype">string</emphasis>.Equals(this.<link linkend="_class_semver_1_1_sem_version_1a8bb1554a68d74cef681af7cc01d460ef">Prerelease</link>,&#32;other.Prerelease,&#32;StringComparison.Ordinal)&#32;&amp;&amp;
+00456 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordtype">string</emphasis>.Equals(this.<link linkend="_class_semver_1_1_sem_version_1a665a136e947cb428968ebe21579ac0cf">Build</link>,&#32;other.Build,&#32;StringComparison.Ordinal);
+00457 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00458 
+<anchor xml:id="__sem_version_8cs_source_1l00465"/><link linkend="_class_semver_1_1_sem_version_1ac570f6109ec0a58cbe5127b7505c654d">00465</link> &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keyword">override</emphasis>&#32;<emphasis role="keywordtype">int</emphasis>&#32;<link linkend="_class_semver_1_1_sem_version_1ac570f6109ec0a58cbe5127b7505c654d">GetHashCode</link>()
+00466 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00467 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;unchecked
+00468 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00469 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordtype">int</emphasis>&#32;result&#32;=&#32;this.<link linkend="_class_semver_1_1_sem_version_1a11294c417e3952d0429cbc7e398d0d49">Major</link>.GetHashCode();
+00470 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;result&#32;=&#32;result&#32;*&#32;31&#32;+&#32;this.<link linkend="_class_semver_1_1_sem_version_1a74229ba692723ce4079715c3cff26413">Minor</link>.GetHashCode();
+00471 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;result&#32;=&#32;result&#32;*&#32;31&#32;+&#32;this.<link linkend="_class_semver_1_1_sem_version_1a03f77dd74e47eefff519ba00cd43db9a">Patch</link>.GetHashCode();
+00472 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;result&#32;=&#32;result&#32;*&#32;31&#32;+&#32;this.<link linkend="_class_semver_1_1_sem_version_1a8bb1554a68d74cef681af7cc01d460ef">Prerelease</link>.GetHashCode();
+00473 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;result&#32;=&#32;result&#32;*&#32;31&#32;+&#32;this.<link linkend="_class_semver_1_1_sem_version_1a665a136e947cb428968ebe21579ac0cf">Build</link>.GetHashCode();
+00474 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;result;
+00475 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00476 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00477 
+00478 <emphasis role="preprocessor">#if&#32;!NETSTANDARD</emphasis>
+00479 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;[SecurityPermission(SecurityAction.Demand,&#32;SerializationFormatter&#32;=&#32;<emphasis role="keyword">true</emphasis>)]
+<anchor xml:id="__sem_version_8cs_source_1l00480"/><link linkend="_class_semver_1_1_sem_version_1ab7a3c2f630b6220ecb7c05c21aea9eb5">00480</link> &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;<link linkend="_class_semver_1_1_sem_version_1ab7a3c2f630b6220ecb7c05c21aea9eb5">GetObjectData</link>(SerializationInfo&#32;info,&#32;StreamingContext&#32;context)
+00481 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00482 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(info&#32;==&#32;<emphasis role="keyword">null</emphasis>)&#32;<emphasis role="keywordflow">throw</emphasis>&#32;<emphasis role="keyword">new</emphasis>&#32;ArgumentNullException(<emphasis role="stringliteral">&quot;info&quot;</emphasis>);
+00483 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;info.AddValue(<emphasis role="stringliteral">&quot;SemVersion&quot;</emphasis>,&#32;<link linkend="_class_semver_1_1_sem_version_1a6a2cd954a8993437f925b94d1c54b59c">ToString</link>());
+00484 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00485 <emphasis role="preprocessor">#endif</emphasis>
+00486 
+<anchor xml:id="__sem_version_8cs_source_1l00492"/><link linkend="_class_semver_1_1_sem_version_1a2d0eef22f96f4ed95c48b851363c58d5">00492</link> &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keyword">static</emphasis>&#32;implicit&#32;<emphasis role="keyword">operator</emphasis>&#32;<link linkend="_class_semver_1_1_sem_version">SemVersion</link>(<emphasis role="keywordtype">string</emphasis>&#32;version)
+00493 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00494 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;<link linkend="_class_semver_1_1_sem_version">SemVersion</link>.<link linkend="_class_semver_1_1_sem_version_1a3928bdf405e6d854e400d2fbd5cd0164">Parse</link>(version);
+00495 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00496 
+<anchor xml:id="__sem_version_8cs_source_1l00503"/><link linkend="_class_semver_1_1_sem_version_1aff575c02e2b0eaa74e2aee6da139f315">00503</link> &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keyword">static</emphasis>&#32;<emphasis role="keywordtype">bool</emphasis>&#32;<link linkend="_class_semver_1_1_sem_version_1aff575c02e2b0eaa74e2aee6da139f315">operator ==</link>(<link linkend="_class_semver_1_1_sem_version">SemVersion</link>&#32;left,&#32;<link linkend="_class_semver_1_1_sem_version">SemVersion</link>&#32;right)
+00504 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00505 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;<link linkend="_class_semver_1_1_sem_version">SemVersion</link>.<link linkend="_class_semver_1_1_sem_version_1a6d469a3a2b0caf2d0edecda486f86464">Equals</link>(left,&#32;right);
+00506 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00507 
+<anchor xml:id="__sem_version_8cs_source_1l00514"/><link linkend="_class_semver_1_1_sem_version_1ab0eb279a6d17558b7b134359f8179ff4">00514</link> &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keyword">static</emphasis>&#32;<emphasis role="keywordtype">bool</emphasis>&#32;<link linkend="_class_semver_1_1_sem_version_1ab0eb279a6d17558b7b134359f8179ff4">operator !=</link>(<link linkend="_class_semver_1_1_sem_version">SemVersion</link>&#32;left,&#32;<link linkend="_class_semver_1_1_sem_version">SemVersion</link>&#32;right)
+00515 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00516 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;!<link linkend="_class_semver_1_1_sem_version">SemVersion</link>.<link linkend="_class_semver_1_1_sem_version_1a6d469a3a2b0caf2d0edecda486f86464">Equals</link>(left,&#32;right);
+00517 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00518 
+<anchor xml:id="__sem_version_8cs_source_1l00525"/><link linkend="_class_semver_1_1_sem_version_1a7206817504d2de152c454cfda9e3bd71">00525</link> &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keyword">static</emphasis>&#32;<emphasis role="keywordtype">bool</emphasis>&#32;<link linkend="_class_semver_1_1_sem_version_1a7206817504d2de152c454cfda9e3bd71">operator &gt;</link>(<link linkend="_class_semver_1_1_sem_version">SemVersion</link>&#32;left,&#32;<link linkend="_class_semver_1_1_sem_version">SemVersion</link>&#32;right)
+00526 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00527 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;<link linkend="_class_semver_1_1_sem_version">SemVersion</link>.<link linkend="_class_semver_1_1_sem_version_1a60f0e0c81e54b95ad9cd72526480f39b">Compare</link>(left,&#32;right)&#32;&gt;&#32;0;
+00528 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00529 
+<anchor xml:id="__sem_version_8cs_source_1l00536"/><link linkend="_class_semver_1_1_sem_version_1a9bb9a799d7f3292569ec3ed2e7a95c56">00536</link> &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keyword">static</emphasis>&#32;<emphasis role="keywordtype">bool</emphasis>&#32;<link linkend="_class_semver_1_1_sem_version_1a9bb9a799d7f3292569ec3ed2e7a95c56">operator &gt;=</link>(<link linkend="_class_semver_1_1_sem_version">SemVersion</link>&#32;left,&#32;<link linkend="_class_semver_1_1_sem_version">SemVersion</link>&#32;right)
+00537 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00538 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;left&#32;==&#32;right&#32;||&#32;left&#32;&gt;&#32;right;
+00539 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00540 
+<anchor xml:id="__sem_version_8cs_source_1l00547"/><link linkend="_class_semver_1_1_sem_version_1a2d6cd9e1f8b7ce8649582170471f4e33">00547</link> &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keyword">static</emphasis>&#32;<emphasis role="keywordtype">bool</emphasis>&#32;<link linkend="_class_semver_1_1_sem_version_1a2d6cd9e1f8b7ce8649582170471f4e33">operator &lt;</link>(<link linkend="_class_semver_1_1_sem_version">SemVersion</link>&#32;left,&#32;<link linkend="_class_semver_1_1_sem_version">SemVersion</link>&#32;right)
+00548 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00549 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;<link linkend="_class_semver_1_1_sem_version">SemVersion</link>.<link linkend="_class_semver_1_1_sem_version_1a60f0e0c81e54b95ad9cd72526480f39b">Compare</link>(left,&#32;right)&#32;&lt;&#32;0;
+00550 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00551 
+<anchor xml:id="__sem_version_8cs_source_1l00558"/><link linkend="_class_semver_1_1_sem_version_1a235b920e8e35516c891e59f8bf5b9aef">00558</link> &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keyword">static</emphasis>&#32;<emphasis role="keywordtype">bool</emphasis>&#32;<link linkend="_class_semver_1_1_sem_version_1a235b920e8e35516c891e59f8bf5b9aef">operator &lt;=</link>(<link linkend="_class_semver_1_1_sem_version">SemVersion</link>&#32;left,&#32;<link linkend="_class_semver_1_1_sem_version">SemVersion</link>&#32;right)
+00559 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00560 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;left&#32;==&#32;right&#32;||&#32;left&#32;&lt;&#32;right;
+00561 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00562 &#32;&#32;&#32;&#32;}
+00563 }
+</programlisting></section>

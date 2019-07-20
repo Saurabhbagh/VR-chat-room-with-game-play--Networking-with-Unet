@@ -1,0 +1,74 @@
+<?xml version='1.0' encoding='UTF-8' standalone='no'?>
+<section xmlns="http://docbook.org/ns/docbook" version="5.0" xmlns:xlink="http://www.w3.org/1999/xlink" xml:id="__editor_utils_8cs_source">
+<title>EditorUtils.cs</title>
+<indexterm><primary>O:/GitHUBMINIPRoject/Assets/LeapMotion/Core/Scripts/Utils/Editor/EditorUtils.cs</primary></indexterm>
+<programlisting>00001 <emphasis role="comment">/******************************************************************************</emphasis>
+00002 <emphasis role="comment">&#32;*&#32;Copyright&#32;(C)&#32;Leap&#32;Motion,&#32;Inc.&#32;2011-2018.&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;*</emphasis>
+00003 <emphasis role="comment">&#32;*&#32;Leap&#32;Motion&#32;proprietary&#32;and&#32;confidential.&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;*</emphasis>
+00004 <emphasis role="comment">&#32;*&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;*</emphasis>
+00005 <emphasis role="comment">&#32;*&#32;Use&#32;subject&#32;to&#32;the&#32;terms&#32;of&#32;the&#32;Leap&#32;Motion&#32;SDK&#32;Agreement&#32;available&#32;at&#32;&#32;&#32;&#32;&#32;*</emphasis>
+00006 <emphasis role="comment">&#32;*&#32;https://developer.leapmotion.com/sdk_agreement,&#32;or&#32;another&#32;agreement&#32;&#32;&#32;&#32;&#32;&#32;&#32;*</emphasis>
+00007 <emphasis role="comment">&#32;*&#32;between&#32;Leap&#32;Motion&#32;and&#32;you,&#32;your&#32;company&#32;or&#32;other&#32;organization.&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;*</emphasis>
+00008 <emphasis role="comment">&#32;******************************************************************************/</emphasis>
+00009 
+00010 <emphasis role="keyword">using</emphasis>&#32;<link linkend="_namespace_leap">Leap</link>.<link linkend="_namespace_leap_1_1_unity">Unity</link>.<link linkend="_namespace_leap_1_1_unity_1_1_query">Query</link>;
+00011 <emphasis role="keyword">using</emphasis>&#32;System;
+00012 <emphasis role="keyword">using</emphasis>&#32;System.Collections.Generic;
+00013 <emphasis role="keyword">using</emphasis>&#32;System.Reflection;
+00014 <emphasis role="keyword">using</emphasis>&#32;<link linkend="_namespace_unity_editor">UnityEditor</link>;
+00015 <emphasis role="keyword">using</emphasis>&#32;<link linkend="__balloon_8cs_1a7d67e097df9376eb709b6a23aa3c7d23">UnityEngine</link>;
+00016 <emphasis role="keyword">using</emphasis>&#32;<link linkend="_namespace_unity_engine">UnityEngine</link>.SceneManagement;
+00017 
+00018 <emphasis role="keyword">namespace&#32;</emphasis><link linkend="_namespace_leap_1_1_unity">Leap.Unity</link>&#32;{
+00019 
+00020 &#32;&#32;<emphasis role="keyword">using</emphasis>&#32;<link linkend="__implements_interface_8cs_1a324f8dae84ead9019a250b472ca1b436">UnityObject</link>&#32;=&#32;<link linkend="_namespace_unity_engine">UnityEngine</link>.Object;
+00021 
+00022 &#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keyword">static</emphasis>&#32;<emphasis role="keyword">class&#32;</emphasis>EditorUtils&#32;{
+00023 
+00024 &#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;<emphasis role="keyword">class&#32;</emphasis>SceneReference&lt;T&gt;&#32;where&#32;T&#32;:&#32;<link linkend="__implements_interface_8cs_1a324f8dae84ead9019a250b472ca1b436">UnityObject</link>&#32;{
+00025 &#32;&#32;&#32;&#32;&#32;&#32;SerializedObject&#32;objectContainingReference;
+00026 &#32;&#32;&#32;&#32;&#32;&#32;SerializedProperty&#32;reference;
+00027 &#32;&#32;&#32;&#32;}
+00028 
+00034 &#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keyword">static</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;ReplaceSceneReferences&lt;T&gt;(T&#32;a,&#32;T&#32;b)&#32;where&#32;T&#32;:&#32;<link linkend="__implements_interface_8cs_1a324f8dae84ead9019a250b472ca1b436">UnityObject</link>&#32;{
+00035 &#32;&#32;&#32;&#32;&#32;&#32;var&#32;aId&#32;=&#32;a.GetInstanceID();
+00036 &#32;&#32;&#32;&#32;&#32;&#32;var&#32;refType&#32;=&#32;typeof(T);
+00037 &#32;&#32;&#32;&#32;&#32;&#32;
+00038 &#32;&#32;&#32;&#32;&#32;&#32;var&#32;curScene&#32;=&#32;SceneManager.GetActiveScene();
+00039 &#32;&#32;&#32;&#32;&#32;&#32;var&#32;rootObjs&#32;=&#32;curScene.GetRootGameObjects();
+00040 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">foreach</emphasis>&#32;(var&#32;rootObj&#32;<emphasis role="keywordflow">in</emphasis>&#32;rootObjs)&#32;{
+00041 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;var&#32;transforms&#32;=&#32;rootObj.GetComponentsInChildren&lt;Transform&gt;();
+00042 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">foreach</emphasis>&#32;(var&#32;transform&#32;<emphasis role="keywordflow">in</emphasis>&#32;transforms)&#32;{
+00043 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;var&#32;components&#32;=&#32;transform.GetComponents&lt;Component&gt;();
+00044 
+00045 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;var&#32;objectChanges&#32;=&#32;<emphasis role="keyword">new</emphasis>&#32;List&lt;Action&gt;();
+00046 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">foreach</emphasis>&#32;(var&#32;component&#32;<emphasis role="keywordflow">in</emphasis>&#32;components)&#32;{
+00047 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;var&#32;compType&#32;=&#32;typeof(Component);
+00048 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;var&#32;fieldInfos&#32;=&#32;compType.GetFields(BindingFlags.Instance
+00049 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;|&#32;BindingFlags.FlattenHierarchy&#32;|&#32;BindingFlags.NonPublic
+00050 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;|&#32;BindingFlags.Public);
+00051 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">foreach</emphasis>&#32;(var&#32;fieldInfo&#32;<emphasis role="keywordflow">in</emphasis>&#32;fieldInfos.Query()
+00052 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;.Where(fi&#32;=&gt;&#32;fi.FieldType.IsAssignableFrom(refType)))&#32;{
+00053 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;var&#32;refValue&#32;=&#32;fieldInfo.GetValue(component)&#32;as&#32;T;
+00054 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(refValue.GetInstanceID()&#32;==&#32;aId)&#32;{
+00055 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;objectChanges.Add(()&#32;=&gt;&#32;{
+00056 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;fieldInfo.SetValue(fieldInfo,&#32;b);
+00057 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;});
+00058 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00059 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00060 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00061 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(objectChanges.Count&#32;&gt;&#32;0)&#32;{
+00062 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;Undo.RecordObject(transform.gameObject,
+00063 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="stringliteral">&quot;Swap&#32;&quot;</emphasis>&#32;+&#32;transform.name&#32;+&#32;<emphasis role="stringliteral">&quot;&#32;references&#32;from&#32;&quot;</emphasis>&#32;+&#32;a.name&#32;+&#32;<emphasis role="stringliteral">&quot;&#32;to&#32;&quot;</emphasis>&#32;+&#32;b.name);
+00064 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">foreach</emphasis>&#32;(var&#32;change&#32;<emphasis role="keywordflow">in</emphasis>&#32;objectChanges)&#32;{
+00065 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;change();
+00066 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00067 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00068 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00069 &#32;&#32;&#32;&#32;&#32;&#32;}
+00070 &#32;&#32;&#32;&#32;}
+00071 
+00072 &#32;&#32;}
+00073 
+00074 }
+</programlisting></section>

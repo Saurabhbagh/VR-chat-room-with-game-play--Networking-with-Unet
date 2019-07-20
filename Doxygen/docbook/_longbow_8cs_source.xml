@@ -1,0 +1,398 @@
+<?xml version='1.0' encoding='UTF-8' standalone='no'?>
+<section xmlns="http://docbook.org/ns/docbook" version="5.0" xmlns:xlink="http://www.w3.org/1999/xlink" xml:id="__longbow_8cs_source">
+<title>Longbow.cs</title>
+<indexterm><primary>O:/GitHUBMINIPRoject/Assets/SteamVR/InteractionSystem/Longbow/Scripts/Longbow.cs</primary></indexterm>
+<programlisting>00001 <emphasis role="comment">//=======&#32;Copyright&#32;(c)&#32;Valve&#32;Corporation,&#32;All&#32;rights&#32;reserved.&#32;===============</emphasis>
+00002 <emphasis role="comment">//</emphasis>
+00003 <emphasis role="comment">//&#32;Purpose:&#32;The&#32;bow</emphasis>
+00004 <emphasis role="comment">//</emphasis>
+00005 <emphasis role="comment">//=============================================================================</emphasis>
+00006 
+00007 <emphasis role="keyword">using</emphasis>&#32;<link linkend="__balloon_8cs_1a7d67e097df9376eb709b6a23aa3c7d23">UnityEngine</link>;
+00008 <emphasis role="keyword">using</emphasis>&#32;System.Collections;
+00009 <emphasis role="keyword">using</emphasis>&#32;System.Collections.Generic;
+00010 
+00011 <emphasis role="keyword">namespace&#32;</emphasis><link linkend="_namespace_valve_1_1_v_r_1_1_interaction_system">Valve.VR.InteractionSystem</link>
+00012 {
+00013 &#32;&#32;&#32;&#32;<emphasis role="comment">//-------------------------------------------------------------------------</emphasis>
+00014 &#32;&#32;&#32;&#32;[RequireComponent(&#32;typeof(&#32;Interactable&#32;)&#32;)]
+<anchor xml:id="__longbow_8cs_source_1l00015"/><link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_longbow">00015</link> &#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keyword">class&#32;</emphasis><link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_longbow">Longbow</link>&#32;:&#32;MonoBehaviour
+00016 &#32;&#32;&#32;&#32;{
+<anchor xml:id="__longbow_8cs_source_1l00017"/><link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_longbow_1a1a13793c73b85cc47cc323af991169be">00017</link> &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keyword">enum</emphasis>&#32;<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_longbow_1a1a13793c73b85cc47cc323af991169be">Handedness</link>&#32;{&#32;Left,&#32;Right&#32;};
+00018 
+<anchor xml:id="__longbow_8cs_source_1l00019"/><link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_longbow_1a50efe1398921e159ce3e7a3ddd228799">00019</link> &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_longbow_1a1a13793c73b85cc47cc323af991169be">Handedness</link>&#32;<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_longbow_1a50efe1398921e159ce3e7a3ddd228799">currentHandGuess</link>&#32;=&#32;<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_longbow_1a1a13793c73b85cc47cc323af991169be">Handedness</link>.Left;
+00020 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;<emphasis role="keywordtype">float</emphasis>&#32;timeOfPossibleHandSwitch&#32;=&#32;0f;
+00021 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;<emphasis role="keywordtype">float</emphasis>&#32;timeBeforeConfirmingHandSwitch&#32;=&#32;1.5f;
+00022 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;<emphasis role="keywordtype">bool</emphasis>&#32;possibleHandSwitch&#32;=&#32;<emphasis role="keyword">false</emphasis>;
+00023 
+<anchor xml:id="__longbow_8cs_source_1l00024"/><link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_longbow_1af757d0d80234138d49f593282fcb9da9">00024</link> &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;Transform&#32;<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_longbow_1af757d0d80234138d49f593282fcb9da9">pivotTransform</link>;
+<anchor xml:id="__longbow_8cs_source_1l00025"/><link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_longbow_1ad3a312a36990ee4d3b312cece61c8de3">00025</link> &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;Transform&#32;<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_longbow_1ad3a312a36990ee4d3b312cece61c8de3">handleTransform</link>;
+00026 
+00027 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_hand">Hand</link>&#32;hand;
+00028 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_arrow_hand">ArrowHand</link>&#32;arrowHand;
+00029 
+<anchor xml:id="__longbow_8cs_source_1l00030"/><link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_longbow_1a0a9ebd634ee05177f21171a32fb1e525">00030</link> &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;Transform&#32;<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_longbow_1a0a9ebd634ee05177f21171a32fb1e525">nockTransform</link>;
+<anchor xml:id="__longbow_8cs_source_1l00031"/><link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_longbow_1a439ae7b21f5baefc78053bd32de81404">00031</link> &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;Transform&#32;<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_longbow_1a439ae7b21f5baefc78053bd32de81404">nockRestTransform</link>;
+00032 
+<anchor xml:id="__longbow_8cs_source_1l00033"/><link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_longbow_1af05bb2dbf9bc54f282088d4d2a4753ca">00033</link> &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keywordtype">bool</emphasis>&#32;<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_longbow_1af05bb2dbf9bc54f282088d4d2a4753ca">autoSpawnArrowHand</link>&#32;=&#32;<emphasis role="keyword">true</emphasis>;
+<anchor xml:id="__longbow_8cs_source_1l00034"/><link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_longbow_1acf32893c0d8d9925bccb4a6369b68144">00034</link> &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_item_package">ItemPackage</link>&#32;<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_longbow_1acf32893c0d8d9925bccb4a6369b68144">arrowHandItemPackage</link>;
+<anchor xml:id="__longbow_8cs_source_1l00035"/><link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_longbow_1aaab9d5480bf1f4acb18da7cf3cb91b0a">00035</link> &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;GameObject&#32;<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_longbow_1aaab9d5480bf1f4acb18da7cf3cb91b0a">arrowHandPrefab</link>;
+00036 
+<anchor xml:id="__longbow_8cs_source_1l00037"/><link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_longbow_1a3a0cb07c85c95fa3d052d45dcfa5ca8a">00037</link> &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keywordtype">bool</emphasis>&#32;<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_longbow_1a3a0cb07c85c95fa3d052d45dcfa5ca8a">nocked</link>;
+<anchor xml:id="__longbow_8cs_source_1l00038"/><link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_longbow_1aef7ba1ecd690e0a7e432df432a5bfeb4">00038</link> &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keywordtype">bool</emphasis>&#32;<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_longbow_1aef7ba1ecd690e0a7e432df432a5bfeb4">pulled</link>;
+00039 
+00040 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;<emphasis role="keyword">const</emphasis>&#32;<emphasis role="keywordtype">float</emphasis>&#32;minPull&#32;=&#32;0.05f;
+00041 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;<emphasis role="keyword">const</emphasis>&#32;<emphasis role="keywordtype">float</emphasis>&#32;maxPull&#32;=&#32;0.5f;
+00042 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;<emphasis role="keywordtype">float</emphasis>&#32;nockDistanceTravelled&#32;=&#32;0f;
+00043 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;<emphasis role="keywordtype">float</emphasis>&#32;hapticDistanceThreshold&#32;=&#32;0.01f;
+00044 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;<emphasis role="keywordtype">float</emphasis>&#32;lastTickDistance;
+00045 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;<emphasis role="keyword">const</emphasis>&#32;<emphasis role="keywordtype">float</emphasis>&#32;bowPullPulseStrengthLow&#32;=&#32;100;
+00046 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;<emphasis role="keyword">const</emphasis>&#32;<emphasis role="keywordtype">float</emphasis>&#32;bowPullPulseStrengthHigh&#32;=&#32;500;
+00047 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;Vector3&#32;bowLeftVector;
+00048 
+<anchor xml:id="__longbow_8cs_source_1l00049"/><link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_longbow_1a9dc4e4aecaa9b346be14cb381aa56158">00049</link> &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keywordtype">float</emphasis>&#32;<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_longbow_1a9dc4e4aecaa9b346be14cb381aa56158">arrowMinVelocity</link>&#32;=&#32;3f;
+<anchor xml:id="__longbow_8cs_source_1l00050"/><link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_longbow_1aa70ecf34111c961f1807fb74c6332db7">00050</link> &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keywordtype">float</emphasis>&#32;<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_longbow_1aa70ecf34111c961f1807fb74c6332db7">arrowMaxVelocity</link>&#32;=&#32;30f;
+00051 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;<emphasis role="keywordtype">float</emphasis>&#32;arrowVelocity&#32;=&#32;30f;
+00052 
+00053 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;<emphasis role="keywordtype">float</emphasis>&#32;minStrainTickTime&#32;=&#32;0.1f;
+00054 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;<emphasis role="keywordtype">float</emphasis>&#32;maxStrainTickTime&#32;=&#32;0.5f;
+00055 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;<emphasis role="keywordtype">float</emphasis>&#32;nextStrainTick&#32;=&#32;0;
+00056 
+00057 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;<emphasis role="keywordtype">bool</emphasis>&#32;lerpBackToZeroRotation;
+00058 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;<emphasis role="keywordtype">float</emphasis>&#32;lerpStartTime;
+00059 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;<emphasis role="keywordtype">float</emphasis>&#32;lerpDuration&#32;=&#32;0.15f;
+00060 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;Quaternion&#32;lerpStartRotation;
+00061 
+00062 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;<emphasis role="keywordtype">float</emphasis>&#32;nockLerpStartTime;
+00063 
+00064 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;Quaternion&#32;nockLerpStartRotation;
+00065 
+<anchor xml:id="__longbow_8cs_source_1l00066"/><link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_longbow_1a4387570c5440d83e71d8087fadac7177">00066</link> &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keywordtype">float</emphasis>&#32;<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_longbow_1a4387570c5440d83e71d8087fadac7177">drawOffset</link>&#32;=&#32;0.06f;
+00067 
+<anchor xml:id="__longbow_8cs_source_1l00068"/><link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_longbow_1ac8567eb47c06e6daee08d40022ba86b6">00068</link> &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_linear_mapping">LinearMapping</link>&#32;<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_longbow_1ac8567eb47c06e6daee08d40022ba86b6">bowDrawLinearMapping</link>;
+00069 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;
+00070 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;Vector3&#32;lateUpdatePos;
+00071 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;Quaternion&#32;lateUpdateRot;
+00072 
+<anchor xml:id="__longbow_8cs_source_1l00073"/><link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_longbow_1a86d5e6565e71ab26a6d58a9afd8ec685">00073</link> &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_sound_bow_click">SoundBowClick</link>&#32;<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_longbow_1a86d5e6565e71ab26a6d58a9afd8ec685">drawSound</link>;
+00074 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;<emphasis role="keywordtype">float</emphasis>&#32;drawTension;
+<anchor xml:id="__longbow_8cs_source_1l00075"/><link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_longbow_1a71748533e18de5815af1f19da1157c95">00075</link> &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_sound_play_oneshot">SoundPlayOneshot</link>&#32;<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_longbow_1a71748533e18de5815af1f19da1157c95">arrowSlideSound</link>;
+<anchor xml:id="__longbow_8cs_source_1l00076"/><link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_longbow_1a16d66d2b39ae5cb1693cae811a3e28e4">00076</link> &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_sound_play_oneshot">SoundPlayOneshot</link>&#32;<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_longbow_1a16d66d2b39ae5cb1693cae811a3e28e4">releaseSound</link>;
+<anchor xml:id="__longbow_8cs_source_1l00077"/><link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_longbow_1a4face5c164fc3db112f68557571c5f7f">00077</link> &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_sound_play_oneshot">SoundPlayOneshot</link>&#32;<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_longbow_1a4face5c164fc3db112f68557571c5f7f">nockSound</link>;
+00078 
+00079 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;SteamVR_Events.Action&#32;newPosesAppliedAction;
+00080 
+00081 
+00082 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//-------------------------------------------------</emphasis>
+00083 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;OnAttachedToHand(&#32;<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_hand">Hand</link>&#32;attachedHand&#32;)
+00084 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00085 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;hand&#32;=&#32;attachedHand;
+00086 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00087 
+00088 
+00089 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//-------------------------------------------------</emphasis>
+00090 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;HandAttachedUpdate(&#32;<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_hand">Hand</link>&#32;hand&#32;)
+00091 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00092 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;Reset&#32;transform&#32;since&#32;we&#32;cheated&#32;it&#32;right&#32;after&#32;getting&#32;poses&#32;on&#32;previous&#32;frame</emphasis>
+00093 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//transform.localPosition&#32;=&#32;Vector3.zero;</emphasis>
+00094 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//transform.localRotation&#32;=&#32;Quaternion.identity;</emphasis>
+00095 
+00096 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;Update&#32;handedness&#32;guess</emphasis>
+00097 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;EvaluateHandedness();
+00098 
+00099 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(&#32;<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_longbow_1a3a0cb07c85c95fa3d052d45dcfa5ca8a">nocked</link>&#32;)
+00100 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00101 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;Vector3&#32;nockToarrowHand&#32;=&#32;(&#32;arrowHand.<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_arrow_hand_1a14683ec3df3b0d154dd3f08801825060">arrowNockTransform</link>.parent.position&#32;-&#32;<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_longbow_1a439ae7b21f5baefc78053bd32de81404">nockRestTransform</link>.position&#32;);&#32;<emphasis role="comment">//&#32;Vector&#32;from&#32;bow&#32;nock&#32;transform&#32;to&#32;arrowhand&#32;nock&#32;transform&#32;-&#32;used&#32;to&#32;align&#32;bow&#32;when&#32;drawing</emphasis>
+00102 
+00103 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;Align&#32;bow</emphasis>
+00104 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;Time&#32;lerp&#32;value&#32;used&#32;for&#32;ramping&#32;into&#32;drawn&#32;bow&#32;orientation</emphasis>
+00105 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordtype">float</emphasis>&#32;lerp&#32;=&#32;Util.RemapNumberClamped(&#32;Time.time,&#32;nockLerpStartTime,&#32;(&#32;nockLerpStartTime&#32;+&#32;lerpDuration&#32;),&#32;0f,&#32;1f&#32;);
+00106 
+00107 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordtype">float</emphasis>&#32;pullLerp&#32;=&#32;Util.RemapNumberClamped(&#32;nockToarrowHand.magnitude,&#32;minPull,&#32;maxPull,&#32;0f,&#32;1f&#32;);&#32;<emphasis role="comment">//&#32;Normalized&#32;current&#32;state&#32;of&#32;bow&#32;draw&#32;0&#32;-&#32;1</emphasis>
+00108 
+00109 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;Vector3&#32;arrowNockTransformToHeadset&#32;=&#32;(&#32;(&#32;<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_player">Player</link>.<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_player_1ad6c38e0b00917563e4b19d206d20466e">instance</link>.<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_player_1a1ed62d545589d4e836edcc6e6e5494a3">hmdTransform</link>.position&#32;+&#32;(&#32;Vector3.down&#32;*&#32;0.05f&#32;)&#32;)&#32;-&#32;arrowHand.<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_arrow_hand_1a14683ec3df3b0d154dd3f08801825060">arrowNockTransform</link>.parent.position&#32;).normalized;
+00110 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;Vector3&#32;arrowHandPosition&#32;=&#32;(&#32;arrowHand.<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_arrow_hand_1a14683ec3df3b0d154dd3f08801825060">arrowNockTransform</link>.parent.position&#32;+&#32;(&#32;(&#32;arrowNockTransformToHeadset&#32;*&#32;<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_longbow_1a4387570c5440d83e71d8087fadac7177">drawOffset</link>&#32;)&#32;*&#32;pullLerp&#32;)&#32;);&#32;<emphasis role="comment">//&#32;Use&#32;this&#32;line&#32;to&#32;lerp&#32;arrowHand&#32;nock&#32;position</emphasis>
+00111 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//Vector3&#32;arrowHandPosition&#32;=&#32;arrowHand.arrowNockTransform.position;&#32;//&#32;Use&#32;this&#32;line&#32;if&#32;we&#32;don&apos;t&#32;want&#32;to&#32;lerp&#32;arrowHand&#32;nock&#32;position</emphasis>
+00112 
+00113 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;Vector3&#32;pivotToString&#32;=&#32;(&#32;arrowHandPosition&#32;-&#32;<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_longbow_1af757d0d80234138d49f593282fcb9da9">pivotTransform</link>.position&#32;).normalized;
+00114 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;Vector3&#32;pivotToLowerHandle&#32;=&#32;(&#32;<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_longbow_1ad3a312a36990ee4d3b312cece61c8de3">handleTransform</link>.position&#32;-&#32;<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_longbow_1af757d0d80234138d49f593282fcb9da9">pivotTransform</link>.position&#32;).normalized;
+00115 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;bowLeftVector&#32;=&#32;-Vector3.Cross(&#32;pivotToLowerHandle,&#32;pivotToString&#32;);
+00116 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_longbow_1af757d0d80234138d49f593282fcb9da9">pivotTransform</link>.rotation&#32;=&#32;Quaternion.Lerp(&#32;nockLerpStartRotation,&#32;Quaternion.LookRotation(&#32;pivotToString,&#32;bowLeftVector&#32;),&#32;lerp&#32;);
+00117 
+00118 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;Move&#32;nock&#32;position</emphasis>
+00119 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(&#32;Vector3.Dot(&#32;nockToarrowHand,&#32;-<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_longbow_1a0a9ebd634ee05177f21171a32fb1e525">nockTransform</link>.forward&#32;)&#32;&gt;&#32;0&#32;)
+00120 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00121 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordtype">float</emphasis>&#32;distanceToarrowHand&#32;=&#32;nockToarrowHand.magnitude&#32;*&#32;lerp;
+00122 
+00123 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_longbow_1a0a9ebd634ee05177f21171a32fb1e525">nockTransform</link>.localPosition&#32;=&#32;<emphasis role="keyword">new</emphasis>&#32;Vector3(&#32;0f,&#32;0f,&#32;Mathf.Clamp(&#32;-distanceToarrowHand,&#32;-maxPull,&#32;0f&#32;)&#32;);
+00124 
+00125 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;nockDistanceTravelled&#32;=&#32;-<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_longbow_1a0a9ebd634ee05177f21171a32fb1e525">nockTransform</link>.localPosition.z;
+00126 
+00127 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;arrowVelocity&#32;=&#32;Util.RemapNumber(&#32;nockDistanceTravelled,&#32;minPull,&#32;maxPull,&#32;<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_longbow_1a9dc4e4aecaa9b346be14cb381aa56158">arrowMinVelocity</link>,&#32;<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_longbow_1aa70ecf34111c961f1807fb74c6332db7">arrowMaxVelocity</link>&#32;);
+00128 
+00129 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;drawTension&#32;=&#32;Util.RemapNumberClamped(&#32;nockDistanceTravelled,&#32;0,&#32;maxPull,&#32;0f,&#32;1f&#32;);
+00130 
+00131 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;this.bowDrawLinearMapping.<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_linear_mapping_1a775b4f01f606f8083af2dc1ae0f373a5">value</link>&#32;=&#32;drawTension;&#32;<emphasis role="comment">//&#32;Send&#32;drawTension&#32;value&#32;to&#32;LinearMapping&#32;script,&#32;which&#32;drives&#32;the&#32;bow&#32;draw&#32;animation</emphasis>
+00132 
+00133 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(&#32;nockDistanceTravelled&#32;&gt;&#32;minPull&#32;)
+00134 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00135 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_longbow_1aef7ba1ecd690e0a7e432df432a5bfeb4">pulled</link>&#32;=&#32;<emphasis role="keyword">true</emphasis>;
+00136 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00137 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">else</emphasis>
+00138 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00139 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_longbow_1aef7ba1ecd690e0a7e432df432a5bfeb4">pulled</link>&#32;=&#32;<emphasis role="keyword">false</emphasis>;
+00140 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00141 
+00142 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(&#32;(&#32;nockDistanceTravelled&#32;&gt;&#32;(&#32;lastTickDistance&#32;+&#32;hapticDistanceThreshold&#32;)&#32;)&#32;||&#32;nockDistanceTravelled&#32;&lt;&#32;(&#32;lastTickDistance&#32;-&#32;hapticDistanceThreshold&#32;)&#32;)
+00143 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00144 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;ushort&#32;hapticStrength&#32;=&#32;(ushort)Util.RemapNumber(&#32;nockDistanceTravelled,&#32;0,&#32;maxPull,&#32;bowPullPulseStrengthLow,&#32;bowPullPulseStrengthHigh&#32;);
+00145 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;hand.<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_hand_1ab9e8c722bbad5cb37f0268f4c1745118">TriggerHapticPulse</link>(&#32;hapticStrength&#32;);
+00146 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;hand.<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_hand_1af5e110dcf7ecc1498c8e8e1425636f81">otherHand</link>.<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_hand_1ab9e8c722bbad5cb37f0268f4c1745118">TriggerHapticPulse</link>(&#32;hapticStrength&#32;);
+00147 
+00148 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_longbow_1a86d5e6565e71ab26a6d58a9afd8ec685">drawSound</link>.<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_sound_bow_click_1a6bf68c8fbc92f67a09ac3f3bf2e03806">PlayBowTensionClicks</link>(&#32;drawTension&#32;);
+00149 
+00150 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;lastTickDistance&#32;=&#32;nockDistanceTravelled;
+00151 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00152 
+00153 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(&#32;nockDistanceTravelled&#32;&gt;=&#32;maxPull&#32;)
+00154 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00155 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(&#32;Time.time&#32;&gt;&#32;nextStrainTick&#32;)
+00156 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00157 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;hand.<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_hand_1ab9e8c722bbad5cb37f0268f4c1745118">TriggerHapticPulse</link>(&#32;400&#32;);
+00158 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;hand.<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_hand_1af5e110dcf7ecc1498c8e8e1425636f81">otherHand</link>.<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_hand_1ab9e8c722bbad5cb37f0268f4c1745118">TriggerHapticPulse</link>(&#32;400&#32;);
+00159 
+00160 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_longbow_1a86d5e6565e71ab26a6d58a9afd8ec685">drawSound</link>.<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_sound_bow_click_1a6bf68c8fbc92f67a09ac3f3bf2e03806">PlayBowTensionClicks</link>(&#32;drawTension&#32;);
+00161 
+00162 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;nextStrainTick&#32;=&#32;Time.time&#32;+&#32;Random.Range(&#32;minStrainTickTime,&#32;maxStrainTickTime&#32;);
+00163 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00164 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00165 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00166 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">else</emphasis>
+00167 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00168 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_longbow_1a0a9ebd634ee05177f21171a32fb1e525">nockTransform</link>.localPosition&#32;=&#32;<emphasis role="keyword">new</emphasis>&#32;Vector3(&#32;0f,&#32;0f,&#32;0f&#32;);
+00169 
+00170 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;this.bowDrawLinearMapping.<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_linear_mapping_1a775b4f01f606f8083af2dc1ae0f373a5">value</link>&#32;=&#32;0f;
+00171 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00172 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00173 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">else</emphasis>
+00174 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00175 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(&#32;lerpBackToZeroRotation&#32;)
+00176 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00177 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordtype">float</emphasis>&#32;lerp&#32;=&#32;Util.RemapNumber(&#32;Time.time,&#32;lerpStartTime,&#32;lerpStartTime&#32;+&#32;lerpDuration,&#32;0,&#32;1&#32;);
+00178 
+00179 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_longbow_1af757d0d80234138d49f593282fcb9da9">pivotTransform</link>.localRotation&#32;=&#32;Quaternion.Lerp(&#32;lerpStartRotation,&#32;Quaternion.identity,&#32;lerp&#32;);
+00180 
+00181 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(&#32;lerp&#32;&gt;=&#32;1&#32;)
+00182 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00183 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;lerpBackToZeroRotation&#32;=&#32;<emphasis role="keyword">false</emphasis>;
+00184 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00185 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00186 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00187 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00188 
+00189 
+00190 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//-------------------------------------------------</emphasis>
+<anchor xml:id="__longbow_8cs_source_1l00191"/><link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_longbow_1a1c9904dc841fdd685790ac4b5568dd0a">00191</link> &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_longbow_1a1c9904dc841fdd685790ac4b5568dd0a">ArrowReleased</link>()
+00192 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00193 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_longbow_1a3a0cb07c85c95fa3d052d45dcfa5ca8a">nocked</link>&#32;=&#32;<emphasis role="keyword">false</emphasis>;
+00194 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;hand.<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_hand_1aebd333682282351892fcc4b9df395e30">HoverUnlock</link>(&#32;GetComponent&lt;Interactable&gt;()&#32;);
+00195 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;hand.<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_hand_1af5e110dcf7ecc1498c8e8e1425636f81">otherHand</link>.<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_hand_1aebd333682282351892fcc4b9df395e30">HoverUnlock</link>(&#32;arrowHand.GetComponent&lt;<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_interactable">Interactable</link>&gt;()&#32;);
+00196 
+00197 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(&#32;<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_longbow_1a16d66d2b39ae5cb1693cae811a3e28e4">releaseSound</link>&#32;!=&#32;<emphasis role="keyword">null</emphasis>&#32;)
+00198 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00199 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_longbow_1a16d66d2b39ae5cb1693cae811a3e28e4">releaseSound</link>.<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_sound_play_oneshot_1add1324a91d31e0d4e252a3e109425363">Play</link>();
+00200 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00201 
+00202 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;this.StartCoroutine(&#32;this.ResetDrawAnim()&#32;);
+00203 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00204 
+00205 
+00206 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//-------------------------------------------------</emphasis>
+00207 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;IEnumerator&#32;ResetDrawAnim()
+00208 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00209 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordtype">float</emphasis>&#32;startTime&#32;=&#32;Time.time;
+00210 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordtype">float</emphasis>&#32;startLerp&#32;=&#32;drawTension;
+00211 
+00212 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">while</emphasis>&#32;(&#32;Time.time&#32;&lt;&#32;(&#32;startTime&#32;+&#32;0.02f&#32;)&#32;)
+00213 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00214 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordtype">float</emphasis>&#32;lerp&#32;=&#32;Util.RemapNumberClamped(&#32;Time.time,&#32;startTime,&#32;startTime&#32;+&#32;0.02f,&#32;startLerp,&#32;0f&#32;);
+00215 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;this.bowDrawLinearMapping.<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_linear_mapping_1a775b4f01f606f8083af2dc1ae0f373a5">value</link>&#32;=&#32;lerp;
+00216 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;yield&#32;<emphasis role="keywordflow">return</emphasis>&#32;<emphasis role="keyword">null</emphasis>;
+00217 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00218 
+00219 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;this.bowDrawLinearMapping.<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_linear_mapping_1a775b4f01f606f8083af2dc1ae0f373a5">value</link>&#32;=&#32;0;
+00220 
+00221 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;yield&#32;<emphasis role="keywordflow">break</emphasis>;
+00222 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00223 
+00224 
+00225 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//-------------------------------------------------</emphasis>
+<anchor xml:id="__longbow_8cs_source_1l00226"/><link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_longbow_1a527b263071c9dc84cae6571626ad6a70">00226</link> &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keywordtype">float</emphasis>&#32;<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_longbow_1a527b263071c9dc84cae6571626ad6a70">GetArrowVelocity</link>()
+00227 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00228 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;arrowVelocity;
+00229 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00230 
+00231 
+00232 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//-------------------------------------------------</emphasis>
+<anchor xml:id="__longbow_8cs_source_1l00233"/><link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_longbow_1ae7a746228eaa9c9cb02b612ac21e2c1e">00233</link> &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_longbow_1ae7a746228eaa9c9cb02b612ac21e2c1e">StartRotationLerp</link>()
+00234 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00235 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;lerpStartTime&#32;=&#32;Time.time;
+00236 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;lerpBackToZeroRotation&#32;=&#32;<emphasis role="keyword">true</emphasis>;
+00237 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;lerpStartRotation&#32;=&#32;<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_longbow_1af757d0d80234138d49f593282fcb9da9">pivotTransform</link>.localRotation;
+00238 
+00239 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;Util.ResetTransform(&#32;<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_longbow_1a0a9ebd634ee05177f21171a32fb1e525">nockTransform</link>&#32;);
+00240 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00241 
+00242 
+00243 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//-------------------------------------------------</emphasis>
+<anchor xml:id="__longbow_8cs_source_1l00244"/><link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_longbow_1ab6c7f26589147353e5360df8fd2452d9">00244</link> &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_longbow_1ab6c7f26589147353e5360df8fd2452d9">StartNock</link>(&#32;<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_arrow_hand">ArrowHand</link>&#32;currentArrowHand&#32;)
+00245 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00246 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;arrowHand&#32;=&#32;currentArrowHand;
+00247 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;hand.<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_hand_1a07600fb46d1bdbf3a02e70197d471134">HoverLock</link>(&#32;GetComponent&lt;Interactable&gt;()&#32;);
+00248 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_longbow_1a3a0cb07c85c95fa3d052d45dcfa5ca8a">nocked</link>&#32;=&#32;<emphasis role="keyword">true</emphasis>;
+00249 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;nockLerpStartTime&#32;=&#32;Time.time;
+00250 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;nockLerpStartRotation&#32;=&#32;<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_longbow_1af757d0d80234138d49f593282fcb9da9">pivotTransform</link>.rotation;
+00251 
+00252 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;Sound&#32;of&#32;arrow&#32;sliding&#32;on&#32;nock&#32;as&#32;it&apos;s&#32;being&#32;pulled&#32;back</emphasis>
+00253 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_longbow_1a71748533e18de5815af1f19da1157c95">arrowSlideSound</link>.<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_sound_play_oneshot_1add1324a91d31e0d4e252a3e109425363">Play</link>();
+00254 
+00255 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;Decide&#32;which&#32;hand&#32;we&apos;re&#32;drawing&#32;with&#32;and&#32;lerp&#32;to&#32;the&#32;correct&#32;side</emphasis>
+00256 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;DoHandednessCheck();
+00257 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00258 
+00259 
+00260 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//-------------------------------------------------</emphasis>
+00261 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;EvaluateHandedness()
+00262 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00263 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;var&#32;handType&#32;=&#32;hand.<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_hand_1a05520135148fd74ca10b8549d5c7354d">handType</link>;
+00264 
+00265 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(&#32;handType&#32;==&#32;<link linkend="_namespace_valve_1_1_v_r_1a82e5bf501cc3aa155444ee3f0662853f">SteamVR_Input_Sources</link>.LeftHand&#32;)<emphasis role="comment">//&#32;Bow&#32;hand&#32;is&#32;further&#32;left&#32;than&#32;arrow&#32;hand.</emphasis>
+00266 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00267 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;We&#32;were&#32;considering&#32;a&#32;switch,&#32;but&#32;the&#32;current&#32;controller&#32;orientation&#32;matches&#32;our&#32;currently&#32;assigned&#32;handedness,&#32;so&#32;no&#32;longer&#32;consider&#32;a&#32;switch</emphasis>
+00268 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(&#32;possibleHandSwitch&#32;&amp;&amp;&#32;<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_longbow_1a50efe1398921e159ce3e7a3ddd228799">currentHandGuess</link>&#32;==&#32;<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_longbow_1a1a13793c73b85cc47cc323af991169be">Handedness</link>.Left&#32;)
+00269 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00270 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;possibleHandSwitch&#32;=&#32;<emphasis role="keyword">false</emphasis>;
+00271 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00272 
+00273 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;If&#32;we&#32;previously&#32;thought&#32;the&#32;bow&#32;was&#32;right-handed,&#32;and&#32;were&#32;not&#32;already&#32;considering&#32;switching,&#32;start&#32;considering&#32;a&#32;switch</emphasis>
+00274 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(&#32;!possibleHandSwitch&#32;&amp;&amp;&#32;<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_longbow_1a50efe1398921e159ce3e7a3ddd228799">currentHandGuess</link>&#32;==&#32;<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_longbow_1a1a13793c73b85cc47cc323af991169be">Handedness</link>.Right&#32;)
+00275 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00276 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;possibleHandSwitch&#32;=&#32;<emphasis role="keyword">true</emphasis>;
+00277 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;timeOfPossibleHandSwitch&#32;=&#32;Time.time;
+00278 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00279 
+00280 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;If&#32;we&#32;are&#32;considering&#32;a&#32;handedness&#32;switch,&#32;and&#32;it&apos;s&#32;been&#32;this&#32;way&#32;long&#32;enough,&#32;switch</emphasis>
+00281 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(&#32;possibleHandSwitch&#32;&amp;&amp;&#32;Time.time&#32;&gt;&#32;(&#32;timeOfPossibleHandSwitch&#32;+&#32;timeBeforeConfirmingHandSwitch&#32;)&#32;)
+00282 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00283 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_longbow_1a50efe1398921e159ce3e7a3ddd228799">currentHandGuess</link>&#32;=&#32;<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_longbow_1a1a13793c73b85cc47cc323af991169be">Handedness</link>.Left;
+00284 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;possibleHandSwitch&#32;=&#32;<emphasis role="keyword">false</emphasis>;
+00285 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00286 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00287 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">else</emphasis>&#32;<emphasis role="comment">//&#32;Bow&#32;hand&#32;is&#32;further&#32;right&#32;than&#32;arrow&#32;hand</emphasis>
+00288 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00289 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;We&#32;were&#32;considering&#32;a&#32;switch,&#32;but&#32;the&#32;current&#32;controller&#32;orientation&#32;matches&#32;our&#32;currently&#32;assigned&#32;handedness,&#32;so&#32;no&#32;longer&#32;consider&#32;a&#32;switch</emphasis>
+00290 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(&#32;possibleHandSwitch&#32;&amp;&amp;&#32;<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_longbow_1a50efe1398921e159ce3e7a3ddd228799">currentHandGuess</link>&#32;==&#32;<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_longbow_1a1a13793c73b85cc47cc323af991169be">Handedness</link>.Right&#32;)
+00291 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00292 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;possibleHandSwitch&#32;=&#32;<emphasis role="keyword">false</emphasis>;
+00293 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00294 
+00295 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;If&#32;we&#32;previously&#32;thought&#32;the&#32;bow&#32;was&#32;right-handed,&#32;and&#32;were&#32;not&#32;already&#32;considering&#32;switching,&#32;start&#32;considering&#32;a&#32;switch</emphasis>
+00296 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(&#32;!possibleHandSwitch&#32;&amp;&amp;&#32;<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_longbow_1a50efe1398921e159ce3e7a3ddd228799">currentHandGuess</link>&#32;==&#32;<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_longbow_1a1a13793c73b85cc47cc323af991169be">Handedness</link>.Left&#32;)
+00297 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00298 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;possibleHandSwitch&#32;=&#32;<emphasis role="keyword">true</emphasis>;
+00299 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;timeOfPossibleHandSwitch&#32;=&#32;Time.time;
+00300 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00301 
+00302 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;If&#32;we&#32;are&#32;considering&#32;a&#32;handedness&#32;switch,&#32;and&#32;it&apos;s&#32;been&#32;this&#32;way&#32;long&#32;enough,&#32;switch</emphasis>
+00303 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(&#32;possibleHandSwitch&#32;&amp;&amp;&#32;Time.time&#32;&gt;&#32;(&#32;timeOfPossibleHandSwitch&#32;+&#32;timeBeforeConfirmingHandSwitch&#32;)&#32;)
+00304 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00305 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_longbow_1a50efe1398921e159ce3e7a3ddd228799">currentHandGuess</link>&#32;=&#32;<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_longbow_1a1a13793c73b85cc47cc323af991169be">Handedness</link>.Right;
+00306 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;possibleHandSwitch&#32;=&#32;<emphasis role="keyword">false</emphasis>;
+00307 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00308 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00309 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00310 
+00311 
+00312 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//-------------------------------------------------</emphasis>
+00313 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;DoHandednessCheck()
+00314 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00315 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;Based&#32;on&#32;our&#32;current&#32;best&#32;guess&#32;about&#32;hand,&#32;switch&#32;bow&#32;orientation&#32;and&#32;arrow&#32;lerp&#32;direction</emphasis>
+00316 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(&#32;<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_longbow_1a50efe1398921e159ce3e7a3ddd228799">currentHandGuess</link>&#32;==&#32;<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_longbow_1a1a13793c73b85cc47cc323af991169be">Handedness</link>.Left&#32;)
+00317 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00318 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_longbow_1af757d0d80234138d49f593282fcb9da9">pivotTransform</link>.localScale&#32;=&#32;<emphasis role="keyword">new</emphasis>&#32;Vector3(&#32;1f,&#32;1f,&#32;1f&#32;);
+00319 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00320 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">else</emphasis>
+00321 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00322 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_longbow_1af757d0d80234138d49f593282fcb9da9">pivotTransform</link>.localScale&#32;=&#32;<emphasis role="keyword">new</emphasis>&#32;Vector3(&#32;1f,&#32;-1f,&#32;1f&#32;);
+00323 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00324 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00325 
+00326 
+00327 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//-------------------------------------------------</emphasis>
+<anchor xml:id="__longbow_8cs_source_1l00328"/><link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_longbow_1a279e4793dd08ca0e19cf3ad84c6f65ad">00328</link> &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_longbow_1a279e4793dd08ca0e19cf3ad84c6f65ad">ArrowInPosition</link>()
+00329 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00330 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;DoHandednessCheck();
+00331 
+00332 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(&#32;<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_longbow_1a4face5c164fc3db112f68557571c5f7f">nockSound</link>&#32;!=&#32;<emphasis role="keyword">null</emphasis>&#32;)
+00333 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00334 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_longbow_1a4face5c164fc3db112f68557571c5f7f">nockSound</link>.<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_sound_play_oneshot_1add1324a91d31e0d4e252a3e109425363">Play</link>();
+00335 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00336 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00337 
+00338 
+00339 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//-------------------------------------------------</emphasis>
+<anchor xml:id="__longbow_8cs_source_1l00340"/><link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_longbow_1af32e9030daa9811c2cc879a2769948f9">00340</link> &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_longbow_1af32e9030daa9811c2cc879a2769948f9">ReleaseNock</link>()&#32;
+00341 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00342 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;ArrowHand&#32;tells&#32;us&#32;to&#32;do&#32;this&#32;when&#32;we&#32;release&#32;the&#32;buttons&#32;when&#32;bow&#32;is&#32;nocked&#32;but&#32;not&#32;drawn&#32;far&#32;enough</emphasis>
+00343 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_longbow_1a3a0cb07c85c95fa3d052d45dcfa5ca8a">nocked</link>&#32;=&#32;<emphasis role="keyword">false</emphasis>;
+00344 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;hand.<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_hand_1aebd333682282351892fcc4b9df395e30">HoverUnlock</link>(&#32;GetComponent&lt;Interactable&gt;()&#32;);
+00345 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;this.StartCoroutine(&#32;this.ResetDrawAnim()&#32;);
+00346 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00347 
+00348 
+00349 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//-------------------------------------------------</emphasis>
+00350 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;ShutDown()
+00351 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00352 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(&#32;hand&#32;!=&#32;<emphasis role="keyword">null</emphasis>&#32;&amp;&amp;&#32;hand.<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_hand_1af5e110dcf7ecc1498c8e8e1425636f81">otherHand</link>.<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_hand_1ad73d70c80ce508e57c01618f7797188e">currentAttachedObject</link>&#32;!=&#32;<emphasis role="keyword">null</emphasis>&#32;)
+00353 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00354 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(&#32;hand.<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_hand_1af5e110dcf7ecc1498c8e8e1425636f81">otherHand</link>.<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_hand_1ad73d70c80ce508e57c01618f7797188e">currentAttachedObject</link>.GetComponent&lt;<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_item_package_reference">ItemPackageReference</link>&gt;()&#32;!=&#32;<emphasis role="keyword">null</emphasis>&#32;)
+00355 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00356 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(&#32;hand.<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_hand_1af5e110dcf7ecc1498c8e8e1425636f81">otherHand</link>.<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_hand_1ad73d70c80ce508e57c01618f7797188e">currentAttachedObject</link>.GetComponent&lt;<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_item_package_reference">ItemPackageReference</link>&gt;().<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_item_package_reference_1a69090c43467f5e32692c0e6379c4c970">itemPackage</link>&#32;==&#32;<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_longbow_1acf32893c0d8d9925bccb4a6369b68144">arrowHandItemPackage</link>&#32;)
+00357 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00358 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;hand.<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_hand_1af5e110dcf7ecc1498c8e8e1425636f81">otherHand</link>.<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_hand_1ab0bccf232d1291c6c3000d9a967635ca">DetachObject</link>(&#32;hand.<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_hand_1af5e110dcf7ecc1498c8e8e1425636f81">otherHand</link>.<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_hand_1ad73d70c80ce508e57c01618f7797188e">currentAttachedObject</link>&#32;);
+00359 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00360 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00361 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00362 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00363 
+00364 
+00365 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//-------------------------------------------------</emphasis>
+00366 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;OnHandFocusLost(&#32;Hand&#32;hand&#32;)
+00367 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00368 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;gameObject.SetActive(&#32;<emphasis role="keyword">false</emphasis>&#32;);
+00369 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00370 
+00371 
+00372 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//-------------------------------------------------</emphasis>
+00373 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;OnHandFocusAcquired(&#32;Hand&#32;hand&#32;)
+00374 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00375 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;gameObject.SetActive(&#32;<emphasis role="keyword">true</emphasis>&#32;);
+00376 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;OnAttachedToHand(&#32;hand&#32;);
+00377 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00378 
+00379 
+00380 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//-------------------------------------------------</emphasis>
+00381 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;OnDetachedFromHand(&#32;Hand&#32;hand&#32;)
+00382 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00383 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;Destroy(&#32;gameObject&#32;);
+00384 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00385 
+00386 
+00387 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//-------------------------------------------------</emphasis>
+00388 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordtype">void</emphasis>&#32;OnDestroy()
+00389 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00390 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;ShutDown();
+00391 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00392 &#32;&#32;&#32;&#32;}
+00393 }
+</programlisting></section>

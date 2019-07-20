@@ -1,0 +1,702 @@
+<?xml version='1.0' encoding='UTF-8' standalone='no'?>
+<section xmlns="http://docbook.org/ns/docbook" version="5.0" xmlns:xlink="http://www.w3.org/1999/xlink" xml:id="__interaction_hand_8cs_source">
+<title>InteractionHand.cs</title>
+<indexterm><primary>O:/GitHUBMINIPRoject/Assets/LeapMotion/Modules/InteractionEngine/Scripts/InteractionHand.cs</primary></indexterm>
+<programlisting>00001 <emphasis role="comment">/******************************************************************************</emphasis>
+00002 <emphasis role="comment">&#32;*&#32;Copyright&#32;(C)&#32;Leap&#32;Motion,&#32;Inc.&#32;2011-2018.&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;*</emphasis>
+00003 <emphasis role="comment">&#32;*&#32;Leap&#32;Motion&#32;proprietary&#32;and&#32;confidential.&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;*</emphasis>
+00004 <emphasis role="comment">&#32;*&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;*</emphasis>
+00005 <emphasis role="comment">&#32;*&#32;Use&#32;subject&#32;to&#32;the&#32;terms&#32;of&#32;the&#32;Leap&#32;Motion&#32;SDK&#32;Agreement&#32;available&#32;at&#32;&#32;&#32;&#32;&#32;*</emphasis>
+00006 <emphasis role="comment">&#32;*&#32;https://developer.leapmotion.com/sdk_agreement,&#32;or&#32;another&#32;agreement&#32;&#32;&#32;&#32;&#32;&#32;&#32;*</emphasis>
+00007 <emphasis role="comment">&#32;*&#32;between&#32;Leap&#32;Motion&#32;and&#32;you,&#32;your&#32;company&#32;or&#32;other&#32;organization.&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;*</emphasis>
+00008 <emphasis role="comment">&#32;******************************************************************************/</emphasis>
+00009 
+00010 <emphasis role="keyword">using</emphasis>&#32;InteractionEngineUtility;
+00011 <emphasis role="keyword">using</emphasis>&#32;<link linkend="_namespace_leap">Leap</link>.<link linkend="_namespace_leap_1_1_unity">Unity</link>.<link linkend="_namespace_leap_1_1_unity_1_1_interaction">Interaction</link>.<link linkend="_namespace_leap_1_1_unity_1_1_interaction_1_1_internal">Internal</link>;
+00012 <emphasis role="keyword">using</emphasis>&#32;<link linkend="_namespace_leap">Leap</link>.<link linkend="_namespace_leap_1_1_unity">Unity</link>.<link linkend="_namespace_leap_1_1_unity_1_1_runtime_gizmos">RuntimeGizmos</link>;
+00013 <emphasis role="keyword">using</emphasis>&#32;<link linkend="_namespace_leap">Leap</link>.<link linkend="_namespace_leap_1_1_unity">Unity</link>.<link linkend="_namespace_leap_1_1_unity_1_1_space">Space</link>;
+00014 <emphasis role="keyword">using</emphasis>&#32;<link linkend="_namespace_leap">Leap</link>.<link linkend="_namespace_leap_1_1_unity">Unity</link>.<link linkend="_namespace_leap_1_1_unity_1_1_query">Query</link>;
+00015 <emphasis role="keyword">using</emphasis>&#32;System;
+00016 <emphasis role="keyword">using</emphasis>&#32;System.Collections;
+00017 <emphasis role="keyword">using</emphasis>&#32;System.Collections.Generic;
+00018 <emphasis role="keyword">using</emphasis>&#32;<link linkend="__balloon_8cs_1a7d67e097df9376eb709b6a23aa3c7d23">UnityEngine</link>;
+00019 <emphasis role="keyword">using</emphasis>&#32;<link linkend="_namespace_leap">Leap</link>.<link linkend="_namespace_leap_1_1_unity">Unity</link>.<link linkend="_namespace_leap_1_1_unity_1_1_attributes">Attributes</link>;
+00020 
+00021 <emphasis role="keyword">namespace&#32;</emphasis><link linkend="_namespace_leap_1_1_unity_1_1_interaction">Leap.Unity.Interaction</link>&#32;{
+00022 
+<anchor xml:id="__interaction_hand_8cs_source_1l00023"/><link linkend="_namespace_leap_1_1_unity_1_1_interaction_1ab4a739b7f8a6748903e2ccc029df7a50">00023</link> &#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keyword">enum</emphasis>&#32;<link linkend="_namespace_leap_1_1_unity_1_1_interaction_1ab4a739b7f8a6748903e2ccc029df7a50">HandDataMode</link>&#32;{&#32;<link linkend="_namespace_leap_1_1_unity_1_1_interaction_1ab4a739b7f8a6748903e2ccc029df7a50a60fc9b6e87d69e5d8adcffb6dd8a9746">PlayerLeft</link>,&#32;<link linkend="_namespace_leap_1_1_unity_1_1_interaction_1ab4a739b7f8a6748903e2ccc029df7a50ae2f87041e4cb98a6501b9f54ff61b67b">PlayerRight</link>,&#32;<link linkend="_namespace_leap_1_1_unity_1_1_interaction_1ab4a739b7f8a6748903e2ccc029df7a50a90589c47f06eb971d548591f23c285af">Custom</link>&#32;}
+00024 
+00025 &#32;&#32;[DisallowMultipleComponent]
+<anchor xml:id="__interaction_hand_8cs_source_1l00026"/><link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_hand">00026</link> &#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keyword">class&#32;</emphasis><link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_hand">InteractionHand</link>&#32;:&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_controller">InteractionController</link>&#32;{
+00027 
+00028 <emphasis role="preprocessor">&#32;&#32;&#32;&#32;#region&#32;Inspector</emphasis>
+00029 
+00030 &#32;&#32;&#32;&#32;[SerializeField]
+00031 &#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;<link linkend="_class_leap_1_1_unity_1_1_leap_provider">LeapProvider</link>&#32;_leapProvider;
+00032 
+00033 &#32;&#32;&#32;&#32;[Header(<emphasis role="stringliteral">&quot;Hand&#32;Configuration&quot;</emphasis>)]
+00034 
+00035 &#32;&#32;&#32;&#32;[Tooltip(<emphasis role="stringliteral">&quot;Should&#32;the&#32;data&#32;for&#32;the&#32;underlying&#32;Leap&#32;hand&#32;come&#32;from&#32;the&#32;player&apos;s&#32;left&#32;&quot;</emphasis>
+00036 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;+&#32;<emphasis role="stringliteral">&quot;hand&#32;or&#32;their&#32;right&#32;hand?&#32;Alternatively,&#32;you&#32;can&#32;set&#32;this&#32;mode&#32;to&#32;Custom&#32;&quot;</emphasis>
+00037 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;+&#32;<emphasis role="stringliteral">&quot;to&#32;specify&#32;accessor&#32;functions&#32;manually&#32;via&#32;script&#32;(recommended&#32;for&#32;advanced&#32;&quot;</emphasis>
+00038 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;+&#32;<emphasis role="stringliteral">&quot;users&#32;only).&quot;</emphasis>)]
+00039 &#32;&#32;&#32;&#32;[SerializeField,&#32;<link linkend="_class_leap_1_1_unity_1_1_attributes_1_1_edit_time_only">EditTimeOnly</link>]
+00040 &#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;<link linkend="_namespace_leap_1_1_unity_1_1_interaction_1ab4a739b7f8a6748903e2ccc029df7a50">HandDataMode</link>&#32;_handDataMode;
+<anchor xml:id="__interaction_hand_8cs_source_1l00041"/><link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_hand_1afa891e4ad766e5470dc8fdf0e78a7334">00041</link> &#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<link linkend="_namespace_leap_1_1_unity_1_1_interaction_1ab4a739b7f8a6748903e2ccc029df7a50">HandDataMode</link>&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_hand_1afa891e4ad766e5470dc8fdf0e78a7334">handDataMode</link>&#32;{
+00042 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">get</emphasis>&#32;{&#32;<emphasis role="keywordflow">return</emphasis>&#32;_handDataMode;&#32;}
+00043 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">set</emphasis>&#32;{
+00044 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;TODO:&#32;Do&#32;validation&#32;if&#32;this&#32;is&#32;modified!</emphasis>
+00045 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;_handDataMode&#32;=&#32;value;
+00046 &#32;&#32;&#32;&#32;&#32;&#32;}
+00047 &#32;&#32;&#32;&#32;}
+00048 
+<anchor xml:id="__interaction_hand_8cs_source_1l00055"/><link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_hand_1a09719682ae423b8b6d52d12a81a1b05c">00055</link> &#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keywordtype">bool</emphasis>[]&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_hand_1a09719682ae423b8b6d52d12a81a1b05c">enabledPrimaryHoverFingertips</link>&#32;=&#32;<emphasis role="keyword">new</emphasis>&#32;<emphasis role="keywordtype">bool</emphasis>[5]&#32;{&#32;<emphasis role="keyword">true</emphasis>,&#32;<emphasis role="keyword">true</emphasis>,&#32;<emphasis role="keyword">true</emphasis>,&#32;<emphasis role="keyword">false</emphasis>,&#32;<emphasis role="keyword">false</emphasis>&#32;};
+00056 
+00057 <emphasis role="preprocessor">&#32;&#32;&#32;&#32;#endregion</emphasis>
+00058 
+00059 <emphasis role="preprocessor">&#32;&#32;&#32;&#32;#region&#32;Hand&#32;Data</emphasis>
+00060 &#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<link linkend="_class_leap_1_1_unity_1_1_leap_provider">LeapProvider</link>&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_hand_1af5d2087b092dc81bba8b6f4fae96999b">leapProvider</link>&#32;{
+00066 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">get</emphasis>&#32;{&#32;<emphasis role="keywordflow">return</emphasis>&#32;_leapProvider;&#32;}
+00067 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">set</emphasis>&#32;{
+00068 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(_leapProvider&#32;!=&#32;<emphasis role="keyword">null</emphasis>&#32;&amp;&amp;&#32;Application.isPlaying)&#32;{
+00069 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;_leapProvider.<link linkend="_class_leap_1_1_unity_1_1_leap_provider_1a125e19c25c0006a12f53e3069627b87f">OnFixedFrame</link>&#32;-=&#32;onProviderFixedFrame;
+00070 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00071 
+00072 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;_leapProvider&#32;=&#32;value;
+00073 
+00074 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(_leapProvider&#32;!=&#32;<emphasis role="keyword">null</emphasis>&#32;&amp;&amp;&#32;Application.isPlaying)&#32;{
+00075 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;_leapProvider.<link linkend="_class_leap_1_1_unity_1_1_leap_provider_1a125e19c25c0006a12f53e3069627b87f">OnFixedFrame</link>&#32;+=&#32;onProviderFixedFrame;
+00076 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00077 &#32;&#32;&#32;&#32;&#32;&#32;}
+00078 &#32;&#32;&#32;&#32;}
+00079 
+00080 &#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;Func&lt;<link linkend="_namespace_leap">Leap</link>.<link linkend="_class_leap_1_1_frame">Frame</link>,&#32;<link linkend="_namespace_leap">Leap</link>.<link linkend="_class_leap_1_1_hand">Hand</link>&gt;&#32;_handAccessorFunc;
+<anchor xml:id="__interaction_hand_8cs_source_1l00086"/><link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_hand_1a02fa026e8ea8ace2b826bbbfd10dd58f">00086</link> &#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;Func&lt;<link linkend="_namespace_leap">Leap</link>.<link linkend="_class_leap_1_1_frame">Frame</link>,&#32;<link linkend="_namespace_leap">Leap</link>.<link linkend="_class_leap_1_1_hand">Hand</link>&gt;&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_hand_1a02fa026e8ea8ace2b826bbbfd10dd58f">handAccessorFunc</link>&#32;{
+00087 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">get</emphasis>&#32;{&#32;<emphasis role="keywordflow">return</emphasis>&#32;_handAccessorFunc;&#32;}
+00088 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">set</emphasis>&#32;{&#32;_handAccessorFunc&#32;=&#32;value;&#32;}
+00089 &#32;&#32;&#32;&#32;}
+00090 
+00094 &#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;<link linkend="_class_leap_1_1_hand">Hand</link>&#32;_handData&#32;=&#32;<emphasis role="keyword">new</emphasis>&#32;<link linkend="_namespace_leap_1_1_unity_1_1_interaction_1a9752eb3e2905e8ebd134fff20c155e6baa78b1ac16c0cd02168097fc9a9bd7604">Hand</link>();
+00095 
+00101 &#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;<link linkend="_class_leap_1_1_hand">Hand</link>&#32;_unwarpedHandData&#32;=&#32;<emphasis role="keyword">new</emphasis>&#32;<link linkend="_namespace_leap_1_1_unity_1_1_interaction_1a9752eb3e2905e8ebd134fff20c155e6baa78b1ac16c0cd02168097fc9a9bd7604">Hand</link>();
+00102 
+00106 &#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;<link linkend="_class_leap_1_1_hand">Hand</link>&#32;_hand;
+00107 
+00108 <emphasis role="preprocessor">&#32;&#32;&#32;&#32;#endregion</emphasis>
+00109 
+00110 <emphasis role="preprocessor">&#32;&#32;&#32;&#32;#region&#32;Unity&#32;Events</emphasis>
+00111 
+<anchor xml:id="__interaction_hand_8cs_source_1l00112"/><link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_hand_1abce682528cf0c3d2bd353c3ed86e72e5">00112</link> &#32;&#32;&#32;&#32;<emphasis role="keyword">protected</emphasis>&#32;<emphasis role="keyword">override</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_hand_1abce682528cf0c3d2bd353c3ed86e72e5">Reset</link>()&#32;{
+00113 &#32;&#32;&#32;&#32;&#32;&#32;base.Reset();
+00114 
+00115 &#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_hand_1a09719682ae423b8b6d52d12a81a1b05c">enabledPrimaryHoverFingertips</link>&#32;=&#32;<emphasis role="keyword">new</emphasis>&#32;<emphasis role="keywordtype">bool</emphasis>[]&#32;{&#32;<emphasis role="keyword">true</emphasis>,&#32;<emphasis role="keyword">true</emphasis>,&#32;<emphasis role="keyword">true</emphasis>,&#32;<emphasis role="keyword">false</emphasis>,&#32;<emphasis role="keyword">false</emphasis>&#32;};
+00116 &#32;&#32;&#32;&#32;}
+00117 
+<anchor xml:id="__interaction_hand_8cs_source_1l00118"/><link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_hand_1a83cd2a6e82f7213b6dc2f17667c6389d">00118</link> &#32;&#32;&#32;&#32;<emphasis role="keyword">protected</emphasis>&#32;<emphasis role="keyword">override</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_hand_1a83cd2a6e82f7213b6dc2f17667c6389d">Start</link>()&#32;{
+00119 &#32;&#32;&#32;&#32;&#32;&#32;base.Start();
+00120 
+00121 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;Check&#32;manual&#32;configuration&#32;if&#32;data&#32;mode&#32;is&#32;custom.</emphasis>
+00122 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_hand_1afa891e4ad766e5470dc8fdf0e78a7334">handDataMode</link>&#32;==&#32;<link linkend="_namespace_leap_1_1_unity_1_1_interaction_1ab4a739b7f8a6748903e2ccc029df7a50">HandDataMode</link>.Custom)&#32;{
+00123 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_hand_1af5d2087b092dc81bba8b6f4fae96999b">leapProvider</link>&#32;==&#32;<emphasis role="keyword">null</emphasis>)&#32;{
+00124 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;Debug.LogError(<emphasis role="stringliteral">&quot;handDataMode&#32;is&#32;set&#32;to&#32;Custom,&#32;but&#32;no&#32;provider&#32;is&#32;set!&#32;&quot;</emphasis>
+00125 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;+&#32;<emphasis role="stringliteral">&quot;Please&#32;add&#32;a&#32;custom&#32;script&#32;that&#32;will&#32;configure&#32;the&#32;correct&#32;&quot;</emphasis>
+00126 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;+&#32;<emphasis role="stringliteral">&quot;LeapProvider&#32;for&#32;this&#32;InteractionHand&#32;before&#32;its&#32;Start()&#32;is&#32;&quot;</emphasis>
+00127 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;+&#32;<emphasis role="stringliteral">&quot;called,&#32;or&#32;set&#32;the&#32;handDataMode&#32;to&#32;a&#32;value&#32;other&#32;than&#32;Custom.&quot;</emphasis>,
+00128 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">this</emphasis>);
+00129 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>;
+00130 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00131 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">else</emphasis>&#32;<emphasis role="keywordflow">if</emphasis>&#32;(<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_hand_1a02fa026e8ea8ace2b826bbbfd10dd58f">handAccessorFunc</link>&#32;==&#32;<emphasis role="keyword">null</emphasis>)&#32;{
+00132 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;Debug.LogError(<emphasis role="stringliteral">&quot;handDataMode&#32;is&#32;set&#32;to&#32;Custom,&#32;but&#32;no&#32;handAccessorFunc&#32;has&#32;&quot;</emphasis>
+00133 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;+&#32;<emphasis role="stringliteral">&quot;been&#32;set!&#32;Please&#32;add&#32;a&#32;custom&#32;script&#32;that&#32;will&#32;configure&#32;the&#32;&quot;</emphasis>
+00134 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;+&#32;<emphasis role="stringliteral">&quot;hand&#32;accessor&#32;function&#32;that&#32;will&#32;convert&#32;Leap&#32;frames&#32;into&#32;&quot;</emphasis>
+00135 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;+&#32;<emphasis role="stringliteral">&quot;Leap&#32;hand&#32;data&#32;for&#32;this&#32;InteractionHand&#32;before&#32;its&#32;Start()&#32;&quot;</emphasis>
+00136 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;+&#32;<emphasis role="stringliteral">&quot;is&#32;called,&#32;or&#32;set&#32;the&#32;handDataMode&#32;to&#32;a&#32;value&#32;other&#32;than&#32;&quot;</emphasis>
+00137 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;+&#32;<emphasis role="stringliteral">&quot;Custom.&quot;</emphasis>,&#32;<emphasis role="keyword">this</emphasis>);
+00138 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>;
+00139 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00140 &#32;&#32;&#32;&#32;&#32;&#32;}
+00141 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">else</emphasis>&#32;{&#32;<emphasis role="comment">//&#32;Otherwise,&#32;configure&#32;automatically.</emphasis>
+00142 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_hand_1af5d2087b092dc81bba8b6f4fae96999b">leapProvider</link>&#32;==&#32;<emphasis role="keyword">null</emphasis>)&#32;{
+00143 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_hand_1af5d2087b092dc81bba8b6f4fae96999b">leapProvider</link>&#32;=&#32;Hands.Provider;
+00144 
+00145 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_hand_1af5d2087b092dc81bba8b6f4fae96999b">leapProvider</link>&#32;==&#32;<emphasis role="keyword">null</emphasis>)&#32;{
+00146 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;Debug.LogError(<emphasis role="stringliteral">&quot;No&#32;LeapServiceProvider&#32;was&#32;found&#32;in&#32;your&#32;scene!&#32;Please&#32;&quot;</emphasis>
+00147 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;+&#32;<emphasis role="stringliteral">&quot;make&#32;sure&#32;you&#32;have&#32;a&#32;LeapServiceProvider&#32;if&#32;you&#32;intend&#32;to&#32;&quot;</emphasis>
+00148 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;+&#32;<emphasis role="stringliteral">&quot;use&#32;Leap&#32;hands&#32;in&#32;your&#32;scene.&quot;</emphasis>,&#32;<emphasis role="keyword">this</emphasis>);
+00149 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>;
+00150 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00151 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00152 
+00153 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_hand_1a02fa026e8ea8ace2b826bbbfd10dd58f">handAccessorFunc</link>&#32;==&#32;<emphasis role="keyword">null</emphasis>)&#32;{
+00154 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_hand_1afa891e4ad766e5470dc8fdf0e78a7334">handDataMode</link>&#32;==&#32;<link linkend="_namespace_leap_1_1_unity_1_1_interaction_1ab4a739b7f8a6748903e2ccc029df7a50">HandDataMode</link>.PlayerLeft)&#32;{
+00155 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_hand_1a02fa026e8ea8ace2b826bbbfd10dd58f">handAccessorFunc</link>&#32;=&#32;(frame)&#32;=&gt;&#32;frame.Hands.Query()
+00156 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;.FirstOrDefault(hand&#32;=&gt;&#32;hand.IsLeft);
+00157 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00158 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">else</emphasis>&#32;{
+00159 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_hand_1a02fa026e8ea8ace2b826bbbfd10dd58f">handAccessorFunc</link>&#32;=&#32;(frame)&#32;=&gt;&#32;frame.Hands.Query()
+00160 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;.FirstOrDefault(hand&#32;=&gt;&#32;hand.IsRight);
+00161 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00162 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00163 &#32;&#32;&#32;&#32;&#32;&#32;}
+00164 
+00165 &#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_hand_1af5d2087b092dc81bba8b6f4fae96999b">leapProvider</link>.<link linkend="_class_leap_1_1_unity_1_1_leap_provider_1a125e19c25c0006a12f53e3069627b87f">OnFixedFrame</link>&#32;-=&#32;onProviderFixedFrame;&#32;<emphasis role="comment">//&#32;avoid&#32;double-subscribe</emphasis>
+00166 &#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_hand_1af5d2087b092dc81bba8b6f4fae96999b">leapProvider</link>.<link linkend="_class_leap_1_1_unity_1_1_leap_provider_1a125e19c25c0006a12f53e3069627b87f">OnFixedFrame</link>&#32;+=&#32;onProviderFixedFrame;
+00167 
+00168 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;Set&#32;up&#32;hover&#32;point&#32;Transform&#32;for&#32;the&#32;palm.</emphasis>
+00169 &#32;&#32;&#32;&#32;&#32;&#32;Transform&#32;palmTransform&#32;=&#32;<emphasis role="keyword">new</emphasis>&#32;GameObject(<emphasis role="stringliteral">&quot;Palm&#32;Transform&quot;</emphasis>).transform;
+00170 &#32;&#32;&#32;&#32;&#32;&#32;palmTransform.parent&#32;=&#32;this.transform;
+00171 &#32;&#32;&#32;&#32;&#32;&#32;_backingHoverPointTransform&#32;=&#32;palmTransform;
+00172 
+00173 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;Set&#32;up&#32;primary&#32;hover&#32;point&#32;Transforms&#32;for&#32;the&#32;fingertips.&#32;We&apos;ll&#32;only&#32;use</emphasis>
+00174 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;some&#32;of&#32;them,&#32;depending&#32;on&#32;user&#32;settings.</emphasis>
+00175 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">for</emphasis>&#32;(<emphasis role="keywordtype">int</emphasis>&#32;i&#32;=&#32;0;&#32;i&#32;&lt;&#32;5;&#32;i++)&#32;{
+00176 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;Transform&#32;fingertipTransform&#32;=&#32;<emphasis role="keyword">new</emphasis>&#32;GameObject(<emphasis role="stringliteral">&quot;Fingertip&#32;Transform&quot;</emphasis>).transform;
+00177 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;fingertipTransform.parent&#32;=&#32;this.transform;
+00178 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;_backingFingertipTransforms.Add(fingertipTransform);
+00179 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;_fingertipTransforms.Add(<emphasis role="keyword">null</emphasis>);
+00180 &#32;&#32;&#32;&#32;&#32;&#32;}
+00181 &#32;&#32;&#32;&#32;}
+00182 
+00183 &#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;OnDestroy()&#32;{
+00184 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(_leapProvider&#32;!=&#32;<emphasis role="keyword">null</emphasis>)&#32;{
+00185 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;_leapProvider.<link linkend="_class_leap_1_1_unity_1_1_leap_provider_1a125e19c25c0006a12f53e3069627b87f">OnFixedFrame</link>&#32;-=&#32;onProviderFixedFrame;
+00186 &#32;&#32;&#32;&#32;&#32;&#32;}
+00187 &#32;&#32;&#32;&#32;}
+00188 
+00189 &#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;onProviderFixedFrame(<link linkend="_namespace_leap">Leap</link>.<link linkend="_class_leap_1_1_frame">Frame</link>&#32;frame)&#32;{
+00190 &#32;&#32;&#32;&#32;&#32;&#32;_hand&#32;=&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_hand_1a02fa026e8ea8ace2b826bbbfd10dd58f">handAccessorFunc</link>(frame);
+00191 
+00192 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(_hand&#32;!=&#32;<emphasis role="keyword">null</emphasis>)&#32;{
+00193 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;_handData.CopyFrom(_hand);
+00194 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;_unwarpedHandData.CopyFrom(_handData);
+00195 
+00196 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;refreshPointDataFromHand();
+00197 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;_lastCustomHandWasLeft&#32;=&#32;_unwarpedHandData.<link linkend="_class_leap_1_1_hand_1a783d6adaec7c3f3422e70bba4480b39d">IsLeft</link>;
+00198 &#32;&#32;&#32;&#32;&#32;&#32;}
+00199 
+00200 &#32;&#32;&#32;&#32;}
+00201 
+00202 <emphasis role="preprocessor">&#32;&#32;&#32;&#32;#endregion</emphasis>
+00203 
+00204 <emphasis role="preprocessor">&#32;&#32;&#32;&#32;#region&#32;General&#32;InteractionController&#32;Implementation</emphasis>
+00205 
+<anchor xml:id="__interaction_hand_8cs_source_1l00209"/><link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_hand_1a3e4c5576bf023cf5e944e8ec2dd4d18f">00209</link> &#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keyword">override</emphasis>&#32;<emphasis role="keywordtype">bool</emphasis>&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_hand_1a3e4c5576bf023cf5e944e8ec2dd4d18f">isTracked</link>&#32;{&#32;<emphasis role="keyword">get</emphasis>&#32;{&#32;<emphasis role="keywordflow">return</emphasis>&#32;_hand&#32;!=&#32;<emphasis role="keyword">null</emphasis>;&#32;}&#32;}
+00210 
+<anchor xml:id="__interaction_hand_8cs_source_1l00214"/><link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_hand_1acbb176be9d544a2f1967770f8af6f4d9">00214</link> &#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keyword">override</emphasis>&#32;<emphasis role="keywordtype">bool</emphasis>&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_hand_1acbb176be9d544a2f1967770f8af6f4d9">isBeingMoved</link>&#32;{&#32;<emphasis role="keyword">get</emphasis>&#32;{&#32;<emphasis role="keywordflow">return</emphasis>&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_hand_1a3e4c5576bf023cf5e944e8ec2dd4d18f">isTracked</link>;&#32;}&#32;}
+00215 
+<anchor xml:id="__interaction_hand_8cs_source_1l00225"/><link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_hand_1a49dba50672251b00081f95e8de3c2993">00225</link> &#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<link linkend="_class_leap_1_1_hand">Hand</link>&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_hand_1a49dba50672251b00081f95e8de3c2993">leapHand</link>&#32;{&#32;<emphasis role="keyword">get</emphasis>&#32;{&#32;<emphasis role="keywordflow">return</emphasis>&#32;_unwarpedHandData;&#32;}&#32;}
+00226 
+00227 &#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;<emphasis role="keywordtype">bool</emphasis>&#32;_lastCustomHandWasLeft&#32;=&#32;<emphasis role="keyword">false</emphasis>;
+<anchor xml:id="__interaction_hand_8cs_source_1l00231"/><link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_hand_1a445aaa40de828283c32fa39440789da3">00231</link> &#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keyword">override</emphasis>&#32;<emphasis role="keywordtype">bool</emphasis>&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_hand_1a445aaa40de828283c32fa39440789da3">isLeft</link>&#32;{
+00232 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">get</emphasis>&#32;{
+00233 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">switch</emphasis>&#32;(<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_hand_1afa891e4ad766e5470dc8fdf0e78a7334">handDataMode</link>)&#32;{
+00234 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">case</emphasis>&#32;<link linkend="_namespace_leap_1_1_unity_1_1_interaction_1ab4a739b7f8a6748903e2ccc029df7a50">HandDataMode</link>.PlayerLeft:
+00235 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;<emphasis role="keyword">true</emphasis>;
+00236 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">case</emphasis>&#32;<link linkend="_namespace_leap_1_1_unity_1_1_interaction_1ab4a739b7f8a6748903e2ccc029df7a50">HandDataMode</link>.PlayerRight:
+00237 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;<emphasis role="keyword">false</emphasis>;
+00238 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">case</emphasis>&#32;<link linkend="_namespace_leap_1_1_unity_1_1_interaction_1ab4a739b7f8a6748903e2ccc029df7a50">HandDataMode</link>.Custom:&#32;<emphasis role="keywordflow">default</emphasis>:
+00239 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;_lastCustomHandWasLeft;
+00240 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00241 &#32;&#32;&#32;&#32;&#32;&#32;}
+00242 &#32;&#32;&#32;&#32;}
+00243 
+<anchor xml:id="__interaction_hand_8cs_source_1l00247"/><link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_hand_1a4a543fdfc71afe7939be5be59872d3da">00247</link> &#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keyword">override</emphasis>&#32;Vector3&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_hand_1a4a543fdfc71afe7939be5be59872d3da">position</link>&#32;{
+00248 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">get</emphasis>&#32;{&#32;<emphasis role="keywordflow">return</emphasis>&#32;_handData.<link linkend="_class_leap_1_1_hand_1aaf0940b9108e92c22e33b9c6cd32921a">PalmPosition</link>.ToVector3();&#32;}
+00249 &#32;&#32;&#32;&#32;}
+00250 
+<anchor xml:id="__interaction_hand_8cs_source_1l00254"/><link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_hand_1aec6f850d43b7333816ca0974268332ce">00254</link> &#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keyword">override</emphasis>&#32;Quaternion&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_hand_1aec6f850d43b7333816ca0974268332ce">rotation</link>&#32;{
+00255 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">get</emphasis>&#32;{&#32;<emphasis role="keywordflow">return</emphasis>&#32;_handData.<link linkend="_class_leap_1_1_hand_1ad1f22c3baf75294e2aa4d834d87fec20">Rotation</link>.ToQuaternion();&#32;}
+00256 &#32;&#32;&#32;&#32;}
+00257 
+<anchor xml:id="__interaction_hand_8cs_source_1l00261"/><link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_hand_1a8e7c251e07d665007e3c6d88c3b3fce4">00261</link> &#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keyword">override</emphasis>&#32;Vector3&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_hand_1a8e7c251e07d665007e3c6d88c3b3fce4">velocity</link>&#32;{
+00262 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">get</emphasis>&#32;{&#32;<emphasis role="keywordflow">return</emphasis>&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_hand_1a3e4c5576bf023cf5e944e8ec2dd4d18f">isTracked</link>&#32;?&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_hand_1a49dba50672251b00081f95e8de3c2993">leapHand</link>.<link linkend="_class_leap_1_1_hand_1a61f0daa7259d6c5fe03b9466d4743b43">PalmVelocity</link>.ToVector3()&#32;:&#32;Vector3.zero;&#32;}
+00263 &#32;&#32;&#32;&#32;}
+00264 
+<anchor xml:id="__interaction_hand_8cs_source_1l00269"/><link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_hand_1af21b7c107fc75a75a362679d4471fa6a">00269</link> &#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keyword">override</emphasis>&#32;<link linkend="_namespace_leap_1_1_unity_1_1_interaction_1a9752eb3e2905e8ebd134fff20c155e6b">ControllerType</link>&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_hand_1af21b7c107fc75a75a362679d4471fa6a">controllerType</link>&#32;{
+00270 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">get</emphasis>&#32;{&#32;<emphasis role="keywordflow">return</emphasis>&#32;<link linkend="_namespace_leap_1_1_unity_1_1_interaction_1a9752eb3e2905e8ebd134fff20c155e6b">ControllerType</link>.Hand;&#32;}
+00271 &#32;&#32;&#32;&#32;}
+00272 
+<anchor xml:id="__interaction_hand_8cs_source_1l00277"/><link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_hand_1a098b5fc8fdbaeb93681014cd3286e6e1">00277</link> &#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keyword">override</emphasis>&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_hand">InteractionHand</link>&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_hand_1a098b5fc8fdbaeb93681014cd3286e6e1">intHand</link>&#32;{
+00278 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">get</emphasis>&#32;{&#32;<emphasis role="keywordflow">return</emphasis>&#32;<emphasis role="keyword">this</emphasis>;&#32;}
+00279 &#32;&#32;&#32;&#32;}
+00280 
+<anchor xml:id="__interaction_hand_8cs_source_1l00281"/><link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_hand_1af6558dfad2bffcf4126ded024dc08c6d">00281</link> &#32;&#32;&#32;&#32;<emphasis role="keyword">protected</emphasis>&#32;<emphasis role="keyword">override</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_hand_1af6558dfad2bffcf4126ded024dc08c6d">onObjectUnregistered</link>(<link linkend="_interface_leap_1_1_unity_1_1_interaction_1_1_i_interaction_behaviour">IInteractionBehaviour</link>&#32;intObj)&#32;{
+00282 &#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_hand_1aeb1b0a92a1d62de094c6207a7edbd3e4">grabClassifier</link>.<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_internal_1_1_heuristic_grab_classifier_1a40a2327dbe8e9ec05bf97fbb32ed9324">UnregisterInteractionBehaviour</link>(intObj);
+00283 &#32;&#32;&#32;&#32;}
+00284 
+<anchor xml:id="__interaction_hand_8cs_source_1l00285"/><link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_hand_1ae6c2849268e677588ab571707d5aec5b">00285</link> &#32;&#32;&#32;&#32;<emphasis role="keyword">protected</emphasis>&#32;<emphasis role="keyword">override</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_hand_1ae6c2849268e677588ab571707d5aec5b">fixedUpdateController</link>()&#32;{
+00286 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;Transform&#32;the&#32;hand&#32;ahead&#32;if&#32;the&#32;manager&#32;is&#32;in&#32;a&#32;moving&#32;reference&#32;frame.</emphasis>
+00287 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_controller_1a9e906a87460175737227bd0f42bebdce">manager</link>.<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_manager_1aadad63856353238fd977cb228cd7f6bf">hasMovingFrameOfReference</link>)&#32;{
+00288 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;Vector3&#32;transformAheadPosition;
+00289 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;Quaternion&#32;transformAheadRotation;
+00290 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_controller_1a9e906a87460175737227bd0f42bebdce">manager</link>.<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_manager_1ab3f0e103a262ec1e7a9689e243cb62ad">TransformAheadByFixedUpdate</link>(_unwarpedHandData.<link linkend="_class_leap_1_1_hand_1aaf0940b9108e92c22e33b9c6cd32921a">PalmPosition</link>.ToVector3(),
+00291 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;_unwarpedHandData.<link linkend="_class_leap_1_1_hand_1ad1f22c3baf75294e2aa4d834d87fec20">Rotation</link>.ToQuaternion(),
+00292 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;out&#32;transformAheadPosition,
+00293 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;out&#32;transformAheadRotation);
+00294 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;_unwarpedHandData.SetTransform(transformAheadPosition,&#32;transformAheadRotation);
+00295 &#32;&#32;&#32;&#32;&#32;&#32;}
+00296 &#32;&#32;&#32;&#32;}
+00297 
+00298 <emphasis role="preprocessor">&#32;&#32;&#32;&#32;#endregion</emphasis>
+00299 
+00300 <emphasis role="preprocessor">&#32;&#32;&#32;&#32;#region&#32;Hovering&#32;Controller&#32;Implementation</emphasis>
+00301 
+00302 &#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;Transform&#32;_backingHoverPointTransform&#32;=&#32;<emphasis role="keyword">null</emphasis>;
+<anchor xml:id="__interaction_hand_8cs_source_1l00303"/><link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_hand_1a0f241a7ebea2f55c68666273fe5eda39">00303</link> &#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keyword">override</emphasis>&#32;Vector3&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_hand_1a0f241a7ebea2f55c68666273fe5eda39">hoverPoint</link>&#32;{
+00304 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">get</emphasis>&#32;{
+00305 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(_backingHoverPointTransform&#32;==&#32;<emphasis role="keyword">null</emphasis>)&#32;{
+00306 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_hand_1a49dba50672251b00081f95e8de3c2993">leapHand</link>.<link linkend="_class_leap_1_1_hand_1aaf0940b9108e92c22e33b9c6cd32921a">PalmPosition</link>.ToVector3();
+00307 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00308 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">else</emphasis>&#32;{
+00309 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;_backingHoverPointTransform.position;
+00310 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00311 &#32;&#32;&#32;&#32;&#32;&#32;}
+00312 &#32;&#32;&#32;&#32;}
+00313 
+00314 &#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;List&lt;Transform&gt;&#32;_backingFingertipTransforms&#32;=&#32;<emphasis role="keyword">new</emphasis>&#32;List&lt;Transform&gt;();
+00315 &#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;List&lt;Transform&gt;&#32;_fingertipTransforms&#32;=&#32;<emphasis role="keyword">new</emphasis>&#32;List&lt;Transform&gt;();
+<anchor xml:id="__interaction_hand_8cs_source_1l00316"/><link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_hand_1a61394986b5c5dcd7ead304d389e86db7">00316</link> &#32;&#32;&#32;&#32;<emphasis role="keyword">protected</emphasis>&#32;<emphasis role="keyword">override</emphasis>&#32;List&lt;Transform&gt;&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_hand_1a61394986b5c5dcd7ead304d389e86db7">_primaryHoverPoints</link>&#32;{
+00317 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">get</emphasis>&#32;{
+00318 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;_fingertipTransforms;
+00319 &#32;&#32;&#32;&#32;&#32;&#32;}
+00320 &#32;&#32;&#32;&#32;}
+00321 
+00322 &#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;refreshPointDataFromHand()&#32;{
+00323 &#32;&#32;&#32;&#32;&#32;&#32;refreshHoverPoint();
+00324 &#32;&#32;&#32;&#32;&#32;&#32;refreshPrimaryHoverPoints();
+00325 &#32;&#32;&#32;&#32;&#32;&#32;refreshGraspManipulatorPoints();
+00326 &#32;&#32;&#32;&#32;}
+00327 
+00328 &#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;refreshHoverPoint()&#32;{
+00329 &#32;&#32;&#32;&#32;&#32;&#32;_backingHoverPointTransform.position&#32;=&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_hand_1a49dba50672251b00081f95e8de3c2993">leapHand</link>.<link linkend="_class_leap_1_1_hand_1aaf0940b9108e92c22e33b9c6cd32921a">PalmPosition</link>.ToVector3();
+00330 &#32;&#32;&#32;&#32;&#32;&#32;_backingHoverPointTransform.rotation&#32;=&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_hand_1a49dba50672251b00081f95e8de3c2993">leapHand</link>.<link linkend="_class_leap_1_1_hand_1ad1f22c3baf75294e2aa4d834d87fec20">Rotation</link>.ToQuaternion();
+00331 &#32;&#32;&#32;&#32;}
+00332 
+00333 &#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;refreshPrimaryHoverPoints()&#32;{
+00334 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">for</emphasis>&#32;(<emphasis role="keywordtype">int</emphasis>&#32;i&#32;=&#32;0;&#32;i&#32;&lt;&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_hand_1a09719682ae423b8b6d52d12a81a1b05c">enabledPrimaryHoverFingertips</link>.Length;&#32;i++)&#32;{
+00335 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_hand_1a09719682ae423b8b6d52d12a81a1b05c">enabledPrimaryHoverFingertips</link>[i])&#32;{
+00336 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;_fingertipTransforms[i]&#32;=&#32;_backingFingertipTransforms[i];
+00337 
+00338 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_leap_1_1_finger">Finger</link>&#32;finger&#32;=&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_hand_1a49dba50672251b00081f95e8de3c2993">leapHand</link>.<link linkend="_class_leap_1_1_hand_1ac9f68349507bfa13e3ac24738382bea6">Fingers</link>[i];
+00339 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;_fingertipTransforms[i].position&#32;=&#32;finger.<link linkend="_class_leap_1_1_finger_1aae573cee6c1bdefd293838f133235b2d">TipPosition</link>.ToVector3();
+00340 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;_fingertipTransforms[i].rotation&#32;=&#32;finger.<link linkend="_class_leap_1_1_finger_1a86f26bdb56cc3550a9f86120263e0319">bones</link>[3].<link linkend="_class_leap_1_1_bone_1a1531c2eecaace7d4532e78f903f3b59a">Rotation</link>.ToQuaternion();
+00341 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00342 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">else</emphasis>&#32;{
+00343 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;_fingertipTransforms[i]&#32;=&#32;<emphasis role="keyword">null</emphasis>;
+00344 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00345 &#32;&#32;&#32;&#32;&#32;&#32;}
+00346 &#32;&#32;&#32;&#32;}
+00347 
+<anchor xml:id="__interaction_hand_8cs_source_1l00348"/><link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_hand_1a223e3ae675f5017063a14f8f1305ed7a">00348</link> &#32;&#32;&#32;&#32;<emphasis role="keyword">protected</emphasis>&#32;<emphasis role="keyword">override</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_hand_1a223e3ae675f5017063a14f8f1305ed7a">unwarpColliders</link>(Transform&#32;primaryHoverPoint,
+00349 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_interface_leap_1_1_unity_1_1_space_1_1_i_space_component">ISpaceComponent</link>&#32;warpedSpaceElement)&#32;{
+00350 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;Extension&#32;method&#32;calculates&#32;&quot;unwarped&quot;&#32;pose&#32;in&#32;world&#32;space.</emphasis>
+00351 &#32;&#32;&#32;&#32;&#32;&#32;Vector3&#32;&#32;&#32;&#32;unwarpedPosition;
+00352 &#32;&#32;&#32;&#32;&#32;&#32;Quaternion&#32;unwarpedRotation;
+00353 &#32;&#32;&#32;&#32;&#32;&#32;warpedSpaceElement.<link linkend="_interface_leap_1_1_unity_1_1_space_1_1_i_space_component_1aa8e8762d2a71655cd50455d87e6a9ef4">anchor</link>.<link linkend="_class_leap_1_1_unity_1_1_space_1_1_leap_space_anchor_1a6f98d35d75f83e2ff2c978715520c836">transformer</link>.WorldSpaceUnwarp(primaryHoverPoint.position,&#32;
+00354 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;primaryHoverPoint.rotation,
+00355 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;out&#32;unwarpedPosition,
+00356 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;out&#32;unwarpedRotation);
+00357 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;
+00358 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;First&#32;shift&#32;the&#32;hand&#32;to&#32;be&#32;centered&#32;on&#32;the&#32;fingertip&#32;position&#32;so&#32;that&#32;rotations</emphasis>
+00359 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;applied&#32;to&#32;the&#32;hand&#32;will&#32;pivot&#32;around&#32;the&#32;fingertip,&#32;then&#32;apply&#32;the&#32;rest&#32;of&#32;the</emphasis>
+00360 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;transformation.</emphasis>
+00361 &#32;&#32;&#32;&#32;&#32;&#32;_unwarpedHandData.Transform(-primaryHoverPoint.position,&#32;Quaternion.identity);
+00362 &#32;&#32;&#32;&#32;&#32;&#32;_unwarpedHandData.Transform(unwarpedPosition,&#32;unwarpedRotation
+00363 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;*&#32;Quaternion.Inverse(primaryHoverPoint.rotation));
+00364 
+00365 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;Hand&#32;data&#32;was&#32;modified,&#32;so&#32;refresh&#32;point&#32;data.</emphasis>
+00366 &#32;&#32;&#32;&#32;&#32;&#32;refreshPointDataFromHand();
+00367 &#32;&#32;&#32;&#32;}
+00368 
+00369 <emphasis role="preprocessor">&#32;&#32;&#32;&#32;#endregion</emphasis>
+00370 
+00371 <emphasis role="preprocessor">&#32;&#32;&#32;&#32;#region&#32;Contact&#32;Controller&#32;Implementation</emphasis>
+00372 
+00373 &#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;<emphasis role="keyword">const</emphasis>&#32;<emphasis role="keywordtype">int</emphasis>&#32;NUM_FINGERS&#32;=&#32;5;
+00374 &#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;<emphasis role="keyword">const</emphasis>&#32;<emphasis role="keywordtype">int</emphasis>&#32;BONES_PER_FINGER&#32;=&#32;3;
+00375 
+00376 &#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_contact_bone">ContactBone</link>[]&#32;_contactBones;
+<anchor xml:id="__interaction_hand_8cs_source_1l00377"/><link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_hand_1a915151eafdde812438fc5b8f9fe34db8">00377</link> &#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keyword">override</emphasis>&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_contact_bone">ContactBone</link>[]&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_hand_1a915151eafdde812438fc5b8f9fe34db8">contactBones</link>&#32;{
+00378 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">get</emphasis>&#32;{&#32;<emphasis role="keywordflow">return</emphasis>&#32;_contactBones;&#32;}
+00379 &#32;&#32;&#32;&#32;}
+00380 
+00381 &#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;GameObject&#32;_contactBoneParent;
+<anchor xml:id="__interaction_hand_8cs_source_1l00382"/><link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_hand_1a3cac8a0150d868b76fa631a7518ec575">00382</link> &#32;&#32;&#32;&#32;<emphasis role="keyword">protected</emphasis>&#32;<emphasis role="keyword">override</emphasis>&#32;GameObject&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_hand_1a3cac8a0150d868b76fa631a7518ec575">contactBoneParent</link>&#32;{
+00383 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">get</emphasis>&#32;{&#32;<emphasis role="keywordflow">return</emphasis>&#32;_contactBoneParent;&#32;}
+00384 &#32;&#32;&#32;&#32;}
+00385 
+00386 &#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;delegate&#32;<emphasis role="keywordtype">void</emphasis>&#32;BoneMapFunc(<link linkend="_namespace_leap">Leap</link>.<link linkend="_class_leap_1_1_hand">Hand</link>&#32;hand,&#32;out&#32;Vector3&#32;targetPosition,
+00387 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;out&#32;Quaternion&#32;targetRotation);
+00388 &#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;BoneMapFunc[]&#32;_handContactBoneMapFunctions;
+00389 
+<anchor xml:id="__interaction_hand_8cs_source_1l00390"/><link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_hand_1a760d127098bcd961aa2ede7c279faa9c">00390</link> &#32;&#32;&#32;&#32;<emphasis role="keyword">protected</emphasis>&#32;<emphasis role="keyword">override</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_hand_1a760d127098bcd961aa2ede7c279faa9c">getColliderBoneTargetPositionRotation</link>(<emphasis role="keywordtype">int</emphasis>&#32;contactBoneIndex,
+00391 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;out&#32;Vector3&#32;targetPosition,
+00392 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;out&#32;Quaternion&#32;targetRotation)&#32;{
+00393 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">using</emphasis>&#32;(<emphasis role="keyword">new</emphasis>&#32;<link linkend="_struct_leap_1_1_unity_1_1_profiler_sample">ProfilerSample</link>(<emphasis role="stringliteral">&quot;InteractionHand:&#32;getColliderBoneTargetPositionRotation&quot;</emphasis>))&#32;{
+00394 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;_handContactBoneMapFunctions[contactBoneIndex](_unwarpedHandData,
+00395 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;out&#32;targetPosition,
+00396 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;out&#32;targetRotation);
+00397 &#32;&#32;&#32;&#32;&#32;&#32;}
+00398 &#32;&#32;&#32;&#32;}
+00399 
+<anchor xml:id="__interaction_hand_8cs_source_1l00400"/><link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_hand_1a01581c96fd67f53a9b8a6ddc36e0709c">00400</link> &#32;&#32;&#32;&#32;<emphasis role="keyword">protected</emphasis>&#32;<emphasis role="keyword">override</emphasis>&#32;<emphasis role="keywordtype">bool</emphasis>&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_hand_1a01581c96fd67f53a9b8a6ddc36e0709c">initContact</link>()&#32;{
+00401 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(!<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_hand_1a3e4c5576bf023cf5e944e8ec2dd4d18f">isTracked</link>)&#32;<emphasis role="keywordflow">return</emphasis>&#32;<emphasis role="keyword">false</emphasis>;
+00402 
+00403 &#32;&#32;&#32;&#32;&#32;&#32;initContactBoneContainer();
+00404 &#32;&#32;&#32;&#32;&#32;&#32;initContactBones();
+00405 
+00406 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;<emphasis role="keyword">true</emphasis>;
+00407 &#32;&#32;&#32;&#32;}
+00408 
+<anchor xml:id="__interaction_hand_8cs_source_1l00409"/><link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_hand_1a5fe00b0f12a6e91eecdf6472b2fa0775">00409</link> &#32;&#32;&#32;&#32;<emphasis role="keyword">protected</emphasis>&#32;<emphasis role="keyword">override</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_hand_1a5fe00b0f12a6e91eecdf6472b2fa0775">onPreEnableSoftContact</link>()&#32;{
+00410 &#32;&#32;&#32;&#32;&#32;&#32;resetContactBoneJoints();
+00411 &#32;&#32;&#32;&#32;}
+00412 
+<anchor xml:id="__interaction_hand_8cs_source_1l00413"/><link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_hand_1abeba3757a254063269d0a417ac0611d0">00413</link> &#32;&#32;&#32;&#32;<emphasis role="keyword">protected</emphasis>&#32;<emphasis role="keyword">override</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_hand_1abeba3757a254063269d0a417ac0611d0">onPostDisableSoftContact</link>()&#32;{
+00414 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_hand_1a3e4c5576bf023cf5e944e8ec2dd4d18f">isTracked</link>)&#32;resetContactBoneJoints();
+00415 &#32;&#32;&#32;&#32;}
+00416 
+00417 <emphasis role="preprocessor">&#32;&#32;&#32;&#32;#region&#32;Contact&#32;Bone&#32;Management</emphasis>
+00418 
+00419 &#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;initContactBoneContainer()&#32;{
+00420 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordtype">string</emphasis>&#32;name&#32;=&#32;(_unwarpedHandData.<link linkend="_class_leap_1_1_hand_1a783d6adaec7c3f3422e70bba4480b39d">IsLeft</link>&#32;?&#32;<emphasis role="stringliteral">&quot;Left&quot;</emphasis>&#32;:&#32;<emphasis role="stringliteral">&quot;Right&quot;</emphasis>)&#32;+&#32;<emphasis role="stringliteral">&quot;&#32;Interaction&#32;Hand&#32;Contact&#32;Bones&quot;</emphasis>;
+00421 &#32;&#32;&#32;&#32;&#32;&#32;_contactBoneParent&#32;=&#32;<emphasis role="keyword">new</emphasis>&#32;GameObject(name);
+00422 &#32;&#32;&#32;&#32;}
+00423 
+00424 &#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;initContactBones()&#32;{
+00425 &#32;&#32;&#32;&#32;&#32;&#32;_contactBones&#32;=&#32;<emphasis role="keyword">new</emphasis>&#32;ContactBone[NUM_FINGERS&#32;*&#32;BONES_PER_FINGER&#32;+&#32;1];
+00426 &#32;&#32;&#32;&#32;&#32;&#32;_handContactBoneMapFunctions&#32;=&#32;<emphasis role="keyword">new</emphasis>&#32;BoneMapFunc[NUM_FINGERS&#32;*&#32;BONES_PER_FINGER&#32;+&#32;1];
+00427 
+00428 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;Finger&#32;bones</emphasis>
+00429 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">for</emphasis>&#32;(<emphasis role="keywordtype">int</emphasis>&#32;fingerIndex&#32;=&#32;0;&#32;fingerIndex&#32;&lt;&#32;NUM_FINGERS;&#32;fingerIndex++)&#32;{
+00430 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">for</emphasis>&#32;(<emphasis role="keywordtype">int</emphasis>&#32;jointIndex&#32;=&#32;0;&#32;jointIndex&#32;&lt;&#32;BONES_PER_FINGER;&#32;jointIndex++)&#32;{
+00431 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;GameObject&#32;contactBoneObj&#32;=&#32;<emphasis role="keyword">new</emphasis>&#32;GameObject(<emphasis role="stringliteral">&quot;Contact&#32;Fingerbone&quot;</emphasis>,&#32;typeof(CapsuleCollider),&#32;typeof(Rigidbody),&#32;typeof(ContactBone));
+00432 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;contactBoneObj.layer&#32;=&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_controller_1a9e906a87460175737227bd0f42bebdce">manager</link>.<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_manager_1a8d638a6bce8faff14a6ceedf0d7cd9eb">contactBoneLayer</link>;
+00433 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;
+00434 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_leap_1_1_bone">Bone</link>&#32;bone&#32;=&#32;_unwarpedHandData.<link linkend="_class_leap_1_1_hand_1ac9f68349507bfa13e3ac24738382bea6">Fingers</link>[fingerIndex]
+00435 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;.Bone((<link linkend="_class_leap_1_1_bone">Bone</link>.<link linkend="_class_leap_1_1_bone_1a21054e31cefa7b75f25a026006fdbb1b">BoneType</link>)(jointIndex)&#32;+&#32;1);&#32;<emphasis role="comment">//&#32;+1&#32;to&#32;skip&#32;first&#32;bone.</emphasis>
+00436 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordtype">int</emphasis>&#32;boneArrayIndex&#32;=&#32;fingerIndex&#32;*&#32;BONES_PER_FINGER&#32;+&#32;jointIndex;
+00437 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;contactBoneObj.transform.position&#32;=&#32;bone.<link linkend="_class_leap_1_1_bone_1a820e1a7a9975c41ca14aec7c806b9c65">Center</link>.ToVector3();
+00438 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;contactBoneObj.transform.rotation&#32;=&#32;bone.<link linkend="_class_leap_1_1_bone_1a1531c2eecaace7d4532e78f903f3b59a">Rotation</link>.ToQuaternion();
+00439 
+00440 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;Remember&#32;the&#32;method&#32;we&#32;used&#32;to&#32;calculate&#32;this&#32;bone&#32;position&#32;from</emphasis>
+00441 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;a&#32;Leap&#32;Hand&#32;for&#32;later.</emphasis>
+00442 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordtype">int</emphasis>&#32;fingerIndexCopy&#32;=&#32;fingerIndex;
+00443 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordtype">int</emphasis>&#32;jointIndexCopy&#32;=&#32;jointIndex;
+00444 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;_handContactBoneMapFunctions[boneArrayIndex]&#32;=&#32;(<link linkend="_namespace_leap">Leap</link>.<link linkend="_class_leap_1_1_hand">Hand</link>&#32;hand,
+00445 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;out&#32;Vector3&#32;targetPosition,
+00446 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;out&#32;Quaternion&#32;targetRotation)&#32;=&gt;&#32;{
+00447 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_leap_1_1_bone">Bone</link>&#32;theBone&#32;=&#32;hand.Fingers[fingerIndexCopy].<link linkend="_class_leap_1_1_bone_1aa9d04e2a54120f2981563db7cdf2a401">Bone</link>((<link linkend="_class_leap_1_1_bone">Bone</link>.<link linkend="_class_leap_1_1_bone_1a21054e31cefa7b75f25a026006fdbb1b">BoneType</link>)(jointIndexCopy&#32;+&#32;1));
+00448 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;targetPosition&#32;=&#32;theBone.<link linkend="_class_leap_1_1_bone_1a820e1a7a9975c41ca14aec7c806b9c65">Center</link>.ToVector3();
+00449 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;targetRotation&#32;=&#32;theBone.<link linkend="_class_leap_1_1_bone_1a1531c2eecaace7d4532e78f903f3b59a">Rotation</link>.ToQuaternion();
+00450 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;};
+00451 
+00452 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;CapsuleCollider&#32;capsule&#32;=&#32;contactBoneObj.GetComponent&lt;CapsuleCollider&gt;();
+00453 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;capsule.direction&#32;=&#32;2;
+00454 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;capsule.radius&#32;=&#32;bone.<link linkend="_class_leap_1_1_bone_1a1bea3ae48af0c138e0423276191ed8ab">Width</link>&#32;*&#32;0.5f;
+00455 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;capsule.height&#32;=&#32;bone.<link linkend="_class_leap_1_1_bone_1ab10b9823a94b21069ded7fe9cbf92dc8">Length</link>&#32;+&#32;bone.<link linkend="_class_leap_1_1_bone_1a1bea3ae48af0c138e0423276191ed8ab">Width</link>;
+00456 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;capsule.material&#32;=&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_controller_1ab4e6b3b0d4793ea376619f9dc452b9f4">defaultContactBoneMaterial</link>;
+00457 
+00458 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;ContactBone&#32;contactBone&#32;=&#32;initContactBone(bone,&#32;contactBoneObj,&#32;boneArrayIndex,&#32;capsule);
+00459 
+00460 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;contactBone.lastTargetPosition&#32;=&#32;bone.<link linkend="_class_leap_1_1_bone_1a820e1a7a9975c41ca14aec7c806b9c65">Center</link>.ToVector3();
+00461 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00462 &#32;&#32;&#32;&#32;&#32;&#32;}
+00463 
+00464 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;Palm&#32;bone</emphasis>
+00465 &#32;&#32;&#32;&#32;&#32;&#32;{
+00466 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;Palm&#32;is&#32;attached&#32;to&#32;the&#32;third&#32;metacarpal&#32;and&#32;derived&#32;from&#32;it.</emphasis>
+00467 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;GameObject&#32;contactBoneObj&#32;=&#32;<emphasis role="keyword">new</emphasis>&#32;GameObject(<emphasis role="stringliteral">&quot;Contact&#32;Palm&#32;Bone&quot;</emphasis>,&#32;typeof(BoxCollider),&#32;typeof(Rigidbody),&#32;typeof(ContactBone));
+00468 
+00469 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;Bone&#32;bone&#32;=&#32;_unwarpedHandData.<link linkend="_class_leap_1_1_hand_1ac9f68349507bfa13e3ac24738382bea6">Fingers</link>[(int)Finger.FingerType.TYPE_MIDDLE].Bone(Bone.BoneType.TYPE_METACARPAL);
+00470 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordtype">int</emphasis>&#32;boneArrayIndex&#32;=&#32;NUM_FINGERS&#32;*&#32;BONES_PER_FINGER;
+00471 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;contactBoneObj.transform.position&#32;=&#32;_unwarpedHandData.<link linkend="_class_leap_1_1_hand_1aaf0940b9108e92c22e33b9c6cd32921a">PalmPosition</link>.ToVector3();
+00472 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;contactBoneObj.transform.rotation&#32;=&#32;_unwarpedHandData.<link linkend="_class_leap_1_1_hand_1ad1f22c3baf75294e2aa4d834d87fec20">Rotation</link>.ToQuaternion();
+00473 
+00474 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;Remember&#32;the&#32;method&#32;we&#32;used&#32;to&#32;calculate&#32;the&#32;palm&#32;from&#32;a&#32;Leap&#32;Hand&#32;for&#32;later.</emphasis>
+00475 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;_handContactBoneMapFunctions[boneArrayIndex]&#32;=&#32;(<link linkend="_namespace_leap">Leap</link>.<link linkend="_class_leap_1_1_hand">Hand</link>&#32;hand,
+00476 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;out&#32;Vector3&#32;targetPosition,
+00477 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;out&#32;Quaternion&#32;targetRotation)&#32;=&gt;&#32;{
+00478 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;targetPosition&#32;=&#32;hand.PalmPosition.ToVector3();
+00479 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;targetRotation&#32;=&#32;hand.Rotation.ToQuaternion();
+00480 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;};
+00481 
+00482 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;BoxCollider&#32;box&#32;=&#32;contactBoneObj.GetComponent&lt;BoxCollider&gt;();
+00483 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;box.center&#32;=&#32;<emphasis role="keyword">new</emphasis>&#32;Vector3(_unwarpedHandData.<link linkend="_class_leap_1_1_hand_1a783d6adaec7c3f3422e70bba4480b39d">IsLeft</link>&#32;?&#32;-0.005f&#32;:&#32;0.005f,&#32;bone.Width&#32;*&#32;-0.3f,&#32;-0.01f);
+00484 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;box.size&#32;=&#32;<emphasis role="keyword">new</emphasis>&#32;Vector3(bone.Length,&#32;bone.Width,&#32;bone.Length);
+00485 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;box.material&#32;=&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_controller_1ab4e6b3b0d4793ea376619f9dc452b9f4">defaultContactBoneMaterial</link>;
+00486 
+00487 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;initContactBone(<emphasis role="keyword">null</emphasis>,&#32;contactBoneObj,&#32;boneArrayIndex,&#32;box);
+00488 &#32;&#32;&#32;&#32;&#32;&#32;}
+00489 
+00490 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;Constrain&#32;the&#32;bones&#32;to&#32;each&#32;other&#32;to&#32;prevent&#32;separation.</emphasis>
+00491 &#32;&#32;&#32;&#32;&#32;&#32;addContactBoneJoints();
+00492 &#32;&#32;&#32;&#32;}
+00493 
+00494 &#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;ContactBone&#32;initContactBone(<link linkend="_namespace_leap">Leap</link>.<link linkend="_class_leap_1_1_bone">Bone</link>&#32;bone,&#32;GameObject&#32;contactBoneObj,&#32;<emphasis role="keywordtype">int</emphasis>&#32;boneArrayIndex,&#32;Collider&#32;boneCollider)&#32;{
+00495 &#32;&#32;&#32;&#32;&#32;&#32;contactBoneObj.layer&#32;=&#32;_contactBoneParent.gameObject.layer;
+00496 &#32;&#32;&#32;&#32;&#32;&#32;contactBoneObj.transform.localScale&#32;=&#32;Vector3.one;
+00497 
+00498 &#32;&#32;&#32;&#32;&#32;&#32;ContactBone&#32;contactBone&#32;=&#32;contactBoneObj.GetComponent&lt;ContactBone&gt;();
+00499 &#32;&#32;&#32;&#32;&#32;&#32;contactBone.collider&#32;=&#32;boneCollider;
+00500 &#32;&#32;&#32;&#32;&#32;&#32;contactBone.interactionController&#32;=&#32;<emphasis role="keyword">this</emphasis>;
+00501 &#32;&#32;&#32;&#32;&#32;&#32;contactBone.interactionHand&#32;=&#32;<emphasis role="keyword">this</emphasis>;
+00502 &#32;&#32;&#32;&#32;&#32;&#32;_contactBones[boneArrayIndex]&#32;=&#32;contactBone;
+00503 
+00504 &#32;&#32;&#32;&#32;&#32;&#32;Transform&#32;capsuleTransform&#32;=&#32;contactBoneObj.transform;
+00505 &#32;&#32;&#32;&#32;&#32;&#32;capsuleTransform.SetParent(_contactBoneParent.transform,&#32;<emphasis role="keyword">false</emphasis>);
+00506 
+00507 &#32;&#32;&#32;&#32;&#32;&#32;Rigidbody&#32;body&#32;=&#32;contactBoneObj.GetComponent&lt;Rigidbody&gt;();
+00508 &#32;&#32;&#32;&#32;&#32;&#32;body.freezeRotation&#32;=&#32;<emphasis role="keyword">true</emphasis>;
+00509 &#32;&#32;&#32;&#32;&#32;&#32;contactBone.<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_contact_bone_1af615ba6957558427e50254b0d412858d">rigidbody</link>&#32;=&#32;body;
+00510 &#32;&#32;&#32;&#32;&#32;&#32;body.useGravity&#32;=&#32;<emphasis role="keyword">false</emphasis>;
+00511 &#32;&#32;&#32;&#32;&#32;&#32;body.collisionDetectionMode&#32;=&#32;CollisionDetectionMode.ContinuousDynamic;&#32;<emphasis role="comment">//&#32;TODO:&#32;Allow&#32;different&#32;collision&#32;detection&#32;modes&#32;as&#32;an&#32;optimization.</emphasis>
+00512 
+00513 &#32;&#32;&#32;&#32;&#32;&#32;body.mass&#32;=&#32;0.1f;
+00514 &#32;&#32;&#32;&#32;&#32;&#32;body.position&#32;=&#32;bone&#32;!=&#32;<emphasis role="keyword">null</emphasis>&#32;?&#32;bone.Center.ToVector3()
+00515 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;:&#32;_unwarpedHandData.<link linkend="_class_leap_1_1_hand_1aaf0940b9108e92c22e33b9c6cd32921a">PalmPosition</link>.ToVector3();
+00516 &#32;&#32;&#32;&#32;&#32;&#32;body.rotation&#32;=&#32;bone&#32;!=&#32;<emphasis role="keyword">null</emphasis>&#32;?&#32;bone.Rotation.ToQuaternion()
+00517 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;:&#32;_unwarpedHandData.<link linkend="_class_leap_1_1_hand_1ad1f22c3baf75294e2aa4d834d87fec20">Rotation</link>.ToQuaternion();
+00518 &#32;&#32;&#32;&#32;&#32;&#32;contactBone.lastTargetPosition&#32;=&#32;bone&#32;!=&#32;<emphasis role="keyword">null</emphasis>&#32;?&#32;bone.Center.ToVector3()
+00519 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;:&#32;_unwarpedHandData.<link linkend="_class_leap_1_1_hand_1aaf0940b9108e92c22e33b9c6cd32921a">PalmPosition</link>.ToVector3();
+00520 
+00521 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;contactBone;
+00522 &#32;&#32;&#32;&#32;}
+00523 
+00524 &#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;addContactBoneJoints()&#32;{
+00525 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">for</emphasis>&#32;(<emphasis role="keywordtype">int</emphasis>&#32;fingerIndex&#32;=&#32;0;&#32;fingerIndex&#32;&lt;&#32;NUM_FINGERS;&#32;fingerIndex++)&#32;{
+00526 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">for</emphasis>&#32;(<emphasis role="keywordtype">int</emphasis>&#32;jointIndex&#32;=&#32;0;&#32;jointIndex&#32;&lt;&#32;BONES_PER_FINGER;&#32;jointIndex++)&#32;{
+00527 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;Bone&#32;bone&#32;=&#32;_unwarpedHandData.<link linkend="_class_leap_1_1_hand_1ac9f68349507bfa13e3ac24738382bea6">Fingers</link>[fingerIndex].Bone((Bone.BoneType)(jointIndex)&#32;+&#32;1);&#32;<emphasis role="comment">//&#32;+1&#32;to&#32;skip&#32;first&#32;bone.</emphasis>
+00528 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordtype">int</emphasis>&#32;boneArrayIndex&#32;=&#32;fingerIndex&#32;*&#32;BONES_PER_FINGER&#32;+&#32;jointIndex;
+00529 
+00530 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;FixedJoint&#32;joint&#32;=&#32;_contactBones[boneArrayIndex].gameObject.AddComponent&lt;FixedJoint&gt;();
+00531 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;joint.autoConfigureConnectedAnchor&#32;=&#32;<emphasis role="keyword">false</emphasis>;
+00532 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(jointIndex&#32;!=&#32;0)&#32;{
+00533 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;Bone&#32;prevBone&#32;=&#32;_unwarpedHandData.<link linkend="_class_leap_1_1_hand_1ac9f68349507bfa13e3ac24738382bea6">Fingers</link>[fingerIndex].Bone((Bone.BoneType)(jointIndex));
+00534 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;joint.connectedBody&#32;=&#32;_contactBones[boneArrayIndex&#32;-&#32;1].<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_contact_bone_1af615ba6957558427e50254b0d412858d">rigidbody</link>;
+00535 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;joint.anchor&#32;=&#32;Vector3.back&#32;*&#32;bone.Length&#32;/&#32;2f;
+00536 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;joint.connectedAnchor&#32;=&#32;Vector3.forward&#32;*&#32;prevBone.Length&#32;/&#32;2f;
+00537 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;_contactBones[boneArrayIndex].<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_contact_bone_1a0e26687a959891f032733c206c91dd57">joint</link>&#32;=&#32;joint;
+00538 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00539 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">else</emphasis>&#32;{
+00540 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;joint.connectedBody&#32;=&#32;_contactBones[NUM_FINGERS&#32;*&#32;BONES_PER_FINGER].<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_contact_bone_1af615ba6957558427e50254b0d412858d">rigidbody</link>;
+00541 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;joint.anchor&#32;=&#32;Vector3.back&#32;*&#32;bone.Length&#32;/&#32;2f;
+00542 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;joint.connectedAnchor&#32;=&#32;_contactBones[NUM_FINGERS&#32;*&#32;BONES_PER_FINGER].transform.InverseTransformPoint(bone.PrevJoint.ToVector3());
+00543 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;_contactBones[boneArrayIndex].<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_contact_bone_1a609880a3d01dd5e23b6b03b546cc2ba4">metacarpalJoint</link>&#32;=&#32;joint;
+00544 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00545 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00546 &#32;&#32;&#32;&#32;&#32;&#32;}
+00547 &#32;&#32;&#32;&#32;}
+00548 
+00550 &#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;resetContactBoneJoints()&#32;{
+00551 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;If&#32;contact&#32;bones&#32;array&#32;is&#32;null,&#32;there&apos;s&#32;nothing&#32;to&#32;reset.&#32;This&#32;can&#32;happen&#32;if</emphasis>
+00552 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;the&#32;controller&#32;is&#32;disabled&#32;before&#32;it&#32;had&#32;a&#32;chance&#32;to&#32;initialize&#32;contact.</emphasis>
+00553 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(_contactBones&#32;==&#32;<emphasis role="keyword">null</emphasis>)&#32;<emphasis role="keywordflow">return</emphasis>;
+00554 
+00555 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;If&#32;the&#32;palm&#32;contact&#32;bone&#32;is&#32;null,&#32;we&#32;can&apos;t&#32;reset&#32;bone&#32;joints.</emphasis>
+00556 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(_contactBones[NUM_FINGERS&#32;*&#32;BONES_PER_FINGER]&#32;==&#32;<emphasis role="keyword">null</emphasis>)&#32;<emphasis role="keywordflow">return</emphasis>;
+00557 
+00558 &#32;&#32;&#32;&#32;&#32;&#32;_contactBones[NUM_FINGERS&#32;*&#32;BONES_PER_FINGER].transform.position&#32;=&#32;_unwarpedHandData.<link linkend="_class_leap_1_1_hand_1aaf0940b9108e92c22e33b9c6cd32921a">PalmPosition</link>.ToVector3();
+00559 &#32;&#32;&#32;&#32;&#32;&#32;_contactBones[NUM_FINGERS&#32;*&#32;BONES_PER_FINGER].transform.rotation&#32;=&#32;_unwarpedHandData.<link linkend="_class_leap_1_1_hand_1ad1f22c3baf75294e2aa4d834d87fec20">Rotation</link>.ToQuaternion();
+00560 &#32;&#32;&#32;&#32;&#32;&#32;_contactBones[NUM_FINGERS&#32;*&#32;BONES_PER_FINGER].<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_contact_bone_1af615ba6957558427e50254b0d412858d">rigidbody</link>.velocity&#32;=&#32;Vector3.zero;
+00561 &#32;&#32;&#32;&#32;&#32;&#32;_contactBones[NUM_FINGERS&#32;*&#32;BONES_PER_FINGER].<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_contact_bone_1af615ba6957558427e50254b0d412858d">rigidbody</link>.angularVelocity&#32;=&#32;Vector3.zero;
+00562 
+00563 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">for</emphasis>&#32;(<emphasis role="keywordtype">int</emphasis>&#32;fingerIndex&#32;=&#32;0;&#32;fingerIndex&#32;&lt;&#32;NUM_FINGERS;&#32;fingerIndex++)&#32;{
+00564 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">for</emphasis>&#32;(<emphasis role="keywordtype">int</emphasis>&#32;jointIndex&#32;=&#32;0;&#32;jointIndex&#32;&lt;&#32;BONES_PER_FINGER;&#32;jointIndex++)&#32;{
+00565 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;Bone&#32;bone&#32;=&#32;_unwarpedHandData.<link linkend="_class_leap_1_1_hand_1ac9f68349507bfa13e3ac24738382bea6">Fingers</link>[fingerIndex].Bone((Bone.BoneType)(jointIndex)&#32;+&#32;1);&#32;<emphasis role="comment">//&#32;+1&#32;to&#32;skip&#32;first&#32;bone.</emphasis>
+00566 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordtype">int</emphasis>&#32;boneArrayIndex&#32;=&#32;fingerIndex&#32;*&#32;BONES_PER_FINGER&#32;+&#32;jointIndex;
+00567 
+00568 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;_contactBones[boneArrayIndex].transform.position&#32;=&#32;bone.Center.ToVector3();
+00569 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;_contactBones[boneArrayIndex].transform.rotation&#32;=&#32;bone.Rotation.ToQuaternion();
+00570 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;_contactBones[boneArrayIndex].<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_contact_bone_1af615ba6957558427e50254b0d412858d">rigidbody</link>.position&#32;=&#32;bone.Center.ToVector3();
+00571 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;_contactBones[boneArrayIndex].<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_contact_bone_1af615ba6957558427e50254b0d412858d">rigidbody</link>.rotation&#32;=&#32;bone.Rotation.ToQuaternion();
+00572 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;_contactBones[boneArrayIndex].<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_contact_bone_1af615ba6957558427e50254b0d412858d">rigidbody</link>.velocity&#32;=&#32;Vector3.zero;
+00573 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;_contactBones[boneArrayIndex].<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_contact_bone_1af615ba6957558427e50254b0d412858d">rigidbody</link>.angularVelocity&#32;=&#32;Vector3.zero;
+00574 
+00575 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(jointIndex&#32;!=&#32;0&#32;&amp;&amp;&#32;_contactBones[boneArrayIndex].joint&#32;!=&#32;<emphasis role="keyword">null</emphasis>)&#32;{
+00576 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;Bone&#32;prevBone&#32;=&#32;_unwarpedHandData.<link linkend="_class_leap_1_1_hand_1ac9f68349507bfa13e3ac24738382bea6">Fingers</link>[fingerIndex].Bone((Bone.BoneType)(jointIndex));
+00577 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;_contactBones[boneArrayIndex].<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_contact_bone_1a0e26687a959891f032733c206c91dd57">joint</link>.connectedBody&#32;=&#32;_contactBones[boneArrayIndex&#32;-&#32;1].<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_contact_bone_1af615ba6957558427e50254b0d412858d">rigidbody</link>;
+00578 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;_contactBones[boneArrayIndex].<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_contact_bone_1a0e26687a959891f032733c206c91dd57">joint</link>.anchor&#32;=&#32;Vector3.back&#32;*&#32;bone.Length&#32;/&#32;2f;
+00579 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;_contactBones[boneArrayIndex].<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_contact_bone_1a0e26687a959891f032733c206c91dd57">joint</link>.connectedAnchor&#32;=&#32;Vector3.forward&#32;*&#32;prevBone.Length&#32;/&#32;2f;
+00580 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00581 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">else</emphasis>&#32;<emphasis role="keywordflow">if</emphasis>&#32;(_contactBones[boneArrayIndex].metacarpalJoint&#32;!=&#32;<emphasis role="keyword">null</emphasis>)&#32;{
+00582 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;_contactBones[boneArrayIndex].<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_contact_bone_1a609880a3d01dd5e23b6b03b546cc2ba4">metacarpalJoint</link>.connectedBody&#32;=&#32;_contactBones[NUM_FINGERS&#32;*&#32;BONES_PER_FINGER].<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_contact_bone_1af615ba6957558427e50254b0d412858d">rigidbody</link>;
+00583 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;_contactBones[boneArrayIndex].<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_contact_bone_1a609880a3d01dd5e23b6b03b546cc2ba4">metacarpalJoint</link>.anchor&#32;=&#32;Vector3.back&#32;*&#32;bone.Length&#32;/&#32;2f;
+00584 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;_contactBones[boneArrayIndex].<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_contact_bone_1a609880a3d01dd5e23b6b03b546cc2ba4">metacarpalJoint</link>.connectedAnchor&#32;=&#32;_contactBones[NUM_FINGERS&#32;*&#32;BONES_PER_FINGER].transform
+00585 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;.InverseTransformPoint(bone.PrevJoint.ToVector3());
+00586 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00587 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00588 &#32;&#32;&#32;&#32;&#32;&#32;}
+00589 &#32;&#32;&#32;&#32;}
+00590 
+<anchor xml:id="__interaction_hand_8cs_source_1l00595"/><link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_hand_1a39457043d21af87fcbcf45c8c0876b1e">00595</link> &#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_hand_1a39457043d21af87fcbcf45c8c0876b1e">FillBones</link>(<link linkend="_class_leap_1_1_hand">Hand</link>&#32;inHand)&#32;{
+00596 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_controller_1a7efdf9619c04ed13e0f223c12c6ae429">softContactEnabled</link>)&#32;{&#32;<emphasis role="keywordflow">return</emphasis>;&#32;}
+00597 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(Application.isPlaying&#32;&amp;&amp;&#32;_contactBones.Length&#32;==&#32;NUM_FINGERS&#32;*&#32;BONES_PER_FINGER&#32;+&#32;1)&#32;{
+00598 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_struct_leap_1_1_vector">Vector</link>&#32;elbowPos&#32;=&#32;inHand.<link linkend="_class_leap_1_1_hand_1a929a9aae640b9e8de5b544d7faacd04a">Arm</link>.<link linkend="_class_leap_1_1_arm_1a4249c0d34efeac222e96ba444bec5876">ElbowPosition</link>;
+00599 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;inHand.SetTransform(_contactBones[NUM_FINGERS&#32;*&#32;BONES_PER_FINGER].rigidbody.position,&#32;_contactBones[NUM_FINGERS&#32;*&#32;BONES_PER_FINGER].<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_contact_bone_1af615ba6957558427e50254b0d412858d">rigidbody</link>.rotation);
+00600 
+00601 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">for</emphasis>&#32;(<emphasis role="keywordtype">int</emphasis>&#32;fingerIndex&#32;=&#32;0;&#32;fingerIndex&#32;&lt;&#32;NUM_FINGERS;&#32;fingerIndex++)&#32;{
+00602 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">for</emphasis>&#32;(<emphasis role="keywordtype">int</emphasis>&#32;jointIndex&#32;=&#32;0;&#32;jointIndex&#32;&lt;&#32;BONES_PER_FINGER;&#32;jointIndex++)&#32;{
+00603 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_leap_1_1_bone">Bone</link>&#32;bone&#32;=&#32;inHand.<link linkend="_class_leap_1_1_hand_1ac9f68349507bfa13e3ac24738382bea6">Fingers</link>[fingerIndex].Bone((<link linkend="_class_leap_1_1_bone">Bone</link>.<link linkend="_class_leap_1_1_bone_1a21054e31cefa7b75f25a026006fdbb1b">BoneType</link>)(jointIndex)&#32;+&#32;1);
+00604 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordtype">int</emphasis>&#32;boneArrayIndex&#32;=&#32;fingerIndex&#32;*&#32;BONES_PER_FINGER&#32;+&#32;jointIndex;
+00605 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_struct_leap_1_1_vector">Vector</link>&#32;displacement&#32;=&#32;_contactBones[boneArrayIndex].<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_contact_bone_1af615ba6957558427e50254b0d412858d">rigidbody</link>.position.ToVector()&#32;-&#32;bone.<link linkend="_class_leap_1_1_bone_1a820e1a7a9975c41ca14aec7c806b9c65">Center</link>;
+00606 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;bone.<link linkend="_class_leap_1_1_bone_1a820e1a7a9975c41ca14aec7c806b9c65">Center</link>&#32;+=&#32;displacement;
+00607 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;bone.<link linkend="_class_leap_1_1_bone_1a9bf9d79aa10edd70baa3d27e8bac0730">PrevJoint</link>&#32;+=&#32;displacement;
+00608 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;bone.<link linkend="_class_leap_1_1_bone_1ac0923c0228d11208289b81ff8ed208b7">NextJoint</link>&#32;+=&#32;displacement;
+00609 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;bone.<link linkend="_class_leap_1_1_bone_1a1531c2eecaace7d4532e78f903f3b59a">Rotation</link>&#32;=&#32;_contactBones[boneArrayIndex].<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_contact_bone_1af615ba6957558427e50254b0d412858d">rigidbody</link>.rotation.ToLeapQuaternion();
+00610 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00611 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00612 
+00613 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;inHand.<link linkend="_class_leap_1_1_hand_1a929a9aae640b9e8de5b544d7faacd04a">Arm</link>.<link linkend="_class_leap_1_1_bone_1a9bf9d79aa10edd70baa3d27e8bac0730">PrevJoint</link>&#32;=&#32;elbowPos;
+00614 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;inHand.<link linkend="_class_leap_1_1_hand_1a929a9aae640b9e8de5b544d7faacd04a">Arm</link>.<link linkend="_class_leap_1_1_bone_1a15e47cfdff3b474b9da055ae15aec82e">Direction</link>&#32;=&#32;(inHand.<link linkend="_class_leap_1_1_hand_1a929a9aae640b9e8de5b544d7faacd04a">Arm</link>.<link linkend="_class_leap_1_1_bone_1a9bf9d79aa10edd70baa3d27e8bac0730">PrevJoint</link>&#32;-&#32;inHand.<link linkend="_class_leap_1_1_hand_1a929a9aae640b9e8de5b544d7faacd04a">Arm</link>.<link linkend="_class_leap_1_1_bone_1ac0923c0228d11208289b81ff8ed208b7">NextJoint</link>).Normalized;
+00615 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;inHand.<link linkend="_class_leap_1_1_hand_1a929a9aae640b9e8de5b544d7faacd04a">Arm</link>.<link linkend="_class_leap_1_1_bone_1a820e1a7a9975c41ca14aec7c806b9c65">Center</link>&#32;=&#32;(inHand.<link linkend="_class_leap_1_1_hand_1a929a9aae640b9e8de5b544d7faacd04a">Arm</link>.<link linkend="_class_leap_1_1_bone_1a9bf9d79aa10edd70baa3d27e8bac0730">PrevJoint</link>&#32;+&#32;inHand.<link linkend="_class_leap_1_1_hand_1a929a9aae640b9e8de5b544d7faacd04a">Arm</link>.<link linkend="_class_leap_1_1_bone_1ac0923c0228d11208289b81ff8ed208b7">NextJoint</link>)&#32;*&#32;0.5f;
+00616 &#32;&#32;&#32;&#32;&#32;&#32;}
+00617 &#32;&#32;&#32;&#32;}
+00618 
+00619 <emphasis role="preprocessor">&#32;&#32;&#32;&#32;#endregion</emphasis>
+00620 
+00621 <emphasis role="preprocessor">&#32;&#32;&#32;&#32;#endregion</emphasis>
+00622 
+00623 <emphasis role="preprocessor">&#32;&#32;&#32;&#32;#region&#32;Grasp&#32;Controller&#32;Implementation</emphasis>
+00624 
+00625 &#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;List&lt;Vector3&gt;&#32;_graspManipulatorPoints&#32;=&#32;<emphasis role="keyword">new</emphasis>&#32;List&lt;Vector3&gt;();
+<anchor xml:id="__interaction_hand_8cs_source_1l00626"/><link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_hand_1a2c6bb1acc1d651e8579ab86373e50d3e">00626</link> &#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keyword">override</emphasis>&#32;List&lt;Vector3&gt;&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_hand_1a2c6bb1acc1d651e8579ab86373e50d3e">graspManipulatorPoints</link>&#32;{
+00627 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">get</emphasis>&#32;{
+00628 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;_graspManipulatorPoints;
+00629 &#32;&#32;&#32;&#32;&#32;&#32;}
+00630 &#32;&#32;&#32;&#32;}
+00631 
+00632 &#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;refreshGraspManipulatorPoints()&#32;{
+00633 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordtype">int</emphasis>&#32;bufferIndex&#32;=&#32;0;
+00634 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">for</emphasis>&#32;(<emphasis role="keywordtype">int</emphasis>&#32;i&#32;=&#32;0;&#32;i&#32;&lt;&#32;NUM_FINGERS;&#32;i++)&#32;{
+00635 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">for</emphasis>&#32;(<emphasis role="keywordtype">int</emphasis>&#32;boneIdx&#32;=&#32;0;&#32;boneIdx&#32;&lt;&#32;2;&#32;boneIdx++)&#32;{
+00636 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;Update&#32;or&#32;add&#32;knuckle-joint&#32;and&#32;first-finger-bone&#32;positions&#32;as&#32;the&#32;grasp</emphasis>
+00637 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;manipulator&#32;points&#32;for&#32;this&#32;Hand.</emphasis>
+00638 
+00639 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;Vector3&#32;point&#32;=&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_hand_1a49dba50672251b00081f95e8de3c2993">leapHand</link>.<link linkend="_class_leap_1_1_hand_1ac9f68349507bfa13e3ac24738382bea6">Fingers</link>[i].bones[boneIdx].NextJoint.ToVector3();
+00640 
+00641 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(_graspManipulatorPoints.Count&#32;-&#32;1&#32;&lt;&#32;bufferIndex)&#32;{
+00642 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;_graspManipulatorPoints.Add(point);
+00643 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00644 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">else</emphasis>&#32;{
+00645 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;_graspManipulatorPoints[bufferIndex]&#32;=&#32;point;
+00646 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00647 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;bufferIndex&#32;+=&#32;1;
+00648 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00649 &#32;&#32;&#32;&#32;&#32;&#32;}
+00650 &#32;&#32;&#32;&#32;}
+00651 
+00652 &#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_internal_1_1_heuristic_grab_classifier">HeuristicGrabClassifier</link>&#32;_grabClassifier;
+<anchor xml:id="__interaction_hand_8cs_source_1l00656"/><link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_hand_1aeb1b0a92a1d62de094c6207a7edbd3e4">00656</link> &#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_internal_1_1_heuristic_grab_classifier">HeuristicGrabClassifier</link>&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_hand_1aeb1b0a92a1d62de094c6207a7edbd3e4">grabClassifier</link>&#32;{
+00657 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">get</emphasis>&#32;{
+00658 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(_grabClassifier&#32;==&#32;<emphasis role="keyword">null</emphasis>)&#32;_grabClassifier&#32;=&#32;<emphasis role="keyword">new</emphasis>&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_internal_1_1_heuristic_grab_classifier">HeuristicGrabClassifier</link>(<emphasis role="keyword">this</emphasis>);
+00659 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;_grabClassifier;
+00660 &#32;&#32;&#32;&#32;&#32;&#32;}
+00661 &#32;&#32;&#32;&#32;}
+00662 
+00663 &#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;Vector3[]&#32;_fingertipPositionsBuffer&#32;=&#32;<emphasis role="keyword">new</emphasis>&#32;Vector3[5];
+<anchor xml:id="__interaction_hand_8cs_source_1l00671"/><link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_hand_1ad3db830a66914a000a05003b36b4596d">00671</link> &#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keyword">override</emphasis>&#32;Vector3&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_hand_1ad3db830a66914a000a05003b36b4596d">GetGraspPoint</link>()&#32;{
+00672 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(!<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_controller_1afd400c908dffa22a7fb025f067df34e5">isGraspingObject</link>)&#32;{
+00673 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;Debug.LogError(<emphasis role="stringliteral">&quot;Tried&#32;to&#32;get&#32;grasp&#32;point&#32;of&#32;InteractionHand,&#32;but&#32;it&#32;is&#32;not&#32;&quot;</emphasis>
+00674 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;+&#32;<emphasis role="stringliteral">&quot;currently&#32;grasping&#32;an&#32;object.&quot;</emphasis>,&#32;<emphasis role="keyword">this</emphasis>);
+00675 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_hand_1a49dba50672251b00081f95e8de3c2993">leapHand</link>.<link linkend="_class_leap_1_1_hand_1aaf0940b9108e92c22e33b9c6cd32921a">PalmPosition</link>.ToVector3();
+00676 &#32;&#32;&#32;&#32;&#32;&#32;}
+00677 
+00678 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordtype">int</emphasis>&#32;numGraspingFingertips&#32;=&#32;0;
+00679 &#32;&#32;&#32;&#32;&#32;&#32;_grabClassifier.<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_internal_1_1_heuristic_grab_classifier_1a54611fe455fec49241a629b7d9eea6c6">GetGraspingFingertipPositions</link>(<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_controller_1aecfb55af7f506df76774eac811ad25fc">graspedObject</link>,&#32;_fingertipPositionsBuffer,&#32;out&#32;numGraspingFingertips);
+00680 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(numGraspingFingertips&#32;&gt;&#32;0)&#32;{
+00681 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;Vector3&#32;sum&#32;=&#32;Vector3.zero;
+00682 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">for</emphasis>&#32;(<emphasis role="keywordtype">int</emphasis>&#32;i&#32;=&#32;0;&#32;i&#32;&lt;&#32;numGraspingFingertips;&#32;i++)&#32;{
+00683 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;sum&#32;+=&#32;_fingertipPositionsBuffer[i];
+00684 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00685 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;sum&#32;/&#32;numGraspingFingertips;
+00686 &#32;&#32;&#32;&#32;&#32;&#32;}
+00687 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">else</emphasis>&#32;{
+00688 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_hand_1a49dba50672251b00081f95e8de3c2993">leapHand</link>.<link linkend="_class_leap_1_1_hand_1aaf0940b9108e92c22e33b9c6cd32921a">PalmPosition</link>.ToVector3();
+00689 &#32;&#32;&#32;&#32;&#32;&#32;}
+00690 &#32;&#32;&#32;&#32;}
+00691 
+<anchor xml:id="__interaction_hand_8cs_source_1l00698"/><link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_hand_1a278a920f19b3a940628ddf08c502c7e0">00698</link> &#32;&#32;&#32;&#32;<emphasis role="keyword">protected</emphasis>&#32;<emphasis role="keyword">override</emphasis>&#32;<emphasis role="keywordtype">bool</emphasis>&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_hand_1a278a920f19b3a940628ddf08c502c7e0">checkShouldGraspAtemporal</link>(<link linkend="_interface_leap_1_1_unity_1_1_interaction_1_1_i_interaction_behaviour">IInteractionBehaviour</link>&#32;intObj)&#32;{
+00699 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_hand_1aeb1b0a92a1d62de094c6207a7edbd3e4">grabClassifier</link>.<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_internal_1_1_heuristic_grab_classifier_1a162bb92ee41f1376f650d3dd351aa2f0">TryGrasp</link>(intObj,&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_hand_1a49dba50672251b00081f95e8de3c2993">leapHand</link>))&#32;{
+00700 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;var&#32;tempControllers&#32;=&#32;Pool&lt;List&lt;InteractionController&gt;&gt;.Spawn();
+00701 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">try</emphasis>&#32;{
+00702 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;tempControllers.Add(<emphasis role="keyword">this</emphasis>);
+00703 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;intObj.<link linkend="_interface_leap_1_1_unity_1_1_interaction_1_1_i_interaction_behaviour_1af603fe6d03b61ae9e5d05c7809b05160">BeginGrasp</link>(tempControllers);
+00704 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;<emphasis role="keyword">true</emphasis>;
+00705 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00706 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">finally</emphasis>&#32;{
+00707 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;tempControllers.Clear();
+00708 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;Pool&lt;List&lt;InteractionController&gt;&gt;.Recycle(tempControllers);
+00709 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00710 &#32;&#32;&#32;&#32;&#32;&#32;}
+00711 
+00712 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;<emphasis role="keyword">false</emphasis>;
+00713 &#32;&#32;&#32;&#32;}
+00714 
+<anchor xml:id="__interaction_hand_8cs_source_1l00715"/><link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_hand_1a0a175ec3d49aae78a5c6951fd744080b">00715</link> &#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keyword">override</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_hand_1a0a175ec3d49aae78a5c6951fd744080b">SwapGrasp</link>(<link linkend="_interface_leap_1_1_unity_1_1_interaction_1_1_i_interaction_behaviour">IInteractionBehaviour</link>&#32;replacement)&#32;{
+00716 &#32;&#32;&#32;&#32;&#32;&#32;var&#32;original&#32;=&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_controller_1aecfb55af7f506df76774eac811ad25fc">graspedObject</link>;
+00717 
+00718 &#32;&#32;&#32;&#32;&#32;&#32;base.SwapGrasp(replacement);
+00719 
+00720 &#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_hand_1aeb1b0a92a1d62de094c6207a7edbd3e4">grabClassifier</link>.<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_internal_1_1_heuristic_grab_classifier_1a475f3bc02d1c3649d24ee266e2221c3b">SwapClassifierState</link>(original,&#32;replacement);
+00721 &#32;&#32;&#32;&#32;}
+00722 
+<anchor xml:id="__interaction_hand_8cs_source_1l00723"/><link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_hand_1a899637eb040f88fa2cac4b27e4113684">00723</link> &#32;&#32;&#32;&#32;<emphasis role="keyword">protected</emphasis>&#32;<emphasis role="keyword">override</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_hand_1a899637eb040f88fa2cac4b27e4113684">fixedUpdateGraspingState</link>()&#32;{
+00724 &#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_hand_1aeb1b0a92a1d62de094c6207a7edbd3e4">grabClassifier</link>.<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_internal_1_1_heuristic_grab_classifier_1ae3d0c844b6f3a40df35e6a2c71efbefd">FixedUpdateClassifierHandState</link>();
+00725 &#32;&#32;&#32;&#32;}
+00726 
+<anchor xml:id="__interaction_hand_8cs_source_1l00727"/><link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_hand_1a1506a0d6e49010aedb6a8fe5a528d4fe">00727</link> &#32;&#32;&#32;&#32;<emphasis role="keyword">protected</emphasis>&#32;<emphasis role="keyword">override</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_hand_1a1506a0d6e49010aedb6a8fe5a528d4fe">onGraspedObjectForciblyReleased</link>(<link linkend="_interface_leap_1_1_unity_1_1_interaction_1_1_i_interaction_behaviour">IInteractionBehaviour</link>&#32;objectToBeReleased)&#32;{
+00728 &#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_hand_1aeb1b0a92a1d62de094c6207a7edbd3e4">grabClassifier</link>.<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_internal_1_1_heuristic_grab_classifier_1a9c2b9020038d2087dd78e9c4ccdbfcdb">NotifyGraspForciblyReleased</link>(objectToBeReleased);
+00729 &#32;&#32;&#32;&#32;}
+00730 
+<anchor xml:id="__interaction_hand_8cs_source_1l00731"/><link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_hand_1aaf0c4bf5f6892517ac5be576104550b4">00731</link> &#32;&#32;&#32;&#32;<emphasis role="keyword">protected</emphasis>&#32;<emphasis role="keyword">override</emphasis>&#32;<emphasis role="keywordtype">bool</emphasis>&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_hand_1aaf0c4bf5f6892517ac5be576104550b4">checkShouldRelease</link>(out&#32;<link linkend="_interface_leap_1_1_unity_1_1_interaction_1_1_i_interaction_behaviour">IInteractionBehaviour</link>&#32;objectToRelease)&#32;{
+00732 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_hand_1aeb1b0a92a1d62de094c6207a7edbd3e4">grabClassifier</link>.<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_internal_1_1_heuristic_grab_classifier_1a188485d78695a6f187e7c28532548033">FixedUpdateClassifierRelease</link>(out&#32;objectToRelease);
+00733 &#32;&#32;&#32;&#32;}
+00734 
+<anchor xml:id="__interaction_hand_8cs_source_1l00735"/><link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_hand_1ae9cb040d9827bec38bf1c1b3560d7cbb">00735</link> &#32;&#32;&#32;&#32;<emphasis role="keyword">protected</emphasis>&#32;<emphasis role="keyword">override</emphasis>&#32;<emphasis role="keywordtype">bool</emphasis>&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_hand_1ae9cb040d9827bec38bf1c1b3560d7cbb">checkShouldGrasp</link>(out&#32;<link linkend="_interface_leap_1_1_unity_1_1_interaction_1_1_i_interaction_behaviour">IInteractionBehaviour</link>&#32;objectToGrasp)&#32;{
+00736 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_hand_1aeb1b0a92a1d62de094c6207a7edbd3e4">grabClassifier</link>.<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_internal_1_1_heuristic_grab_classifier_1ad958ef46c9aacf8fa7646fb52329f266">FixedUpdateClassifierGrasp</link>(out&#32;objectToGrasp);
+00737 &#32;&#32;&#32;&#32;}
+00738 
+00739 <emphasis role="preprocessor">&#32;&#32;&#32;&#32;#endregion</emphasis>
+00740 
+00741 <emphasis role="preprocessor">&#32;&#32;&#32;&#32;#region&#32;Gizmos</emphasis>
+00742 
+00743 <emphasis role="preprocessor">&#32;&#32;&#32;&#32;#if&#32;UNITY_EDITOR</emphasis>
+00744 
+00745 &#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;<link linkend="_namespace_leap">Leap</link>.<link linkend="_class_leap_1_1_hand">Hand</link>&#32;_testHand&#32;=&#32;<emphasis role="keyword">null</emphasis>;
+00746 
+00747 &#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keyword">override</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_controller_1aea16165952781a04b0da774cca6561a1">OnDrawRuntimeGizmos</link>(<link linkend="_class_leap_1_1_unity_1_1_runtime_gizmos_1_1_runtime_gizmo_drawer">RuntimeGizmoDrawer</link>&#32;drawer)&#32;{
+00748 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(Application.isPlaying)&#32;{
+00749 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;base.OnDrawRuntimeGizmos(drawer);
+00750 &#32;&#32;&#32;&#32;&#32;&#32;}
+00751 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">else</emphasis>&#32;{
+00752 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;var&#32;provider&#32;=&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_hand_1af5d2087b092dc81bba8b6f4fae96999b">leapProvider</link>;
+00753 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(provider&#32;==&#32;<emphasis role="keyword">null</emphasis>)&#32;{
+00754 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;provider&#32;=&#32;Hands.Provider;
+00755 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00756 
+00757 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(_testHand&#32;==&#32;<emphasis role="keyword">null</emphasis>&#32;&amp;&amp;&#32;provider&#32;!=&#32;<emphasis role="keyword">null</emphasis>)&#32;{
+00758 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;_testHand&#32;=&#32;provider.MakeTestHand(this.<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_hand_1a445aaa40de828283c32fa39440789da3">isLeft</link>);
+00759 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00760 
+00761 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;Hover&#32;Point</emphasis>
+00762 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;_unwarpedHandData&#32;=&#32;_testHand;&#32;<emphasis role="comment">//&#32;hoverPoint&#32;is&#32;driven&#32;by&#32;this&#32;backing&#32;variable</emphasis>
+00763 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_controller_1a91d025406da30ca80629fd01898b6935">drawHoverPoint</link>(drawer,&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_hand_1a0f241a7ebea2f55c68666273fe5eda39">hoverPoint</link>);
+00764 
+00765 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;Primary&#32;Hover&#32;Points</emphasis>
+00766 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">for</emphasis>&#32;(<emphasis role="keywordtype">int</emphasis>&#32;i&#32;=&#32;0;&#32;i&#32;&lt;&#32;NUM_FINGERS;&#32;i++)&#32;{
+00767 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_hand_1a09719682ae423b8b6d52d12a81a1b05c">enabledPrimaryHoverFingertips</link>[i])&#32;{
+00768 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_controller_1abab3a785a24c9d0d028ca7757d7aa657">drawPrimaryHoverPoint</link>(drawer,&#32;_testHand.Fingers[i].TipPosition.ToVector3());
+00769 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00770 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00771 &#32;&#32;&#32;&#32;&#32;&#32;}
+00772 &#32;&#32;&#32;&#32;}
+00773 
+00774 <emphasis role="preprocessor">&#32;&#32;&#32;&#32;#endif</emphasis>
+00775 
+00776 <emphasis role="preprocessor">&#32;&#32;&#32;&#32;#endregion</emphasis>
+00777 
+00778 &#32;&#32;}
+00779 
+00780 }
+</programlisting></section>

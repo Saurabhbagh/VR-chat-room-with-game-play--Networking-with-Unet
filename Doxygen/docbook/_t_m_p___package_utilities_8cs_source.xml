@@ -1,0 +1,831 @@
+<?xml version='1.0' encoding='UTF-8' standalone='no'?>
+<section xmlns="http://docbook.org/ns/docbook" version="5.0" xmlns:xlink="http://www.w3.org/1999/xlink" xml:id="__t_m_p___package_utilities_8cs_source">
+<title>TMP_PackageUtilities.cs</title>
+<indexterm><primary>O:/GitHUBMINIPRoject/Library/PackageCache/com.unity.textmeshpro@1.3.0/Scripts/Editor/TMP_PackageUtilities.cs</primary></indexterm>
+<programlisting>00001 <emphasis role="keyword">using</emphasis>&#32;<link linkend="__balloon_8cs_1a7d67e097df9376eb709b6a23aa3c7d23">UnityEngine</link>;
+00002 <emphasis role="keyword">using</emphasis>&#32;<link linkend="_namespace_unity_editor">UnityEditor</link>;
+00003 <emphasis role="keyword">using</emphasis>&#32;System.IO;
+00004 <emphasis role="keyword">using</emphasis>&#32;System.Collections;
+00005 <emphasis role="keyword">using</emphasis>&#32;System.Collections.Generic;
+00006 <emphasis role="keyword">using</emphasis>&#32;<link linkend="_namespace_t_m_pro">TMPro</link>.<link linkend="_namespace_t_m_pro_1_1_editor_utilities">EditorUtilities</link>;
+00007 
+00008 
+00009 <emphasis role="keyword">namespace&#32;</emphasis><link linkend="_namespace_t_m_pro">TMPro</link>
+00010 {
+00014 &#32;&#32;&#32;&#32;[System.Serializable]
+<anchor xml:id="__t_m_p___package_utilities_8cs_source_1l00015"/><link linkend="_struct_t_m_pro_1_1_asset_conversion_record">00015</link> &#32;&#32;&#32;&#32;<emphasis role="keyword">struct&#32;</emphasis><link linkend="_struct_t_m_pro_1_1_asset_conversion_record">AssetConversionRecord</link>
+00016 &#32;&#32;&#32;&#32;{
+<anchor xml:id="__t_m_p___package_utilities_8cs_source_1l00017"/><link linkend="_struct_t_m_pro_1_1_asset_conversion_record_1a162b46d5a4ab24deb0ebd538d16bc4f2">00017</link> &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keywordtype">string</emphasis>&#32;<link linkend="_struct_t_m_pro_1_1_asset_conversion_record_1a162b46d5a4ab24deb0ebd538d16bc4f2">referencedResource</link>;
+<anchor xml:id="__t_m_p___package_utilities_8cs_source_1l00018"/><link linkend="_struct_t_m_pro_1_1_asset_conversion_record_1a406640440ce56962696b39a605cc80a6">00018</link> &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keywordtype">string</emphasis>&#32;<link linkend="_struct_t_m_pro_1_1_asset_conversion_record_1a406640440ce56962696b39a605cc80a6">target</link>;
+<anchor xml:id="__t_m_p___package_utilities_8cs_source_1l00019"/><link linkend="_struct_t_m_pro_1_1_asset_conversion_record_1a7217cf55ce06161e09a6bb6fa78714b0">00019</link> &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keywordtype">string</emphasis>&#32;<link linkend="_struct_t_m_pro_1_1_asset_conversion_record_1a7217cf55ce06161e09a6bb6fa78714b0">replacement</link>;
+00020 &#32;&#32;&#32;&#32;}
+00021 
+00022 
+00027 &#32;&#32;&#32;&#32;[System.Serializable]
+<anchor xml:id="__t_m_p___package_utilities_8cs_source_1l00028"/><link linkend="_class_t_m_pro_1_1_asset_conversion_data">00028</link> &#32;&#32;&#32;&#32;<emphasis role="keyword">class&#32;</emphasis><link linkend="_class_t_m_pro_1_1_asset_conversion_data">AssetConversionData</link>
+00029 &#32;&#32;&#32;&#32;{
+<anchor xml:id="__t_m_p___package_utilities_8cs_source_1l00030"/><link linkend="_class_t_m_pro_1_1_asset_conversion_data_1af8fb67a3f99e7c37cc2f4f187fe47c0a">00030</link> &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;List&lt;AssetConversionRecord&gt;&#32;<link linkend="_class_t_m_pro_1_1_asset_conversion_data_1af8fb67a3f99e7c37cc2f4f187fe47c0a">assetRecords</link>;
+00031 &#32;&#32;&#32;&#32;}
+00032 
+00033 
+<anchor xml:id="__t_m_p___package_utilities_8cs_source_1l00034"/><link linkend="_class_t_m_pro_1_1_t_m_p___project_conversion_utility">00034</link> &#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keyword">class&#32;</emphasis><link linkend="_class_t_m_pro_1_1_t_m_p___project_conversion_utility">TMP_ProjectConversionUtility</link>&#32;:&#32;EditorWindow
+00035 &#32;&#32;&#32;&#32;{
+00036 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;Create&#32;Sprite&#32;Asset&#32;Editor&#32;Window</emphasis>
+00037 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;[MenuItem(<emphasis role="stringliteral">&quot;Window/TextMeshPro/Project&#32;Files&#32;GUID&#32;Remapping&#32;Tool&quot;</emphasis>,&#32;<emphasis role="keyword">false</emphasis>,&#32;2100)]
+00038 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">static</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;ShowConverterWindow()
+00039 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00040 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;var&#32;window&#32;=&#32;GetWindow&lt;TMP_ProjectConversionUtility&gt;();
+00041 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;window.titleContent&#32;=&#32;<emphasis role="keyword">new</emphasis>&#32;GUIContent(<emphasis role="stringliteral">&quot;Conversion&#32;Tool&quot;</emphasis>);
+00042 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;window.Focus();
+00043 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00044 
+00045 
+00049 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">struct&#32;</emphasis>AssetModificationRecord
+00050 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00051 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keywordtype">string</emphasis>&#32;assetFilePath;
+00052 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keywordtype">string</emphasis>&#32;assetDataFile;
+00053 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00054 
+00055 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;<emphasis role="keyword">static</emphasis>&#32;<emphasis role="keywordtype">string</emphasis>&#32;m_ProjectFolderToScan;
+00056 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;<emphasis role="keyword">static</emphasis>&#32;<emphasis role="keywordtype">bool</emphasis>&#32;m_IsAlreadyScanningProject;
+00057 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;<emphasis role="keyword">static</emphasis>&#32;<emphasis role="keywordtype">bool</emphasis>&#32;m_CancelScanProcess;
+00058 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;<emphasis role="keyword">static</emphasis>&#32;<emphasis role="keywordtype">string</emphasis>&#32;k_ProjectScanReportDefaultText&#32;=&#32;<emphasis role="stringliteral">&quot;&lt;color=#FFFF80&gt;&lt;b&gt;Project&#32;Scan&#32;Results&lt;/b&gt;&lt;/color&gt;\n&quot;</emphasis>;
+00059 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;<emphasis role="keyword">static</emphasis>&#32;<emphasis role="keywordtype">string</emphasis>&#32;m_ProjectScanResults&#32;=&#32;<emphasis role="keywordtype">string</emphasis>.Empty;
+00060 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;<emphasis role="keyword">static</emphasis>&#32;Vector2&#32;m_ProjectScanResultScrollPosition;
+00061 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;<emphasis role="keyword">static</emphasis>&#32;<emphasis role="keywordtype">float</emphasis>&#32;m_ProgressPercentage&#32;=&#32;0;
+00062 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;<emphasis role="keyword">static</emphasis>&#32;<emphasis role="keywordtype">int</emphasis>&#32;m_ScanningTotalFiles;
+00063 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;<emphasis role="keyword">static</emphasis>&#32;<emphasis role="keywordtype">int</emphasis>&#32;m_ScanningCurrentFileIndex;
+00064 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;<emphasis role="keyword">static</emphasis>&#32;<emphasis role="keywordtype">string</emphasis>&#32;m_ScanningCurrentFileName;
+00065 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;<emphasis role="keyword">static</emphasis>&#32;List&lt;AssetModificationRecord&gt;&#32;m_ModifiedAssetList&#32;=&#32;<emphasis role="keyword">new</emphasis>&#32;List&lt;AssetModificationRecord&gt;();
+00066 
+00067 
+00068 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordtype">void</emphasis>&#32;OnEnable()
+00069 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00070 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;Set&#32;Editor&#32;Window&#32;Size</emphasis>
+00071 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;SetEditorWindowSize();
+00072 
+00073 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;m_ProjectScanResults&#32;=&#32;k_ProjectScanReportDefaultText;
+00074 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00075 
+00076 
+00077 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordtype">void</emphasis>&#32;OnGUI()
+00078 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00079 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;GUILayout.BeginVertical();
+00080 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00081 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;Scan&#32;project&#32;files&#32;and&#32;resources</emphasis>
+00082 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;GUILayout.BeginVertical(EditorStyles.helpBox);
+00083 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00084 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;GUILayout.Label(<emphasis role="stringliteral">&quot;Scan&#32;Project&#32;Files&quot;</emphasis>,&#32;EditorStyles.boldLabel);
+00085 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;GUILayout.Label(<emphasis role="stringliteral">&quot;Press&#32;the&#32;&lt;i&gt;Scan&#32;Project&#32;Files&lt;/i&gt;&#32;button&#32;to&#32;begin&#32;scanning&#32;your&#32;project&#32;for&#32;files&#32;&amp;&#32;resources&#32;that&#32;were&#32;created&#32;with&#32;a&#32;previous&#32;version&#32;of&#32;TextMesh&#32;Pro.&quot;</emphasis>,&#32;TMP_UIStyleManager.label);
+00086 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;GUILayout.Space(10f);
+00087 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;GUILayout.Label(<emphasis role="stringliteral">&quot;Project&#32;folder&#32;to&#32;be&#32;scanned.&#32;Example&#32;\&quot;Assets/TextMesh&#32;Pro\&quot;&quot;</emphasis>);
+00088 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;m_ProjectFolderToScan&#32;=&#32;EditorGUILayout.TextField(<emphasis role="stringliteral">&quot;Folder&#32;Path:&#32;&#32;&#32;&#32;&#32;&#32;Assets/&quot;</emphasis>,&#32;m_ProjectFolderToScan);
+00089 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;GUILayout.Space(5f);
+00090 
+00091 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;GUI.enabled&#32;=&#32;m_IsAlreadyScanningProject&#32;==&#32;<emphasis role="keyword">false</emphasis>&#32;?&#32;true&#32;:&#32;<emphasis role="keyword">false</emphasis>;
+00092 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(GUILayout.Button(<emphasis role="stringliteral">&quot;Scan&#32;Project&#32;Files&quot;</emphasis>))
+00093 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00094 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;m_CancelScanProcess&#32;=&#32;<emphasis role="keyword">false</emphasis>;
+00095 
+00096 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;Make&#32;sure&#32;Asset&#32;Serialization&#32;mode&#32;is&#32;set&#32;to&#32;ForceText&#32;and&#32;Version&#32;Control&#32;mode&#32;to&#32;Visible&#32;Meta&#32;Files.</emphasis>
+00097 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(CheckProjectSerializationAndSourceControlModes()&#32;==&#32;<emphasis role="keyword">true</emphasis>)
+00098 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00099 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_t_m_pro_1_1_editor_utilities_1_1_editor_coroutine">EditorCoroutine</link>.<link linkend="_class_t_m_pro_1_1_editor_utilities_1_1_editor_coroutine_1abab6d5eb211e23d072db7181905df57b">StartCoroutine</link>(ScanProjectFiles());
+00100 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00101 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">else</emphasis>
+00102 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00103 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;EditorUtility.DisplayDialog(<emphasis role="stringliteral">&quot;Project&#32;Settings&#32;Change&#32;Required&quot;</emphasis>,&#32;<emphasis role="stringliteral">&quot;In&#32;menu&#32;options&#32;\&quot;Edit&#32;-&#32;Project&#32;Settings&#32;-&#32;Editor\&quot;,&#32;please&#32;change&#32;Asset&#32;Serialization&#32;Mode&#32;to&#32;ForceText&#32;and&#32;Source&#32;Control&#32;Mode&#32;to&#32;Visible&#32;Meta&#32;Files.&quot;</emphasis>,&#32;<emphasis role="stringliteral">&quot;OK&quot;</emphasis>,&#32;<emphasis role="keywordtype">string</emphasis>.Empty);
+00104 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00105 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00106 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;GUI.enabled&#32;=&#32;<emphasis role="keyword">true</emphasis>;
+00107 
+00108 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;Display&#32;progress&#32;bar</emphasis>
+00109 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;Rect&#32;rect&#32;=&#32;GUILayoutUtility.GetRect(0f,&#32;20f,&#32;GUILayout.ExpandWidth(<emphasis role="keyword">true</emphasis>));
+00110 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;EditorGUI.ProgressBar(rect,&#32;m_ProgressPercentage,&#32;<emphasis role="stringliteral">&quot;Scan&#32;Progress&#32;(&quot;</emphasis>&#32;+&#32;m_ScanningCurrentFileIndex&#32;+&#32;<emphasis role="stringliteral">&quot;/&quot;</emphasis>&#32;+&#32;m_ScanningTotalFiles&#32;+&#32;<emphasis role="stringliteral">&quot;)&quot;</emphasis>);
+00111 
+00112 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;Display&#32;cancel&#32;button&#32;and&#32;name&#32;of&#32;file&#32;currently&#32;being&#32;scanned.</emphasis>
+00113 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(m_IsAlreadyScanningProject)
+00114 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00115 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;Rect&#32;cancelRect&#32;=&#32;<emphasis role="keyword">new</emphasis>&#32;Rect(rect.width&#32;-&#32;20,&#32;rect.y&#32;+&#32;2,&#32;20,&#32;16);
+00116 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(GUI.Button(cancelRect,&#32;<emphasis role="stringliteral">&quot;X&quot;</emphasis>))
+00117 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00118 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;m_CancelScanProcess&#32;=&#32;<emphasis role="keyword">true</emphasis>;
+00119 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00120 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;GUILayout.Label(<emphasis role="stringliteral">&quot;Scanning:&#32;&quot;</emphasis>&#32;+&#32;m_ScanningCurrentFileName);
+00121 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00122 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">else</emphasis>
+00123 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;GUILayout.Label(<emphasis role="keywordtype">string</emphasis>.Empty);
+00124 
+00125 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;GUILayout.Space(5);
+00126 
+00127 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;Creation&#32;Feedback</emphasis>
+00128 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;GUILayout.BeginVertical(TMP_UIStyleManager.textAreaBoxWindow,&#32;GUILayout.ExpandHeight(<emphasis role="keyword">true</emphasis>));
+00129 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00130 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;m_ProjectScanResultScrollPosition&#32;=&#32;EditorGUILayout.BeginScrollView(m_ProjectScanResultScrollPosition,&#32;GUILayout.ExpandHeight(<emphasis role="keyword">true</emphasis>));
+00131 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;EditorGUILayout.LabelField(m_ProjectScanResults,&#32;TMP_UIStyleManager.label);
+00132 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;EditorGUILayout.EndScrollView();
+00133 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00134 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;GUILayout.EndVertical();
+00135 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;GUILayout.Space(5f);
+00136 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00137 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;GUILayout.EndVertical();
+00138 
+00139 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;Scan&#32;project&#32;files&#32;and&#32;resources</emphasis>
+00140 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;GUILayout.BeginVertical(EditorStyles.helpBox);
+00141 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{&#32;
+00142 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;GUILayout.Label(<emphasis role="stringliteral">&quot;Save&#32;Modified&#32;Project&#32;Files&quot;</emphasis>,&#32;EditorStyles.boldLabel);
+00143 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;GUILayout.Label(<emphasis role="stringliteral">&quot;Pressing&#32;the&#32;&lt;i&gt;Save&#32;Modified&#32;Project&#32;Files&lt;/i&gt;&#32;button&#32;will&#32;update&#32;the&#32;files&#32;in&#32;the&#32;&lt;i&gt;Project&#32;Scan&#32;Results&lt;/i&gt;&#32;listed&#32;above.&#32;&lt;color=#FFFF80&gt;Please&#32;make&#32;sure&#32;that&#32;you&#32;have&#32;created&#32;a&#32;backup&#32;of&#32;your&#32;project&#32;first&lt;/color&gt;&#32;as&#32;these&#32;file&#32;modifications&#32;are&#32;permanent&#32;and&#32;cannot&#32;be&#32;undone.&quot;</emphasis>,&#32;TMP_UIStyleManager.label);
+00144 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;GUILayout.Space(5f);
+00145 
+00146 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;GUI.enabled&#32;=&#32;m_IsAlreadyScanningProject&#32;==&#32;<emphasis role="keyword">false</emphasis>&#32;&amp;&amp;&#32;m_ModifiedAssetList.Count&#32;&gt;&#32;0&#32;?&#32;true&#32;:&#32;<emphasis role="keyword">false</emphasis>;
+00147 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(GUILayout.Button(<emphasis role="stringliteral">&quot;Save&#32;Modified&#32;Project&#32;Files&quot;</emphasis>))
+00148 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00149 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;UpdateProjectFiles();
+00150 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00151 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;GUILayout.Space(10f);
+00152 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00153 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;GUILayout.EndVertical();
+00154 
+00155 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00156 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;GUILayout.EndVertical();
+00157 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;GUILayout.Space(5f);
+00158 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00159 
+00160 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordtype">void</emphasis>&#32;OnInspectorUpdate()
+00161 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00162 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;Repaint();
+00163 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00164 
+00165 
+00169 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordtype">void</emphasis>&#32;SetEditorWindowSize()
+00170 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00171 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;EditorWindow&#32;editorWindow&#32;=&#32;<emphasis role="keyword">this</emphasis>;
+00172 
+00173 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;Vector2&#32;currentWindowSize&#32;=&#32;editorWindow.minSize;
+00174 
+00175 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;editorWindow.minSize&#32;=&#32;<emphasis role="keyword">new</emphasis>&#32;Vector2(Mathf.Max(640,&#32;currentWindowSize.x),&#32;Mathf.Max(420,&#32;currentWindowSize.y));
+00176 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00177 
+00178 
+00179 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;IEnumerator&#32;ScanProjectFiles()
+00180 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00181 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;m_IsAlreadyScanningProject&#32;=&#32;<emphasis role="keyword">true</emphasis>;
+00182 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordtype">string</emphasis>&#32;projectPath&#32;=&#32;Path.GetFullPath(<emphasis role="stringliteral">&quot;Assets/..&quot;</emphasis>);
+00183 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordtype">string</emphasis>&#32;packageFullPath&#32;=&#32;EditorUtilities.TMP_EditorUtility.packageFullPath;
+00184 
+00185 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;List&#32;containing&#32;assets&#32;that&#32;have&#32;been&#32;modified.</emphasis>
+00186 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordtype">string</emphasis>&#32;scanResults&#32;=&#32;k_ProjectScanReportDefaultText;
+00187 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;m_ModifiedAssetList.Clear();
+00188 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;m_ProgressPercentage&#32;=&#32;0;
+00189 
+00190 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;Read&#32;Conversion&#32;Data&#32;from&#32;Json&#32;file.</emphasis>
+00191 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_t_m_pro_1_1_asset_conversion_data">AssetConversionData</link>&#32;conversionData&#32;=&#32;JsonUtility.FromJson&lt;<link linkend="_class_t_m_pro_1_1_asset_conversion_data">AssetConversionData</link>&gt;(File.ReadAllText(packageFullPath&#32;+&#32;<emphasis role="stringliteral">&quot;/PackageConversionData.json&quot;</emphasis>));
+00192 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_t_m_pro_1_1_asset_conversion_data">AssetConversionData</link>&#32;conversionData_Assets&#32;=&#32;JsonUtility.FromJson&lt;<link linkend="_class_t_m_pro_1_1_asset_conversion_data">AssetConversionData</link>&gt;(File.ReadAllText(packageFullPath&#32;+&#32;<emphasis role="stringliteral">&quot;/PackageConversionData_Assets.json&quot;</emphasis>));
+00193 
+00194 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;Get&#32;list&#32;of&#32;GUIDs&#32;for&#32;assets&#32;that&#32;might&#32;contain&#32;references&#32;to&#32;previous&#32;GUIDs&#32;that&#32;require&#32;updating.</emphasis>
+00195 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordtype">string</emphasis>&#32;searchFolder&#32;=&#32;<emphasis role="keywordtype">string</emphasis>.IsNullOrEmpty(m_ProjectFolderToScan)&#32;?&#32;<emphasis role="stringliteral">&quot;Assets&quot;</emphasis>&#32;:&#32;(<emphasis role="stringliteral">&quot;Assets/&quot;</emphasis>&#32;+&#32;m_ProjectFolderToScan);
+00196 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordtype">string</emphasis>[]&#32;projectGUIDs&#32;=&#32;AssetDatabase.FindAssets(<emphasis role="stringliteral">&quot;t:Object&quot;</emphasis>,&#32;<emphasis role="keyword">new</emphasis>&#32;<emphasis role="keywordtype">string</emphasis>[]&#32;{&#32;searchFolder&#32;});
+00197 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;m_ScanningTotalFiles&#32;=&#32;projectGUIDs.Length;
+00198 
+00199 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordtype">bool</emphasis>&#32;cancelScanning&#32;=&#32;<emphasis role="keyword">false</emphasis>;
+00200 
+00201 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;Iterate&#32;through&#32;projectGUIDs&#32;to&#32;search&#32;project&#32;assets&#32;of&#32;the&#32;types&#32;likely&#32;to&#32;reference&#32;GUIDs&#32;and&#32;FileIDs&#32;used&#32;by&#32;previous&#32;versions&#32;of&#32;TextMesh&#32;Pro.&#32;</emphasis>
+00202 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">for</emphasis>&#32;(<emphasis role="keywordtype">int</emphasis>&#32;i&#32;=&#32;0;&#32;i&#32;&lt;&#32;projectGUIDs.Length&#32;&amp;&amp;&#32;cancelScanning&#32;==&#32;<emphasis role="keyword">false</emphasis>;&#32;i++)
+00203 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00204 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(m_CancelScanProcess)
+00205 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00206 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;cancelScanning&#32;=&#32;<emphasis role="keyword">true</emphasis>;
+00207 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;ResetScanProcess();
+00208 
+00209 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">continue</emphasis>;
+00210 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00211 
+00212 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;m_ScanningCurrentFileIndex&#32;=&#32;i&#32;+&#32;1;
+00213 
+00214 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordtype">string</emphasis>&#32;guid&#32;=&#32;projectGUIDs[i];
+00215 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordtype">string</emphasis>&#32;assetFilePath&#32;=&#32;AssetDatabase.GUIDToAssetPath(guid);
+00216 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordtype">string</emphasis>&#32;assetFileExtension&#32;=&#32;Path.GetExtension(assetFilePath);
+00217 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;System.Type&#32;assetType&#32;=&#32;AssetDatabase.GetMainAssetTypeAtPath(assetFilePath);
+00218 
+00219 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;Filter&#32;out&#32;asset&#32;types&#32;that&#32;we&#32;can&apos;t&#32;read&#32;or&#32;have&#32;not&#32;interest&#32;in&#32;searching.</emphasis>
+00220 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(assetType&#32;==&#32;typeof(DefaultAsset)&#32;||&#32;assetType&#32;==&#32;typeof(MonoScript)&#32;||&#32;assetType&#32;==&#32;typeof(Texture2D)&#32;||&#32;assetType&#32;==&#32;typeof(Texture3D)&#32;||&#32;assetType&#32;==&#32;typeof(Cubemap)&#32;||
+00221 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;assetType&#32;==&#32;typeof(TextAsset)&#32;||&#32;assetType&#32;==&#32;typeof(Shader)&#32;||&#32;assetType&#32;==&#32;typeof(Font)&#32;||&#32;assetType&#32;==&#32;typeof(UnityEditorInternal.AssemblyDefinitionAsset)&#32;||
+00222 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;assetType&#32;==&#32;typeof(GUISkin)&#32;||&#32;assetType&#32;==&#32;typeof(PhysicsMaterial2D)&#32;||&#32;assetType&#32;==&#32;typeof(PhysicMaterial)&#32;||&#32;assetType&#32;==&#32;typeof(<link linkend="_namespace_unity_engine">UnityEngine</link>.U2D.SpriteAtlas)&#32;||&#32;assetType&#32;==&#32;typeof(<link linkend="_namespace_unity_engine">UnityEngine</link>.Tilemaps.Tile)&#32;||
+00223 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;assetType&#32;==&#32;typeof(AudioClip)&#32;||&#32;assetType&#32;==&#32;typeof(ComputeShader)&#32;||&#32;assetType&#32;==&#32;typeof(<link linkend="_namespace_unity_editor">UnityEditor</link>.Animations.AnimatorController)&#32;||&#32;assetType&#32;==&#32;typeof(<link linkend="_namespace_unity_engine">UnityEngine</link>.AI.NavMeshData)&#32;||
+00224 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;assetType&#32;==&#32;typeof(Mesh)&#32;||&#32;assetType&#32;==&#32;typeof(RenderTexture)&#32;||&#32;assetType&#32;==&#32;typeof(Texture2DArray)&#32;||&#32;assetType&#32;==&#32;typeof(LightingDataAsset)&#32;||&#32;assetType&#32;==&#32;typeof(AvatarMask)&#32;||
+00225 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;assetType&#32;==&#32;typeof(AnimatorOverrideController)&#32;||&#32;assetType&#32;==&#32;typeof(TerrainData)&#32;||&#32;assetType&#32;==&#32;typeof(HumanTemplate)&#32;||&#32;assetType&#32;==&#32;typeof(Flare)&#32;||&#32;assetType&#32;==&#32;typeof(<link linkend="_namespace_unity_engine">UnityEngine</link>.Video.VideoClip))
+00226 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">continue</emphasis>;
+00227 
+00228 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;Exclude&#32;FBX</emphasis>
+00229 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(assetType&#32;==&#32;typeof(GameObject)&#32;&amp;&amp;&#32;(assetFileExtension&#32;==&#32;<emphasis role="stringliteral">&quot;.FBX&quot;</emphasis>&#32;||&#32;assetFileExtension&#32;==&#32;<emphasis role="stringliteral">&quot;.fbx&quot;</emphasis>))
+00230 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">continue</emphasis>;
+00231 
+00232 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;m_ScanningCurrentFileName&#32;=&#32;assetFilePath;
+00233 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//Debug.Log(&quot;Searching&#32;Asset:&#32;[&quot;&#32;+&#32;assetFilePath&#32;+&#32;&quot;]&#32;with&#32;file&#32;extension&#32;[&quot;&#32;+&#32;assetFileExtension&#32;+&#32;&quot;]&#32;of&#32;type&#32;[&quot;&#32;+&#32;assetType&#32;+&#32;&quot;]&quot;);</emphasis>
+00234 
+00235 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;Read&#32;the&#32;asset&#32;data&#32;file</emphasis>
+00236 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordtype">string</emphasis>&#32;assetDataFile&#32;=&#32;<emphasis role="keywordtype">string</emphasis>.Empty;
+00237 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">try</emphasis>
+00238 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00239 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;assetDataFile&#32;=&#32;File.ReadAllText(projectPath&#32;+&#32;<emphasis role="stringliteral">&quot;/&quot;</emphasis>&#32;+&#32;assetFilePath);
+00240 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00241 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">catch</emphasis>
+00242 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00243 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;Continue&#32;to&#32;the&#32;next&#32;asset&#32;if&#32;we&#32;can&apos;t&#32;read&#32;the&#32;current&#32;one.</emphasis>
+00244 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">continue</emphasis>;
+00245 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00246 
+00247 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordtype">bool</emphasis>&#32;hasFileChanged&#32;=&#32;<emphasis role="keyword">false</emphasis>;
+00248 
+00249 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;Special&#32;handling&#32;/&#32;optimization&#32;if&#32;assetType&#32;is&#32;null</emphasis>
+00250 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(assetType&#32;==&#32;<emphasis role="keyword">null</emphasis>)
+00251 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00252 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">foreach</emphasis>&#32;(<link linkend="_struct_t_m_pro_1_1_asset_conversion_record">AssetConversionRecord</link>&#32;record&#32;<emphasis role="keywordflow">in</emphasis>&#32;conversionData_Assets.assetRecords)
+00253 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00254 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(assetDataFile.Contains(record.<link linkend="_struct_t_m_pro_1_1_asset_conversion_record_1a406640440ce56962696b39a605cc80a6">target</link>))
+00255 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00256 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;hasFileChanged&#32;=&#32;<emphasis role="keyword">true</emphasis>;
+00257 
+00258 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;assetDataFile&#32;=&#32;assetDataFile.Replace(record.<link linkend="_struct_t_m_pro_1_1_asset_conversion_record_1a406640440ce56962696b39a605cc80a6">target</link>,&#32;record.<link linkend="_struct_t_m_pro_1_1_asset_conversion_record_1a7217cf55ce06161e09a6bb6fa78714b0">replacement</link>);
+00259 
+00260 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//Debug.Log(&quot;Replacing&#32;Reference&#32;to&#32;[&quot;&#32;+&#32;record.referencedResource&#32;+&#32;&quot;]&#32;using&#32;[&quot;&#32;+&#32;record.target&#32;+&#32;&quot;]&#32;with&#32;[&quot;&#32;+&#32;record.replacement&#32;+&#32;&quot;]&#32;in&#32;asset&#32;file:&#32;[&quot;&#32;+&#32;assetFilePath&#32;+&#32;&quot;].&quot;);</emphasis>
+00261 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00262 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00263 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00264 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">else</emphasis>
+00265 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00266 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">foreach</emphasis>&#32;(<link linkend="_struct_t_m_pro_1_1_asset_conversion_record">AssetConversionRecord</link>&#32;record&#32;<emphasis role="keywordflow">in</emphasis>&#32;conversionData.<link linkend="_class_t_m_pro_1_1_asset_conversion_data_1af8fb67a3f99e7c37cc2f4f187fe47c0a">assetRecords</link>)
+00267 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00268 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(assetDataFile.Contains(record.<link linkend="_struct_t_m_pro_1_1_asset_conversion_record_1a406640440ce56962696b39a605cc80a6">target</link>))
+00269 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00270 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;hasFileChanged&#32;=&#32;<emphasis role="keyword">true</emphasis>;
+00271 
+00272 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;assetDataFile&#32;=&#32;assetDataFile.Replace(record.<link linkend="_struct_t_m_pro_1_1_asset_conversion_record_1a406640440ce56962696b39a605cc80a6">target</link>,&#32;record.<link linkend="_struct_t_m_pro_1_1_asset_conversion_record_1a7217cf55ce06161e09a6bb6fa78714b0">replacement</link>);
+00273 
+00274 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//Debug.Log(&quot;Replacing&#32;Reference&#32;to&#32;[&quot;&#32;+&#32;record.referencedResource&#32;+&#32;&quot;]&#32;using&#32;[&quot;&#32;+&#32;record.target&#32;+&#32;&quot;]&#32;with&#32;[&quot;&#32;+&#32;record.replacement&#32;+&#32;&quot;]&#32;in&#32;asset&#32;file:&#32;[&quot;&#32;+&#32;assetFilePath&#32;+&#32;&quot;].&quot;);</emphasis>
+00275 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00276 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00277 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00278 
+00279 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(hasFileChanged)
+00280 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00281 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//Debug.Log(&quot;Adding&#32;[&quot;&#32;+&#32;assetFilePath&#32;+&#32;&quot;]&#32;to&#32;list&#32;of&#32;assets&#32;to&#32;be&#32;modified.&quot;);</emphasis>
+00282 
+00283 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;AssetModificationRecord&#32;modifiedAsset;
+00284 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;modifiedAsset.assetFilePath&#32;=&#32;assetFilePath;
+00285 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;modifiedAsset.assetDataFile&#32;=&#32;assetDataFile;
+00286 
+00287 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;m_ModifiedAssetList.Add(modifiedAsset);
+00288 
+00289 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;scanResults&#32;+=&#32;assetFilePath&#32;+&#32;<emphasis role="stringliteral">&quot;\n&quot;</emphasis>;
+00290 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00291 
+00292 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;m_ProjectScanResults&#32;=&#32;scanResults;
+00293 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;m_ProgressPercentage&#32;=&#32;(float)i&#32;/&#32;(projectGUIDs.Length&#32;*&#32;2);
+00294 
+00295 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;yield&#32;<emphasis role="keywordflow">return</emphasis>&#32;<emphasis role="keyword">null</emphasis>;
+00296 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00297 
+00298 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;Iterate&#32;through&#32;projectGUIDs&#32;(again)&#32;to&#32;search&#32;project&#32;meta&#32;files&#32;which&#32;reference&#32;GUIDs&#32;used&#32;by&#32;previous&#32;versions&#32;of&#32;TextMesh&#32;Pro.&#32;</emphasis>
+00299 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">for</emphasis>&#32;(<emphasis role="keywordtype">int</emphasis>&#32;i&#32;=&#32;0;&#32;i&#32;&lt;&#32;projectGUIDs.Length&#32;&amp;&amp;&#32;cancelScanning&#32;==&#32;<emphasis role="keyword">false</emphasis>;&#32;i++)
+00300 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00301 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(m_CancelScanProcess)
+00302 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00303 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;cancelScanning&#32;=&#32;<emphasis role="keyword">true</emphasis>;
+00304 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;ResetScanProcess();
+00305 
+00306 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">continue</emphasis>;
+00307 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00308 
+00309 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordtype">string</emphasis>&#32;guid&#32;=&#32;projectGUIDs[i];
+00310 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordtype">string</emphasis>&#32;assetFilePath&#32;=&#32;AssetDatabase.GUIDToAssetPath(guid);
+00311 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordtype">string</emphasis>&#32;assetMetaFilePath&#32;=&#32;AssetDatabase.GetTextMetaFilePathFromAssetPath(assetFilePath);
+00312 
+00313 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;Read&#32;the&#32;asset&#32;meta&#32;data&#32;file</emphasis>
+00314 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordtype">string</emphasis>&#32;assetMetaFile&#32;=&#32;File.ReadAllText(projectPath&#32;+&#32;<emphasis role="stringliteral">&quot;/&quot;</emphasis>&#32;+&#32;assetMetaFilePath);
+00315 
+00316 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordtype">bool</emphasis>&#32;hasFileChanged&#32;=&#32;<emphasis role="keyword">false</emphasis>;
+00317 
+00318 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;m_ScanningCurrentFileName&#32;=&#32;assetMetaFilePath;
+00319 
+00320 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">foreach</emphasis>&#32;(<link linkend="_struct_t_m_pro_1_1_asset_conversion_record">AssetConversionRecord</link>&#32;record&#32;<emphasis role="keywordflow">in</emphasis>&#32;conversionData.<link linkend="_class_t_m_pro_1_1_asset_conversion_data_1af8fb67a3f99e7c37cc2f4f187fe47c0a">assetRecords</link>)
+00321 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00322 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(assetMetaFile.Contains(record.<link linkend="_struct_t_m_pro_1_1_asset_conversion_record_1a406640440ce56962696b39a605cc80a6">target</link>))
+00323 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00324 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;hasFileChanged&#32;=&#32;<emphasis role="keyword">true</emphasis>;
+00325 
+00326 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;assetMetaFile&#32;=&#32;assetMetaFile.Replace(record.<link linkend="_struct_t_m_pro_1_1_asset_conversion_record_1a406640440ce56962696b39a605cc80a6">target</link>,&#32;record.<link linkend="_struct_t_m_pro_1_1_asset_conversion_record_1a7217cf55ce06161e09a6bb6fa78714b0">replacement</link>);
+00327 
+00328 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//Debug.Log(&quot;Replacing&#32;Reference&#32;to&#32;[&quot;&#32;+&#32;record.referencedResource&#32;+&#32;&quot;]&#32;using&#32;[&quot;&#32;+&#32;record.target&#32;+&#32;&quot;]&#32;with&#32;[&quot;&#32;+&#32;record.replacement&#32;+&#32;&quot;]&#32;in&#32;asset&#32;file:&#32;[&quot;&#32;+&#32;assetMetaFilePath&#32;+&#32;&quot;].&quot;);</emphasis>
+00329 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00330 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00331 
+00332 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(hasFileChanged)
+00333 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00334 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//Debug.Log(&quot;Adding&#32;[&quot;&#32;+&#32;assetMetaFilePath&#32;+&#32;&quot;]&#32;to&#32;list&#32;of&#32;meta&#32;files&#32;to&#32;be&#32;modified.&quot;);</emphasis>
+00335 
+00336 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;AssetModificationRecord&#32;modifiedAsset;
+00337 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;modifiedAsset.assetFilePath&#32;=&#32;assetMetaFilePath;
+00338 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;modifiedAsset.assetDataFile&#32;=&#32;assetMetaFile;
+00339 
+00340 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;m_ModifiedAssetList.Add(modifiedAsset);
+00341 
+00342 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;scanResults&#32;+=&#32;assetMetaFilePath&#32;+&#32;<emphasis role="stringliteral">&quot;\n&quot;</emphasis>;
+00343 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00344 
+00345 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;m_ProjectScanResults&#32;=&#32;scanResults;
+00346 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;m_ProgressPercentage&#32;=&#32;0.5f&#32;+&#32;((float)i&#32;/&#32;(projectGUIDs.Length&#32;*&#32;2));
+00347 
+00348 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;yield&#32;<emphasis role="keywordflow">return</emphasis>&#32;<emphasis role="keyword">null</emphasis>;
+00349 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00350 
+00351 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;m_IsAlreadyScanningProject&#32;=&#32;<emphasis role="keyword">false</emphasis>;
+00352 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;m_ScanningCurrentFileName&#32;=&#32;<emphasis role="keywordtype">string</emphasis>.Empty;
+00353 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00354 
+00355 
+00359 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;<emphasis role="keyword">static</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;ResetScanProcess()
+00360 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00361 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;m_IsAlreadyScanningProject&#32;=&#32;<emphasis role="keyword">false</emphasis>;
+00362 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;m_ScanningCurrentFileName&#32;=&#32;<emphasis role="keywordtype">string</emphasis>.Empty;
+00363 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;m_ProgressPercentage&#32;=&#32;0;
+00364 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;m_ScanningCurrentFileIndex&#32;=&#32;0;
+00365 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;m_ScanningTotalFiles&#32;=&#32;0;
+00366 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00367 
+00368 
+00372 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;<emphasis role="keyword">static</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;UpdateProjectFiles()
+00373 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00374 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;Make&#32;sure&#32;Asset&#32;Serialization&#32;mode&#32;is&#32;set&#32;to&#32;ForceText&#32;with&#32;Visible&#32;Meta&#32;Files.</emphasis>
+00375 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;CheckProjectSerializationAndSourceControlModes();
+00376 
+00377 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordtype">string</emphasis>&#32;projectPath&#32;=&#32;Path.GetFullPath(<emphasis role="stringliteral">&quot;Assets/..&quot;</emphasis>);
+00378 
+00379 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;Display&#32;dialogue&#32;to&#32;show&#32;user&#32;a&#32;list&#32;of&#32;project&#32;files&#32;that&#32;will&#32;be&#32;modified&#32;upon&#32;their&#32;consent.</emphasis>
+00380 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(EditorUtility.DisplayDialog(<emphasis role="stringliteral">&quot;Save&#32;Modified&#32;Asset(s)?&quot;</emphasis>,&#32;<emphasis role="stringliteral">&quot;Are&#32;you&#32;sure&#32;you&#32;want&#32;to&#32;save&#32;all&#32;modified&#32;assets?&quot;</emphasis>,&#32;<emphasis role="stringliteral">&quot;YES&quot;</emphasis>,&#32;<emphasis role="stringliteral">&quot;NO&quot;</emphasis>))
+00381 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00382 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">for</emphasis>&#32;(<emphasis role="keywordtype">int</emphasis>&#32;i&#32;=&#32;0;&#32;i&#32;&lt;&#32;m_ModifiedAssetList.Count;&#32;i++)
+00383 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00384 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;Make&#32;sure&#32;all&#32;file&#32;streams&#32;that&#32;might&#32;have&#32;been&#32;opened&#32;by&#32;Unity&#32;are&#32;closed.</emphasis>
+00385 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//AssetDatabase.ReleaseCachedFileHandles();</emphasis>
+00386 
+00387 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//Debug.Log(&quot;Writing&#32;asset&#32;file&#32;[&quot;&#32;+&#32;m_ModifiedAssetList[i].assetFilePath&#32;+&#32;&quot;].&quot;);</emphasis>
+00388 
+00389 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;File.WriteAllText(projectPath&#32;+&#32;<emphasis role="stringliteral">&quot;/&quot;</emphasis>&#32;+&#32;m_ModifiedAssetList[i].assetFilePath,&#32;m_ModifiedAssetList[i].assetDataFile);
+00390 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00391 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00392 
+00393 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;AssetDatabase.Refresh();
+00394 
+00395 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;m_ProgressPercentage&#32;=&#32;0;
+00396 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;m_ProjectScanResults&#32;=&#32;k_ProjectScanReportDefaultText;
+00397 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00398 
+00399 
+00403 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;<emphasis role="keyword">static</emphasis>&#32;<emphasis role="keywordtype">bool</emphasis>&#32;CheckProjectSerializationAndSourceControlModes()
+00404 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00405 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;Check&#32;Project&#32;Asset&#32;Serialization&#32;and&#32;Visible&#32;Meta&#32;Files&#32;mode.</emphasis>
+00406 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(EditorSettings.serializationMode&#32;!=&#32;SerializationMode.ForceText&#32;||&#32;EditorSettings.externalVersionControl&#32;!=&#32;<emphasis role="stringliteral">&quot;Visible&#32;Meta&#32;Files&quot;</emphasis>)
+00407 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00408 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;<emphasis role="keyword">false</emphasis>;
+00409 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00410 
+00411 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;<emphasis role="keyword">true</emphasis>;
+00412 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00413 &#32;&#32;&#32;&#32;}
+00414 
+00415 
+00416 
+<anchor xml:id="__t_m_p___package_utilities_8cs_source_1l00417"/><link linkend="_class_t_m_pro_1_1_t_m_p___package_utilities">00417</link> &#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keyword">class&#32;</emphasis><link linkend="_class_t_m_pro_1_1_t_m_p___package_utilities">TMP_PackageUtilities</link>&#32;:&#32;Editor
+00418 &#32;&#32;&#32;&#32;{
+00419 
+00420 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">enum</emphasis>&#32;SaveAssetDialogueOptions&#32;{&#32;Unset&#32;=&#32;0,&#32;Save&#32;=&#32;1,&#32;SaveAll&#32;=&#32;2,&#32;DoNotSave&#32;=&#32;3&#32;};
+00421 
+00422 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;<emphasis role="keyword">static</emphasis>&#32;SerializationMode&#32;m_ProjectAssetSerializationMode;
+00423 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;<emphasis role="keyword">static</emphasis>&#32;<emphasis role="keywordtype">string</emphasis>&#32;m_ProjectExternalVersionControl;
+00424 
+00425 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">struct&#32;</emphasis>AssetRemappingRecord
+00426 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00427 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keywordtype">string</emphasis>&#32;oldGuid;
+00428 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keywordtype">string</emphasis>&#32;newGuid;
+00429 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keywordtype">string</emphasis>&#32;assetPath;
+00430 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00431 
+00432 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">struct&#32;</emphasis>AssetModificationRecord
+00433 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00434 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keywordtype">string</emphasis>&#32;assetFilePath;
+00435 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keywordtype">string</emphasis>&#32;assetDataFile;
+00436 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00437 
+00438 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;Create&#32;Sprite&#32;Asset&#32;Editor&#32;Window</emphasis>
+00439 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//[MenuItem(&quot;Window/TextMeshPro/Generate&#32;New&#32;Package&#32;GUIDs&quot;,&#32;false,&#32;1500)]</emphasis>
+<anchor xml:id="__t_m_p___package_utilities_8cs_source_1l00440"/><link linkend="_class_t_m_pro_1_1_t_m_p___package_utilities_1ac893fee8fe15aa046c7d590006bbbdb8">00440</link> &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keyword">static</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;<link linkend="_class_t_m_pro_1_1_t_m_p___package_utilities_1ac893fee8fe15aa046c7d590006bbbdb8">GenerateNewPackageGUIDs_Menu</link>()
+00441 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00442 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;GenerateNewPackageGUIDs();
+00443 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00444 
+00445 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;
+00449 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;[MenuItem(<emphasis role="stringliteral">&quot;Window/TextMeshPro/Import&#32;TMP&#32;Essential&#32;Resources&quot;</emphasis>,&#32;<emphasis role="keyword">false</emphasis>,&#32;2050)]
+<anchor xml:id="__t_m_p___package_utilities_8cs_source_1l00450"/><link linkend="_class_t_m_pro_1_1_t_m_p___package_utilities_1a11f7e20b4617d90a5f1da630ed02b0dd">00450</link> &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keyword">static</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;<link linkend="_class_t_m_pro_1_1_t_m_p___package_utilities_1a11f7e20b4617d90a5f1da630ed02b0dd">ImportProjectResourcesMenu</link>()
+00451 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00452 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;ImportProjectResources();
+00453 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00454 
+00455 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;
+00459 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;[MenuItem(<emphasis role="stringliteral">&quot;Window/TextMeshPro/Import&#32;TMP&#32;Examples&#32;and&#32;Extras&quot;</emphasis>,&#32;<emphasis role="keyword">false</emphasis>,&#32;2051)]
+<anchor xml:id="__t_m_p___package_utilities_8cs_source_1l00460"/><link linkend="_class_t_m_pro_1_1_t_m_p___package_utilities_1aa73bd06e0ec78098db6c2d895bf8412e">00460</link> &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keyword">static</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;<link linkend="_class_t_m_pro_1_1_t_m_p___package_utilities_1aa73bd06e0ec78098db6c2d895bf8412e">ImportExamplesContentMenu</link>()
+00461 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00462 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;ImportExtraContent();
+00463 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00464 
+00465 
+00466 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;Create&#32;Sprite&#32;Asset&#32;Editor&#32;Window</emphasis>
+00467 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//[MenuItem(&quot;Window/TextMeshPro/Convert&#32;TMP&#32;Project&#32;Files&#32;to&#32;UPM&quot;,&#32;false,&#32;1510)]</emphasis>
+<anchor xml:id="__t_m_p___package_utilities_8cs_source_1l00468"/><link linkend="_class_t_m_pro_1_1_t_m_p___package_utilities_1a049f2aee85c729a36286c8f57ed14a65">00468</link> &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keyword">static</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;<link linkend="_class_t_m_pro_1_1_t_m_p___package_utilities_1a049f2aee85c729a36286c8f57ed14a65">ConvertProjectGUIDsMenu</link>()
+00469 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00470 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;ConvertProjectGUIDsToUPM();
+00471 
+00472 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//GetVersionInfo();</emphasis>
+00473 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00474 
+00475 
+00476 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;Create&#32;Sprite&#32;Asset&#32;Editor&#32;Window</emphasis>
+00477 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//[MenuItem(&quot;Window/TextMeshPro/Convert&#32;GUID&#32;(Source&#32;to&#32;DLL)&quot;,&#32;false,&#32;2010)]</emphasis>
+<anchor xml:id="__t_m_p___package_utilities_8cs_source_1l00478"/><link linkend="_class_t_m_pro_1_1_t_m_p___package_utilities_1a04787a4fc933d24280f8daf104208d39">00478</link> &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keyword">static</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;<link linkend="_class_t_m_pro_1_1_t_m_p___package_utilities_1a04787a4fc933d24280f8daf104208d39">ConvertGUIDFromSourceToDLLMenu</link>()
+00479 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00480 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//ConvertGUIDFromSourceToDLL();</emphasis>
+00481 
+00482 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//GetVersionInfo();</emphasis>
+00483 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00484 
+00485 
+00486 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;Create&#32;Sprite&#32;Asset&#32;Editor&#32;Window</emphasis>
+00487 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//[MenuItem(&quot;Window/TextMeshPro/Convert&#32;GUID&#32;(DLL&#32;to&#32;Source)&quot;,&#32;false,&#32;2020)]</emphasis>
+<anchor xml:id="__t_m_p___package_utilities_8cs_source_1l00488"/><link linkend="_class_t_m_pro_1_1_t_m_p___package_utilities_1a9ca977a668368d564883e9c34b261cb0">00488</link> &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keyword">static</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;<link linkend="_class_t_m_pro_1_1_t_m_p___package_utilities_1a9ca977a668368d564883e9c34b261cb0">ConvertGUIDFromDllToSourceMenu</link>()
+00489 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00490 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//ConvertGUIDFromDLLToSource();</emphasis>
+00491 
+00492 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//GetVersionInfo();</emphasis>
+00493 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00494 
+00495 
+00496 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;Create&#32;Sprite&#32;Asset&#32;Editor&#32;Window</emphasis>
+00497 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//[MenuItem(&quot;Window/TextMeshPro/Extract&#32;Package&#32;GUIDs&quot;,&#32;false,&#32;1530)]</emphasis>
+<anchor xml:id="__t_m_p___package_utilities_8cs_source_1l00498"/><link linkend="_class_t_m_pro_1_1_t_m_p___package_utilities_1a1504406c8d99b0d9653f24596ac8f1f5">00498</link> &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keyword">static</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;<link linkend="_class_t_m_pro_1_1_t_m_p___package_utilities_1a1504406c8d99b0d9653f24596ac8f1f5">ExtractPackageGUIDMenu</link>()
+00499 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00500 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;ExtractPackageGUIDs();
+00501 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00502 
+00503 
+00504 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;<emphasis role="keyword">static</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;GetVersionInfo()
+00505 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00506 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordtype">string</emphasis>&#32;version&#32;=&#32;<link linkend="_class_t_m_pro_1_1_t_m_p___settings">TMP_Settings</link>.<link linkend="_class_t_m_pro_1_1_t_m_p___settings_1a38df8ce7c134d19b17a3eb3a761eba67">version</link>;
+00507 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;Debug.Log(<emphasis role="stringliteral">&quot;The&#32;version&#32;of&#32;this&#32;TextMesh&#32;Pro&#32;UPM&#32;package&#32;is&#32;(&quot;</emphasis>&#32;+&#32;version&#32;+&#32;<emphasis role="stringliteral">&quot;).&quot;</emphasis>);
+00508 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00509 
+00510 
+00514 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;<emphasis role="keyword">static</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;ImportExtraContent()
+00515 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00516 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordtype">string</emphasis>&#32;packageFullPath&#32;=&#32;EditorUtilities.TMP_EditorUtility.packageFullPath;
+00517 
+00518 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;AssetDatabase.ImportPackage(packageFullPath&#32;+&#32;<emphasis role="stringliteral">&quot;/Package&#32;Resources/TMP&#32;Examples&#32;&amp;&#32;Extras.unitypackage&quot;</emphasis>,&#32;<emphasis role="keyword">true</emphasis>);
+00519 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00520 
+00521 
+00525 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;<emphasis role="keyword">static</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;ImportProjectResources()
+00526 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00527 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordtype">string</emphasis>&#32;packageFullPath&#32;=&#32;EditorUtilities.TMP_EditorUtility.packageFullPath;
+00528 
+00529 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;AssetDatabase.ImportPackage(packageFullPath&#32;+&#32;<emphasis role="stringliteral">&quot;/Package&#32;Resources/TMP&#32;Essential&#32;Resources.unitypackage&quot;</emphasis>,&#32;<emphasis role="keyword">true</emphasis>);
+00530 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00531 
+00532 
+00536 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;<emphasis role="keyword">static</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;GenerateNewPackageGUIDs()
+00537 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00538 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;Make&#32;sure&#32;Asset&#32;Serialization&#32;mode&#32;is&#32;set&#32;to&#32;ForceText&#32;with&#32;Visible&#32;Meta&#32;Files.</emphasis>
+00539 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;SetProjectSerializationAndSourceControlModes();
+00540 
+00541 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordtype">string</emphasis>&#32;projectPath&#32;=&#32;Path.GetFullPath(<emphasis role="stringliteral">&quot;Assets/..&quot;</emphasis>);
+00542 
+00543 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;Clear&#32;existing&#32;dictionary&#32;of&#32;AssetRecords</emphasis>
+00544 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;List&lt;AssetRemappingRecord&gt;&#32;assetRecords&#32;=&#32;<emphasis role="keyword">new</emphasis>&#32;List&lt;AssetRemappingRecord&gt;();
+00545 
+00546 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;Get&#32;full&#32;list&#32;of&#32;GUIDs&#32;used&#32;in&#32;the&#32;package&#32;which&#32;including&#32;folders.</emphasis>
+00547 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordtype">string</emphasis>[]&#32;packageGUIDs&#32;=&#32;AssetDatabase.FindAssets(<emphasis role="stringliteral">&quot;t:Object&quot;</emphasis>,&#32;<emphasis role="keyword">new</emphasis>&#32;<emphasis role="keywordtype">string</emphasis>[]&#32;{&#32;<emphasis role="stringliteral">&quot;Assets/Packages/com.unity.TextMeshPro&quot;</emphasis>&#32;});
+00548 
+00549 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">for</emphasis>&#32;(<emphasis role="keywordtype">int</emphasis>&#32;i&#32;=&#32;0;&#32;i&#32;&lt;&#32;packageGUIDs.Length;&#32;i++)
+00550 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00551 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;Could&#32;add&#32;a&#32;progress&#32;bar&#32;for&#32;this&#32;process&#32;(if&#32;needed)</emphasis>
+00552 
+00553 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordtype">string</emphasis>&#32;guid&#32;=&#32;packageGUIDs[i];
+00554 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordtype">string</emphasis>&#32;assetFilePath&#32;=&#32;AssetDatabase.GUIDToAssetPath(guid);
+00555 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordtype">string</emphasis>&#32;assetMetaFilePath&#32;=&#32;AssetDatabase.GetTextMetaFilePathFromAssetPath(assetFilePath);
+00556 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//System.Type&#32;assetType&#32;=&#32;AssetDatabase.GetMainAssetTypeAtPath(assetFilePath);</emphasis>
+00557 
+00558 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;AssetRemappingRecord&#32;assetRecord;
+00559 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;assetRecord.oldGuid&#32;=&#32;guid;
+00560 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;assetRecord.assetPath&#32;=&#32;assetFilePath;
+00561 
+00562 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordtype">string</emphasis>&#32;newGUID&#32;=&#32;GenerateUniqueGUID();
+00563 
+00564 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;assetRecord.newGuid&#32;=&#32;newGUID;
+00565 
+00566 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(assetRecords.FindIndex(item&#32;=&gt;&#32;item.oldGuid&#32;==&#32;guid)&#32;!=&#32;-1)
+00567 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">continue</emphasis>;
+00568 
+00569 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;assetRecords.Add(assetRecord);
+00570 
+00571 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;Read&#32;the&#32;meta&#32;file&#32;for&#32;the&#32;given&#32;asset.</emphasis>
+00572 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordtype">string</emphasis>&#32;assetMetaFile&#32;=&#32;File.ReadAllText(projectPath&#32;+&#32;<emphasis role="stringliteral">&quot;/&quot;</emphasis>&#32;+&#32;assetMetaFilePath);
+00573 
+00574 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;assetMetaFile&#32;=&#32;assetMetaFile.Replace(<emphasis role="stringliteral">&quot;guid:&#32;&quot;</emphasis>&#32;+&#32;guid,&#32;<emphasis role="stringliteral">&quot;guid:&#32;&quot;</emphasis>&#32;+&#32;newGUID);
+00575 
+00576 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;File.WriteAllText(projectPath&#32;+&#32;<emphasis role="stringliteral">&quot;/&quot;</emphasis>&#32;+&#32;assetMetaFilePath,&#32;assetMetaFile);
+00577 
+00578 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//Debug.Log(&quot;Asset:&#32;[&quot;&#32;+&#32;assetFilePath&#32;+&#32;&quot;]&#32;&#32;&#32;Type:&#32;&quot;&#32;+&#32;assetType&#32;+&#32;&quot;&#32;&#32;&#32;Current&#32;GUID:&#32;[&quot;&#32;+&#32;guid&#32;+&#32;&quot;]&#32;&#32;&#32;New&#32;GUID:&#32;[&quot;&#32;+&#32;newGUID&#32;+&#32;&quot;]&quot;);</emphasis>
+00579 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00580 
+00581 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;AssetDatabase.Refresh();
+00582 
+00583 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;Get&#32;list&#32;of&#32;GUIDs&#32;for&#32;assets&#32;that&#32;might&#32;need&#32;references&#32;to&#32;previous&#32;GUIDs&#32;which&#32;need&#32;to&#32;be&#32;updated.</emphasis>
+00584 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;packageGUIDs&#32;=&#32;AssetDatabase.FindAssets(<emphasis role="stringliteral">&quot;t:Object&quot;</emphasis>);&#32;<emphasis role="comment">//&#32;&#32;(&quot;t:Object&quot;,&#32;new&#32;string[]&#32;{&#32;&quot;Assets/Asset&#32;Importer&quot;&#32;});</emphasis>
+00585 
+00586 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">for</emphasis>&#32;(<emphasis role="keywordtype">int</emphasis>&#32;i&#32;=&#32;0;&#32;i&#32;&lt;&#32;packageGUIDs.Length;&#32;i++)
+00587 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00588 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;Could&#32;add&#32;a&#32;progress&#32;bar&#32;for&#32;this&#32;process</emphasis>
+00589 
+00590 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordtype">string</emphasis>&#32;guid&#32;=&#32;packageGUIDs[i];
+00591 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordtype">string</emphasis>&#32;assetFilePath&#32;=&#32;AssetDatabase.GUIDToAssetPath(guid);
+00592 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;System.Type&#32;assetType&#32;=&#32;AssetDatabase.GetMainAssetTypeAtPath(assetFilePath);
+00593 
+00594 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;Filter&#32;out&#32;file&#32;types&#32;we&#32;are&#32;not&#32;interested&#32;in</emphasis>
+00595 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(assetType&#32;==&#32;typeof(DefaultAsset)&#32;||&#32;assetType&#32;==&#32;typeof(MonoScript)&#32;||&#32;assetType&#32;==&#32;typeof(Texture2D)&#32;||&#32;assetType&#32;==&#32;typeof(TextAsset)&#32;||&#32;assetType&#32;==&#32;typeof(Shader))
+00596 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">continue</emphasis>;
+00597 
+00598 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;Read&#32;the&#32;asset&#32;data&#32;file</emphasis>
+00599 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordtype">string</emphasis>&#32;assetDataFile&#32;=&#32;File.ReadAllText(projectPath&#32;+&#32;<emphasis role="stringliteral">&quot;/&quot;</emphasis>&#32;+&#32;assetFilePath);
+00600 
+00601 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//Debug.Log(&quot;Searching&#32;Asset:&#32;[&quot;&#32;+&#32;assetFilePath&#32;+&#32;&quot;]&#32;of&#32;type:&#32;&quot;&#32;+&#32;assetType);</emphasis>
+00602 
+00603 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordtype">bool</emphasis>&#32;hasFileChanged&#32;=&#32;<emphasis role="keyword">false</emphasis>;
+00604 
+00605 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">foreach</emphasis>&#32;(AssetRemappingRecord&#32;record&#32;<emphasis role="keywordflow">in</emphasis>&#32;assetRecords)
+00606 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00607 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(assetDataFile.Contains(record.oldGuid))
+00608 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00609 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;hasFileChanged&#32;=&#32;<emphasis role="keyword">true</emphasis>;
+00610 
+00611 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;assetDataFile&#32;=&#32;assetDataFile.Replace(record.oldGuid,&#32;record.newGuid);
+00612 
+00613 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;Debug.Log(<emphasis role="stringliteral">&quot;Replacing&#32;old&#32;GUID:&#32;[&quot;</emphasis>&#32;+&#32;record.oldGuid&#32;+&#32;<emphasis role="stringliteral">&quot;]&#32;by&#32;new&#32;GUID:&#32;[&quot;</emphasis>&#32;+&#32;record.newGuid&#32;+&#32;<emphasis role="stringliteral">&quot;]&#32;in&#32;asset&#32;file:&#32;[&quot;</emphasis>&#32;+&#32;assetFilePath&#32;+&#32;<emphasis role="stringliteral">&quot;].&quot;</emphasis>);
+00614 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00615 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00616 
+00617 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(hasFileChanged)
+00618 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00619 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;Add&#32;file&#32;to&#32;list&#32;of&#32;changed&#32;files</emphasis>
+00620 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;File.WriteAllText(projectPath&#32;+&#32;<emphasis role="stringliteral">&quot;/&quot;</emphasis>&#32;+&#32;assetFilePath,&#32;assetDataFile);
+00621 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00622 
+00623 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00624 
+00625 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;AssetDatabase.Refresh();
+00626 
+00627 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;Restore&#32;project&#32;Asset&#32;Serialization&#32;and&#32;Source&#32;Control&#32;modes.</emphasis>
+00628 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;RestoreProjectSerializationAndSourceControlModes();
+00629 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00630 
+00631 
+00632 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;<emphasis role="keyword">static</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;ExtractPackageGUIDs()
+00633 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00634 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;Make&#32;sure&#32;Asset&#32;Serialization&#32;mode&#32;is&#32;set&#32;to&#32;ForceText&#32;with&#32;Visible&#32;Meta&#32;Files.</emphasis>
+00635 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;SetProjectSerializationAndSourceControlModes();
+00636 
+00637 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordtype">string</emphasis>&#32;projectPath&#32;=&#32;Path.GetFullPath(<emphasis role="stringliteral">&quot;Assets/..&quot;</emphasis>);
+00638 
+00639 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;Create&#32;new&#32;instance&#32;of&#32;AssetConversionData&#32;file</emphasis>
+00640 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;AssetConversionData&#32;data&#32;=&#32;<emphasis role="keyword">new</emphasis>&#32;AssetConversionData();
+00641 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;data.assetRecords&#32;=&#32;<emphasis role="keyword">new</emphasis>&#32;List&lt;AssetConversionRecord&gt;();
+00642 
+00643 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;Get&#32;full&#32;list&#32;of&#32;GUIDs&#32;used&#32;in&#32;the&#32;package&#32;which&#32;including&#32;folders.</emphasis>
+00644 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordtype">string</emphasis>[]&#32;packageGUIDs&#32;=&#32;AssetDatabase.FindAssets(<emphasis role="stringliteral">&quot;t:Object&quot;</emphasis>,&#32;<emphasis role="keyword">new</emphasis>&#32;<emphasis role="keywordtype">string</emphasis>[]&#32;{&#32;<emphasis role="stringliteral">&quot;Assets/Packages/com.unity.TextMeshPro&quot;</emphasis>&#32;});
+00645 
+00646 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">for</emphasis>&#32;(<emphasis role="keywordtype">int</emphasis>&#32;i&#32;=&#32;0;&#32;i&#32;&lt;&#32;packageGUIDs.Length;&#32;i++)
+00647 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00648 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;Could&#32;add&#32;a&#32;progress&#32;bar&#32;for&#32;this&#32;process&#32;(if&#32;needed)</emphasis>
+00649 
+00650 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordtype">string</emphasis>&#32;guid&#32;=&#32;packageGUIDs[i];
+00651 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordtype">string</emphasis>&#32;assetFilePath&#32;=&#32;AssetDatabase.GUIDToAssetPath(guid);
+00652 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//string&#32;assetMetaFilePath&#32;=&#32;AssetDatabase.GetTextMetaFilePathFromAssetPath(assetFilePath);</emphasis>
+00653 
+00654 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//ObjectIdentifier[]&#32;localIdentifider&#32;=&#32;BundleBuildInterface.GetPlayerObjectIdentifiersInAsset(new&#32;GUID(guid),&#32;BuildTarget.NoTarget);</emphasis>
+00655 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//System.Type[]&#32;types&#32;=&#32;BundleBuildInterface.GetTypeForObjects(localIdentifider);</emphasis>
+00656 
+00657 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;System.Type&#32;assetType&#32;=&#32;AssetDatabase.GetMainAssetTypeAtPath(assetFilePath);
+00658 
+00659 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;Filter&#32;out&#32;file&#32;types&#32;we&#32;are&#32;not&#32;interested&#32;in</emphasis>
+00660 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(assetType&#32;==&#32;typeof(DefaultAsset))
+00661 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">continue</emphasis>;
+00662 
+00663 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordtype">string</emphasis>&#32;newGuid&#32;=&#32;GenerateUniqueGUID();
+00664 
+00665 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;AssetConversionRecord&#32;record;
+00666 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;record.referencedResource&#32;=&#32;Path.GetFileName(assetFilePath);
+00667 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;record.target&#32;=&#32;<emphasis role="stringliteral">&quot;fileID:&#32;2108210716,&#32;guid:&#32;&quot;</emphasis>&#32;+&#32;newGuid;
+00668 
+00669 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;record.replacement&#32;=&#32;<emphasis role="stringliteral">&quot;fileID:&#32;11500000,&#32;guid:&#32;&quot;</emphasis>&#32;+&#32;guid;
+00670 
+00671 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//if&#32;(m_AssetRecords.FindIndex(item&#32;=&gt;&#32;item.oldGuid&#32;==&#32;guid)&#32;!=&#32;-1)</emphasis>
+00672 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;&#32;&#32;&#32;continue;</emphasis>
+00673 
+00674 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;data.assetRecords.Add(record);
+00675 
+00676 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;Read&#32;the&#32;meta&#32;file&#32;for&#32;the&#32;given&#32;asset.</emphasis>
+00677 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//string&#32;assetMetaFile&#32;=&#32;File.ReadAllText(projectPath&#32;+&#32;&quot;/&quot;&#32;+&#32;assetMetaFilePath);</emphasis>
+00678 
+00679 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//assetMetaFile&#32;=&#32;assetMetaFile.Replace(&quot;guid:&#32;&quot;&#32;+&#32;guid,&#32;&quot;guid:&#32;&quot;&#32;+&#32;newGUID);</emphasis>
+00680 
+00681 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//File.WriteAllText(projectPath&#32;+&#32;&quot;/&quot;&#32;+&#32;assetMetaFilePath,&#32;assetMetaFile);</emphasis>
+00682 
+00683 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;Debug.Log(<emphasis role="stringliteral">&quot;Asset:&#32;[&quot;</emphasis>&#32;+&#32;Path.GetFileName(assetFilePath)&#32;+&#32;<emphasis role="stringliteral">&quot;]&#32;&#32;&#32;Type:&#32;&quot;</emphasis>&#32;+&#32;assetType&#32;+&#32;<emphasis role="stringliteral">&quot;&#32;&#32;&#32;Current&#32;GUID:&#32;[&quot;</emphasis>&#32;+&#32;guid&#32;+&#32;<emphasis role="stringliteral">&quot;]&#32;&#32;&#32;New&#32;GUID:&#32;[&quot;</emphasis>&#32;+&#32;newGuid&#32;+&#32;<emphasis role="stringliteral">&quot;]&quot;</emphasis>);
+00684 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00685 
+00686 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;Write&#32;new&#32;information&#32;into&#32;JSON&#32;file</emphasis>
+00687 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordtype">string</emphasis>&#32;dataFile&#32;=&#32;JsonUtility.ToJson(data,&#32;<emphasis role="keyword">true</emphasis>);
+00688 
+00689 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;File.WriteAllText(projectPath&#32;+&#32;<emphasis role="stringliteral">&quot;/Assets/Packages/com.unity.TextMeshPro/PackageConversionData.json&quot;</emphasis>,&#32;dataFile);
+00690 
+00691 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;Restore&#32;project&#32;Asset&#32;Serialization&#32;and&#32;Source&#32;Control&#32;modes.</emphasis>
+00692 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;RestoreProjectSerializationAndSourceControlModes();
+00693 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00694 
+00695 
+00699 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;<emphasis role="keyword">static</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;ConvertProjectGUIDsToUPM()
+00700 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00701 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;Make&#32;sure&#32;Asset&#32;Serialization&#32;mode&#32;is&#32;set&#32;to&#32;ForceText&#32;with&#32;Visible&#32;Meta&#32;Files.</emphasis>
+00702 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;SetProjectSerializationAndSourceControlModes();
+00703 
+00704 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordtype">string</emphasis>&#32;projectPath&#32;=&#32;Path.GetFullPath(<emphasis role="stringliteral">&quot;Assets/..&quot;</emphasis>);
+00705 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordtype">string</emphasis>&#32;packageFullPath&#32;=&#32;EditorUtilities.TMP_EditorUtility.packageFullPath;
+00706 
+00707 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;List&#32;containing&#32;assets&#32;that&#32;have&#32;been&#32;modified.</emphasis>
+00708 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;List&lt;AssetModificationRecord&gt;&#32;modifiedAssetList&#32;=&#32;<emphasis role="keyword">new</emphasis>&#32;List&lt;AssetModificationRecord&gt;();
+00709 
+00710 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;Read&#32;Conversion&#32;Data&#32;from&#32;Json&#32;file.</emphasis>
+00711 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;AssetConversionData&#32;conversionData&#32;=&#32;JsonUtility.FromJson&lt;AssetConversionData&gt;(File.ReadAllText(packageFullPath&#32;+&#32;<emphasis role="stringliteral">&quot;/PackageConversionData.json&quot;</emphasis>));
+00712 
+00713 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;Get&#32;list&#32;of&#32;GUIDs&#32;for&#32;assets&#32;that&#32;might&#32;contain&#32;references&#32;to&#32;previous&#32;GUIDs&#32;that&#32;require&#32;updating.</emphasis>
+00714 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordtype">string</emphasis>[]&#32;projectGUIDs&#32;=&#32;AssetDatabase.FindAssets(<emphasis role="stringliteral">&quot;t:Object&quot;</emphasis>);
+00715 
+00716 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">for</emphasis>&#32;(<emphasis role="keywordtype">int</emphasis>&#32;i&#32;=&#32;0;&#32;i&#32;&lt;&#32;projectGUIDs.Length;&#32;i++)
+00717 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00718 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;Could&#32;add&#32;a&#32;progress&#32;bar&#32;for&#32;this&#32;process</emphasis>
+00719 
+00720 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordtype">string</emphasis>&#32;guid&#32;=&#32;projectGUIDs[i];
+00721 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordtype">string</emphasis>&#32;assetFilePath&#32;=&#32;AssetDatabase.GUIDToAssetPath(guid);
+00722 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;System.Type&#32;assetType&#32;=&#32;AssetDatabase.GetMainAssetTypeAtPath(assetFilePath);
+00723 
+00724 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;Filter&#32;out&#32;file&#32;types&#32;we&#32;are&#32;not&#32;interested&#32;in</emphasis>
+00725 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(assetType&#32;==&#32;typeof(DefaultAsset)&#32;||&#32;assetType&#32;==&#32;typeof(MonoScript)&#32;||&#32;assetType&#32;==&#32;typeof(Texture2D)&#32;||&#32;assetType&#32;==&#32;typeof(TextAsset)&#32;||&#32;assetType&#32;==&#32;typeof(Shader))
+00726 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">continue</emphasis>;
+00727 
+00728 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;Read&#32;the&#32;asset&#32;data&#32;file</emphasis>
+00729 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordtype">string</emphasis>&#32;assetDataFile&#32;=&#32;File.ReadAllText(projectPath&#32;+&#32;<emphasis role="stringliteral">&quot;/&quot;</emphasis>&#32;+&#32;assetFilePath);
+00730 
+00731 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//Debug.Log(&quot;Searching&#32;Asset:&#32;[&quot;&#32;+&#32;assetFilePath&#32;+&#32;&quot;]&#32;of&#32;type:&#32;&quot;&#32;+&#32;assetType);</emphasis>
+00732 
+00733 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordtype">bool</emphasis>&#32;hasFileChanged&#32;=&#32;<emphasis role="keyword">false</emphasis>;
+00734 
+00735 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">foreach</emphasis>&#32;(AssetConversionRecord&#32;record&#32;<emphasis role="keywordflow">in</emphasis>&#32;conversionData.assetRecords)
+00736 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00737 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(assetDataFile.Contains(record.target))
+00738 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00739 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;hasFileChanged&#32;=&#32;<emphasis role="keyword">true</emphasis>;
+00740 
+00741 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;assetDataFile&#32;=&#32;assetDataFile.Replace(record.target,&#32;record.replacement);
+00742 
+00743 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;Debug.Log(<emphasis role="stringliteral">&quot;Replacing&#32;Reference&#32;to&#32;[&quot;</emphasis>&#32;+&#32;record.referencedResource&#32;+&#32;<emphasis role="stringliteral">&quot;]&#32;using&#32;[&quot;</emphasis>&#32;+&#32;record.target&#32;+&#32;<emphasis role="stringliteral">&quot;]&#32;with&#32;[&quot;</emphasis>&#32;+&#32;record.replacement&#32;+&#32;<emphasis role="stringliteral">&quot;]&#32;in&#32;asset&#32;file:&#32;[&quot;</emphasis>&#32;+&#32;assetFilePath&#32;+&#32;<emphasis role="stringliteral">&quot;].&quot;</emphasis>);
+00744 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00745 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00746 
+00747 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(hasFileChanged)
+00748 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00749 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;Debug.Log(<emphasis role="stringliteral">&quot;Adding&#32;[&quot;</emphasis>&#32;+&#32;assetFilePath&#32;+&#32;<emphasis role="stringliteral">&quot;]&#32;to&#32;list&#32;of&#32;assets&#32;to&#32;be&#32;modified.&quot;</emphasis>);
+00750 
+00751 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;AssetModificationRecord&#32;modifiedAsset;
+00752 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;modifiedAsset.assetFilePath&#32;=&#32;assetFilePath;
+00753 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;modifiedAsset.assetDataFile&#32;=&#32;assetDataFile;
+00754 
+00755 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;modifiedAssetList.Add(modifiedAsset);
+00756 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00757 
+00758 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00759 
+00760 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;Scan&#32;project&#32;meta&#32;files&#32;to&#32;update&#32;GUIDs&#32;of&#32;assets&#32;whose&#32;GUID&#32;has&#32;changed.</emphasis>
+00761 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;projectGUIDs&#32;=&#32;AssetDatabase.FindAssets(<emphasis role="stringliteral">&quot;t:Object&quot;</emphasis>);
+00762 
+00763 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">for</emphasis>&#32;(<emphasis role="keywordtype">int</emphasis>&#32;i&#32;=&#32;0;&#32;i&#32;&lt;&#32;projectGUIDs.Length;&#32;i++)
+00764 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00765 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordtype">string</emphasis>&#32;guid&#32;=&#32;projectGUIDs[i];
+00766 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordtype">string</emphasis>&#32;assetFilePath&#32;=&#32;AssetDatabase.GUIDToAssetPath(guid);
+00767 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordtype">string</emphasis>&#32;assetMetaFilePath&#32;=&#32;AssetDatabase.GetTextMetaFilePathFromAssetPath(assetFilePath);
+00768 
+00769 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;Read&#32;the&#32;asset&#32;meta&#32;data&#32;file</emphasis>
+00770 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordtype">string</emphasis>&#32;assetMetaFile&#32;=&#32;File.ReadAllText(projectPath&#32;+&#32;<emphasis role="stringliteral">&quot;/&quot;</emphasis>&#32;+&#32;assetMetaFilePath);
+00771 
+00772 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordtype">bool</emphasis>&#32;hasFileChanged&#32;=&#32;<emphasis role="keyword">false</emphasis>;
+00773 
+00774 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">foreach</emphasis>&#32;(AssetConversionRecord&#32;record&#32;<emphasis role="keywordflow">in</emphasis>&#32;conversionData.assetRecords)
+00775 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00776 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(assetMetaFile.Contains(record.target))
+00777 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00778 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;hasFileChanged&#32;=&#32;<emphasis role="keyword">true</emphasis>;
+00779 
+00780 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;assetMetaFile&#32;=&#32;assetMetaFile.Replace(record.target,&#32;record.replacement);
+00781 
+00782 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;Debug.Log(<emphasis role="stringliteral">&quot;Replacing&#32;Reference&#32;to&#32;[&quot;</emphasis>&#32;+&#32;record.referencedResource&#32;+&#32;<emphasis role="stringliteral">&quot;]&#32;using&#32;[&quot;</emphasis>&#32;+&#32;record.target&#32;+&#32;<emphasis role="stringliteral">&quot;]&#32;with&#32;[&quot;</emphasis>&#32;+&#32;record.replacement&#32;+&#32;<emphasis role="stringliteral">&quot;]&#32;in&#32;asset&#32;file:&#32;[&quot;</emphasis>&#32;+&#32;assetMetaFilePath&#32;+&#32;<emphasis role="stringliteral">&quot;].&quot;</emphasis>);
+00783 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00784 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00785 
+00786 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(hasFileChanged)
+00787 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00788 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;Debug.Log(<emphasis role="stringliteral">&quot;Adding&#32;[&quot;</emphasis>&#32;+&#32;assetMetaFilePath&#32;+&#32;<emphasis role="stringliteral">&quot;]&#32;to&#32;list&#32;of&#32;meta&#32;files&#32;to&#32;be&#32;modified.&quot;</emphasis>);
+00789 
+00790 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;AssetModificationRecord&#32;modifiedAsset;
+00791 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;modifiedAsset.assetFilePath&#32;=&#32;assetMetaFilePath;
+00792 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;modifiedAsset.assetDataFile&#32;=&#32;assetMetaFile;
+00793 
+00794 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;modifiedAssetList.Add(modifiedAsset);
+00795 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00796 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00797 
+00798 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;Display&#32;dialogue&#32;to&#32;show&#32;user&#32;a&#32;list&#32;of&#32;project&#32;files&#32;that&#32;will&#32;be&#32;modified&#32;upon&#32;their&#32;consent.</emphasis>
+00799 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(EditorUtility.DisplayDialog(<emphasis role="stringliteral">&quot;Save&#32;Modified&#32;Asset(s)?&quot;</emphasis>,&#32;<emphasis role="stringliteral">&quot;Are&#32;you&#32;sure&#32;you&#32;want&#32;to&#32;save&#32;all&#32;modified&#32;assets?&quot;</emphasis>,&#32;<emphasis role="stringliteral">&quot;YES&quot;</emphasis>,&#32;<emphasis role="stringliteral">&quot;NO&quot;</emphasis>))
+00800 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00801 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">for</emphasis>&#32;(<emphasis role="keywordtype">int</emphasis>&#32;i&#32;=&#32;0;&#32;i&#32;&lt;&#32;modifiedAssetList.Count;&#32;i++)
+00802 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00803 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;Make&#32;sure&#32;all&#32;file&#32;streams&#32;that&#32;might&#32;have&#32;been&#32;opened&#32;by&#32;Unity&#32;are&#32;closed.</emphasis>
+00804 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//AssetDatabase.ReleaseCachedFileHandles();</emphasis>
+00805 
+00806 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;Debug.Log(<emphasis role="stringliteral">&quot;Writing&#32;asset&#32;file&#32;[&quot;</emphasis>&#32;+&#32;modifiedAssetList[i].assetFilePath&#32;+&#32;<emphasis role="stringliteral">&quot;].&quot;</emphasis>);
+00807 
+00808 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//File.WriteAllText(projectPath&#32;+&#32;&quot;/&quot;&#32;+&#32;modifiedAssetList[i].assetFilePath,&#32;modifiedAssetList[i].assetDataFile);</emphasis>
+00809 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00810 
+00811 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00812 
+00813 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;AssetDatabase.Refresh();
+00814 
+00815 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;Restore&#32;project&#32;Asset&#32;Serialization&#32;and&#32;Source&#32;Control&#32;modes.</emphasis>
+00816 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;RestoreProjectSerializationAndSourceControlModes();
+00817 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00818 
+00819 
+00824 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;<emphasis role="keyword">static</emphasis>&#32;<emphasis role="keywordtype">string</emphasis>&#32;GenerateUniqueGUID()
+00825 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00826 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordtype">string</emphasis>&#32;monoGuid&#32;=&#32;System.Guid.NewGuid().ToString();
+00827 
+00828 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordtype">char</emphasis>[]&#32;charGuid&#32;=&#32;<emphasis role="keyword">new</emphasis>&#32;<emphasis role="keywordtype">char</emphasis>[32];
+00829 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordtype">int</emphasis>&#32;<link linkend="_namespace_valve_1_1_v_r_1ac40c4bdf0a3dcd6e69cad2d85f287c67a6a992d5529f459a44fee58c733255e86">index</link>&#32;=&#32;0;
+00830 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">for</emphasis>&#32;(<emphasis role="keywordtype">int</emphasis>&#32;i&#32;=&#32;0;&#32;i&#32;&lt;&#32;monoGuid.Length;&#32;i++)
+00831 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00832 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(monoGuid[i]&#32;!=&#32;<emphasis role="charliteral">&apos;-&apos;</emphasis>)
+00833 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;charGuid[<link linkend="_namespace_valve_1_1_v_r_1ac40c4bdf0a3dcd6e69cad2d85f287c67a6a992d5529f459a44fee58c733255e86">index</link>++]&#32;=&#32;monoGuid[i];
+00834 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00835 
+00836 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordtype">string</emphasis>&#32;guid&#32;=&#32;<emphasis role="keyword">new</emphasis>&#32;string(charGuid);
+00837 
+00838 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;Make&#32;sure&#32;new&#32;GUID&#32;is&#32;not&#32;already&#32;used&#32;by&#32;some&#32;other&#32;asset.</emphasis>
+00839 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(AssetDatabase.GUIDToAssetPath(guid)&#32;!=&#32;<emphasis role="keywordtype">string</emphasis>.Empty)
+00840 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;guid&#32;=&#32;GenerateUniqueGUID();
+00841 
+00842 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;guid;
+00843 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00844 
+00845 
+00849 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;<emphasis role="keyword">static</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;SetProjectSerializationAndSourceControlModes()
+00850 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00851 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;Make&#32;sure&#32;Asset&#32;Serialization&#32;mode&#32;is&#32;set&#32;to&#32;ForceText&#32;with&#32;Visible&#32;Meta&#32;Files.</emphasis>
+00852 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;m_ProjectAssetSerializationMode&#32;=&#32;EditorSettings.serializationMode;
+00853 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(m_ProjectAssetSerializationMode&#32;!=&#32;SerializationMode.ForceText)
+00854 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_namespace_unity_editor">UnityEditor</link>.EditorSettings.serializationMode&#32;=&#32;SerializationMode.ForceText;
+00855 
+00856 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;m_ProjectExternalVersionControl&#32;=&#32;EditorSettings.externalVersionControl;
+00857 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(m_ProjectExternalVersionControl&#32;!=&#32;<emphasis role="stringliteral">&quot;Visible&#32;Meta&#32;Files&quot;</emphasis>)
+00858 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_namespace_unity_editor">UnityEditor</link>.EditorSettings.externalVersionControl&#32;=&#32;<emphasis role="stringliteral">&quot;Visible&#32;Meta&#32;Files&quot;</emphasis>;
+00859 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00860 
+00861 
+00865 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;<emphasis role="keyword">static</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;RestoreProjectSerializationAndSourceControlModes()
+00866 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00867 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;Make&#32;sure&#32;Asset&#32;Serialization&#32;mode&#32;is&#32;set&#32;to&#32;ForceText&#32;with&#32;Visible&#32;Meta&#32;Files.</emphasis>
+00868 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(m_ProjectAssetSerializationMode&#32;!=&#32;EditorSettings.serializationMode)
+00869 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;EditorSettings.serializationMode&#32;=&#32;m_ProjectAssetSerializationMode;
+00870 
+00871 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(m_ProjectExternalVersionControl&#32;!=&#32;EditorSettings.externalVersionControl)
+00872 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;EditorSettings.externalVersionControl&#32;=&#32;m_ProjectExternalVersionControl;
+00873 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00874 
+00875 &#32;&#32;&#32;&#32;}
+00876 }
+</programlisting></section>

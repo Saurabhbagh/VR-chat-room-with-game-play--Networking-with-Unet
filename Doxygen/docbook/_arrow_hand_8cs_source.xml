@@ -1,0 +1,308 @@
+<?xml version='1.0' encoding='UTF-8' standalone='no'?>
+<section xmlns="http://docbook.org/ns/docbook" version="5.0" xmlns:xlink="http://www.w3.org/1999/xlink" xml:id="__arrow_hand_8cs_source">
+<title>ArrowHand.cs</title>
+<indexterm><primary>O:/GitHUBMINIPRoject/Assets/SteamVR/InteractionSystem/Longbow/Scripts/ArrowHand.cs</primary></indexterm>
+<programlisting>00001 <emphasis role="comment">//=======&#32;Copyright&#32;(c)&#32;Valve&#32;Corporation,&#32;All&#32;rights&#32;reserved.&#32;===============</emphasis>
+00002 <emphasis role="comment">//</emphasis>
+00003 <emphasis role="comment">//&#32;Purpose:&#32;The&#32;object&#32;attached&#32;to&#32;the&#32;player&apos;s&#32;hand&#32;that&#32;spawns&#32;and&#32;fires&#32;the</emphasis>
+00004 <emphasis role="comment">//&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;arrow</emphasis>
+00005 <emphasis role="comment">//</emphasis>
+00006 <emphasis role="comment">//=============================================================================</emphasis>
+00007 
+00008 <emphasis role="keyword">using</emphasis>&#32;<link linkend="__balloon_8cs_1a7d67e097df9376eb709b6a23aa3c7d23">UnityEngine</link>;
+00009 <emphasis role="keyword">using</emphasis>&#32;System.Collections;
+00010 <emphasis role="keyword">using</emphasis>&#32;System.Collections.Generic;
+00011 
+00012 <emphasis role="keyword">namespace&#32;</emphasis><link linkend="_namespace_valve_1_1_v_r_1_1_interaction_system">Valve.VR.InteractionSystem</link>
+00013 {
+00014 &#32;&#32;&#32;&#32;<emphasis role="comment">//-------------------------------------------------------------------------</emphasis>
+<anchor xml:id="__arrow_hand_8cs_source_1l00015"/><link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_arrow_hand">00015</link> &#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keyword">class&#32;</emphasis><link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_arrow_hand">ArrowHand</link>&#32;:&#32;MonoBehaviour
+00016 &#32;&#32;&#32;&#32;{
+00017 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_hand">Hand</link>&#32;hand;
+00018 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_longbow">Longbow</link>&#32;bow;
+00019 
+00020 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;GameObject&#32;currentArrow;
+<anchor xml:id="__arrow_hand_8cs_source_1l00021"/><link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_arrow_hand_1a25901b629ca2b817de503b98f696aab9">00021</link> &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;GameObject&#32;<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_arrow_hand_1a25901b629ca2b817de503b98f696aab9">arrowPrefab</link>;
+00022 
+<anchor xml:id="__arrow_hand_8cs_source_1l00023"/><link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_arrow_hand_1a14683ec3df3b0d154dd3f08801825060">00023</link> &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;Transform&#32;<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_arrow_hand_1a14683ec3df3b0d154dd3f08801825060">arrowNockTransform</link>;
+00024 
+<anchor xml:id="__arrow_hand_8cs_source_1l00025"/><link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_arrow_hand_1a081821aeedbf4d2aeb868f0baa252d00">00025</link> &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keywordtype">float</emphasis>&#32;<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_arrow_hand_1a081821aeedbf4d2aeb868f0baa252d00">nockDistance</link>&#32;=&#32;0.1f;
+<anchor xml:id="__arrow_hand_8cs_source_1l00026"/><link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_arrow_hand_1a058123659a580ef9a460d9ed576eae99">00026</link> &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keywordtype">float</emphasis>&#32;<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_arrow_hand_1a058123659a580ef9a460d9ed576eae99">lerpCompleteDistance</link>&#32;=&#32;0.08f;
+<anchor xml:id="__arrow_hand_8cs_source_1l00027"/><link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_arrow_hand_1a196de8b1ec4f79ba4f429b04e68409f9">00027</link> &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keywordtype">float</emphasis>&#32;<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_arrow_hand_1a196de8b1ec4f79ba4f429b04e68409f9">rotationLerpThreshold</link>&#32;=&#32;0.15f;
+<anchor xml:id="__arrow_hand_8cs_source_1l00028"/><link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_arrow_hand_1ade30be6b85b696d644ab2250a7ea12c6">00028</link> &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keywordtype">float</emphasis>&#32;<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_arrow_hand_1ade30be6b85b696d644ab2250a7ea12c6">positionLerpThreshold</link>&#32;=&#32;0.15f;
+00029 
+00030 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;<emphasis role="keywordtype">bool</emphasis>&#32;allowArrowSpawn&#32;=&#32;<emphasis role="keyword">true</emphasis>;
+00031 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;<emphasis role="keywordtype">bool</emphasis>&#32;nocked;
+00032 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;<link linkend="_namespace_valve_1_1_v_r_1_1_interaction_system_1ae03ab84d315f5997fd000817bfb96a0f">GrabTypes</link>&#32;nockedWithType&#32;=&#32;<link linkend="_namespace_valve_1_1_v_r_1_1_interaction_system_1ae03ab84d315f5997fd000817bfb96a0f">GrabTypes</link>.None;
+00033 
+00034 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;<emphasis role="keywordtype">bool</emphasis>&#32;inNockRange&#32;=&#32;<emphasis role="keyword">false</emphasis>;
+00035 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;<emphasis role="keywordtype">bool</emphasis>&#32;arrowLerpComplete&#32;=&#32;<emphasis role="keyword">false</emphasis>;
+00036 
+<anchor xml:id="__arrow_hand_8cs_source_1l00037"/><link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_arrow_hand_1aaf9325ee478d746598cf0500de63bb39">00037</link> &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_sound_play_oneshot">SoundPlayOneshot</link>&#32;<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_arrow_hand_1aaf9325ee478d746598cf0500de63bb39">arrowSpawnSound</link>;
+00038 
+00039 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_allow_teleport_while_attached_to_hand">AllowTeleportWhileAttachedToHand</link>&#32;allowTeleport&#32;=&#32;<emphasis role="keyword">null</emphasis>;
+00040 
+<anchor xml:id="__arrow_hand_8cs_source_1l00041"/><link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_arrow_hand_1a546cfd0a16a1f6b3d05596b1b3a9fc2f">00041</link> &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keywordtype">int</emphasis>&#32;<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_arrow_hand_1a546cfd0a16a1f6b3d05596b1b3a9fc2f">maxArrowCount</link>&#32;=&#32;10;
+00042 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;List&lt;GameObject&gt;&#32;arrowList;
+00043 
+00044 
+00045 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//-------------------------------------------------</emphasis>
+00046 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordtype">void</emphasis>&#32;Awake()
+00047 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00048 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;allowTeleport&#32;=&#32;GetComponent&lt;AllowTeleportWhileAttachedToHand&gt;();
+00049 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//allowTeleport.teleportAllowed&#32;=&#32;true;</emphasis>
+00050 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;allowTeleport.<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_allow_teleport_while_attached_to_hand_1a6f0746ef884a0b5a80460a01d0e47d66">overrideHoverLock</link>&#32;=&#32;<emphasis role="keyword">false</emphasis>;
+00051 
+00052 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;arrowList&#32;=&#32;<emphasis role="keyword">new</emphasis>&#32;List&lt;GameObject&gt;();
+00053 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00054 
+00055 
+00056 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//-------------------------------------------------</emphasis>
+00057 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;OnAttachedToHand(&#32;<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_hand">Hand</link>&#32;attachedHand&#32;)
+00058 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00059 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;hand&#32;=&#32;attachedHand;
+00060 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;FindBow();
+00061 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00062 
+00063 
+00064 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//-------------------------------------------------</emphasis>
+00065 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;GameObject&#32;InstantiateArrow()
+00066 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00067 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;GameObject&#32;arrow&#32;=&#32;Instantiate(&#32;<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_arrow_hand_1a25901b629ca2b817de503b98f696aab9">arrowPrefab</link>,&#32;<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_arrow_hand_1a14683ec3df3b0d154dd3f08801825060">arrowNockTransform</link>.position,&#32;<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_arrow_hand_1a14683ec3df3b0d154dd3f08801825060">arrowNockTransform</link>.rotation&#32;)&#32;as&#32;GameObject;
+00068 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;arrow.name&#32;=&#32;&quot;Bow&#32;Arrow&quot;;
+00069 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;arrow.transform.parent&#32;=&#32;<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_arrow_hand_1a14683ec3df3b0d154dd3f08801825060">arrowNockTransform</link>;
+00070 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;Util.ResetTransform(&#32;arrow.transform&#32;);
+00071 
+00072 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;arrowList.Add(&#32;arrow&#32;);
+00073 
+00074 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;while&#32;(&#32;arrowList.Count&#32;&gt;&#32;<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_arrow_hand_1a546cfd0a16a1f6b3d05596b1b3a9fc2f">maxArrowCount</link>&#32;)
+00075 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00076 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;GameObject&#32;oldArrow&#32;=&#32;arrowList[0];
+00077 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;arrowList.RemoveAt(&#32;0&#32;);
+00078 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(&#32;oldArrow&#32;)
+00079 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00080 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;Destroy(&#32;oldArrow&#32;);
+00081 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00082 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00083 
+00084 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;arrow;
+00085 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00086 
+00087 
+00088 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//-------------------------------------------------</emphasis>
+00089 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;HandAttachedUpdate(&#32;Hand&#32;hand&#32;)
+00090 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00091 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(&#32;bow&#32;==&#32;<emphasis role="keyword">null</emphasis>&#32;)
+00092 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00093 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;FindBow();
+00094 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00095 
+00096 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(&#32;bow&#32;==&#32;<emphasis role="keyword">null</emphasis>&#32;)
+00097 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00098 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>;
+00099 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00100 
+00101 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(&#32;allowArrowSpawn&#32;&amp;&amp;&#32;(&#32;currentArrow&#32;==&#32;<emphasis role="keyword">null</emphasis>&#32;)&#32;)&#32;<emphasis role="comment">//&#32;If&#32;we&apos;re&#32;allowed&#32;to&#32;have&#32;an&#32;active&#32;arrow&#32;in&#32;hand&#32;but&#32;don&apos;t&#32;yet,&#32;spawn&#32;one</emphasis>
+00102 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00103 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;currentArrow&#32;=&#32;InstantiateArrow();
+00104 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_arrow_hand_1aaf9325ee478d746598cf0500de63bb39">arrowSpawnSound</link>.<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_sound_play_oneshot_1add1324a91d31e0d4e252a3e109425363">Play</link>();
+00105 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00106 
+00107 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordtype">float</emphasis>&#32;distanceToNockPosition&#32;=&#32;Vector3.Distance(&#32;transform.parent.position,&#32;bow.<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_longbow_1a0a9ebd634ee05177f21171a32fb1e525">nockTransform</link>.position&#32;);
+00108 
+00109 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;If&#32;there&apos;s&#32;an&#32;arrow&#32;spawned&#32;in&#32;the&#32;hand&#32;and&#32;it&apos;s&#32;not&#32;nocked&#32;yet</emphasis>
+00110 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(&#32;!nocked&#32;)
+00111 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00112 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;If&#32;we&apos;re&#32;close&#32;enough&#32;to&#32;nock&#32;position&#32;that&#32;we&#32;want&#32;to&#32;start&#32;arrow&#32;rotation&#32;lerp,&#32;do&#32;so</emphasis>
+00113 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(&#32;distanceToNockPosition&#32;&lt;&#32;<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_arrow_hand_1a196de8b1ec4f79ba4f429b04e68409f9">rotationLerpThreshold</link>&#32;)
+00114 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00115 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordtype">float</emphasis>&#32;lerp&#32;=&#32;Util.RemapNumber(&#32;distanceToNockPosition,&#32;<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_arrow_hand_1a196de8b1ec4f79ba4f429b04e68409f9">rotationLerpThreshold</link>,&#32;<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_arrow_hand_1a058123659a580ef9a460d9ed576eae99">lerpCompleteDistance</link>,&#32;0,&#32;1&#32;);
+00116 
+00117 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_arrow_hand_1a14683ec3df3b0d154dd3f08801825060">arrowNockTransform</link>.rotation&#32;=&#32;Quaternion.Lerp(&#32;<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_arrow_hand_1a14683ec3df3b0d154dd3f08801825060">arrowNockTransform</link>.parent.rotation,&#32;bow.<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_longbow_1a439ae7b21f5baefc78053bd32de81404">nockRestTransform</link>.rotation,&#32;lerp&#32;);
+00118 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00119 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">else</emphasis>&#32;<emphasis role="comment">//&#32;Not&#32;close&#32;enough&#32;for&#32;rotation&#32;lerp,&#32;reset&#32;rotation</emphasis>
+00120 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00121 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_arrow_hand_1a14683ec3df3b0d154dd3f08801825060">arrowNockTransform</link>.localRotation&#32;=&#32;Quaternion.identity;
+00122 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00123 
+00124 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;If&#32;we&apos;re&#32;close&#32;enough&#32;to&#32;the&#32;nock&#32;position&#32;that&#32;we&#32;want&#32;to&#32;start&#32;arrow&#32;position&#32;lerp,&#32;do&#32;so</emphasis>
+00125 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(&#32;distanceToNockPosition&#32;&lt;&#32;<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_arrow_hand_1ade30be6b85b696d644ab2250a7ea12c6">positionLerpThreshold</link>&#32;)
+00126 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00127 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordtype">float</emphasis>&#32;posLerp&#32;=&#32;Util.RemapNumber(&#32;distanceToNockPosition,&#32;<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_arrow_hand_1ade30be6b85b696d644ab2250a7ea12c6">positionLerpThreshold</link>,&#32;<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_arrow_hand_1a058123659a580ef9a460d9ed576eae99">lerpCompleteDistance</link>,&#32;0,&#32;1&#32;);
+00128 
+00129 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;posLerp&#32;=&#32;Mathf.Clamp(&#32;posLerp,&#32;0f,&#32;1f&#32;);
+00130 
+00131 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_arrow_hand_1a14683ec3df3b0d154dd3f08801825060">arrowNockTransform</link>.position&#32;=&#32;Vector3.Lerp(&#32;<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_arrow_hand_1a14683ec3df3b0d154dd3f08801825060">arrowNockTransform</link>.parent.position,&#32;bow.<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_longbow_1a439ae7b21f5baefc78053bd32de81404">nockRestTransform</link>.position,&#32;posLerp&#32;);
+00132 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00133 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">else</emphasis>&#32;<emphasis role="comment">//&#32;Not&#32;close&#32;enough&#32;for&#32;position&#32;lerp,&#32;reset&#32;position</emphasis>
+00134 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00135 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_arrow_hand_1a14683ec3df3b0d154dd3f08801825060">arrowNockTransform</link>.position&#32;=&#32;<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_arrow_hand_1a14683ec3df3b0d154dd3f08801825060">arrowNockTransform</link>.parent.position;
+00136 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00137 
+00138 
+00139 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;Give&#32;a&#32;haptic&#32;tick&#32;when&#32;lerp&#32;is&#32;visually&#32;complete</emphasis>
+00140 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(&#32;distanceToNockPosition&#32;&lt;&#32;<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_arrow_hand_1a058123659a580ef9a460d9ed576eae99">lerpCompleteDistance</link>&#32;)
+00141 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00142 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(&#32;!arrowLerpComplete&#32;)
+00143 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00144 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;arrowLerpComplete&#32;=&#32;<emphasis role="keyword">true</emphasis>;
+00145 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;hand.TriggerHapticPulse(&#32;500&#32;);
+00146 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00147 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00148 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">else</emphasis>
+00149 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00150 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(&#32;arrowLerpComplete&#32;)
+00151 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00152 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;arrowLerpComplete&#32;=&#32;<emphasis role="keyword">false</emphasis>;
+00153 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00154 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00155 
+00156 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;Allow&#32;nocking&#32;the&#32;arrow&#32;when&#32;controller&#32;is&#32;close&#32;enough</emphasis>
+00157 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(&#32;distanceToNockPosition&#32;&lt;&#32;<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_arrow_hand_1a081821aeedbf4d2aeb868f0baa252d00">nockDistance</link>&#32;)
+00158 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00159 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(&#32;!inNockRange&#32;)
+00160 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00161 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;inNockRange&#32;=&#32;<emphasis role="keyword">true</emphasis>;
+00162 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;bow.<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_longbow_1a279e4793dd08ca0e19cf3ad84c6f65ad">ArrowInPosition</link>();
+00163 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00164 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00165 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">else</emphasis>
+00166 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00167 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(&#32;inNockRange&#32;)
+00168 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00169 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;inNockRange&#32;=&#32;<emphasis role="keyword">false</emphasis>;
+00170 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00171 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00172 
+00173 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_namespace_valve_1_1_v_r_1_1_interaction_system_1ae03ab84d315f5997fd000817bfb96a0f">GrabTypes</link>&#32;bestGrab&#32;=&#32;hand.GetBestGrabbingType(<link linkend="_namespace_valve_1_1_v_r_1_1_interaction_system_1ae03ab84d315f5997fd000817bfb96a0f">GrabTypes</link>.Pinch,&#32;<emphasis role="keyword">true</emphasis>);
+00174 
+00175 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;If&#32;arrow&#32;is&#32;close&#32;enough&#32;to&#32;the&#32;nock&#32;position&#32;and&#32;we&apos;re&#32;pressing&#32;the&#32;trigger,&#32;and&#32;we&apos;re&#32;not&#32;nocked&#32;yet,&#32;Nock</emphasis>
+00176 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(&#32;(&#32;distanceToNockPosition&#32;&lt;&#32;<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_arrow_hand_1a081821aeedbf4d2aeb868f0baa252d00">nockDistance</link>&#32;)&#32;&amp;&amp;&#32;bestGrab&#32;!=&#32;<link linkend="_namespace_valve_1_1_v_r_1_1_interaction_system_1ae03ab84d315f5997fd000817bfb96a0f">GrabTypes</link>.None&#32;&amp;&amp;&#32;!nocked&#32;)
+00177 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00178 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(&#32;currentArrow&#32;==&#32;<emphasis role="keyword">null</emphasis>&#32;)
+00179 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00180 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;currentArrow&#32;=&#32;InstantiateArrow();
+00181 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00182 
+00183 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;nocked&#32;=&#32;<emphasis role="keyword">true</emphasis>;
+00184 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;nockedWithType&#32;=&#32;bestGrab;
+00185 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;bow.<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_longbow_1ab6c7f26589147353e5360df8fd2452d9">StartNock</link>(&#32;<emphasis role="keyword">this</emphasis>&#32;);
+00186 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;hand.HoverLock(&#32;GetComponent&lt;Interactable&gt;()&#32;);
+00187 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;allowTeleport.<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_allow_teleport_while_attached_to_hand_1a0b4bb44373b1273e58ea29e700b3c479">teleportAllowed</link>&#32;=&#32;<emphasis role="keyword">false</emphasis>;
+00188 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;currentArrow.transform.parent&#32;=&#32;bow.<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_longbow_1a0a9ebd634ee05177f21171a32fb1e525">nockTransform</link>;
+00189 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;Util.ResetTransform(&#32;currentArrow.transform&#32;);
+00190 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;Util.ResetTransform(&#32;<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_arrow_hand_1a14683ec3df3b0d154dd3f08801825060">arrowNockTransform</link>&#32;);
+00191 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00192 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00193 
+00194 
+00195 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;If&#32;arrow&#32;is&#32;nocked,&#32;and&#32;we&#32;release&#32;the&#32;trigger</emphasis>
+00196 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(&#32;nocked&#32;&amp;&amp;&#32;hand.IsGrabbingWithType(nockedWithType)&#32;==&#32;false&#32;)
+00197 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00198 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(&#32;bow.<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_longbow_1aef7ba1ecd690e0a7e432df432a5bfeb4">pulled</link>&#32;)&#32;<emphasis role="comment">//&#32;If&#32;bow&#32;is&#32;pulled&#32;back&#32;far&#32;enough,&#32;fire&#32;arrow,&#32;otherwise&#32;reset&#32;arrow&#32;in&#32;arrowhand</emphasis>
+00199 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00200 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;FireArrow();
+00201 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00202 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">else</emphasis>
+00203 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00204 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_arrow_hand_1a14683ec3df3b0d154dd3f08801825060">arrowNockTransform</link>.rotation&#32;=&#32;currentArrow.transform.rotation;
+00205 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;currentArrow.transform.parent&#32;=&#32;<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_arrow_hand_1a14683ec3df3b0d154dd3f08801825060">arrowNockTransform</link>;
+00206 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;Util.ResetTransform(&#32;currentArrow.transform&#32;);
+00207 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;nocked&#32;=&#32;<emphasis role="keyword">false</emphasis>;
+00208 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;nockedWithType&#32;=&#32;<link linkend="_namespace_valve_1_1_v_r_1_1_interaction_system_1ae03ab84d315f5997fd000817bfb96a0f">GrabTypes</link>.None;
+00209 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;bow.<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_longbow_1af32e9030daa9811c2cc879a2769948f9">ReleaseNock</link>();
+00210 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;hand.HoverUnlock(&#32;GetComponent&lt;Interactable&gt;()&#32;);
+00211 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;allowTeleport.<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_allow_teleport_while_attached_to_hand_1a0b4bb44373b1273e58ea29e700b3c479">teleportAllowed</link>&#32;=&#32;<emphasis role="keyword">true</emphasis>;
+00212 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00213 
+00214 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;bow.<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_longbow_1ae7a746228eaa9c9cb02b612ac21e2c1e">StartRotationLerp</link>();&#32;<emphasis role="comment">//&#32;Arrow&#32;is&#32;releasing&#32;from&#32;the&#32;bow,&#32;tell&#32;the&#32;bow&#32;to&#32;lerp&#32;back&#32;to&#32;controller&#32;rotation</emphasis>
+00215 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00216 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00217 
+00218 
+00219 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//-------------------------------------------------</emphasis>
+00220 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;OnDetachedFromHand(&#32;Hand&#32;hand&#32;)
+00221 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00222 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;Destroy(&#32;gameObject&#32;);
+00223 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00224 
+00225 
+00226 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//-------------------------------------------------</emphasis>
+00227 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;FireArrow()
+00228 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00229 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;currentArrow.transform.parent&#32;=&#32;<emphasis role="keyword">null</emphasis>;
+00230 
+00231 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;Arrow&#32;arrow&#32;=&#32;currentArrow.GetComponent&lt;Arrow&gt;();
+00232 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;arrow.shaftRB.isKinematic&#32;=&#32;<emphasis role="keyword">false</emphasis>;
+00233 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;arrow.shaftRB.useGravity&#32;=&#32;<emphasis role="keyword">true</emphasis>;
+00234 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;arrow.shaftRB.transform.GetComponent&lt;BoxCollider&gt;().enabled&#32;=&#32;<emphasis role="keyword">true</emphasis>;
+00235 
+00236 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;arrow.arrowHeadRB.isKinematic&#32;=&#32;<emphasis role="keyword">false</emphasis>;
+00237 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;arrow.arrowHeadRB.useGravity&#32;=&#32;<emphasis role="keyword">true</emphasis>;
+00238 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;arrow.arrowHeadRB.transform.GetComponent&lt;BoxCollider&gt;().enabled&#32;=&#32;<emphasis role="keyword">true</emphasis>;
+00239 
+00240 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;arrow.arrowHeadRB.AddForce(&#32;currentArrow.transform.forward&#32;*&#32;bow.<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_longbow_1a527b263071c9dc84cae6571626ad6a70">GetArrowVelocity</link>(),&#32;ForceMode.VelocityChange&#32;);
+00241 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;arrow.arrowHeadRB.AddTorque(&#32;currentArrow.transform.forward&#32;*&#32;10&#32;);
+00242 
+00243 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;nocked&#32;=&#32;<emphasis role="keyword">false</emphasis>;
+00244 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;nockedWithType&#32;=&#32;<link linkend="_namespace_valve_1_1_v_r_1_1_interaction_system_1ae03ab84d315f5997fd000817bfb96a0f">GrabTypes</link>.None;
+00245 
+00246 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;currentArrow.GetComponent&lt;Arrow&gt;().ArrowReleased(&#32;bow.<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_longbow_1a527b263071c9dc84cae6571626ad6a70">GetArrowVelocity</link>()&#32;);
+00247 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;bow.<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_longbow_1a1c9904dc841fdd685790ac4b5568dd0a">ArrowReleased</link>();
+00248 
+00249 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;allowArrowSpawn&#32;=&#32;<emphasis role="keyword">false</emphasis>;
+00250 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;Invoke(&#32;<emphasis role="stringliteral">&quot;EnableArrowSpawn&quot;</emphasis>,&#32;0.5f&#32;);
+00251 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;StartCoroutine(&#32;ArrowReleaseHaptics()&#32;);
+00252 
+00253 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;currentArrow&#32;=&#32;<emphasis role="keyword">null</emphasis>;
+00254 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;allowTeleport.<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_allow_teleport_while_attached_to_hand_1a0b4bb44373b1273e58ea29e700b3c479">teleportAllowed</link>&#32;=&#32;<emphasis role="keyword">true</emphasis>;
+00255 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00256 
+00257 
+00258 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//-------------------------------------------------</emphasis>
+00259 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;EnableArrowSpawn()
+00260 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00261 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;allowArrowSpawn&#32;=&#32;<emphasis role="keyword">true</emphasis>;
+00262 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00263 
+00264 
+00265 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//-------------------------------------------------</emphasis>
+00266 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;IEnumerator&#32;ArrowReleaseHaptics()
+00267 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00268 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;yield&#32;<emphasis role="keywordflow">return</emphasis>&#32;<emphasis role="keyword">new</emphasis>&#32;WaitForSeconds(&#32;0.05f&#32;);
+00269 
+00270 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;hand.otherHand.TriggerHapticPulse(&#32;1500&#32;);
+00271 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;yield&#32;<emphasis role="keywordflow">return</emphasis>&#32;<emphasis role="keyword">new</emphasis>&#32;WaitForSeconds(&#32;0.05f&#32;);
+00272 
+00273 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;hand.otherHand.TriggerHapticPulse(&#32;800&#32;);
+00274 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;yield&#32;<emphasis role="keywordflow">return</emphasis>&#32;<emphasis role="keyword">new</emphasis>&#32;WaitForSeconds(&#32;0.05f&#32;);
+00275 
+00276 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;hand.otherHand.TriggerHapticPulse(&#32;500&#32;);
+00277 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;yield&#32;<emphasis role="keywordflow">return</emphasis>&#32;<emphasis role="keyword">new</emphasis>&#32;WaitForSeconds(&#32;0.05f&#32;);
+00278 
+00279 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;hand.otherHand.TriggerHapticPulse(&#32;300&#32;);
+00280 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00281 
+00282 
+00283 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//-------------------------------------------------</emphasis>
+00284 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;OnHandFocusLost(&#32;Hand&#32;hand&#32;)
+00285 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00286 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;gameObject.SetActive(&#32;<emphasis role="keyword">false</emphasis>&#32;);
+00287 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00288 
+00289 
+00290 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//-------------------------------------------------</emphasis>
+00291 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;OnHandFocusAcquired(&#32;Hand&#32;hand&#32;)
+00292 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00293 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;gameObject.SetActive(&#32;<emphasis role="keyword">true</emphasis>&#32;);
+00294 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00295 
+00296 
+00297 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//-------------------------------------------------</emphasis>
+00298 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;FindBow()
+00299 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00300 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;bow&#32;=&#32;hand.otherHand.GetComponentInChildren&lt;Longbow&gt;();
+00301 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00302 &#32;&#32;&#32;&#32;}
+00303 }
+</programlisting></section>

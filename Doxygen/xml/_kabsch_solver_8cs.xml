@@ -1,0 +1,109 @@
+<?xml version='1.0' encoding='UTF-8' standalone='no'?>
+<doxygen xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="compound.xsd" version="1.8.15">
+  <compounddef id="_kabsch_solver_8cs" kind="file" language="C#">
+    <compoundname>KabschSolver.cs</compoundname>
+    <innerclass refid="class_leap_1_1_unity_1_1_interaction_1_1_kabsch_solver" prot="public">Leap::Unity::Interaction::KabschSolver</innerclass>
+    <innerclass refid="class_leap_1_1_unity_1_1_interaction_1_1_from_matrix_extension" prot="public">Leap::Unity::Interaction::FromMatrixExtension</innerclass>
+    <innernamespace refid="namespace_leap">Leap</innernamespace>
+    <innernamespace refid="namespace_leap_1_1_unity">Leap::Unity</innernamespace>
+    <innernamespace refid="namespace_leap_1_1_unity_1_1_interaction">Leap::Unity::Interaction</innernamespace>
+    <briefdescription>
+    </briefdescription>
+    <detaileddescription>
+    </detaileddescription>
+    <programlisting>
+<codeline lineno="1"><highlight class="comment">/******************************************************************************</highlight></codeline>
+<codeline lineno="2"><highlight class="comment"><sp/>*<sp/>Copyright<sp/>(C)<sp/>Leap<sp/>Motion,<sp/>Inc.<sp/>2011-2018.<sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/>*</highlight></codeline>
+<codeline lineno="3"><highlight class="comment"><sp/>*<sp/>Leap<sp/>Motion<sp/>proprietary<sp/>and<sp/>confidential.<sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/>*</highlight></codeline>
+<codeline lineno="4"><highlight class="comment"><sp/>*<sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/>*</highlight></codeline>
+<codeline lineno="5"><highlight class="comment"><sp/>*<sp/>Use<sp/>subject<sp/>to<sp/>the<sp/>terms<sp/>of<sp/>the<sp/>Leap<sp/>Motion<sp/>SDK<sp/>Agreement<sp/>available<sp/>at<sp/><sp/><sp/><sp/><sp/>*</highlight></codeline>
+<codeline lineno="6"><highlight class="comment"><sp/>*<sp/>https://developer.leapmotion.com/sdk_agreement,<sp/>or<sp/>another<sp/>agreement<sp/><sp/><sp/><sp/><sp/><sp/><sp/>*</highlight></codeline>
+<codeline lineno="7"><highlight class="comment"><sp/>*<sp/>between<sp/>Leap<sp/>Motion<sp/>and<sp/>you,<sp/>your<sp/>company<sp/>or<sp/>other<sp/>organization.<sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/>*</highlight></codeline>
+<codeline lineno="8"><highlight class="comment"><sp/>******************************************************************************/</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="9"><highlight class="normal"></highlight></codeline>
+<codeline lineno="10"><highlight class="normal"></highlight><highlight class="keyword">using</highlight><highlight class="normal"><sp/><ref refid="_balloon_8cs_1a7d67e097df9376eb709b6a23aa3c7d23" kindref="member">UnityEngine</ref>;</highlight></codeline>
+<codeline lineno="11"><highlight class="normal"></highlight><highlight class="keyword">using</highlight><highlight class="normal"><sp/>System.Collections.Generic;</highlight></codeline>
+<codeline lineno="12"><highlight class="normal"></highlight></codeline>
+<codeline lineno="13"><highlight class="normal"></highlight><highlight class="keyword">namespace<sp/></highlight><highlight class="normal"><ref refid="namespace_leap_1_1_unity_1_1_interaction" kindref="compound">Leap.Unity.Interaction</ref><sp/>{</highlight></codeline>
+<codeline lineno="14"><highlight class="normal"></highlight></codeline>
+<codeline lineno="15" refid="class_leap_1_1_unity_1_1_interaction_1_1_kabsch_solver" refkind="compound"><highlight class="normal"><sp/><sp/></highlight><highlight class="keyword">public</highlight><highlight class="normal"><sp/></highlight><highlight class="keyword">class<sp/></highlight><highlight class="normal"><ref refid="class_leap_1_1_unity_1_1_interaction_1_1_kabsch_solver" kindref="compound">KabschSolver</ref><sp/>{</highlight></codeline>
+<codeline lineno="16"><highlight class="normal"><sp/><sp/><sp/><sp/>Vector3[]<sp/>QuatBasis<sp/>=<sp/></highlight><highlight class="keyword">new</highlight><highlight class="normal"><sp/>Vector3[3];</highlight></codeline>
+<codeline lineno="17"><highlight class="normal"><sp/><sp/><sp/><sp/>Vector3[]<sp/>DataCovariance<sp/>=<sp/></highlight><highlight class="keyword">new</highlight><highlight class="normal"><sp/>Vector3[3];</highlight></codeline>
+<codeline lineno="18"><highlight class="normal"><sp/><sp/><sp/><sp/>Quaternion<sp/>OptimalRotation<sp/>=<sp/>Quaternion.identity;</highlight></codeline>
+<codeline lineno="19" refid="class_leap_1_1_unity_1_1_interaction_1_1_kabsch_solver_1a6aac06a0dcbe2e7ac0a53b43b64bdcaf" refkind="member"><highlight class="normal"><sp/><sp/><sp/><sp/></highlight><highlight class="keyword">public</highlight><highlight class="normal"><sp/>Matrix4x4<sp/><ref refid="class_leap_1_1_unity_1_1_interaction_1_1_kabsch_solver_1a6aac06a0dcbe2e7ac0a53b43b64bdcaf" kindref="member">SolveKabsch</ref>(List&lt;Vector3&gt;<sp/>inPoints,<sp/>List&lt;Vector3&gt;<sp/>refPoints)<sp/>{</highlight></codeline>
+<codeline lineno="20"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/></highlight><highlight class="keywordflow">if</highlight><highlight class="normal"><sp/>(inPoints.Count<sp/>!=<sp/>refPoints.Count)<sp/>{<sp/></highlight><highlight class="keywordflow">return</highlight><highlight class="normal"><sp/>Matrix4x4.identity;<sp/>}</highlight></codeline>
+<codeline lineno="21"><highlight class="normal"></highlight></codeline>
+<codeline lineno="22"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/></highlight><highlight class="comment">//Calculate<sp/>the<sp/>centroid<sp/>offset<sp/>and<sp/>construct<sp/>the<sp/>centroid-shifted<sp/>point<sp/>matrices</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="23"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/>Vector3<sp/>inCentroid<sp/>=<sp/>Vector3.zero;<sp/>Vector3<sp/>refCentroid<sp/>=<sp/>Vector3.zero;</highlight></codeline>
+<codeline lineno="24"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/></highlight><highlight class="keywordflow">for</highlight><highlight class="normal"><sp/>(</highlight><highlight class="keywordtype">int</highlight><highlight class="normal"><sp/>i<sp/>=<sp/>0;<sp/>i<sp/>&lt;<sp/>inPoints.Count;<sp/>i++)<sp/>{</highlight></codeline>
+<codeline lineno="25"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/>inCentroid<sp/>+=<sp/>inPoints[i];</highlight></codeline>
+<codeline lineno="26"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/>refCentroid<sp/>+=<sp/>refPoints[i];</highlight></codeline>
+<codeline lineno="27"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/>}</highlight></codeline>
+<codeline lineno="28"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/>inCentroid<sp/>/=<sp/>inPoints.Count;</highlight></codeline>
+<codeline lineno="29"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/>refCentroid<sp/>/=<sp/>refPoints.Count;</highlight></codeline>
+<codeline lineno="30"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/></highlight><highlight class="keywordflow">for</highlight><highlight class="normal"><sp/>(</highlight><highlight class="keywordtype">int</highlight><highlight class="normal"><sp/>i<sp/>=<sp/>0;<sp/>i<sp/>&lt;<sp/>inPoints.Count;<sp/>i++)<sp/>{</highlight></codeline>
+<codeline lineno="31"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/>inPoints[i]<sp/>-=<sp/>inCentroid;</highlight></codeline>
+<codeline lineno="32"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/>refPoints[i]<sp/>-=<sp/>refCentroid;</highlight></codeline>
+<codeline lineno="33"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/>}</highlight></codeline>
+<codeline lineno="34"><highlight class="normal"></highlight></codeline>
+<codeline lineno="35"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/></highlight><highlight class="comment">//Calculate<sp/>the<sp/>covariance<sp/>matrix,<sp/>is<sp/>a<sp/>3x3<sp/>Matrix<sp/>and<sp/>Calculate<sp/>the<sp/>optimal<sp/>rotation</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="36"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/>extractRotation(TransposeMult(inPoints,<sp/>refPoints,<sp/>DataCovariance),<sp/>ref<sp/>OptimalRotation);</highlight></codeline>
+<codeline lineno="37"><highlight class="normal"></highlight></codeline>
+<codeline lineno="38"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/></highlight><highlight class="keywordflow">return</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="39"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/>Matrix4x4.TRS(refCentroid,<sp/>Quaternion.identity,<sp/>Vector3.one)<sp/>*</highlight></codeline>
+<codeline lineno="40"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/>Matrix4x4.TRS(Vector3.zero,<sp/>OptimalRotation,<sp/>Vector3.one)<sp/>*</highlight></codeline>
+<codeline lineno="41"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/>Matrix4x4.TRS(-inCentroid,<sp/>Quaternion.identity,<sp/>Vector3.one);</highlight></codeline>
+<codeline lineno="42"><highlight class="normal"><sp/><sp/><sp/><sp/>}</highlight></codeline>
+<codeline lineno="43"><highlight class="normal"></highlight></codeline>
+<codeline lineno="44"><highlight class="normal"><sp/><sp/><sp/><sp/></highlight><highlight class="comment">//https://animation.rwth-aachen.de/media/papers/2016-MIG-StableRotation.pdf</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="45"><highlight class="normal"><sp/><sp/><sp/><sp/></highlight><highlight class="keywordtype">void</highlight><highlight class="normal"><sp/>extractRotation(Vector3[]<sp/>A,<sp/>ref<sp/>Quaternion<sp/>q)<sp/>{</highlight></codeline>
+<codeline lineno="46"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/></highlight><highlight class="keywordflow">for</highlight><highlight class="normal"><sp/>(</highlight><highlight class="keywordtype">int</highlight><highlight class="normal"><sp/>iter<sp/>=<sp/>0;<sp/>iter<sp/>&lt;<sp/>9;<sp/>iter++)<sp/>{</highlight></codeline>
+<codeline lineno="47"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/>Vector3[]<sp/>R<sp/>=<sp/><ref refid="class_leap_1_1_unity_1_1_interaction_1_1_kabsch_solver_1a28fe7e92b8cb302758c2b5e86860af7b" kindref="member">MatrixFromQuaternion</ref>(q,<sp/>QuatBasis);</highlight></codeline>
+<codeline lineno="48"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/>Vector3<sp/>omega<sp/>=<sp/>(Vector3.Cross(R[0],<sp/>A[0])<sp/>+</highlight></codeline>
+<codeline lineno="49"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/>Vector3.Cross(R[1],<sp/>A[1])<sp/>+</highlight></codeline>
+<codeline lineno="50"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/>Vector3.Cross(R[2],<sp/>A[2]))<sp/>*</highlight></codeline>
+<codeline lineno="51"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/>(1f<sp/>/<sp/>Mathf.Abs(Vector3.Dot(R[0],<sp/>A[0])<sp/>+</highlight></codeline>
+<codeline lineno="52"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/>Vector3.Dot(R[1],<sp/>A[1])<sp/>+</highlight></codeline>
+<codeline lineno="53"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/>Vector3.Dot(R[2],<sp/>A[2])<sp/>+<sp/>0.000000001f));</highlight></codeline>
+<codeline lineno="54"><highlight class="normal"></highlight></codeline>
+<codeline lineno="55"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/></highlight><highlight class="keywordtype">float</highlight><highlight class="normal"><sp/>w<sp/>=<sp/>Mathf.Clamp(omega.magnitude<sp/>*<sp/>50f,<sp/>-10f,<sp/>10f);<sp/></highlight><highlight class="comment">//How<sp/>aggressive<sp/>each<sp/>iteration<sp/>should<sp/>be</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="56"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/></highlight><highlight class="keywordflow">if</highlight><highlight class="normal"><sp/>(w<sp/>&lt;<sp/>0.000000001f)</highlight></codeline>
+<codeline lineno="57"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/></highlight><highlight class="keywordflow">break</highlight><highlight class="normal">;</highlight></codeline>
+<codeline lineno="58"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/>q<sp/>=<sp/>Quaternion.AngleAxis(w,<sp/>(1f<sp/>/<sp/>w)<sp/>*<sp/>omega)<sp/>*<sp/>q;</highlight></codeline>
+<codeline lineno="59"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/>q<sp/>=<sp/>Quaternion.Lerp(q,<sp/>q,<sp/>0f);</highlight><highlight class="comment">//Normalizes<sp/>the<sp/>Quaternion;<sp/>critical<sp/>for<sp/>error<sp/>suppression</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="60"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/>}</highlight></codeline>
+<codeline lineno="61"><highlight class="normal"><sp/><sp/><sp/><sp/>}</highlight></codeline>
+<codeline lineno="62"><highlight class="normal"></highlight></codeline>
+<codeline lineno="63"><highlight class="normal"><sp/><sp/><sp/><sp/></highlight><highlight class="comment">//Calculate<sp/>Covariance<sp/>Matrices<sp/>--------------------------------------------------</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="64"><highlight class="normal"><sp/><sp/><sp/><sp/>Vector3[]<sp/>TransposeMult(List&lt;Vector3&gt;<sp/>vec1,<sp/>List&lt;Vector3&gt;<sp/>vec2,<sp/>Vector3[]<sp/>covariance)<sp/>{</highlight></codeline>
+<codeline lineno="65"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/></highlight><highlight class="keywordflow">for</highlight><highlight class="normal"><sp/>(</highlight><highlight class="keywordtype">int</highlight><highlight class="normal"><sp/>i<sp/>=<sp/>0;<sp/>i<sp/>&lt;<sp/>3;<sp/>i++)<sp/>{<sp/></highlight><highlight class="comment">//i<sp/>is<sp/>the<sp/>row<sp/>in<sp/>this<sp/>matrix</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="66"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/>covariance[i]<sp/>=<sp/>Vector3.zero;</highlight></codeline>
+<codeline lineno="67"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/></highlight><highlight class="keywordflow">for</highlight><highlight class="normal"><sp/>(</highlight><highlight class="keywordtype">int</highlight><highlight class="normal"><sp/>j<sp/>=<sp/>0;<sp/>j<sp/>&lt;<sp/>3;<sp/>j++)<sp/>{</highlight><highlight class="comment">//j<sp/>is<sp/>the<sp/>column<sp/>in<sp/>the<sp/>other<sp/>matrix</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="68"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/></highlight><highlight class="keywordflow">for</highlight><highlight class="normal"><sp/>(</highlight><highlight class="keywordtype">int</highlight><highlight class="normal"><sp/>k<sp/>=<sp/>0;<sp/>k<sp/>&lt;<sp/>vec1.Count;<sp/>k++)<sp/>{</highlight><highlight class="comment">//k<sp/>is<sp/>the<sp/>column<sp/>in<sp/>this<sp/>matrix</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="69"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/>covariance[i][j]<sp/>+=<sp/>vec1[k][i]<sp/>*<sp/>vec2[k][j];</highlight></codeline>
+<codeline lineno="70"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/>}</highlight></codeline>
+<codeline lineno="71"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/>}</highlight></codeline>
+<codeline lineno="72"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/>}</highlight></codeline>
+<codeline lineno="73"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/></highlight><highlight class="keywordflow">return</highlight><highlight class="normal"><sp/>covariance;</highlight></codeline>
+<codeline lineno="74"><highlight class="normal"><sp/><sp/><sp/><sp/>}</highlight></codeline>
+<codeline lineno="75"><highlight class="normal"></highlight></codeline>
+<codeline lineno="76" refid="class_leap_1_1_unity_1_1_interaction_1_1_kabsch_solver_1a28fe7e92b8cb302758c2b5e86860af7b" refkind="member"><highlight class="normal"><sp/><sp/><sp/><sp/></highlight><highlight class="keyword">public</highlight><highlight class="normal"><sp/></highlight><highlight class="keyword">static</highlight><highlight class="normal"><sp/>Vector3[]<sp/><ref refid="class_leap_1_1_unity_1_1_interaction_1_1_kabsch_solver_1a28fe7e92b8cb302758c2b5e86860af7b" kindref="member">MatrixFromQuaternion</ref>(Quaternion<sp/>q,<sp/>Vector3[]<sp/>covariance)<sp/>{</highlight></codeline>
+<codeline lineno="77"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/>covariance[0]<sp/>=<sp/>q<sp/>*<sp/>Vector3.right;</highlight></codeline>
+<codeline lineno="78"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/>covariance[1]<sp/>=<sp/>q<sp/>*<sp/>Vector3.up;</highlight></codeline>
+<codeline lineno="79"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/>covariance[2]<sp/>=<sp/>q<sp/>*<sp/>Vector3.forward;</highlight></codeline>
+<codeline lineno="80"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/></highlight><highlight class="keywordflow">return</highlight><highlight class="normal"><sp/>covariance;</highlight></codeline>
+<codeline lineno="81"><highlight class="normal"><sp/><sp/><sp/><sp/>}</highlight></codeline>
+<codeline lineno="82"><highlight class="normal"><sp/><sp/>}</highlight></codeline>
+<codeline lineno="83"><highlight class="normal"></highlight></codeline>
+<codeline lineno="84"><highlight class="normal"><sp/><sp/></highlight><highlight class="keyword">public</highlight><highlight class="normal"><sp/></highlight><highlight class="keyword">static</highlight><highlight class="normal"><sp/></highlight><highlight class="keyword">class<sp/></highlight><highlight class="normal">FromMatrixExtension<sp/>{</highlight></codeline>
+<codeline lineno="85"><highlight class="normal"><sp/><sp/><sp/><sp/></highlight><highlight class="keyword">public</highlight><highlight class="normal"><sp/></highlight><highlight class="keyword">static</highlight><highlight class="normal"><sp/>Vector3<sp/>GetVector3(</highlight><highlight class="keyword">this</highlight><highlight class="normal"><sp/>Matrix4x4<sp/>m)<sp/>{<sp/></highlight><highlight class="keywordflow">return</highlight><highlight class="normal"><sp/>m.GetColumn(3);<sp/>}</highlight></codeline>
+<codeline lineno="86"><highlight class="normal"><sp/><sp/><sp/><sp/></highlight><highlight class="keyword">public</highlight><highlight class="normal"><sp/></highlight><highlight class="keyword">static</highlight><highlight class="normal"><sp/>Quaternion<sp/>GetQuaternion(</highlight><highlight class="keyword">this</highlight><highlight class="normal"><sp/>Matrix4x4<sp/>m)<sp/>{</highlight></codeline>
+<codeline lineno="87"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/></highlight><highlight class="keywordflow">if</highlight><highlight class="normal"><sp/>(m.GetColumn(2)<sp/>==<sp/>m.GetColumn(1))<sp/>{<sp/></highlight><highlight class="keywordflow">return</highlight><highlight class="normal"><sp/>Quaternion.identity;<sp/>}</highlight></codeline>
+<codeline lineno="88"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/></highlight><highlight class="keywordflow">return</highlight><highlight class="normal"><sp/>Quaternion.LookRotation(m.GetColumn(2),<sp/>m.GetColumn(1));</highlight></codeline>
+<codeline lineno="89"><highlight class="normal"><sp/><sp/><sp/><sp/>}</highlight></codeline>
+<codeline lineno="90"><highlight class="normal"><sp/><sp/>}</highlight></codeline>
+<codeline lineno="91"><highlight class="normal">}</highlight></codeline>
+    </programlisting>
+    <location file="O:/GitHUBMINIPRoject/Assets/LeapMotion/Modules/InteractionEngine/Scripts/Utility/KabschSolver.cs"/>
+  </compounddef>
+</doxygen>

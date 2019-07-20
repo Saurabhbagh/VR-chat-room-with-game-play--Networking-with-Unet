@@ -1,0 +1,234 @@
+<?xml version='1.0' encoding='UTF-8' standalone='no'?>
+<section xmlns="http://docbook.org/ns/docbook" version="5.0" xmlns:xlink="http://www.w3.org/1999/xlink" xml:id="__upm_base_operation_8cs_source">
+<title>UpmBaseOperation.cs</title>
+<indexterm><primary>O:/GitHUBMINIPRoject/Library/PackageCache/com.unity.package-manager-ui@2.0.7/Editor/Sources/Services/Upm/UpmBaseOperation.cs</primary></indexterm>
+<programlisting>00001 <emphasis role="keyword">using</emphasis>&#32;System;
+00002 <emphasis role="keyword">using</emphasis>&#32;System.Globalization;
+00003 <emphasis role="keyword">using</emphasis>&#32;System.Collections.Generic;
+00004 <emphasis role="keyword">using</emphasis>&#32;System.Linq;
+00005 <emphasis role="keyword">using</emphasis>&#32;<link linkend="_namespace_semver">Semver</link>;
+00006 <emphasis role="keyword">using</emphasis>&#32;<link linkend="__balloon_8cs_1a7d67e097df9376eb709b6a23aa3c7d23">UnityEngine</link>;
+00007 <emphasis role="keyword">using</emphasis>&#32;<link linkend="_namespace_unity_editor">UnityEditor</link>.<link linkend="_namespace_unity_editor_1_1_package_manager">PackageManager</link>.Requests;
+00008 
+00009 <emphasis role="keyword">namespace&#32;</emphasis><link linkend="_namespace_unity_editor_1_1_package_manager_1_1_u_i">UnityEditor.PackageManager.UI</link>
+00010 {&#32;&#32;&#32;&#32;
+<anchor xml:id="__upm_base_operation_8cs_source_1l00011"/><link linkend="_class_unity_editor_1_1_package_manager_1_1_u_i_1_1_upm_base_operation">00011</link> &#32;&#32;&#32;&#32;<emphasis role="keyword">internal</emphasis>&#32;<emphasis role="keyword">abstract</emphasis>&#32;<emphasis role="keyword">class&#32;</emphasis><link linkend="_class_unity_editor_1_1_package_manager_1_1_u_i_1_1_upm_base_operation">UpmBaseOperation</link>&#32;:&#32;<link linkend="_interface_unity_editor_1_1_package_manager_1_1_u_i_1_1_i_base_operation">IBaseOperation</link>
+00012 &#32;&#32;&#32;&#32;{
+<anchor xml:id="__upm_base_operation_8cs_source_1l00013"/><link linkend="_class_unity_editor_1_1_package_manager_1_1_u_i_1_1_upm_base_operation_1ac210057da378964fb9b69ddf919909c0">00013</link> &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keyword">static</emphasis>&#32;<emphasis role="keywordtype">string</emphasis>&#32;<link linkend="_class_unity_editor_1_1_package_manager_1_1_u_i_1_1_upm_base_operation_1ac210057da378964fb9b69ddf919909c0">GroupName</link>(PackageSource&#32;origin)
+00014 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00015 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;var&#32;group&#32;=&#32;<link linkend="_namespace_unity_editor_1_1_package_manager_1_1_u_i_1ac4723ed066e47a786b12bd8f7c93bb71">PackageGroupOrigins</link>.Packages.ToString();
+00016 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(origin&#32;==&#32;PackageSource.BuiltIn)
+00017 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;group&#32;=&#32;<link linkend="_namespace_unity_editor_1_1_package_manager_1_1_u_i_1ac4723ed066e47a786b12bd8f7c93bb71">PackageGroupOrigins</link>.BuiltInPackages.ToString();
+00018 
+00019 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;group;
+00020 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00021 
+<anchor xml:id="__upm_base_operation_8cs_source_1l00022"/><link linkend="_class_unity_editor_1_1_package_manager_1_1_u_i_1_1_upm_base_operation_1a1b5f0339693904dce28d8a9935530fa8">00022</link> &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">protected</emphasis>&#32;<emphasis role="keyword">static</emphasis>&#32;IEnumerable&lt;PackageInfo&gt;&#32;<link linkend="_class_unity_editor_1_1_package_manager_1_1_u_i_1_1_upm_base_operation_1a1b5f0339693904dce28d8a9935530fa8">FromUpmPackageInfo</link>(PackageManager.PackageInfo&#32;info,&#32;<emphasis role="keywordtype">bool</emphasis>&#32;isCurrent=<emphasis role="keyword">true</emphasis>)
+00023 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00024 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;var&#32;packages&#32;=&#32;<emphasis role="keyword">new</emphasis>&#32;List&lt;PackageInfo&gt;();
+00025 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;var&#32;displayName&#32;=&#32;info.displayName;
+00026 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(<emphasis role="keywordtype">string</emphasis>.IsNullOrEmpty(displayName))
+00027 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00028 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;displayName&#32;=&#32;info.name.Replace(<emphasis role="stringliteral">&quot;com.unity.modules.&quot;</emphasis>,&#32;<emphasis role="stringliteral">&quot;&quot;</emphasis>);
+00029 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;displayName&#32;=&#32;displayName.Replace(<emphasis role="stringliteral">&quot;com.unity.&quot;</emphasis>,&#32;<emphasis role="stringliteral">&quot;&quot;</emphasis>);
+00030 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;displayName&#32;=&#32;<emphasis role="keyword">new</emphasis>&#32;CultureInfo(<emphasis role="stringliteral">&quot;en-US&quot;</emphasis>).TextInfo.ToTitleCase(displayName);
+00031 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00032 
+00033 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordtype">string</emphasis>&#32;author&#32;=&#32;info.author.name;
+00034 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(<emphasis role="keywordtype">string</emphasis>.IsNullOrEmpty(info.author.name)&#32;&amp;&amp;&#32;info.name.StartsWith(<emphasis role="stringliteral">&quot;com.unity.&quot;</emphasis>))
+00035 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;author&#32;=&#32;<emphasis role="stringliteral">&quot;Unity&#32;Technologies&#32;Inc.&quot;</emphasis>;
+00036 
+00037 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;var&#32;lastCompatible&#32;=&#32;info.versions.latestCompatible;
+00038 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;var&#32;versions&#32;=&#32;<emphasis role="keyword">new</emphasis>&#32;List&lt;string&gt;();
+00039 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;versions.AddRange(info.versions.compatible);
+00040 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(versions.FindIndex(version&#32;=&gt;&#32;version&#32;==&#32;info.version)&#32;==&#32;-1)
+00041 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00042 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;versions.Add(info.version);
+00043 
+00044 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;versions.Sort((left,&#32;right)&#32;=&gt;
+00045 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00046 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(left&#32;==&#32;<emphasis role="keyword">null</emphasis>&#32;||&#32;right&#32;==&#32;<emphasis role="keyword">null</emphasis>)&#32;<emphasis role="keywordflow">return</emphasis>&#32;0;
+00047 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;
+00048 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_semver_1_1_sem_version">SemVersion</link>&#32;leftVersion&#32;=&#32;left;
+00049 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_semver_1_1_sem_version">SemVersion</link>&#32;righVersion&#32;=&#32;right;
+00050 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;leftVersion.<link linkend="_class_semver_1_1_sem_version_1adabe1c3ea77ec1dae140cdc3aa4c60b1">CompareByPrecedence</link>(righVersion);
+00051 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;});
+00052 
+00053 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_semver_1_1_sem_version">SemVersion</link>&#32;packageVersion&#32;=&#32;info.version;
+00054 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(!<emphasis role="keywordtype">string</emphasis>.IsNullOrEmpty(lastCompatible))
+00055 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00056 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_semver_1_1_sem_version">SemVersion</link>&#32;lastCompatibleVersion&#32;=
+00057 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordtype">string</emphasis>.IsNullOrEmpty(lastCompatible)&#32;?&#32;(<link linkend="_class_semver_1_1_sem_version">SemVersion</link>)&#32;<emphasis role="keyword">null</emphasis>&#32;:&#32;lastCompatible;
+00058 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(packageVersion&#32;!=&#32;<emphasis role="keyword">null</emphasis>&#32;&amp;&amp;&#32;<emphasis role="keywordtype">string</emphasis>.IsNullOrEmpty(packageVersion.<link linkend="_class_semver_1_1_sem_version_1a8bb1554a68d74cef681af7cc01d460ef">Prerelease</link>)&#32;&amp;&amp;
+00059 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;packageVersion.<link linkend="_class_semver_1_1_sem_version_1adabe1c3ea77ec1dae140cdc3aa4c60b1">CompareByPrecedence</link>(lastCompatibleVersion)&#32;&gt;&#32;0)
+00060 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;lastCompatible&#32;=&#32;info.version;
+00061 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00062 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">else</emphasis>
+00063 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00064 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(packageVersion&#32;!=&#32;<emphasis role="keyword">null</emphasis>&#32;&amp;&amp;&#32;<emphasis role="keywordtype">string</emphasis>.IsNullOrEmpty(packageVersion.<link linkend="_class_semver_1_1_sem_version_1a8bb1554a68d74cef681af7cc01d460ef">Prerelease</link>))
+00065 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;lastCompatible&#32;=&#32;info.version;
+00066 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00067 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00068 
+00069 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">foreach</emphasis>(var&#32;version&#32;<emphasis role="keywordflow">in</emphasis>&#32;versions)
+00070 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00071 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;var&#32;isVersionCurrent&#32;=&#32;version&#32;==&#32;info.version&#32;&amp;&amp;&#32;isCurrent;
+00072 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;var&#32;isBuiltIn&#32;=&#32;info.source&#32;==&#32;PackageSource.BuiltIn;
+00073 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;var&#32;isVerified&#32;=&#32;<emphasis role="keywordtype">string</emphasis>.IsNullOrEmpty(<link linkend="_class_semver_1_1_sem_version">SemVersion</link>.<link linkend="_class_semver_1_1_sem_version_1a3928bdf405e6d854e400d2fbd5cd0164">Parse</link>(version).<link linkend="_class_semver_1_1_sem_version_1a8bb1554a68d74cef681af7cc01d460ef">Prerelease</link>)&#32;&amp;&amp;&#32;version&#32;==&#32;info.versions.recommended;
+00074 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;var&#32;state&#32;=&#32;(isBuiltIn&#32;||&#32;info.version&#32;==&#32;lastCompatible&#32;|| !isCurrent&#32;)&#32;?&#32;<link linkend="_namespace_unity_editor_1_1_package_manager_1_1_u_i_1ab1815eb3e48074893d9dc1dc99a4a32a">PackageState</link>.UpToDate&#32;:&#32;<link linkend="_namespace_unity_editor_1_1_package_manager_1_1_u_i_1ab1815eb3e48074893d9dc1dc99a4a32a">PackageState</link>.Outdated;
+00075 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;
+00076 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;Happens&#32;mostly&#32;when&#32;using&#32;a&#32;package&#32;that&#32;hasn&apos;t&#32;been&#32;in&#32;production&#32;yet.</emphasis>
+00077 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(info.versions.all.Length&#32;&lt;=&#32;0)
+00078 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;state&#32;=&#32;<link linkend="_namespace_unity_editor_1_1_package_manager_1_1_u_i_1ab1815eb3e48074893d9dc1dc99a4a32a">PackageState</link>.UpToDate;
+00079 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;
+00080 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(info.errors.Length&#32;&gt;&#32;0)
+00081 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;state&#32;=&#32;<link linkend="_namespace_unity_editor_1_1_package_manager_1_1_u_i_1ab1815eb3e48074893d9dc1dc99a4a32a">PackageState</link>.Error;
+00082 
+00083 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;var&#32;packageInfo&#32;=&#32;<emphasis role="keyword">new</emphasis>&#32;<link linkend="_class_unity_editor_1_1_package_manager_1_1_u_i_1_1_package_info">PackageInfo</link>
+00084 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00085 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;Name&#32;=&#32;info.name,
+00086 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;DisplayName&#32;=&#32;displayName,
+00087 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;PackageId&#32;=&#32;version&#32;==&#32;info.version&#32;?&#32;info.packageId&#32;:&#32;<emphasis role="keyword">null</emphasis>,
+00088 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;Version&#32;=&#32;version,
+00089 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;Description&#32;=&#32;info.description,
+00090 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;Category&#32;=&#32;info.category,
+00091 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;IsCurrent&#32;=&#32;isVersionCurrent,
+00092 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;IsLatest&#32;=&#32;version&#32;==&#32;lastCompatible,
+00093 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;IsVerified&#32;=&#32;isVerified,
+00094 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;Errors&#32;=&#32;info.errors.ToList(),
+00095 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;Group&#32;=&#32;<link linkend="_class_unity_editor_1_1_package_manager_1_1_u_i_1_1_upm_base_operation_1ac210057da378964fb9b69ddf919909c0">GroupName</link>(info.source),
+00096 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;State&#32;=&#32;state,
+00097 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;Origin&#32;=&#32;isBuiltIn&#32;||&#32;isVersionCurrent&#32;?&#32;info.source&#32;:&#32;PackageSource.Registry,
+00098 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;Author&#32;=&#32;author,
+00099 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;Info&#32;=&#32;info
+00100 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;};
+00101 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;
+00102 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;packages.Add(packageInfo);
+00103 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00104 
+00105 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;packages;
+00106 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00107 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;
+<anchor xml:id="__upm_base_operation_8cs_source_1l00108"/><link linkend="_class_unity_editor_1_1_package_manager_1_1_u_i_1_1_upm_base_operation_1a7d5501ef1cff8562b55b86b29ddd91b9">00108</link> &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keyword">static</emphasis>&#32;<emphasis role="keyword">event</emphasis>&#32;Action&lt;UpmBaseOperation&gt;&#32;<link linkend="_class_unity_editor_1_1_package_manager_1_1_u_i_1_1_upm_base_operation_1a7d5501ef1cff8562b55b86b29ddd91b9">OnOperationStart</link>&#32;=&#32;delegate&#32;{&#32;};
+00109 
+<anchor xml:id="__upm_base_operation_8cs_source_1l00110"/><link linkend="_class_unity_editor_1_1_package_manager_1_1_u_i_1_1_upm_base_operation_1af1ff89f0295369d7a9ae7e0987451b1d">00110</link> &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keyword">event</emphasis>&#32;Action&lt;Error&gt;&#32;<link linkend="_class_unity_editor_1_1_package_manager_1_1_u_i_1_1_upm_base_operation_1af1ff89f0295369d7a9ae7e0987451b1d">OnOperationError</link>&#32;=&#32;delegate&#32;{&#32;};
+<anchor xml:id="__upm_base_operation_8cs_source_1l00111"/><link linkend="_class_unity_editor_1_1_package_manager_1_1_u_i_1_1_upm_base_operation_1a29672fd8715a0084d008dc9ec89f17b3">00111</link> &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keyword">event</emphasis>&#32;Action&#32;<link linkend="_class_unity_editor_1_1_package_manager_1_1_u_i_1_1_upm_base_operation_1a29672fd8715a0084d008dc9ec89f17b3">OnOperationFinalized</link>&#32;=&#32;delegate&#32;{&#32;};
+00112 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;
+<anchor xml:id="__upm_base_operation_8cs_source_1l00113"/><link linkend="_class_unity_editor_1_1_package_manager_1_1_u_i_1_1_upm_base_operation_1a5d5284c292d559bf9d79f612d58a674c">00113</link> &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<link linkend="_class_unity_editor_1_1_package_manager_1_1_u_i_1_1_upm_base_operation_1a116dcc466d587905084e826b47f7e05b">Error</link>&#32;<link linkend="_class_unity_editor_1_1_package_manager_1_1_u_i_1_1_upm_base_operation_1a5d5284c292d559bf9d79f612d58a674c">ForceError</link>&#32;{&#32;<emphasis role="keyword">get</emphasis>;&#32;<emphasis role="keyword">set</emphasis>;&#32;}&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;Allow&#32;external&#32;component&#32;to&#32;force&#32;an&#32;error&#32;on&#32;the&#32;requests&#32;(eg:&#32;testing)</emphasis>
+<anchor xml:id="__upm_base_operation_8cs_source_1l00114"/><link linkend="_class_unity_editor_1_1_package_manager_1_1_u_i_1_1_upm_base_operation_1a116dcc466d587905084e826b47f7e05b">00114</link> &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<link linkend="_class_unity_editor_1_1_package_manager_1_1_u_i_1_1_upm_base_operation_1a116dcc466d587905084e826b47f7e05b">Error</link>&#32;<link linkend="_class_unity_editor_1_1_package_manager_1_1_u_i_1_1_upm_base_operation_1a116dcc466d587905084e826b47f7e05b">Error</link>&#32;{&#32;<emphasis role="keyword">get</emphasis>;&#32;<emphasis role="keyword">protected</emphasis>&#32;<emphasis role="keyword">set</emphasis>;&#32;}&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;Keep&#32;last&#32;error</emphasis>
+00115 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;
+<anchor xml:id="__upm_base_operation_8cs_source_1l00116"/><link linkend="_class_unity_editor_1_1_package_manager_1_1_u_i_1_1_upm_base_operation_1a0541fe1457f933977b2c3c3b13c504af">00116</link> &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keywordtype">bool</emphasis>&#32;<link linkend="_class_unity_editor_1_1_package_manager_1_1_u_i_1_1_upm_base_operation_1a0541fe1457f933977b2c3c3b13c504af">IsCompleted</link>&#32;{&#32;<emphasis role="keyword">get</emphasis>;&#32;<emphasis role="keyword">private</emphasis>&#32;<emphasis role="keyword">set</emphasis>;&#32;}
+00117 
+00118 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">protected</emphasis>&#32;<emphasis role="keyword">abstract</emphasis>&#32;Request&#32;<link linkend="_class_unity_editor_1_1_package_manager_1_1_u_i_1_1_upm_base_operation_1ae4b93c7bf7b6eb994082e78cb146f793">CreateRequest</link>();
+00119 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;
+00120 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;[SerializeField]
+<anchor xml:id="__upm_base_operation_8cs_source_1l00121"/><link linkend="_class_unity_editor_1_1_package_manager_1_1_u_i_1_1_upm_base_operation_1afd2e01e03363616313513a57f74211d8">00121</link> &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">protected</emphasis>&#32;Request&#32;<link linkend="_class_unity_editor_1_1_package_manager_1_1_u_i_1_1_upm_base_operation_1afd2e01e03363616313513a57f74211d8">CurrentRequest</link>;
+<anchor xml:id="__upm_base_operation_8cs_source_1l00122"/><link linkend="_class_unity_editor_1_1_package_manager_1_1_u_i_1_1_upm_base_operation_1aa5c5c1e083dbdc2a6ba63e444d0266ad">00122</link> &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;readonly&#32;<link linkend="_class_unity_editor_1_1_package_manager_1_1_u_i_1_1_threaded_delay">ThreadedDelay</link>&#32;<link linkend="_class_unity_editor_1_1_package_manager_1_1_u_i_1_1_upm_base_operation_1aa5c5c1e083dbdc2a6ba63e444d0266ad">Delay</link>&#32;=&#32;<emphasis role="keyword">new</emphasis>&#32;<link linkend="_class_unity_editor_1_1_package_manager_1_1_u_i_1_1_threaded_delay">ThreadedDelay</link>();
+00123 
+00124 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">protected</emphasis>&#32;<emphasis role="keyword">abstract</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;<link linkend="_class_unity_editor_1_1_package_manager_1_1_u_i_1_1_upm_base_operation_1a5a4730e21b4cea1052e494cc5ca0eb84">ProcessData</link>();
+00125 
+<anchor xml:id="__upm_base_operation_8cs_source_1l00126"/><link linkend="_class_unity_editor_1_1_package_manager_1_1_u_i_1_1_upm_base_operation_1ab1e89a04a3d2d224c3e167fc9d42092d">00126</link> &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">protected</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;<link linkend="_class_unity_editor_1_1_package_manager_1_1_u_i_1_1_upm_base_operation_1ab1e89a04a3d2d224c3e167fc9d42092d">Start</link>()
+00127 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00128 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_unity_editor_1_1_package_manager_1_1_u_i_1_1_upm_base_operation_1a116dcc466d587905084e826b47f7e05b">Error</link>&#32;=&#32;<emphasis role="keyword">null</emphasis>;
+00129 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_unity_editor_1_1_package_manager_1_1_u_i_1_1_upm_base_operation_1a7d5501ef1cff8562b55b86b29ddd91b9">OnOperationStart</link>(<emphasis role="keyword">this</emphasis>);
+00130 
+00131 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_unity_editor_1_1_package_manager_1_1_u_i_1_1_upm_base_operation_1aa5c5c1e083dbdc2a6ba63e444d0266ad">Delay</link>.<link linkend="_class_unity_editor_1_1_package_manager_1_1_u_i_1_1_threaded_delay_1a380a324e01afc8c58f59d7883eac6c66">Start</link>();
+00132 
+00133 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(TryForcedError())
+00134 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>;
+00135 
+00136 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;EditorApplication.update&#32;+=&#32;Progress;
+00137 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00138 
+00139 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;Common&#32;progress&#32;code&#32;for&#32;all&#32;classes</emphasis>
+00140 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;Progress()
+00141 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00142 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(!<link linkend="_class_unity_editor_1_1_package_manager_1_1_u_i_1_1_upm_base_operation_1aa5c5c1e083dbdc2a6ba63e444d0266ad">Delay</link>.<link linkend="_class_unity_editor_1_1_package_manager_1_1_u_i_1_1_threaded_delay_1afdfca2a4da7c8d6df395e77cc85bfc29">IsDone</link>)
+00143 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>;
+00144 
+00145 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;Create&#32;the&#32;request&#32;after&#32;the&#32;delay</emphasis>
+00146 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(<link linkend="_class_unity_editor_1_1_package_manager_1_1_u_i_1_1_upm_base_operation_1afd2e01e03363616313513a57f74211d8">CurrentRequest</link>&#32;==&#32;<emphasis role="keyword">null</emphasis>)
+00147 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00148 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_unity_editor_1_1_package_manager_1_1_u_i_1_1_upm_base_operation_1afd2e01e03363616313513a57f74211d8">CurrentRequest</link>&#32;=&#32;<link linkend="_class_unity_editor_1_1_package_manager_1_1_u_i_1_1_upm_base_operation_1ae4b93c7bf7b6eb994082e78cb146f793">CreateRequest</link>();
+00149 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00150 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;
+00151 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;Since&#32;CurrentRequest&apos;s&#32;error&#32;property&#32;is&#32;private,&#32;we&#32;need&#32;to&#32;simulate</emphasis>
+00152 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;an&#32;error&#32;instead&#32;of&#32;just&#32;setting&#32;it.</emphasis>
+00153 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(TryForcedError())
+00154 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>;
+00155 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;
+00156 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(<link linkend="_class_unity_editor_1_1_package_manager_1_1_u_i_1_1_upm_base_operation_1afd2e01e03363616313513a57f74211d8">CurrentRequest</link>.IsCompleted)
+00157 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00158 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(<link linkend="_class_unity_editor_1_1_package_manager_1_1_u_i_1_1_upm_base_operation_1afd2e01e03363616313513a57f74211d8">CurrentRequest</link>.Status&#32;==&#32;StatusCode.Success)
+00159 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;OnDone();
+00160 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">else</emphasis>&#32;<emphasis role="keywordflow">if</emphasis>&#32;(<link linkend="_class_unity_editor_1_1_package_manager_1_1_u_i_1_1_upm_base_operation_1afd2e01e03363616313513a57f74211d8">CurrentRequest</link>.Status&#32;&gt;=&#32;StatusCode.Failure)
+00161 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;OnError(<link linkend="_class_unity_editor_1_1_package_manager_1_1_u_i_1_1_upm_base_operation_1afd2e01e03363616313513a57f74211d8">CurrentRequest</link>.Error);
+00162 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">else</emphasis>
+00163 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;Debug.LogError(<emphasis role="stringliteral">&quot;Unsupported&#32;progress&#32;state&#32;&quot;</emphasis>&#32;+&#32;<link linkend="_class_unity_editor_1_1_package_manager_1_1_u_i_1_1_upm_base_operation_1afd2e01e03363616313513a57f74211d8">CurrentRequest</link>.Status);
+00164 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00165 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00166 
+00167 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;OnError(<link linkend="_class_unity_editor_1_1_package_manager_1_1_u_i_1_1_upm_base_operation_1a116dcc466d587905084e826b47f7e05b">Error</link>&#32;error)
+00168 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00169 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">try</emphasis>
+00170 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00171 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_unity_editor_1_1_package_manager_1_1_u_i_1_1_upm_base_operation_1a116dcc466d587905084e826b47f7e05b">Error</link>&#32;=&#32;error;
+00172 
+00173 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;var&#32;message&#32;=&#32;<emphasis role="stringliteral">&quot;Cannot&#32;perform&#32;upm&#32;operation.&quot;</emphasis>;
+00174 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(error&#32;!=&#32;<emphasis role="keyword">null</emphasis>)
+00175 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;message&#32;=&#32;<emphasis role="stringliteral">&quot;Cannot&#32;perform&#32;upm&#32;operation:&#32;&quot;</emphasis>&#32;+&#32;<link linkend="_class_unity_editor_1_1_package_manager_1_1_u_i_1_1_upm_base_operation_1a116dcc466d587905084e826b47f7e05b">Error</link>.message&#32;+&#32;<emphasis role="stringliteral">&quot;&#32;[&quot;</emphasis>&#32;+&#32;<link linkend="_class_unity_editor_1_1_package_manager_1_1_u_i_1_1_upm_base_operation_1a116dcc466d587905084e826b47f7e05b">Error</link>.errorCode&#32;+&#32;<emphasis role="stringliteral">&quot;]&quot;</emphasis>;
+00176 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;
+00177 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;Debug.LogError(message);
+00178 
+00179 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_unity_editor_1_1_package_manager_1_1_u_i_1_1_upm_base_operation_1af1ff89f0295369d7a9ae7e0987451b1d">OnOperationError</link>(<link linkend="_class_unity_editor_1_1_package_manager_1_1_u_i_1_1_upm_base_operation_1a116dcc466d587905084e826b47f7e05b">Error</link>);
+00180 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00181 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">catch</emphasis>&#32;(Exception&#32;exception)
+00182 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00183 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;Debug.LogError(<emphasis role="stringliteral">&quot;Package&#32;Manager&#32;Window&#32;had&#32;an&#32;error&#32;while&#32;reporting&#32;an&#32;error&#32;in&#32;an&#32;operation:&#32;&quot;</emphasis>&#32;+&#32;exception);&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;
+00184 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00185 
+00186 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;FinalizeOperation();
+00187 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00188 
+00189 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;OnDone()
+00190 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00191 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">try</emphasis>
+00192 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00193 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_unity_editor_1_1_package_manager_1_1_u_i_1_1_upm_base_operation_1a5a4730e21b4cea1052e494cc5ca0eb84">ProcessData</link>();
+00194 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00195 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">catch</emphasis>&#32;(Exception&#32;error)
+00196 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00197 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;Debug.LogError(<emphasis role="stringliteral">&quot;Package&#32;Manager&#32;Window&#32;had&#32;an&#32;error&#32;while&#32;completing&#32;an&#32;operation:&#32;&quot;</emphasis>&#32;+&#32;error);
+00198 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00199 
+00200 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;FinalizeOperation();
+00201 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00202 
+00203 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;FinalizeOperation()
+00204 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00205 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;EditorApplication.update&#32;-=&#32;Progress;
+00206 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_unity_editor_1_1_package_manager_1_1_u_i_1_1_upm_base_operation_1a29672fd8715a0084d008dc9ec89f17b3">OnOperationFinalized</link>();
+00207 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_unity_editor_1_1_package_manager_1_1_u_i_1_1_upm_base_operation_1a0541fe1457f933977b2c3c3b13c504af">IsCompleted</link>&#32;=&#32;<emphasis role="keyword">true</emphasis>;
+00208 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00209 
+<anchor xml:id="__upm_base_operation_8cs_source_1l00210"/><link linkend="_class_unity_editor_1_1_package_manager_1_1_u_i_1_1_upm_base_operation_1a4e52e6586c22b12c9b25f905f6fd2a25">00210</link> &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;<link linkend="_class_unity_editor_1_1_package_manager_1_1_u_i_1_1_upm_base_operation_1a4e52e6586c22b12c9b25f905f6fd2a25">Cancel</link>()
+00211 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00212 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;EditorApplication.update&#32;-=&#32;Progress;
+00213 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_unity_editor_1_1_package_manager_1_1_u_i_1_1_upm_base_operation_1af1ff89f0295369d7a9ae7e0987451b1d">OnOperationError</link>&#32;=&#32;delegate&#32;{&#32;};
+00214 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_unity_editor_1_1_package_manager_1_1_u_i_1_1_upm_base_operation_1a29672fd8715a0084d008dc9ec89f17b3">OnOperationFinalized</link>&#32;=&#32;delegate&#32;{&#32;};
+00215 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_unity_editor_1_1_package_manager_1_1_u_i_1_1_upm_base_operation_1a0541fe1457f933977b2c3c3b13c504af">IsCompleted</link>&#32;=&#32;<emphasis role="keyword">true</emphasis>;
+00216 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00217 
+00218 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;<emphasis role="keywordtype">bool</emphasis>&#32;TryForcedError()
+00219 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00220 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(<link linkend="_class_unity_editor_1_1_package_manager_1_1_u_i_1_1_upm_base_operation_1a5d5284c292d559bf9d79f612d58a674c">ForceError</link>&#32;!=&#32;<emphasis role="keyword">null</emphasis>)
+00221 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00222 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;OnError(<link linkend="_class_unity_editor_1_1_package_manager_1_1_u_i_1_1_upm_base_operation_1a5d5284c292d559bf9d79f612d58a674c">ForceError</link>);
+00223 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;<emphasis role="keyword">true</emphasis>;
+00224 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00225 
+00226 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;<emphasis role="keyword">false</emphasis>;
+00227 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00228 &#32;&#32;&#32;&#32;}
+00229 }
+</programlisting></section>

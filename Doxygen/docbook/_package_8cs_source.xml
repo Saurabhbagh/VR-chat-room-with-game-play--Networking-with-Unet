@@ -1,0 +1,227 @@
+<?xml version='1.0' encoding='UTF-8' standalone='no'?>
+<section xmlns="http://docbook.org/ns/docbook" version="5.0" xmlns:xlink="http://www.w3.org/1999/xlink" xml:id="__package_8cs_source">
+<title>Package.cs</title>
+<indexterm><primary>O:/GitHUBMINIPRoject/Library/PackageCache/com.unity.package-manager-ui@2.0.7/Editor/Sources/Services/Packages/Package.cs</primary></indexterm>
+<programlisting>00001 <emphasis role="keyword">using</emphasis>&#32;System;
+00002 <emphasis role="keyword">using</emphasis>&#32;System.Collections.Generic;
+00003 <emphasis role="keyword">using</emphasis>&#32;System.IO;
+00004 <emphasis role="keyword">using</emphasis>&#32;System.Linq;
+00005 <emphasis role="keyword">using</emphasis>&#32;<link linkend="__balloon_8cs_1a7d67e097df9376eb709b6a23aa3c7d23">UnityEngine</link>;
+00006 
+00007 <emphasis role="keyword">namespace&#32;</emphasis><link linkend="_namespace_unity_editor_1_1_package_manager_1_1_u_i">UnityEditor.PackageManager.UI</link>
+00008 {&#32;&#32;&#32;&#32;
+00009 &#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;History&#32;of&#32;a&#32;single&#32;package</emphasis>
+<anchor xml:id="__package_8cs_source_1l00010"/><link linkend="_class_unity_editor_1_1_package_manager_1_1_u_i_1_1_package">00010</link> &#32;&#32;&#32;&#32;<emphasis role="keyword">internal</emphasis>&#32;<emphasis role="keyword">class&#32;</emphasis><link linkend="_class_unity_editor_1_1_package_manager_1_1_u_i_1_1_package">Package</link>&#32;:&#32;IEquatable&lt;Package&gt;
+00011 &#32;&#32;&#32;&#32;{
+00012 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">static</emphasis>&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keywordtype">bool</emphasis>&#32;<link linkend="_class_unity_editor_1_1_package_manager_1_1_u_i_1_1_package_1ab997af9e3e2f5d8dbeb5c8cff8d4bec9">ShouldProposeLatestVersions</link>
+<anchor xml:id="__package_8cs_source_1l00013"/><link linkend="_class_unity_editor_1_1_package_manager_1_1_u_i_1_1_package_1ab997af9e3e2f5d8dbeb5c8cff8d4bec9">00013</link> &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00014 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">get</emphasis>
+00015 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00016 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;Until&#32;we&#32;figure&#32;out&#32;a&#32;way&#32;to&#32;test&#32;this&#32;properly,&#32;alway&#32;show&#32;standard&#32;behavior</emphasis>
+00017 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;&#32;&#32;&#32;return&#32;InternalEditorUtility.IsUnityBeta()&#32;&amp;&amp;&#32;!Unsupported.IsDeveloperMode();</emphasis>
+00018 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;<emphasis role="keyword">false</emphasis>;
+00019 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00020 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00021 
+00022 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;There&#32;can&#32;only&#32;be&#32;one&#32;package&#32;add/remove&#32;operation.</emphasis>
+00023 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;<emphasis role="keyword">static</emphasis>&#32;<link linkend="_interface_unity_editor_1_1_package_manager_1_1_u_i_1_1_i_base_operation">IBaseOperation</link>&#32;addRemoveOperationInstance;
+00024 
+00025 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keyword">static</emphasis>&#32;<emphasis role="keywordtype">bool</emphasis>&#32;<link linkend="_class_unity_editor_1_1_package_manager_1_1_u_i_1_1_package_1a4b61acd81bacd398c6022e75cf33811a">AddRemoveOperationInProgress</link>
+<anchor xml:id="__package_8cs_source_1l00026"/><link linkend="_class_unity_editor_1_1_package_manager_1_1_u_i_1_1_package_1a4b61acd81bacd398c6022e75cf33811a">00026</link> &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00027 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">get</emphasis>&#32;{&#32;<emphasis role="keywordflow">return</emphasis>&#32;addRemoveOperationInstance&#32;!=&#32;<emphasis role="keyword">null</emphasis>&#32;&amp;&amp;&#32;!addRemoveOperationInstance.<link linkend="_interface_unity_editor_1_1_package_manager_1_1_u_i_1_1_i_base_operation_1afd5cd3a0d72355105f5ba5e6ad373d1a">IsCompleted</link>;&#32;}
+00028 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00029 
+00030 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">internal</emphasis>&#32;<emphasis role="keyword">const</emphasis>&#32;<emphasis role="keywordtype">string</emphasis>&#32;packageManagerUIName&#32;=&#32;<emphasis role="stringliteral">&quot;com.unity.package-manager-ui&quot;</emphasis>;
+00031 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;readonly&#32;<emphasis role="keywordtype">string</emphasis>&#32;packageName;
+00032 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;IEnumerable&lt;PackageInfo&gt;&#32;source;
+00033 
+00034 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">internal</emphasis>&#32;<link linkend="_class_unity_editor_1_1_package_manager_1_1_u_i_1_1_package">Package</link>(<emphasis role="keywordtype">string</emphasis>&#32;packageName,&#32;IEnumerable&lt;PackageInfo&gt;&#32;infos)
+00035 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00036 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(<emphasis role="keywordtype">string</emphasis>.IsNullOrEmpty(packageName))
+00037 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">throw</emphasis>&#32;<emphasis role="keyword">new</emphasis>&#32;ArgumentException(<emphasis role="stringliteral">&quot;Cannot&#32;be&#32;empty&#32;or&#32;null&quot;</emphasis>,&#32;<emphasis role="stringliteral">&quot;packageName&quot;</emphasis>);
+00038 
+00039 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(!infos.Any())
+00040 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">throw</emphasis>&#32;<emphasis role="keyword">new</emphasis>&#32;ArgumentException(<emphasis role="stringliteral">&quot;Cannot&#32;be&#32;empty&quot;</emphasis>,&#32;<emphasis role="stringliteral">&quot;infos&quot;</emphasis>);
+00041 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;
+00042 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;this.packageName&#32;=&#32;packageName;
+00043 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;UpdateSource(infos);
+00044 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00045 
+00046 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">internal</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;UpdateSource(IEnumerable&lt;PackageInfo&gt;&#32;source)
+00047 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00048 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;this.source&#32;=&#32;source;
+00049 <emphasis role="preprocessor">#if&#32;UNITY_2018_3_OR_NEWER</emphasis>
+00050 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(<link linkend="_class_unity_editor_1_1_package_manager_1_1_u_i_1_1_package_1ab837ed795bd116a8f53fb33928a86c5b">IsPackageManagerUI</link>)
+00051 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;this.source&#32;=&#32;this.source.Where(p&#32;=&gt;&#32;p&#32;!=&#32;<emphasis role="keyword">null</emphasis>&#32;&amp;&amp;&#32;p.Version.Major&#32;&gt;=&#32;2);
+00052 <emphasis role="preprocessor">#endif</emphasis>
+00053 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00054 
+<anchor xml:id="__package_8cs_source_1l00055"/><link linkend="_class_unity_editor_1_1_package_manager_1_1_u_i_1_1_package_1ac9a3a0581e85149b7e0a614b9f3de3f6">00055</link> &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<link linkend="_class_unity_editor_1_1_package_manager_1_1_u_i_1_1_package_info">PackageInfo</link>&#32;<link linkend="_class_unity_editor_1_1_package_manager_1_1_u_i_1_1_package_1ac9a3a0581e85149b7e0a614b9f3de3f6">Current</link>&#32;{&#32;<emphasis role="keyword">get</emphasis>&#32;{&#32;<emphasis role="keywordflow">return</emphasis>&#32;Versions.FirstOrDefault(package&#32;=&gt;&#32;package.IsCurrent);&#32;}&#32;}
+00056 
+00057 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;This&#32;is&#32;the&#32;latest&#32;verified&#32;or&#32;official&#32;release&#32;(eg:&#32;1.3.2).&#32;Not&#32;necessarily&#32;the&#32;latest&#32;verified&#32;release&#32;(eg:&#32;1.2.4)&#32;or&#32;that&#32;latest&#32;candidate&#32;(eg:&#32;1.4.0-beta)</emphasis>
+00058 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<link linkend="_class_unity_editor_1_1_package_manager_1_1_u_i_1_1_package_info">PackageInfo</link>&#32;<link linkend="_class_unity_editor_1_1_package_manager_1_1_u_i_1_1_package_1a0a16f0854f348cea456abe0983590de3">LatestUpdate</link>
+<anchor xml:id="__package_8cs_source_1l00059"/><link linkend="_class_unity_editor_1_1_package_manager_1_1_u_i_1_1_package_1a0a16f0854f348cea456abe0983590de3">00059</link> &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00060 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">get</emphasis>
+00061 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00062 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;We&#32;want&#32;to&#32;show&#32;the&#32;absolute&#32;latest&#32;when&#32;in&#32;beta&#32;mode</emphasis>
+00063 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(<link linkend="_class_unity_editor_1_1_package_manager_1_1_u_i_1_1_package_1ab997af9e3e2f5d8dbeb5c8cff8d4bec9">ShouldProposeLatestVersions</link>)
+00064 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;Latest;
+00065 
+00066 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;Override&#32;with&#32;current&#32;when&#32;it&apos;s&#32;version&#32;locked</emphasis>
+00067 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;var&#32;current&#32;=&#32;<link linkend="_class_unity_editor_1_1_package_manager_1_1_u_i_1_1_package_1ac9a3a0581e85149b7e0a614b9f3de3f6">Current</link>;
+00068 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(current&#32;!=&#32;<emphasis role="keyword">null</emphasis>&#32;&amp;&amp;&#32;current.IsVersionLocked)
+00069 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;current;
+00070 
+00071 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;Get&#32;all&#32;the&#32;candidates&#32;versions&#32;(verified,&#32;release,&#32;preview)&#32;that&#32;are&#32;newer&#32;than&#32;current</emphasis>
+00072 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;var&#32;<link linkend="_namespace_unity_editor_1_1_package_manager_1_1_u_i_1afd939208534e3c178925b2f726ab9efea723aa82a83c278d5e7e7be9b109b406a">verified</link>&#32;=&#32;Verified;
+00073 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;var&#32;latestRelease&#32;=&#32;LatestRelease;
+00074 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;var&#32;latestPreview&#32;=&#32;Versions.LastOrDefault(package&#32;=&gt;&#32;package.IsPreview);
+00075 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;var&#32;candidates&#32;=&#32;<emphasis role="keyword">new</emphasis>&#32;List&lt;PackageInfo&gt;
+00076 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00077 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_namespace_unity_editor_1_1_package_manager_1_1_u_i_1afd939208534e3c178925b2f726ab9efea723aa82a83c278d5e7e7be9b109b406a">verified</link>,
+00078 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;latestRelease,
+00079 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;latestPreview,
+00080 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}.Where(package&#32;=&gt;&#32;package&#32;!=&#32;<emphasis role="keyword">null</emphasis>&#32;&amp;&amp;&#32;(current&#32;==&#32;<emphasis role="keyword">null</emphasis>&#32;||&#32;current&#32;==&#32;package&#32;||&#32;current.Version&#32;&lt;&#32;package.Version)).ToList();
+00081 
+00082 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(candidates.Contains(<link linkend="_namespace_unity_editor_1_1_package_manager_1_1_u_i_1afd939208534e3c178925b2f726ab9efea723aa82a83c278d5e7e7be9b109b406a">verified</link>))
+00083 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;<link linkend="_namespace_unity_editor_1_1_package_manager_1_1_u_i_1afd939208534e3c178925b2f726ab9efea723aa82a83c278d5e7e7be9b109b406a">verified</link>;
+00084 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;((current&#32;==&#32;<emphasis role="keyword">null</emphasis>&#32;||&#32;!current.IsVerified&#32;)&#32;&amp;&amp;&#32;candidates.Contains(latestRelease))
+00085 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;latestRelease;
+00086 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;((current&#32;==&#32;<emphasis role="keyword">null</emphasis>&#32;||&#32;current.IsPreview)&#32;&amp;&amp;&#32;candidates.Contains(latestPreview))
+00087 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;latestPreview;
+00088 
+00089 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;Show&#32;current&#32;if&#32;it&#32;exists,&#32;otherwise&#32;latest&#32;user&#32;visible,&#32;and&#32;then&#32;otherwise&#32;show&#32;the&#32;absolute&#32;latest</emphasis>
+00090 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;current&#32;??&#32;Latest;
+00091 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00092 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00093 
+00094 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<link linkend="_class_unity_editor_1_1_package_manager_1_1_u_i_1_1_package_info">PackageInfo</link>&#32;<link linkend="_class_unity_editor_1_1_package_manager_1_1_u_i_1_1_package_1abe3e3394cd7310123c5b4b885740d274">LatestPatch</link>
+<anchor xml:id="__package_8cs_source_1l00095"/><link linkend="_class_unity_editor_1_1_package_manager_1_1_u_i_1_1_package_1abe3e3394cd7310123c5b4b885740d274">00095</link> &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00096 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">get</emphasis>
+00097 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00098 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(<link linkend="_class_unity_editor_1_1_package_manager_1_1_u_i_1_1_package_1ac9a3a0581e85149b7e0a614b9f3de3f6">Current</link>&#32;==&#32;<emphasis role="keyword">null</emphasis>)
+00099 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;<emphasis role="keyword">null</emphasis>;
+00100 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;
+00101 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;Get&#32;all&#32;version&#32;that&#32;have&#32;the&#32;same&#32;Major/Minor</emphasis>
+00102 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;var&#32;versions&#32;=&#32;Versions.Where(package&#32;=&gt;&#32;package.Version.Major&#32;==&#32;<link linkend="_class_unity_editor_1_1_package_manager_1_1_u_i_1_1_package_1ac9a3a0581e85149b7e0a614b9f3de3f6">Current</link>.<link linkend="_class_unity_editor_1_1_package_manager_1_1_u_i_1_1_package_info_1ad1fa218396015cbbc2bb750eae1992ae">Version</link>.Major&#32;&amp;&amp;&#32;package.Version.Minor&#32;==&#32;<link linkend="_class_unity_editor_1_1_package_manager_1_1_u_i_1_1_package_1ac9a3a0581e85149b7e0a614b9f3de3f6">Current</link>.<link linkend="_class_unity_editor_1_1_package_manager_1_1_u_i_1_1_package_info_1ad1fa218396015cbbc2bb750eae1992ae">Version</link>.Minor);
+00103 
+00104 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;versions.LastOrDefault();
+00105 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00106 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00107 
+00108 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;This&#32;is&#32;the&#32;very&#32;latest&#32;version,&#32;including&#32;pre-releases&#32;(eg:&#32;1.4.0-beta).</emphasis>
+00109 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">internal</emphasis>&#32;<link linkend="_class_unity_editor_1_1_package_manager_1_1_u_i_1_1_package_info">PackageInfo</link>&#32;Latest&#32;{&#32;<emphasis role="keyword">get</emphasis>&#32;{&#32;<emphasis role="keywordflow">return</emphasis>&#32;Versions.FirstOrDefault(package&#32;=&gt;&#32;package.IsLatest)&#32;??&#32;Versions.LastOrDefault();&#32;}&#32;}
+00110 
+00111 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;Returns&#32;the&#32;current&#32;version&#32;if&#32;it&#32;exist,&#32;otherwise&#32;returns&#32;the&#32;latest&#32;user&#32;visible&#32;version.</emphasis>
+00112 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">internal</emphasis>&#32;PackageInfo&#32;VersionToDisplay&#32;{&#32;<emphasis role="keyword">get</emphasis>&#32;{&#32;<emphasis role="keywordflow">return</emphasis>&#32;<link linkend="_class_unity_editor_1_1_package_manager_1_1_u_i_1_1_package_1ac9a3a0581e85149b7e0a614b9f3de3f6">Current</link>&#32;??&#32;<link linkend="_class_unity_editor_1_1_package_manager_1_1_u_i_1_1_package_1a0a16f0854f348cea456abe0983590de3">LatestUpdate</link>;&#32;}&#32;}
+00113 
+00114 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;Every&#32;version&#32;available&#32;for&#32;this&#32;package</emphasis>
+00115 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">internal</emphasis>&#32;IEnumerable&lt;PackageInfo&gt;&#32;Versions&#32;{&#32;<emphasis role="keyword">get</emphasis>&#32;{&#32;<emphasis role="keywordflow">return</emphasis>&#32;source.OrderBy(package&#32;=&gt;&#32;package.Version);&#32;}&#32;}
+00116 
+00117 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;Every&#32;version&#32;that&apos;s&#32;not&#32;a&#32;pre-release&#32;(eg:&#32;not&#32;beta/alpha/preview).</emphasis>
+00118 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">internal</emphasis>&#32;IEnumerable&lt;PackageInfo&gt;&#32;ReleaseVersions
+00119 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00120 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">get</emphasis>&#32;{&#32;<emphasis role="keywordflow">return</emphasis>&#32;Versions.Where(package&#32;=&gt;&#32;!package.IsPreRelease);&#32;}
+00121 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00122 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;
+00123 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">internal</emphasis>&#32;PackageInfo&#32;LatestRelease&#32;{&#32;<emphasis role="keyword">get</emphasis>&#32;{<emphasis role="keywordflow">return</emphasis>&#32;ReleaseVersions.LastOrDefault();}}
+00124 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">internal</emphasis>&#32;PackageInfo&#32;Verified&#32;{&#32;<emphasis role="keyword">get</emphasis>&#32;{<emphasis role="keywordflow">return</emphasis>&#32;Versions.FirstOrDefault(package&#32;=&gt;&#32;package.IsVerified);}}
+00125 
+00126 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">internal</emphasis>&#32;<emphasis role="keywordtype">bool</emphasis>&#32;IsAfterCurrentVersion(PackageInfo&#32;packageInfo)&#32;{&#32;<emphasis role="keywordflow">return</emphasis>&#32;<link linkend="_class_unity_editor_1_1_package_manager_1_1_u_i_1_1_package_1ac9a3a0581e85149b7e0a614b9f3de3f6">Current</link>&#32;==&#32;<emphasis role="keyword">null</emphasis>&#32;||&#32;(packageInfo&#32;!=&#32;<emphasis role="keyword">null</emphasis>&#32;&#32;&amp;&amp;&#32;packageInfo.Version&#32;&gt;&#32;<link linkend="_class_unity_editor_1_1_package_manager_1_1_u_i_1_1_package_1ac9a3a0581e85149b7e0a614b9f3de3f6">Current</link>.<link linkend="_class_unity_editor_1_1_package_manager_1_1_u_i_1_1_package_info_1ad1fa218396015cbbc2bb750eae1992ae">Version</link>);&#32;}
+00127 
+00128 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">internal</emphasis>&#32;<emphasis role="keywordtype">bool</emphasis>&#32;IsBuiltIn&#32;{<emphasis role="keyword">get</emphasis>&#32;{&#32;<emphasis role="keywordflow">return</emphasis>&#32;Versions.Any()&#32;&amp;&amp;&#32;Versions.First().IsBuiltIn;&#32;}}
+00129 
+<anchor xml:id="__package_8cs_source_1l00130"/><link linkend="_class_unity_editor_1_1_package_manager_1_1_u_i_1_1_package_1a1044e19763ce3d709ee4547b975a1472">00130</link> &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keywordtype">string</emphasis>&#32;<link linkend="_class_unity_editor_1_1_package_manager_1_1_u_i_1_1_package_1a1044e19763ce3d709ee4547b975a1472">Name</link>&#32;{&#32;<emphasis role="keyword">get</emphasis>&#32;{&#32;<emphasis role="keywordflow">return</emphasis>&#32;packageName;&#32;}&#32;}
+00131 
+00132 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keywordtype">bool</emphasis>&#32;<link linkend="_class_unity_editor_1_1_package_manager_1_1_u_i_1_1_package_1ab837ed795bd116a8f53fb33928a86c5b">IsPackageManagerUI</link>
+<anchor xml:id="__package_8cs_source_1l00133"/><link linkend="_class_unity_editor_1_1_package_manager_1_1_u_i_1_1_package_1ab837ed795bd116a8f53fb33928a86c5b">00133</link> &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00134 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">get</emphasis>&#32;{&#32;<emphasis role="keywordflow">return</emphasis>&#32;<link linkend="_class_unity_editor_1_1_package_manager_1_1_u_i_1_1_package_1a1044e19763ce3d709ee4547b975a1472">Name</link>&#32;==&#32;packageManagerUIName;&#32;}
+00135 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00136 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;
+<anchor xml:id="__package_8cs_source_1l00137"/><link linkend="_class_unity_editor_1_1_package_manager_1_1_u_i_1_1_package_1ab39056f1dd2aa0783f6de3f9bd42e5cc">00137</link> &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keywordtype">bool</emphasis>&#32;<link linkend="_class_unity_editor_1_1_package_manager_1_1_u_i_1_1_package_1ab39056f1dd2aa0783f6de3f9bd42e5cc">Equals</link>(<link linkend="_class_unity_editor_1_1_package_manager_1_1_u_i_1_1_package">Package</link>&#32;other)
+00138 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00139 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(other&#32;==&#32;<emphasis role="keyword">null</emphasis>)&#32;
+00140 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;<emphasis role="keyword">false</emphasis>;
+00141 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;
+00142 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;packageName&#32;==&#32;other.packageName;
+00143 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00144 
+<anchor xml:id="__package_8cs_source_1l00145"/><link linkend="_class_unity_editor_1_1_package_manager_1_1_u_i_1_1_package_1a595f5f2201a65d9c83dc1f86b7b230fd">00145</link> &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keyword">override</emphasis>&#32;<emphasis role="keywordtype">int</emphasis>&#32;<link linkend="_class_unity_editor_1_1_package_manager_1_1_u_i_1_1_package_1a595f5f2201a65d9c83dc1f86b7b230fd">GetHashCode</link>()
+00146 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00147 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;packageName.GetHashCode();
+00148 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00149 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;
+00150 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;[SerializeField]
+00151 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">internal</emphasis>&#32;readonly&#32;<link linkend="_class_unity_editor_1_1_package_manager_1_1_u_i_1_1_operation_signal">OperationSignal&lt;IAddOperation&gt;</link>&#32;AddSignal&#32;=&#32;<emphasis role="keyword">new</emphasis>&#32;<link linkend="_class_unity_editor_1_1_package_manager_1_1_u_i_1_1_operation_signal">OperationSignal&lt;IAddOperation&gt;</link>();
+00152 
+00153 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;Action&#32;OnAddOperationFinalizedEvent;
+00154 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;
+00155 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">internal</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;Add(<link linkend="_class_unity_editor_1_1_package_manager_1_1_u_i_1_1_package_info">PackageInfo</link>&#32;packageInfo)
+00156 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00157 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(packageInfo&#32;==&#32;<link linkend="_class_unity_editor_1_1_package_manager_1_1_u_i_1_1_package_1ac9a3a0581e85149b7e0a614b9f3de3f6">Current</link>&#32;||&#32;<link linkend="_class_unity_editor_1_1_package_manager_1_1_u_i_1_1_package_1a4b61acd81bacd398c6022e75cf33811a">AddRemoveOperationInProgress</link>)
+00158 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>;
+00159 
+00160 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;var&#32;operation&#32;=&#32;OperationFactory.Instance.CreateAddOperation();
+00161 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;addRemoveOperationInstance&#32;=&#32;operation;
+00162 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;OnAddOperationFinalizedEvent&#32;=&#32;()&#32;=&gt;
+00163 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00164 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;AddSignal.Operation&#32;=&#32;<emphasis role="keyword">null</emphasis>;
+00165 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;operation.<link linkend="_interface_unity_editor_1_1_package_manager_1_1_u_i_1_1_i_base_operation_1a06c7f83f9ae4c86c58022b867d670e60">OnOperationFinalized</link>&#32;-=&#32;OnAddOperationFinalizedEvent;
+00166 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_unity_editor_1_1_package_manager_1_1_u_i_1_1_package_collection">PackageCollection</link>.<link linkend="_class_unity_editor_1_1_package_manager_1_1_u_i_1_1_package_collection_1a75a698a6c798e48fbddf0e7edbf6db71">Instance</link>.FetchListOfflineCache(<emphasis role="keyword">true</emphasis>);
+00167 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;};
+00168 
+00169 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;operation.OnOperationFinalized&#32;+=&#32;OnAddOperationFinalizedEvent;
+00170 
+00171 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;AddSignal.SetOperation(operation);
+00172 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;operation.AddPackageAsync(packageInfo);
+00173 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00174 
+00175 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">internal</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;Update()
+00176 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00177 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;Add(Latest);
+00178 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00179 
+00180 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">internal</emphasis>&#32;<emphasis role="keyword">static</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;AddFromLocalDisk(<emphasis role="keywordtype">string</emphasis>&#32;path)
+00181 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00182 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(<link linkend="_class_unity_editor_1_1_package_manager_1_1_u_i_1_1_package_1a4b61acd81bacd398c6022e75cf33811a">AddRemoveOperationInProgress</link>)
+00183 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>;
+00184 
+00185 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;var&#32;packageJson&#32;=&#32;PackageJsonHelper.Load(path);
+00186 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(<emphasis role="keyword">null</emphasis>&#32;==&#32;packageJson)
+00187 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00188 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;Debug.LogError(<emphasis role="keywordtype">string</emphasis>.Format(<emphasis role="stringliteral">&quot;Invalid&#32;package&#32;path:&#32;cannot&#32;find&#32;\&quot;{0}\&quot;.&quot;</emphasis>,&#32;path));
+00189 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>;
+00190 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00191 
+00192 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;var&#32;operation&#32;=&#32;OperationFactory.Instance.CreateAddOperation();
+00193 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;addRemoveOperationInstance&#32;=&#32;operation;
+00194 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;operation.AddPackageAsync(packageJson.PackageInfo);
+00195 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00196 
+00197 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;[SerializeField]
+00198 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">internal</emphasis>&#32;readonly&#32;OperationSignal&lt;IRemoveOperation&gt;&#32;RemoveSignal&#32;=&#32;<emphasis role="keyword">new</emphasis>&#32;OperationSignal&lt;IRemoveOperation&gt;();
+00199 
+00200 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;Action&#32;OnRemoveOperationFinalizedEvent;
+00201 
+<anchor xml:id="__package_8cs_source_1l00202"/><link linkend="_class_unity_editor_1_1_package_manager_1_1_u_i_1_1_package_1aab70b50e6866314537b5c0a0edfd60ec">00202</link> &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;<link linkend="_class_unity_editor_1_1_package_manager_1_1_u_i_1_1_package_1aab70b50e6866314537b5c0a0edfd60ec">Remove</link>()
+00203 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00204 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(<link linkend="_class_unity_editor_1_1_package_manager_1_1_u_i_1_1_package_1ac9a3a0581e85149b7e0a614b9f3de3f6">Current</link>&#32;==&#32;<emphasis role="keyword">null</emphasis>&#32;||&#32;<link linkend="_class_unity_editor_1_1_package_manager_1_1_u_i_1_1_package_1a4b61acd81bacd398c6022e75cf33811a">AddRemoveOperationInProgress</link>)
+00205 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>;
+00206 
+00207 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;var&#32;operation&#32;=&#32;OperationFactory.Instance.CreateRemoveOperation();
+00208 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;addRemoveOperationInstance&#32;=&#32;operation;
+00209 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;OnRemoveOperationFinalizedEvent&#32;=&#32;()&#32;=&gt;
+00210 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00211 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;RemoveSignal.Operation&#32;=&#32;<emphasis role="keyword">null</emphasis>;
+00212 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;operation.<link linkend="_interface_unity_editor_1_1_package_manager_1_1_u_i_1_1_i_base_operation_1a06c7f83f9ae4c86c58022b867d670e60">OnOperationFinalized</link>&#32;-=&#32;OnRemoveOperationFinalizedEvent;
+00213 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_unity_editor_1_1_package_manager_1_1_u_i_1_1_package_collection">PackageCollection</link>.<link linkend="_class_unity_editor_1_1_package_manager_1_1_u_i_1_1_package_collection_1a75a698a6c798e48fbddf0e7edbf6db71">Instance</link>.FetchListOfflineCache(<emphasis role="keyword">true</emphasis>);
+00214 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;};
+00215 
+00216 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;operation.OnOperationFinalized&#32;+=&#32;OnRemoveOperationFinalizedEvent;
+00217 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;RemoveSignal.SetOperation(operation);
+00218 
+00219 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;operation.RemovePackageAsync(<link linkend="_class_unity_editor_1_1_package_manager_1_1_u_i_1_1_package_1ac9a3a0581e85149b7e0a614b9f3de3f6">Current</link>);
+00220 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00221 &#32;&#32;&#32;&#32;}
+00222 }
+</programlisting></section>

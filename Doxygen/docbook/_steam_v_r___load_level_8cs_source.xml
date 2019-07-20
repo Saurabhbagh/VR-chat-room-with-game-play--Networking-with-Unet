@@ -1,0 +1,507 @@
+<?xml version='1.0' encoding='UTF-8' standalone='no'?>
+<section xmlns="http://docbook.org/ns/docbook" version="5.0" xmlns:xlink="http://www.w3.org/1999/xlink" xml:id="__steam_v_r___load_level_8cs_source">
+<title>SteamVR_LoadLevel.cs</title>
+<indexterm><primary>O:/GitHUBMINIPRoject/Assets/SteamVR/Scripts/SteamVR_LoadLevel.cs</primary></indexterm>
+<programlisting>00001 <emphasis role="comment">//=======&#32;Copyright&#32;(c)&#32;Valve&#32;Corporation,&#32;All&#32;rights&#32;reserved.&#32;===============</emphasis>
+00002 <emphasis role="comment">//</emphasis>
+00003 <emphasis role="comment">//&#32;Purpose:&#32;Helper&#32;for&#32;smoothing&#32;over&#32;transitions&#32;between&#32;levels.</emphasis>
+00004 <emphasis role="comment">//</emphasis>
+00005 <emphasis role="comment">//=============================================================================</emphasis>
+00006 
+00007 <emphasis role="keyword">using</emphasis>&#32;<link linkend="__balloon_8cs_1a7d67e097df9376eb709b6a23aa3c7d23">UnityEngine</link>;
+00008 <emphasis role="keyword">using</emphasis>&#32;System.Collections;
+00009 <emphasis role="keyword">using</emphasis>&#32;<link linkend="_namespace_valve">Valve</link>.<link linkend="_namespace_valve_1_1_v_r">VR</link>;
+00010 <emphasis role="keyword">using</emphasis>&#32;System.IO;
+00011 
+00012 <emphasis role="keyword">namespace&#32;</emphasis><link linkend="_namespace_valve_1_1_v_r">Valve.VR</link>
+00013 {
+<anchor xml:id="__steam_v_r___load_level_8cs_source_1l00014"/><link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___load_level">00014</link> &#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keyword">class&#32;</emphasis><link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___load_level">SteamVR_LoadLevel</link>&#32;:&#32;MonoBehaviour
+00015 &#32;&#32;&#32;&#32;{
+00016 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;<emphasis role="keyword">static</emphasis>&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___load_level">SteamVR_LoadLevel</link>&#32;_active&#32;=&#32;<emphasis role="keyword">null</emphasis>;
+<anchor xml:id="__steam_v_r___load_level_8cs_source_1l00017"/><link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___load_level_1ac26d25e9953dc093823c8b2b17ab8512">00017</link> &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keyword">static</emphasis>&#32;<emphasis role="keywordtype">bool</emphasis>&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___load_level_1ac26d25e9953dc093823c8b2b17ab8512">loading</link>&#32;{&#32;<emphasis role="keyword">get</emphasis>&#32;{&#32;<emphasis role="keywordflow">return</emphasis>&#32;_active&#32;!=&#32;<emphasis role="keyword">null</emphasis>;&#32;}&#32;}
+00018 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keyword">static</emphasis>&#32;<emphasis role="keywordtype">float</emphasis>&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___load_level_1a29e394161a441efd0b33e516871b475d">progress</link>
+<anchor xml:id="__steam_v_r___load_level_8cs_source_1l00019"/><link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___load_level_1a29e394161a441efd0b33e516871b475d">00019</link> &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00020 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">get</emphasis>&#32;{&#32;<emphasis role="keywordflow">return</emphasis>&#32;(_active&#32;!=&#32;<emphasis role="keyword">null</emphasis>&#32;&amp;&amp;&#32;_active.async&#32;!=&#32;<emphasis role="keyword">null</emphasis>)&#32;?&#32;_active.async.progress&#32;:&#32;0.0f;&#32;}
+00021 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00022 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keyword">static</emphasis>&#32;Texture&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___load_level_1a48a694e49f94051b84dcc127df255397">progressTexture</link>
+<anchor xml:id="__steam_v_r___load_level_8cs_source_1l00023"/><link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___load_level_1a48a694e49f94051b84dcc127df255397">00023</link> &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00024 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">get</emphasis>&#32;{&#32;<emphasis role="keywordflow">return</emphasis>&#32;(_active&#32;!=&#32;<emphasis role="keyword">null</emphasis>)&#32;?&#32;_active.renderTexture&#32;:&#32;<emphasis role="keyword">null</emphasis>;&#32;}
+00025 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00026 
+00027 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;Name&#32;of&#32;level&#32;to&#32;load.</emphasis>
+<anchor xml:id="__steam_v_r___load_level_8cs_source_1l00028"/><link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___load_level_1ac07ec4814e60ad5c6ccae6ed9d596ba5">00028</link> &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keywordtype">string</emphasis>&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___load_level_1ac07ec4814e60ad5c6ccae6ed9d596ba5">levelName</link>;
+00029 
+00030 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;Name&#32;of&#32;internal&#32;process&#32;to&#32;launch&#32;(instead&#32;of&#32;levelName).</emphasis>
+<anchor xml:id="__steam_v_r___load_level_8cs_source_1l00031"/><link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___load_level_1a88826d505c93cf3901bd9205b3241638">00031</link> &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keywordtype">string</emphasis>&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___load_level_1a88826d505c93cf3901bd9205b3241638">internalProcessPath</link>;
+00032 
+00033 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;The&#32;command-line&#32;args&#32;for&#32;the&#32;internal&#32;process&#32;to&#32;launch.</emphasis>
+<anchor xml:id="__steam_v_r___load_level_8cs_source_1l00034"/><link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___load_level_1a803bdef44067d35c1ac7f42e88e5468f">00034</link> &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keywordtype">string</emphasis>&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___load_level_1a803bdef44067d35c1ac7f42e88e5468f">internalProcessArgs</link>;
+00035 
+00036 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;If&#32;true,&#32;call&#32;LoadLevelAdditiveAsync&#32;instead&#32;of&#32;LoadLevelAsync.</emphasis>
+<anchor xml:id="__steam_v_r___load_level_8cs_source_1l00037"/><link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___load_level_1a3f5f4bf18ba7aefcf0c6fdecbb123b33">00037</link> &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keywordtype">bool</emphasis>&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___load_level_1a3f5f4bf18ba7aefcf0c6fdecbb123b33">loadAdditive</link>;
+00038 
+00039 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;Async&#32;load&#32;causes&#32;crashes&#32;in&#32;some&#32;apps.</emphasis>
+<anchor xml:id="__steam_v_r___load_level_8cs_source_1l00040"/><link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___load_level_1ae05b17c8b80f005d9c6680e7e3509665">00040</link> &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keywordtype">bool</emphasis>&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___load_level_1ae05b17c8b80f005d9c6680e7e3509665">loadAsync</link>&#32;=&#32;<emphasis role="keyword">true</emphasis>;
+00041 
+00042 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;Optional&#32;logo&#32;texture.</emphasis>
+<anchor xml:id="__steam_v_r___load_level_8cs_source_1l00043"/><link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___load_level_1a24191ab16ec7437a80867d87e637e9e3">00043</link> &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;Texture&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___load_level_1a24191ab16ec7437a80867d87e637e9e3">loadingScreen</link>;
+00044 
+00045 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;Optional&#32;progress&#32;bar&#32;textures.</emphasis>
+<anchor xml:id="__steam_v_r___load_level_8cs_source_1l00046"/><link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___load_level_1ac24427f0e2b7fad8df5d3c9c64726db9">00046</link> &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;Texture&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___load_level_1ac24427f0e2b7fad8df5d3c9c64726db9">progressBarEmpty</link>,&#32;progressBarFull;
+00047 
+00048 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;Sizes&#32;of&#32;overlays.</emphasis>
+<anchor xml:id="__steam_v_r___load_level_8cs_source_1l00049"/><link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___load_level_1a18434a86860d0950b709a0090e6d89eb">00049</link> &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keywordtype">float</emphasis>&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___load_level_1a18434a86860d0950b709a0090e6d89eb">loadingScreenWidthInMeters</link>&#32;=&#32;6.0f;
+<anchor xml:id="__steam_v_r___load_level_8cs_source_1l00050"/><link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___load_level_1ab40ac35782bff5b0b4fde9caec4753db">00050</link> &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keywordtype">float</emphasis>&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___load_level_1ab40ac35782bff5b0b4fde9caec4753db">progressBarWidthInMeters</link>&#32;=&#32;3.0f;
+00051 
+00052 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;If&#32;specified,&#32;the&#32;loading&#32;screen&#32;will&#32;be&#32;positioned&#32;in&#32;the&#32;player&apos;s&#32;view&#32;this&#32;far&#32;away.</emphasis>
+<anchor xml:id="__steam_v_r___load_level_8cs_source_1l00053"/><link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___load_level_1a7608fc39bc1501a37bc12b101fa60eaa">00053</link> &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keywordtype">float</emphasis>&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___load_level_1a7608fc39bc1501a37bc12b101fa60eaa">loadingScreenDistance</link>&#32;=&#32;0.0f;
+00054 
+00055 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;Optional&#32;overrides&#32;for&#32;where&#32;to&#32;display&#32;loading&#32;screen&#32;and&#32;progress&#32;bar&#32;overlays.</emphasis>
+00056 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;Otherwise&#32;defaults&#32;to&#32;using&#32;this&#32;object&apos;s&#32;transform.</emphasis>
+<anchor xml:id="__steam_v_r___load_level_8cs_source_1l00057"/><link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___load_level_1adb958a39d324ca7aa7391594afd1e65c">00057</link> &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;Transform&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___load_level_1adb958a39d324ca7aa7391594afd1e65c">loadingScreenTransform</link>,&#32;progressBarTransform;
+00058 
+00059 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;Optional&#32;skybox&#32;override&#32;textures.</emphasis>
+<anchor xml:id="__steam_v_r___load_level_8cs_source_1l00060"/><link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___load_level_1a95d45adace3d6ec6b590e841229cb042">00060</link> &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;Texture&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___load_level_1a95d45adace3d6ec6b590e841229cb042">front</link>,&#32;back,&#32;left,&#32;right,&#32;top,&#32;bottom;
+00061 
+00062 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;Colors&#32;to&#32;use&#32;when&#32;dropping&#32;to&#32;the&#32;compositor&#32;between&#32;levels&#32;if&#32;no&#32;skybox&#32;is&#32;set.</emphasis>
+<anchor xml:id="__steam_v_r___load_level_8cs_source_1l00063"/><link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___load_level_1a663bf9934d6ce7f601189b6507bdfd2c">00063</link> &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;Color&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___load_level_1a663bf9934d6ce7f601189b6507bdfd2c">backgroundColor</link>&#32;=&#32;Color.black;
+00064 
+00065 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;If&#32;false,&#32;the&#32;background&#32;color&#32;above&#32;gets&#32;applied&#32;as&#32;the&#32;foreground&#32;color&#32;in&#32;the&#32;compositor.</emphasis>
+00066 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;This&#32;does&#32;not&#32;have&#32;any&#32;effect&#32;when&#32;using&#32;a&#32;skybox&#32;instead.</emphasis>
+<anchor xml:id="__steam_v_r___load_level_8cs_source_1l00067"/><link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___load_level_1a45cda28d3ef83a848fb85e1b0fe70acd">00067</link> &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keywordtype">bool</emphasis>&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___load_level_1a45cda28d3ef83a848fb85e1b0fe70acd">showGrid</link>&#32;=&#32;<emphasis role="keyword">false</emphasis>;
+00068 
+00069 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;Time&#32;to&#32;fade&#32;from&#32;current&#32;scene&#32;to&#32;the&#32;compositor&#32;and&#32;back.</emphasis>
+<anchor xml:id="__steam_v_r___load_level_8cs_source_1l00070"/><link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___load_level_1a7b1678ec4a9cfe4677f7bb62b4e2605d">00070</link> &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keywordtype">float</emphasis>&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___load_level_1a7b1678ec4a9cfe4677f7bb62b4e2605d">fadeOutTime</link>&#32;=&#32;0.5f;
+<anchor xml:id="__steam_v_r___load_level_8cs_source_1l00071"/><link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___load_level_1af8a3b1c29f83d0396558840ce132ea84">00071</link> &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keywordtype">float</emphasis>&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___load_level_1af8a3b1c29f83d0396558840ce132ea84">fadeInTime</link>&#32;=&#32;0.5f;
+00072 
+00073 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;Additional&#32;time&#32;to&#32;wait&#32;after&#32;finished&#32;loading&#32;before&#32;we&#32;start&#32;fading&#32;the&#32;new&#32;scene&#32;back&#32;in.</emphasis>
+00074 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;This&#32;is&#32;to&#32;cover&#32;up&#32;any&#32;initial&#32;hitching&#32;that&#32;takes&#32;place&#32;right&#32;at&#32;the&#32;start&#32;of&#32;levels.</emphasis>
+00075 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;Most&#32;scenes&#32;should&#32;hopefully&#32;not&#32;require&#32;this.</emphasis>
+<anchor xml:id="__steam_v_r___load_level_8cs_source_1l00076"/><link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___load_level_1adb1b07df595fc98133a7a09c16f566ef">00076</link> &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keywordtype">float</emphasis>&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___load_level_1adb1b07df595fc98133a7a09c16f566ef">postLoadSettleTime</link>&#32;=&#32;0.0f;
+00077 
+00078 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;Time&#32;to&#32;fade&#32;loading&#32;screen&#32;in&#32;and&#32;out&#32;(also&#32;used&#32;for&#32;progress&#32;bar).</emphasis>
+<anchor xml:id="__steam_v_r___load_level_8cs_source_1l00079"/><link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___load_level_1a1b7a66cdceb72c6d10e7232c21e7ba57">00079</link> &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keywordtype">float</emphasis>&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___load_level_1a1b7a66cdceb72c6d10e7232c21e7ba57">loadingScreenFadeInTime</link>&#32;=&#32;1.0f;
+<anchor xml:id="__steam_v_r___load_level_8cs_source_1l00080"/><link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___load_level_1a204cc6798b089fcef99241dd98732e70">00080</link> &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keywordtype">float</emphasis>&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___load_level_1a204cc6798b089fcef99241dd98732e70">loadingScreenFadeOutTime</link>&#32;=&#32;0.25f;
+00081 
+00082 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordtype">float</emphasis>&#32;fadeRate&#32;=&#32;1.0f;
+00083 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordtype">float</emphasis>&#32;alpha&#32;=&#32;0.0f;
+00084 
+00085 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;AsyncOperation&#32;async;&#32;<emphasis role="comment">//&#32;used&#32;to&#32;track&#32;level&#32;load&#32;progress</emphasis>
+00086 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;RenderTexture&#32;renderTexture;&#32;<emphasis role="comment">//&#32;used&#32;to&#32;render&#32;progress&#32;bar</emphasis>
+00087 
+00088 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;ulong&#32;loadingScreenOverlayHandle&#32;=&#32;<link linkend="_class_valve_1_1_v_r_1_1_open_v_r">OpenVR</link>.<link linkend="_class_valve_1_1_v_r_1_1_open_v_r_1ad9be268d73a128738178fd468dc8cfe1">k_ulOverlayHandleInvalid</link>;
+00089 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;ulong&#32;progressBarOverlayHandle&#32;=&#32;<link linkend="_class_valve_1_1_v_r_1_1_open_v_r">OpenVR</link>.<link linkend="_class_valve_1_1_v_r_1_1_open_v_r_1ad9be268d73a128738178fd468dc8cfe1">k_ulOverlayHandleInvalid</link>;
+00090 
+<anchor xml:id="__steam_v_r___load_level_8cs_source_1l00091"/><link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___load_level_1ac2ffd012899c91cf6ad2af73c7f5a0ee">00091</link> &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keywordtype">bool</emphasis>&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___load_level_1ac2ffd012899c91cf6ad2af73c7f5a0ee">autoTriggerOnEnable</link>&#32;=&#32;<emphasis role="keyword">false</emphasis>;
+00092 
+00093 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordtype">void</emphasis>&#32;OnEnable()
+00094 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00095 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___load_level_1ac2ffd012899c91cf6ad2af73c7f5a0ee">autoTriggerOnEnable</link>)
+00096 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___load_level_1a159effd47c6ba4c6e2d58951c17135d0">Trigger</link>();
+00097 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00098 
+<anchor xml:id="__steam_v_r___load_level_8cs_source_1l00099"/><link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___load_level_1a159effd47c6ba4c6e2d58951c17135d0">00099</link> &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___load_level_1a159effd47c6ba4c6e2d58951c17135d0">Trigger</link>()
+00100 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00101 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(!<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___load_level_1ac26d25e9953dc093823c8b2b17ab8512">loading</link>&#32;&amp;&amp;&#32;!<emphasis role="keywordtype">string</emphasis>.IsNullOrEmpty(<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___load_level_1ac07ec4814e60ad5c6ccae6ed9d596ba5">levelName</link>))
+00102 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;StartCoroutine(LoadLevel());
+00103 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00104 
+00105 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;Helper&#32;function&#32;to&#32;quickly&#32;and&#32;simply&#32;load&#32;a&#32;level&#32;from&#32;script.</emphasis>
+<anchor xml:id="__steam_v_r___load_level_8cs_source_1l00106"/><link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___load_level_1aed516148c0b0add76c609f6184550ac4">00106</link> &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keyword">static</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___load_level_1aed516148c0b0add76c609f6184550ac4">Begin</link>(<emphasis role="keywordtype">string</emphasis>&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___load_level_1ac07ec4814e60ad5c6ccae6ed9d596ba5">levelName</link>,
+00107 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordtype">bool</emphasis>&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___load_level_1a45cda28d3ef83a848fb85e1b0fe70acd">showGrid</link>&#32;=&#32;<emphasis role="keyword">false</emphasis>,&#32;<emphasis role="keywordtype">float</emphasis>&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___load_level_1a7b1678ec4a9cfe4677f7bb62b4e2605d">fadeOutTime</link>&#32;=&#32;0.5f,
+00108 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordtype">float</emphasis>&#32;r&#32;=&#32;0.0f,&#32;<emphasis role="keywordtype">float</emphasis>&#32;g&#32;=&#32;0.0f,&#32;<emphasis role="keywordtype">float</emphasis>&#32;b&#32;=&#32;0.0f,&#32;<emphasis role="keywordtype">float</emphasis>&#32;a&#32;=&#32;1.0f)
+00109 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00110 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;var&#32;loader&#32;=&#32;<emphasis role="keyword">new</emphasis>&#32;GameObject(<emphasis role="stringliteral">&quot;loader&quot;</emphasis>).AddComponent&lt;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___load_level">SteamVR_LoadLevel</link>&gt;();
+00111 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;loader.<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___load_level_1ac07ec4814e60ad5c6ccae6ed9d596ba5">levelName</link>&#32;=&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___load_level_1ac07ec4814e60ad5c6ccae6ed9d596ba5">levelName</link>;
+00112 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;loader.showGrid&#32;=&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___load_level_1a45cda28d3ef83a848fb85e1b0fe70acd">showGrid</link>;
+00113 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;loader.fadeOutTime&#32;=&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___load_level_1a7b1678ec4a9cfe4677f7bb62b4e2605d">fadeOutTime</link>;
+00114 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;loader.backgroundColor&#32;=&#32;<emphasis role="keyword">new</emphasis>&#32;Color(r,&#32;g,&#32;b,&#32;a);
+00115 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;loader.Trigger();
+00116 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00117 
+00118 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;Updates&#32;progress&#32;bar.</emphasis>
+00119 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordtype">void</emphasis>&#32;OnGUI()
+00120 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00121 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(_active&#32;!=&#32;<emphasis role="keyword">this</emphasis>)
+00122 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>;
+00123 
+00124 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;Optionally&#32;create&#32;an&#32;overlay&#32;for&#32;our&#32;progress&#32;bar&#32;to&#32;use,&#32;separate&#32;from&#32;the&#32;loading&#32;screen.</emphasis>
+00125 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___load_level_1ac24427f0e2b7fad8df5d3c9c64726db9">progressBarEmpty</link>&#32;!=&#32;<emphasis role="keyword">null</emphasis>&#32;&amp;&amp;&#32;progressBarFull&#32;!=&#32;<emphasis role="keyword">null</emphasis>)
+00126 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00127 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(progressBarOverlayHandle&#32;==&#32;<link linkend="_class_valve_1_1_v_r_1_1_open_v_r">OpenVR</link>.<link linkend="_class_valve_1_1_v_r_1_1_open_v_r_1ad9be268d73a128738178fd468dc8cfe1">k_ulOverlayHandleInvalid</link>)
+00128 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;progressBarOverlayHandle&#32;=&#32;GetOverlayHandle(<emphasis role="stringliteral">&quot;progressBar&quot;</emphasis>,&#32;progressBarTransform&#32;!=&#32;<emphasis role="keyword">null</emphasis>&#32;?&#32;progressBarTransform&#32;:&#32;transform,&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___load_level_1ab40ac35782bff5b0b4fde9caec4753db">progressBarWidthInMeters</link>);
+00129 
+00130 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(progressBarOverlayHandle&#32;!=&#32;<link linkend="_class_valve_1_1_v_r_1_1_open_v_r">OpenVR</link>.<link linkend="_class_valve_1_1_v_r_1_1_open_v_r_1ad9be268d73a128738178fd468dc8cfe1">k_ulOverlayHandleInvalid</link>)
+00131 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00132 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;var&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___load_level_1a29e394161a441efd0b33e516871b475d">progress</link>&#32;=&#32;(async&#32;!=&#32;<emphasis role="keyword">null</emphasis>)&#32;?&#32;async.progress&#32;:&#32;0.0f;
+00133 
+00134 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;Use&#32;the&#32;full&#32;bar&#32;size&#32;for&#32;everything.</emphasis>
+00135 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;var&#32;w&#32;=&#32;progressBarFull.width;
+00136 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;var&#32;h&#32;=&#32;progressBarFull.height;
+00137 
+00138 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;Create&#32;a&#32;separate&#32;render&#32;texture&#32;so&#32;we&#32;can&#32;composite&#32;the&#32;full&#32;image&#32;on&#32;top&#32;of&#32;the&#32;empty&#32;one.</emphasis>
+00139 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;if&#32;(renderTexture&#32;==&#32;<emphasis role="keyword">null</emphasis>)
+00140 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00141 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;renderTexture&#32;=&#32;<emphasis role="keyword">new</emphasis>&#32;RenderTexture(w,&#32;h,&#32;0);
+00142 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;renderTexture.Create();
+00143 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00144 
+00145 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;var&#32;prevActive&#32;=&#32;RenderTexture.active;
+00146 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;RenderTexture.active&#32;=&#32;renderTexture;
+00147 
+00148 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(Event.current.type&#32;==&#32;EventType.Repaint)
+00149 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;GL.Clear(<emphasis role="keyword">false</emphasis>,&#32;<emphasis role="keyword">true</emphasis>,&#32;Color.clear);
+00150 
+00151 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;GUILayout.BeginArea(<emphasis role="keyword">new</emphasis>&#32;Rect(0,&#32;0,&#32;w,&#32;h));
+00152 
+00153 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;GUI.DrawTexture(<emphasis role="keyword">new</emphasis>&#32;Rect(0,&#32;0,&#32;w,&#32;h),&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___load_level_1ac24427f0e2b7fad8df5d3c9c64726db9">progressBarEmpty</link>);
+00154 
+00155 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;Reveal&#32;the&#32;full&#32;bar&#32;texture&#32;based&#32;on&#32;progress.</emphasis>
+00156 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;GUI.DrawTextureWithTexCoords(<emphasis role="keyword">new</emphasis>&#32;Rect(0,&#32;0,&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___load_level_1a29e394161a441efd0b33e516871b475d">progress</link>&#32;*&#32;w,&#32;h),&#32;progressBarFull,&#32;<emphasis role="keyword">new</emphasis>&#32;Rect(0.0f,&#32;0.0f,&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___load_level_1a29e394161a441efd0b33e516871b475d">progress</link>,&#32;1.0f));
+00157 
+00158 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;GUILayout.EndArea();
+00159 
+00160 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;RenderTexture.active&#32;=&#32;prevActive;
+00161 
+00162 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;Texture&#32;needs&#32;to&#32;be&#32;set&#32;every&#32;frame&#32;after&#32;it&#32;is&#32;updated&#32;since&#32;SteamVR&#32;makes&#32;a&#32;copy&#32;internally&#32;to&#32;a&#32;shared&#32;texture.</emphasis>
+00163 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;var&#32;overlay&#32;=&#32;<link linkend="_class_valve_1_1_v_r_1_1_open_v_r">OpenVR</link>.<link linkend="_class_valve_1_1_v_r_1_1_open_v_r_1a03223e58125dbd40477879c4283728a3">Overlay</link>;
+00164 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(overlay&#32;!=&#32;<emphasis role="keyword">null</emphasis>)
+00165 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00166 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;var&#32;texture&#32;=&#32;<emphasis role="keyword">new</emphasis>&#32;<link linkend="_struct_valve_1_1_v_r_1_1_texture__t">Texture_t</link>();
+00167 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;texture.handle&#32;=&#32;renderTexture.GetNativeTexturePtr();
+00168 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;texture.eType&#32;=&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r">SteamVR</link>.<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r_1af374389920329f77814037a571f6bf2f">instance</link>.<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r_1ab18af3cf2ec5ed39ceee8901c9df6f1f">textureType</link>;
+00169 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;texture.eColorSpace&#32;=&#32;<link linkend="_namespace_valve_1_1_v_r_1aeb0fba37ba28d8ca276d7c10f01809ac">EColorSpace</link>.Auto;
+00170 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;overlay.SetOverlayTexture(progressBarOverlayHandle,&#32;ref&#32;texture);
+00171 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00172 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00173 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00174 
+00175 <emphasis role="preprocessor">#if&#32;false</emphasis>
+00176 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;Draw&#32;loading&#32;screen&#32;and&#32;progress&#32;bar&#32;to&#32;2d&#32;companion&#32;window&#32;as&#32;well.</emphasis>
+00177 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___load_level_1a24191ab16ec7437a80867d87e637e9e3">loadingScreen</link>&#32;!=&#32;<emphasis role="keyword">null</emphasis>)
+00178 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00179 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;var&#32;screenAspect&#32;=&#32;(float)Screen.width&#32;/&#32;Screen.height;
+00180 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;var&#32;textureAspect&#32;=&#32;(<emphasis role="keywordtype">float</emphasis>)<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___load_level_1a24191ab16ec7437a80867d87e637e9e3">loadingScreen</link>.width&#32;/&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___load_level_1a24191ab16ec7437a80867d87e637e9e3">loadingScreen</link>.height;
+00181 
+00182 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordtype">float</emphasis>&#32;w,&#32;h;
+00183 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(screenAspect&#32;&lt;&#32;textureAspect)
+00184 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00185 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;Clamp&#32;horizontally</emphasis>
+00186 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;w&#32;=&#32;Screen.width&#32;*&#32;0.9f;
+00187 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;h&#32;=&#32;w&#32;/&#32;textureAspect;
+00188 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00189 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">else</emphasis>
+00190 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00191 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;Clamp&#32;vertically</emphasis>
+00192 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;h&#32;=&#32;Screen.height&#32;*&#32;0.9f;
+00193 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;w&#32;=&#32;h&#32;*&#32;textureAspect;
+00194 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00195 
+00196 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;GUILayout.BeginArea(<emphasis role="keyword">new</emphasis>&#32;Rect(0,&#32;0,&#32;Screen.width,&#32;Screen.height));
+00197 
+00198 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;var&#32;x&#32;=&#32;Screen.width&#32;/&#32;2&#32;-&#32;w&#32;/&#32;2;
+00199 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;var&#32;y&#32;=&#32;Screen.height&#32;/&#32;2&#32;-&#32;h&#32;/&#32;2;
+00200 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;GUI.DrawTexture(<emphasis role="keyword">new</emphasis>&#32;Rect(x,&#32;y,&#32;w,&#32;h),&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___load_level_1a24191ab16ec7437a80867d87e637e9e3">loadingScreen</link>);
+00201 
+00202 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;GUILayout.EndArea();
+00203 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00204 
+00205 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(renderTexture&#32;!=&#32;<emphasis role="keyword">null</emphasis>)
+00206 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00207 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;var&#32;x&#32;=&#32;Screen.width&#32;/&#32;2&#32;-&#32;renderTexture.width&#32;/&#32;2;
+00208 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;var&#32;y&#32;=&#32;Screen.height&#32;*&#32;0.9f&#32;-&#32;renderTexture.height;
+00209 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;GUI.DrawTexture(<emphasis role="keyword">new</emphasis>&#32;Rect(x,&#32;y,&#32;renderTexture.width,&#32;renderTexture.height),&#32;renderTexture);
+00210 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00211 <emphasis role="preprocessor">#endif</emphasis>
+00212 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00213 
+00214 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;Fade&#32;our&#32;overlays&#32;in/out&#32;over&#32;time.</emphasis>
+00215 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordtype">void</emphasis>&#32;Update()
+00216 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00217 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(_active&#32;!=&#32;<emphasis role="keyword">this</emphasis>)
+00218 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>;
+00219 
+00220 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;alpha&#32;=&#32;Mathf.Clamp01(alpha&#32;+&#32;fadeRate&#32;*&#32;Time.deltaTime);
+00221 
+00222 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;var&#32;overlay&#32;=&#32;<link linkend="_class_valve_1_1_v_r_1_1_open_v_r">OpenVR</link>.<link linkend="_class_valve_1_1_v_r_1_1_open_v_r_1a03223e58125dbd40477879c4283728a3">Overlay</link>;
+00223 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(overlay&#32;!=&#32;<emphasis role="keyword">null</emphasis>)
+00224 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00225 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(loadingScreenOverlayHandle&#32;!=&#32;<link linkend="_class_valve_1_1_v_r_1_1_open_v_r">OpenVR</link>.<link linkend="_class_valve_1_1_v_r_1_1_open_v_r_1ad9be268d73a128738178fd468dc8cfe1">k_ulOverlayHandleInvalid</link>)
+00226 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;overlay.<link linkend="_class_valve_1_1_v_r_1_1_c_v_r_overlay_1a813f1c421db4878560061db98e26d252">SetOverlayAlpha</link>(loadingScreenOverlayHandle,&#32;alpha);
+00227 
+00228 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(progressBarOverlayHandle&#32;!=&#32;<link linkend="_class_valve_1_1_v_r_1_1_open_v_r">OpenVR</link>.<link linkend="_class_valve_1_1_v_r_1_1_open_v_r_1ad9be268d73a128738178fd468dc8cfe1">k_ulOverlayHandleInvalid</link>)
+00229 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;overlay.SetOverlayAlpha(progressBarOverlayHandle,&#32;alpha);
+00230 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00231 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00232 
+00233 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;Corourtine&#32;to&#32;handle&#32;all&#32;the&#32;steps&#32;across&#32;loading&#32;boundaries.</emphasis>
+00234 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;IEnumerator&#32;LoadLevel()
+00235 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00236 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;Optionally&#32;rotate&#32;loading&#32;screen&#32;transform&#32;around&#32;the&#32;camera&#32;into&#32;view.</emphasis>
+00237 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;We&#32;assume&#32;here&#32;that&#32;the&#32;loading&#32;screen&#32;is&#32;already&#32;facing&#32;toward&#32;the&#32;origin,</emphasis>
+00238 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;and&#32;that&#32;the&#32;progress&#32;bar&#32;transform&#32;(if&#32;any)&#32;is&#32;a&#32;child&#32;and&#32;will&#32;follow&#32;along.</emphasis>
+00239 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___load_level_1a24191ab16ec7437a80867d87e637e9e3">loadingScreen</link>&#32;!=&#32;<emphasis role="keyword">null</emphasis>&#32;&amp;&amp;&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___load_level_1a7608fc39bc1501a37bc12b101fa60eaa">loadingScreenDistance</link>&#32;&gt;&#32;0.0f)
+00240 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00241 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;Transform&#32;hmd&#32;=&#32;this.transform;
+00242 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(<link linkend="_namespace_valve_1_1_v_r_1a82e5bf501cc3aa155444ee3f0662853fa967d35e40f3f95b1f538bd248640bf3b">Camera</link>.main&#32;!=&#32;<emphasis role="keyword">null</emphasis>)
+00243 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;hmd&#32;=&#32;<link linkend="_namespace_valve_1_1_v_r_1a82e5bf501cc3aa155444ee3f0662853fa967d35e40f3f95b1f538bd248640bf3b">Camera</link>.main.transform;
+00244 
+00245 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;Quaternion&#32;rot&#32;=&#32;Quaternion.Euler(0.0f,&#32;hmd.eulerAngles.y,&#32;0.0f);
+00246 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;Vector3&#32;pos&#32;=&#32;hmd.position&#32;+&#32;(rot&#32;*&#32;<emphasis role="keyword">new</emphasis>&#32;Vector3(0.0f,&#32;0.0f,&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___load_level_1a7608fc39bc1501a37bc12b101fa60eaa">loadingScreenDistance</link>));
+00247 
+00248 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;var&#32;t&#32;=&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___load_level_1adb958a39d324ca7aa7391594afd1e65c">loadingScreenTransform</link>&#32;!=&#32;<emphasis role="keyword">null</emphasis>&#32;?&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___load_level_1adb958a39d324ca7aa7391594afd1e65c">loadingScreenTransform</link>&#32;:&#32;transform;
+00249 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;t.position&#32;=&#32;pos;
+00250 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;t.rotation&#32;=&#32;rot;
+00251 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00252 
+00253 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;_active&#32;=&#32;<emphasis role="keyword">this</emphasis>;
+00254 
+00255 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;SteamVR_Events.Loading.Send(<emphasis role="keyword">true</emphasis>);
+00256 
+00257 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;Calculate&#32;rate&#32;for&#32;fading&#32;in&#32;loading&#32;screen&#32;and&#32;progress&#32;bar.</emphasis>
+00258 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___load_level_1a1b7a66cdceb72c6d10e7232c21e7ba57">loadingScreenFadeInTime</link>&#32;&gt;&#32;0.0f)
+00259 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00260 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;fadeRate&#32;=&#32;1.0f&#32;/&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___load_level_1a1b7a66cdceb72c6d10e7232c21e7ba57">loadingScreenFadeInTime</link>;
+00261 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00262 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">else</emphasis>
+00263 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00264 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;alpha&#32;=&#32;1.0f;
+00265 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00266 
+00267 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;var&#32;overlay&#32;=&#32;<link linkend="_class_valve_1_1_v_r_1_1_open_v_r">OpenVR</link>.<link linkend="_class_valve_1_1_v_r_1_1_open_v_r_1a03223e58125dbd40477879c4283728a3">Overlay</link>;
+00268 
+00269 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;Optionally&#32;create&#32;our&#32;loading&#32;screen&#32;overlay.</emphasis>
+00270 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___load_level_1a24191ab16ec7437a80867d87e637e9e3">loadingScreen</link>&#32;!=&#32;<emphasis role="keyword">null</emphasis>&#32;&amp;&amp;&#32;overlay&#32;!=&#32;<emphasis role="keyword">null</emphasis>)
+00271 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00272 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;loadingScreenOverlayHandle&#32;=&#32;GetOverlayHandle(<emphasis role="stringliteral">&quot;loadingScreen&quot;</emphasis>,&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___load_level_1adb958a39d324ca7aa7391594afd1e65c">loadingScreenTransform</link>&#32;!=&#32;<emphasis role="keyword">null</emphasis>&#32;?&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___load_level_1adb958a39d324ca7aa7391594afd1e65c">loadingScreenTransform</link>&#32;:&#32;transform,&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___load_level_1a18434a86860d0950b709a0090e6d89eb">loadingScreenWidthInMeters</link>);
+00273 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(loadingScreenOverlayHandle&#32;!=&#32;<link linkend="_class_valve_1_1_v_r_1_1_open_v_r">OpenVR</link>.<link linkend="_class_valve_1_1_v_r_1_1_open_v_r_1ad9be268d73a128738178fd468dc8cfe1">k_ulOverlayHandleInvalid</link>)
+00274 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00275 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;var&#32;texture&#32;=&#32;<emphasis role="keyword">new</emphasis>&#32;<link linkend="_struct_valve_1_1_v_r_1_1_texture__t">Texture_t</link>();
+00276 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;texture.handle&#32;=&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___load_level_1a24191ab16ec7437a80867d87e637e9e3">loadingScreen</link>.GetNativeTexturePtr();
+00277 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;texture.eType&#32;=&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r">SteamVR</link>.<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r_1af374389920329f77814037a571f6bf2f">instance</link>.<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r_1ab18af3cf2ec5ed39ceee8901c9df6f1f">textureType</link>;
+00278 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;texture.eColorSpace&#32;=&#32;<link linkend="_namespace_valve_1_1_v_r_1aeb0fba37ba28d8ca276d7c10f01809ac">EColorSpace</link>.Auto;
+00279 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;overlay.SetOverlayTexture(loadingScreenOverlayHandle,&#32;ref&#32;texture);
+00280 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00281 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00282 
+00283 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordtype">bool</emphasis>&#32;fadedForeground&#32;=&#32;<emphasis role="keyword">false</emphasis>;
+00284 
+00285 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;Fade&#32;out&#32;to&#32;compositor</emphasis>
+00286 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;SteamVR_Events.LoadingFadeOut.Send(<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___load_level_1a7b1678ec4a9cfe4677f7bb62b4e2605d">fadeOutTime</link>);
+00287 
+00288 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;Optionally&#32;set&#32;a&#32;skybox&#32;to&#32;use&#32;as&#32;a&#32;backdrop&#32;in&#32;the&#32;compositor.</emphasis>
+00289 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;var&#32;compositor&#32;=&#32;<link linkend="_class_valve_1_1_v_r_1_1_open_v_r">OpenVR</link>.<link linkend="_class_valve_1_1_v_r_1_1_open_v_r_1a398bc817d8516416f480aed933599ac5">Compositor</link>;
+00290 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(compositor&#32;!=&#32;<emphasis role="keyword">null</emphasis>)
+00291 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00292 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___load_level_1a95d45adace3d6ec6b590e841229cb042">front</link>&#32;!=&#32;<emphasis role="keyword">null</emphasis>)
+00293 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00294 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___skybox">SteamVR_Skybox</link>.<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___skybox_1aa5c43e8868825c66751bb3b68c04cbca">SetOverride</link>(<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___load_level_1a95d45adace3d6ec6b590e841229cb042">front</link>,&#32;back,&#32;left,&#32;right,&#32;top,&#32;bottom);
+00295 
+00296 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;Explicitly&#32;fade&#32;to&#32;the&#32;compositor&#32;since&#32;loading&#32;will&#32;cause&#32;us&#32;to&#32;stop&#32;rendering.</emphasis>
+00297 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;compositor.FadeGrid(<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___load_level_1a7b1678ec4a9cfe4677f7bb62b4e2605d">fadeOutTime</link>,&#32;<emphasis role="keyword">true</emphasis>);
+00298 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;yield&#32;<emphasis role="keywordflow">return</emphasis>&#32;<emphasis role="keyword">new</emphasis>&#32;WaitForSeconds(<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___load_level_1a7b1678ec4a9cfe4677f7bb62b4e2605d">fadeOutTime</link>);
+00299 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00300 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">else</emphasis>&#32;<emphasis role="keywordflow">if</emphasis>&#32;(<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___load_level_1a663bf9934d6ce7f601189b6507bdfd2c">backgroundColor</link>&#32;!=&#32;Color.clear)
+00301 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00302 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;Otherwise,&#32;use&#32;the&#32;specified&#32;background&#32;color.</emphasis>
+00303 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___load_level_1a45cda28d3ef83a848fb85e1b0fe70acd">showGrid</link>)
+00304 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00305 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;Set&#32;compositor&#32;background&#32;color&#32;immediately,&#32;and&#32;start&#32;fading&#32;to&#32;it.</emphasis>
+00306 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;compositor.FadeToColor(0.0f,&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___load_level_1a663bf9934d6ce7f601189b6507bdfd2c">backgroundColor</link>.r,&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___load_level_1a663bf9934d6ce7f601189b6507bdfd2c">backgroundColor</link>.g,&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___load_level_1a663bf9934d6ce7f601189b6507bdfd2c">backgroundColor</link>.b,&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___load_level_1a663bf9934d6ce7f601189b6507bdfd2c">backgroundColor</link>.a,&#32;<emphasis role="keyword">true</emphasis>);
+00307 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;compositor.FadeGrid(<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___load_level_1a7b1678ec4a9cfe4677f7bb62b4e2605d">fadeOutTime</link>,&#32;<emphasis role="keyword">true</emphasis>);
+00308 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;yield&#32;<emphasis role="keywordflow">return</emphasis>&#32;<emphasis role="keyword">new</emphasis>&#32;WaitForSeconds(<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___load_level_1a7b1678ec4a9cfe4677f7bb62b4e2605d">fadeOutTime</link>);
+00309 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00310 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">else</emphasis>
+00311 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00312 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;Fade&#32;the&#32;foreground&#32;color&#32;in&#32;(which&#32;will&#32;blend&#32;on&#32;top&#32;of&#32;the&#32;scene),&#32;and&#32;then&#32;cut&#32;to&#32;the&#32;compositor.</emphasis>
+00313 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;compositor.FadeToColor(<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___load_level_1a7b1678ec4a9cfe4677f7bb62b4e2605d">fadeOutTime</link>,&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___load_level_1a663bf9934d6ce7f601189b6507bdfd2c">backgroundColor</link>.r,&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___load_level_1a663bf9934d6ce7f601189b6507bdfd2c">backgroundColor</link>.g,&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___load_level_1a663bf9934d6ce7f601189b6507bdfd2c">backgroundColor</link>.b,&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___load_level_1a663bf9934d6ce7f601189b6507bdfd2c">backgroundColor</link>.a,&#32;<emphasis role="keyword">false</emphasis>);
+00314 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;yield&#32;<emphasis role="keywordflow">return</emphasis>&#32;<emphasis role="keyword">new</emphasis>&#32;WaitForSeconds(<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___load_level_1a7b1678ec4a9cfe4677f7bb62b4e2605d">fadeOutTime</link>&#32;+&#32;0.1f);
+00315 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;compositor.FadeGrid(0.0f,&#32;<emphasis role="keyword">true</emphasis>);
+00316 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;fadedForeground&#32;=&#32;<emphasis role="keyword">true</emphasis>;
+00317 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00318 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00319 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00320 
+00321 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;Now&#32;that&#32;we&apos;re&#32;fully&#32;faded&#32;out,&#32;we&#32;can&#32;stop&#32;submitting&#32;frames&#32;to&#32;the&#32;compositor.</emphasis>
+00322 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___render">SteamVR_Render</link>.<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___render_1ad0d6a11827b9c94df738a6e3669a0e70">pauseRendering</link>&#32;=&#32;<emphasis role="keyword">true</emphasis>;
+00323 
+00324 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;Continue&#32;waiting&#32;for&#32;the&#32;overlays&#32;to&#32;fully&#32;fade&#32;in&#32;before&#32;continuing.</emphasis>
+00325 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">while</emphasis>&#32;(alpha&#32;&lt;&#32;1.0f)
+00326 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;yield&#32;<emphasis role="keywordflow">return</emphasis>&#32;<emphasis role="keyword">null</emphasis>;
+00327 
+00328 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;Keep&#32;us&#32;from&#32;getting&#32;destroyed&#32;when&#32;loading&#32;the&#32;new&#32;level,&#32;otherwise&#32;this&#32;coroutine&#32;will&#32;get&#32;stopped&#32;prematurely.</emphasis>
+00329 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;transform.parent&#32;=&#32;<emphasis role="keyword">null</emphasis>;
+00330 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;DontDestroyOnLoad(gameObject);
+00331 
+00332 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(!<emphasis role="keywordtype">string</emphasis>.IsNullOrEmpty(<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___load_level_1a88826d505c93cf3901bd9205b3241638">internalProcessPath</link>))
+00333 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00334 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;Debug.Log(<emphasis role="stringliteral">&quot;&lt;b&gt;[SteamVR]&lt;/b&gt;&#32;Launching&#32;external&#32;application...&quot;</emphasis>);
+00335 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;var&#32;applications&#32;=&#32;<link linkend="_class_valve_1_1_v_r_1_1_open_v_r">OpenVR</link>.<link linkend="_class_valve_1_1_v_r_1_1_open_v_r_1affb13ebb2d1cfcb5a0a7204ca5cd78e5">Applications</link>;
+00336 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(applications&#32;==&#32;<emphasis role="keyword">null</emphasis>)
+00337 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00338 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;Debug.Log(<emphasis role="stringliteral">&quot;&lt;b&gt;[SteamVR]&lt;/b&gt;&#32;Failed&#32;to&#32;get&#32;OpenVR.Applications&#32;interface!&quot;</emphasis>);
+00339 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00340 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">else</emphasis>
+00341 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00342 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;var&#32;workingDirectory&#32;=&#32;Directory.GetCurrentDirectory();
+00343 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;var&#32;fullPath&#32;=&#32;Path.Combine(workingDirectory,&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___load_level_1a88826d505c93cf3901bd9205b3241638">internalProcessPath</link>);
+00344 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;Debug.Log(<emphasis role="stringliteral">&quot;&lt;b&gt;[SteamVR]&lt;/b&gt;&#32;LaunchingInternalProcess&quot;</emphasis>);
+00345 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;Debug.Log(<emphasis role="stringliteral">&quot;&lt;b&gt;[SteamVR]&lt;/b&gt;&#32;ExternalAppPath&#32;=&#32;&quot;</emphasis>&#32;+&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___load_level_1a88826d505c93cf3901bd9205b3241638">internalProcessPath</link>);
+00346 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;Debug.Log(<emphasis role="stringliteral">&quot;&lt;b&gt;[SteamVR]&lt;/b&gt;&#32;FullPath&#32;=&#32;&quot;</emphasis>&#32;+&#32;fullPath);
+00347 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;Debug.Log(<emphasis role="stringliteral">&quot;&lt;b&gt;[SteamVR]&lt;/b&gt;&#32;ExternalAppArgs&#32;=&#32;&quot;</emphasis>&#32;+&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___load_level_1a803bdef44067d35c1ac7f42e88e5468f">internalProcessArgs</link>);
+00348 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;Debug.Log(<emphasis role="stringliteral">&quot;&lt;b&gt;[SteamVR]&lt;/b&gt;&#32;WorkingDirectory&#32;=&#32;&quot;</emphasis>&#32;+&#32;workingDirectory);
+00349 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;var&#32;error&#32;=&#32;applications.<link linkend="_class_valve_1_1_v_r_1_1_c_v_r_applications_1aecc547aa078162f39cc95d6eb7191f0d">LaunchInternalProcess</link>(fullPath,&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___load_level_1a803bdef44067d35c1ac7f42e88e5468f">internalProcessArgs</link>,&#32;workingDirectory);
+00350 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;Debug.Log(<emphasis role="stringliteral">&quot;&lt;b&gt;[SteamVR]&lt;/b&gt;&#32;LaunchInternalProcessError:&#32;&quot;</emphasis>&#32;+&#32;error);
+00351 <emphasis role="preprocessor">#if&#32;UNITY_EDITOR</emphasis>
+00352 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_namespace_unity_editor">UnityEditor</link>.EditorApplication.isPlaying&#32;=&#32;<emphasis role="keyword">false</emphasis>;
+00353 <emphasis role="preprocessor">#elif&#32;!UNITY_METRO</emphasis>
+00354 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;System.Diagnostics.Process.GetCurrentProcess().Kill();
+00355 <emphasis role="preprocessor">#endif</emphasis>
+00356 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00357 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00358 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">else</emphasis>
+00359 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00360 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;var&#32;mode&#32;=&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___load_level_1a3f5f4bf18ba7aefcf0c6fdecbb123b33">loadAdditive</link>&#32;?&#32;<link linkend="_namespace_unity_engine">UnityEngine</link>.SceneManagement.LoadSceneMode.Additive&#32;:&#32;<link linkend="_namespace_unity_engine">UnityEngine</link>.SceneManagement.LoadSceneMode.Single;
+00361 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___load_level_1ae05b17c8b80f005d9c6680e7e3509665">loadAsync</link>)
+00362 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00363 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_namespace_valve_1_1_v_r_1aecd07a81fe79a9f96c6787513e2d98e4ae498749f3c42246d50b15c81c101d988">Application</link>.backgroundLoadingPriority&#32;=&#32;ThreadPriority.Low;
+00364 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;async&#32;=&#32;<link linkend="_namespace_unity_engine">UnityEngine</link>.SceneManagement.SceneManager.LoadSceneAsync(<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___load_level_1ac07ec4814e60ad5c6ccae6ed9d596ba5">levelName</link>,&#32;mode);
+00365 
+00366 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;Performing&#32;this&#32;in&#32;a&#32;while&#32;loop&#32;instead&#32;seems&#32;to&#32;help&#32;smooth&#32;things&#32;out.</emphasis>
+00367 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//yield&#32;return&#32;async;</emphasis>
+00368 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">while</emphasis>&#32;(!async.isDone)
+00369 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00370 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;yield&#32;<emphasis role="keywordflow">return</emphasis>&#32;<emphasis role="keyword">null</emphasis>;
+00371 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00372 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00373 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">else</emphasis>
+00374 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00375 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_namespace_unity_engine">UnityEngine</link>.SceneManagement.SceneManager.LoadScene(<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___load_level_1ac07ec4814e60ad5c6ccae6ed9d596ba5">levelName</link>,&#32;mode);
+00376 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00377 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00378 
+00379 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;yield&#32;<emphasis role="keywordflow">return</emphasis>&#32;<emphasis role="keyword">null</emphasis>;
+00380 
+00381 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;System.GC.Collect();
+00382 
+00383 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;yield&#32;<emphasis role="keywordflow">return</emphasis>&#32;<emphasis role="keyword">null</emphasis>;
+00384 
+00385 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;Shader.WarmupAllShaders();
+00386 
+00387 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;Optionally&#32;wait&#32;a&#32;short&#32;period&#32;of&#32;time&#32;after&#32;loading&#32;everything&#32;back&#32;in,&#32;but&#32;before&#32;we&#32;start&#32;rendering&#32;again</emphasis>
+00388 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;in&#32;order&#32;to&#32;give&#32;everything&#32;a&#32;change&#32;to&#32;settle&#32;down&#32;to&#32;avoid&#32;any&#32;hitching&#32;at&#32;the&#32;start&#32;of&#32;the&#32;new&#32;level.</emphasis>
+00389 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;yield&#32;<emphasis role="keywordflow">return</emphasis>&#32;<emphasis role="keyword">new</emphasis>&#32;WaitForSeconds(<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___load_level_1adb1b07df595fc98133a7a09c16f566ef">postLoadSettleTime</link>);
+00390 
+00391 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___render">SteamVR_Render</link>.<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___render_1ad0d6a11827b9c94df738a6e3669a0e70">pauseRendering</link>&#32;=&#32;<emphasis role="keyword">false</emphasis>;
+00392 
+00393 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;Fade&#32;out&#32;loading&#32;screen.</emphasis>
+00394 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___load_level_1a204cc6798b089fcef99241dd98732e70">loadingScreenFadeOutTime</link>&#32;&gt;&#32;0.0f)
+00395 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00396 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;fadeRate&#32;=&#32;-1.0f&#32;/&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___load_level_1a204cc6798b089fcef99241dd98732e70">loadingScreenFadeOutTime</link>;
+00397 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00398 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">else</emphasis>
+00399 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00400 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;alpha&#32;=&#32;0.0f;
+00401 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00402 
+00403 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;Fade&#32;out&#32;to&#32;compositor</emphasis>
+00404 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;SteamVR_Events.LoadingFadeIn.Send(<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___load_level_1af8a3b1c29f83d0396558840ce132ea84">fadeInTime</link>);
+00405 
+00406 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;Refresh&#32;compositor&#32;reference&#32;since&#32;loading&#32;scenes&#32;might&#32;have&#32;invalidated&#32;it.</emphasis>
+00407 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;compositor&#32;=&#32;<link linkend="_class_valve_1_1_v_r_1_1_open_v_r">OpenVR</link>.<link linkend="_class_valve_1_1_v_r_1_1_open_v_r_1a398bc817d8516416f480aed933599ac5">Compositor</link>;
+00408 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(compositor&#32;!=&#32;<emphasis role="keyword">null</emphasis>)
+00409 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00410 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;Fade&#32;out&#32;foreground&#32;color&#32;if&#32;necessary.</emphasis>
+00411 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(fadedForeground)
+00412 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00413 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;compositor.<link linkend="_class_valve_1_1_v_r_1_1_c_v_r_compositor_1a5a3244fc83b8da0ac59d8e9099947684">FadeGrid</link>(0.0f,&#32;<emphasis role="keyword">false</emphasis>);
+00414 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;compositor.FadeToColor(<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___load_level_1af8a3b1c29f83d0396558840ce132ea84">fadeInTime</link>,&#32;0.0f,&#32;0.0f,&#32;0.0f,&#32;0.0f,&#32;<emphasis role="keyword">false</emphasis>);
+00415 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;yield&#32;<emphasis role="keywordflow">return</emphasis>&#32;<emphasis role="keyword">new</emphasis>&#32;WaitForSeconds(<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___load_level_1af8a3b1c29f83d0396558840ce132ea84">fadeInTime</link>);
+00416 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00417 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">else</emphasis>
+00418 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00419 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;Fade&#32;scene&#32;back&#32;in,&#32;and&#32;reset&#32;skybox&#32;once&#32;no&#32;longer&#32;visible.</emphasis>
+00420 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;compositor.FadeGrid(<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___load_level_1af8a3b1c29f83d0396558840ce132ea84">fadeInTime</link>,&#32;<emphasis role="keyword">false</emphasis>);
+00421 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;yield&#32;<emphasis role="keywordflow">return</emphasis>&#32;<emphasis role="keyword">new</emphasis>&#32;WaitForSeconds(<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___load_level_1af8a3b1c29f83d0396558840ce132ea84">fadeInTime</link>);
+00422 
+00423 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___load_level_1a95d45adace3d6ec6b590e841229cb042">front</link>&#32;!=&#32;<emphasis role="keyword">null</emphasis>)
+00424 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00425 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___skybox">SteamVR_Skybox</link>.<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___skybox_1af2326152206cf107c0fd164d5856146b">ClearOverride</link>();
+00426 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00427 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00428 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00429 
+00430 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;Finally,&#32;stick&#32;around&#32;long&#32;enough&#32;for&#32;our&#32;overlays&#32;to&#32;fully&#32;fade&#32;out.</emphasis>
+00431 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">while</emphasis>&#32;(alpha&#32;&gt;&#32;0.0f)
+00432 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;yield&#32;<emphasis role="keywordflow">return</emphasis>&#32;<emphasis role="keyword">null</emphasis>;
+00433 
+00434 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(overlay&#32;!=&#32;<emphasis role="keyword">null</emphasis>)
+00435 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00436 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(progressBarOverlayHandle&#32;!=&#32;<link linkend="_class_valve_1_1_v_r_1_1_open_v_r">OpenVR</link>.<link linkend="_class_valve_1_1_v_r_1_1_open_v_r_1ad9be268d73a128738178fd468dc8cfe1">k_ulOverlayHandleInvalid</link>)
+00437 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;overlay.HideOverlay(progressBarOverlayHandle);
+00438 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(loadingScreenOverlayHandle&#32;!=&#32;<link linkend="_class_valve_1_1_v_r_1_1_open_v_r">OpenVR</link>.<link linkend="_class_valve_1_1_v_r_1_1_open_v_r_1ad9be268d73a128738178fd468dc8cfe1">k_ulOverlayHandleInvalid</link>)
+00439 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;overlay.HideOverlay(loadingScreenOverlayHandle);
+00440 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00441 
+00442 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;Destroy(gameObject);
+00443 
+00444 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;_active&#32;=&#32;<emphasis role="keyword">null</emphasis>;
+00445 
+00446 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;SteamVR_Events.Loading.Send(<emphasis role="keyword">false</emphasis>);
+00447 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00448 
+00449 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;Helper&#32;to&#32;create&#32;(or&#32;reuse&#32;if&#32;possible)&#32;each&#32;of&#32;our&#32;different&#32;overlay&#32;types.</emphasis>
+00450 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;ulong&#32;GetOverlayHandle(<emphasis role="keywordtype">string</emphasis>&#32;overlayName,&#32;Transform&#32;transform,&#32;<emphasis role="keywordtype">float</emphasis>&#32;widthInMeters&#32;=&#32;1.0f)
+00451 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00452 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;ulong&#32;handle&#32;=&#32;<link linkend="_class_valve_1_1_v_r_1_1_open_v_r">OpenVR</link>.<link linkend="_class_valve_1_1_v_r_1_1_open_v_r_1ad9be268d73a128738178fd468dc8cfe1">k_ulOverlayHandleInvalid</link>;
+00453 
+00454 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;var&#32;overlay&#32;=&#32;<link linkend="_class_valve_1_1_v_r_1_1_open_v_r">OpenVR</link>.<link linkend="_class_valve_1_1_v_r_1_1_open_v_r_1a03223e58125dbd40477879c4283728a3">Overlay</link>;
+00455 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(overlay&#32;==&#32;<emphasis role="keyword">null</emphasis>)
+00456 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;handle;
+00457 
+00458 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;var&#32;key&#32;=&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___overlay">SteamVR_Overlay</link>.<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___overlay_1abcca08e2e6e1afe4cbd813abca787701">key</link>&#32;+&#32;<emphasis role="stringliteral">&quot;.&quot;</emphasis>&#32;+&#32;overlayName;
+00459 
+00460 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;var&#32;error&#32;=&#32;overlay.FindOverlay(key,&#32;ref&#32;handle);
+00461 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(error&#32;!=&#32;<link linkend="_namespace_valve_1_1_v_r_1aaee5c5144f42b7969d45b854f51b0c18">EVROverlayError</link>.None)
+00462 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;error&#32;=&#32;overlay.CreateOverlay(key,&#32;overlayName,&#32;ref&#32;handle);
+00463 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(error&#32;==&#32;<link linkend="_namespace_valve_1_1_v_r_1aaee5c5144f42b7969d45b854f51b0c18">EVROverlayError</link>.None)
+00464 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00465 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;overlay.ShowOverlay(handle);
+00466 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;overlay.SetOverlayAlpha(handle,&#32;alpha);
+00467 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;overlay.SetOverlayWidthInMeters(handle,&#32;widthInMeters);
+00468 
+00469 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;D3D&#32;textures&#32;are&#32;upside-down&#32;in&#32;Unity&#32;to&#32;match&#32;OpenGL.</emphasis>
+00470 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r">SteamVR</link>.<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r_1af374389920329f77814037a571f6bf2f">instance</link>.<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r_1ab18af3cf2ec5ed39ceee8901c9df6f1f">textureType</link>&#32;==&#32;<link linkend="_namespace_valve_1_1_v_r_1a9481de640e411eef49c2f3fdca82eaa3">ETextureType</link>.DirectX)
+00471 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00472 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;var&#32;textureBounds&#32;=&#32;<emphasis role="keyword">new</emphasis>&#32;<link linkend="_struct_valve_1_1_v_r_1_1_v_r_texture_bounds__t">VRTextureBounds_t</link>();
+00473 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;textureBounds.uMin&#32;=&#32;0;
+00474 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;textureBounds.vMin&#32;=&#32;1;
+00475 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;textureBounds.uMax&#32;=&#32;1;
+00476 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;textureBounds.vMax&#32;=&#32;0;
+00477 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;overlay.SetOverlayTextureBounds(handle,&#32;ref&#32;textureBounds);
+00478 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00479 
+00480 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;Convert&#32;from&#32;world&#32;space&#32;to&#32;tracking&#32;space&#32;using&#32;the&#32;top-most&#32;camera.</emphasis>
+00481 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;var&#32;vrcam&#32;=&#32;(<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___load_level_1a7608fc39bc1501a37bc12b101fa60eaa">loadingScreenDistance</link>&#32;==&#32;0.0f)&#32;?&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___render">SteamVR_Render</link>.<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___render_1a4fae36331a03674fa212cfc38aa18358">Top</link>()&#32;:&#32;<emphasis role="keyword">null</emphasis>;
+00482 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(vrcam&#32;!=&#32;<emphasis role="keyword">null</emphasis>&#32;&amp;&amp;&#32;vrcam.origin&#32;!=&#32;<emphasis role="keyword">null</emphasis>)
+00483 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00484 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;var&#32;offset&#32;=&#32;<emphasis role="keyword">new</emphasis>&#32;SteamVR_Utils.RigidTransform(vrcam.origin,&#32;transform);
+00485 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;offset.pos.x&#32;/=&#32;vrcam.<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___camera_1a12fe684a54d4cade55c1ba7d693e38bd">origin</link>.localScale.x;
+00486 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;offset.pos.y&#32;/=&#32;vrcam.origin.localScale.y;
+00487 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;offset.pos.z&#32;/=&#32;vrcam.origin.localScale.z;
+00488 
+00489 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;var&#32;t&#32;=&#32;offset.ToHmdMatrix34();
+00490 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;overlay.SetOverlayTransformAbsolute(handle,&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r">SteamVR</link>.<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r_1a8d2a06793f921d45801b50af18f0c413">settings</link>.<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___settings_1a915da3507ad2861be45ad3d957cece37">trackingSpace</link>,&#32;ref&#32;t);
+00491 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00492 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">else</emphasis>
+00493 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00494 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;var&#32;t&#32;=&#32;<emphasis role="keyword">new</emphasis>&#32;SteamVR_Utils.RigidTransform(transform).ToHmdMatrix34();
+00495 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;overlay.SetOverlayTransformAbsolute(handle,&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r">SteamVR</link>.<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r_1a8d2a06793f921d45801b50af18f0c413">settings</link>.<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___settings_1a915da3507ad2861be45ad3d957cece37">trackingSpace</link>,&#32;ref&#32;t);
+00496 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00497 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00498 
+00499 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;handle;
+00500 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00501 &#32;&#32;&#32;&#32;}
+00502 }
+</programlisting></section>

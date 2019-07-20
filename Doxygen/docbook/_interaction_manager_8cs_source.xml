@@ -1,0 +1,951 @@
+<?xml version='1.0' encoding='UTF-8' standalone='no'?>
+<section xmlns="http://docbook.org/ns/docbook" version="5.0" xmlns:xlink="http://www.w3.org/1999/xlink" xml:id="__interaction_manager_8cs_source">
+<title>InteractionManager.cs</title>
+<indexterm><primary>O:/GitHUBMINIPRoject/Assets/LeapMotion/Modules/InteractionEngine/Scripts/InteractionManager.cs</primary></indexterm>
+<programlisting>00001 <emphasis role="comment">/******************************************************************************</emphasis>
+00002 <emphasis role="comment">&#32;*&#32;Copyright&#32;(C)&#32;Leap&#32;Motion,&#32;Inc.&#32;2011-2018.&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;*</emphasis>
+00003 <emphasis role="comment">&#32;*&#32;Leap&#32;Motion&#32;proprietary&#32;and&#32;confidential.&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;*</emphasis>
+00004 <emphasis role="comment">&#32;*&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;*</emphasis>
+00005 <emphasis role="comment">&#32;*&#32;Use&#32;subject&#32;to&#32;the&#32;terms&#32;of&#32;the&#32;Leap&#32;Motion&#32;SDK&#32;Agreement&#32;available&#32;at&#32;&#32;&#32;&#32;&#32;*</emphasis>
+00006 <emphasis role="comment">&#32;*&#32;https://developer.leapmotion.com/sdk_agreement,&#32;or&#32;another&#32;agreement&#32;&#32;&#32;&#32;&#32;&#32;&#32;*</emphasis>
+00007 <emphasis role="comment">&#32;*&#32;between&#32;Leap&#32;Motion&#32;and&#32;you,&#32;your&#32;company&#32;or&#32;other&#32;organization.&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;*</emphasis>
+00008 <emphasis role="comment">&#32;******************************************************************************/</emphasis>
+00009 
+00010 <emphasis role="keyword">using</emphasis>&#32;InteractionEngineUtility;
+00011 <emphasis role="keyword">using</emphasis>&#32;<link linkend="_namespace_leap">Leap</link>.<link linkend="_namespace_leap_1_1_unity">Unity</link>.<link linkend="_namespace_leap_1_1_unity_1_1_attributes">Attributes</link>;
+00012 <emphasis role="keyword">using</emphasis>&#32;<link linkend="_namespace_leap">Leap</link>.<link linkend="_namespace_leap_1_1_unity">Unity</link>.<link linkend="_namespace_leap_1_1_unity_1_1_runtime_gizmos">RuntimeGizmos</link>;
+00013 <emphasis role="keyword">using</emphasis>&#32;<link linkend="_namespace_leap">Leap</link>.<link linkend="_namespace_leap_1_1_unity">Unity</link>.<link linkend="_namespace_leap_1_1_unity_1_1_query">Query</link>;
+00014 <emphasis role="keyword">using</emphasis>&#32;<link linkend="_namespace_leap">Leap</link>.<link linkend="_namespace_leap_1_1_unity">Unity</link>.<link linkend="_namespace_leap_1_1_unity_1_1_interaction">Interaction</link>.<link linkend="_namespace_leap_1_1_unity_1_1_interaction_1_1_internal">Internal</link>;
+00015 <emphasis role="keyword">using</emphasis>&#32;System;
+00016 <emphasis role="keyword">using</emphasis>&#32;System.Collections.Generic;
+00017 <emphasis role="keyword">using</emphasis>&#32;<link linkend="__balloon_8cs_1a7d67e097df9376eb709b6a23aa3c7d23">UnityEngine</link>;
+00018 
+00019 <emphasis role="preprocessor">#if&#32;UNITY_EDITOR</emphasis>
+00020 <emphasis role="keyword">using</emphasis>&#32;<link linkend="_namespace_unity_editor">UnityEditor</link>;
+00021 <emphasis role="preprocessor">#endif</emphasis>
+00022 
+00023 <emphasis role="keyword">namespace&#32;</emphasis><link linkend="_namespace_leap_1_1_unity_1_1_interaction">Leap.Unity.Interaction</link>&#32;{
+00024 
+00025 &#32;&#32;[DisallowMultipleComponent]
+00026 &#32;&#32;[ExecuteInEditMode]
+<anchor xml:id="__interaction_manager_8cs_source_1l00027"/><link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_manager">00027</link> &#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keyword">class&#32;</emphasis><link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_manager">InteractionManager</link>&#32;:&#32;MonoBehaviour,&#32;<link linkend="_interface_leap_1_1_unity_1_1_interaction_1_1_i_internal_interaction_manager">IInternalInteractionManager</link>,
+00028 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_interface_leap_1_1_unity_1_1_runtime_gizmos_1_1_i_runtime_gizmo_component">IRuntimeGizmoComponent</link>&#32;{
+00029 
+00030 <emphasis role="preprocessor">&#32;&#32;&#32;&#32;#region&#32;Inspector</emphasis>
+00031 
+00032 &#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;Header&#32;&quot;Interaction&#32;Controllers&quot;&#32;via&#32;InteractionManagerEditor.cs.</emphasis>
+00033 &#32;&#32;&#32;&#32;[SerializeField]
+00034 &#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_controller_set">InteractionControllerSet</link>&#32;_interactionControllers&#32;=&#32;<emphasis role="keyword">new</emphasis>&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_controller_set">InteractionControllerSet</link>();
+<anchor xml:id="__interaction_manager_8cs_source_1l00038"/><link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_manager_1a8946daadeba0069746b6db6aff5c1ea8">00038</link> &#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<link linkend="_struct_leap_1_1_unity_1_1_readonly_hash_set">ReadonlyHashSet&lt;InteractionController&gt;</link>&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_manager_1a8946daadeba0069746b6db6aff5c1ea8">interactionControllers</link>&#32;{
+00039 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">get</emphasis>&#32;{&#32;<emphasis role="keywordflow">return</emphasis>&#32;_interactionControllers;&#32;}
+00040 &#32;&#32;&#32;&#32;}
+00041 
+00042 &#32;&#32;&#32;&#32;[Header(<emphasis role="stringliteral">&quot;Interaction&#32;Settings&quot;</emphasis>)]
+00043 
+00044 &#32;&#32;&#32;&#32;[SerializeField]
+00045 &#32;&#32;&#32;&#32;[Tooltip(<emphasis role="stringliteral">&quot;Beyond&#32;this&#32;radius,&#32;an&#32;interaction&#32;object&#32;will&#32;not&#32;receive&#32;hover&#32;or&#32;primary&#32;&quot;</emphasis>
+00046 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;+&#32;<emphasis role="stringliteral">&quot;hover&#32;callbacks&#32;from&#32;an&#32;interaction&#32;controller.&#32;(Smaller&#32;values&#32;are&#32;&quot;</emphasis>
+00047 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;+&#32;<emphasis role="stringliteral">&quot;cheaper.)&#32;This&#32;value&#32;is&#32;automatically&#32;scaled&#32;under&#32;the&#32;hood&#32;by&#32;the&#32;&quot;</emphasis>
+00048 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;+&#32;<emphasis role="stringliteral">&quot;Interaction&#32;Manager&apos;s&#32;lossyScale.x,&#32;so&#32;it&apos;s&#32;recommended&#32;to&#32;keep&#32;your&#32;&quot;</emphasis>
+00049 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;+&#32;<emphasis role="stringliteral">&quot;Interaction&#32;Manager&#32;with&#32;unit&#32;scale&#32;underneath&#32;your&#32;&apos;Player&apos;&#32;Transform&#32;if&#32;&quot;</emphasis>
+00050 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;+&#32;<emphasis role="stringliteral">&quot;you&#32;expect&#32;your&#32;player&apos;s&#32;hands&#32;or&#32;controllers&#32;to&#32;ever&#32;have&#32;non-unit&#32;scale.&quot;</emphasis>)]
+<anchor xml:id="__interaction_manager_8cs_source_1l00051"/><link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_manager_1a64d2d9e76c9c255c51cceab432176b7e">00051</link> &#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keywordtype">float</emphasis>&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_manager_1a64d2d9e76c9c255c51cceab432176b7e">hoverActivationRadius</link>&#32;=&#32;0.2F;
+00052 
+00053 &#32;&#32;&#32;&#32;[Tooltip(<emphasis role="stringliteral">&quot;Beyond&#32;this&#32;radius,&#32;an&#32;interaction&#32;object&#32;will&#32;not&#32;be&#32;considered&#32;for&#32;&quot;</emphasis>
+00054 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;+&#32;<emphasis role="stringliteral">&quot;contact&#32;or&#32;grasping&#32;logic.&#32;The&#32;radius&#32;should&#32;be&#32;small&#32;as&#32;an&#32;optimization&#32;&quot;</emphasis>
+00055 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;+&#32;<emphasis role="stringliteral">&quot;but&#32;certainly&#32;not&#32;smaller&#32;than&#32;an&#32;interaction&#32;controller&#32;and&#32;not&#32;too&#32;tight&#32;&quot;</emphasis>
+00056 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;+&#32;<emphasis role="stringliteral">&quot;around&#32;the&#32;controller&#32;to&#32;allow&#32;good&#32;behavior&#32;when&#32;it&#32;is&#32;moving&#32;quickly&#32;&quot;</emphasis>
+00057 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;+&#32;<emphasis role="stringliteral">&quot;through&#32;space.&#32;This&#32;value&#32;is&#32;automatically&#32;scaled&#32;under&#32;the&#32;hood&#32;by&#32;the&#32;&quot;</emphasis>
+00058 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;+&#32;<emphasis role="stringliteral">&quot;Interaction&#32;Manager&apos;s&#32;lossyScale.x,&#32;so&#32;it&apos;s&#32;recommended&#32;to&#32;keep&#32;your&#32;&quot;</emphasis>
+00059 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;+&#32;<emphasis role="stringliteral">&quot;Interaction&#32;Manager&#32;with&#32;unit&#32;scale&#32;underneath&#32;your&#32;&apos;Player&apos;&#32;Transform&#32;if&#32;&quot;</emphasis>
+00060 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;+&#32;<emphasis role="stringliteral">&quot;you&#32;expect&#32;your&#32;player&apos;s&#32;hands&#32;or&#32;controllers&#32;to&#32;ever&#32;have&#32;non-unit&#32;scale.&quot;</emphasis>)]
+<anchor xml:id="__interaction_manager_8cs_source_1l00061"/><link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_manager_1abab33ed7036f6694c970e0f7a73254f3">00061</link> &#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keywordtype">float</emphasis>&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_manager_1abab33ed7036f6694c970e0f7a73254f3">touchActivationRadius</link>&#32;=&#32;0.075F;
+00062 
+00063 &#32;&#32;&#32;&#32;[Header(<emphasis role="stringliteral">&quot;Layer&#32;Settings&quot;</emphasis>)]
+00064 &#32;&#32;&#32;&#32;[Tooltip(<emphasis role="stringliteral">&quot;Whether&#32;or&#32;not&#32;to&#32;create&#32;the&#32;layers&#32;used&#32;for&#32;interaction&#32;when&#32;the&#32;scene&#32;&quot;</emphasis>
+00065 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;+&#32;<emphasis role="stringliteral">&quot;runs.&#32;Interactions&#32;require&#32;an&#32;interaction&#32;layer&#32;(for&#32;objects),&#32;a&#32;grasped&#32;&quot;</emphasis>
+00066 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;+&#32;<emphasis role="stringliteral">&quot;object&#32;layer,&#32;and&#32;a&#32;contact&#32;bone&#32;layer&#32;(for&#32;interaction&#32;controller&#32;&apos;bone&apos;&#32;&quot;</emphasis>
+00067 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;+&#32;<emphasis role="stringliteral">&quot;colliders).&#32;Keep&#32;this&#32;checked&#32;to&#32;have&#32;these&#32;layers&#32;created&#32;for&#32;you,&#32;but&#32;be&#32;&quot;</emphasis>
+00068 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;+&#32;<emphasis role="stringliteral">&quot;aware&#32;that&#32;the&#32;generated&#32;layers&#32;will&#32;have&#32;blank&#32;names&#32;due&#32;to&#32;Unity&#32;&quot;</emphasis>
+00069 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;+&#32;<emphasis role="stringliteral">&quot;limitations.&quot;</emphasis>)]
+00070 &#32;&#32;&#32;&#32;[SerializeField]
+00071 &#32;&#32;&#32;&#32;[<link linkend="_class_leap_1_1_unity_1_1_attributes_1_1_edit_time_only">EditTimeOnly</link>]
+<anchor xml:id="__interaction_manager_8cs_source_1l00072"/><link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_manager_1a67b3425669699e61b3649ed83f5b3283">00072</link> &#32;&#32;&#32;&#32;<emphasis role="keyword">protected</emphasis>&#32;<emphasis role="keywordtype">bool</emphasis>&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_manager_1a67b3425669699e61b3649ed83f5b3283">_autoGenerateLayers</link>&#32;=&#32;<emphasis role="keyword">true</emphasis>;
+<anchor xml:id="__interaction_manager_8cs_source_1l00076"/><link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_manager_1a9444a5cee976bad9ae36b128f9f26ba7">00076</link> &#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keywordtype">bool</emphasis>&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_manager_1a9444a5cee976bad9ae36b128f9f26ba7">autoGenerateLayers</link>&#32;{&#32;<emphasis role="keyword">get</emphasis>&#32;{&#32;<emphasis role="keywordflow">return</emphasis>&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_manager_1a67b3425669699e61b3649ed83f5b3283">_autoGenerateLayers</link>;&#32;}&#32;}
+00077 
+00078 &#32;&#32;&#32;&#32;[Tooltip(<emphasis role="stringliteral">&quot;When&#32;automatically&#32;generating&#32;layers,&#32;the&#32;Interaction&#32;layer&#32;(for&#32;&quot;</emphasis>
+00079 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;+&#32;<emphasis role="stringliteral">&quot;interactable&#32;objects)&#32;will&#32;use&#32;the&#32;same&#32;physics&#32;collision&#32;flags&#32;as&#32;the&#32;&quot;</emphasis>
+00080 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;+&#32;<emphasis role="stringliteral">&quot;layer&#32;specified&#32;here.&quot;</emphasis>)]
+00081 &#32;&#32;&#32;&#32;[SerializeField]
+<anchor xml:id="__interaction_manager_8cs_source_1l00082"/><link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_manager_1a17b10e0cecd075456a90be0617c77b25">00082</link> &#32;&#32;&#32;&#32;<emphasis role="keyword">protected</emphasis>&#32;<link linkend="_struct_leap_1_1_unity_1_1_single_layer">SingleLayer</link>&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_manager_1a17b10e0cecd075456a90be0617c77b25">_templateLayer</link>&#32;=&#32;0;
+<anchor xml:id="__interaction_manager_8cs_source_1l00083"/><link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_manager_1a08c617c31954540a87088b1b65250859">00083</link> &#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<link linkend="_struct_leap_1_1_unity_1_1_single_layer">SingleLayer</link>&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_manager_1a08c617c31954540a87088b1b65250859">templateLayer</link>&#32;{&#32;<emphasis role="keyword">get</emphasis>&#32;{&#32;<emphasis role="keywordflow">return</emphasis>&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_manager_1a17b10e0cecd075456a90be0617c77b25">_templateLayer</link>;&#32;}&#32;}
+00084 
+00085 &#32;&#32;&#32;&#32;[Tooltip(<emphasis role="stringliteral">&quot;The&#32;layer&#32;for&#32;interactable&#32;objects&#32;(i.e.&#32;InteractionBehaviours).&#32;Usually&#32;&quot;</emphasis>
+00086 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;+&#32;<emphasis role="stringliteral">&quot;this&#32;would&#32;have&#32;the&#32;same&#32;collision&#32;flags&#32;as&#32;the&#32;Default&#32;layer,&#32;but&#32;it&#32;&quot;</emphasis>
+00087 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;+&#32;<emphasis role="stringliteral">&quot;should&#32;be&#32;its&#32;own&#32;layer&#32;so&#32;interaction&#32;controllers&#32;don&apos;t&#32;have&#32;to&#32;check&#32;&quot;</emphasis>
+00088 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;+&#32;<emphasis role="stringliteral">&quot;collision&#32;against&#32;all&#32;physics&#32;objects&#32;in&#32;the&#32;scene.&quot;</emphasis>)]
+00089 &#32;&#32;&#32;&#32;[SerializeField]
+<anchor xml:id="__interaction_manager_8cs_source_1l00090"/><link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_manager_1a829ba8a9a24d75793ff6f05f39d70134">00090</link> &#32;&#32;&#32;&#32;<emphasis role="keyword">protected</emphasis>&#32;<link linkend="_struct_leap_1_1_unity_1_1_single_layer">SingleLayer</link>&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_manager_1a829ba8a9a24d75793ff6f05f39d70134">_interactionLayer</link>&#32;=&#32;0;
+<anchor xml:id="__interaction_manager_8cs_source_1l00091"/><link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_manager_1abeed762876c9d024999e75142a523c80">00091</link> &#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<link linkend="_struct_leap_1_1_unity_1_1_single_layer">SingleLayer</link>&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_manager_1abeed762876c9d024999e75142a523c80">interactionLayer</link>&#32;{&#32;<emphasis role="keyword">get</emphasis>&#32;{&#32;<emphasis role="keywordflow">return</emphasis>&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_manager_1a829ba8a9a24d75793ff6f05f39d70134">_interactionLayer</link>;&#32;}&#32;}
+00092 
+00093 &#32;&#32;&#32;&#32;[Tooltip(<emphasis role="stringliteral">&quot;The&#32;layer&#32;objects&#32;are&#32;moved&#32;to&#32;when&#32;they&#32;become&#32;grasped,&#32;or&#32;if&#32;they&#32;are&#32;&quot;</emphasis>
+00094 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;+&#32;<emphasis role="stringliteral">&quot;otherwise&#32;ignoring&#32;controller&#32;contact.&#32;This&#32;layer&#32;should&#32;not&#32;collide&#32;with&#32;&quot;</emphasis>
+00095 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;+&#32;<emphasis role="stringliteral">&quot;the&#32;contact&#32;bone&#32;layer,&#32;but&#32;should&#32;collide&#32;with&#32;everything&#32;else&#32;that&#32;the&#32;&quot;</emphasis>
+00096 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;+&#32;<emphasis role="stringliteral">&quot;interaction&#32;layer&#32;collides&#32;with.&quot;</emphasis>)]
+00097 &#32;&#32;&#32;&#32;[SerializeField]
+<anchor xml:id="__interaction_manager_8cs_source_1l00098"/><link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_manager_1a19f2155251076eb53a9083f8f5be2de4">00098</link> &#32;&#32;&#32;&#32;<emphasis role="keyword">protected</emphasis>&#32;<link linkend="_struct_leap_1_1_unity_1_1_single_layer">SingleLayer</link>&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_manager_1a19f2155251076eb53a9083f8f5be2de4">_interactionNoContactLayer</link>&#32;=&#32;0;
+<anchor xml:id="__interaction_manager_8cs_source_1l00099"/><link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_manager_1af684f38e796818e34bf5c9bcc50f0ebe">00099</link> &#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<link linkend="_struct_leap_1_1_unity_1_1_single_layer">SingleLayer</link>&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_manager_1af684f38e796818e34bf5c9bcc50f0ebe">interactionNoContactLayer</link>&#32;{&#32;<emphasis role="keyword">get</emphasis>&#32;{&#32;<emphasis role="keywordflow">return</emphasis>&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_manager_1a19f2155251076eb53a9083f8f5be2de4">_interactionNoContactLayer</link>;&#32;}&#32;}
+00100 
+00101 &#32;&#32;&#32;&#32;[Tooltip(<emphasis role="stringliteral">&quot;The&#32;layer&#32;containing&#32;the&#32;collider&#32;&apos;bones&apos;&#32;of&#32;the&#32;interaction&#32;controller.&#32;&quot;</emphasis>
+00102 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;+&#32;<emphasis role="stringliteral">&quot;This&#32;layer&#32;should&#32;collide&#32;with&#32;anything&#32;you&apos;d&#32;like&#32;to&#32;be&#32;able&#32;to&#32;touch,&#32;&quot;</emphasis>
+00103 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;+&#32;<emphasis role="stringliteral">&quot;but&#32;it&#32;should&#32;not&#32;collide&#32;with&#32;the&#32;grasped&#32;object&#32;layer.&quot;</emphasis>)]
+00104 &#32;&#32;&#32;&#32;[SerializeField]
+<anchor xml:id="__interaction_manager_8cs_source_1l00105"/><link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_manager_1a8e8253c955fd19ddf980040c058098c8">00105</link> &#32;&#32;&#32;&#32;<emphasis role="keyword">protected</emphasis>&#32;<link linkend="_struct_leap_1_1_unity_1_1_single_layer">SingleLayer</link>&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_manager_1a8e8253c955fd19ddf980040c058098c8">_contactBoneLayer</link>&#32;=&#32;0;
+<anchor xml:id="__interaction_manager_8cs_source_1l00106"/><link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_manager_1a8d638a6bce8faff14a6ceedf0d7cd9eb">00106</link> &#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<link linkend="_struct_leap_1_1_unity_1_1_single_layer">SingleLayer</link>&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_manager_1a8d638a6bce8faff14a6ceedf0d7cd9eb">contactBoneLayer</link>&#32;{&#32;<emphasis role="keyword">get</emphasis>&#32;{&#32;<emphasis role="keywordflow">return</emphasis>&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_manager_1a8e8253c955fd19ddf980040c058098c8">_contactBoneLayer</link>;&#32;}&#32;}
+00107 
+00108 &#32;&#32;&#32;&#32;[Header(<emphasis role="stringliteral">&quot;Debug&#32;Settings&quot;</emphasis>)]
+00109 &#32;&#32;&#32;&#32;[SerializeField]
+00110 &#32;&#32;&#32;&#32;[Tooltip(<emphasis role="stringliteral">&quot;Rendering&#32;runtime&#32;gizmos&#32;requires&#32;having&#32;a&#32;Runtime&#32;Gizmo&#32;Manager&#32;somewhere&#32;&quot;</emphasis>
+00111 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;+&#32;<emphasis role="stringliteral">&quot;in&#32;the&#32;scene.&quot;</emphasis>)]
+00112 &#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;<emphasis role="keywordtype">bool</emphasis>&#32;_drawControllerRuntimeGizmos&#32;=&#32;<emphasis role="keyword">false</emphasis>;
+00113 
+00114 <emphasis role="preprocessor">&#32;&#32;&#32;&#32;#endregion</emphasis>
+00115 
+00116 <emphasis role="preprocessor">&#32;&#32;&#32;&#32;#region&#32;Events</emphasis>
+00117 
+<anchor xml:id="__interaction_manager_8cs_source_1l00118"/><link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_manager_1a8db1a9bcd11e194d99df929b8bddcdcc">00118</link> &#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;Action&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_manager_1a8db1a9bcd11e194d99df929b8bddcdcc">OnGraphicalUpdate</link>&#32;=&#32;()&#32;=&gt;&#32;{&#32;};
+<anchor xml:id="__interaction_manager_8cs_source_1l00119"/><link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_manager_1ac5ca2a8716263ba7c473cf120fd5dca2">00119</link> &#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;Action&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_manager_1ac5ca2a8716263ba7c473cf120fd5dca2">OnPrePhysicalUpdate</link>&#32;=&#32;()&#32;=&gt;&#32;{&#32;};
+<anchor xml:id="__interaction_manager_8cs_source_1l00120"/><link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_manager_1ae1d1c4819b9762af4d1633e2c14ee7b1">00120</link> &#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;Action&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_manager_1ae1d1c4819b9762af4d1633e2c14ee7b1">OnPostPhysicalUpdate</link>&#32;=&#32;()&#32;=&gt;&#32;{&#32;};
+00121 
+00122 <emphasis role="preprocessor">&#32;&#32;&#32;&#32;#endregion</emphasis>
+00123 
+00124 <emphasis role="preprocessor">&#32;&#32;&#32;&#32;#region&#32;Scale&#32;Support</emphasis>
+00125 
+00126 &#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;<emphasis role="keywordtype">float</emphasis>&#32;_scale&#32;=&#32;1F;
+00127 
+<anchor xml:id="__interaction_manager_8cs_source_1l00132"/><link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_manager_1a36150064a656dc0d048f5d234b8ff88f">00132</link> &#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keywordtype">float</emphasis>&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_manager_1a36150064a656dc0d048f5d234b8ff88f">WorldHoverActivationRadius</link>&#32;{&#32;<emphasis role="keyword">get</emphasis>&#32;{&#32;<emphasis role="keywordflow">return</emphasis>&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_manager_1a64d2d9e76c9c255c51cceab432176b7e">hoverActivationRadius</link>&#32;*&#32;_scale;&#32;}&#32;}
+00133 
+<anchor xml:id="__interaction_manager_8cs_source_1l00139"/><link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_manager_1af4c1780a031a91b3dac0846a5577be26">00139</link> &#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keywordtype">float</emphasis>&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_manager_1af4c1780a031a91b3dac0846a5577be26">WorldTouchActivationRadius</link>&#32;{&#32;<emphasis role="keyword">get</emphasis>&#32;{&#32;<emphasis role="keywordflow">return</emphasis>&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_manager_1abab33ed7036f6694c970e0f7a73254f3">touchActivationRadius</link>&#32;*&#32;_scale;&#32;}&#32;}
+00140 
+<anchor xml:id="__interaction_manager_8cs_source_1l00145"/><link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_manager_1a129650833ce143b39615e9f2906a3669">00145</link> &#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keywordtype">float</emphasis>&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_manager_1a129650833ce143b39615e9f2906a3669">SimulationScale</link>&#32;{&#32;<emphasis role="keyword">get</emphasis>&#32;{&#32;<emphasis role="keywordflow">return</emphasis>&#32;_scale;&#32;}&#32;}
+00146 
+00147 <emphasis role="preprocessor">&#32;&#32;&#32;&#32;#endregion</emphasis>
+00148 
+00149 <emphasis role="preprocessor">&#32;&#32;&#32;&#32;#region&#32;Object&#32;Tracking</emphasis>
+00150 
+00151 &#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;HashSet&lt;IInteractionBehaviour&gt;&#32;_interactionObjects&#32;=&#32;<emphasis role="keyword">new</emphasis>&#32;HashSet&lt;IInteractionBehaviour&gt;();
+<anchor xml:id="__interaction_manager_8cs_source_1l00156"/><link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_manager_1ad34f64a6e84ba3bed98a4f386857d4e2">00156</link> &#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<link linkend="_struct_leap_1_1_unity_1_1_readonly_hash_set">ReadonlyHashSet&lt;IInteractionBehaviour&gt;</link>&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_manager_1ad34f64a6e84ba3bed98a4f386857d4e2">interactionObjects</link>&#32;{
+00157 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">get</emphasis>&#32;{&#32;<emphasis role="keywordflow">return</emphasis>&#32;_interactionObjects;&#32;}
+00158 &#32;&#32;&#32;&#32;}
+00159 
+00160 &#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;Dictionary&lt;Rigidbody,&#32;IInteractionBehaviour&gt;&#32;_interactionObjectBodies;
+<anchor xml:id="__interaction_manager_8cs_source_1l00165"/><link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_manager_1a8db6ce75ed2fbf2fc032499f1e25d34c">00165</link> &#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;Dictionary&lt;Rigidbody,&#32;IInteractionBehaviour&gt;&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_manager_1a8db6ce75ed2fbf2fc032499f1e25d34c">interactionObjectBodies</link>&#32;{
+00166 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">get</emphasis>&#32;{
+00167 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(_interactionObjectBodies&#32;==&#32;<emphasis role="keyword">null</emphasis>)&#32;{
+00168 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;_interactionObjectBodies&#32;=&#32;<emphasis role="keyword">new</emphasis>&#32;Dictionary&lt;Rigidbody,&#32;IInteractionBehaviour&gt;();
+00169 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00170 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;_interactionObjectBodies;
+00171 &#32;&#32;&#32;&#32;&#32;&#32;}
+00172 &#32;&#32;&#32;&#32;}
+00173 
+00174 &#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;Dictionary&lt;Rigidbody,&#32;ContactBone&gt;&#32;_contactBoneBodies;
+<anchor xml:id="__interaction_manager_8cs_source_1l00179"/><link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_manager_1a025e8a1a9e433fd86245a0e836deba86">00179</link> &#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;Dictionary&lt;Rigidbody,&#32;ContactBone&gt;&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_manager_1a025e8a1a9e433fd86245a0e836deba86">contactBoneBodies</link>&#32;{
+00180 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">get</emphasis>&#32;{
+00181 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(_contactBoneBodies&#32;==&#32;<emphasis role="keyword">null</emphasis>)&#32;{
+00182 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;_contactBoneBodies&#32;=&#32;<emphasis role="keyword">new</emphasis>&#32;Dictionary&lt;Rigidbody,&#32;ContactBone&gt;();
+00183 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00184 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;_contactBoneBodies;
+00185 &#32;&#32;&#32;&#32;&#32;&#32;}
+00186 &#32;&#32;&#32;&#32;}
+00187 
+00188 <emphasis role="preprocessor">&#32;&#32;&#32;&#32;#endregion</emphasis>
+00189 
+00190 <emphasis role="preprocessor">&#32;&#32;&#32;&#32;#region&#32;Singleton&#32;Pattern&#32;(Optional)</emphasis>
+00191 
+00192 &#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;<emphasis role="keyword">static</emphasis>&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_manager">InteractionManager</link>&#32;s_instance;
+<anchor xml:id="__interaction_manager_8cs_source_1l00209"/><link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_manager_1ad59361bc7c0cc65f18f0c9b9b0fac587">00209</link> &#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keyword">static</emphasis>&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_manager">InteractionManager</link>&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_manager_1ad59361bc7c0cc65f18f0c9b9b0fac587">instance</link>&#32;{
+00210 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">get</emphasis>&#32;{
+00211 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(s_instance&#32;==&#32;<emphasis role="keyword">null</emphasis>)&#32;{&#32;s_instance&#32;=&#32;FindObjectOfType&lt;InteractionManager&gt;();&#32;}
+00212 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;s_instance;
+00213 &#32;&#32;&#32;&#32;&#32;&#32;}
+00214 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">set</emphasis>&#32;{&#32;s_instance&#32;=&#32;value;&#32;}
+00215 &#32;&#32;&#32;&#32;}
+00216 
+00217 <emphasis role="preprocessor">&#32;&#32;&#32;&#32;#endregion</emphasis>
+00218 
+00219 <emphasis role="preprocessor">&#32;&#32;&#32;&#32;#region&#32;Unity&#32;Events</emphasis>
+00220 
+00221 &#32;&#32;&#32;&#32;<emphasis role="keywordtype">void</emphasis>&#32;OnValidate()&#32;{
+00222 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(!Application.isPlaying&#32;&amp;&amp;&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_manager_1a67b3425669699e61b3649ed83f5b3283">_autoGenerateLayers</link>)&#32;{
+00223 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_manager_1ac412bb63a1141bba69c9f898cea2b1db">generateAutomaticLayers</link>();
+00224 &#32;&#32;&#32;&#32;&#32;&#32;}
+00225 
+00226 &#32;&#32;&#32;&#32;&#32;&#32;refreshInteractionControllers();
+00227 &#32;&#32;&#32;&#32;}
+00228 
+00229 &#32;&#32;&#32;&#32;<emphasis role="keywordtype">void</emphasis>&#32;Awake()&#32;{
+00230 &#32;&#32;&#32;&#32;&#32;&#32;refreshInteractionControllers();
+00231 
+00232 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(!Application.isPlaying)&#32;<emphasis role="keywordflow">return</emphasis>;
+00233 
+00234 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(s_instance&#32;==&#32;<emphasis role="keyword">null</emphasis>)&#32;s_instance&#32;=&#32;<emphasis role="keyword">this</emphasis>;
+00235 
+00236 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_manager_1a67b3425669699e61b3649ed83f5b3283">_autoGenerateLayers</link>)&#32;{
+00237 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_manager_1ac412bb63a1141bba69c9f898cea2b1db">generateAutomaticLayers</link>();
+00238 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;setupAutomaticCollisionLayers();
+00239 &#32;&#32;&#32;&#32;&#32;&#32;}
+00240 
+00241 &#32;&#32;&#32;&#32;&#32;&#32;_prevPosition&#32;=&#32;this.transform.position;
+00242 &#32;&#32;&#32;&#32;&#32;&#32;_prevRotation&#32;=&#32;this.transform.rotation;
+00243 
+00244 <emphasis role="preprocessor">&#32;&#32;&#32;&#32;&#32;&#32;#if&#32;UNITY_EDITOR</emphasis>
+00245 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(_drawControllerRuntimeGizmos&#32;==&#32;<emphasis role="keyword">true</emphasis>)&#32;{
+00246 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(FindObjectOfType&lt;RuntimeGizmoManager&gt;()&#32;==&#32;<emphasis role="keyword">null</emphasis>)&#32;{
+00247 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;Debug.LogWarning(<emphasis role="stringliteral">&quot;&apos;_drawControllerRuntimeGizmos&apos;&#32;is&#32;enabled,&#32;but&#32;there&#32;is&#32;no&#32;&quot;</emphasis>
+00248 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;+&#32;<emphasis role="stringliteral">&quot;RuntimeGizmoManager&#32;in&#32;your&#32;scene.&#32;Please&#32;add&#32;one&#32;if&#32;you&apos;d&#32;&quot;</emphasis>
+00249 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;+&#32;<emphasis role="stringliteral">&quot;like&#32;to&#32;render&#32;gizmos&#32;in&#32;the&#32;editor&#32;and&#32;in&#32;your&#32;headset.&quot;</emphasis>);
+00250 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00251 &#32;&#32;&#32;&#32;&#32;&#32;}
+00252 <emphasis role="preprocessor">&#32;&#32;&#32;&#32;&#32;&#32;#endif</emphasis>
+00253 &#32;&#32;&#32;&#32;}
+00254 
+00255 &#32;&#32;&#32;&#32;<emphasis role="keywordtype">void</emphasis>&#32;OnDisable()&#32;{
+00256 <emphasis role="preprocessor">&#32;&#32;&#32;&#32;&#32;&#32;#if&#32;UNITY_EDITOR</emphasis>
+00257 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(!<link linkend="_namespace_valve_1_1_v_r_1aecd07a81fe79a9f96c6787513e2d98e4ae498749f3c42246d50b15c81c101d988">Application</link>.isPlaying)&#32;<emphasis role="keywordflow">return</emphasis>;
+00258 <emphasis role="preprocessor">&#32;&#32;&#32;&#32;&#32;&#32;#endif</emphasis>
+00259 
+00260 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">foreach</emphasis>&#32;(var&#32;intController&#32;<emphasis role="keywordflow">in</emphasis>&#32;_interactionControllers)&#32;{
+00261 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;Disables&#32;the&#32;colliders&#32;in&#32;the&#32;interaction&#32;controller;</emphasis>
+00262 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;soft&#32;contact&#32;won&apos;t&#32;be&#32;applied&#32;if&#32;the&#32;controller&#32;is&#32;not&#32;updating.</emphasis>
+00263 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;intController.EnableSoftContact();
+00264 
+00265 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(intController.isGraspingObject)&#32;{
+00266 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;intController.ReleaseGrasp();
+00267 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00268 &#32;&#32;&#32;&#32;&#32;&#32;}
+00269 &#32;&#32;&#32;&#32;}
+00270 
+00271 &#32;&#32;&#32;&#32;<emphasis role="keywordtype">void</emphasis>&#32;Update()&#32;{
+00272 <emphasis role="preprocessor">&#32;&#32;&#32;&#32;&#32;&#32;#if&#32;UNITY_EDITOR</emphasis>
+00273 &#32;&#32;&#32;&#32;&#32;&#32;refreshInteractionControllers();
+00274 <emphasis role="preprocessor">&#32;&#32;&#32;&#32;&#32;&#32;#endif</emphasis>
+00275 &#32;&#32;&#32;&#32;}
+00276 
+00277 &#32;&#32;&#32;&#32;<emphasis role="keywordtype">void</emphasis>&#32;FixedUpdate()&#32;{
+00278 &#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_manager_1ac5ca2a8716263ba7c473cf120fd5dca2">OnPrePhysicalUpdate</link>();
+00279 
+00280 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;Physics&#32;should&#32;only&#32;be&#32;synced&#32;once&#32;at&#32;the&#32;beginning&#32;of&#32;the&#32;physics&#32;simulation.</emphasis>
+00281 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;(Will&#32;be&#32;re-set&#32;to&#32;its&#32;original&#32;value&#32;at&#32;the&#32;end&#32;of&#32;the&#32;update.)</emphasis>
+00282 <emphasis role="preprocessor">&#32;&#32;&#32;&#32;&#32;&#32;#if&#32;UNITY_2017_2_OR_NEWER</emphasis>
+00283 &#32;&#32;&#32;&#32;&#32;&#32;var&#32;preUpdateAutoSyncTransforms&#32;=&#32;<link linkend="_namespace_leap_1_1_unity_1a186e5eb0a2b743f1f6b79346f0ab8ad0a50ae99e9c35446c2580e4b540b0fd104">Physics</link>.autoSyncTransforms;
+00284 &#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_namespace_leap_1_1_unity_1a186e5eb0a2b743f1f6b79346f0ab8ad0a50ae99e9c35446c2580e4b540b0fd104">Physics</link>.autoSyncTransforms&#32;=&#32;<emphasis role="keyword">false</emphasis>;
+00285 <emphasis role="preprocessor">&#32;&#32;&#32;&#32;&#32;&#32;#endif</emphasis>
+00286 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">try</emphasis>&#32;{
+00287 
+00288 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;refreshInteractionControllers();
+00289 
+00290 <emphasis role="preprocessor">&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;#if&#32;UNITY_EDITOR</emphasis>
+00291 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(!<link linkend="_namespace_valve_1_1_v_r_1aecd07a81fe79a9f96c6787513e2d98e4ae498749f3c42246d50b15c81c101d988">Application</link>.isPlaying)&#32;<emphasis role="keywordflow">return</emphasis>;
+00292 <emphasis role="preprocessor">&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;#endif</emphasis>
+00293 
+00294 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">using</emphasis>&#32;(<emphasis role="keyword">new</emphasis>&#32;ProfilerSample(<emphasis role="stringliteral">&quot;Interaction&#32;Manager&#32;FixedUpdate&quot;</emphasis>,&#32;this.gameObject))&#32;{
+00295 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;Ensure&#32;scale&#32;information&#32;is&#32;up-to-date.</emphasis>
+00296 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;_scale&#32;=&#32;this.transform.lossyScale.x;
+00297 
+00298 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;Update&#32;each&#32;interaction&#32;controller&#32;(Leap&#32;hands&#32;or&#32;supported&#32;VR&#32;controllers).</emphasis>
+00299 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;fixedUpdateInteractionControllers();
+00300 
+00301 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;Perform&#32;each&#32;interaction&#32;object&apos;s&#32;FixedUpdateObject.</emphasis>
+00302 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">using</emphasis>&#32;(<emphasis role="keyword">new</emphasis>&#32;ProfilerSample(<emphasis role="stringliteral">&quot;FixedUpdateObject&#32;per-InteractionBehaviour&quot;</emphasis>))&#32;{
+00303 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">foreach</emphasis>&#32;(var&#32;interactionObj&#32;<emphasis role="keywordflow">in</emphasis>&#32;_interactionObjects)&#32;{
+00304 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;interactionObj.FixedUpdateObject();
+00305 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00306 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00307 
+00308 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;Apply&#32;soft&#32;contacts&#32;from&#32;all&#32;controllers&#32;in&#32;a&#32;unified&#32;solve.</emphasis>
+00309 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;(This&#32;will&#32;clear&#32;softContacts&#32;and&#32;originalVelocities&#32;as&#32;well.)</emphasis>
+00310 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">using</emphasis>&#32;(<emphasis role="keyword">new</emphasis>&#32;ProfilerSample(<emphasis role="stringliteral">&quot;Apply&#32;Soft&#32;Contacts&quot;</emphasis>))&#32;{
+00311 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(_drawControllerRuntimeGizmos)&#32;{
+00312 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;_softContactsToDraw&#32;=&#32;<emphasis role="keyword">new</emphasis>&#32;List&lt;PhysicsUtility.SoftContact&gt;(<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_manager_1a70605cd65741d1ec3409745fdf09c3ee">_softContacts</link>);
+00313 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00314 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_manager_1a70605cd65741d1ec3409745fdf09c3ee">_softContacts</link>.Count&#32;&gt;&#32;0)&#32;{
+00315 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;PhysicsUtility.applySoftContacts(<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_manager_1a70605cd65741d1ec3409745fdf09c3ee">_softContacts</link>,&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_manager_1a049c0b24c30386942bb3abe7d3118b6e">_softContactOriginalVelocities</link>);
+00316 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00317 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00318 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00319 
+00320 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_manager_1ae1d1c4819b9762af4d1633e2c14ee7b1">OnPostPhysicalUpdate</link>();
+00321 
+00322 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;updateMovingFrameOfReferenceSupport();
+00323 
+00324 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_manager_1a9444a5cee976bad9ae36b128f9f26ba7">autoGenerateLayers</link>)&#32;{
+00325 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;autoUpdateContactBoneLayerCollision();
+00326 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00327 
+00328 &#32;&#32;&#32;&#32;&#32;&#32;}
+00329 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">finally</emphasis>&#32;{
+00330 <emphasis role="preprocessor">&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;#if&#32;UNITY_2017_2_OR_NEWER</emphasis>
+00331 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;Restore&#32;the&#32;autoSyncTransforms&#32;setting&#32;to&#32;whatever&#32;the&#32;user&#32;had&#32;it&#32;as&#32;before</emphasis>
+00332 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;the&#32;Manager&#32;FixedUpdate.</emphasis>
+00333 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_namespace_leap_1_1_unity_1a186e5eb0a2b743f1f6b79346f0ab8ad0a50ae99e9c35446c2580e4b540b0fd104">Physics</link>.autoSyncTransforms&#32;=&#32;preUpdateAutoSyncTransforms;
+00334 <emphasis role="preprocessor">&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;#endif</emphasis>
+00335 &#32;&#32;&#32;&#32;&#32;&#32;}
+00336 &#32;&#32;&#32;&#32;}
+00337 
+00338 &#32;&#32;&#32;&#32;<emphasis role="keywordtype">void</emphasis>&#32;LateUpdate()&#32;{
+00339 &#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_manager_1a8db1a9bcd11e194d99df929b8bddcdcc">OnGraphicalUpdate</link>();
+00340 &#32;&#32;&#32;&#32;}
+00341 
+00342 <emphasis role="preprocessor">#endregion</emphasis>
+00343 
+00344 <emphasis role="preprocessor">&#32;&#32;&#32;&#32;#region&#32;Controller&#32;Interaction&#32;State&#32;&amp;&#32;Callbacks&#32;Update</emphasis>
+00345 
+00346 &#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;HashSet&lt;InteractionController&gt;&#32;_activeControllersBuffer&#32;=&#32;<emphasis role="keyword">new</emphasis>&#32;HashSet&lt;InteractionController&gt;();
+00347 &#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;HashSet&lt;InteractionController&gt;&#32;_hoverControllersBuffer&#32;=&#32;<emphasis role="keyword">new</emphasis>&#32;HashSet&lt;InteractionController&gt;();
+00348 &#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;HashSet&lt;InteractionController&gt;&#32;_contactControllersBuffer&#32;=&#32;<emphasis role="keyword">new</emphasis>&#32;HashSet&lt;InteractionController&gt;();
+00349 &#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;HashSet&lt;InteractionController&gt;&#32;_graspingControllersBuffer&#32;=&#32;<emphasis role="keyword">new</emphasis>&#32;HashSet&lt;InteractionController&gt;();
+00350 
+00351 &#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;fixedUpdateInteractionControllers()&#32;{
+00352 
+00353 &#32;&#32;&#32;&#32;&#32;&#32;_hoverControllersBuffer.Clear();
+00354 &#32;&#32;&#32;&#32;&#32;&#32;_contactControllersBuffer.Clear();
+00355 &#32;&#32;&#32;&#32;&#32;&#32;_graspingControllersBuffer.Clear();
+00356 &#32;&#32;&#32;&#32;&#32;&#32;_activeControllersBuffer.Clear();
+00357 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">foreach</emphasis>&#32;(var&#32;controller&#32;<emphasis role="keywordflow">in</emphasis>&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_manager_1a8946daadeba0069746b6db6aff5c1ea8">interactionControllers</link>)&#32;{
+00358 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(!controller.isActiveAndEnabled)&#32;<emphasis role="keywordflow">continue</emphasis>;
+00359 
+00360 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;_activeControllersBuffer.Add(controller);
+00361 
+00362 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(controller.hoverEnabled)&#32;_hoverControllersBuffer.Add(controller);
+00363 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(controller.contactEnabled)&#32;_contactControllersBuffer.Add(controller);
+00364 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(controller.graspingEnabled)&#32;_graspingControllersBuffer.Add(controller);
+00365 &#32;&#32;&#32;&#32;&#32;&#32;}
+00366 
+00367 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">using</emphasis>&#32;(<emphasis role="keyword">new</emphasis>&#32;ProfilerSample(<emphasis role="stringliteral">&quot;Fixed&#32;Update&#32;Controllers&#32;(General&#32;Update)&quot;</emphasis>))&#32;{
+00368 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;Perform&#32;general&#32;controller&#32;update,&#32;for&#32;controller&#32;collider&#32;and&#32;point</emphasis>
+00369 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;representations.</emphasis>
+00370 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">foreach</emphasis>&#32;(var&#32;controller&#32;<emphasis role="keywordflow">in</emphasis>&#32;_activeControllersBuffer)&#32;{
+00371 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(!controller.isActiveAndEnabled)&#32;<emphasis role="keywordflow">continue</emphasis>;
+00372 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;(controller&#32;as&#32;IInternalInteractionController).FixedUpdateController();
+00373 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00374 &#32;&#32;&#32;&#32;&#32;&#32;}
+00375 
+00376 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">using</emphasis>&#32;(<emphasis role="keyword">new</emphasis>&#32;ProfilerSample(<emphasis role="stringliteral">&quot;Fixed&#32;Update&#32;Controllers&#32;(Interaction&#32;State&#32;and&#32;Callbacks)&quot;</emphasis>))&#32;{
+00377 
+00378 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">/*</emphasis>
+00379 <emphasis role="comment">&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;*&#32;Interactions&#32;are&#32;checked&#32;here&#32;in&#32;a&#32;very&#32;specific&#32;manner&#32;so&#32;that&#32;interaction</emphasis>
+00380 <emphasis role="comment">&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;*&#32;callbacks&#32;always&#32;occur&#32;in&#32;a&#32;strict&#32;order&#32;and&#32;interaction&#32;object&#32;state&#32;is</emphasis>
+00381 <emphasis role="comment">&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;*&#32;always&#32;updated&#32;directly&#32;before&#32;the&#32;relevant&#32;callbacks&#32;occur.</emphasis>
+00382 <emphasis role="comment">&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;*</emphasis>
+00383 <emphasis role="comment">&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;*&#32;Interaction&#32;callbacks&#32;will&#32;only&#32;occur&#32;outside&#32;this&#32;order&#32;if&#32;a&#32;script</emphasis>
+00384 <emphasis role="comment">&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;*&#32;manually&#32;forces&#32;interaction&#32;state-changes;&#32;for&#32;example,&#32;calling</emphasis>
+00385 <emphasis role="comment">&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;*&#32;interactionController.ReleaseGrasp()&#32;will&#32;immediately&#32;call</emphasis>
+00386 <emphasis role="comment">&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;*&#32;interactionObject.OnPerControllerGraspEnd()&#32;on&#32;the&#32;formerly&#32;grasped&#32;object.</emphasis>
+00387 <emphasis role="comment">&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;*</emphasis>
+00388 <emphasis role="comment">&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;*&#32;Callback&#32;order:</emphasis>
+00389 <emphasis role="comment">&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;*&#32;-&#32;Suspension&#32;(when&#32;a&#32;grasped&#32;object&apos;s&#32;grasping&#32;controller&#32;loses&#32;tracking)</emphasis>
+00390 <emphasis role="comment">&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;*&#32;-&#32;Just-Ended&#32;Interactions&#32;(Grasps,&#32;then&#32;Contacts,&#32;then&#32;Hovers)</emphasis>
+00391 <emphasis role="comment">&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;*&#32;-&#32;Just-Begun&#32;Interactions&#32;(Hovers,&#32;then&#32;Contacts,&#32;then&#32;Grasps)</emphasis>
+00392 <emphasis role="comment">&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;*&#32;-&#32;Sustained&#32;Interactions&#32;(Hovers,&#32;then&#32;Contacts,&#32;then&#32;Grasps)</emphasis>
+00393 <emphasis role="comment">&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;*/</emphasis>
+00394 
+00395 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;Suspension&#32;//</emphasis>
+00396 
+00397 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;Check&#32;controllers&#32;beginning&#32;object&#32;suspension.</emphasis>
+00398 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">foreach</emphasis>&#32;(var&#32;controller&#32;<emphasis role="keywordflow">in</emphasis>&#32;_graspingControllersBuffer)&#32;{
+00399 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;IInteractionBehaviour&#32;suspendedObj;
+00400 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;((controller&#32;as&#32;IInternalInteractionController).CheckSuspensionBegin(out&#32;suspendedObj))&#32;{
+00401 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;suspendedObj.BeginSuspension(controller);
+00402 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00403 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00404 
+00405 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;Check&#32;controllers&#32;ending&#32;object&#32;suspension.</emphasis>
+00406 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">foreach</emphasis>&#32;(var&#32;controller&#32;<emphasis role="keywordflow">in</emphasis>&#32;_graspingControllersBuffer)&#32;{
+00407 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;IInteractionBehaviour&#32;resumedObj;
+00408 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;((controller&#32;as&#32;IInternalInteractionController).CheckSuspensionEnd(out&#32;resumedObj))&#32;{
+00409 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;resumedObj.EndSuspension(controller);
+00410 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00411 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00412 
+00413 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;Ending&#32;Interactions&#32;//</emphasis>
+00414 
+00415 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;checkEndingGrasps(_graspingControllersBuffer);
+00416 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;checkEndingContacts(_contactControllersBuffer);
+00417 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;checkEndingPrimaryHovers(_hoverControllersBuffer);
+00418 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;checkEndingHovers(_hoverControllersBuffer);
+00419 
+00420 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;Beginning&#32;Interactions&#32;//</emphasis>
+00421 
+00422 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;checkBeginningHovers(_hoverControllersBuffer);
+00423 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;checkBeginningPrimaryHovers(_hoverControllersBuffer);
+00424 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;checkBeginningContacts(_contactControllersBuffer);
+00425 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;checkBeginningGrasps(_graspingControllersBuffer);
+00426 
+00427 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;Sustained&#32;Interactions&#32;//</emphasis>
+00428 
+00429 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;checkSustainingHovers(_hoverControllersBuffer);
+00430 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;checkSustainingPrimaryHovers(_hoverControllersBuffer);
+00431 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;checkSustainingContacts(_contactControllersBuffer);
+00432 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;checkSustainingGrasps(_graspingControllersBuffer);
+00433 
+00434 &#32;&#32;&#32;&#32;&#32;&#32;}
+00435 &#32;&#32;&#32;&#32;}
+00436 
+00437 <emphasis role="preprocessor">&#32;&#32;&#32;&#32;#region&#32;State-Check&#32;Remapping&#32;Functions</emphasis>
+00438 
+00439 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;checkEndingGrasps(ReadonlyHashSet&lt;InteractionController&gt;&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_manager_1a8946daadeba0069746b6db6aff5c1ea8">interactionControllers</link>)&#32;{
+00440 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;remapInteractionObjectStateChecks(
+00441 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;controllers:&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_manager_1a8946daadeba0069746b6db6aff5c1ea8">interactionControllers</link>,
+00442 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;stateCheckFunc:&#32;(InteractionController&#32;maybeReleasingController,&#32;out&#32;IInteractionBehaviour&#32;maybeReleasedObject)&#32;=&gt;&#32;{
+00443 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;(maybeReleasingController&#32;as&#32;IInternalInteractionController).CheckGraspEnd(out&#32;maybeReleasedObject);
+00444 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;},
+00445 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;actionPerInteractionObject:&#32;(releasedObject,&#32;releasingIntControllers)&#32;=&gt;&#32;{
+00446 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;releasedObject.EndGrasp(releasingIntControllers);
+00447 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;});
+00448 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00449 
+00450 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;checkEndingContacts(ReadonlyHashSet&lt;InteractionController&gt;&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_manager_1a8946daadeba0069746b6db6aff5c1ea8">interactionControllers</link>)&#32;{
+00451 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;remapMultiInteractionObjectStateChecks(
+00452 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;controllers:&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_manager_1a8946daadeba0069746b6db6aff5c1ea8">interactionControllers</link>,
+00453 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;multiObjectStateCheckFunc:&#32;(InteractionController&#32;maybeEndedContactingController,&#32;out&#32;HashSet&lt;IInteractionBehaviour&gt;&#32;endContactedObjects)&#32;=&gt;&#32;{
+00454 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;(maybeEndedContactingController&#32;as&#32;IInternalInteractionController).CheckContactEnd(out&#32;endContactedObjects);
+00455 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;},
+00456 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;actionPerInteractionObject:&#32;(endContactedObject,&#32;endContactedIntControllers)&#32;=&gt;&#32;{
+00457 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;endContactedObject.EndContact(endContactedIntControllers);
+00458 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;});
+00459 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00460 
+00461 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;checkEndingPrimaryHovers(ReadonlyHashSet&lt;InteractionController&gt;&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_manager_1a8946daadeba0069746b6db6aff5c1ea8">interactionControllers</link>)&#32;{
+00462 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;remapInteractionObjectStateChecks(
+00463 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;controllers:&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_manager_1a8946daadeba0069746b6db6aff5c1ea8">interactionControllers</link>,
+00464 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;stateCheckFunc:&#32;(InteractionController&#32;maybeEndedPrimaryHoveringController,&#32;out&#32;IInteractionBehaviour&#32;endPrimaryHoveredObject)&#32;=&gt;&#32;{
+00465 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;(maybeEndedPrimaryHoveringController&#32;as&#32;IInternalInteractionController).CheckPrimaryHoverEnd(out&#32;endPrimaryHoveredObject);
+00466 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;},
+00467 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;actionPerInteractionObject:&#32;(endPrimaryHoveredObject,&#32;noLongerPrimaryHoveringControllers)&#32;=&gt;&#32;{
+00468 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;endPrimaryHoveredObject.EndPrimaryHover(noLongerPrimaryHoveringControllers);
+00469 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;});
+00470 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00471 
+00472 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;checkEndingHovers(ReadonlyHashSet&lt;InteractionController&gt;&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_manager_1a8946daadeba0069746b6db6aff5c1ea8">interactionControllers</link>)&#32;{
+00473 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;remapMultiInteractionObjectStateChecks(
+00474 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;controllers:&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_manager_1a8946daadeba0069746b6db6aff5c1ea8">interactionControllers</link>,
+00475 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;multiObjectStateCheckFunc:&#32;(InteractionController&#32;maybeEndedHoveringController,&#32;out&#32;HashSet&lt;IInteractionBehaviour&gt;&#32;endHoveredObjects)&#32;=&gt;&#32;{
+00476 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;(maybeEndedHoveringController&#32;as&#32;IInternalInteractionController).CheckHoverEnd(out&#32;endHoveredObjects);
+00477 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;},
+00478 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;actionPerInteractionObject:&#32;(endHoveredObject,&#32;endHoveringIntControllers)&#32;=&gt;&#32;{
+00479 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;endHoveredObject.EndHover(endHoveringIntControllers);
+00480 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;});
+00481 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00482 
+00483 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;checkBeginningHovers(ReadonlyHashSet&lt;InteractionController&gt;&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_manager_1a8946daadeba0069746b6db6aff5c1ea8">interactionControllers</link>)&#32;{
+00484 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;remapMultiInteractionObjectStateChecks(
+00485 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;controllers:&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_manager_1a8946daadeba0069746b6db6aff5c1ea8">interactionControllers</link>,
+00486 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;multiObjectStateCheckFunc:&#32;(InteractionController&#32;maybeBeganHoveringController,&#32;out&#32;HashSet&lt;IInteractionBehaviour&gt;&#32;beganHoveredObjects)&#32;=&gt;&#32;{
+00487 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;(maybeBeganHoveringController&#32;as&#32;IInternalInteractionController).CheckHoverBegin(out&#32;beganHoveredObjects);
+00488 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;},
+00489 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;actionPerInteractionObject:&#32;(beganHoveredObject,&#32;beganHoveringIntControllers)&#32;=&gt;&#32;{
+00490 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;beganHoveredObject.BeginHover(beganHoveringIntControllers);
+00491 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;});
+00492 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00493 
+00494 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;checkBeginningPrimaryHovers(ReadonlyHashSet&lt;InteractionController&gt;&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_manager_1a8946daadeba0069746b6db6aff5c1ea8">interactionControllers</link>)&#32;{
+00495 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;remapInteractionObjectStateChecks(
+00496 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;controllers:&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_manager_1a8946daadeba0069746b6db6aff5c1ea8">interactionControllers</link>,
+00497 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;stateCheckFunc:&#32;(InteractionController&#32;maybeBeganPrimaryHoveringController,&#32;out&#32;IInteractionBehaviour&#32;primaryHoveredObject)&#32;=&gt;&#32;{
+00498 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;(maybeBeganPrimaryHoveringController&#32;as&#32;IInternalInteractionController).CheckPrimaryHoverBegin(out&#32;primaryHoveredObject);
+00499 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;},
+00500 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;actionPerInteractionObject:&#32;(newlyPrimaryHoveredObject,&#32;beganPrimaryHoveringControllers)&#32;=&gt;&#32;{
+00501 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;newlyPrimaryHoveredObject.BeginPrimaryHover(beganPrimaryHoveringControllers);
+00502 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;});
+00503 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00504 
+00505 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;checkBeginningContacts(ReadonlyHashSet&lt;InteractionController&gt;&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_manager_1a8946daadeba0069746b6db6aff5c1ea8">interactionControllers</link>)&#32;{
+00506 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;remapMultiInteractionObjectStateChecks(
+00507 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;controllers:&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_manager_1a8946daadeba0069746b6db6aff5c1ea8">interactionControllers</link>,
+00508 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;multiObjectStateCheckFunc:&#32;(InteractionController&#32;maybeBeganContactingController,&#32;out&#32;HashSet&lt;IInteractionBehaviour&gt;&#32;beganContactedObjects)&#32;=&gt;&#32;{
+00509 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;(maybeBeganContactingController&#32;as&#32;IInternalInteractionController).CheckContactBegin(out&#32;beganContactedObjects);
+00510 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;},
+00511 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;actionPerInteractionObject:&#32;(beganContactedObject,&#32;beganContactingIntControllers)&#32;=&gt;&#32;{
+00512 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;beganContactedObject.BeginContact(beganContactingIntControllers);
+00513 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;});
+00514 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00515 
+00516 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;checkBeginningGrasps(ReadonlyHashSet&lt;InteractionController&gt;&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_manager_1a8946daadeba0069746b6db6aff5c1ea8">interactionControllers</link>)&#32;{
+00517 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;remapInteractionObjectStateChecks(
+00518 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;controllers:&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_manager_1a8946daadeba0069746b6db6aff5c1ea8">interactionControllers</link>,
+00519 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;stateCheckFunc:&#32;(InteractionController&#32;maybeBeganGraspingController,&#32;out&#32;IInteractionBehaviour&#32;graspedObject)&#32;=&gt;&#32;{
+00520 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;(maybeBeganGraspingController&#32;as&#32;IInternalInteractionController).CheckGraspBegin(out&#32;graspedObject);
+00521 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;},
+00522 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;actionPerInteractionObject:&#32;(newlyGraspedObject,&#32;beganGraspingIntControllers)&#32;=&gt;&#32;{
+00523 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;newlyGraspedObject.BeginGrasp(beganGraspingIntControllers);
+00524 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;});
+00525 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00526 
+00527 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;checkSustainingHovers(ReadonlyHashSet&lt;InteractionController&gt;&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_manager_1a8946daadeba0069746b6db6aff5c1ea8">interactionControllers</link>)&#32;{
+00528 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;remapMultiInteractionObjectStateChecks(
+00529 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;controllers:&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_manager_1a8946daadeba0069746b6db6aff5c1ea8">interactionControllers</link>,
+00530 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;multiObjectStateCheckFunc:&#32;(InteractionController&#32;maybeSustainedHoveringController,&#32;out&#32;HashSet&lt;IInteractionBehaviour&gt;&#32;hoveredObjects)&#32;=&gt;&#32;{
+00531 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;(maybeSustainedHoveringController&#32;as&#32;IInternalInteractionController).CheckHoverStay(out&#32;hoveredObjects);
+00532 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;},
+00533 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;actionPerInteractionObject:&#32;(hoveredObject,&#32;hoveringIntControllers)&#32;=&gt;&#32;{
+00534 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;hoveredObject.StayHovered(hoveringIntControllers);
+00535 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;});
+00536 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00537 
+00538 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;checkSustainingPrimaryHovers(ReadonlyHashSet&lt;InteractionController&gt;&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_manager_1a8946daadeba0069746b6db6aff5c1ea8">interactionControllers</link>)&#32;{
+00539 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;remapInteractionObjectStateChecks(
+00540 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;controllers:&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_manager_1a8946daadeba0069746b6db6aff5c1ea8">interactionControllers</link>,
+00541 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;stateCheckFunc:&#32;(InteractionController&#32;maybeSustainedPrimaryHoveringController,&#32;out&#32;IInteractionBehaviour&#32;primaryHoveredObject)&#32;=&gt;&#32;{
+00542 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;(maybeSustainedPrimaryHoveringController&#32;as&#32;IInternalInteractionController).CheckPrimaryHoverStay(out&#32;primaryHoveredObject);
+00543 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;},
+00544 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;actionPerInteractionObject:&#32;(primaryHoveredObject,&#32;primaryHoveringControllers)&#32;=&gt;&#32;{
+00545 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;primaryHoveredObject.StayPrimaryHovered(primaryHoveringControllers);
+00546 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;});
+00547 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00548 
+00549 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;checkSustainingContacts(ReadonlyHashSet&lt;InteractionController&gt;&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_manager_1a8946daadeba0069746b6db6aff5c1ea8">interactionControllers</link>)&#32;{
+00550 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;remapMultiInteractionObjectStateChecks(
+00551 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;controllers:&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_manager_1a8946daadeba0069746b6db6aff5c1ea8">interactionControllers</link>,
+00552 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;multiObjectStateCheckFunc:&#32;(InteractionController&#32;maybeSustainedContactingController,&#32;out&#32;HashSet&lt;IInteractionBehaviour&gt;&#32;contactedObjects)&#32;=&gt;&#32;{
+00553 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;(maybeSustainedContactingController&#32;as&#32;IInternalInteractionController).CheckContactStay(out&#32;contactedObjects);
+00554 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;},
+00555 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;actionPerInteractionObject:&#32;(contactedObject,&#32;contactingIntControllers)&#32;=&gt;&#32;{
+00556 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;contactedObject.StayContacted(contactingIntControllers);
+00557 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;});
+00558 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00559 
+00560 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;checkSustainingGrasps(ReadonlyHashSet&lt;InteractionController&gt;&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_manager_1a8946daadeba0069746b6db6aff5c1ea8">interactionControllers</link>)&#32;{
+00561 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;remapInteractionObjectStateChecks(
+00562 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;controllers:&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_manager_1a8946daadeba0069746b6db6aff5c1ea8">interactionControllers</link>,
+00563 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;stateCheckFunc:&#32;(InteractionController&#32;maybeSustainedGraspingController,&#32;out&#32;IInteractionBehaviour&#32;graspedObject)&#32;=&gt;&#32;{
+00564 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;(maybeSustainedGraspingController&#32;as&#32;IInternalInteractionController).CheckGraspHold(out&#32;graspedObject);
+00565 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;},
+00566 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;actionPerInteractionObject:&#32;(contactedObject,&#32;contactingIntControllers)&#32;=&gt;&#32;{
+00567 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;contactedObject.StayGrasped(contactingIntControllers);
+00568 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;});
+00569 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00570 
+00571 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;delegate&#32;<emphasis role="keywordtype">bool</emphasis>&#32;StateChangeCheckFunc(InteractionController&#32;controller,&#32;out&#32;IInteractionBehaviour&#32;obj);
+00572 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;delegate&#32;<emphasis role="keywordtype">bool</emphasis>&#32;MultiStateChangeCheckFunc(InteractionController&#32;controller,&#32;out&#32;HashSet&lt;IInteractionBehaviour&gt;&#32;objs);
+00573 
+00574 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;[ThreadStatic]
+00575 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;<emphasis role="keyword">static</emphasis>&#32;Dictionary&lt;IInteractionBehaviour,&#32;List&lt;InteractionController&gt;&gt;&#32;s_objControllersMap&#32;=&#32;<emphasis role="keyword">new</emphasis>&#32;Dictionary&lt;IInteractionBehaviour,&#32;List&lt;InteractionController&gt;&gt;();
+00576 
+00580 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;remapInteractionObjectStateChecks(ReadonlyHashSet&lt;InteractionController&gt;&#32;controllers,
+00581 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;StateChangeCheckFunc&#32;stateCheckFunc,
+00582 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;Action&lt;IInteractionBehaviour,&#32;List&lt;InteractionController&gt;&gt;&#32;actionPerInteractionObject)&#32;{
+00583 
+00584 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;Ensure&#32;the&#32;object-&gt;controllers&#32;buffer&#32;is&#32;non-null&#32;(ThreadStatic&#32;quirk)&#32;and&#32;clean.</emphasis>
+00585 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(s_objControllersMap&#32;==&#32;<emphasis role="keyword">null</emphasis>)&#32;s_objControllersMap&#32;=&#32;<emphasis role="keyword">new</emphasis>&#32;Dictionary&lt;IInteractionBehaviour,&#32;List&lt;InteractionController&gt;&gt;();
+00586 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;s_objControllersMap.Clear();
+00587 
+00588 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;In&#32;a&#32;nutshell,&#32;this&#32;remaps&#32;methods&#32;per-controller&#32;that&#32;output&#32;an&#32;interaction&#32;object&#32;if&#32;the&#32;controller&#32;changed&#32;that&#32;object&apos;s&#32;state</emphasis>
+00589 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;to&#32;methods&#32;per-object&#32;with&#32;all&#32;of&#32;the&#32;controllers&#32;for&#32;which&#32;the&#32;check&#32;produced&#32;a&#32;state-change.</emphasis>
+00590 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">foreach</emphasis>&#32;(var&#32;controller&#32;<emphasis role="keywordflow">in</emphasis>&#32;controllers)&#32;{
+00591 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;IInteractionBehaviour&#32;objectWhoseStateChanged;
+00592 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(stateCheckFunc(controller,&#32;out&#32;objectWhoseStateChanged))&#32;{
+00593 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(!s_objControllersMap.ContainsKey(objectWhoseStateChanged))&#32;{
+00594 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;s_objControllersMap[objectWhoseStateChanged]&#32;=&#32;Pool&lt;List&lt;InteractionController&gt;&gt;.Spawn();
+00595 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00596 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;s_objControllersMap[objectWhoseStateChanged].Add(controller);
+00597 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00598 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00599 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;Finally,&#32;iterate&#32;through&#32;each&#32;(object,&#32;controllers)&#32;pair&#32;and&#32;call&#32;the&#32;action&#32;for&#32;each&#32;pair</emphasis>
+00600 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">foreach</emphasis>&#32;(var&#32;objControllesPair&#32;<emphasis role="keywordflow">in</emphasis>&#32;s_objControllersMap)&#32;{
+00601 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;actionPerInteractionObject(objControllesPair.Key,&#32;objControllesPair.Value);
+00602 
+00603 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;Clear&#32;each&#32;controllers&#32;list&#32;and&#32;return&#32;it&#32;to&#32;the&#32;list&#32;pool.</emphasis>
+00604 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;objControllesPair.Value.Clear();
+00605 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;Pool&lt;List&lt;InteractionController&gt;&gt;.Recycle(objControllesPair.Value);
+00606 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00607 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00608 
+00612 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;remapMultiInteractionObjectStateChecks(ReadonlyHashSet&lt;InteractionController&gt;&#32;controllers,
+00613 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;MultiStateChangeCheckFunc&#32;multiObjectStateCheckFunc,
+00614 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;Action&lt;IInteractionBehaviour,&#32;List&lt;InteractionController&gt;&gt;&#32;actionPerInteractionObject)&#32;{
+00615 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;Ensure&#32;object&lt;-&gt;controllers&#32;buffer&#32;is&#32;non-null&#32;(ThreadStatic&#32;quirk)&#32;and&#32;clean.</emphasis>
+00616 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(s_objControllersMap&#32;==&#32;<emphasis role="keyword">null</emphasis>)&#32;s_objControllersMap&#32;=&#32;<emphasis role="keyword">new</emphasis>&#32;Dictionary&lt;IInteractionBehaviour,&#32;List&lt;InteractionController&gt;&gt;();
+00617 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;s_objControllersMap.Clear();
+00618 
+00619 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;In&#32;a&#32;nutshell,&#32;this&#32;remaps&#32;methods&#32;per-controller&#32;that&#32;output&#32;multiple&#32;interaction&#32;objects&#32;if&#32;the&#32;controller&#32;changed&#32;those&#32;objects&apos;&#32;states</emphasis>
+00620 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;to&#32;methods&#32;per-object&#32;with&#32;all&#32;of&#32;the&#32;controllers&#32;for&#32;which&#32;the&#32;check&#32;produced&#32;a&#32;state-change.</emphasis>
+00621 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">foreach</emphasis>&#32;(var&#32;controller&#32;<emphasis role="keywordflow">in</emphasis>&#32;controllers)&#32;{
+00622 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;HashSet&lt;IInteractionBehaviour&gt;&#32;stateChangedObjects;
+00623 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(multiObjectStateCheckFunc(controller,&#32;out&#32;stateChangedObjects))&#32;{
+00624 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">foreach</emphasis>&#32;(var&#32;stateChangedObject&#32;<emphasis role="keywordflow">in</emphasis>&#32;stateChangedObjects)&#32;{
+00625 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(!s_objControllersMap.ContainsKey(stateChangedObject))&#32;{
+00626 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;s_objControllersMap[stateChangedObject]&#32;=&#32;Pool&lt;List&lt;InteractionController&gt;&gt;.Spawn();
+00627 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00628 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;s_objControllersMap[stateChangedObject].Add(controller);
+00629 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00630 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00631 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00632 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;Finally,&#32;iterate&#32;through&#32;each&#32;(object,&#32;controllers)&#32;pair&#32;and&#32;call&#32;the&#32;action&#32;for&#32;each&#32;pair</emphasis>
+00633 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">foreach</emphasis>&#32;(var&#32;objControllersPair&#32;<emphasis role="keywordflow">in</emphasis>&#32;s_objControllersMap)&#32;{
+00634 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;actionPerInteractionObject(objControllersPair.Key,&#32;objControllersPair.Value);
+00635 
+00636 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;Clear&#32;each&#32;controllers&#32;list&#32;and&#32;return&#32;it&#32;to&#32;the&#32;list&#32;pool.</emphasis>
+00637 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;objControllersPair.Value.Clear();
+00638 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;Pool&lt;List&lt;InteractionController&gt;&gt;.Recycle(objControllersPair.Value);
+00639 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00640 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00641 
+00642 <emphasis role="preprocessor">&#32;&#32;&#32;&#32;#endregion</emphasis>
+00643 
+00644 <emphasis role="preprocessor">&#32;&#32;&#32;&#32;#region&#32;State&#32;Notifications</emphasis>
+00645 
+00646 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;TODO:&#32;Delete&#32;this&#32;whole&#32;sction</emphasis>
+00647 
+00648 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//private&#32;HashSet&lt;InteractionController&gt;&#32;controllerSetBuffer&#32;=&#32;new&#32;HashSet&lt;InteractionController&gt;();</emphasis>
+00649 
+00650 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//void&#32;IInternalInteractionManager.NotifyControllerDisabled(InteractionController&#32;controller)&#32;{</emphasis>
+00651 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;&#32;controllerSetBuffer.Clear();</emphasis>
+00652 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;&#32;controllerSetBuffer.Add(controller);</emphasis>
+00653 
+00654 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;&#32;checkEndingGrasps(controllerSetBuffer);</emphasis>
+00655 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;&#32;checkEndingContacts(controllerSetBuffer);</emphasis>
+00656 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;&#32;checkEndingPrimaryHovers(controllerSetBuffer);</emphasis>
+00657 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;&#32;checkEndingHovers(controllerSetBuffer);</emphasis>
+00658 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//}</emphasis>
+00659 
+00660 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//void&#32;IInternalInteractionManager.NotifyHoverDisabled(InteractionController&#32;controller)&#32;{</emphasis>
+00661 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;&#32;controllerSetBuffer.Clear();</emphasis>
+00662 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;&#32;controllerSetBuffer.Add(controller);</emphasis>
+00663 
+00664 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;&#32;checkEndingPrimaryHovers(controllerSetBuffer);</emphasis>
+00665 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;&#32;checkEndingHovers(controllerSetBuffer);</emphasis>
+00666 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//}</emphasis>
+00667 
+00668 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//void&#32;IInternalInteractionManager.NotifyContactDisabled(InteractionController&#32;controller)&#32;{</emphasis>
+00669 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;&#32;controllerSetBuffer.Clear();</emphasis>
+00670 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;&#32;controllerSetBuffer.Add(controller);</emphasis>
+00671 
+00672 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;&#32;checkEndingContacts(controllerSetBuffer);</emphasis>
+00673 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//}</emphasis>
+00674 
+00675 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//void&#32;IInternalInteractionManager.NotifyObjectHoverIgnored(IInteractionBehaviour&#32;intObj)&#32;{</emphasis>
+00676 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;&#32;controllerSetBuffer.Clear();</emphasis>
+00677 
+00678 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;&#32;foreach&#32;(var&#32;controller&#32;in&#32;interactionControllers)&#32;{</emphasis>
+00679 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;&#32;&#32;&#32;if&#32;(controller.hoveredObjects.Contains(intObj))&#32;{</emphasis>
+00680 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;&#32;&#32;&#32;&#32;&#32;(controller&#32;as&#32;IInternalInteractionController).ClearHoverTrackingForObject(intObj);</emphasis>
+00681 
+00682 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;&#32;&#32;&#32;&#32;&#32;controllerSetBuffer.Add(controller);</emphasis>
+00683 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;&#32;&#32;&#32;}</emphasis>
+00684 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;&#32;}</emphasis>
+00685 
+00686 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;&#32;checkEndingHovers(controllerSetBuffer);</emphasis>
+00687 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//}</emphasis>
+00688 
+00689 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//void&#32;IInternalInteractionManager.NotifyObjectPrimaryHoverIgnored(IInteractionBehaviour&#32;intObj)&#32;{</emphasis>
+00690 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;&#32;controllerSetBuffer.Clear();</emphasis>
+00691 
+00692 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;&#32;foreach&#32;(var&#32;controller&#32;in&#32;interactionControllers)&#32;{</emphasis>
+00693 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;&#32;&#32;&#32;if&#32;(controller.primaryHoveredObject&#32;==&#32;intObj)&#32;{</emphasis>
+00694 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;&#32;&#32;&#32;&#32;&#32;(controller&#32;as&#32;IInternalInteractionController).ClearPrimaryHoverTrackingForObject(intObj);</emphasis>
+00695 
+00696 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;&#32;&#32;&#32;&#32;&#32;controllerSetBuffer.Add(controller);</emphasis>
+00697 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;&#32;&#32;&#32;}</emphasis>
+00698 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;&#32;}</emphasis>
+00699 
+00700 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;&#32;checkEndingPrimaryHovers(controllerSetBuffer);</emphasis>
+00701 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//}</emphasis>
+00702 
+00703 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//void&#32;IInternalInteractionManager.NotifyObjectContactIgnored(IInteractionBehaviour&#32;intObj)&#32;{</emphasis>
+00704 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;&#32;controllerSetBuffer.Clear();</emphasis>
+00705 
+00706 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;&#32;foreach&#32;(var&#32;controller&#32;in&#32;interactionControllers)&#32;{</emphasis>
+00707 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;&#32;&#32;&#32;if&#32;(controller.contactingObjects.Contains(intObj))&#32;{</emphasis>
+00708 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;&#32;&#32;&#32;&#32;&#32;(controller&#32;as&#32;IInternalInteractionController).ClearContactTrackingForObject(intObj);</emphasis>
+00709 
+00710 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;&#32;&#32;&#32;&#32;&#32;controllerSetBuffer.Add(controller);</emphasis>
+00711 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;&#32;&#32;&#32;}</emphasis>
+00712 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;&#32;}</emphasis>
+00713 
+00714 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;&#32;checkEndingContacts(controllerSetBuffer);</emphasis>
+00715 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//}</emphasis>
+00716 
+00717 <emphasis role="preprocessor">&#32;&#32;&#32;&#32;#endregion</emphasis>
+00718 
+00719 <emphasis role="preprocessor">&#32;&#32;&#32;&#32;#endregion</emphasis>
+00720 
+00721 <emphasis role="preprocessor">&#32;&#32;&#32;&#32;#region&#32;Object&#32;Registration</emphasis>
+00722 
+<anchor xml:id="__interaction_manager_8cs_source_1l00723"/><link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_manager_1acc03ba640a74c7b100a7942c427b9ad9">00723</link> &#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_manager_1acc03ba640a74c7b100a7942c427b9ad9">RegisterInteractionBehaviour</link>(<link linkend="_interface_leap_1_1_unity_1_1_interaction_1_1_i_interaction_behaviour">IInteractionBehaviour</link>&#32;interactionObj)&#32;{
+00724 &#32;&#32;&#32;&#32;&#32;&#32;_interactionObjects.Add(interactionObj);
+00725 &#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_manager_1a8db6ce75ed2fbf2fc032499f1e25d34c">interactionObjectBodies</link>[interactionObj.<link linkend="_interface_leap_1_1_unity_1_1_interaction_1_1_i_interaction_behaviour_1a9e83e4dac0c2d1117738b55b34dbde2d">rigidbody</link>]&#32;=&#32;interactionObj;
+00726 &#32;&#32;&#32;&#32;}
+00727 
+<anchor xml:id="__interaction_manager_8cs_source_1l00733"/><link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_manager_1a789f594e57a18f29111f81ada09cd262">00733</link> &#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keywordtype">bool</emphasis>&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_manager_1a789f594e57a18f29111f81ada09cd262">UnregisterInteractionBehaviour</link>(<link linkend="_interface_leap_1_1_unity_1_1_interaction_1_1_i_interaction_behaviour">IInteractionBehaviour</link>&#32;interactionObj)&#32;{
+00734 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordtype">bool</emphasis>&#32;wasRemovalSuccessful&#32;=&#32;_interactionObjects.Remove(interactionObj);
+00735 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(wasRemovalSuccessful)&#32;{
+00736 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">foreach</emphasis>&#32;(var&#32;intController&#32;<emphasis role="keywordflow">in</emphasis>&#32;_interactionControllers)&#32;{
+00737 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;intController.ReleaseObject(interactionObj);
+00738 
+00739 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;intController.NotifyObjectUnregistered(interactionObj);
+00740 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00741 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_manager_1a8db6ce75ed2fbf2fc032499f1e25d34c">interactionObjectBodies</link>.Remove(interactionObj.<link linkend="_interface_leap_1_1_unity_1_1_interaction_1_1_i_interaction_behaviour_1a9e83e4dac0c2d1117738b55b34dbde2d">rigidbody</link>);
+00742 &#32;&#32;&#32;&#32;&#32;&#32;}
+00743 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;wasRemovalSuccessful;
+00744 &#32;&#32;&#32;&#32;}
+00745 
+<anchor xml:id="__interaction_manager_8cs_source_1l00746"/><link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_manager_1a98a566e73eea4c336c32fad4a89f8502">00746</link> &#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keywordtype">bool</emphasis>&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_manager_1a98a566e73eea4c336c32fad4a89f8502">IsBehaviourRegistered</link>(<link linkend="_interface_leap_1_1_unity_1_1_interaction_1_1_i_interaction_behaviour">IInteractionBehaviour</link>&#32;interactionObj)&#32;{
+00747 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;_interactionObjects.Contains(interactionObj);
+00748 &#32;&#32;&#32;&#32;}
+00749 
+00750 <emphasis role="preprocessor">&#32;&#32;&#32;&#32;#endregion</emphasis>
+00751 
+00752 <emphasis role="preprocessor">&#32;&#32;&#32;&#32;#region&#32;Moving&#32;Frame&#32;of&#32;Reference&#32;Support</emphasis>
+00753 
+<anchor xml:id="__interaction_manager_8cs_source_1l00754"/><link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_manager_1aadad63856353238fd977cb228cd7f6bf">00754</link> &#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keywordtype">bool</emphasis>&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_manager_1aadad63856353238fd977cb228cd7f6bf">hasMovingFrameOfReference</link>&#32;{
+00755 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">get</emphasis>&#32;{
+00756 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;(this.transform.position&#32;-&#32;_prevPosition).magnitude&#32;&gt;&#32;0.0001F
+00757 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;||&#32;Quaternion.Angle(transform.rotation&#32;*&#32;Quaternion.Inverse(_prevRotation),
+00758 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;Quaternion.identity)&#32;&gt;&#32;0.01F;
+00759 &#32;&#32;&#32;&#32;&#32;&#32;}
+00760 &#32;&#32;&#32;&#32;}
+00761 
+00762 &#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;Support&#32;for&#32;a&#32;moving&#32;frame&#32;of&#32;reference.</emphasis>
+00763 &#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;Vector3&#32;_prevPosition&#32;=&#32;Vector3.zero;
+00764 &#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;Quaternion&#32;_prevRotation&#32;=&#32;Quaternion.identity;
+00765 
+00766 &#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;updateMovingFrameOfReferenceSupport()&#32;{
+00767 &#32;&#32;&#32;&#32;&#32;&#32;_prevPosition&#32;=&#32;this.transform.position;
+00768 &#32;&#32;&#32;&#32;&#32;&#32;_prevRotation&#32;=&#32;this.transform.rotation;
+00769 &#32;&#32;&#32;&#32;}
+00770 
+<anchor xml:id="__interaction_manager_8cs_source_1l00777"/><link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_manager_1ab3f0e103a262ec1e7a9689e243cb62ad">00777</link> &#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_manager_1ab3f0e103a262ec1e7a9689e243cb62ad">TransformAheadByFixedUpdate</link>(Vector3&#32;position,&#32;Quaternion&#32;rotation,&#32;out&#32;Vector3&#32;newPosition,&#32;out&#32;Quaternion&#32;newRotation)&#32;{
+00778 &#32;&#32;&#32;&#32;&#32;&#32;Vector3&#32;worldDisplacement&#32;=&#32;this.transform.position&#32;-&#32;_prevPosition;
+00779 &#32;&#32;&#32;&#32;&#32;&#32;Quaternion&#32;worldRotation&#32;=&#32;this.transform.rotation&#32;*&#32;Quaternion.Inverse(_prevRotation);
+00780 &#32;&#32;&#32;&#32;&#32;&#32;newPosition&#32;=&#32;((worldRotation&#32;*&#32;(position&#32;-&#32;this.transform.position&#32;+&#32;worldDisplacement)))&#32;+&#32;this.transform.position;
+00781 &#32;&#32;&#32;&#32;&#32;&#32;newRotation&#32;=&#32;worldRotation&#32;*&#32;rotation;
+00782 &#32;&#32;&#32;&#32;}
+00783 
+<anchor xml:id="__interaction_manager_8cs_source_1l00790"/><link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_manager_1a930a2c30dd330b50d86b1ead4eda9a0a">00790</link> &#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_manager_1a930a2c30dd330b50d86b1ead4eda9a0a">TransformAheadByFixedUpdate</link>(Vector3&#32;position,&#32;out&#32;Vector3&#32;newPosition)&#32;{
+00791 &#32;&#32;&#32;&#32;&#32;&#32;Vector3&#32;worldDisplacement&#32;=&#32;this.transform.position&#32;-&#32;_prevPosition;
+00792 &#32;&#32;&#32;&#32;&#32;&#32;Quaternion&#32;worldRotation&#32;=&#32;this.transform.rotation&#32;*&#32;Quaternion.Inverse(_prevRotation);
+00793 &#32;&#32;&#32;&#32;&#32;&#32;newPosition&#32;=&#32;((worldRotation&#32;*&#32;(position&#32;-&#32;this.transform.position&#32;+&#32;worldDisplacement)))&#32;+&#32;this.transform.position;
+00794 &#32;&#32;&#32;&#32;}
+00795 
+00796 <emphasis role="preprocessor">&#32;&#32;&#32;&#32;#endregion</emphasis>
+00797 
+00798 <emphasis role="preprocessor">&#32;&#32;&#32;&#32;#region&#32;Soft&#32;Contact&#32;Support</emphasis>
+00799 
+00803 &#32;&#32;&#32;&#32;[NonSerialized]
+00804 &#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;List&lt;PhysicsUtility.SoftContact&gt;&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_manager_1a70605cd65741d1ec3409745fdf09c3ee">_softContacts</link>
+<anchor xml:id="__interaction_manager_8cs_source_1l00805"/><link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_manager_1a70605cd65741d1ec3409745fdf09c3ee">00805</link> &#32;&#32;&#32;&#32;&#32;&#32;=&#32;<emphasis role="keyword">new</emphasis>&#32;List&lt;PhysicsUtility.SoftContact&gt;(80);
+00806 
+00810 &#32;&#32;&#32;&#32;[NonSerialized]
+00811 &#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;Dictionary&lt;Rigidbody,&#32;PhysicsUtility.Velocities&gt;&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_manager_1a049c0b24c30386942bb3abe7d3118b6e">_softContactOriginalVelocities</link>
+<anchor xml:id="__interaction_manager_8cs_source_1l00812"/><link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_manager_1a049c0b24c30386942bb3abe7d3118b6e">00812</link> &#32;&#32;&#32;&#32;&#32;&#32;=&#32;<emphasis role="keyword">new</emphasis>&#32;Dictionary&lt;Rigidbody,&#32;PhysicsUtility.Velocities&gt;(5);
+00813 
+00817 &#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;List&lt;PhysicsUtility.SoftContact&gt;&#32;_softContactsToDraw
+00818 &#32;&#32;&#32;&#32;&#32;&#32;=&#32;<emphasis role="keyword">new</emphasis>&#32;List&lt;PhysicsUtility.SoftContact&gt;();
+00819 
+00820 <emphasis role="preprocessor">&#32;&#32;&#32;&#32;#endregion</emphasis>
+00821 
+00822 <emphasis role="preprocessor">&#32;&#32;&#32;&#32;#region&#32;Interaction&#32;Controllers</emphasis>
+00823 
+00824 &#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;refreshInteractionControllers()&#32;{
+00825 &#32;&#32;&#32;&#32;&#32;&#32;_interactionControllers.Clear();
+00826 
+00827 &#32;&#32;&#32;&#32;&#32;&#32;var&#32;tempControllers&#32;=&#32;Pool&lt;List&lt;InteractionController&gt;&gt;.Spawn();
+00828 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">try</emphasis>&#32;{
+00829 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;this.transform.GetComponentsInChildren&lt;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_controller">InteractionController</link>&gt;(<emphasis role="keyword">false</emphasis>,&#32;tempControllers);
+00830 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">foreach</emphasis>&#32;(var&#32;controller&#32;<emphasis role="keywordflow">in</emphasis>&#32;tempControllers)&#32;{
+00831 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;_interactionControllers.Add(controller);
+00832 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00833 &#32;&#32;&#32;&#32;&#32;&#32;}
+00834 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">finally</emphasis>&#32;{
+00835 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;tempControllers.Clear();
+00836 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;Pool&lt;List&lt;InteractionController&gt;&gt;.Recycle(tempControllers);
+00837 &#32;&#32;&#32;&#32;&#32;&#32;}
+00838 &#32;&#32;&#32;&#32;}
+00839 
+00840 <emphasis role="preprocessor">&#32;&#32;&#32;&#32;#endregion</emphasis>
+00841 
+00842 <emphasis role="preprocessor">&#32;&#32;&#32;&#32;#region&#32;Layers</emphasis>
+00843 
+00844 <emphasis role="preprocessor">&#32;&#32;&#32;&#32;#region&#32;Automatic&#32;Layers</emphasis>
+00845 
+<anchor xml:id="__interaction_manager_8cs_source_1l00846"/><link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_manager_1ac412bb63a1141bba69c9f898cea2b1db">00846</link> &#32;&#32;&#32;&#32;<emphasis role="keyword">protected</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_manager_1ac412bb63a1141bba69c9f898cea2b1db">generateAutomaticLayers</link>()&#32;{
+00847 &#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_manager_1a829ba8a9a24d75793ff6f05f39d70134">_interactionLayer</link>&#32;=&#32;-1;
+00848 &#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_manager_1a19f2155251076eb53a9083f8f5be2de4">_interactionNoContactLayer</link>&#32;=&#32;-1;
+00849 &#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_manager_1a8e8253c955fd19ddf980040c058098c8">_contactBoneLayer</link>&#32;=&#32;-1;
+00850 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">for</emphasis>&#32;(<emphasis role="keywordtype">int</emphasis>&#32;i&#32;=&#32;8;&#32;i&#32;&lt;&#32;32;&#32;i++)&#32;{
+00851 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordtype">string</emphasis>&#32;layerName&#32;=&#32;LayerMask.LayerToName(i);
+00852 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(<emphasis role="keywordtype">string</emphasis>.IsNullOrEmpty(layerName))&#32;{
+00853 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_manager_1a829ba8a9a24d75793ff6f05f39d70134">_interactionLayer</link>&#32;==&#32;-1)&#32;{
+00854 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_manager_1a829ba8a9a24d75793ff6f05f39d70134">_interactionLayer</link>&#32;=&#32;i;
+00855 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00856 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">else</emphasis>&#32;<emphasis role="keywordflow">if</emphasis>&#32;(<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_manager_1a19f2155251076eb53a9083f8f5be2de4">_interactionNoContactLayer</link>&#32;==&#32;-1)&#32;{
+00857 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_manager_1a19f2155251076eb53a9083f8f5be2de4">_interactionNoContactLayer</link>&#32;=&#32;i;
+00858 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00859 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">else</emphasis>&#32;<emphasis role="keywordflow">if</emphasis>&#32;(<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_manager_1a8e8253c955fd19ddf980040c058098c8">_contactBoneLayer</link>&#32;==&#32;-1)&#32;{
+00860 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_manager_1a8e8253c955fd19ddf980040c058098c8">_contactBoneLayer</link>&#32;=&#32;i;
+00861 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">break</emphasis>;
+00862 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00863 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00864 &#32;&#32;&#32;&#32;&#32;&#32;}
+00865 
+00866 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_manager_1a829ba8a9a24d75793ff6f05f39d70134">_interactionLayer</link>&#32;==&#32;-1&#32;||&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_manager_1a19f2155251076eb53a9083f8f5be2de4">_interactionNoContactLayer</link>&#32;==&#32;-1&#32;||&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_manager_1a8e8253c955fd19ddf980040c058098c8">_contactBoneLayer</link>&#32;==&#32;-1)&#32;{
+00867 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(Application.isPlaying)&#32;{
+00868 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;enabled&#32;=&#32;<emphasis role="keyword">false</emphasis>;
+00869 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00870 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;Debug.LogError(<emphasis role="stringliteral">&quot;InteractionManager&#32;Could&#32;not&#32;find&#32;enough&#32;free&#32;layers&#32;for&#32;&quot;</emphasis>
+00871 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;+&#32;<emphasis role="stringliteral">&quot;auto-setup;&#32;manual&#32;setup&#32;is&#32;required.&quot;</emphasis>,&#32;this.gameObject);
+00872 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_manager_1a67b3425669699e61b3649ed83f5b3283">_autoGenerateLayers</link>&#32;=&#32;<emphasis role="keyword">false</emphasis>;
+00873 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>;
+00874 &#32;&#32;&#32;&#32;&#32;&#32;}
+00875 &#32;&#32;&#32;&#32;}
+00876 
+00877 &#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;setupAutomaticCollisionLayers()&#32;{
+00878 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">for</emphasis>&#32;(<emphasis role="keywordtype">int</emphasis>&#32;i&#32;=&#32;0;&#32;i&#32;&lt;&#32;32;&#32;i++)&#32;{
+00879 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;Copy&#32;ignore&#32;settings&#32;from&#32;template&#32;layer</emphasis>
+00880 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordtype">bool</emphasis>&#32;shouldIgnore&#32;=&#32;<link linkend="_namespace_leap_1_1_unity_1a186e5eb0a2b743f1f6b79346f0ab8ad0a50ae99e9c35446c2580e4b540b0fd104">Physics</link>.GetIgnoreLayerCollision(<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_manager_1a17b10e0cecd075456a90be0617c77b25">_templateLayer</link>,&#32;i);
+00881 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_namespace_leap_1_1_unity_1a186e5eb0a2b743f1f6b79346f0ab8ad0a50ae99e9c35446c2580e4b540b0fd104">Physics</link>.IgnoreLayerCollision(<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_manager_1a829ba8a9a24d75793ff6f05f39d70134">_interactionLayer</link>,&#32;i,&#32;shouldIgnore);
+00882 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_namespace_leap_1_1_unity_1a186e5eb0a2b743f1f6b79346f0ab8ad0a50ae99e9c35446c2580e4b540b0fd104">Physics</link>.IgnoreLayerCollision(<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_manager_1a19f2155251076eb53a9083f8f5be2de4">_interactionNoContactLayer</link>,&#32;i,&#32;shouldIgnore);
+00883 
+00884 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;Contact&#32;bones,&#32;generally,&#32;shouldn&apos;t&#32;collide&#32;with&#32;anything&#32;except&#32;interaction</emphasis>
+00885 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;layers.</emphasis>
+00886 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_namespace_leap_1_1_unity_1a186e5eb0a2b743f1f6b79346f0ab8ad0a50ae99e9c35446c2580e4b540b0fd104">Physics</link>.IgnoreLayerCollision(<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_manager_1a8e8253c955fd19ddf980040c058098c8">_contactBoneLayer</link>,&#32;i,&#32;<emphasis role="keyword">true</emphasis>);
+00887 &#32;&#32;&#32;&#32;&#32;&#32;}
+00888 
+00889 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;Enable&#32;interactions&#32;between&#32;the&#32;contact&#32;bones&#32;and&#32;the&#32;interaction&#32;layer.</emphasis>
+00890 &#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_namespace_leap_1_1_unity_1a186e5eb0a2b743f1f6b79346f0ab8ad0a50ae99e9c35446c2580e4b540b0fd104">Physics</link>.IgnoreLayerCollision(<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_manager_1a8e8253c955fd19ddf980040c058098c8">_contactBoneLayer</link>,&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_manager_1a829ba8a9a24d75793ff6f05f39d70134">_interactionLayer</link>,&#32;<emphasis role="keyword">false</emphasis>);
+00891 
+00892 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;Disable&#32;interactions&#32;between&#32;the&#32;contact&#32;bones&#32;and&#32;the&#32;no-contact&#32;layer.</emphasis>
+00893 &#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_namespace_leap_1_1_unity_1a186e5eb0a2b743f1f6b79346f0ab8ad0a50ae99e9c35446c2580e4b540b0fd104">Physics</link>.IgnoreLayerCollision(<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_manager_1a8e8253c955fd19ddf980040c058098c8">_contactBoneLayer</link>,&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_manager_1a19f2155251076eb53a9083f8f5be2de4">_interactionNoContactLayer</link>,&#32;<emphasis role="keyword">true</emphasis>);
+00894 &#32;&#32;&#32;&#32;}
+00895 
+00896 <emphasis role="preprocessor">&#32;&#32;&#32;&#32;#endregion</emphasis>
+00897 
+00898 <emphasis role="preprocessor">&#32;&#32;&#32;&#32;#region&#32;Interaction&#32;Object&#32;Layer&#32;Tracking</emphasis>
+00899 
+00900 &#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;Dictionary&lt;SingleLayer,&#32;HashSet&lt;IInteractionBehaviour&gt;&gt;&#32;_intObjInteractionLayers&#32;=&#32;<emphasis role="keyword">new</emphasis>&#32;Dictionary&lt;SingleLayer,&#32;HashSet&lt;IInteractionBehaviour&gt;&gt;();
+00901 &#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;Dictionary&lt;SingleLayer,&#32;HashSet&lt;IInteractionBehaviour&gt;&gt;&#32;_intObjNoContactLayers&#32;&#32;&#32;=&#32;<emphasis role="keyword">new</emphasis>&#32;Dictionary&lt;SingleLayer,&#32;HashSet&lt;IInteractionBehaviour&gt;&gt;();
+00902 
+00903 &#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;<emphasis role="keywordtype">int</emphasis>&#32;_interactionLayerMask&#32;=&#32;0;
+<anchor xml:id="__interaction_manager_8cs_source_1l00907"/><link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_manager_1ac8f4cc8c3f11fb6f67640072100b7e8a">00907</link> &#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keywordtype">int</emphasis>&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_manager_1ac8f4cc8c3f11fb6f67640072100b7e8a">GetInteractionLayerMask</link>()&#32;{
+00908 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;_interactionLayerMask;
+00909 &#32;&#32;&#32;&#32;}
+00910 
+00911 &#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;refreshInteractionLayerMask()&#32;{
+00912 &#32;&#32;&#32;&#32;&#32;&#32;_interactionLayerMask&#32;=&#32;0;
+00913 
+00914 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;Accumulate&#32;single-layer&#32;layer&#32;masks&#32;into&#32;the&#32;combined&#32;interaction&#32;layer&#32;mask.</emphasis>
+00915 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">foreach</emphasis>&#32;(var&#32;layerObjSetPair&#32;<emphasis role="keywordflow">in</emphasis>&#32;_intObjInteractionLayers)&#32;{
+00916 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;Skip&#32;any&#32;layers&#32;that&#32;may&#32;no&#32;longer&#32;have&#32;interaction&#32;objects.</emphasis>
+00917 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(layerObjSetPair.Value.Count&#32;==&#32;0)&#32;<emphasis role="keywordflow">continue</emphasis>;
+00918 
+00919 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;_interactionLayerMask&#32;=&#32;layerObjSetPair.Key.layerMask&#32;|&#32;_interactionLayerMask;
+00920 &#32;&#32;&#32;&#32;&#32;&#32;}
+00921 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">foreach</emphasis>&#32;(var&#32;layerObjSetPair&#32;<emphasis role="keywordflow">in</emphasis>&#32;_intObjNoContactLayers)&#32;{
+00922 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;Skip&#32;any&#32;layers&#32;that&#32;may&#32;no&#32;longer&#32;have&#32;interaction&#32;objects.</emphasis>
+00923 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(layerObjSetPair.Value.Count&#32;==&#32;0)&#32;<emphasis role="keywordflow">continue</emphasis>;
+00924 
+00925 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;_interactionLayerMask&#32;=&#32;layerObjSetPair.Key.layerMask&#32;|&#32;_interactionLayerMask;
+00926 &#32;&#32;&#32;&#32;&#32;&#32;}
+00927 &#32;&#32;&#32;&#32;}
+00928 
+00929 &#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;<emphasis role="keywordtype">bool</emphasis>[]&#32;_contactBoneIgnoreCollisionLayers&#32;=&#32;<emphasis role="keyword">new</emphasis>&#32;<emphasis role="keywordtype">bool</emphasis>[32];
+00936 &#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;autoUpdateContactBoneLayerCollision()&#32;{
+00937 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;Make&#32;sure&#32;we&#32;ignore&#32;all&#32;layers&#32;by&#32;default!</emphasis>
+00938 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">for</emphasis>&#32;(<emphasis role="keywordtype">int</emphasis>&#32;i&#32;=&#32;0;&#32;i&#32;&lt;&#32;32;&#32;i++)&#32;{
+00939 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;_contactBoneIgnoreCollisionLayers[i]&#32;=&#32;<emphasis role="keyword">true</emphasis>;
+00940 &#32;&#32;&#32;&#32;&#32;&#32;}
+00941 
+00942 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;Ignore&#32;everything&#32;except&#32;those&#32;layers&#32;that&#32;we&#32;know&#32;are&#32;at&#32;least&#32;one</emphasis>
+00943 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;interaction&#32;object&apos;s&#32;interaction&#32;layer.</emphasis>
+00944 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">foreach</emphasis>&#32;(var&#32;layerObjSetPair&#32;<emphasis role="keywordflow">in</emphasis>&#32;_intObjInteractionLayers)&#32;{
+00945 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordtype">bool</emphasis>&#32;ignoreLayerCollision;
+00946 
+00947 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(layerObjSetPair.Value.Count&#32;==&#32;0)&#32;{
+00948 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;ignoreLayerCollision&#32;=&#32;<emphasis role="keyword">true</emphasis>;
+00949 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00950 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">else</emphasis>&#32;{
+00951 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;ignoreLayerCollision&#32;=&#32;<emphasis role="keyword">false</emphasis>;
+00952 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00953 
+00954 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(layerObjSetPair.Key.layerIndex&#32;&lt;&#32;_contactBoneIgnoreCollisionLayers.Length)&#32;{
+00955 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;_contactBoneIgnoreCollisionLayers[layerObjSetPair.Key.layerIndex]&#32;=&#32;ignoreLayerCollision;
+00956 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00957 &#32;&#32;&#32;&#32;&#32;&#32;}
+00958 
+00959 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">for</emphasis>&#32;(<emphasis role="keywordtype">int</emphasis>&#32;i&#32;=&#32;0;&#32;i&#32;&lt;&#32;32;&#32;i++)&#32;{
+00960 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_namespace_leap_1_1_unity_1a186e5eb0a2b743f1f6b79346f0ab8ad0a50ae99e9c35446c2580e4b540b0fd104">Physics</link>.IgnoreLayerCollision(<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_manager_1a8d638a6bce8faff14a6ceedf0d7cd9eb">contactBoneLayer</link>.<link linkend="_struct_leap_1_1_unity_1_1_single_layer_1a5e955c6fd2ba1991b97b333e176f005b">layerIndex</link>,&#32;i,
+00961 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;_contactBoneIgnoreCollisionLayers[i]);
+00962 &#32;&#32;&#32;&#32;&#32;&#32;}
+00963 &#32;&#32;&#32;&#32;}
+00964 
+00965 &#32;&#32;&#32;&#32;<emphasis role="keywordtype">void</emphasis>&#32;IInternalInteractionManager.RefreshLayersNow()&#32;{
+00966 &#32;&#32;&#32;&#32;&#32;&#32;refreshInteractionLayerMask();
+00967 &#32;&#32;&#32;&#32;}
+00968 
+00969 &#32;&#32;&#32;&#32;<emphasis role="keywordtype">void</emphasis>&#32;IInternalInteractionManager.NotifyIntObjAddedInteractionLayer(IInteractionBehaviour&#32;intObj,&#32;<emphasis role="keywordtype">int</emphasis>&#32;layer,&#32;<emphasis role="keywordtype">bool</emphasis>&#32;refreshImmediately)&#32;{
+00970 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(!_intObjInteractionLayers.ContainsKey(layer))&#32;{
+00971 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;_intObjInteractionLayers[layer]&#32;=&#32;<emphasis role="keyword">new</emphasis>&#32;HashSet&lt;IInteractionBehaviour&gt;();
+00972 &#32;&#32;&#32;&#32;&#32;&#32;}
+00973 
+00974 &#32;&#32;&#32;&#32;&#32;&#32;_intObjInteractionLayers[layer].Add(intObj);
+00975 
+00976 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(refreshImmediately)&#32;{
+00977 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;refreshInteractionLayerMask();
+00978 &#32;&#32;&#32;&#32;&#32;&#32;}
+00979 &#32;&#32;&#32;&#32;}
+00980 
+00981 &#32;&#32;&#32;&#32;<emphasis role="keywordtype">void</emphasis>&#32;IInternalInteractionManager.NotifyIntObjRemovedInteractionLayer(IInteractionBehaviour&#32;intObj,&#32;<emphasis role="keywordtype">int</emphasis>&#32;layer,&#32;<emphasis role="keywordtype">bool</emphasis>&#32;refreshImmediately)&#32;{
+00982 &#32;&#32;&#32;&#32;&#32;&#32;_intObjInteractionLayers[layer].Remove(intObj);
+00983 
+00984 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(refreshImmediately)&#32;{
+00985 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;refreshInteractionLayerMask();
+00986 &#32;&#32;&#32;&#32;&#32;&#32;}
+00987 &#32;&#32;&#32;&#32;}
+00988 
+00989 &#32;&#32;&#32;&#32;<emphasis role="keywordtype">void</emphasis>&#32;IInternalInteractionManager.NotifyIntObjAddedNoContactLayer(IInteractionBehaviour&#32;intObj,&#32;<emphasis role="keywordtype">int</emphasis>&#32;layer,&#32;<emphasis role="keywordtype">bool</emphasis>&#32;refreshImmediately)&#32;{
+00990 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(!_intObjNoContactLayers.ContainsKey(layer))&#32;{
+00991 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;_intObjNoContactLayers[layer]&#32;=&#32;<emphasis role="keyword">new</emphasis>&#32;HashSet&lt;IInteractionBehaviour&gt;();
+00992 &#32;&#32;&#32;&#32;&#32;&#32;}
+00993 
+00994 &#32;&#32;&#32;&#32;&#32;&#32;_intObjNoContactLayers[layer].Add(intObj);
+00995 
+00996 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(refreshImmediately)&#32;{
+00997 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;refreshInteractionLayerMask();
+00998 &#32;&#32;&#32;&#32;&#32;&#32;}
+00999 &#32;&#32;&#32;&#32;}
+01000 
+01001 &#32;&#32;&#32;&#32;<emphasis role="keywordtype">void</emphasis>&#32;IInternalInteractionManager.NotifyIntObjRemovedNoContactLayer(IInteractionBehaviour&#32;intObj,&#32;<emphasis role="keywordtype">int</emphasis>&#32;layer,&#32;<emphasis role="keywordtype">bool</emphasis>&#32;refreshImmediately)&#32;{
+01002 &#32;&#32;&#32;&#32;&#32;&#32;_intObjNoContactLayers[layer].Remove(intObj);
+01003 
+01004 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(refreshImmediately)&#32;{
+01005 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;refreshInteractionLayerMask();
+01006 &#32;&#32;&#32;&#32;&#32;&#32;}
+01007 &#32;&#32;&#32;&#32;}
+01008 
+01009 <emphasis role="preprocessor">&#32;&#32;&#32;&#32;#endregion</emphasis>
+01010 
+01011 <emphasis role="preprocessor">&#32;&#32;&#32;&#32;#endregion</emphasis>
+01012 
+01013 <emphasis role="preprocessor">&#32;&#32;&#32;&#32;#region&#32;Runtime&#32;Gizmos</emphasis>
+01014 
+<anchor xml:id="__interaction_manager_8cs_source_1l01015"/><link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_manager_1ad85d00ee53f6c8569a27ffbc1c582724">01015</link> &#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_manager_1ad85d00ee53f6c8569a27ffbc1c582724">OnDrawRuntimeGizmos</link>(<link linkend="_class_leap_1_1_unity_1_1_runtime_gizmos_1_1_runtime_gizmo_drawer">RuntimeGizmoDrawer</link>&#32;drawer)&#32;{
+01016 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(_drawControllerRuntimeGizmos)&#32;{
+01017 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">foreach</emphasis>&#32;(var&#32;controller&#32;<emphasis role="keywordflow">in</emphasis>&#32;_interactionControllers)&#32;{
+01018 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(controller&#32;!=&#32;<emphasis role="keyword">null</emphasis>)&#32;{
+01019 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;controller.OnDrawRuntimeGizmos(drawer);
+01020 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+01021 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+01022 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;
+01023 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">foreach</emphasis>&#32;(PhysicsUtility.SoftContact&#32;contact&#32;in&#32;_softContactsToDraw)&#32;{
+01024 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;drawer.<link linkend="_class_leap_1_1_unity_1_1_runtime_gizmos_1_1_runtime_gizmo_drawer_1acdd890c95db06e3d95bbafd740ed11ef">DrawSphere</link>(contact.position,&#32;0.01f);
+01025 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;drawer.<link linkend="_class_leap_1_1_unity_1_1_runtime_gizmos_1_1_runtime_gizmo_drawer_1a7e1e78b8cec3277c218cf05af7b43aae">DrawLine</link>(contact.position,&#32;contact.position&#32;+&#32;(contact.normal&#32;*&#32;0.02f));
+01026 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+01027 &#32;&#32;&#32;&#32;&#32;&#32;}
+01028 &#32;&#32;&#32;&#32;}
+01029 
+01030 <emphasis role="preprocessor">&#32;&#32;&#32;&#32;#endregion</emphasis>
+01031 
+01032 &#32;&#32;}
+01033 
+01034 }
+</programlisting></section>

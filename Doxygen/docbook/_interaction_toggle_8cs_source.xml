@@ -1,0 +1,129 @@
+<?xml version='1.0' encoding='UTF-8' standalone='no'?>
+<section xmlns="http://docbook.org/ns/docbook" version="5.0" xmlns:xlink="http://www.w3.org/1999/xlink" xml:id="__interaction_toggle_8cs_source">
+<title>InteractionToggle.cs</title>
+<indexterm><primary>O:/GitHUBMINIPRoject/Assets/LeapMotion/Modules/InteractionEngine/Scripts/UI/InteractionToggle.cs</primary></indexterm>
+<programlisting>00001 <emphasis role="comment">/******************************************************************************</emphasis>
+00002 <emphasis role="comment">&#32;*&#32;Copyright&#32;(C)&#32;Leap&#32;Motion,&#32;Inc.&#32;2011-2018.&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;*</emphasis>
+00003 <emphasis role="comment">&#32;*&#32;Leap&#32;Motion&#32;proprietary&#32;and&#32;confidential.&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;*</emphasis>
+00004 <emphasis role="comment">&#32;*&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;*</emphasis>
+00005 <emphasis role="comment">&#32;*&#32;Use&#32;subject&#32;to&#32;the&#32;terms&#32;of&#32;the&#32;Leap&#32;Motion&#32;SDK&#32;Agreement&#32;available&#32;at&#32;&#32;&#32;&#32;&#32;*</emphasis>
+00006 <emphasis role="comment">&#32;*&#32;https://developer.leapmotion.com/sdk_agreement,&#32;or&#32;another&#32;agreement&#32;&#32;&#32;&#32;&#32;&#32;&#32;*</emphasis>
+00007 <emphasis role="comment">&#32;*&#32;between&#32;Leap&#32;Motion&#32;and&#32;you,&#32;your&#32;company&#32;or&#32;other&#32;organization.&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;*</emphasis>
+00008 <emphasis role="comment">&#32;******************************************************************************/</emphasis>
+00009 
+00010 <emphasis role="keyword">using</emphasis>&#32;System;
+00011 <emphasis role="keyword">using</emphasis>&#32;<link linkend="__balloon_8cs_1a7d67e097df9376eb709b6a23aa3c7d23">UnityEngine</link>;
+00012 <emphasis role="keyword">using</emphasis>&#32;<link linkend="_namespace_unity_engine">UnityEngine</link>.Events;
+00013 <emphasis role="keyword">using</emphasis>&#32;<link linkend="_namespace_unity_engine">UnityEngine</link>.Serialization;
+00014 
+00015 <emphasis role="keyword">namespace&#32;</emphasis><link linkend="_namespace_leap_1_1_unity_1_1_interaction">Leap.Unity.Interaction</link>&#32;{
+00016 
+<anchor xml:id="__interaction_toggle_8cs_source_1l00020"/><link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_toggle">00020</link> &#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keyword">class&#32;</emphasis><link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_toggle">InteractionToggle</link>&#32;:&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_button">InteractionButton</link>&#32;{
+00021 
+00022 &#32;&#32;&#32;&#32;[Tooltip(<emphasis role="stringliteral">&quot;The&#32;height&#32;that&#32;this&#32;button&#32;rests&#32;at;&#32;this&#32;value&#32;is&#32;a&#32;lerp&#32;in&#32;between&#32;the&#32;min&#32;and&#32;max&#32;height.&quot;</emphasis>)]
+00023 &#32;&#32;&#32;&#32;[Range(0f,&#32;1f)]
+<anchor xml:id="__interaction_toggle_8cs_source_1l00025"/><link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_toggle_1a52c3b4eb6b808f7c1234873725ea4699">00025</link> &#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keywordtype">float</emphasis>&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_toggle_1a52c3b4eb6b808f7c1234873725ea4699">toggledRestingHeight</link>&#32;=&#32;0.25f;
+00026 
+00027 &#32;&#32;&#32;&#32;[SerializeField,&#32;FormerlySerializedAs(<emphasis role="stringliteral">&quot;_toggled&quot;</emphasis>)]
+00028 &#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;<emphasis role="keywordtype">bool</emphasis>&#32;_isToggled&#32;=&#32;<emphasis role="keyword">false</emphasis>;
+00029 
+00030 &#32;&#32;&#32;&#32;[SerializeField]
+00031 &#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;<emphasis role="keywordtype">bool</emphasis>&#32;_startToggled&#32;=&#32;<emphasis role="keyword">false</emphasis>;
+00032 
+<anchor xml:id="__interaction_toggle_8cs_source_1l00034"/><link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_toggle_1a02368504664d3a79e06e0ad9f0775e6f">00034</link> &#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keywordtype">bool</emphasis>&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_toggle_1a02368504664d3a79e06e0ad9f0775e6f">isToggled</link>&#32;{
+00035 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">get</emphasis>&#32;{
+00036 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;_isToggled;
+00037 &#32;&#32;&#32;&#32;&#32;&#32;}
+00038 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">set</emphasis>&#32;{
+00039 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(_isToggled&#32;!=&#32;value)&#32;{
+00040 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;_isToggled&#32;=&#32;value;
+00041 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(_isToggled)&#32;{
+00042 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_toggle_1a4d6b89ed3edf03304314adeb0be46130">OnToggle</link>();
+00043 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}&#32;<emphasis role="keywordflow">else</emphasis>&#32;{
+00044 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_toggle_1a19deb4f0a9661a3e6fbfbc23d9d4512f">OnUntoggle</link>();
+00045 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00046 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_button_1ac5d100f680957b8a06989b47241d3624">restingHeight</link>&#32;=&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_toggle_1a02368504664d3a79e06e0ad9f0775e6f">isToggled</link>&#32;?&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_toggle_1a52c3b4eb6b808f7c1234873725ea4699">toggledRestingHeight</link>&#32;:&#32;_originalRestingHeight;
+00047 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_behaviour_1a4f54f1794944882d8cf51bd641a5341c">rigidbody</link>.WakeUp();
+00048 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_button_1aba499ecdce469e3288650158dce28735">_pressedThisFrame</link>&#32;=&#32;value;
+00049 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_button_1a24190962b49e9308337362aca6c3e157">_unpressedThisFrame</link>&#32;=&#32;!value;
+00050 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00051 &#32;&#32;&#32;&#32;&#32;&#32;}
+00052 &#32;&#32;&#32;&#32;}
+00053 
+00055 &#32;&#32;&#32;&#32;[FormerlySerializedAs(<emphasis role="stringliteral">&quot;toggleEvent&quot;</emphasis>)]
+00056 &#32;&#32;&#32;&#32;[SerializeField]
+00057 &#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;UnityEvent&#32;_toggleEvent&#32;=&#32;<emphasis role="keyword">new</emphasis>&#32;UnityEvent();
+00058 
+<anchor xml:id="__interaction_toggle_8cs_source_1l00062"/><link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_toggle_1a4d6b89ed3edf03304314adeb0be46130">00062</link> &#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;Action&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_toggle_1a4d6b89ed3edf03304314adeb0be46130">OnToggle</link>&#32;=&#32;()&#32;=&gt;&#32;{&#32;};
+00063 
+00065 &#32;&#32;&#32;&#32;[FormerlySerializedAs(<emphasis role="stringliteral">&quot;unToggleEvent&quot;</emphasis>)]
+00066 &#32;&#32;&#32;&#32;[SerializeField]
+<anchor xml:id="__interaction_toggle_8cs_source_1l00067"/><link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_toggle_1a28d81a96312e39af3871b395e977d088">00067</link> &#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;UnityEvent&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_toggle_1a28d81a96312e39af3871b395e977d088">_untoggleEvent</link>&#32;=&#32;<emphasis role="keyword">new</emphasis>&#32;UnityEvent();
+00068 
+<anchor xml:id="__interaction_toggle_8cs_source_1l00072"/><link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_toggle_1a19deb4f0a9661a3e6fbfbc23d9d4512f">00072</link> &#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;Action&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_toggle_1a19deb4f0a9661a3e6fbfbc23d9d4512f">OnUntoggle</link>&#32;=&#32;()&#32;=&gt;&#32;{&#32;};
+00073 
+00074 &#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;<emphasis role="keywordtype">float</emphasis>&#32;_originalRestingHeight;
+<anchor xml:id="__interaction_toggle_8cs_source_1l00075"/><link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_toggle_1aef60cd4161e0cecc20905b5b610a8ab7">00075</link> &#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keywordtype">float</emphasis>&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_toggle_1aef60cd4161e0cecc20905b5b610a8ab7">untoggledRestingHeight</link>&#32;{
+00076 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">get</emphasis>&#32;{
+00077 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;_originalRestingHeight;
+00078 &#32;&#32;&#32;&#32;&#32;&#32;}
+00079 &#32;&#32;&#32;&#32;}
+00080 
+<anchor xml:id="__interaction_toggle_8cs_source_1l00084"/><link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_toggle_1a0aa93471870ce44e62c499437ad7f34c">00084</link> &#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;Vector3&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_toggle_1a0aa93471870ce44e62c499437ad7f34c">RelaxedToggledLocalPosition</link>&#32;{
+00085 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">get</emphasis>&#32;{
+00086 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_button_1aaff55c4ea819215e2100b6906f970746">initialLocalPosition</link>&#32;+&#32;Vector3.back&#32;*&#32;Mathf.Lerp(<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_button_1a26f7eabb9d9880d63ab19f7dbeff186a">minMaxHeight</link>.x,&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_button_1a26f7eabb9d9880d63ab19f7dbeff186a">minMaxHeight</link>.y,&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_toggle_1a52c3b4eb6b808f7c1234873725ea4699">toggledRestingHeight</link>);
+00087 &#32;&#32;&#32;&#32;&#32;&#32;}
+00088 &#32;&#32;&#32;&#32;}
+00089 
+<anchor xml:id="__interaction_toggle_8cs_source_1l00093"/><link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_toggle_1a5bea9ebaa3eacfbf60cec56df5c73f32">00093</link> &#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keyword">override</emphasis>&#32;Vector3&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_toggle_1a5bea9ebaa3eacfbf60cec56df5c73f32">RelaxedLocalPosition</link>&#32;{
+00094 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">get</emphasis>&#32;{
+00095 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(!Application.isPlaying)&#32;{
+00096 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_button_1aaff55c4ea819215e2100b6906f970746">initialLocalPosition</link>&#32;+&#32;Vector3.back&#32;*&#32;Mathf.Lerp(<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_button_1a26f7eabb9d9880d63ab19f7dbeff186a">minMaxHeight</link>.x,&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_button_1a26f7eabb9d9880d63ab19f7dbeff186a">minMaxHeight</link>.y,&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_button_1ac5d100f680957b8a06989b47241d3624">restingHeight</link>);
+00097 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00098 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">else</emphasis>&#32;{
+00099 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_button_1aaff55c4ea819215e2100b6906f970746">initialLocalPosition</link>&#32;+&#32;Vector3.back&#32;*&#32;Mathf.Lerp(<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_button_1a26f7eabb9d9880d63ab19f7dbeff186a">minMaxHeight</link>.x,&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_button_1a26f7eabb9d9880d63ab19f7dbeff186a">minMaxHeight</link>.y,&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_toggle_1aef60cd4161e0cecc20905b5b610a8ab7">untoggledRestingHeight</link>);
+00100 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00101 &#32;&#32;&#32;&#32;&#32;&#32;}
+00102 &#32;&#32;&#32;&#32;}
+00103 
+<anchor xml:id="__interaction_toggle_8cs_source_1l00104"/><link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_toggle_1ad2840a310771196cfe8e13b6e21e0fdd">00104</link> &#32;&#32;&#32;&#32;<emphasis role="keyword">protected</emphasis>&#32;<emphasis role="keyword">override</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_toggle_1ad2840a310771196cfe8e13b6e21e0fdd">Awake</link>()&#32;{
+00105 &#32;&#32;&#32;&#32;&#32;&#32;base.Awake();
+00106 &#32;&#32;&#32;&#32;&#32;&#32;
+00107 &#32;&#32;&#32;&#32;&#32;&#32;_originalRestingHeight&#32;=&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_button_1ac5d100f680957b8a06989b47241d3624">restingHeight</link>;
+00108 &#32;&#32;&#32;&#32;}
+00109 
+<anchor xml:id="__interaction_toggle_8cs_source_1l00110"/><link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_toggle_1ab72d4861fbce848ae802d990917ee50e">00110</link> &#32;&#32;&#32;&#32;<emphasis role="keyword">protected</emphasis>&#32;<emphasis role="keyword">override</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_toggle_1ab72d4861fbce848ae802d990917ee50e">Start</link>()&#32;{
+00111 &#32;&#32;&#32;&#32;&#32;&#32;base.Start();
+00112 
+00113 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(_startToggled)&#32;{
+00114 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_toggle_1a02368504664d3a79e06e0ad9f0775e6f">isToggled</link>&#32;=&#32;<emphasis role="keyword">true</emphasis>;
+00115 &#32;&#32;&#32;&#32;&#32;&#32;}
+00116 
+00117 &#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_toggle_1a4d6b89ed3edf03304314adeb0be46130">OnToggle</link>&#32;+=&#32;_toggleEvent.Invoke;
+00118 &#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_toggle_1a19deb4f0a9661a3e6fbfbc23d9d4512f">OnUntoggle</link>&#32;+=&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_toggle_1a28d81a96312e39af3871b395e977d088">_untoggleEvent</link>.Invoke;
+00119 &#32;&#32;&#32;&#32;}
+00120 
+<anchor xml:id="__interaction_toggle_8cs_source_1l00121"/><link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_toggle_1ac5a6bd9608c07270d3ef41feb0913bba">00121</link> &#32;&#32;&#32;&#32;<emphasis role="keyword">protected</emphasis>&#32;<emphasis role="keyword">override</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_toggle_1ac5a6bd9608c07270d3ef41feb0913bba">OnEnable</link>()&#32;{
+00122 &#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_button_1a604925418c20993e8dcd62b44442f02e">OnPress</link>&#32;+=&#32;OnPressed;
+00123 &#32;&#32;&#32;&#32;&#32;&#32;base.OnEnable();
+00124 &#32;&#32;&#32;&#32;}
+00125 
+<anchor xml:id="__interaction_toggle_8cs_source_1l00126"/><link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_toggle_1a9cbebe0123cbea22e469877317fa97ac">00126</link> &#32;&#32;&#32;&#32;<emphasis role="keyword">protected</emphasis>&#32;<emphasis role="keyword">override</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_toggle_1a9cbebe0123cbea22e469877317fa97ac">OnDisable</link>()&#32;{
+00127 &#32;&#32;&#32;&#32;&#32;&#32;base.OnDisable();
+00128 &#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_button_1a604925418c20993e8dcd62b44442f02e">OnPress</link>&#32;-=&#32;OnPressed;
+00129 &#32;&#32;&#32;&#32;}
+00130 
+00131 &#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;OnPressed()&#32;{
+00132 &#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_toggle_1a02368504664d3a79e06e0ad9f0775e6f">isToggled</link>&#32;=&#32;!<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_toggle_1a02368504664d3a79e06e0ad9f0775e6f">isToggled</link>;
+00133 &#32;&#32;&#32;&#32;}
+00134 
+<anchor xml:id="__interaction_toggle_8cs_source_1l00139"/><link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_toggle_1a8f7718af1921acdf098f92cea3ec496f">00139</link> &#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_toggle_1a8f7718af1921acdf098f92cea3ec496f">Toggle</link>()&#32;{
+00140 &#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_toggle_1a02368504664d3a79e06e0ad9f0775e6f">isToggled</link>&#32;=&#32;<emphasis role="keyword">true</emphasis>;
+00141 &#32;&#32;&#32;&#32;}
+00142 
+<anchor xml:id="__interaction_toggle_8cs_source_1l00146"/><link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_toggle_1a86710d731160a015986142cfe47e01e0">00146</link> &#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_toggle_1a86710d731160a015986142cfe47e01e0">Untoggle</link>()&#32;{
+00147 &#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_toggle_1a02368504664d3a79e06e0ad9f0775e6f">isToggled</link>&#32;=&#32;<emphasis role="keyword">false</emphasis>;
+00148 &#32;&#32;&#32;&#32;}
+00149 &#32;&#32;}
+00150 }
+</programlisting></section>

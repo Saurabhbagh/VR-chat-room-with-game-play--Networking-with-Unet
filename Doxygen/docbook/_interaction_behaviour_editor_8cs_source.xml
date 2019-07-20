@@ -1,0 +1,226 @@
+<?xml version='1.0' encoding='UTF-8' standalone='no'?>
+<section xmlns="http://docbook.org/ns/docbook" version="5.0" xmlns:xlink="http://www.w3.org/1999/xlink" xml:id="__interaction_behaviour_editor_8cs_source">
+<title>InteractionBehaviourEditor.cs</title>
+<indexterm><primary>O:/GitHUBMINIPRoject/Assets/LeapMotion/Modules/InteractionEngine/Scripts/Editor/InteractionBehaviourEditor.cs</primary></indexterm>
+<programlisting>00001 <emphasis role="comment">/******************************************************************************</emphasis>
+00002 <emphasis role="comment">&#32;*&#32;Copyright&#32;(C)&#32;Leap&#32;Motion,&#32;Inc.&#32;2011-2018.&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;*</emphasis>
+00003 <emphasis role="comment">&#32;*&#32;Leap&#32;Motion&#32;proprietary&#32;and&#32;confidential.&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;*</emphasis>
+00004 <emphasis role="comment">&#32;*&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;*</emphasis>
+00005 <emphasis role="comment">&#32;*&#32;Use&#32;subject&#32;to&#32;the&#32;terms&#32;of&#32;the&#32;Leap&#32;Motion&#32;SDK&#32;Agreement&#32;available&#32;at&#32;&#32;&#32;&#32;&#32;*</emphasis>
+00006 <emphasis role="comment">&#32;*&#32;https://developer.leapmotion.com/sdk_agreement,&#32;or&#32;another&#32;agreement&#32;&#32;&#32;&#32;&#32;&#32;&#32;*</emphasis>
+00007 <emphasis role="comment">&#32;*&#32;between&#32;Leap&#32;Motion&#32;and&#32;you,&#32;your&#32;company&#32;or&#32;other&#32;organization.&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;*</emphasis>
+00008 <emphasis role="comment">&#32;******************************************************************************/</emphasis>
+00009 
+00010 <emphasis role="keyword">using</emphasis>&#32;<link linkend="_namespace_leap">Leap</link>.<link linkend="_namespace_leap_1_1_unity">Unity</link>.<link linkend="_namespace_leap_1_1_unity_1_1_query">Query</link>;
+00011 <emphasis role="keyword">using</emphasis>&#32;<link linkend="_namespace_unity_editor">UnityEditor</link>;
+00012 <emphasis role="keyword">using</emphasis>&#32;<link linkend="__balloon_8cs_1a7d67e097df9376eb709b6a23aa3c7d23">UnityEngine</link>;
+00013 
+00014 <emphasis role="keyword">namespace&#32;</emphasis><link linkend="_namespace_leap_1_1_unity_1_1_interaction">Leap.Unity.Interaction</link>&#32;{
+00015 
+00016 &#32;&#32;[CanEditMultipleObjects]
+00017 &#32;&#32;[CustomEditor(typeof(InteractionBehaviour),&#32;editorForChildClasses:&#32;<emphasis role="keyword">true</emphasis>)]
+<anchor xml:id="__interaction_behaviour_editor_8cs_source_1l00018"/><link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_behaviour_editor">00018</link> &#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keyword">class&#32;</emphasis><link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_behaviour_editor">InteractionBehaviourEditor</link>&#32;:&#32;<link linkend="_class_leap_1_1_unity_1_1_custom_editor_base">CustomEditorBase</link>&lt;InteractionBehaviour&gt;&#32;{
+00019 
+00020 &#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;<link linkend="_class_leap_1_1_unity_1_1_enum_event_table_editor">EnumEventTableEditor</link>&#32;_tableEditor;
+00021 
+<anchor xml:id="__interaction_behaviour_editor_8cs_source_1l00022"/><link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_behaviour_editor_1ab79cc92b11713942f5e3453789317297">00022</link> &#32;&#32;&#32;&#32;<emphasis role="keyword">protected</emphasis>&#32;<emphasis role="keyword">override</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_behaviour_editor_1ab79cc92b11713942f5e3453789317297">OnEnable</link>()&#32;{
+00023 &#32;&#32;&#32;&#32;&#32;&#32;base.OnEnable();
+00024 
+00025 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;Interaction&#32;Manager&#32;hookup.</emphasis>
+00026 &#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_leap_1_1_unity_1_1_custom_editor_base_1ac4af66143c23aa0601e20d58bb3f532e">specifyCustomDecorator</link>(<emphasis role="stringliteral">&quot;_manager&quot;</emphasis>,&#32;drawInteractionManagerDecorator);
+00027 
+00028 &#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_leap_1_1_unity_1_1_custom_editor_base_1a1f7e4b6641ca944bac1efc1679a40afd">deferProperty</link>(<emphasis role="stringliteral">&quot;_eventTable&quot;</emphasis>);
+00029 &#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_leap_1_1_unity_1_1_custom_editor_base_1aab8bbda3edcc92a5c3d5a5360988c265">specifyCustomDrawer</link>(<emphasis role="stringliteral">&quot;_eventTable&quot;</emphasis>,&#32;drawEventTable);
+00030 
+00031 &#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_leap_1_1_unity_1_1_custom_editor_base_1a050b2c7054d16bc8e497877eed360664">specifyConditionalDrawing</link>(()&#32;=&gt;&#32;!<link linkend="_class_leap_1_1_unity_1_1_custom_editor_base_1ab3c7d33ed1e58869160ccc7d1a189264">targets</link>.Query().All(intObj&#32;=&gt;&#32;intObj.ignoreContact),
+00032 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="stringliteral">&quot;_contactForceMode&quot;</emphasis>);
+00033 
+00034 &#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_leap_1_1_unity_1_1_custom_editor_base_1a050b2c7054d16bc8e497877eed360664">specifyConditionalDrawing</link>(()&#32;=&gt;&#32;!<link linkend="_class_leap_1_1_unity_1_1_custom_editor_base_1ab3c7d33ed1e58869160ccc7d1a189264">targets</link>.Query().All(intObj&#32;=&gt;&#32;intObj.ignoreGrasping),
+00035 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="stringliteral">&quot;_allowMultiGrasp&quot;</emphasis>,
+00036 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="stringliteral">&quot;_moveObjectWhenGrasped&quot;</emphasis>,
+00037 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="stringliteral">&quot;graspedMovementType&quot;</emphasis>);
+00038 
+00039 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;Layer&#32;Overrides</emphasis>
+00040 &#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_leap_1_1_unity_1_1_custom_editor_base_1a050b2c7054d16bc8e497877eed360664">specifyConditionalDrawing</link>(()&#32;=&gt;&#32;<link linkend="_class_leap_1_1_unity_1_1_custom_editor_base_1ab3c7d33ed1e58869160ccc7d1a189264">targets</link>.Query().Any(intObj&#32;=&gt;&#32;intObj.overrideInteractionLayer),
+00041 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="stringliteral">&quot;_interactionLayer&quot;</emphasis>);
+00042 &#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_leap_1_1_unity_1_1_custom_editor_base_1ac4af66143c23aa0601e20d58bb3f532e">specifyCustomDecorator</link>(<emphasis role="stringliteral">&quot;_interactionLayer&quot;</emphasis>,&#32;drawInteractionLayerDecorator);
+00043 &#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_leap_1_1_unity_1_1_custom_editor_base_1a050b2c7054d16bc8e497877eed360664">specifyConditionalDrawing</link>(()&#32;=&gt;&#32;<link linkend="_class_leap_1_1_unity_1_1_custom_editor_base_1ab3c7d33ed1e58869160ccc7d1a189264">targets</link>.Query().Any(intObj&#32;=&gt;&#32;intObj.overrideNoContactLayer),
+00044 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="stringliteral">&quot;_noContactLayer&quot;</emphasis>);
+00045 &#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_leap_1_1_unity_1_1_custom_editor_base_1ac4af66143c23aa0601e20d58bb3f532e">specifyCustomDecorator</link>(<emphasis role="stringliteral">&quot;_noContactLayer&quot;</emphasis>,&#32;drawNoContactLayerDecorator);
+00046 &#32;&#32;&#32;&#32;}
+00047 
+00048 &#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;drawInteractionManagerDecorator(SerializedProperty&#32;property)&#32;{
+00049 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordtype">bool</emphasis>&#32;shouldDrawInteractionManagerNotSetWarning&#32;=&#32;<emphasis role="keyword">false</emphasis>;
+00050 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">foreach</emphasis>&#32;(var&#32;<link linkend="_class_leap_1_1_unity_1_1_custom_editor_base_1a20eea7e492831d5b4cde7eeaf0ce749e">target</link>&#32;<emphasis role="keywordflow">in</emphasis>&#32;<link linkend="_class_leap_1_1_unity_1_1_custom_editor_base_1ab3c7d33ed1e58869160ccc7d1a189264">targets</link>)&#32;{
+00051 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(PrefabUtility.GetPrefabType(<link linkend="_class_leap_1_1_unity_1_1_custom_editor_base_1a20eea7e492831d5b4cde7eeaf0ce749e">target</link>)&#32;==&#32;PrefabType.Prefab)&#32;<emphasis role="keywordflow">continue</emphasis>;
+00052 
+00053 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(<link linkend="_class_leap_1_1_unity_1_1_custom_editor_base_1a20eea7e492831d5b4cde7eeaf0ce749e">target</link>.manager&#32;==&#32;<emphasis role="keyword">null</emphasis>)&#32;{
+00054 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;shouldDrawInteractionManagerNotSetWarning&#32;=&#32;<emphasis role="keyword">true</emphasis>;
+00055 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">break</emphasis>;
+00056 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00057 &#32;&#32;&#32;&#32;&#32;&#32;}
+00058 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(shouldDrawInteractionManagerNotSetWarning)&#32;{
+00059 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordtype">bool</emphasis>&#32;pluralTargets&#32;=&#32;<link linkend="_class_leap_1_1_unity_1_1_custom_editor_base_1ab3c7d33ed1e58869160ccc7d1a189264">targets</link>.Length&#32;&gt;&#32;1;
+00060 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordtype">string</emphasis>&#32;noManagerSetWarningMessage&#32;=&#32;<emphasis role="stringliteral">&quot;&quot;</emphasis>;
+00061 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(pluralTargets)&#32;{
+00062 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;noManagerSetWarningMessage&#32;=&#32;<emphasis role="stringliteral">&quot;One&#32;or&#32;more&#32;of&#32;the&#32;currently&#32;selected&#32;interaction&#32;&quot;</emphasis>
+00063 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;+&#32;<emphasis role="stringliteral">&quot;objects&#32;doesn&apos;t&#32;have&#32;its&#32;Interaction&#32;Manager&#32;set.&#32;&quot;</emphasis>;
+00064 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00065 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">else</emphasis>&#32;{
+00066 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;noManagerSetWarningMessage&#32;=&#32;<emphasis role="stringliteral">&quot;The&#32;currently&#32;selected&#32;interaction&#32;object&#32;doesn&apos;t&#32;&quot;</emphasis>
+00067 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;+&#32;<emphasis role="stringliteral">&quot;have&#32;its&#32;Interaction&#32;Manager&#32;set.&#32;&quot;</emphasis>;
+00068 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00069 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;noManagerSetWarningMessage&#32;+=&#32;<emphasis role="stringliteral">&quot;&#32;Object&#32;validation&#32;requires&#32;a&#32;configured&#32;manager&#32;&quot;</emphasis>
+00070 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;+&#32;<emphasis role="stringliteral">&quot;property.&quot;</emphasis>;
+00071 
+00072 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;drawSetManagerWarningBox(noManagerSetWarningMessage,&#32;MessageType.Error);
+00073 &#32;&#32;&#32;&#32;&#32;&#32;}
+00074 &#32;&#32;&#32;&#32;}
+00075 
+00076 &#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;drawSetManagerWarningBox(<emphasis role="keywordtype">string</emphasis>&#32;warningMessage,&#32;MessageType&#32;messageType)&#32;{
+00077 &#32;&#32;&#32;&#32;&#32;&#32;EditorGUILayout.BeginHorizontal();
+00078 
+00079 &#32;&#32;&#32;&#32;&#32;&#32;EditorGUILayout.HelpBox(warningMessage,&#32;messageType);
+00080 
+00081 &#32;&#32;&#32;&#32;&#32;&#32;Rect&#32;buttonRect&#32;=&#32;EditorGUILayout.GetControlRect(GUILayout.MaxWidth(100F),
+00082 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;GUILayout.ExpandHeight(<emphasis role="keyword">true</emphasis>),
+00083 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;GUILayout.MaxHeight(40F));
+00084 &#32;&#32;&#32;&#32;&#32;&#32;InteractionManager&#32;manager&#32;=&#32;InteractionManager.instance;
+00085 &#32;&#32;&#32;&#32;&#32;&#32;EditorGUI.BeginDisabledGroup(manager&#32;==&#32;<emphasis role="keyword">null</emphasis>);
+00086 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(GUI.Button(buttonRect,&#32;<emphasis role="keyword">new</emphasis>&#32;GUIContent(<emphasis role="stringliteral">&quot;Auto-Fix&quot;</emphasis>,
+00087 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;manager&#32;==&#32;<emphasis role="keyword">null</emphasis>&#32;?&#32;<emphasis role="stringliteral">&quot;Please&#32;add&#32;an&#32;Interaction&#32;Manager&#32;to&#32;&quot;</emphasis>
+00088 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;+&#32;<emphasis role="stringliteral">&quot;your&#32;scene.&quot;</emphasis>
+00089 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;:&#32;<emphasis role="stringliteral">&quot;Use&#32;InteractionManager.instance&#32;to&#32;&quot;</emphasis>
+00090 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;+&#32;<emphasis role="stringliteral">&quot;automatically&#32;set&#32;the&#32;manager&#32;of&#32;the&#32;&quot;</emphasis>
+00091 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;+&#32;<emphasis role="stringliteral">&quot;selected&#32;interaction&#32;objects.&quot;</emphasis>)))&#32;{
+00092 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(manager&#32;==&#32;<emphasis role="keyword">null</emphasis>)&#32;{
+00093 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;Debug.LogError(<emphasis role="stringliteral">&quot;Attempt&#32;to&#32;find&#32;an&#32;InteractionManager&#32;instance&#32;failed.&#32;Is&#32;there&#32;&quot;</emphasis>
+00094 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;+&#32;<emphasis role="stringliteral">&quot;an&#32;InteractionManager&#32;in&#32;your&#32;scene?&quot;</emphasis>);
+00095 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00096 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">else</emphasis>&#32;{
+00097 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">foreach</emphasis>&#32;(var&#32;<link linkend="_class_leap_1_1_unity_1_1_custom_editor_base_1a20eea7e492831d5b4cde7eeaf0ce749e">target</link>&#32;<emphasis role="keywordflow">in</emphasis>&#32;<link linkend="_class_leap_1_1_unity_1_1_custom_editor_base_1ab3c7d33ed1e58869160ccc7d1a189264">targets</link>)&#32;{
+00098 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(PrefabUtility.GetPrefabType(<link linkend="_class_leap_1_1_unity_1_1_custom_editor_base_1a20eea7e492831d5b4cde7eeaf0ce749e">target</link>)&#32;==&#32;PrefabType.Prefab)&#32;<emphasis role="keywordflow">continue</emphasis>;
+00099 
+00100 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;Undo.RecordObject(<link linkend="_class_leap_1_1_unity_1_1_custom_editor_base_1a20eea7e492831d5b4cde7eeaf0ce749e">target</link>,&#32;<emphasis role="stringliteral">&quot;Auto-set&#32;Interaction&#32;Manager&quot;</emphasis>);
+00101 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_leap_1_1_unity_1_1_custom_editor_base_1a20eea7e492831d5b4cde7eeaf0ce749e">target</link>.manager&#32;=&#32;manager;
+00102 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00103 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00104 &#32;&#32;&#32;&#32;&#32;&#32;}
+00105 &#32;&#32;&#32;&#32;&#32;&#32;EditorGUI.EndDisabledGroup();
+00106 
+00107 &#32;&#32;&#32;&#32;&#32;&#32;EditorGUILayout.EndHorizontal();
+00108 
+00109 &#32;&#32;&#32;&#32;&#32;&#32;EditorGUILayout.Space();
+00110 &#32;&#32;&#32;&#32;}
+00111 
+00112 &#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;drawInteractionLayerDecorator(SerializedProperty&#32;property)&#32;{
+00113 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordtype">bool</emphasis>&#32;shouldDrawWarning&#32;=&#32;<emphasis role="keyword">false</emphasis>;
+00114 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">foreach</emphasis>&#32;(var&#32;<link linkend="_class_leap_1_1_unity_1_1_custom_editor_base_1a20eea7e492831d5b4cde7eeaf0ce749e">target</link>&#32;<emphasis role="keywordflow">in</emphasis>&#32;<link linkend="_class_leap_1_1_unity_1_1_custom_editor_base_1ab3c7d33ed1e58869160ccc7d1a189264">targets</link>)&#32;{
+00115 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(<link linkend="_class_leap_1_1_unity_1_1_custom_editor_base_1a20eea7e492831d5b4cde7eeaf0ce749e">target</link>.manager&#32;==&#32;<emphasis role="keyword">null</emphasis>)&#32;<emphasis role="keywordflow">continue</emphasis>;&#32;<emphasis role="comment">//&#32;Can&apos;t&#32;check.</emphasis>
+00116 
+00117 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(<link linkend="_class_leap_1_1_unity_1_1_custom_editor_base_1a20eea7e492831d5b4cde7eeaf0ce749e">target</link>.overrideInteractionLayer
+00118 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&amp;&amp;&#32;!<link linkend="_class_leap_1_1_unity_1_1_custom_editor_base_1a20eea7e492831d5b4cde7eeaf0ce749e">target</link>.manager.autoGenerateLayers
+00119 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&amp;&amp;&#32;<link linkend="_namespace_leap_1_1_unity_1a186e5eb0a2b743f1f6b79346f0ab8ad0a50ae99e9c35446c2580e4b540b0fd104">Physics</link>.GetIgnoreLayerCollision(<link linkend="_class_leap_1_1_unity_1_1_custom_editor_base_1a20eea7e492831d5b4cde7eeaf0ce749e">target</link>.interactionLayer.layerIndex,
+00120 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_leap_1_1_unity_1_1_custom_editor_base_1a20eea7e492831d5b4cde7eeaf0ce749e">target</link>.manager.contactBoneLayer.layerIndex))&#32;{
+00121 
+00122 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;shouldDrawWarning&#32;=&#32;<emphasis role="keyword">true</emphasis>;
+00123 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">break</emphasis>;
+00124 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00125 &#32;&#32;&#32;&#32;&#32;&#32;}
+00126 
+00127 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(shouldDrawWarning)&#32;{
+00128 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordtype">bool</emphasis>&#32;pluralTargets&#32;=&#32;<link linkend="_class_leap_1_1_unity_1_1_custom_editor_base_1ab3c7d33ed1e58869160ccc7d1a189264">targets</link>.Length&#32;&gt;&#32;1;
+00129 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordtype">string</emphasis>&#32;message;
+00130 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(pluralTargets)&#32;{
+00131 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;message&#32;=&#32;<emphasis role="stringliteral">&quot;One&#32;or&#32;more&#32;of&#32;the&#32;selected&#32;interaction&#32;objects&#32;has&#32;its&#32;&quot;</emphasis>
+00132 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;+&#32;<emphasis role="stringliteral">&quot;Interaction&#32;layer&#32;set&#32;NOT&#32;to&#32;collide&#32;with&#32;the&#32;contact&#32;bone&#32;&quot;</emphasis>
+00133 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;+&#32;<emphasis role="stringliteral">&quot;layer.&#32;&quot;</emphasis>;
+00134 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00135 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">else</emphasis>&#32;{
+00136 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;message&#32;=&#32;<emphasis role="stringliteral">&quot;The&#32;selected&#32;interaction&#32;object&#32;has&#32;its&#32;Interaction&#32;layer&#32;set&#32;&quot;</emphasis>
+00137 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;+&#32;<emphasis role="stringliteral">&quot;NOT&#32;to&#32;collide&#32;with&#32;the&#32;contact&#32;bone&#32;layer.&#32;&quot;</emphasis>;
+00138 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00139 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;message&#32;+=&#32;<emphasis role="stringliteral">&quot;This&#32;will&#32;prevent&#32;an&#32;interaction&#32;object&#32;from&#32;supporting&#32;contact&#32;with&#32;&quot;</emphasis>
+00140 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;+&#32;<emphasis role="stringliteral">&quot;any&#32;hands&#32;or&#32;controllers.&quot;</emphasis>;
+00141 
+00142 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;EditorGUILayout.HelpBox(message,&#32;MessageType.Warning);
+00143 &#32;&#32;&#32;&#32;&#32;&#32;}
+00144 &#32;&#32;&#32;&#32;}
+00145 
+00146 &#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;drawNoContactLayerDecorator(SerializedProperty&#32;property)&#32;{
+00147 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordtype">bool</emphasis>&#32;shouldDrawCollisionWarning&#32;=&#32;<emphasis role="keyword">false</emphasis>;
+00148 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">foreach</emphasis>&#32;(var&#32;<link linkend="_class_leap_1_1_unity_1_1_custom_editor_base_1a20eea7e492831d5b4cde7eeaf0ce749e">target</link>&#32;<emphasis role="keywordflow">in</emphasis>&#32;<link linkend="_class_leap_1_1_unity_1_1_custom_editor_base_1ab3c7d33ed1e58869160ccc7d1a189264">targets</link>)&#32;{
+00149 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(<link linkend="_class_leap_1_1_unity_1_1_custom_editor_base_1a20eea7e492831d5b4cde7eeaf0ce749e">target</link>.manager&#32;==&#32;<emphasis role="keyword">null</emphasis>)&#32;<emphasis role="keywordflow">continue</emphasis>;&#32;<emphasis role="comment">//&#32;Can&apos;t&#32;check.</emphasis>
+00150 
+00151 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(<link linkend="_class_leap_1_1_unity_1_1_custom_editor_base_1a20eea7e492831d5b4cde7eeaf0ce749e">target</link>.overrideNoContactLayer
+00152 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&amp;&amp;&#32;!<link linkend="_class_leap_1_1_unity_1_1_custom_editor_base_1a20eea7e492831d5b4cde7eeaf0ce749e">target</link>.manager.autoGenerateLayers
+00153 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&amp;&amp;&#32;!<link linkend="_namespace_leap_1_1_unity_1a186e5eb0a2b743f1f6b79346f0ab8ad0a50ae99e9c35446c2580e4b540b0fd104">Physics</link>.GetIgnoreLayerCollision(<link linkend="_class_leap_1_1_unity_1_1_custom_editor_base_1a20eea7e492831d5b4cde7eeaf0ce749e">target</link>.noContactLayer.layerIndex,
+00154 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_leap_1_1_unity_1_1_custom_editor_base_1a20eea7e492831d5b4cde7eeaf0ce749e">target</link>.manager.contactBoneLayer.layerIndex))&#32;{
+00155 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;shouldDrawCollisionWarning&#32;=&#32;<emphasis role="keyword">true</emphasis>;
+00156 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">break</emphasis>;
+00157 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00158 &#32;&#32;&#32;&#32;&#32;&#32;}
+00159 
+00160 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(shouldDrawCollisionWarning)&#32;{
+00161 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordtype">bool</emphasis>&#32;pluralTargets&#32;=&#32;<link linkend="_class_leap_1_1_unity_1_1_custom_editor_base_1ab3c7d33ed1e58869160ccc7d1a189264">targets</link>.Length&#32;&gt;&#32;1;
+00162 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordtype">string</emphasis>&#32;noContactErrorMessage;
+00163 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(pluralTargets)&#32;{
+00164 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;noContactErrorMessage&#32;=&#32;<emphasis role="stringliteral">&quot;One&#32;or&#32;more&#32;selected&#32;interaction&#32;objects&#32;has&#32;its&#32;No&#32;&quot;</emphasis>
+00165 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;+&#32;<emphasis role="stringliteral">&quot;Contact&#32;layer&#32;set&#32;to&#32;collide&#32;with&#32;the&#32;contact&#32;bone&#32;&quot;</emphasis>
+00166 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;+&#32;<emphasis role="stringliteral">&quot;layer.&#32;&quot;</emphasis>;
+00167 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00168 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">else</emphasis>&#32;{
+00169 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;noContactErrorMessage&#32;=&#32;<emphasis role="stringliteral">&quot;This&#32;interaction&#32;object&#32;has&#32;its&#32;No&#32;Contact&#32;layer&#32;set&#32;&quot;</emphasis>
+00170 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;+&#32;<emphasis role="stringliteral">&quot;to&#32;collide&#32;with&#32;the&#32;contact&#32;bone&#32;layer.&#32;&quot;</emphasis>;
+00171 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00172 
+00173 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;noContactErrorMessage&#32;+=&#32;<emphasis role="stringliteral">&quot;Please&#32;ensure&#32;the&#32;Interaction&#32;Manager&apos;s&#32;contact&#32;bone&#32;&quot;</emphasis>
+00174 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;+&#32;<emphasis role="stringliteral">&quot;layer&#32;is&#32;set&#32;not&#32;to&#32;collide&#32;with&#32;any&#32;interaction&#32;&quot;</emphasis>
+00175 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;+&#32;<emphasis role="stringliteral">&quot;object&apos;s&#32;No&#32;Contact&#32;layer.&quot;</emphasis>;
+00176 
+00177 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;EditorGUILayout.HelpBox(noContactErrorMessage,&#32;MessageType.Error);
+00178 &#32;&#32;&#32;&#32;&#32;&#32;}
+00179 &#32;&#32;&#32;&#32;}
+00180 
+<anchor xml:id="__interaction_behaviour_editor_8cs_source_1l00181"/><link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_behaviour_editor_1afa4ad41f5b9616fca03ff68ad9835fa8">00181</link> &#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keyword">override</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_behaviour_editor_1afa4ad41f5b9616fca03ff68ad9835fa8">OnInspectorGUI</link>()&#32;{
+00182 &#32;&#32;&#32;&#32;&#32;&#32;checkHasColliders();
+00183 &#32;&#32;&#32;&#32;&#32;&#32;
+00184 &#32;&#32;&#32;&#32;&#32;&#32;base.OnInspectorGUI();
+00185 &#32;&#32;&#32;&#32;}
+00186 
+00187 &#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;checkHasColliders()&#32;{
+00188 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordtype">bool</emphasis>&#32;anyMissingColliders&#32;=&#32;<emphasis role="keyword">false</emphasis>;
+00189 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">foreach</emphasis>&#32;(var&#32;singleTarget&#32;<emphasis role="keywordflow">in</emphasis>&#32;<link linkend="_class_leap_1_1_unity_1_1_custom_editor_base_1ab3c7d33ed1e58869160ccc7d1a189264">targets</link>)&#32;{
+00190 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(singleTarget.GetComponentsInChildren&lt;Collider&gt;().Length&#32;==&#32;0)&#32;{
+00191 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;anyMissingColliders&#32;=&#32;<emphasis role="keyword">true</emphasis>;&#32;<emphasis role="keywordflow">break</emphasis>;
+00192 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00193 &#32;&#32;&#32;&#32;&#32;&#32;}
+00194 
+00195 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(anyMissingColliders)&#32;{
+00196 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordtype">bool</emphasis>&#32;pluralObjects&#32;=&#32;<link linkend="_class_leap_1_1_unity_1_1_custom_editor_base_1ab3c7d33ed1e58869160ccc7d1a189264">targets</link>.Length&#32;&gt;&#32;1;
+00197 
+00198 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordtype">string</emphasis>&#32;message;
+00199 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(pluralObjects)&#32;{
+00200 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;message&#32;=&#32;<emphasis role="stringliteral">&quot;One&#32;or&#32;more&#32;of&#32;the&#32;currently&#32;selected&#32;interaction&#32;objects&#32;have&#32;no&#32;&quot;</emphasis>
+00201 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;+&#32;<emphasis role="stringliteral">&quot;colliders.&#32;Interaction&#32;objects&#32;without&#32;any&#32;Colliders&#32;cannot&#32;be&#32;&quot;</emphasis>
+00202 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;+&#32;<emphasis role="stringliteral">&quot;interacted&#32;with.&quot;</emphasis>;
+00203 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00204 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">else</emphasis>&#32;{
+00205 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;message&#32;=&#32;<emphasis role="stringliteral">&quot;This&#32;interaction&#32;object&#32;has&#32;no&#32;Colliders.&#32;Interaction&#32;objects&#32;&quot;</emphasis>
+00206 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;+&#32;<emphasis role="stringliteral">&quot;without&#32;any&#32;Colliders&#32;cannot&#32;be&#32;interacted&#32;with.&quot;</emphasis>;
+00207 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00208 
+00209 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;EditorGUILayout.HelpBox(message,&#32;MessageType.Warning);
+00210 &#32;&#32;&#32;&#32;&#32;&#32;}
+00211 &#32;&#32;&#32;&#32;}
+00212 
+00213 &#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;drawEventTable(SerializedProperty&#32;property)&#32;{
+00214 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(_tableEditor&#32;==&#32;<emphasis role="keyword">null</emphasis>)&#32;{
+00215 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;_tableEditor&#32;=&#32;<emphasis role="keyword">new</emphasis>&#32;EnumEventTableEditor(property,&#32;typeof(InteractionBehaviour.EventType));
+00216 &#32;&#32;&#32;&#32;&#32;&#32;}
+00217 
+00218 &#32;&#32;&#32;&#32;&#32;&#32;_tableEditor.<link linkend="_class_leap_1_1_unity_1_1_enum_event_table_editor_1a0750f6e4ebe155b598189387c896ade0">DoGuiLayout</link>();
+00219 &#32;&#32;&#32;&#32;}
+00220 &#32;&#32;}
+00221 }
+</programlisting></section>

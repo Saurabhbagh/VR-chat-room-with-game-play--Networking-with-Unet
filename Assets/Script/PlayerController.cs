@@ -103,7 +103,7 @@ public class PlayerController : NetworkBehaviour
     /// <param name="y">rotation of the left controller</param>
 
     [Command]
-    void CmdFireLeft(Vector3 x, Quaternion y)
+    public void CmdFireLeft(Vector3 x, Quaternion y)
     {
         
         /// Create the Bullet from the Bullet Prefab
@@ -113,7 +113,7 @@ public class PlayerController : NetworkBehaviour
         bullet.GetComponent<Rigidbody>().velocity = bullet.transform.forward * 20;
         /// Spawn the bullet on the Clients
         NetworkServer.Spawn(bullet);
-        /// Destroy the bullet after 2 seconds
+        /// Destroy the bullet after 8 seconds
         Destroy(bullet, 8.0f);
 
 
@@ -136,7 +136,7 @@ public class PlayerController : NetworkBehaviour
         // Spawn the bullet on the Clients
         NetworkServer.Spawn(bullet);
 
-        // Destroy the bullet after 2 seconds
+        // Destroy the bullet after 8 seconds
         Destroy(bullet, 8.0f);
 
 

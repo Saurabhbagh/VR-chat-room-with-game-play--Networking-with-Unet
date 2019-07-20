@@ -1,0 +1,110 @@
+<?xml version='1.0' encoding='UTF-8' standalone='no'?>
+<section xmlns="http://docbook.org/ns/docbook" version="5.0" xmlns:xlink="http://www.w3.org/1999/xlink" xml:id="__t_m_pro___sorting_layer_helper_8cs_source">
+<title>TMPro_SortingLayerHelper.cs</title>
+<indexterm><primary>O:/GitHUBMINIPRoject/Library/PackageCache/com.unity.textmeshpro@1.3.0/Scripts/Editor/TMPro_SortingLayerHelper.cs</primary></indexterm>
+<programlisting>00001 <emphasis role="comment">/*</emphasis>
+00002 <emphasis role="comment">&#32;*&#32;Copyright&#32;(c)&#32;2014,&#32;Nick&#32;Gravelyn.</emphasis>
+00003 <emphasis role="comment">&#32;*</emphasis>
+00004 <emphasis role="comment">&#32;*&#32;This&#32;software&#32;is&#32;provided&#32;&apos;as-is&apos;,&#32;without&#32;any&#32;express&#32;or&#32;implied</emphasis>
+00005 <emphasis role="comment">&#32;*&#32;warranty.&#32;In&#32;no&#32;event&#32;will&#32;the&#32;authors&#32;be&#32;held&#32;liable&#32;for&#32;any&#32;damages</emphasis>
+00006 <emphasis role="comment">&#32;*&#32;arising&#32;from&#32;the&#32;use&#32;of&#32;this&#32;software.</emphasis>
+00007 <emphasis role="comment">&#32;*</emphasis>
+00008 <emphasis role="comment">&#32;*&#32;Permission&#32;is&#32;granted&#32;to&#32;anyone&#32;to&#32;use&#32;this&#32;software&#32;for&#32;any&#32;purpose,</emphasis>
+00009 <emphasis role="comment">&#32;*&#32;including&#32;commercial&#32;applications,&#32;and&#32;to&#32;alter&#32;it&#32;and&#32;redistribute&#32;it</emphasis>
+00010 <emphasis role="comment">&#32;*&#32;freely,&#32;subject&#32;to&#32;the&#32;following&#32;restrictions:</emphasis>
+00011 <emphasis role="comment">&#32;*</emphasis>
+00012 <emphasis role="comment">&#32;*&#32;&#32;&#32;&#32;1.&#32;The&#32;origin&#32;of&#32;this&#32;software&#32;must&#32;not&#32;be&#32;misrepresented;&#32;you&#32;must&#32;not</emphasis>
+00013 <emphasis role="comment">&#32;*&#32;&#32;&#32;&#32;claim&#32;that&#32;you&#32;wrote&#32;the&#32;original&#32;software.&#32;If&#32;you&#32;use&#32;this&#32;software</emphasis>
+00014 <emphasis role="comment">&#32;*&#32;&#32;&#32;&#32;in&#32;a&#32;product,&#32;an&#32;acknowledgment&#32;in&#32;the&#32;product&#32;documentation&#32;would&#32;be</emphasis>
+00015 <emphasis role="comment">&#32;*&#32;&#32;&#32;&#32;appreciated&#32;but&#32;is&#32;not&#32;required.</emphasis>
+00016 <emphasis role="comment">&#32;*</emphasis>
+00017 <emphasis role="comment">&#32;*&#32;&#32;&#32;&#32;2.&#32;Altered&#32;source&#32;versions&#32;must&#32;be&#32;plainly&#32;marked&#32;as&#32;such,&#32;and&#32;must&#32;not&#32;be</emphasis>
+00018 <emphasis role="comment">&#32;*&#32;&#32;&#32;&#32;misrepresented&#32;as&#32;being&#32;the&#32;original&#32;software.</emphasis>
+00019 <emphasis role="comment">&#32;*</emphasis>
+00020 <emphasis role="comment">&#32;*&#32;&#32;&#32;&#32;3.&#32;This&#32;notice&#32;may&#32;not&#32;be&#32;removed&#32;or&#32;altered&#32;from&#32;any&#32;source</emphasis>
+00021 <emphasis role="comment">&#32;*&#32;&#32;&#32;&#32;distribution.</emphasis>
+00022 <emphasis role="comment">&#32;*/</emphasis>
+00023 
+00024 <emphasis role="keyword">using</emphasis>&#32;<link linkend="__balloon_8cs_1a7d67e097df9376eb709b6a23aa3c7d23">UnityEngine</link>;
+00025 <emphasis role="keyword">using</emphasis>&#32;<link linkend="_namespace_unity_editor">UnityEditor</link>;
+00026 <emphasis role="keyword">using</emphasis>&#32;System;
+00027 <emphasis role="keyword">using</emphasis>&#32;System.Reflection;
+00028 
+00029 <emphasis role="keyword">namespace&#32;</emphasis><link linkend="_namespace_t_m_pro">TMPro</link>
+00030 {
+00031 &#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;Helpers&#32;used&#32;by&#32;the&#32;different&#32;sorting&#32;layer&#32;classes.</emphasis>
+00032 &#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keyword">static</emphasis>&#32;<emphasis role="keyword">class&#32;</emphasis>SortingLayerHelper
+00033 &#32;&#32;&#32;&#32;{
+00034 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;<emphasis role="keyword">static</emphasis>&#32;Type&#32;_utilityType;
+00035 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;<emphasis role="keyword">static</emphasis>&#32;PropertyInfo&#32;_sortingLayerNamesProperty;
+00036 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;<emphasis role="keyword">static</emphasis>&#32;MethodInfo&#32;_getSortingLayerUserIdMethod;
+00037 
+00038 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">static</emphasis>&#32;SortingLayerHelper()
+00039 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00040 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;_utilityType&#32;=&#32;Type.GetType(<emphasis role="stringliteral">&quot;UnityEditorInternal.InternalEditorUtility,&#32;UnityEditor&quot;</emphasis>);
+00041 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;_sortingLayerNamesProperty&#32;=&#32;_utilityType.GetProperty(<emphasis role="stringliteral">&quot;sortingLayerNames&quot;</emphasis>,&#32;BindingFlags.Static&#32;|&#32;BindingFlags.NonPublic);
+00042 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;_getSortingLayerUserIdMethod&#32;=&#32;_utilityType.GetMethod(<emphasis role="stringliteral">&quot;GetSortingLayerUniqueID&quot;</emphasis>,&#32;BindingFlags.Static&#32;|&#32;BindingFlags.NonPublic);
+00043 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00044 
+00045 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;Gets&#32;an&#32;array&#32;of&#32;sorting&#32;layer&#32;names.</emphasis>
+00046 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;Since&#32;this&#32;uses&#32;reflection,&#32;callers&#32;should&#32;check&#32;for&#32;&apos;null&apos;&#32;which&#32;will&#32;be&#32;returned&#32;if&#32;the&#32;reflection&#32;fails.</emphasis>
+00047 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keyword">static</emphasis>&#32;<emphasis role="keywordtype">string</emphasis>[]&#32;sortingLayerNames
+00048 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00049 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">get</emphasis>
+00050 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00051 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(_sortingLayerNamesProperty&#32;==&#32;<emphasis role="keyword">null</emphasis>)
+00052 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00053 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;<emphasis role="keyword">null</emphasis>;
+00054 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00055 
+00056 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;_sortingLayerNamesProperty.GetValue(<emphasis role="keyword">null</emphasis>,&#32;<emphasis role="keyword">null</emphasis>)&#32;as&#32;<emphasis role="keywordtype">string</emphasis>[];
+00057 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00058 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00059 
+00060 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;Given&#32;the&#32;ID&#32;of&#32;a&#32;sorting&#32;layer,&#32;returns&#32;the&#32;sorting&#32;layer&apos;s&#32;name</emphasis>
+00061 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keyword">static</emphasis>&#32;<emphasis role="keywordtype">string</emphasis>&#32;GetSortingLayerNameFromID(<emphasis role="keywordtype">int</emphasis>&#32;<emphasis role="keywordtype">id</emphasis>)
+00062 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00063 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordtype">string</emphasis>[]&#32;names&#32;=&#32;sortingLayerNames;
+00064 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(names&#32;==&#32;<emphasis role="keyword">null</emphasis>)
+00065 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00066 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;<emphasis role="keyword">null</emphasis>;
+00067 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00068 
+00069 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">for</emphasis>&#32;(<emphasis role="keywordtype">int</emphasis>&#32;i&#32;=&#32;0;&#32;i&#32;&lt;&#32;names.Length;&#32;i++)
+00070 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00071 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(GetSortingLayerIDForIndex(i)&#32;==&#32;<emphasis role="keywordtype">id</emphasis>)
+00072 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00073 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;names[i];
+00074 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00075 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00076 
+00077 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;<emphasis role="keyword">null</emphasis>;
+00078 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00079 
+00080 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;Given&#32;the&#32;name&#32;of&#32;a&#32;sorting&#32;layer,&#32;returns&#32;the&#32;ID.</emphasis>
+00081 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keyword">static</emphasis>&#32;<emphasis role="keywordtype">int</emphasis>&#32;GetSortingLayerIDForName(<emphasis role="keywordtype">string</emphasis>&#32;name)
+00082 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00083 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordtype">string</emphasis>[]&#32;names&#32;=&#32;sortingLayerNames;
+00084 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(names&#32;==&#32;<emphasis role="keyword">null</emphasis>)
+00085 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00086 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;0;
+00087 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00088 
+00089 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;GetSortingLayerIDForIndex(Array.IndexOf(names,&#32;name));
+00090 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00091 
+00092 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;Helper&#32;to&#32;convert&#32;from&#32;a&#32;sorting&#32;layer&#32;INDEX&#32;to&#32;a&#32;sorting&#32;layer&#32;ID.&#32;These&#32;are&#32;not&#32;the&#32;same&#32;thing.</emphasis>
+00093 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;IDs&#32;are&#32;based&#32;on&#32;the&#32;order&#32;in&#32;which&#32;layers&#32;were&#32;created&#32;and&#32;do&#32;not&#32;change&#32;when&#32;reordering&#32;the&#32;layers.</emphasis>
+00094 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;Thankfully&#32;there&#32;is&#32;a&#32;private&#32;helper&#32;we&#32;can&#32;call&#32;to&#32;get&#32;the&#32;ID&#32;for&#32;a&#32;layer&#32;given&#32;its&#32;index.</emphasis>
+00095 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keyword">static</emphasis>&#32;<emphasis role="keywordtype">int</emphasis>&#32;GetSortingLayerIDForIndex(<emphasis role="keywordtype">int</emphasis>&#32;index)
+00096 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00097 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(_getSortingLayerUserIdMethod&#32;==&#32;<emphasis role="keyword">null</emphasis>)
+00098 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00099 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;0;
+00100 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00101 
+00102 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;(<emphasis role="keywordtype">int</emphasis>)_getSortingLayerUserIdMethod.Invoke(<emphasis role="keyword">null</emphasis>,&#32;<emphasis role="keyword">new</emphasis>&#32;<emphasis role="keywordtype">object</emphasis>[]&#32;{&#32;<link linkend="_namespace_valve_1_1_v_r_1ac40c4bdf0a3dcd6e69cad2d85f287c67a6a992d5529f459a44fee58c733255e86">index</link>&#32;});
+00103 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00104 &#32;&#32;&#32;&#32;}
+00105 }
+</programlisting></section>

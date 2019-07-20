@@ -1,0 +1,259 @@
+<?xml version='1.0' encoding='UTF-8' standalone='no'?>
+<section xmlns="http://docbook.org/ns/docbook" version="5.0" xmlns:xlink="http://www.w3.org/1999/xlink" xml:id="__interaction_checks_8cs_source">
+<title>InteractionChecks.cs</title>
+<indexterm><primary>O:/GitHUBMINIPRoject/Assets/LeapMotion/Modules/InteractionEngine/Scripts/Internal/Editor/InteractionChecks.cs</primary></indexterm>
+<programlisting>00001 <emphasis role="comment">/******************************************************************************</emphasis>
+00002 <emphasis role="comment">&#32;*&#32;Copyright&#32;(C)&#32;Leap&#32;Motion,&#32;Inc.&#32;2011-2018.&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;*</emphasis>
+00003 <emphasis role="comment">&#32;*&#32;Leap&#32;Motion&#32;proprietary&#32;and&#32;confidential.&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;*</emphasis>
+00004 <emphasis role="comment">&#32;*&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;*</emphasis>
+00005 <emphasis role="comment">&#32;*&#32;Use&#32;subject&#32;to&#32;the&#32;terms&#32;of&#32;the&#32;Leap&#32;Motion&#32;SDK&#32;Agreement&#32;available&#32;at&#32;&#32;&#32;&#32;&#32;*</emphasis>
+00006 <emphasis role="comment">&#32;*&#32;https://developer.leapmotion.com/sdk_agreement,&#32;or&#32;another&#32;agreement&#32;&#32;&#32;&#32;&#32;&#32;&#32;*</emphasis>
+00007 <emphasis role="comment">&#32;*&#32;between&#32;Leap&#32;Motion&#32;and&#32;you,&#32;your&#32;company&#32;or&#32;other&#32;organization.&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;*</emphasis>
+00008 <emphasis role="comment">&#32;******************************************************************************/</emphasis>
+00009 
+00010 <emphasis role="keyword">using</emphasis>&#32;System;
+00011 <emphasis role="keyword">using</emphasis>&#32;<link linkend="__balloon_8cs_1a7d67e097df9376eb709b6a23aa3c7d23">UnityEngine</link>;
+00012 <emphasis role="keyword">using</emphasis>&#32;<link linkend="_namespace_unity_editor">UnityEditor</link>;
+00013 
+<anchor xml:id="__interaction_checks_8cs_source_1l00014"/><link linkend="_namespace_leap_1_1_unity_1_1_interaction_1_1_internal">00014</link> <emphasis role="keyword">namespace&#32;</emphasis><link linkend="_namespace_leap_1_1_unity_1_1_interaction_1_1_internal">Leap.Unity.Interaction.Internal</link>&#32;{
+00015 
+<anchor xml:id="__interaction_checks_8cs_source_1l00016"/><link linkend="_namespace_leap_1_1_unity_1_1_interaction_1_1_internal_1afd0057d3352139df1a5ca0526cbabe20">00016</link> &#32;&#32;<emphasis role="keyword">using</emphasis>&#32;<link linkend="_namespace_leap_1_1_unity_1_1_interaction_1_1_internal_1afd0057d3352139df1a5ca0526cbabe20">UnityObject</link>&#32;=&#32;<link linkend="_namespace_unity_engine">UnityEngine</link>.Object;
+00017 &#32;&#32;<emphasis role="keyword">using</emphasis>&#32;<link linkend="_struct_leap_1_1_unity_1_1_query_1_1_query">Query</link>;
+00018 
+00019 &#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keyword">static</emphasis>&#32;<emphasis role="keyword">class&#32;</emphasis>InteractionChecks&#32;{
+00020 &#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keyword">const</emphasis>&#32;<emphasis role="keywordtype">float</emphasis>&#32;MAX_GRAVITY_MAGNITUDE&#32;=&#32;4.905f;
+00021 
+00022 <emphasis role="preprocessor">#if&#32;UNITY_ANDROID</emphasis>
+00023 &#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keyword">const</emphasis>&#32;<emphasis role="keywordtype">float</emphasis>&#32;MAX_TIMESTEP&#32;=&#32;1.0f&#32;/&#32;60.0f;
+00024 <emphasis role="preprocessor">#else</emphasis>
+00025 &#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keyword">const</emphasis>&#32;<emphasis role="keywordtype">float</emphasis>&#32;MAX_TIMESTEP&#32;=&#32;1.0f&#32;/&#32;90.0f;
+00026 <emphasis role="preprocessor">#endif</emphasis>
+00027 &#32;&#32;&#32;&#32;
+00028 &#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;<emphasis role="keyword">const</emphasis>&#32;<emphasis role="keywordtype">string</emphasis>&#32;IGNORE_GRAVITY_CHECK_KEY&#32;=&#32;<emphasis role="stringliteral">&quot;LeapIEIgnoreGravityCheck&quot;</emphasis>;
+00029 &#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;<emphasis role="keyword">const</emphasis>&#32;<emphasis role="keywordtype">string</emphasis>&#32;IGNORE_TIMESTEP_CHECK_KEY&#32;=&#32;<emphasis role="stringliteral">&quot;LeapIEIgnoreTimestepCheck&quot;</emphasis>;
+00030 &#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;<emphasis role="keyword">const</emphasis>&#32;<emphasis role="keywordtype">string</emphasis>&#32;IGNORE_RIGID_HANDS_CHECK_KEY&#32;=&#32;<emphasis role="stringliteral">&quot;LeapIEIgnoreRigidHandsCheck&quot;</emphasis>;
+00031 
+00032 &#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;<emphasis role="keyword">const</emphasis>&#32;<emphasis role="keywordtype">string</emphasis>&#32;SHOULD_LAUNCH_FOR_IE&#32;=&#32;<emphasis role="stringliteral">&quot;LeapWindowPanelShouldLaunchForIE&quot;</emphasis>;
+00033 
+00034 &#32;&#32;&#32;&#32;[InitializeOnLoadMethod]
+00035 &#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;<emphasis role="keyword">static</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;init()&#32;{
+00036 &#32;&#32;&#32;&#32;&#32;&#32;EditorApplication.delayCall&#32;+=&#32;()&#32;=&gt;&#32;{
+00037 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(EditorPrefs.GetBool(SHOULD_LAUNCH_FOR_IE,&#32;defaultValue:&#32;<emphasis role="keyword">true</emphasis>))&#32;{
+00038 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;EditorPrefs.SetBool(SHOULD_LAUNCH_FOR_IE,&#32;<emphasis role="keyword">false</emphasis>);
+00039 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_leap_1_1_unity_1_1_leap_unity_window">LeapUnityWindow</link>.<link linkend="_class_leap_1_1_unity_1_1_leap_unity_window_1a23365de0fb2b614ce387eb2b97feb8a9">Init</link>();
+00040 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00041 &#32;&#32;&#32;&#32;&#32;&#32;};
+00042 
+00043 &#32;&#32;&#32;&#32;&#32;&#32;EditorApplication.playModeStateChanged&#32;-=&#32;onPlayModeStateChanged;
+00044 &#32;&#32;&#32;&#32;&#32;&#32;EditorApplication.playModeStateChanged&#32;+=&#32;onPlayModeStateChanged;
+00045 &#32;&#32;&#32;&#32;}
+00046 
+00047 &#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;<emphasis role="keyword">static</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;onPlayModeStateChanged(PlayModeStateChange&#32;stateChange)&#32;{
+00048 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(stateChange&#32;==&#32;PlayModeStateChange.EnteredPlayMode)&#32;{
+00049 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordtype">bool</emphasis>&#32;allChecksPassed&#32;=&#32;runAllChecks_NoGUI();
+00050 
+00051 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(!allChecksPassed)&#32;{
+00052 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;EditorApplication.delayCall&#32;+=&#32;<link linkend="_class_leap_1_1_unity_1_1_leap_unity_window">LeapUnityWindow</link>.<link linkend="_class_leap_1_1_unity_1_1_leap_unity_window_1a23365de0fb2b614ce387eb2b97feb8a9">Init</link>;
+00053 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00054 &#32;&#32;&#32;&#32;&#32;&#32;}
+00055 &#32;&#32;&#32;&#32;}
+00056 
+00057 &#32;&#32;&#32;&#32;[LeapProjectCheck(<emphasis role="stringliteral">&quot;Interaction&#32;Engine&quot;</emphasis>,&#32;10)]
+00058 &#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keyword">static</emphasis>&#32;<emphasis role="keywordtype">bool</emphasis>&#32;CheckInteractionSettings()&#32;{
+00059 &#32;&#32;&#32;&#32;&#32;&#32;EditorGUILayout.LabelField(<emphasis role="stringliteral">&quot;Interaction&#32;Engine&quot;</emphasis>,&#32;EditorStyles.boldLabel);
+00060 
+00061 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordtype">bool</emphasis>&#32;allChecksPassed&#32;=&#32;runAllChecks_WithGUI();
+00062 
+00063 &#32;&#32;&#32;&#32;&#32;&#32;EditorGUILayout.Space();
+00064 
+00065 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(allChecksPassed)&#32;{
+00066 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;EditorGUILayout.HelpBox(<emphasis role="stringliteral">&quot;All&#32;settings&#32;are&#32;good&#32;for&#32;the&#32;Interaction&#32;Engine!&quot;</emphasis>,
+00067 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;MessageType.Info);
+00068 &#32;&#32;&#32;&#32;&#32;&#32;}
+00069 
+00070 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;<emphasis role="keyword">true</emphasis>;
+00071 &#32;&#32;&#32;&#32;}
+00072 
+00073 <emphasis role="preprocessor">&#32;&#32;&#32;&#32;#region&#32;Run&#32;All&#32;Checks</emphasis>
+00074 
+00075 &#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;<emphasis role="keyword">static</emphasis>&#32;<emphasis role="keywordtype">bool</emphasis>&#32;runAllChecks_NoGUI()&#32;{
+00076 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordtype">bool</emphasis>&#32;allChecksPassed&#32;=&#32;<emphasis role="keyword">true</emphasis>;
+00077 &#32;&#32;&#32;&#32;&#32;&#32;
+00078 &#32;&#32;&#32;&#32;&#32;&#32;allChecksPassed&#32;&amp;=&#32;checkGravity();
+00079 
+00080 &#32;&#32;&#32;&#32;&#32;&#32;allChecksPassed&#32;&amp;=&#32;checkTimeStep();
+00081 
+00082 &#32;&#32;&#32;&#32;&#32;&#32;allChecksPassed&#32;&amp;=&#32;checkRigidHands();
+00083 
+00084 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;allChecksPassed;
+00085 &#32;&#32;&#32;&#32;}
+00086 
+00087 &#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;<emphasis role="keyword">static</emphasis>&#32;<emphasis role="keywordtype">bool</emphasis>&#32;runAllChecks_WithGUI()&#32;{
+00088 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordtype">bool</emphasis>&#32;allChecksPassed&#32;=&#32;<emphasis role="keyword">true</emphasis>;
+00089 &#32;&#32;&#32;&#32;&#32;&#32;
+00090 &#32;&#32;&#32;&#32;&#32;&#32;allChecksPassed&#32;&amp;=&#32;checkGravityAndDrawGUI();
+00091 
+00092 &#32;&#32;&#32;&#32;&#32;&#32;allChecksPassed&#32;&amp;=&#32;checkTimeStepAndDrawGUI();
+00093 
+00094 &#32;&#32;&#32;&#32;&#32;&#32;allChecksPassed&#32;&amp;=&#32;checkRigidHandsAndDrawGUI();
+00095 
+00096 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(!allChecksPassed&#32;&amp;&amp;&#32;Application.isPlaying)&#32;{
+00097 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;EditorGUILayout.Space();
+00098 
+00099 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;EditorGUILayout.HelpBox(<emphasis role="stringliteral">&quot;Editor&#32;is&#32;currently&#32;in&#32;play-mode,&#32;so&#32;any&#32;project&#32;setting&#32;&quot;</emphasis>
+00100 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;+&#32;<emphasis role="stringliteral">&quot;changes&#32;will&#32;be&#32;reverted&#32;upon&#32;returning&#32;to&#32;edit-mode.&#32;You&#32;should&#32;return&#32;to&#32;&quot;</emphasis>
+00101 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;+&#32;<emphasis role="stringliteral">&quot;edit-mode&#32;if&#32;you&#32;want&#32;auto-fixes&#32;to&#32;stick.&quot;</emphasis>,&#32;MessageType.Warning);
+00102 &#32;&#32;&#32;&#32;&#32;&#32;}
+00103 
+00104 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;allChecksPassed;
+00105 &#32;&#32;&#32;&#32;}
+00106 
+00107 <emphasis role="preprocessor">&#32;&#32;&#32;&#32;#endregion</emphasis>
+00108 
+00109 <emphasis role="preprocessor">&#32;&#32;&#32;&#32;#region&#32;Check&#32;Gravity</emphasis>
+00110 
+00111 &#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;<emphasis role="keyword">static</emphasis>&#32;<emphasis role="keywordtype">bool</emphasis>&#32;checkGravity()&#32;{
+00112 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(LeapProjectChecks.CheckIgnoredKey(IGNORE_GRAVITY_CHECK_KEY))&#32;{
+00113 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;<emphasis role="keyword">true</emphasis>;
+00114 &#32;&#32;&#32;&#32;&#32;&#32;}
+00115 &#32;&#32;&#32;&#32;&#32;&#32;
+00116 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(Mathf.Abs(<link linkend="_namespace_leap_1_1_unity_1a186e5eb0a2b743f1f6b79346f0ab8ad0a50ae99e9c35446c2580e4b540b0fd104">Physics</link>.gravity.y)&#32;&gt;&#32;MAX_GRAVITY_MAGNITUDE)&#32;{
+00117 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;<emphasis role="keyword">false</emphasis>;
+00118 &#32;&#32;&#32;&#32;&#32;&#32;}
+00119 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">else</emphasis>&#32;{
+00120 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;<emphasis role="keyword">true</emphasis>;
+00121 &#32;&#32;&#32;&#32;&#32;&#32;}
+00122 &#32;&#32;&#32;&#32;}
+00123 
+00124 &#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;<emphasis role="keyword">static</emphasis>&#32;<emphasis role="keywordtype">bool</emphasis>&#32;checkGravityAndDrawGUI()&#32;{
+00125 &#32;&#32;&#32;&#32;&#32;&#32;var&#32;gravityOK&#32;=&#32;checkGravity();
+00126 
+00127 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(!gravityOK)&#32;{
+00128 
+00129 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;EditorGUILayout.Space();
+00130 
+00131 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">using</emphasis>&#32;(<emphasis role="keyword">new</emphasis>&#32;EditorGUILayout.HorizontalScope())&#32;{
+00132 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;EditorGUILayout.HelpBox(<emphasis role="stringliteral">&quot;Your&#32;gravity&#32;magnitude&#32;is&#32;&quot;</emphasis>&#32;+&#32;<link linkend="_namespace_leap_1_1_unity_1a186e5eb0a2b743f1f6b79346f0ab8ad0a50ae99e9c35446c2580e4b540b0fd104">Physics</link>.gravity.y
+00133 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;+&#32;<emphasis role="stringliteral">&quot;&#32;which&#32;is&#32;stronger&#32;than&#32;the&#32;recommended&#32;value&#32;&quot;</emphasis>
+00134 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;+&#32;<emphasis role="stringliteral">&quot;of&#32;-4.905!\n\nGo&#32;to&#32;Edit/Project&#32;Settings/Physics&#32;&quot;</emphasis>
+00135 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;+&#32;<emphasis role="stringliteral">&quot;to&#32;change&#32;the&#32;magnitude.&quot;</emphasis>,&#32;MessageType.Warning);
+00136 
+00137 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(GUILayout.Button(<emphasis role="stringliteral">&quot;Auto-fix&quot;</emphasis>))&#32;{
+00138 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_namespace_leap_1_1_unity_1a186e5eb0a2b743f1f6b79346f0ab8ad0a50ae99e9c35446c2580e4b540b0fd104">Physics</link>.gravity&#32;=&#32;Vector3.down&#32;*&#32;MAX_GRAVITY_MAGNITUDE;
+00139 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00140 
+00141 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(GUILayout.Button(<emphasis role="stringliteral">&quot;Ignore&quot;</emphasis>))&#32;{
+00142 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;LeapProjectChecks.SetIgnoredKey(IGNORE_GRAVITY_CHECK_KEY,&#32;ignore:&#32;<emphasis role="keyword">true</emphasis>);
+00143 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00144 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00145 &#32;&#32;&#32;&#32;&#32;&#32;}
+00146 
+00147 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;gravityOK;
+00148 &#32;&#32;&#32;&#32;}
+00149 
+00150 <emphasis role="preprocessor">&#32;&#32;&#32;&#32;#endregion</emphasis>
+00151 
+00152 <emphasis role="preprocessor">&#32;&#32;&#32;&#32;#region&#32;Check&#32;Timestep</emphasis>
+00153 
+00154 &#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;<emphasis role="keyword">static</emphasis>&#32;<emphasis role="keywordtype">bool</emphasis>&#32;checkTimeStep()&#32;{
+00155 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(LeapProjectChecks.CheckIgnoredKey(IGNORE_TIMESTEP_CHECK_KEY))&#32;{
+00156 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;<emphasis role="keyword">true</emphasis>;
+00157 &#32;&#32;&#32;&#32;&#32;&#32;}
+00158 
+00159 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(Time.fixedDeltaTime&#32;&gt;&#32;MAX_TIMESTEP&#32;+&#32;Mathf.Epsilon)&#32;{
+00160 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;<emphasis role="keyword">false</emphasis>;
+00161 &#32;&#32;&#32;&#32;&#32;&#32;}
+00162 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">else</emphasis>&#32;{
+00163 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;<emphasis role="keyword">true</emphasis>;
+00164 &#32;&#32;&#32;&#32;&#32;&#32;}
+00165 &#32;&#32;&#32;&#32;}
+00166 
+00167 &#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;<emphasis role="keyword">static</emphasis>&#32;<emphasis role="keywordtype">bool</emphasis>&#32;checkTimeStepAndDrawGUI()&#32;{
+00168 &#32;&#32;&#32;&#32;&#32;&#32;var&#32;timeStepOK&#32;=&#32;checkTimeStep();
+00169 
+00170 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(!timeStepOK)&#32;{
+00171 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordtype">float</emphasis>&#32;roundedTimestep&#32;=&#32;(float)Math.Round(MAX_TIMESTEP,&#32;4);
+00172 
+00173 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;EditorGUILayout.Space();
+00174 
+00175 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">using</emphasis>&#32;(<emphasis role="keyword">new</emphasis>&#32;EditorGUILayout.HorizontalScope())&#32;{
+00176 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;EditorGUILayout.HelpBox(
+00177 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="stringliteral">&quot;Your&#32;fixed&#32;timestep&#32;is&#32;&quot;</emphasis>&#32;+&#32;Time.fixedDeltaTime&#32;+
+00178 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="stringliteral">&quot;,&#32;which&#32;is&#32;slower&#32;than&#32;the&#32;recommended&#32;value&#32;&quot;</emphasis>&#32;+
+00179 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="stringliteral">&quot;of&#32;&quot;</emphasis>&#32;+&#32;roundedTimestep&#32;+&#32;<emphasis role="stringliteral">&quot;.\n\nGo&#32;to&#32;Edit/Project&#32;Settings/Time&#32;&quot;</emphasis>&#32;+
+00180 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="stringliteral">&quot;to&#32;change&#32;the&#32;fixed&#32;timestep.&quot;</emphasis>,&#32;MessageType.Warning);
+00181 
+00182 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(GUILayout.Button(<emphasis role="stringliteral">&quot;Auto-fix&quot;</emphasis>))&#32;{
+00183 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;Time.fixedDeltaTime&#32;=&#32;roundedTimestep;
+00184 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00185 
+00186 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(GUILayout.Button(<emphasis role="stringliteral">&quot;Ignore&quot;</emphasis>))&#32;{
+00187 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;LeapProjectChecks.SetIgnoredKey(IGNORE_TIMESTEP_CHECK_KEY,&#32;ignore:&#32;<emphasis role="keyword">true</emphasis>);
+00188 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00189 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00190 &#32;&#32;&#32;&#32;&#32;&#32;}
+00191 
+00192 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;timeStepOK;
+00193 &#32;&#32;&#32;&#32;}
+00194 
+00195 <emphasis role="preprocessor">&#32;&#32;&#32;&#32;#endregion</emphasis>
+00196 
+00197 <emphasis role="preprocessor">&#32;&#32;&#32;&#32;#region&#32;Check&#32;Rigid&#32;Hands</emphasis>
+00198 
+00199 &#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;<emphasis role="keyword">static</emphasis>&#32;<emphasis role="keywordtype">bool</emphasis>&#32;checkRigidHands()&#32;{
+00200 &#32;&#32;&#32;&#32;&#32;&#32;var&#32;unusedRigidHandObjects&#32;=&#32;(GameObject[])<emphasis role="keyword">null</emphasis>;
+00201 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;checkRigidHands(out&#32;unusedRigidHandObjects);
+00202 &#32;&#32;&#32;&#32;}
+00203 
+00204 &#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;<emphasis role="keyword">static</emphasis>&#32;<emphasis role="keywordtype">bool</emphasis>&#32;checkRigidHands(out&#32;GameObject[]&#32;rigidHandObjects)&#32;{
+00205 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(LeapProjectChecks.CheckIgnoredKey(IGNORE_RIGID_HANDS_CHECK_KEY))&#32;{
+00206 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;rigidHandObjects&#32;=&#32;<emphasis role="keyword">null</emphasis>;
+00207 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;<emphasis role="keyword">true</emphasis>;
+00208 &#32;&#32;&#32;&#32;&#32;&#32;}
+00209 
+00210 &#32;&#32;&#32;&#32;&#32;&#32;rigidHandObjects&#32;=&#32;<link linkend="_namespace_leap_1_1_unity_1_1_interaction_1_1_internal_1afd0057d3352139df1a5ca0526cbabe20">UnityObject</link>.FindObjectsOfType&lt;<link linkend="_class_leap_1_1_unity_1_1_rigid_hand">RigidHand</link>&gt;().<link linkend="_struct_leap_1_1_unity_1_1_query_1_1_query">Query</link>()
+00211 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;.Select(x&#32;=&gt;&#32;x.gameObject).ToArray();
+00212 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(rigidHandObjects.Length&#32;!=&#32;0
+00213 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&amp;&amp;&#32;<link linkend="_namespace_leap_1_1_unity_1_1_interaction_1_1_internal_1afd0057d3352139df1a5ca0526cbabe20">UnityObject</link>.FindObjectOfType&lt;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_manager">InteractionManager</link>&gt;()&#32;!=&#32;<emphasis role="keyword">null</emphasis>)&#32;{
+00214 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;<emphasis role="keyword">false</emphasis>;
+00215 &#32;&#32;&#32;&#32;&#32;&#32;}
+00216 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">else</emphasis>&#32;{
+00217 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;<emphasis role="keyword">true</emphasis>;
+00218 &#32;&#32;&#32;&#32;&#32;&#32;}
+00219 &#32;&#32;&#32;&#32;}
+00220 
+00221 &#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;<emphasis role="keyword">static</emphasis>&#32;<emphasis role="keywordtype">bool</emphasis>&#32;checkRigidHandsAndDrawGUI()&#32;{
+00222 &#32;&#32;&#32;&#32;&#32;&#32;var&#32;rigidHandObjects&#32;=&#32;(GameObject[])<emphasis role="keyword">null</emphasis>;
+00223 &#32;&#32;&#32;&#32;&#32;&#32;var&#32;rigidHandsOK&#32;=&#32;checkRigidHands(out&#32;rigidHandObjects);
+00224 
+00225 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(!rigidHandsOK)&#32;{
+00226 
+00227 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;EditorGUILayout.Space();
+00228 
+00229 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">using</emphasis>&#32;(<emphasis role="keyword">new</emphasis>&#32;EditorGUILayout.HorizontalScope())&#32;{
+00230 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;EditorGUILayout.HelpBox(
+00231 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="stringliteral">&quot;Rigid&#32;Hands&#32;AND&#32;an&#32;Interaction&#32;Manager&#32;are&#32;present&#32;in&#32;your&#32;scene.&#32;&quot;</emphasis>&#32;+
+00232 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="stringliteral">&quot;Rigid&#32;Hands&#32;are&#32;not&#32;compatible&#32;with&#32;the&#32;Interaction&#32;Engine&#32;and&#32;should&#32;&quot;</emphasis>&#32;+
+00233 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="stringliteral">&quot;never&#32;be&#32;used&#32;in&#32;tandem&#32;with&#32;it.&#32;You&#32;should&#32;remove&#32;them&#32;&quot;</emphasis>&#32;+
+00234 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="stringliteral">&quot;from&#32;your&#32;scene.&quot;</emphasis>,&#32;MessageType.Warning);
+00235 
+00236 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(GUILayout.Button(<emphasis role="keyword">new</emphasis>&#32;GUIContent(<emphasis role="stringliteral">&quot;Select&#32;Rigid&#32;Hands&quot;</emphasis>,
+00237 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="stringliteral">&quot;Select&#32;RigidHand&#32;objects&#32;in&#32;the&#32;current&#32;scene.&quot;</emphasis>),
+00238 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;GUILayout.ExpandHeight(<emphasis role="keyword">true</emphasis>),&#32;GUILayout.MaxHeight(40F)))&#32;{
+00239 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;Selection.objects&#32;=&#32;rigidHandObjects;
+00240 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00241 
+00242 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(GUILayout.Button(<emphasis role="stringliteral">&quot;Ignore&quot;</emphasis>))&#32;{
+00243 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;LeapProjectChecks.SetIgnoredKey(IGNORE_RIGID_HANDS_CHECK_KEY,&#32;ignore:&#32;<emphasis role="keyword">true</emphasis>);
+00244 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00245 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00246 &#32;&#32;&#32;&#32;&#32;&#32;}
+00247 
+00248 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;rigidHandsOK;
+00249 &#32;&#32;&#32;&#32;}
+00250 
+00251 <emphasis role="preprocessor">&#32;&#32;&#32;&#32;#endregion</emphasis>
+00252 
+00253 &#32;&#32;}
+00254 }
+</programlisting></section>

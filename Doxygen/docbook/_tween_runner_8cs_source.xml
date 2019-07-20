@@ -1,0 +1,128 @@
+<?xml version='1.0' encoding='UTF-8' standalone='no'?>
+<section xmlns="http://docbook.org/ns/docbook" version="5.0" xmlns:xlink="http://www.w3.org/1999/xlink" xml:id="__tween_runner_8cs_source">
+<title>TweenRunner.cs</title>
+<indexterm><primary>O:/GitHUBMINIPRoject/Assets/LeapMotion/Core/Scripts/Animation/Tween/Internal/TweenRunner.cs</primary></indexterm>
+<programlisting>00001 <emphasis role="comment">/******************************************************************************</emphasis>
+00002 <emphasis role="comment">&#32;*&#32;Copyright&#32;(C)&#32;Leap&#32;Motion,&#32;Inc.&#32;2011-2018.&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;*</emphasis>
+00003 <emphasis role="comment">&#32;*&#32;Leap&#32;Motion&#32;proprietary&#32;and&#32;confidential.&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;*</emphasis>
+00004 <emphasis role="comment">&#32;*&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;*</emphasis>
+00005 <emphasis role="comment">&#32;*&#32;Use&#32;subject&#32;to&#32;the&#32;terms&#32;of&#32;the&#32;Leap&#32;Motion&#32;SDK&#32;Agreement&#32;available&#32;at&#32;&#32;&#32;&#32;&#32;*</emphasis>
+00006 <emphasis role="comment">&#32;*&#32;https://developer.leapmotion.com/sdk_agreement,&#32;or&#32;another&#32;agreement&#32;&#32;&#32;&#32;&#32;&#32;&#32;*</emphasis>
+00007 <emphasis role="comment">&#32;*&#32;between&#32;Leap&#32;Motion&#32;and&#32;you,&#32;your&#32;company&#32;or&#32;other&#32;organization.&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;*</emphasis>
+00008 <emphasis role="comment">&#32;******************************************************************************/</emphasis>
+00009 
+00010 <emphasis role="keyword">using</emphasis>&#32;<link linkend="__balloon_8cs_1a7d67e097df9376eb709b6a23aa3c7d23">UnityEngine</link>;
+00011 <emphasis role="keyword">using</emphasis>&#32;<link linkend="_namespace_unity_engine">UnityEngine</link>.Assertions;
+00012 <emphasis role="keyword">using</emphasis>&#32;System;
+00013 <emphasis role="keyword">using</emphasis>&#32;System.Collections.Generic;
+00014 
+00015 <emphasis role="keyword">namespace&#32;</emphasis><link linkend="_namespace_leap_1_1_unity_1_1_animation_1_1_internal">Leap.Unity.Animation.Internal</link>&#32;{
+00016 
+<anchor xml:id="__tween_runner_8cs_source_1l00017"/><link linkend="_class_leap_1_1_unity_1_1_animation_1_1_internal_1_1_tween_runner">00017</link> &#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keyword">class&#32;</emphasis><link linkend="_class_leap_1_1_unity_1_1_animation_1_1_internal_1_1_tween_runner">TweenRunner</link>&#32;:&#32;MonoBehaviour&#32;{
+00018 &#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;<link linkend="_class_leap_1_1_unity_1_1_animation_1_1_internal_1_1_tween_instance">TweenInstance</link>[]&#32;_runningTweens&#32;=&#32;<emphasis role="keyword">new</emphasis>&#32;<link linkend="_class_leap_1_1_unity_1_1_animation_1_1_internal_1_1_tween_instance">TweenInstance</link>[16];
+00019 &#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;<emphasis role="keywordtype">int</emphasis>&#32;_runningCount&#32;=&#32;0;
+00020 
+00021 &#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;Queue&lt;TweenInstance&gt;&#32;_toRecycle&#32;=&#32;<emphasis role="keyword">new</emphasis>&#32;Queue&lt;TweenInstance&gt;();
+00022 
+00023 &#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;<emphasis role="keyword">static</emphasis>&#32;<link linkend="_class_leap_1_1_unity_1_1_animation_1_1_internal_1_1_tween_runner">TweenRunner</link>&#32;_cachedInstance&#32;=&#32;<emphasis role="keyword">null</emphasis>;
+<anchor xml:id="__tween_runner_8cs_source_1l00024"/><link linkend="_class_leap_1_1_unity_1_1_animation_1_1_internal_1_1_tween_runner_1a17b39765b051fa31558883ada29043fc">00024</link> &#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keyword">static</emphasis>&#32;<link linkend="_class_leap_1_1_unity_1_1_animation_1_1_internal_1_1_tween_runner">TweenRunner</link>&#32;<link linkend="_class_leap_1_1_unity_1_1_animation_1_1_internal_1_1_tween_runner_1a17b39765b051fa31558883ada29043fc">instance</link>&#32;{
+00025 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">get</emphasis>&#32;{
+00026 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(_cachedInstance&#32;==&#32;<emphasis role="keyword">null</emphasis>)&#32;{
+00027 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;_cachedInstance&#32;=&#32;FindObjectOfType&lt;TweenRunner&gt;();
+00028 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(_cachedInstance&#32;==&#32;<emphasis role="keyword">null</emphasis>)&#32;{
+00029 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;_cachedInstance&#32;=&#32;<emphasis role="keyword">new</emphasis>&#32;GameObject(<emphasis role="stringliteral">&quot;__Tween&#32;Runner__&quot;</emphasis>).AddComponent&lt;<link linkend="_class_leap_1_1_unity_1_1_animation_1_1_internal_1_1_tween_runner">TweenRunner</link>&gt;();
+00030 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;_cachedInstance.gameObject.hideFlags&#32;=&#32;HideFlags.HideAndDontSave;
+00031 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00032 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00033 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;_cachedInstance;
+00034 &#32;&#32;&#32;&#32;&#32;&#32;}
+00035 &#32;&#32;&#32;&#32;}
+00036 
+00037 &#32;&#32;&#32;&#32;<emphasis role="keywordtype">void</emphasis>&#32;Update()&#32;{
+00038 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">for</emphasis>&#32;(<emphasis role="keywordtype">int</emphasis>&#32;i&#32;=&#32;_runningCount;&#32;i--&#32;!=&#32;0;)&#32;{
+00039 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;var&#32;<link linkend="_class_leap_1_1_unity_1_1_animation_1_1_internal_1_1_tween_runner_1a17b39765b051fa31558883ada29043fc">instance</link>&#32;=&#32;_runningTweens[i];
+00040 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">try</emphasis>&#32;{
+00041 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_leap_1_1_unity_1_1_animation_1_1_internal_1_1_tween_runner_1a17b39765b051fa31558883ada29043fc">instance</link>.Step(<emphasis role="keyword">this</emphasis>);
+00042 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}&#32;<emphasis role="keywordflow">catch</emphasis>&#32;(Exception&#32;e)&#32;{
+00043 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;Debug.LogError(<emphasis role="stringliteral">&quot;Error&#32;occured&#32;inside&#32;of&#32;tween!&#32;&#32;Tween&#32;has&#32;been&#32;terminated&quot;</emphasis>);
+00044 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;Debug.LogException(e);
+00045 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(<link linkend="_class_leap_1_1_unity_1_1_animation_1_1_internal_1_1_tween_runner_1a17b39765b051fa31558883ada29043fc">instance</link>.runnerIndex&#32;!=&#32;-1)&#32;{
+00046 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_leap_1_1_unity_1_1_animation_1_1_internal_1_1_tween_runner_1ab415e5b8744f8fef7b33d4d01cad6e54">RemoveTween</link>(<link linkend="_class_leap_1_1_unity_1_1_animation_1_1_internal_1_1_tween_runner_1a17b39765b051fa31558883ada29043fc">instance</link>);
+00047 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00048 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00049 &#32;&#32;&#32;&#32;&#32;&#32;}
+00050 
+00051 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">while</emphasis>&#32;(_toRecycle.Count&#32;&gt;&#32;0)&#32;{
+00052 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;var&#32;<link linkend="_class_leap_1_1_unity_1_1_animation_1_1_internal_1_1_tween_runner_1a17b39765b051fa31558883ada29043fc">instance</link>&#32;=&#32;_toRecycle.Dequeue();
+00053 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;Assert.IsTrue(<link linkend="_class_leap_1_1_unity_1_1_animation_1_1_internal_1_1_tween_runner_1a17b39765b051fa31558883ada29043fc">instance</link>.instanceId&#32;&lt;&#32;0,&#32;<emphasis role="stringliteral">&quot;Should&#32;never&#32;try&#32;to&#32;recycle&#32;a&#32;Tween&#32;with&#32;a&#32;valid&#32;instance&#32;id.&quot;</emphasis>);
+00054 
+00055 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(<link linkend="_class_leap_1_1_unity_1_1_animation_1_1_internal_1_1_tween_runner_1a17b39765b051fa31558883ada29043fc">instance</link>.instanceId&#32;==&#32;TweenInstance.ID_WAITING_FOR_RECYCLE)&#32;{
+00056 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;Assert.IsTrue(<link linkend="_class_leap_1_1_unity_1_1_animation_1_1_internal_1_1_tween_runner_1a17b39765b051fa31558883ada29043fc">instance</link>.runnerIndex&#32;==&#32;TweenInstance.NOT_RUNNING,&#32;<emphasis role="stringliteral">&quot;Should&#32;never&#32;try&#32;to&#32;recycle&#32;a&#32;running&#32;Tween.&quot;</emphasis>);
+00057 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_leap_1_1_unity_1_1_animation_1_1_internal_1_1_tween_runner_1a17b39765b051fa31558883ada29043fc">instance</link>.Dispose();
+00058 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00059 &#32;&#32;&#32;&#32;&#32;&#32;}
+00060 &#32;&#32;&#32;&#32;}
+00061 
+<anchor xml:id="__tween_runner_8cs_source_1l00062"/><link linkend="_class_leap_1_1_unity_1_1_animation_1_1_internal_1_1_tween_runner_1a7328229bb7b6f35e7244084c089ccc58">00062</link> &#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;<link linkend="_class_leap_1_1_unity_1_1_animation_1_1_internal_1_1_tween_runner_1a7328229bb7b6f35e7244084c089ccc58">ScheduleForRecycle</link>(<link linkend="_class_leap_1_1_unity_1_1_animation_1_1_internal_1_1_tween_instance">TweenInstance</link>&#32;<link linkend="_class_leap_1_1_unity_1_1_animation_1_1_internal_1_1_tween_runner_1a17b39765b051fa31558883ada29043fc">instance</link>)&#32;{
+00063 &#32;&#32;&#32;&#32;&#32;&#32;Assert.IsTrue(<link linkend="_class_leap_1_1_unity_1_1_animation_1_1_internal_1_1_tween_runner_1a17b39765b051fa31558883ada29043fc">instance</link>.runnerIndex&#32;==&#32;<link linkend="_class_leap_1_1_unity_1_1_animation_1_1_internal_1_1_tween_instance">TweenInstance</link>.<link linkend="_class_leap_1_1_unity_1_1_animation_1_1_internal_1_1_tween_instance_1adbf5b01cdf875afcb36d51ca1183a159">NOT_RUNNING</link>,&#32;<emphasis role="stringliteral">&quot;Should&#32;never&#32;schedule&#32;a&#32;running&#32;Tween&#32;for&#32;recycle.&quot;</emphasis>);
+00064 
+00065 &#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_leap_1_1_unity_1_1_animation_1_1_internal_1_1_tween_runner_1a17b39765b051fa31558883ada29043fc">instance</link>.instanceId&#32;=&#32;<link linkend="_class_leap_1_1_unity_1_1_animation_1_1_internal_1_1_tween_instance">TweenInstance</link>.<link linkend="_class_leap_1_1_unity_1_1_animation_1_1_internal_1_1_tween_instance_1afeb689214b275f07cf6300894566854c">ID_WAITING_FOR_RECYCLE</link>;
+00066 &#32;&#32;&#32;&#32;&#32;&#32;_toRecycle.Enqueue(<link linkend="_class_leap_1_1_unity_1_1_animation_1_1_internal_1_1_tween_runner_1a17b39765b051fa31558883ada29043fc">instance</link>);
+00067 &#32;&#32;&#32;&#32;}
+00068 
+<anchor xml:id="__tween_runner_8cs_source_1l00069"/><link linkend="_class_leap_1_1_unity_1_1_animation_1_1_internal_1_1_tween_runner_1aba1606d61c642a3122bce4426ada3546">00069</link> &#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;<link linkend="_class_leap_1_1_unity_1_1_animation_1_1_internal_1_1_tween_runner_1aba1606d61c642a3122bce4426ada3546">AddTween</link>(<link linkend="_class_leap_1_1_unity_1_1_animation_1_1_internal_1_1_tween_instance">TweenInstance</link>&#32;<link linkend="_class_leap_1_1_unity_1_1_animation_1_1_internal_1_1_tween_runner_1a17b39765b051fa31558883ada29043fc">instance</link>)&#32;{
+00070 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(_runningCount&#32;&gt;=&#32;_runningTweens.Length)&#32;{
+00071 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;Utils.DoubleCapacity(ref&#32;_runningTweens);
+00072 &#32;&#32;&#32;&#32;&#32;&#32;}
+00073 
+00074 &#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_leap_1_1_unity_1_1_animation_1_1_internal_1_1_tween_runner_1a17b39765b051fa31558883ada29043fc">instance</link>.runnerIndex&#32;=&#32;_runningCount;
+00075 &#32;&#32;&#32;&#32;&#32;&#32;_runningTweens[_runningCount++]&#32;=&#32;<link linkend="_class_leap_1_1_unity_1_1_animation_1_1_internal_1_1_tween_runner_1a17b39765b051fa31558883ada29043fc">instance</link>;
+00076 
+00077 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//Dispatch&#32;events&#32;here,&#32;right&#32;when&#32;the&#32;tween&#32;has&#32;started&#32;and&#32;state&#32;is&#32;valid</emphasis>
+00078 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(<link linkend="_class_leap_1_1_unity_1_1_animation_1_1_internal_1_1_tween_runner_1a17b39765b051fa31558883ada29043fc">instance</link>.curPercent&#32;==&#32;0.0f)&#32;{
+00079 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(<link linkend="_class_leap_1_1_unity_1_1_animation_1_1_internal_1_1_tween_runner_1a17b39765b051fa31558883ada29043fc">instance</link>.OnLeaveStart&#32;!=&#32;<emphasis role="keyword">null</emphasis>)&#32;{
+00080 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_leap_1_1_unity_1_1_animation_1_1_internal_1_1_tween_runner_1a17b39765b051fa31558883ada29043fc">instance</link>.OnLeaveStart();
+00081 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00082 &#32;&#32;&#32;&#32;&#32;&#32;}&#32;<emphasis role="keywordflow">else</emphasis>&#32;<emphasis role="keywordflow">if</emphasis>&#32;(<link linkend="_class_leap_1_1_unity_1_1_animation_1_1_internal_1_1_tween_runner_1a17b39765b051fa31558883ada29043fc">instance</link>.curPercent&#32;==&#32;1.0f)&#32;{
+00083 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(<link linkend="_class_leap_1_1_unity_1_1_animation_1_1_internal_1_1_tween_runner_1a17b39765b051fa31558883ada29043fc">instance</link>.OnLeaveEnd&#32;!=&#32;<emphasis role="keyword">null</emphasis>)&#32;{
+00084 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_leap_1_1_unity_1_1_animation_1_1_internal_1_1_tween_runner_1a17b39765b051fa31558883ada29043fc">instance</link>.OnLeaveEnd();
+00085 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00086 &#32;&#32;&#32;&#32;&#32;&#32;}
+00087 &#32;&#32;&#32;&#32;}
+00088 
+<anchor xml:id="__tween_runner_8cs_source_1l00089"/><link linkend="_class_leap_1_1_unity_1_1_animation_1_1_internal_1_1_tween_runner_1ab415e5b8744f8fef7b33d4d01cad6e54">00089</link> &#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;<link linkend="_class_leap_1_1_unity_1_1_animation_1_1_internal_1_1_tween_runner_1ab415e5b8744f8fef7b33d4d01cad6e54">RemoveTween</link>(<link linkend="_class_leap_1_1_unity_1_1_animation_1_1_internal_1_1_tween_instance">TweenInstance</link>&#32;<link linkend="_class_leap_1_1_unity_1_1_animation_1_1_internal_1_1_tween_runner_1a17b39765b051fa31558883ada29043fc">instance</link>)&#32;{
+00090 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(<link linkend="_class_leap_1_1_unity_1_1_animation_1_1_internal_1_1_tween_runner_1a17b39765b051fa31558883ada29043fc">instance</link>.runnerIndex&#32;==&#32;-1)&#32;{
+00091 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>;
+00092 &#32;&#32;&#32;&#32;&#32;&#32;}
+00093 
+00094 &#32;&#32;&#32;&#32;&#32;&#32;--_runningCount;
+00095 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(_runningCount&#32;&lt;&#32;0)&#32;{
+00096 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">throw</emphasis>&#32;<emphasis role="keyword">new</emphasis>&#32;Exception(<emphasis role="stringliteral">&quot;Removed&#32;more&#32;tweens&#32;than&#32;were&#32;started!&quot;</emphasis>);
+00097 &#32;&#32;&#32;&#32;&#32;&#32;}
+00098 
+00099 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordtype">int</emphasis>&#32;index&#32;=&#32;<link linkend="_class_leap_1_1_unity_1_1_animation_1_1_internal_1_1_tween_runner_1a17b39765b051fa31558883ada29043fc">instance</link>.runnerIndex;
+00100 
+00101 &#32;&#32;&#32;&#32;&#32;&#32;_runningTweens[_runningCount].<link linkend="_class_leap_1_1_unity_1_1_animation_1_1_internal_1_1_tween_instance_1a5c88b5a5151ae7560a5a9be273381571">runnerIndex</link>&#32;=&#32;index;
+00102 &#32;&#32;&#32;&#32;&#32;&#32;_runningTweens[index]&#32;=&#32;_runningTweens[_runningCount];
+00103 
+00104 &#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_leap_1_1_unity_1_1_animation_1_1_internal_1_1_tween_runner_1a17b39765b051fa31558883ada29043fc">instance</link>.runnerIndex&#32;=&#32;-1;
+00105 
+00106 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//Dispatch&#32;events&#32;here,&#32;right&#32;when&#32;tween&#32;is&#32;stopped&#32;and&#32;state&#32;is&#32;valid</emphasis>
+00107 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(<link linkend="_class_leap_1_1_unity_1_1_animation_1_1_internal_1_1_tween_runner_1a17b39765b051fa31558883ada29043fc">instance</link>.curPercent&#32;==&#32;1.0f)&#32;{
+00108 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(<link linkend="_class_leap_1_1_unity_1_1_animation_1_1_internal_1_1_tween_runner_1a17b39765b051fa31558883ada29043fc">instance</link>.OnReachEnd&#32;!=&#32;<emphasis role="keyword">null</emphasis>)&#32;{
+00109 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_leap_1_1_unity_1_1_animation_1_1_internal_1_1_tween_runner_1a17b39765b051fa31558883ada29043fc">instance</link>.OnReachEnd();
+00110 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00111 &#32;&#32;&#32;&#32;&#32;&#32;}&#32;<emphasis role="keywordflow">else</emphasis>&#32;<emphasis role="keywordflow">if</emphasis>&#32;(<link linkend="_class_leap_1_1_unity_1_1_animation_1_1_internal_1_1_tween_runner_1a17b39765b051fa31558883ada29043fc">instance</link>.curPercent&#32;==&#32;0.0f)&#32;{
+00112 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(<link linkend="_class_leap_1_1_unity_1_1_animation_1_1_internal_1_1_tween_runner_1a17b39765b051fa31558883ada29043fc">instance</link>.OnReachStart&#32;!=&#32;<emphasis role="keyword">null</emphasis>)&#32;{
+00113 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_leap_1_1_unity_1_1_animation_1_1_internal_1_1_tween_runner_1a17b39765b051fa31558883ada29043fc">instance</link>.OnReachStart();
+00114 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00115 &#32;&#32;&#32;&#32;&#32;&#32;}
+00116 
+00117 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//Instance&#32;might&#32;have&#32;been&#32;re-added&#32;in&#32;one&#32;of&#32;the&#32;above&#32;callbacks</emphasis>
+00118 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(<link linkend="_class_leap_1_1_unity_1_1_animation_1_1_internal_1_1_tween_runner_1a17b39765b051fa31558883ada29043fc">instance</link>.runnerIndex&#32;==&#32;-1&#32;&amp;&amp;&#32;<link linkend="_class_leap_1_1_unity_1_1_animation_1_1_internal_1_1_tween_runner_1a17b39765b051fa31558883ada29043fc">instance</link>.returnToPoolUponStop)&#32;{
+00119 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_leap_1_1_unity_1_1_animation_1_1_internal_1_1_tween_runner_1a7328229bb7b6f35e7244084c089ccc58">ScheduleForRecycle</link>(<link linkend="_class_leap_1_1_unity_1_1_animation_1_1_internal_1_1_tween_runner_1a17b39765b051fa31558883ada29043fc">instance</link>);
+00120 &#32;&#32;&#32;&#32;&#32;&#32;}
+00121 &#32;&#32;&#32;&#32;}
+00122 &#32;&#32;}
+00123 }
+</programlisting></section>

@@ -1,0 +1,316 @@
+<?xml version='1.0' encoding='UTF-8' standalone='no'?>
+<section xmlns="http://docbook.org/ns/docbook" version="5.0" xmlns:xlink="http://www.w3.org/1999/xlink" xml:id="__teleport_arc_8cs_source">
+<title>TeleportArc.cs</title>
+<indexterm><primary>O:/GitHUBMINIPRoject/Assets/SteamVR/InteractionSystem/Teleport/Scripts/TeleportArc.cs</primary></indexterm>
+<programlisting>00001 <emphasis role="comment">//=======&#32;Copyright&#32;(c)&#32;Valve&#32;Corporation,&#32;All&#32;rights&#32;reserved.&#32;===============</emphasis>
+00002 <emphasis role="comment">//</emphasis>
+00003 <emphasis role="comment">//&#32;Purpose:&#32;Displays&#32;the&#32;arc&#32;lines&#32;for&#32;teleporting&#32;and&#32;does&#32;the&#32;traces</emphasis>
+00004 <emphasis role="comment">//</emphasis>
+00005 <emphasis role="comment">//=============================================================================</emphasis>
+00006 
+00007 <emphasis role="keyword">using</emphasis>&#32;<link linkend="__balloon_8cs_1a7d67e097df9376eb709b6a23aa3c7d23">UnityEngine</link>;
+00008 
+00009 <emphasis role="keyword">namespace&#32;</emphasis><link linkend="_namespace_valve_1_1_v_r_1_1_interaction_system">Valve.VR.InteractionSystem</link>
+00010 {
+00011 &#32;&#32;&#32;&#32;<emphasis role="comment">//-------------------------------------------------------------------------</emphasis>
+<anchor xml:id="__teleport_arc_8cs_source_1l00012"/><link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_teleport_arc">00012</link> &#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keyword">class&#32;</emphasis><link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_teleport_arc">TeleportArc</link>&#32;:&#32;MonoBehaviour
+00013 &#32;&#32;&#32;&#32;{
+<anchor xml:id="__teleport_arc_8cs_source_1l00014"/><link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_teleport_arc_1a335ff5bdb6fcbe66dbc4dd99de791e66">00014</link> &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keywordtype">int</emphasis>&#32;<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_teleport_arc_1a335ff5bdb6fcbe66dbc4dd99de791e66">segmentCount</link>&#32;=&#32;60;
+<anchor xml:id="__teleport_arc_8cs_source_1l00015"/><link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_teleport_arc_1a36ba65ade47cede067b4687ef9d4b330">00015</link> &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keywordtype">float</emphasis>&#32;<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_teleport_arc_1a36ba65ade47cede067b4687ef9d4b330">thickness</link>&#32;=&#32;0.01f;
+00016 
+00017 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;[Tooltip(<emphasis role="stringliteral">&quot;The&#32;amount&#32;of&#32;time&#32;in&#32;seconds&#32;to&#32;predict&#32;the&#32;motion&#32;of&#32;the&#32;projectile.&quot;</emphasis>)]
+<anchor xml:id="__teleport_arc_8cs_source_1l00018"/><link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_teleport_arc_1a5119dbbe3c29a72b8f1b8846a32c0ae8">00018</link> &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keywordtype">float</emphasis>&#32;<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_teleport_arc_1a5119dbbe3c29a72b8f1b8846a32c0ae8">arcDuration</link>&#32;=&#32;3.0f;
+00019 
+00020 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;[Tooltip(<emphasis role="stringliteral">&quot;The&#32;amount&#32;of&#32;time&#32;in&#32;seconds&#32;between&#32;each&#32;segment&#32;of&#32;the&#32;projectile.&quot;</emphasis>)]
+<anchor xml:id="__teleport_arc_8cs_source_1l00021"/><link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_teleport_arc_1ada4bf2195cc467abeaf4b503324c5f5b">00021</link> &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keywordtype">float</emphasis>&#32;<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_teleport_arc_1ada4bf2195cc467abeaf4b503324c5f5b">segmentBreak</link>&#32;=&#32;0.025f;
+00022 
+00023 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;[Tooltip(<emphasis role="stringliteral">&quot;The&#32;speed&#32;at&#32;which&#32;the&#32;line&#32;segments&#32;of&#32;the&#32;arc&#32;move.&quot;</emphasis>)]
+<anchor xml:id="__teleport_arc_8cs_source_1l00024"/><link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_teleport_arc_1ac3e49c8e27407aa901e3b5096372b306">00024</link> &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keywordtype">float</emphasis>&#32;<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_teleport_arc_1ac3e49c8e27407aa901e3b5096372b306">arcSpeed</link>&#32;=&#32;0.2f;
+00025 
+<anchor xml:id="__teleport_arc_8cs_source_1l00026"/><link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_teleport_arc_1ad535b1a80d5a2a94a2862a60d4bb7c31">00026</link> &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;Material&#32;<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_teleport_arc_1ad535b1a80d5a2a94a2862a60d4bb7c31">material</link>;
+00027 
+00028 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;[HideInInspector]
+<anchor xml:id="__teleport_arc_8cs_source_1l00029"/><link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_teleport_arc_1a655a026794c332f906afdbe6bf50b937">00029</link> &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keywordtype">int</emphasis>&#32;<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_teleport_arc_1a655a026794c332f906afdbe6bf50b937">traceLayerMask</link>&#32;=&#32;0;
+00030 
+00031 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//Private&#32;data</emphasis>
+00032 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;LineRenderer[]&#32;lineRenderers;
+00033 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;<emphasis role="keywordtype">float</emphasis>&#32;arcTimeOffset&#32;=&#32;0.0f;
+00034 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;<emphasis role="keywordtype">float</emphasis>&#32;prevThickness&#32;=&#32;0.0f;
+00035 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;<emphasis role="keywordtype">int</emphasis>&#32;prevSegmentCount&#32;=&#32;0;
+00036 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;<emphasis role="keywordtype">bool</emphasis>&#32;showArc&#32;=&#32;<emphasis role="keyword">true</emphasis>;
+00037 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;Vector3&#32;startPos;
+00038 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;Vector3&#32;projectileVelocity;
+00039 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;<emphasis role="keywordtype">bool</emphasis>&#32;useGravity&#32;=&#32;<emphasis role="keyword">true</emphasis>;
+00040 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;Transform&#32;arcObjectsTransfrom;
+00041 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;<emphasis role="keywordtype">bool</emphasis>&#32;arcInvalid&#32;=&#32;<emphasis role="keyword">false</emphasis>;
+00042 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;<emphasis role="keywordtype">float</emphasis>&#32;scale&#32;=&#32;1;
+00043 
+00044 
+00045 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//-------------------------------------------------</emphasis>
+00046 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordtype">void</emphasis>&#32;Start()
+00047 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00048 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;arcTimeOffset&#32;=&#32;Time.time;
+00049 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00050 
+00051 
+00052 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//-------------------------------------------------</emphasis>
+00053 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordtype">void</emphasis>&#32;Update()
+00054 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00055 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//scale&#32;arc&#32;to&#32;match&#32;player&#32;scale</emphasis>
+00056 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;scale&#32;=&#32;<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_player">Player</link>.<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_player_1ad6c38e0b00917563e4b19d206d20466e">instance</link>.transform.lossyScale.x;
+00057 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_teleport_arc_1a36ba65ade47cede067b4687ef9d4b330">thickness</link>&#32;!=&#32;prevThickness&#32;||&#32;<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_teleport_arc_1a335ff5bdb6fcbe66dbc4dd99de791e66">segmentCount</link>&#32;!=&#32;prevSegmentCount)
+00058 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00059 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;CreateLineRendererObjects();
+00060 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;prevThickness&#32;=&#32;<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_teleport_arc_1a36ba65ade47cede067b4687ef9d4b330">thickness</link>;
+00061 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;prevSegmentCount&#32;=&#32;<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_teleport_arc_1a335ff5bdb6fcbe66dbc4dd99de791e66">segmentCount</link>;
+00062 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00063 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00064 
+00065 
+00066 
+00067 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//-------------------------------------------------</emphasis>
+00068 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;CreateLineRendererObjects()
+00069 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00070 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//Destroy&#32;any&#32;existing&#32;line&#32;renderer&#32;objects</emphasis>
+00071 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(arcObjectsTransfrom&#32;!=&#32;<emphasis role="keyword">null</emphasis>)
+00072 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00073 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;Destroy(arcObjectsTransfrom.gameObject);
+00074 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00075 
+00076 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;GameObject&#32;arcObjectsParent&#32;=&#32;<emphasis role="keyword">new</emphasis>&#32;GameObject(<emphasis role="stringliteral">&quot;ArcObjects&quot;</emphasis>);
+00077 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;arcObjectsTransfrom&#32;=&#32;arcObjectsParent.transform;
+00078 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;arcObjectsTransfrom.SetParent(this.transform);
+00079 
+00080 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//Create&#32;new&#32;line&#32;renderer&#32;objects</emphasis>
+00081 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;lineRenderers&#32;=&#32;<emphasis role="keyword">new</emphasis>&#32;LineRenderer[<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_teleport_arc_1a335ff5bdb6fcbe66dbc4dd99de791e66">segmentCount</link>];
+00082 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">for</emphasis>&#32;(<emphasis role="keywordtype">int</emphasis>&#32;i&#32;=&#32;0;&#32;i&#32;&lt;&#32;<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_teleport_arc_1a335ff5bdb6fcbe66dbc4dd99de791e66">segmentCount</link>;&#32;++i)
+00083 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00084 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;GameObject&#32;newObject&#32;=&#32;<emphasis role="keyword">new</emphasis>&#32;GameObject(<emphasis role="stringliteral">&quot;LineRenderer_&quot;</emphasis>&#32;+&#32;i);
+00085 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;newObject.transform.SetParent(arcObjectsTransfrom);
+00086 
+00087 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;lineRenderers[i]&#32;=&#32;newObject.AddComponent&lt;LineRenderer&gt;();
+00088 
+00089 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;lineRenderers[i].receiveShadows&#32;=&#32;<emphasis role="keyword">false</emphasis>;
+00090 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;lineRenderers[i].reflectionProbeUsage&#32;=&#32;<link linkend="_namespace_unity_engine">UnityEngine</link>.Rendering.ReflectionProbeUsage.Off;
+00091 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;lineRenderers[i].lightProbeUsage&#32;=&#32;<link linkend="_namespace_unity_engine">UnityEngine</link>.Rendering.LightProbeUsage.Off;
+00092 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;lineRenderers[i].shadowCastingMode&#32;=&#32;<link linkend="_namespace_unity_engine">UnityEngine</link>.Rendering.ShadowCastingMode.Off;
+00093 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;lineRenderers[i].material&#32;=&#32;<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_teleport_arc_1ad535b1a80d5a2a94a2862a60d4bb7c31">material</link>;
+00094 <emphasis role="preprocessor">#if&#32;(UNITY_5_4)</emphasis>
+00095 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;lineRenderers[i].SetWidth(<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_teleport_arc_1a36ba65ade47cede067b4687ef9d4b330">thickness</link>,&#32;<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_teleport_arc_1a36ba65ade47cede067b4687ef9d4b330">thickness</link>);
+00096 <emphasis role="preprocessor">#else</emphasis>
+00097 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;lineRenderers[i].startWidth&#32;=&#32;<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_teleport_arc_1a36ba65ade47cede067b4687ef9d4b330">thickness</link>&#32;*&#32;scale;
+00098 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;lineRenderers[i].endWidth&#32;=&#32;<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_teleport_arc_1a36ba65ade47cede067b4687ef9d4b330">thickness</link>&#32;*&#32;scale;
+00099 <emphasis role="preprocessor">#endif</emphasis>
+00100 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;lineRenderers[i].enabled&#32;=&#32;<emphasis role="keyword">false</emphasis>;
+00101 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00102 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00103 
+00104 
+00105 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//-------------------------------------------------</emphasis>
+<anchor xml:id="__teleport_arc_8cs_source_1l00106"/><link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_teleport_arc_1ac991a684c950f90e2d79fdbc34292b4f">00106</link> &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_teleport_arc_1ac991a684c950f90e2d79fdbc34292b4f">SetArcData</link>(Vector3&#32;position,&#32;Vector3&#32;velocity,&#32;<emphasis role="keywordtype">bool</emphasis>&#32;gravity,&#32;<emphasis role="keywordtype">bool</emphasis>&#32;pointerAtBadAngle)
+00107 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00108 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;startPos&#32;=&#32;position;
+00109 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;projectileVelocity&#32;=&#32;velocity;
+00110 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;useGravity&#32;=&#32;gravity;
+00111 
+00112 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(arcInvalid&#32;&amp;&amp;&#32;!pointerAtBadAngle)
+00113 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00114 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;arcTimeOffset&#32;=&#32;Time.time;
+00115 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00116 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;arcInvalid&#32;=&#32;pointerAtBadAngle;
+00117 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00118 
+00119 
+00120 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//-------------------------------------------------</emphasis>
+<anchor xml:id="__teleport_arc_8cs_source_1l00121"/><link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_teleport_arc_1a51ff54c68c4241221b9435ca3fd3c300">00121</link> &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_teleport_arc_1a51ff54c68c4241221b9435ca3fd3c300">Show</link>()
+00122 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00123 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;showArc&#32;=&#32;<emphasis role="keyword">true</emphasis>;
+00124 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(lineRenderers&#32;==&#32;<emphasis role="keyword">null</emphasis>)
+00125 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00126 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;CreateLineRendererObjects();
+00127 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00128 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00129 
+00130 
+00131 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//-------------------------------------------------</emphasis>
+<anchor xml:id="__teleport_arc_8cs_source_1l00132"/><link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_teleport_arc_1a11fef135b72459c18fdb5b7aff0c1fa6">00132</link> &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_teleport_arc_1a11fef135b72459c18fdb5b7aff0c1fa6">Hide</link>()
+00133 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00134 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//Hide&#32;the&#32;line&#32;segments&#32;if&#32;they&#32;were&#32;previously&#32;being&#32;shown</emphasis>
+00135 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(showArc)
+00136 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00137 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;HideLineSegments(0,&#32;<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_teleport_arc_1a335ff5bdb6fcbe66dbc4dd99de791e66">segmentCount</link>);
+00138 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00139 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;showArc&#32;=&#32;<emphasis role="keyword">false</emphasis>;
+00140 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00141 
+00142 
+00143 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//-------------------------------------------------</emphasis>
+00144 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;Draws&#32;each&#32;segment&#32;of&#32;the&#32;arc&#32;individually</emphasis>
+00145 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//-------------------------------------------------</emphasis>
+<anchor xml:id="__teleport_arc_8cs_source_1l00146"/><link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_teleport_arc_1adaa3a493238168dffd0842e6fc46a0ef">00146</link> &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keywordtype">bool</emphasis>&#32;<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_teleport_arc_1adaa3a493238168dffd0842e6fc46a0ef">DrawArc</link>(out&#32;RaycastHit&#32;hitInfo)
+00147 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00148 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordtype">float</emphasis>&#32;timeStep&#32;=&#32;<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_teleport_arc_1a5119dbbe3c29a72b8f1b8846a32c0ae8">arcDuration</link>&#32;/&#32;<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_teleport_arc_1a335ff5bdb6fcbe66dbc4dd99de791e66">segmentCount</link>;
+00149 
+00150 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordtype">float</emphasis>&#32;currentTimeOffset&#32;=&#32;(Time.time&#32;-&#32;arcTimeOffset)&#32;*&#32;<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_teleport_arc_1ac3e49c8e27407aa901e3b5096372b306">arcSpeed</link>;
+00151 
+00152 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//Reset&#32;the&#32;arc&#32;time&#32;offset&#32;when&#32;it&#32;has&#32;gone&#32;beyond&#32;a&#32;segment&#32;length</emphasis>
+00153 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(currentTimeOffset&#32;&gt;&#32;(timeStep&#32;+&#32;<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_teleport_arc_1ada4bf2195cc467abeaf4b503324c5f5b">segmentBreak</link>))
+00154 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00155 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;arcTimeOffset&#32;=&#32;Time.time;
+00156 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;currentTimeOffset&#32;=&#32;0.0f;
+00157 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00158 
+00159 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordtype">float</emphasis>&#32;segmentStartTime&#32;=&#32;currentTimeOffset;
+00160 
+00161 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordtype">float</emphasis>&#32;arcHitTime&#32;=&#32;FindProjectileCollision(out&#32;hitInfo);
+00162 
+00163 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(arcInvalid)
+00164 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00165 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//Only&#32;draw&#32;first&#32;segment</emphasis>
+00166 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;lineRenderers[0].enabled&#32;=&#32;<emphasis role="keyword">true</emphasis>;
+00167 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;lineRenderers[0].SetPosition(0,&#32;<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_teleport_arc_1ae10ae65cd32a5c53fd83863964d7c707">GetArcPositionAtTime</link>(0.0f));
+00168 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;lineRenderers[0].SetPosition(1,&#32;<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_teleport_arc_1ae10ae65cd32a5c53fd83863964d7c707">GetArcPositionAtTime</link>(arcHitTime&#32;&lt;&#32;timeStep&#32;?&#32;arcHitTime&#32;:&#32;timeStep));
+00169 
+00170 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;HideLineSegments(1,&#32;<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_teleport_arc_1a335ff5bdb6fcbe66dbc4dd99de791e66">segmentCount</link>);
+00171 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00172 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">else</emphasis>
+00173 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00174 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//Draw&#32;the&#32;first&#32;segment&#32;outside&#32;the&#32;loop&#32;if&#32;needed</emphasis>
+00175 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordtype">int</emphasis>&#32;loopStartSegment&#32;=&#32;0;
+00176 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(segmentStartTime&#32;&gt;&#32;<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_teleport_arc_1ada4bf2195cc467abeaf4b503324c5f5b">segmentBreak</link>)
+00177 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00178 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordtype">float</emphasis>&#32;firstSegmentEndTime&#32;=&#32;currentTimeOffset&#32;-&#32;<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_teleport_arc_1ada4bf2195cc467abeaf4b503324c5f5b">segmentBreak</link>;
+00179 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(arcHitTime&#32;&lt;&#32;firstSegmentEndTime)
+00180 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00181 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;firstSegmentEndTime&#32;=&#32;arcHitTime;
+00182 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00183 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;DrawArcSegment(0,&#32;0.0f,&#32;firstSegmentEndTime);
+00184 
+00185 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;loopStartSegment&#32;=&#32;1;
+00186 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00187 
+00188 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordtype">bool</emphasis>&#32;stopArc&#32;=&#32;<emphasis role="keyword">false</emphasis>;
+00189 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordtype">int</emphasis>&#32;currentSegment&#32;=&#32;0;
+00190 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(segmentStartTime&#32;&lt;&#32;arcHitTime)
+00191 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00192 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">for</emphasis>&#32;(currentSegment&#32;=&#32;loopStartSegment;&#32;currentSegment&#32;&lt;&#32;<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_teleport_arc_1a335ff5bdb6fcbe66dbc4dd99de791e66">segmentCount</link>;&#32;++currentSegment)
+00193 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00194 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//Clamp&#32;the&#32;segment&#32;end&#32;time&#32;to&#32;the&#32;arc&#32;duration</emphasis>
+00195 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordtype">float</emphasis>&#32;segmentEndTime&#32;=&#32;segmentStartTime&#32;+&#32;timeStep;
+00196 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(segmentEndTime&#32;&gt;=&#32;<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_teleport_arc_1a5119dbbe3c29a72b8f1b8846a32c0ae8">arcDuration</link>)
+00197 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00198 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;segmentEndTime&#32;=&#32;<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_teleport_arc_1a5119dbbe3c29a72b8f1b8846a32c0ae8">arcDuration</link>;
+00199 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;stopArc&#32;=&#32;<emphasis role="keyword">true</emphasis>;
+00200 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00201 
+00202 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(segmentEndTime&#32;&gt;=&#32;arcHitTime)
+00203 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00204 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;segmentEndTime&#32;=&#32;arcHitTime;
+00205 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;stopArc&#32;=&#32;<emphasis role="keyword">true</emphasis>;
+00206 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00207 
+00208 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;DrawArcSegment(currentSegment,&#32;segmentStartTime,&#32;segmentEndTime);
+00209 
+00210 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;segmentStartTime&#32;+=&#32;timeStep&#32;+&#32;<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_teleport_arc_1ada4bf2195cc467abeaf4b503324c5f5b">segmentBreak</link>;
+00211 
+00212 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//If&#32;the&#32;previous&#32;end&#32;time&#32;or&#32;the&#32;next&#32;start&#32;time&#32;is&#32;beyond&#32;the&#32;duration&#32;then&#32;stop&#32;the&#32;arc</emphasis>
+00213 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(stopArc&#32;||&#32;segmentStartTime&#32;&gt;=&#32;<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_teleport_arc_1a5119dbbe3c29a72b8f1b8846a32c0ae8">arcDuration</link>&#32;||&#32;segmentStartTime&#32;&gt;=&#32;arcHitTime)
+00214 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00215 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">break</emphasis>;
+00216 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00217 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00218 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00219 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">else</emphasis>
+00220 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00221 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;currentSegment--;
+00222 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00223 
+00224 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//Hide&#32;the&#32;rest&#32;of&#32;the&#32;line&#32;segments</emphasis>
+00225 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;HideLineSegments(currentSegment&#32;+&#32;1,&#32;<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_teleport_arc_1a335ff5bdb6fcbe66dbc4dd99de791e66">segmentCount</link>);
+00226 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00227 
+00228 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;arcHitTime&#32;!=&#32;<emphasis role="keywordtype">float</emphasis>.MaxValue;
+00229 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00230 
+00231 
+00232 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//-------------------------------------------------</emphasis>
+00233 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;DrawArcSegment(<emphasis role="keywordtype">int</emphasis>&#32;index,&#32;<emphasis role="keywordtype">float</emphasis>&#32;startTime,&#32;<emphasis role="keywordtype">float</emphasis>&#32;endTime)
+00234 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00235 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;lineRenderers[<link linkend="_namespace_valve_1_1_v_r_1ac40c4bdf0a3dcd6e69cad2d85f287c67a6a992d5529f459a44fee58c733255e86">index</link>].enabled&#32;=&#32;<emphasis role="keyword">true</emphasis>;
+00236 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;lineRenderers[<link linkend="_namespace_valve_1_1_v_r_1ac40c4bdf0a3dcd6e69cad2d85f287c67a6a992d5529f459a44fee58c733255e86">index</link>].SetPosition(0,&#32;<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_teleport_arc_1ae10ae65cd32a5c53fd83863964d7c707">GetArcPositionAtTime</link>(startTime));
+00237 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;lineRenderers[<link linkend="_namespace_valve_1_1_v_r_1ac40c4bdf0a3dcd6e69cad2d85f287c67a6a992d5529f459a44fee58c733255e86">index</link>].SetPosition(1,&#32;<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_teleport_arc_1ae10ae65cd32a5c53fd83863964d7c707">GetArcPositionAtTime</link>(endTime));
+00238 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00239 
+00240 
+00241 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//-------------------------------------------------</emphasis>
+<anchor xml:id="__teleport_arc_8cs_source_1l00242"/><link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_teleport_arc_1ad60be9e28c4b38027bf8f0ac917d6780">00242</link> &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_teleport_arc_1ad60be9e28c4b38027bf8f0ac917d6780">SetColor</link>(Color&#32;color)
+00243 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00244 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">for</emphasis>&#32;(<emphasis role="keywordtype">int</emphasis>&#32;i&#32;=&#32;0;&#32;i&#32;&lt;&#32;<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_teleport_arc_1a335ff5bdb6fcbe66dbc4dd99de791e66">segmentCount</link>;&#32;++i)
+00245 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00246 <emphasis role="preprocessor">#if&#32;(UNITY_5_4)</emphasis>
+00247 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;lineRenderers[i].SetColors(color,&#32;color);
+00248 <emphasis role="preprocessor">#else</emphasis>
+00249 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;lineRenderers[i].startColor&#32;=&#32;color;
+00250 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;lineRenderers[i].endColor&#32;=&#32;color;
+00251 <emphasis role="preprocessor">#endif</emphasis>
+00252 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00253 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00254 
+00255 
+00256 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//-------------------------------------------------</emphasis>
+00257 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;<emphasis role="keywordtype">float</emphasis>&#32;FindProjectileCollision(out&#32;RaycastHit&#32;hitInfo)
+00258 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00259 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordtype">float</emphasis>&#32;timeStep&#32;=&#32;<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_teleport_arc_1a5119dbbe3c29a72b8f1b8846a32c0ae8">arcDuration</link>&#32;/&#32;<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_teleport_arc_1a335ff5bdb6fcbe66dbc4dd99de791e66">segmentCount</link>;
+00260 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordtype">float</emphasis>&#32;segmentStartTime&#32;=&#32;0.0f;
+00261 
+00262 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;hitInfo&#32;=&#32;<emphasis role="keyword">new</emphasis>&#32;RaycastHit();
+00263 
+00264 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;Vector3&#32;segmentStartPos&#32;=&#32;<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_teleport_arc_1ae10ae65cd32a5c53fd83863964d7c707">GetArcPositionAtTime</link>(segmentStartTime);
+00265 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">for</emphasis>&#32;(<emphasis role="keywordtype">int</emphasis>&#32;i&#32;=&#32;0;&#32;i&#32;&lt;&#32;<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_teleport_arc_1a335ff5bdb6fcbe66dbc4dd99de791e66">segmentCount</link>;&#32;++i)
+00266 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00267 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordtype">float</emphasis>&#32;segmentEndTime&#32;=&#32;segmentStartTime&#32;+&#32;timeStep;
+00268 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;Vector3&#32;segmentEndPos&#32;=&#32;<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_teleport_arc_1ae10ae65cd32a5c53fd83863964d7c707">GetArcPositionAtTime</link>(segmentEndTime);
+00269 
+00270 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(Physics.Linecast(segmentStartPos,&#32;segmentEndPos,&#32;out&#32;hitInfo,&#32;<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_teleport_arc_1a655a026794c332f906afdbe6bf50b937">traceLayerMask</link>))
+00271 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00272 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(hitInfo.collider.GetComponent&lt;<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_ignore_teleport_trace">IgnoreTeleportTrace</link>&gt;()&#32;==&#32;<emphasis role="keyword">null</emphasis>)
+00273 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00274 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;Util.DrawCross(hitInfo.point,&#32;Color.red,&#32;0.5f);
+00275 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordtype">float</emphasis>&#32;segmentDistance&#32;=&#32;Vector3.Distance(segmentStartPos,&#32;segmentEndPos);
+00276 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordtype">float</emphasis>&#32;hitTime&#32;=&#32;segmentStartTime&#32;+&#32;(timeStep&#32;*&#32;(hitInfo.distance&#32;/&#32;segmentDistance));
+00277 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;hitTime;
+00278 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00279 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00280 
+00281 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;segmentStartTime&#32;=&#32;segmentEndTime;
+00282 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;segmentStartPos&#32;=&#32;segmentEndPos;
+00283 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00284 
+00285 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;<emphasis role="keywordtype">float</emphasis>.MaxValue;
+00286 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00287 
+00288 
+00289 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//-------------------------------------------------</emphasis>
+<anchor xml:id="__teleport_arc_8cs_source_1l00290"/><link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_teleport_arc_1ae10ae65cd32a5c53fd83863964d7c707">00290</link> &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;Vector3&#32;<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_teleport_arc_1ae10ae65cd32a5c53fd83863964d7c707">GetArcPositionAtTime</link>(<emphasis role="keywordtype">float</emphasis>&#32;time)
+00291 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00292 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;Vector3&#32;gravity&#32;=&#32;useGravity&#32;?&#32;Physics.gravity&#32;:&#32;Vector3.zero;
+00293 
+00294 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;Vector3&#32;arcPos&#32;=&#32;startPos&#32;+&#32;((projectileVelocity&#32;*&#32;time)&#32;+&#32;(0.5f&#32;*&#32;time&#32;*&#32;time)&#32;*&#32;gravity)&#32;*&#32;scale;
+00295 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;arcPos;
+00296 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00297 
+00298 
+00299 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//-------------------------------------------------</emphasis>
+00300 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;HideLineSegments(<emphasis role="keywordtype">int</emphasis>&#32;startSegment,&#32;<emphasis role="keywordtype">int</emphasis>&#32;endSegment)
+00301 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00302 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(lineRenderers&#32;!=&#32;<emphasis role="keyword">null</emphasis>)
+00303 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00304 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">for</emphasis>&#32;(<emphasis role="keywordtype">int</emphasis>&#32;i&#32;=&#32;startSegment;&#32;i&#32;&lt;&#32;endSegment;&#32;++i)
+00305 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00306 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;lineRenderers[i].enabled&#32;=&#32;<emphasis role="keyword">false</emphasis>;
+00307 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00308 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00309 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00310 &#32;&#32;&#32;&#32;}
+00311 }
+</programlisting></section>

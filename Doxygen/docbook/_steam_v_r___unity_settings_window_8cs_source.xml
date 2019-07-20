@@ -1,0 +1,687 @@
+<?xml version='1.0' encoding='UTF-8' standalone='no'?>
+<section xmlns="http://docbook.org/ns/docbook" version="5.0" xmlns:xlink="http://www.w3.org/1999/xlink" xml:id="__steam_v_r___unity_settings_window_8cs_source">
+<title>SteamVR_UnitySettingsWindow.cs</title>
+<indexterm><primary>O:/GitHUBMINIPRoject/Assets/SteamVR/Editor/SteamVR_UnitySettingsWindow.cs</primary></indexterm>
+<programlisting>00001 <emphasis role="comment">//=======&#32;Copyright&#32;(c)&#32;Valve&#32;Corporation,&#32;All&#32;rights&#32;reserved.&#32;===============</emphasis>
+00002 <emphasis role="comment">//</emphasis>
+00003 <emphasis role="comment">//&#32;Purpose:&#32;Prompt&#32;developers&#32;to&#32;use&#32;settings&#32;most&#32;compatible&#32;with&#32;SteamVR.</emphasis>
+00004 <emphasis role="comment">//</emphasis>
+00005 <emphasis role="comment">//=============================================================================</emphasis>
+00006 
+00007 <emphasis role="keyword">using</emphasis>&#32;<link linkend="__balloon_8cs_1a7d67e097df9376eb709b6a23aa3c7d23">UnityEngine</link>;
+00008 <emphasis role="keyword">using</emphasis>&#32;<link linkend="_namespace_unity_editor">UnityEditor</link>;
+00009 <emphasis role="keyword">using</emphasis>&#32;System.IO;
+00010 
+00011 <emphasis role="keyword">namespace&#32;</emphasis><link linkend="_namespace_valve_1_1_v_r">Valve.VR</link>
+00012 {
+00013 &#32;&#32;&#32;&#32;[InitializeOnLoad]
+<anchor xml:id="__steam_v_r___unity_settings_window_8cs_source_1l00014"/><link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___unity_settings_window">00014</link> &#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keyword">class&#32;</emphasis><link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___unity_settings_window">SteamVR_UnitySettingsWindow</link>&#32;:&#32;EditorWindow
+00015 &#32;&#32;&#32;&#32;{
+00016 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">const</emphasis>&#32;<emphasis role="keywordtype">bool</emphasis>&#32;forceShow&#32;=&#32;<emphasis role="keyword">false</emphasis>;&#32;<emphasis role="comment">//&#32;Set&#32;to&#32;true&#32;to&#32;get&#32;the&#32;dialog&#32;to&#32;show&#32;back&#32;up&#32;in&#32;the&#32;case&#32;you&#32;clicked&#32;Ignore&#32;All.</emphasis>
+00017 
+00018 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">const</emphasis>&#32;<emphasis role="keywordtype">string</emphasis>&#32;ignore&#32;=&#32;<emphasis role="stringliteral">&quot;ignore.&quot;</emphasis>;
+00019 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">const</emphasis>&#32;<emphasis role="keywordtype">string</emphasis>&#32;useRecommended&#32;=&#32;<emphasis role="stringliteral">&quot;Use&#32;recommended&#32;({0})&quot;</emphasis>;
+00020 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">const</emphasis>&#32;<emphasis role="keywordtype">string</emphasis>&#32;currentValue&#32;=&#32;<emphasis role="stringliteral">&quot;&#32;(current&#32;=&#32;{0})&quot;</emphasis>;
+00021 
+00022 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">const</emphasis>&#32;<emphasis role="keywordtype">string</emphasis>&#32;buildTarget&#32;=&#32;<emphasis role="stringliteral">&quot;Build&#32;Target&quot;</emphasis>;
+00023 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">const</emphasis>&#32;<emphasis role="keywordtype">string</emphasis>&#32;showUnitySplashScreen&#32;=&#32;<emphasis role="stringliteral">&quot;Show&#32;Unity&#32;Splashscreen&quot;</emphasis>;
+00024 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">const</emphasis>&#32;<emphasis role="keywordtype">string</emphasis>&#32;defaultIsFullScreen&#32;=&#32;<emphasis role="stringliteral">&quot;Default&#32;is&#32;Fullscreen&quot;</emphasis>;
+00025 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">const</emphasis>&#32;<emphasis role="keywordtype">string</emphasis>&#32;defaultScreenSize&#32;=&#32;<emphasis role="stringliteral">&quot;Default&#32;Screen&#32;Size&quot;</emphasis>;
+00026 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">const</emphasis>&#32;<emphasis role="keywordtype">string</emphasis>&#32;runInBackground&#32;=&#32;<emphasis role="stringliteral">&quot;Run&#32;In&#32;Background&quot;</emphasis>;
+00027 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">const</emphasis>&#32;<emphasis role="keywordtype">string</emphasis>&#32;displayResolutionDialog&#32;=&#32;<emphasis role="stringliteral">&quot;Display&#32;Resolution&#32;Dialog&quot;</emphasis>;
+00028 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">const</emphasis>&#32;<emphasis role="keywordtype">string</emphasis>&#32;resizableWindow&#32;=&#32;<emphasis role="stringliteral">&quot;Resizable&#32;Window&quot;</emphasis>;
+00029 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">const</emphasis>&#32;<emphasis role="keywordtype">string</emphasis>&#32;fullscreenMode&#32;=&#32;<emphasis role="stringliteral">&quot;D3D11&#32;Fullscreen&#32;Mode&quot;</emphasis>;
+00030 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">const</emphasis>&#32;<emphasis role="keywordtype">string</emphasis>&#32;visibleInBackground&#32;=&#32;<emphasis role="stringliteral">&quot;Visible&#32;In&#32;Background&quot;</emphasis>;
+00031 <emphasis role="preprocessor">#if&#32;(UNITY_5_4&#32;||&#32;UNITY_5_3&#32;||&#32;UNITY_5_2&#32;||&#32;UNITY_5_1&#32;||&#32;UNITY_5_0)</emphasis>
+00032 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">const</emphasis>&#32;<emphasis role="keywordtype">string</emphasis>&#32;renderingPath&#32;=&#32;<emphasis role="stringliteral">&quot;Rendering&#32;Path&quot;</emphasis>;
+00033 <emphasis role="preprocessor">#endif</emphasis>
+00034 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">const</emphasis>&#32;<emphasis role="keywordtype">string</emphasis>&#32;colorSpace&#32;=&#32;<emphasis role="stringliteral">&quot;Color&#32;Space&quot;</emphasis>;
+00035 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">const</emphasis>&#32;<emphasis role="keywordtype">string</emphasis>&#32;gpuSkinning&#32;=&#32;<emphasis role="stringliteral">&quot;GPU&#32;Skinning&quot;</emphasis>;
+00036 <emphasis role="preprocessor">#if&#32;false&#32;//&#32;skyboxes&#32;are&#32;currently&#32;broken</emphasis>
+00037 &#32;&#32;&#32;&#32;<emphasis role="keyword">const</emphasis>&#32;<emphasis role="keywordtype">string</emphasis>&#32;singlePassStereoRendering&#32;=&#32;<emphasis role="stringliteral">&quot;Single-Pass&#32;Stereo&#32;Rendering&quot;</emphasis>;
+00038 <emphasis role="preprocessor">#endif</emphasis>
+00039 
+00040 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">const</emphasis>&#32;BuildTarget&#32;recommended_BuildTarget&#32;=&#32;BuildTarget.StandaloneWindows64;
+00041 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">const</emphasis>&#32;<emphasis role="keywordtype">bool</emphasis>&#32;recommended_ShowUnitySplashScreen&#32;=&#32;<emphasis role="keyword">false</emphasis>;
+00042 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">const</emphasis>&#32;<emphasis role="keywordtype">bool</emphasis>&#32;recommended_DefaultIsFullScreen&#32;=&#32;<emphasis role="keyword">false</emphasis>;
+00043 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">const</emphasis>&#32;<emphasis role="keywordtype">int</emphasis>&#32;recommended_DefaultScreenWidth&#32;=&#32;1024;
+00044 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">const</emphasis>&#32;<emphasis role="keywordtype">int</emphasis>&#32;recommended_DefaultScreenHeight&#32;=&#32;768;
+00045 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">const</emphasis>&#32;<emphasis role="keywordtype">bool</emphasis>&#32;recommended_RunInBackground&#32;=&#32;<emphasis role="keyword">true</emphasis>;
+00046 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">const</emphasis>&#32;ResolutionDialogSetting&#32;recommended_DisplayResolutionDialog&#32;=&#32;ResolutionDialogSetting.HiddenByDefault;
+00047 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">const</emphasis>&#32;<emphasis role="keywordtype">bool</emphasis>&#32;recommended_ResizableWindow&#32;=&#32;<emphasis role="keyword">true</emphasis>;
+00048 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">const</emphasis>&#32;D3D11FullscreenMode&#32;recommended_FullscreenMode&#32;=&#32;D3D11FullscreenMode.FullscreenWindow;
+00049 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">const</emphasis>&#32;<emphasis role="keywordtype">bool</emphasis>&#32;recommended_VisibleInBackground&#32;=&#32;<emphasis role="keyword">true</emphasis>;
+00050 <emphasis role="preprocessor">#if&#32;(UNITY_5_4&#32;||&#32;UNITY_5_3&#32;||&#32;UNITY_5_2&#32;||&#32;UNITY_5_1&#32;||&#32;UNITY_5_0)</emphasis>
+00051 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">const</emphasis>&#32;RenderingPath&#32;recommended_RenderPath&#32;=&#32;RenderingPath.Forward;
+00052 <emphasis role="preprocessor">#endif</emphasis>
+00053 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">const</emphasis>&#32;ColorSpace&#32;recommended_ColorSpace&#32;=&#32;ColorSpace.Linear;
+00054 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">const</emphasis>&#32;<emphasis role="keywordtype">bool</emphasis>&#32;recommended_GpuSkinning&#32;=&#32;<emphasis role="keyword">true</emphasis>;
+00055 <emphasis role="preprocessor">#if&#32;false</emphasis>
+00056 &#32;&#32;&#32;&#32;<emphasis role="keyword">const</emphasis>&#32;<emphasis role="keywordtype">bool</emphasis>&#32;recommended_SinglePassStereoRendering&#32;=&#32;<emphasis role="keyword">true</emphasis>;
+00057 <emphasis role="preprocessor">#endif</emphasis>
+00058 
+00059 <emphasis role="preprocessor">#if&#32;UNITY_2018_1_OR_NEWER</emphasis>
+00060 &#32;&#32;&#32;&#32;<emphasis role="keyword">const</emphasis>&#32;FullScreenMode&#32;recommended_FullScreenMode&#32;=&#32;FullScreenMode.FullScreenWindow;
+00061 <emphasis role="preprocessor">#endif</emphasis>
+00062 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">static</emphasis>&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___unity_settings_window">SteamVR_UnitySettingsWindow</link>&#32;window;
+00063 
+00064 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">static</emphasis>&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___unity_settings_window">SteamVR_UnitySettingsWindow</link>()
+00065 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00066 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;EditorApplication.update&#32;+=&#32;Update;
+00067 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00068 
+00069 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">static</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;Update()
+00070 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00071 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordtype">bool</emphasis>&#32;show&#32;=
+00072 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;(!EditorPrefs.HasKey(ignore&#32;+&#32;buildTarget)&#32;&amp;&amp;
+00073 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;EditorUserBuildSettings.activeBuildTarget&#32;!=&#32;recommended_BuildTarget)&#32;||
+00074 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;(!EditorPrefs.HasKey(ignore&#32;+&#32;showUnitySplashScreen)&#32;&amp;&amp;
+00075 <emphasis role="preprocessor">#if&#32;(UNITY_5_4&#32;||&#32;UNITY_5_3&#32;||&#32;UNITY_5_2&#32;||&#32;UNITY_5_1&#32;||&#32;UNITY_5_0)</emphasis>
+00076 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;PlayerSettings.showUnitySplashScreen&#32;!=&#32;recommended_ShowUnitySplashScreen)&#32;||
+00077 #<emphasis role="keywordflow">else</emphasis>
+00078 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;PlayerSettings.SplashScreen.show&#32;!=&#32;recommended_ShowUnitySplashScreen)&#32;||
+00079 <emphasis role="preprocessor">#endif</emphasis>
+00080 
+00081 <emphasis role="preprocessor">#if&#32;UNITY_2018_1_OR_NEWER</emphasis>
+00082 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;(!EditorPrefs.HasKey(ignore&#32;+&#32;defaultIsFullScreen)&#32;&amp;&amp;
+00083 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;PlayerSettings.fullScreenMode&#32;!=&#32;recommended_FullScreenMode)&#32;||
+00084 #<emphasis role="keywordflow">else</emphasis>
+00085 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;(!EditorPrefs.HasKey(ignore&#32;+&#32;defaultIsFullScreen)&#32;&amp;&amp;
+00086 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;PlayerSettings.defaultIsFullScreen&#32;!=&#32;recommended_DefaultIsFullScreen)&#32;||
+00087 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;(!EditorPrefs.HasKey(ignore&#32;+&#32;fullscreenMode)&#32;&amp;&amp;
+00088 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;PlayerSettings.d3d11FullscreenMode&#32;!=&#32;recommended_FullscreenMode)&#32;||
+00089 #endif
+00090 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;(!EditorPrefs.HasKey(ignore&#32;+&#32;defaultScreenSize)&#32;&amp;&amp;
+00091 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;(PlayerSettings.defaultScreenWidth&#32;!=&#32;recommended_DefaultScreenWidth&#32;||
+00092 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;PlayerSettings.defaultScreenHeight&#32;!=&#32;recommended_DefaultScreenHeight))&#32;||
+00093 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;(!EditorPrefs.HasKey(ignore&#32;+&#32;runInBackground)&#32;&amp;&amp;
+00094 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;PlayerSettings.runInBackground&#32;!=&#32;recommended_RunInBackground)&#32;||
+00095 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;(!EditorPrefs.HasKey(ignore&#32;+&#32;displayResolutionDialog)&#32;&amp;&amp;
+00096 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;PlayerSettings.displayResolutionDialog&#32;!=&#32;recommended_DisplayResolutionDialog)&#32;||
+00097 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;(!EditorPrefs.HasKey(ignore&#32;+&#32;resizableWindow)&#32;&amp;&amp;
+00098 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;PlayerSettings.resizableWindow&#32;!=&#32;recommended_ResizableWindow)&#32;||
+00099 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;(!EditorPrefs.HasKey(ignore&#32;+&#32;visibleInBackground)&#32;&amp;&amp;
+00100 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;PlayerSettings.visibleInBackground&#32;!=&#32;recommended_VisibleInBackground)&#32;||
+00101 #<emphasis role="keywordflow">if</emphasis>&#32;(UNITY_5_4&#32;||&#32;UNITY_5_3&#32;||&#32;UNITY_5_2&#32;||&#32;UNITY_5_1&#32;||&#32;UNITY_5_0)
+00102 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;(!EditorPrefs.HasKey(ignore&#32;+&#32;renderingPath)&#32;&amp;&amp;
+00103 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;PlayerSettings.renderingPath&#32;!=&#32;recommended_RenderPath)&#32;||
+00104 #endif
+00105 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;(!EditorPrefs.HasKey(ignore&#32;+&#32;colorSpace)&#32;&amp;&amp;
+00106 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;PlayerSettings.colorSpace&#32;!=&#32;recommended_ColorSpace)&#32;||
+00107 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;(!EditorPrefs.HasKey(ignore&#32;+&#32;gpuSkinning)&#32;&amp;&amp;
+00108 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;PlayerSettings.gpuSkinning&#32;!=&#32;recommended_GpuSkinning)&#32;||
+00109 #<emphasis role="keywordflow">if</emphasis>&#32;<emphasis role="keyword">false</emphasis>
+00110 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;(!EditorPrefs.HasKey(ignore&#32;+&#32;singlePassStereoRendering)&#32;&amp;&amp;
+00111 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;PlayerSettings.singlePassStereoRendering&#32;!=&#32;recommended_SinglePassStereoRendering)&#32;||
+00112 #endif
+00113 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;forceShow;
+00114 
+00115 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(show)
+00116 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00117 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;window&#32;=&#32;GetWindow&lt;SteamVR_UnitySettingsWindow&gt;(<emphasis role="keyword">true</emphasis>);
+00118 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;window.minSize&#32;=&#32;<emphasis role="keyword">new</emphasis>&#32;Vector2(320,&#32;440);
+00119 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//window.title&#32;=&#32;&quot;SteamVR&quot;;</emphasis>
+00120 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00121 
+00122 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordtype">string</emphasis>[]&#32;dlls&#32;=&#32;<emphasis role="keyword">new</emphasis>&#32;<emphasis role="keywordtype">string</emphasis>[]
+00123 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00124 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="stringliteral">&quot;Plugins/x86/openvr_api.dll&quot;</emphasis>,
+00125 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="stringliteral">&quot;Plugins/x86_64/openvr_api.dll&quot;</emphasis>
+00126 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;};
+00127 
+00128 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">foreach</emphasis>&#32;(<emphasis role="keywordtype">string</emphasis>&#32;path&#32;<emphasis role="keywordflow">in</emphasis>&#32;dlls)
+00129 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00130 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(!File.Exists(<link linkend="_namespace_valve_1_1_v_r_1aecd07a81fe79a9f96c6787513e2d98e4ae498749f3c42246d50b15c81c101d988">Application</link>.dataPath&#32;+&#32;<emphasis role="stringliteral">&quot;/&quot;</emphasis>&#32;+&#32;path))
+00131 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">continue</emphasis>;
+00132 
+00133 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(AssetDatabase.DeleteAsset(<emphasis role="stringliteral">&quot;Assets/&quot;</emphasis>&#32;+&#32;path))
+00134 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;Debug.Log(<emphasis role="stringliteral">&quot;&lt;b&gt;[SteamVR&#32;Setup]&lt;/b&gt;&#32;Deleting&#32;&quot;</emphasis>&#32;+&#32;path);
+00135 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">else</emphasis>
+00136 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00137 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;Debug.Log(<emphasis role="stringliteral">&quot;&lt;b&gt;[SteamVR&#32;Setup]&lt;/b&gt;&#32;&quot;</emphasis>&#32;+&#32;path&#32;+&#32;<emphasis role="stringliteral">&quot;&#32;in&#32;use;&#32;cannot&#32;delete.&#32;&#32;Please&#32;restart&#32;Unity&#32;to&#32;complete&#32;upgrade.&quot;</emphasis>);
+00138 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00139 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00140 
+00141 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;EditorApplication.update&#32;-=&#32;Update;
+00142 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00143 
+00144 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;Vector2&#32;scrollPosition;
+00145 
+00146 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordtype">string</emphasis>&#32;GetResourcePath()
+00147 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00148 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;var&#32;ms&#32;=&#32;MonoScript.FromScriptableObject(<emphasis role="keyword">this</emphasis>);
+00149 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;var&#32;path&#32;=&#32;AssetDatabase.GetAssetPath(ms);
+00150 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;path&#32;=&#32;Path.GetDirectoryName(path);
+00151 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;path.Substring(0,&#32;path.Length&#32;-&#32;<emphasis role="stringliteral">&quot;Editor&quot;</emphasis>.Length)&#32;+&#32;<emphasis role="stringliteral">&quot;Textures/&quot;</emphasis>;
+00152 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00153 
+<anchor xml:id="__steam_v_r___unity_settings_window_8cs_source_1l00154"/><link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___unity_settings_window_1af3cd22414b46f5f374a364db26880167">00154</link> &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___unity_settings_window_1af3cd22414b46f5f374a364db26880167">OnGUI</link>()
+00155 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00156 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;var&#32;resourcePath&#32;=&#32;GetResourcePath();
+00157 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;var&#32;logo&#32;=&#32;AssetDatabase.LoadAssetAtPath&lt;Texture2D&gt;(resourcePath&#32;+&#32;<emphasis role="stringliteral">&quot;logo.png&quot;</emphasis>);
+00158 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;var&#32;rect&#32;=&#32;GUILayoutUtility.GetRect(position.width,&#32;150,&#32;GUI.skin.box);
+00159 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(logo)
+00160 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;GUI.DrawTexture(rect,&#32;logo,&#32;ScaleMode.ScaleToFit);
+00161 
+00162 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;EditorGUILayout.HelpBox(<emphasis role="stringliteral">&quot;Recommended&#32;project&#32;settings&#32;for&#32;SteamVR:&quot;</emphasis>,&#32;MessageType.Warning);
+00163 
+00164 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;scrollPosition&#32;=&#32;GUILayout.BeginScrollView(scrollPosition);
+00165 
+00166 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordtype">int</emphasis>&#32;numItems&#32;=&#32;0;
+00167 
+00168 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(!EditorPrefs.HasKey(ignore&#32;+&#32;buildTarget)&#32;&amp;&amp;
+00169 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;EditorUserBuildSettings.activeBuildTarget&#32;!=&#32;recommended_BuildTarget)
+00170 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00171 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;++numItems;
+00172 
+00173 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;GUILayout.Label(buildTarget&#32;+&#32;<emphasis role="keywordtype">string</emphasis>.Format(currentValue,&#32;EditorUserBuildSettings.activeBuildTarget));
+00174 
+00175 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;GUILayout.BeginHorizontal();
+00176 
+00177 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(GUILayout.Button(<emphasis role="keywordtype">string</emphasis>.Format(useRecommended,&#32;recommended_BuildTarget)))
+00178 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00179 <emphasis role="preprocessor">#if&#32;(UNITY_5_5&#32;||&#32;UNITY_5_4&#32;||&#32;UNITY_5_3&#32;||&#32;UNITY_5_2&#32;||&#32;UNITY_5_1&#32;||&#32;UNITY_5_0)</emphasis>
+00180 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;EditorUserBuildSettings.SwitchActiveBuildTarget(recommended_BuildTarget);
+00181 <emphasis role="preprocessor">#else</emphasis>
+00182 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;EditorUserBuildSettings.SwitchActiveBuildTarget(BuildTargetGroup.Standalone,&#32;recommended_BuildTarget);
+00183 <emphasis role="preprocessor">#endif</emphasis>
+00184 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00185 
+00186 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;GUILayout.FlexibleSpace();
+00187 
+00188 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(GUILayout.Button(<emphasis role="stringliteral">&quot;Ignore&quot;</emphasis>))
+00189 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00190 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;EditorPrefs.SetBool(ignore&#32;+&#32;buildTarget,&#32;<emphasis role="keyword">true</emphasis>);
+00191 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00192 
+00193 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;GUILayout.EndHorizontal();
+00194 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00195 
+00196 <emphasis role="preprocessor">#if&#32;(UNITY_5_4&#32;||&#32;UNITY_5_3&#32;||&#32;UNITY_5_2&#32;||&#32;UNITY_5_1&#32;||&#32;UNITY_5_0)</emphasis>
+00197 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(!EditorPrefs.HasKey(ignore&#32;+&#32;showUnitySplashScreen)&#32;&amp;&amp;
+00198 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;PlayerSettings.showUnitySplashScreen&#32;!=&#32;recommended_ShowUnitySplashScreen)
+00199 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00200 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;++numItems;
+00201 
+00202 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;GUILayout.Label(showUnitySplashScreen&#32;+&#32;<emphasis role="keywordtype">string</emphasis>.Format(currentValue,&#32;PlayerSettings.showUnitySplashScreen));
+00203 
+00204 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;GUILayout.BeginHorizontal();
+00205 
+00206 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(GUILayout.Button(<emphasis role="keywordtype">string</emphasis>.Format(useRecommended,&#32;recommended_ShowUnitySplashScreen)))
+00207 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00208 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;PlayerSettings.showUnitySplashScreen&#32;=&#32;recommended_ShowUnitySplashScreen;
+00209 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00210 
+00211 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;GUILayout.FlexibleSpace();
+00212 
+00213 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(GUILayout.Button(<emphasis role="stringliteral">&quot;Ignore&quot;</emphasis>))
+00214 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00215 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;EditorPrefs.SetBool(ignore&#32;+&#32;showUnitySplashScreen,&#32;<emphasis role="keyword">true</emphasis>);
+00216 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00217 
+00218 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;GUILayout.EndHorizontal();
+00219 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00220 <emphasis role="preprocessor">#else</emphasis>
+00221 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(!EditorPrefs.HasKey(ignore&#32;+&#32;showUnitySplashScreen)&#32;&amp;&amp;
+00222 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;PlayerSettings.SplashScreen.show&#32;!=&#32;recommended_ShowUnitySplashScreen)
+00223 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00224 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;++numItems;
+00225 
+00226 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;GUILayout.Label(showUnitySplashScreen&#32;+&#32;<emphasis role="keywordtype">string</emphasis>.Format(currentValue,&#32;PlayerSettings.SplashScreen.show));
+00227 
+00228 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;GUILayout.BeginHorizontal();
+00229 
+00230 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(GUILayout.Button(<emphasis role="keywordtype">string</emphasis>.Format(useRecommended,&#32;recommended_ShowUnitySplashScreen)))
+00231 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00232 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;PlayerSettings.SplashScreen.show&#32;=&#32;recommended_ShowUnitySplashScreen;
+00233 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00234 
+00235 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;GUILayout.FlexibleSpace();
+00236 
+00237 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(GUILayout.Button(<emphasis role="stringliteral">&quot;Ignore&quot;</emphasis>))
+00238 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00239 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;EditorPrefs.SetBool(ignore&#32;+&#32;showUnitySplashScreen,&#32;<emphasis role="keyword">true</emphasis>);
+00240 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00241 
+00242 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;GUILayout.EndHorizontal();
+00243 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00244 <emphasis role="preprocessor">#endif</emphasis>
+00245 
+00246 <emphasis role="preprocessor">#if&#32;UNITY_2018_1_OR_NEWER</emphasis>
+00247 <emphasis role="preprocessor">#else</emphasis>
+00248 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(!EditorPrefs.HasKey(ignore&#32;+&#32;defaultIsFullScreen)&#32;&amp;&amp;
+00249 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;PlayerSettings.defaultIsFullScreen&#32;!=&#32;recommended_DefaultIsFullScreen)
+00250 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00251 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;++numItems;
+00252 
+00253 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;GUILayout.Label(defaultIsFullScreen&#32;+&#32;<emphasis role="keywordtype">string</emphasis>.Format(currentValue,&#32;PlayerSettings.defaultIsFullScreen));
+00254 
+00255 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;GUILayout.BeginHorizontal();
+00256 
+00257 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(GUILayout.Button(<emphasis role="keywordtype">string</emphasis>.Format(useRecommended,&#32;recommended_DefaultIsFullScreen)))
+00258 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00259 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;PlayerSettings.defaultIsFullScreen&#32;=&#32;recommended_DefaultIsFullScreen;
+00260 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00261 
+00262 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;GUILayout.FlexibleSpace();
+00263 
+00264 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(GUILayout.Button(<emphasis role="stringliteral">&quot;Ignore&quot;</emphasis>))
+00265 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00266 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;EditorPrefs.SetBool(ignore&#32;+&#32;defaultIsFullScreen,&#32;<emphasis role="keyword">true</emphasis>);
+00267 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00268 
+00269 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;GUILayout.EndHorizontal();
+00270 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00271 <emphasis role="preprocessor">#endif</emphasis>
+00272 
+00273 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(!EditorPrefs.HasKey(ignore&#32;+&#32;defaultScreenSize)&#32;&amp;&amp;
+00274 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;(PlayerSettings.defaultScreenWidth&#32;!=&#32;recommended_DefaultScreenWidth&#32;||
+00275 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;PlayerSettings.defaultScreenHeight&#32;!=&#32;recommended_DefaultScreenHeight))
+00276 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00277 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;++numItems;
+00278 
+00279 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;GUILayout.Label(defaultScreenSize&#32;+&#32;<emphasis role="keywordtype">string</emphasis>.Format(<emphasis role="stringliteral">&quot;&#32;({0}x{1})&quot;</emphasis>,&#32;PlayerSettings.defaultScreenWidth,&#32;PlayerSettings.defaultScreenHeight));
+00280 
+00281 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;GUILayout.BeginHorizontal();
+00282 
+00283 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(GUILayout.Button(<emphasis role="keywordtype">string</emphasis>.Format(<emphasis role="stringliteral">&quot;Use&#32;recommended&#32;({0}x{1})&quot;</emphasis>,&#32;recommended_DefaultScreenWidth,&#32;recommended_DefaultScreenHeight)))
+00284 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00285 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;PlayerSettings.defaultScreenWidth&#32;=&#32;recommended_DefaultScreenWidth;
+00286 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;PlayerSettings.defaultScreenHeight&#32;=&#32;recommended_DefaultScreenHeight;
+00287 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00288 
+00289 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;GUILayout.FlexibleSpace();
+00290 
+00291 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(GUILayout.Button(<emphasis role="stringliteral">&quot;Ignore&quot;</emphasis>))
+00292 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00293 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;EditorPrefs.SetBool(ignore&#32;+&#32;defaultScreenSize,&#32;<emphasis role="keyword">true</emphasis>);
+00294 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00295 
+00296 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;GUILayout.EndHorizontal();
+00297 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00298 
+00299 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(!EditorPrefs.HasKey(ignore&#32;+&#32;runInBackground)&#32;&amp;&amp;
+00300 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;PlayerSettings.runInBackground&#32;!=&#32;recommended_RunInBackground)
+00301 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00302 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;++numItems;
+00303 
+00304 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;GUILayout.Label(runInBackground&#32;+&#32;<emphasis role="keywordtype">string</emphasis>.Format(currentValue,&#32;PlayerSettings.runInBackground));
+00305 
+00306 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;GUILayout.BeginHorizontal();
+00307 
+00308 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(GUILayout.Button(<emphasis role="keywordtype">string</emphasis>.Format(useRecommended,&#32;recommended_RunInBackground)))
+00309 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00310 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;PlayerSettings.runInBackground&#32;=&#32;recommended_RunInBackground;
+00311 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00312 
+00313 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;GUILayout.FlexibleSpace();
+00314 
+00315 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(GUILayout.Button(<emphasis role="stringliteral">&quot;Ignore&quot;</emphasis>))
+00316 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00317 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;EditorPrefs.SetBool(ignore&#32;+&#32;runInBackground,&#32;<emphasis role="keyword">true</emphasis>);
+00318 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00319 
+00320 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;GUILayout.EndHorizontal();
+00321 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00322 
+00323 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(!EditorPrefs.HasKey(ignore&#32;+&#32;displayResolutionDialog)&#32;&amp;&amp;
+00324 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;PlayerSettings.displayResolutionDialog&#32;!=&#32;recommended_DisplayResolutionDialog)
+00325 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00326 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;++numItems;
+00327 
+00328 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;GUILayout.Label(displayResolutionDialog&#32;+&#32;<emphasis role="keywordtype">string</emphasis>.Format(currentValue,&#32;PlayerSettings.displayResolutionDialog));
+00329 
+00330 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;GUILayout.BeginHorizontal();
+00331 
+00332 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(GUILayout.Button(<emphasis role="keywordtype">string</emphasis>.Format(useRecommended,&#32;recommended_DisplayResolutionDialog)))
+00333 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00334 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;PlayerSettings.displayResolutionDialog&#32;=&#32;recommended_DisplayResolutionDialog;
+00335 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00336 
+00337 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;GUILayout.FlexibleSpace();
+00338 
+00339 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(GUILayout.Button(<emphasis role="stringliteral">&quot;Ignore&quot;</emphasis>))
+00340 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00341 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;EditorPrefs.SetBool(ignore&#32;+&#32;displayResolutionDialog,&#32;<emphasis role="keyword">true</emphasis>);
+00342 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00343 
+00344 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;GUILayout.EndHorizontal();
+00345 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00346 
+00347 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(!EditorPrefs.HasKey(ignore&#32;+&#32;resizableWindow)&#32;&amp;&amp;
+00348 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;PlayerSettings.resizableWindow&#32;!=&#32;recommended_ResizableWindow)
+00349 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00350 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;++numItems;
+00351 
+00352 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;GUILayout.Label(resizableWindow&#32;+&#32;<emphasis role="keywordtype">string</emphasis>.Format(currentValue,&#32;PlayerSettings.resizableWindow));
+00353 
+00354 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;GUILayout.BeginHorizontal();
+00355 
+00356 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(GUILayout.Button(<emphasis role="keywordtype">string</emphasis>.Format(useRecommended,&#32;recommended_ResizableWindow)))
+00357 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00358 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;PlayerSettings.resizableWindow&#32;=&#32;recommended_ResizableWindow;
+00359 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00360 
+00361 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;GUILayout.FlexibleSpace();
+00362 
+00363 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(GUILayout.Button(<emphasis role="stringliteral">&quot;Ignore&quot;</emphasis>))
+00364 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00365 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;EditorPrefs.SetBool(ignore&#32;+&#32;resizableWindow,&#32;<emphasis role="keyword">true</emphasis>);
+00366 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00367 
+00368 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;GUILayout.EndHorizontal();
+00369 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00370 <emphasis role="preprocessor">#if&#32;UNITY_2018_1_OR_NEWER</emphasis>
+00371 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(!EditorPrefs.HasKey(ignore&#32;+&#32;defaultIsFullScreen)&#32;&amp;&amp;
+00372 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;PlayerSettings.fullScreenMode&#32;!=&#32;recommended_FullScreenMode)
+00373 #<emphasis role="keywordflow">else</emphasis>
+00374 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(!EditorPrefs.HasKey(ignore&#32;+&#32;fullscreenMode)&#32;&amp;&amp;
+00375 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;PlayerSettings.d3d11FullscreenMode&#32;!=&#32;recommended_FullscreenMode)
+00376 #endif
+00377 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00378 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;++numItems;
+00379 
+00380 <emphasis role="preprocessor">#if&#32;UNITY_2018_1_OR_NEWER</emphasis>
+00381 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;GUILayout.Label(fullscreenMode&#32;+&#32;<emphasis role="keywordtype">string</emphasis>.Format(currentValue,&#32;PlayerSettings.fullScreenMode));
+00382 <emphasis role="preprocessor">#else</emphasis>
+00383 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;GUILayout.Label(fullscreenMode&#32;+&#32;<emphasis role="keywordtype">string</emphasis>.Format(currentValue,&#32;PlayerSettings.d3d11FullscreenMode));
+00384 <emphasis role="preprocessor">#endif</emphasis>
+00385 
+00386 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;GUILayout.BeginHorizontal();
+00387 
+00388 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(GUILayout.Button(<emphasis role="keywordtype">string</emphasis>.Format(useRecommended,&#32;recommended_FullscreenMode)))
+00389 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00390 <emphasis role="preprocessor">#if&#32;UNITY_2018_1_OR_NEWER</emphasis>
+00391 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;PlayerSettings.fullScreenMode&#32;=&#32;recommended_FullScreenMode;
+00392 <emphasis role="preprocessor">#else</emphasis>
+00393 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;PlayerSettings.d3d11FullscreenMode&#32;=&#32;recommended_FullscreenMode;
+00394 <emphasis role="preprocessor">#endif</emphasis>
+00395 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00396 
+00397 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;GUILayout.FlexibleSpace();
+00398 
+00399 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(GUILayout.Button(<emphasis role="stringliteral">&quot;Ignore&quot;</emphasis>))
+00400 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00401 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;EditorPrefs.SetBool(ignore&#32;+&#32;fullscreenMode,&#32;<emphasis role="keyword">true</emphasis>);
+00402 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00403 
+00404 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;GUILayout.EndHorizontal();
+00405 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00406 
+00407 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(!EditorPrefs.HasKey(ignore&#32;+&#32;visibleInBackground)&#32;&amp;&amp;
+00408 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;PlayerSettings.visibleInBackground&#32;!=&#32;recommended_VisibleInBackground)
+00409 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00410 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;++numItems;
+00411 
+00412 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;GUILayout.Label(visibleInBackground&#32;+&#32;<emphasis role="keywordtype">string</emphasis>.Format(currentValue,&#32;PlayerSettings.visibleInBackground));
+00413 
+00414 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;GUILayout.BeginHorizontal();
+00415 
+00416 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(GUILayout.Button(<emphasis role="keywordtype">string</emphasis>.Format(useRecommended,&#32;recommended_VisibleInBackground)))
+00417 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00418 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;PlayerSettings.visibleInBackground&#32;=&#32;recommended_VisibleInBackground;
+00419 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00420 
+00421 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;GUILayout.FlexibleSpace();
+00422 
+00423 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(GUILayout.Button(<emphasis role="stringliteral">&quot;Ignore&quot;</emphasis>))
+00424 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00425 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;EditorPrefs.SetBool(ignore&#32;+&#32;visibleInBackground,&#32;<emphasis role="keyword">true</emphasis>);
+00426 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00427 
+00428 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;GUILayout.EndHorizontal();
+00429 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00430 <emphasis role="preprocessor">#if&#32;(UNITY_5_4&#32;||&#32;UNITY_5_3&#32;||&#32;UNITY_5_2&#32;||&#32;UNITY_5_1&#32;||&#32;UNITY_5_0)</emphasis>
+00431 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(!EditorPrefs.HasKey(ignore&#32;+&#32;renderingPath)&#32;&amp;&amp;
+00432 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;PlayerSettings.renderingPath&#32;!=&#32;recommended_RenderPath)
+00433 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00434 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;++numItems;
+00435 
+00436 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;GUILayout.Label(renderingPath&#32;+&#32;<emphasis role="keywordtype">string</emphasis>.Format(currentValue,&#32;PlayerSettings.renderingPath));
+00437 
+00438 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;GUILayout.BeginHorizontal();
+00439 
+00440 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(GUILayout.Button(<emphasis role="keywordtype">string</emphasis>.Format(useRecommended,&#32;recommended_RenderPath)&#32;+&#32;<emphasis role="stringliteral">&quot;&#32;-&#32;required&#32;for&#32;MSAA&quot;</emphasis>))
+00441 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00442 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;PlayerSettings.renderingPath&#32;=&#32;recommended_RenderPath;
+00443 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00444 
+00445 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;GUILayout.FlexibleSpace();
+00446 
+00447 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(GUILayout.Button(<emphasis role="stringliteral">&quot;Ignore&quot;</emphasis>))
+00448 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00449 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;EditorPrefs.SetBool(ignore&#32;+&#32;renderingPath,&#32;<emphasis role="keyword">true</emphasis>);
+00450 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00451 
+00452 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;GUILayout.EndHorizontal();
+00453 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00454 <emphasis role="preprocessor">#endif</emphasis>
+00455 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(!EditorPrefs.HasKey(ignore&#32;+&#32;colorSpace)&#32;&amp;&amp;
+00456 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;PlayerSettings.colorSpace&#32;!=&#32;recommended_ColorSpace)
+00457 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00458 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;++numItems;
+00459 
+00460 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;GUILayout.Label(colorSpace&#32;+&#32;<emphasis role="keywordtype">string</emphasis>.Format(currentValue,&#32;PlayerSettings.colorSpace));
+00461 
+00462 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;GUILayout.BeginHorizontal();
+00463 
+00464 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(GUILayout.Button(<emphasis role="keywordtype">string</emphasis>.Format(useRecommended,&#32;recommended_ColorSpace)&#32;+&#32;<emphasis role="stringliteral">&quot;&#32;-&#32;requires&#32;reloading&#32;scene&quot;</emphasis>))
+00465 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00466 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;PlayerSettings.colorSpace&#32;=&#32;recommended_ColorSpace;
+00467 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00468 
+00469 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;GUILayout.FlexibleSpace();
+00470 
+00471 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(GUILayout.Button(<emphasis role="stringliteral">&quot;Ignore&quot;</emphasis>))
+00472 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00473 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;EditorPrefs.SetBool(ignore&#32;+&#32;colorSpace,&#32;<emphasis role="keyword">true</emphasis>);
+00474 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00475 
+00476 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;GUILayout.EndHorizontal();
+00477 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00478 
+00479 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(!EditorPrefs.HasKey(ignore&#32;+&#32;gpuSkinning)&#32;&amp;&amp;
+00480 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;PlayerSettings.gpuSkinning&#32;!=&#32;recommended_GpuSkinning)
+00481 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00482 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;++numItems;
+00483 
+00484 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;GUILayout.Label(gpuSkinning&#32;+&#32;<emphasis role="keywordtype">string</emphasis>.Format(currentValue,&#32;PlayerSettings.gpuSkinning));
+00485 
+00486 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;GUILayout.BeginHorizontal();
+00487 
+00488 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(GUILayout.Button(<emphasis role="keywordtype">string</emphasis>.Format(useRecommended,&#32;recommended_GpuSkinning)))
+00489 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00490 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;PlayerSettings.gpuSkinning&#32;=&#32;recommended_GpuSkinning;
+00491 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00492 
+00493 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;GUILayout.FlexibleSpace();
+00494 
+00495 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(GUILayout.Button(<emphasis role="stringliteral">&quot;Ignore&quot;</emphasis>))
+00496 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00497 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;EditorPrefs.SetBool(ignore&#32;+&#32;gpuSkinning,&#32;<emphasis role="keyword">true</emphasis>);
+00498 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00499 
+00500 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;GUILayout.EndHorizontal();
+00501 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00502 
+00503 <emphasis role="preprocessor">#if&#32;false</emphasis>
+00504 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(!EditorPrefs.HasKey(ignore&#32;+&#32;singlePassStereoRendering)&#32;&amp;&amp;
+00505 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;PlayerSettings.singlePassStereoRendering&#32;!=&#32;recommended_SinglePassStereoRendering)
+00506 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00507 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;++numItems;
+00508 
+00509 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;GUILayout.Label(singlePassStereoRendering&#32;+&#32;<emphasis role="keywordtype">string</emphasis>.Format(currentValue,&#32;PlayerSettings.singlePassStereoRendering));
+00510 
+00511 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;GUILayout.BeginHorizontal();
+00512 
+00513 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(GUILayout.Button(<emphasis role="keywordtype">string</emphasis>.Format(useRecommended,&#32;recommended_SinglePassStereoRendering)))
+00514 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00515 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;PlayerSettings.singlePassStereoRendering&#32;=&#32;recommended_SinglePassStereoRendering;
+00516 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00517 
+00518 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;GUILayout.FlexibleSpace();
+00519 
+00520 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(GUILayout.Button(<emphasis role="stringliteral">&quot;Ignore&quot;</emphasis>))
+00521 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00522 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;EditorPrefs.SetBool(ignore&#32;+&#32;singlePassStereoRendering,&#32;<emphasis role="keyword">true</emphasis>);
+00523 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00524 
+00525 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;GUILayout.EndHorizontal();
+00526 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00527 <emphasis role="preprocessor">#endif</emphasis>
+00528 
+00529 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;GUILayout.BeginHorizontal();
+00530 
+00531 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;GUILayout.FlexibleSpace();
+00532 
+00533 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(GUILayout.Button(<emphasis role="stringliteral">&quot;Clear&#32;All&#32;Ignores&quot;</emphasis>))
+00534 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00535 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;EditorPrefs.DeleteKey(ignore&#32;+&#32;buildTarget);
+00536 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;EditorPrefs.DeleteKey(ignore&#32;+&#32;showUnitySplashScreen);
+00537 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;EditorPrefs.DeleteKey(ignore&#32;+&#32;defaultIsFullScreen);
+00538 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;EditorPrefs.DeleteKey(ignore&#32;+&#32;defaultScreenSize);
+00539 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;EditorPrefs.DeleteKey(ignore&#32;+&#32;runInBackground);
+00540 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;EditorPrefs.DeleteKey(ignore&#32;+&#32;displayResolutionDialog);
+00541 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;EditorPrefs.DeleteKey(ignore&#32;+&#32;resizableWindow);
+00542 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;EditorPrefs.DeleteKey(ignore&#32;+&#32;fullscreenMode);
+00543 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;EditorPrefs.DeleteKey(ignore&#32;+&#32;visibleInBackground);
+00544 <emphasis role="preprocessor">#if&#32;(UNITY_5_4&#32;||&#32;UNITY_5_3&#32;||&#32;UNITY_5_2&#32;||&#32;UNITY_5_1&#32;||&#32;UNITY_5_0)</emphasis>
+00545 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;EditorPrefs.DeleteKey(ignore&#32;+&#32;renderingPath);
+00546 <emphasis role="preprocessor">#endif</emphasis>
+00547 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;EditorPrefs.DeleteKey(ignore&#32;+&#32;colorSpace);
+00548 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;EditorPrefs.DeleteKey(ignore&#32;+&#32;gpuSkinning);
+00549 <emphasis role="preprocessor">#if&#32;false</emphasis>
+00550 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;EditorPrefs.DeleteKey(ignore&#32;+&#32;singlePassStereoRendering);
+00551 <emphasis role="preprocessor">#endif</emphasis>
+00552 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00553 
+00554 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;GUILayout.EndHorizontal();
+00555 
+00556 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;GUILayout.EndScrollView();
+00557 
+00558 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;GUILayout.FlexibleSpace();
+00559 
+00560 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;GUILayout.BeginHorizontal();
+00561 
+00562 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(numItems&#32;&gt;&#32;0)
+00563 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00564 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(GUILayout.Button(<emphasis role="stringliteral">&quot;Accept&#32;All&quot;</emphasis>))
+00565 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00566 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;Only&#32;set&#32;those&#32;that&#32;have&#32;not&#32;been&#32;explicitly&#32;ignored.</emphasis>
+00567 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(!EditorPrefs.HasKey(ignore&#32;+&#32;buildTarget))
+00568 #<emphasis role="keywordflow">if</emphasis>&#32;(UNITY_5_5&#32;||&#32;UNITY_5_4&#32;||&#32;UNITY_5_3&#32;||&#32;UNITY_5_2&#32;||&#32;UNITY_5_1&#32;||&#32;UNITY_5_0)
+00569 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;EditorUserBuildSettings.SwitchActiveBuildTarget(recommended_BuildTarget);
+00570 <emphasis role="preprocessor">#else</emphasis>
+00571 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;EditorUserBuildSettings.SwitchActiveBuildTarget(BuildTargetGroup.Standalone,&#32;recommended_BuildTarget);
+00572 <emphasis role="preprocessor">#endif</emphasis>
+00573 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(!EditorPrefs.HasKey(ignore&#32;+&#32;showUnitySplashScreen))
+00574 #<emphasis role="keywordflow">if</emphasis>&#32;(UNITY_5_4&#32;||&#32;UNITY_5_3&#32;||&#32;UNITY_5_2&#32;||&#32;UNITY_5_1&#32;||&#32;UNITY_5_0)
+00575 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;PlayerSettings.showUnitySplashScreen&#32;=&#32;recommended_ShowUnitySplashScreen;
+00576 <emphasis role="preprocessor">#else</emphasis>
+00577 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;PlayerSettings.SplashScreen.show&#32;=&#32;recommended_ShowUnitySplashScreen;
+00578 <emphasis role="preprocessor">#endif</emphasis>
+00579 
+00580 <emphasis role="preprocessor">#if&#32;UNITY_2018_1_OR_NEWER</emphasis>
+00581 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(!EditorPrefs.HasKey(ignore&#32;+&#32;defaultIsFullScreen))
+00582 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;PlayerSettings.fullScreenMode&#32;=&#32;recommended_FullScreenMode;
+00583 #<emphasis role="keywordflow">else</emphasis>
+00584 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;if&#32;(!EditorPrefs.HasKey(ignore&#32;+&#32;defaultIsFullScreen))
+00585 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;PlayerSettings.defaultIsFullScreen&#32;=&#32;recommended_DefaultIsFullScreen;
+00586 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;if&#32;(!EditorPrefs.HasKey(ignore&#32;+&#32;fullscreenMode))
+00587 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;PlayerSettings.d3d11FullscreenMode&#32;=&#32;recommended_FullscreenMode;
+00588 #endif
+00589 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;if&#32;(!EditorPrefs.HasKey(ignore&#32;+&#32;defaultScreenSize))
+00590 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00591 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;PlayerSettings.defaultScreenWidth&#32;=&#32;recommended_DefaultScreenWidth;
+00592 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;PlayerSettings.defaultScreenHeight&#32;=&#32;recommended_DefaultScreenHeight;
+00593 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00594 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(!EditorPrefs.HasKey(ignore&#32;+&#32;runInBackground))
+00595 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;PlayerSettings.runInBackground&#32;=&#32;recommended_RunInBackground;
+00596 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;if&#32;(!EditorPrefs.HasKey(ignore&#32;+&#32;displayResolutionDialog))
+00597 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;PlayerSettings.displayResolutionDialog&#32;=&#32;recommended_DisplayResolutionDialog;
+00598 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;if&#32;(!EditorPrefs.HasKey(ignore&#32;+&#32;resizableWindow))
+00599 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;PlayerSettings.resizableWindow&#32;=&#32;recommended_ResizableWindow;
+00600 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;if&#32;(!EditorPrefs.HasKey(ignore&#32;+&#32;visibleInBackground))
+00601 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;PlayerSettings.visibleInBackground&#32;=&#32;recommended_VisibleInBackground;
+00602 #if&#32;(UNITY_5_4&#32;||&#32;UNITY_5_3&#32;||&#32;UNITY_5_2&#32;||&#32;UNITY_5_1&#32;||&#32;UNITY_5_0)
+00603 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(!EditorPrefs.HasKey(ignore&#32;+&#32;renderingPath))
+00604 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;PlayerSettings.renderingPath&#32;=&#32;recommended_RenderPath;
+00605 #endif
+00606 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;if&#32;(!EditorPrefs.HasKey(ignore&#32;+&#32;colorSpace))
+00607 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;PlayerSettings.colorSpace&#32;=&#32;recommended_ColorSpace;
+00608 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;if&#32;(!EditorPrefs.HasKey(ignore&#32;+&#32;gpuSkinning))
+00609 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;PlayerSettings.gpuSkinning&#32;=&#32;recommended_GpuSkinning;
+00610 #<emphasis role="keywordflow">if</emphasis>&#32;<emphasis role="keyword">false</emphasis>
+00611 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;if&#32;(!EditorPrefs.HasKey(ignore&#32;+&#32;singlePassStereoRendering))
+00612 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;PlayerSettings.singlePassStereoRendering&#32;=&#32;recommended_SinglePassStereoRendering;
+00613 #endif
+00614 
+00615 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;EditorUtility.DisplayDialog(<emphasis role="stringliteral">&quot;Accept&#32;All&quot;</emphasis>,&#32;<emphasis role="stringliteral">&quot;You&#32;made&#32;the&#32;right&#32;choice!&quot;</emphasis>,&#32;<emphasis role="stringliteral">&quot;Ok&quot;</emphasis>);
+00616 
+00617 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;Close();
+00618 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00619 
+00620 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(GUILayout.Button(<emphasis role="stringliteral">&quot;Ignore&#32;All&quot;</emphasis>))
+00621 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00622 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(EditorUtility.DisplayDialog(<emphasis role="stringliteral">&quot;Ignore&#32;All&quot;</emphasis>,&#32;<emphasis role="stringliteral">&quot;Are&#32;you&#32;sure?&quot;</emphasis>,&#32;<emphasis role="stringliteral">&quot;Yes,&#32;Ignore&#32;All&quot;</emphasis>,&#32;<emphasis role="stringliteral">&quot;Cancel&quot;</emphasis>))
+00623 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00624 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;Only&#32;ignore&#32;those&#32;that&#32;do&#32;not&#32;currently&#32;match&#32;our&#32;recommended&#32;settings.</emphasis>
+00625 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(EditorUserBuildSettings.activeBuildTarget&#32;!=&#32;recommended_BuildTarget)
+00626 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;EditorPrefs.SetBool(ignore&#32;+&#32;buildTarget,&#32;<emphasis role="keyword">true</emphasis>);
+00627 <emphasis role="preprocessor">#if&#32;(UNITY_5_4&#32;||&#32;UNITY_5_3&#32;||&#32;UNITY_5_2&#32;||&#32;UNITY_5_1&#32;||&#32;UNITY_5_0)</emphasis>
+00628 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(PlayerSettings.showUnitySplashScreen&#32;!=&#32;recommended_ShowUnitySplashScreen)
+00629 <emphasis role="preprocessor">#else</emphasis>
+00630 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(PlayerSettings.SplashScreen.show&#32;!=&#32;recommended_ShowUnitySplashScreen)
+00631 <emphasis role="preprocessor">#endif</emphasis>
+00632 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;EditorPrefs.SetBool(ignore&#32;+&#32;showUnitySplashScreen,&#32;<emphasis role="keyword">true</emphasis>);
+00633 
+00634 <emphasis role="preprocessor">#if&#32;UNITY_2018_1_OR_NEWER</emphasis>
+00635 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(PlayerSettings.fullScreenMode&#32;!=&#32;recommended_FullScreenMode)
+00636 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00637 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;EditorPrefs.SetBool(ignore&#32;+&#32;defaultIsFullScreen,&#32;<emphasis role="keyword">true</emphasis>);
+00638 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;EditorPrefs.SetBool(ignore&#32;+&#32;fullscreenMode,&#32;<emphasis role="keyword">true</emphasis>);
+00639 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00640 <emphasis role="preprocessor">#else</emphasis>
+00641 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(PlayerSettings.defaultIsFullScreen&#32;!=&#32;recommended_DefaultIsFullScreen)
+00642 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;EditorPrefs.SetBool(ignore&#32;+&#32;defaultIsFullScreen,&#32;<emphasis role="keyword">true</emphasis>);
+00643 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(PlayerSettings.d3d11FullscreenMode&#32;!=&#32;recommended_FullscreenMode)
+00644 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;EditorPrefs.SetBool(ignore&#32;+&#32;fullscreenMode,&#32;<emphasis role="keyword">true</emphasis>);
+00645 <emphasis role="preprocessor">#endif</emphasis>
+00646 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(PlayerSettings.defaultScreenWidth&#32;!=&#32;recommended_DefaultScreenWidth&#32;||
+00647 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;PlayerSettings.defaultScreenHeight&#32;!=&#32;recommended_DefaultScreenHeight)
+00648 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;EditorPrefs.SetBool(ignore&#32;+&#32;defaultScreenSize,&#32;<emphasis role="keyword">true</emphasis>);
+00649 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(PlayerSettings.runInBackground&#32;!=&#32;recommended_RunInBackground)
+00650 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;EditorPrefs.SetBool(ignore&#32;+&#32;runInBackground,&#32;<emphasis role="keyword">true</emphasis>);
+00651 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(PlayerSettings.displayResolutionDialog&#32;!=&#32;recommended_DisplayResolutionDialog)
+00652 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;EditorPrefs.SetBool(ignore&#32;+&#32;displayResolutionDialog,&#32;<emphasis role="keyword">true</emphasis>);
+00653 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(PlayerSettings.resizableWindow&#32;!=&#32;recommended_ResizableWindow)
+00654 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;EditorPrefs.SetBool(ignore&#32;+&#32;resizableWindow,&#32;<emphasis role="keyword">true</emphasis>);
+00655 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(PlayerSettings.visibleInBackground&#32;!=&#32;recommended_VisibleInBackground)
+00656 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;EditorPrefs.SetBool(ignore&#32;+&#32;visibleInBackground,&#32;<emphasis role="keyword">true</emphasis>);
+00657 <emphasis role="preprocessor">#if&#32;(UNITY_5_4&#32;||&#32;UNITY_5_3&#32;||&#32;UNITY_5_2&#32;||&#32;UNITY_5_1&#32;||&#32;UNITY_5_0)</emphasis>
+00658 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(PlayerSettings.renderingPath&#32;!=&#32;recommended_RenderPath)
+00659 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;EditorPrefs.SetBool(ignore&#32;+&#32;renderingPath,&#32;<emphasis role="keyword">true</emphasis>);
+00660 <emphasis role="preprocessor">#endif</emphasis>
+00661 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(PlayerSettings.colorSpace&#32;!=&#32;recommended_ColorSpace)
+00662 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;EditorPrefs.SetBool(ignore&#32;+&#32;colorSpace,&#32;<emphasis role="keyword">true</emphasis>);
+00663 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(PlayerSettings.gpuSkinning&#32;!=&#32;recommended_GpuSkinning)
+00664 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;EditorPrefs.SetBool(ignore&#32;+&#32;gpuSkinning,&#32;<emphasis role="keyword">true</emphasis>);
+00665 <emphasis role="preprocessor">#if&#32;false</emphasis>
+00666 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(PlayerSettings.singlePassStereoRendering&#32;!=&#32;recommended_SinglePassStereoRendering)
+00667 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;EditorPrefs.SetBool(ignore&#32;+&#32;singlePassStereoRendering,&#32;<emphasis role="keyword">true</emphasis>);
+00668 <emphasis role="preprocessor">#endif</emphasis>
+00669 
+00670 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;Close();
+00671 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00672 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00673 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00674 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">else</emphasis>&#32;<emphasis role="keywordflow">if</emphasis>&#32;(GUILayout.Button(<emphasis role="stringliteral">&quot;Close&quot;</emphasis>))
+00675 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00676 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;Close();
+00677 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00678 
+00679 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;GUILayout.EndHorizontal();
+00680 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00681 &#32;&#32;&#32;&#32;}
+00682 }
+</programlisting></section>

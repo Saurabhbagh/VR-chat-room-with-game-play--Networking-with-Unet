@@ -1,0 +1,182 @@
+<?xml version='1.0' encoding='UTF-8' standalone='no'?>
+<section xmlns="http://docbook.org/ns/docbook" version="5.0" xmlns:xlink="http://www.w3.org/1999/xlink" xml:id="__steam_v_r___input___action_set_property_editor_8cs_source">
+<title>SteamVR_Input_ActionSetPropertyEditor.cs</title>
+<indexterm><primary>O:/GitHUBMINIPRoject/Assets/SteamVR/Input/Editor/SteamVR_Input_ActionSetPropertyEditor.cs</primary></indexterm>
+<programlisting>00001 <emphasis role="keyword">using</emphasis>&#32;<link linkend="_namespace_unity_editor">UnityEditor</link>;
+00002 <emphasis role="keyword">using</emphasis>&#32;<link linkend="__balloon_8cs_1a7d67e097df9376eb709b6a23aa3c7d23">UnityEngine</link>;
+00003 
+00004 <emphasis role="keyword">using</emphasis>&#32;System.CodeDom;
+00005 <emphasis role="keyword">using</emphasis>&#32;Microsoft.CSharp;
+00006 <emphasis role="keyword">using</emphasis>&#32;System.IO;
+00007 <emphasis role="keyword">using</emphasis>&#32;System.CodeDom.Compiler;
+00008 
+00009 <emphasis role="keyword">using</emphasis>&#32;System.Linq;
+00010 <emphasis role="keyword">using</emphasis>&#32;System.Collections.Generic;
+00011 <emphasis role="keyword">using</emphasis>&#32;System.Reflection;
+00012 <emphasis role="keyword">using</emphasis>&#32;System.Linq.Expressions;
+00013 <emphasis role="keyword">using</emphasis>&#32;System;
+00014 
+00015 
+00016 <emphasis role="keyword">namespace&#32;</emphasis><link linkend="_namespace_valve_1_1_v_r">Valve.VR</link>
+00017 {
+00018 &#32;&#32;&#32;&#32;[CustomPropertyDrawer(typeof(SteamVR_ActionSet))]
+<anchor xml:id="__steam_v_r___input___action_set_property_editor_8cs_source_1l00019"/><link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___input___action_set_property_editor">00019</link> &#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keyword">class&#32;</emphasis><link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___input___action_set_property_editor">SteamVR_Input_ActionSetPropertyEditor</link>&#32;:&#32;PropertyDrawer
+00020 &#32;&#32;&#32;&#32;{
+<anchor xml:id="__steam_v_r___input___action_set_property_editor_8cs_source_1l00021"/><link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___input___action_set_property_editor_1a7d10921daafc5b145886341404e313d0">00021</link> &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">protected</emphasis>&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___action_set">SteamVR_ActionSet</link>[]&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___input___action_set_property_editor_1a7d10921daafc5b145886341404e313d0">actionSets</link>;
+<anchor xml:id="__steam_v_r___input___action_set_property_editor_8cs_source_1l00022"/><link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___input___action_set_property_editor_1a6f85184391cbaf6b9553403947f19079">00022</link> &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">protected</emphasis>&#32;<emphasis role="keywordtype">string</emphasis>[]&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___input___action_set_property_editor_1a6f85184391cbaf6b9553403947f19079">enumItems</link>;
+<anchor xml:id="__steam_v_r___input___action_set_property_editor_8cs_source_1l00023"/><link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___input___action_set_property_editor_1a44b8bf1bb0f63149daa3ab7c4b6850e1">00023</link> &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keywordtype">int</emphasis>&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___input___action_set_property_editor_1a44b8bf1bb0f63149daa3ab7c4b6850e1">selectedIndex</link>&#32;=&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___input___action_set_property_editor_1a2be8e8b2504b572a5d00cfd4ba31da8b">notInitializedIndex</link>;
+00024 
+<anchor xml:id="__steam_v_r___input___action_set_property_editor_8cs_source_1l00025"/><link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___input___action_set_property_editor_1a2be8e8b2504b572a5d00cfd4ba31da8b">00025</link> &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">protected</emphasis>&#32;<emphasis role="keyword">const</emphasis>&#32;<emphasis role="keywordtype">int</emphasis>&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___input___action_set_property_editor_1a2be8e8b2504b572a5d00cfd4ba31da8b">notInitializedIndex</link>&#32;=&#32;-1;
+<anchor xml:id="__steam_v_r___input___action_set_property_editor_8cs_source_1l00026"/><link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___input___action_set_property_editor_1a76715775134cd70828036551c8965b8e">00026</link> &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">protected</emphasis>&#32;<emphasis role="keyword">const</emphasis>&#32;<emphasis role="keywordtype">int</emphasis>&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___input___action_set_property_editor_1a76715775134cd70828036551c8965b8e">noneIndex</link>&#32;=&#32;0;
+<anchor xml:id="__steam_v_r___input___action_set_property_editor_8cs_source_1l00027"/><link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___input___action_set_property_editor_1aeb816cefc649e2effd070212a6b4968b">00027</link> &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">protected</emphasis>&#32;<emphasis role="keywordtype">int</emphasis>&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___input___action_set_property_editor_1aeb816cefc649e2effd070212a6b4968b">addIndex</link>&#32;=&#32;1;
+00028 
+<anchor xml:id="__steam_v_r___input___action_set_property_editor_8cs_source_1l00029"/><link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___input___action_set_property_editor_1acc051368361abd6814780b7cf772070e">00029</link> &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">protected</emphasis>&#32;<emphasis role="keyword">const</emphasis>&#32;<emphasis role="keywordtype">string</emphasis>&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___input___action_set_property_editor_1acc051368361abd6814780b7cf772070e">defaultPathTemplate</link>&#32;=&#32;<emphasis role="stringliteral">&quot;&#32;&#32;&#32;&#32;\u26A0&#32;Missing&#32;action&#32;set:&#32;{0}&quot;</emphasis>;
+<anchor xml:id="__steam_v_r___input___action_set_property_editor_8cs_source_1l00030"/><link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___input___action_set_property_editor_1a2121d5fb57cc8743a40823506a5e4267">00030</link> &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">protected</emphasis>&#32;<emphasis role="keywordtype">string</emphasis>&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___input___action_set_property_editor_1a2121d5fb57cc8743a40823506a5e4267">defaultPathLabel</link>&#32;=&#32;<emphasis role="keyword">null</emphasis>;
+00031 
+<anchor xml:id="__steam_v_r___input___action_set_property_editor_8cs_source_1l00032"/><link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___input___action_set_property_editor_1ac96a095b8a1e54a9cb1efbe6cd8fd588">00032</link> &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">protected</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___input___action_set_property_editor_1ac96a095b8a1e54a9cb1efbe6cd8fd588">Awake</link>()
+00033 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00034 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___input___action_set_property_editor_1a7d10921daafc5b145886341404e313d0">actionSets</link>&#32;=&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___input">SteamVR_Input</link>.<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___input_1a936c76ec182f18ace45ad74c95ce7629">GetActionSets</link>();
+00035 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___input___action_set_property_editor_1a7d10921daafc5b145886341404e313d0">actionSets</link>&#32;!=&#32;<emphasis role="keyword">null</emphasis>&#32;&amp;&amp;&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___input___action_set_property_editor_1a7d10921daafc5b145886341404e313d0">actionSets</link>.Length&#32;&gt;&#32;0)
+00036 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00037 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;List&lt;string&gt;&#32;enumList&#32;=&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___input___action_set_property_editor_1a7d10921daafc5b145886341404e313d0">actionSets</link>.Select(actionSet&#32;=&gt;&#32;actionSet.fullPath).ToList();
+00038 
+00039 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;enumList.Insert(<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___input___action_set_property_editor_1a76715775134cd70828036551c8965b8e">noneIndex</link>,&#32;<emphasis role="stringliteral">&quot;None&quot;</emphasis>);
+00040 
+00041 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//replace&#32;forward&#32;slashes&#32;with&#32;backslack&#32;instead</emphasis>
+00042 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">for</emphasis>&#32;(<emphasis role="keywordtype">int</emphasis>&#32;<link linkend="_namespace_valve_1_1_v_r_1ac40c4bdf0a3dcd6e69cad2d85f287c67a6a992d5529f459a44fee58c733255e86">index</link>&#32;=&#32;0;&#32;<link linkend="_namespace_valve_1_1_v_r_1ac40c4bdf0a3dcd6e69cad2d85f287c67a6a992d5529f459a44fee58c733255e86">index</link>&#32;&lt;&#32;enumList.Count;&#32;<link linkend="_namespace_valve_1_1_v_r_1ac40c4bdf0a3dcd6e69cad2d85f287c67a6a992d5529f459a44fee58c733255e86">index</link>++)
+00043 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;enumList[<link linkend="_namespace_valve_1_1_v_r_1ac40c4bdf0a3dcd6e69cad2d85f287c67a6a992d5529f459a44fee58c733255e86">index</link>]&#32;=&#32;enumList[<link linkend="_namespace_valve_1_1_v_r_1ac40c4bdf0a3dcd6e69cad2d85f287c67a6a992d5529f459a44fee58c733255e86">index</link>].Replace(<emphasis role="charliteral">&apos;/&apos;</emphasis>,&#32;<emphasis role="charliteral">&apos;\\&apos;</emphasis>);
+00044 
+00045 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;enumList.Add(<emphasis role="stringliteral">&quot;Add...&quot;</emphasis>);
+00046 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___input___action_set_property_editor_1a6f85184391cbaf6b9553403947f19079">enumItems</link>&#32;=&#32;enumList.ToArray();
+00047 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00048 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">else</emphasis>
+00049 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00050 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___input___action_set_property_editor_1a6f85184391cbaf6b9553403947f19079">enumItems</link>&#32;=&#32;<emphasis role="keyword">new</emphasis>&#32;<emphasis role="keywordtype">string</emphasis>[]&#32;{&#32;<emphasis role="stringliteral">&quot;None&quot;</emphasis>,&#32;<emphasis role="stringliteral">&quot;Add...&quot;</emphasis>&#32;};
+00051 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00052 
+00053 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___input___action_set_property_editor_1aeb816cefc649e2effd070212a6b4968b">addIndex</link>&#32;=&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___input___action_set_property_editor_1a6f85184391cbaf6b9553403947f19079">enumItems</link>.Length&#32;-&#32;1;
+00054 
+00055 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">/*</emphasis>
+00056 <emphasis role="comment">&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;//keep&#32;sub&#32;menus:</emphasis>
+00057 <emphasis role="comment">&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;for&#32;(int&#32;index&#32;=&#32;0;&#32;index&#32;&lt;&#32;enumItems.Length;&#32;index++)</emphasis>
+00058 <emphasis role="comment">&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;if&#32;(enumItems[index][0]&#32;==&#32;&apos;/&apos;)</emphasis>
+00059 <emphasis role="comment">&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;enumItems[index]&#32;=&#32;enumItems[index].Substring(1);</emphasis>
+00060 <emphasis role="comment">&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;*/</emphasis>
+00061 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00062 
+<anchor xml:id="__steam_v_r___input___action_set_property_editor_8cs_source_1l00063"/><link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___input___action_set_property_editor_1a102877a32addf001f381bc336ecd07f3">00063</link> &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keyword">override</emphasis>&#32;<emphasis role="keywordtype">float</emphasis>&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___input___action_set_property_editor_1a102877a32addf001f381bc336ecd07f3">GetPropertyHeight</link>(SerializedProperty&#32;property,&#32;GUIContent&#32;label)
+00064 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00065 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordtype">float</emphasis>&#32;height&#32;=&#32;base.GetPropertyHeight(property,&#32;label);
+00066 
+00067 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;SerializedProperty&#32;actionPathProperty&#32;=&#32;<emphasis role="keyword">property</emphasis>.FindPropertyRelative(<emphasis role="stringliteral">&quot;actionSetPath&quot;</emphasis>);
+00068 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(<emphasis role="keywordtype">string</emphasis>.IsNullOrEmpty(actionPathProperty.stringValue)&#32;==&#32;<emphasis role="keyword">false</emphasis>)
+00069 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00070 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___input___action_set_property_editor_1a44b8bf1bb0f63149daa3ab7c4b6850e1">selectedIndex</link>&#32;==&#32;0)
+00071 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;height&#32;*&#32;2;
+00072 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00073 
+00074 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;height;
+00075 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00076 
+00077 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;Draw&#32;the&#32;property&#32;inside&#32;the&#32;given&#32;rect</emphasis>
+<anchor xml:id="__steam_v_r___input___action_set_property_editor_8cs_source_1l00078"/><link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___input___action_set_property_editor_1a87d1ba96689d1dca0022188bd806ec89">00078</link> &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keyword">override</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___input___action_set_property_editor_1a87d1ba96689d1dca0022188bd806ec89">OnGUI</link>(Rect&#32;position,&#32;SerializedProperty&#32;property,&#32;GUIContent&#32;label)
+00079 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00080 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___input">SteamVR_Input</link>.<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___input_1ad3cc52ba6a3fe1eb4c49fb00d49439eb">actions</link>&#32;==&#32;<emphasis role="keyword">null</emphasis>&#32;||&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___input">SteamVR_Input</link>.<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___input_1ad3cc52ba6a3fe1eb4c49fb00d49439eb">actions</link>.Length&#32;==&#32;0)
+00081 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00082 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;EditorGUI.BeginProperty(position,&#32;label,&#32;property);
+00083 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;EditorGUI.LabelField(position,&#32;<emphasis role="stringliteral">&quot;Please&#32;generate&#32;SteamVR&#32;Input&#32;actions&quot;</emphasis>);
+00084 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;EditorGUI.EndProperty();
+00085 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>;
+00086 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00087 
+00088 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___input___action_set_property_editor_1a6f85184391cbaf6b9553403947f19079">enumItems</link>&#32;==&#32;<emphasis role="keyword">null</emphasis>&#32;||&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___input___action_set_property_editor_1a6f85184391cbaf6b9553403947f19079">enumItems</link>.Length&#32;==&#32;0)
+00089 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00090 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___input___action_set_property_editor_1ac96a095b8a1e54a9cb1efbe6cd8fd588">Awake</link>();
+00091 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00092 
+00093 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;Using&#32;BeginProperty&#32;/&#32;EndProperty&#32;on&#32;the&#32;parent&#32;property&#32;means&#32;that</emphasis>
+00094 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;prefab&#32;override&#32;logic&#32;works&#32;on&#32;the&#32;entire&#32;property.</emphasis>
+00095 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;EditorGUI.BeginProperty(position,&#32;label,&#32;property);
+00096 
+00097 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;SerializedProperty&#32;actionPathProperty&#32;=&#32;<emphasis role="keyword">property</emphasis>.FindPropertyRelative(<emphasis role="stringliteral">&quot;actionSetPath&quot;</emphasis>);
+00098 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordtype">string</emphasis>&#32;currentPath&#32;=&#32;<emphasis role="keyword">null</emphasis>;
+00099 
+00100 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(actionPathProperty&#32;!=&#32;<emphasis role="keyword">null</emphasis>)
+00101 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00102 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;currentPath&#32;=&#32;actionPathProperty.stringValue;
+00103 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(<emphasis role="keywordtype">string</emphasis>.IsNullOrEmpty(currentPath)&#32;==&#32;<emphasis role="keyword">false</emphasis>)
+00104 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00105 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">for</emphasis>&#32;(<emphasis role="keywordtype">int</emphasis>&#32;actionSetIndex&#32;=&#32;0;&#32;actionSetIndex&#32;&lt;&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___input___action_set_property_editor_1a7d10921daafc5b145886341404e313d0">actionSets</link>.Length;&#32;actionSetIndex++)
+00106 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00107 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___input___action_set_property_editor_1a7d10921daafc5b145886341404e313d0">actionSets</link>[actionSetIndex].fullPath&#32;==&#32;currentPath)
+00108 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00109 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___input___action_set_property_editor_1a44b8bf1bb0f63149daa3ab7c4b6850e1">selectedIndex</link>&#32;=&#32;actionSetIndex&#32;+&#32;1;&#32;<emphasis role="comment">//&#32;account&#32;for&#32;none&#32;option</emphasis>
+00110 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">break</emphasis>;
+00111 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00112 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00113 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00114 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00115 
+00116 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___input___action_set_property_editor_1a44b8bf1bb0f63149daa3ab7c4b6850e1">selectedIndex</link>&#32;==&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___input___action_set_property_editor_1a2be8e8b2504b572a5d00cfd4ba31da8b">notInitializedIndex</link>)
+00117 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___input___action_set_property_editor_1a44b8bf1bb0f63149daa3ab7c4b6850e1">selectedIndex</link>&#32;=&#32;0;
+00118 
+00119 
+00120 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;Rect&#32;labelPosition&#32;=&#32;position;
+00121 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;labelPosition.width&#32;=&#32;EditorGUIUtility.labelWidth;
+00122 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;EditorGUI.LabelField(labelPosition,&#32;label);
+00123 
+00124 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;Rect&#32;fieldPosition&#32;=&#32;position;
+00125 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;fieldPosition.x&#32;=&#32;(labelPosition.x&#32;+&#32;labelPosition.width);
+00126 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;fieldPosition.width&#32;=&#32;EditorGUIUtility.currentViewWidth&#32;-&#32;(labelPosition.x&#32;+&#32;labelPosition.width)&#32;-&#32;5&#32;-&#32;16;
+00127 
+00128 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___input___action_set_property_editor_1a44b8bf1bb0f63149daa3ab7c4b6850e1">selectedIndex</link>&#32;==&#32;0&#32;&amp;&amp;&#32;<emphasis role="keywordtype">string</emphasis>.IsNullOrEmpty(currentPath)&#32;==&#32;<emphasis role="keyword">false</emphasis>)
+00129 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00130 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___input___action_set_property_editor_1a2121d5fb57cc8743a40823506a5e4267">defaultPathLabel</link>&#32;==&#32;<emphasis role="keyword">null</emphasis>)
+00131 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___input___action_set_property_editor_1a2121d5fb57cc8743a40823506a5e4267">defaultPathLabel</link>&#32;=&#32;<emphasis role="keywordtype">string</emphasis>.Format(<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___input___action_set_property_editor_1acc051368361abd6814780b7cf772070e">defaultPathTemplate</link>,&#32;currentPath);
+00132 
+00133 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;Rect&#32;defaultLabelPosition&#32;=&#32;position;
+00134 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;defaultLabelPosition.y&#32;=&#32;position.y&#32;+&#32;fieldPosition.height&#32;/&#32;2f;
+00135 
+00136 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;EditorGUI.LabelField(defaultLabelPosition,&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___input___action_set_property_editor_1a2121d5fb57cc8743a40823506a5e4267">defaultPathLabel</link>);
+00137 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00138 
+00139 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;Rect&#32;objectRect&#32;=&#32;position;
+00140 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;objectRect.x&#32;=&#32;fieldPosition.x&#32;+&#32;fieldPosition.width&#32;+&#32;15;
+00141 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;objectRect.width&#32;=&#32;10;
+00142 
+00143 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordtype">bool</emphasis>&#32;showInputWindow&#32;=&#32;<emphasis role="keyword">false</emphasis>;
+00144 
+00145 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordtype">int</emphasis>&#32;wasSelected&#32;=&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___input___action_set_property_editor_1a44b8bf1bb0f63149daa3ab7c4b6850e1">selectedIndex</link>;
+00146 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___input___action_set_property_editor_1a44b8bf1bb0f63149daa3ab7c4b6850e1">selectedIndex</link>&#32;=&#32;EditorGUI.Popup(fieldPosition,&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___input___action_set_property_editor_1a44b8bf1bb0f63149daa3ab7c4b6850e1">selectedIndex</link>,&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___input___action_set_property_editor_1a6f85184391cbaf6b9553403947f19079">enumItems</link>);
+00147 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___input___action_set_property_editor_1a44b8bf1bb0f63149daa3ab7c4b6850e1">selectedIndex</link>&#32;!=&#32;wasSelected)
+00148 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00149 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___input___action_set_property_editor_1a44b8bf1bb0f63149daa3ab7c4b6850e1">selectedIndex</link>&#32;==&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___input___action_set_property_editor_1a76715775134cd70828036551c8965b8e">noneIndex</link>&#32;||&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___input___action_set_property_editor_1a44b8bf1bb0f63149daa3ab7c4b6850e1">selectedIndex</link>&#32;==&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___input___action_set_property_editor_1a2be8e8b2504b572a5d00cfd4ba31da8b">notInitializedIndex</link>)
+00150 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00151 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___input___action_set_property_editor_1a44b8bf1bb0f63149daa3ab7c4b6850e1">selectedIndex</link>&#32;=&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___input___action_set_property_editor_1a76715775134cd70828036551c8965b8e">noneIndex</link>;
+00152 
+00153 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;actionPathProperty.stringValue&#32;=&#32;<emphasis role="keyword">null</emphasis>;
+00154 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00155 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">else</emphasis>&#32;<emphasis role="keywordflow">if</emphasis>&#32;(<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___input___action_set_property_editor_1a44b8bf1bb0f63149daa3ab7c4b6850e1">selectedIndex</link>&#32;==&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___input___action_set_property_editor_1aeb816cefc649e2effd070212a6b4968b">addIndex</link>)
+00156 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00157 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___input___action_set_property_editor_1a44b8bf1bb0f63149daa3ab7c4b6850e1">selectedIndex</link>&#32;=&#32;wasSelected;&#32;<emphasis role="comment">//&#32;don&apos;t&#32;change&#32;the&#32;index</emphasis>
+00158 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;showInputWindow&#32;=&#32;<emphasis role="keyword">true</emphasis>;
+00159 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00160 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">else</emphasis>
+00161 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00162 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordtype">int</emphasis>&#32;actionIndex&#32;=&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___input___action_set_property_editor_1a44b8bf1bb0f63149daa3ab7c4b6850e1">selectedIndex</link>&#32;-&#32;1;&#32;<emphasis role="comment">//&#32;account&#32;for&#32;none&#32;option</emphasis>
+00163 
+00164 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;actionPathProperty.stringValue&#32;=&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___input___action_set_property_editor_1a7d10921daafc5b145886341404e313d0">actionSets</link>[actionIndex].<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___action_set_1a2d9abb96df39d29be3ea763a95d56b9c">GetPath</link>();
+00165 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//property.objectReferenceValue&#32;=&#32;actions[actionIndex];</emphasis>
+00166 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00167 
+00168 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">property</emphasis>.serializedObject.ApplyModifiedProperties();
+00169 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00170 
+00171 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;EditorGUI.EndProperty();
+00172 
+00173 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(showInputWindow)
+00174 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___input___editor_window">SteamVR_Input_EditorWindow</link>.<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___input___editor_window_1a6c00ad119684854607a322588bc46c0b">ShowWindow</link>();&#32;<emphasis role="comment">//show&#32;the&#32;input&#32;window&#32;so&#32;they&#32;can&#32;add&#32;a&#32;new&#32;actionset</emphasis>
+00175 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00176 &#32;&#32;&#32;&#32;}
+00177 }
+</programlisting></section>

@@ -1,0 +1,197 @@
+<?xml version='1.0' encoding='UTF-8' standalone='no'?>
+<section xmlns="http://docbook.org/ns/docbook" version="5.0" xmlns:xlink="http://www.w3.org/1999/xlink" xml:id="__complex_throwable_8cs_source">
+<title>ComplexThrowable.cs</title>
+<indexterm><primary>O:/GitHUBMINIPRoject/Assets/SteamVR/InteractionSystem/Core/Scripts/ComplexThrowable.cs</primary></indexterm>
+<programlisting>00001 <emphasis role="comment">//=======&#32;Copyright&#32;(c)&#32;Valve&#32;Corporation,&#32;All&#32;rights&#32;reserved.&#32;===============</emphasis>
+00002 <emphasis role="comment">//</emphasis>
+00003 <emphasis role="comment">//&#32;Purpose:&#32;Throwable&#32;that&#32;uses&#32;physics&#32;joints&#32;to&#32;attach&#32;instead&#32;of&#32;just</emphasis>
+00004 <emphasis role="comment">//&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;parenting</emphasis>
+00005 <emphasis role="comment">//</emphasis>
+00006 <emphasis role="comment">//=============================================================================</emphasis>
+00007 
+00008 <emphasis role="keyword">using</emphasis>&#32;<link linkend="__balloon_8cs_1a7d67e097df9376eb709b6a23aa3c7d23">UnityEngine</link>;
+00009 <emphasis role="keyword">using</emphasis>&#32;System.Collections.Generic;
+00010 
+00011 <emphasis role="keyword">namespace&#32;</emphasis><link linkend="_namespace_valve_1_1_v_r_1_1_interaction_system">Valve.VR.InteractionSystem</link>
+00012 {
+00013 &#32;&#32;&#32;&#32;<emphasis role="comment">//-------------------------------------------------------------------------</emphasis>
+00014 &#32;&#32;&#32;&#32;[RequireComponent(&#32;typeof(&#32;Interactable&#32;)&#32;)]
+<anchor xml:id="__complex_throwable_8cs_source_1l00015"/><link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_complex_throwable">00015</link> &#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keyword">class&#32;</emphasis><link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_complex_throwable">ComplexThrowable</link>&#32;:&#32;MonoBehaviour
+00016 &#32;&#32;&#32;&#32;{
+<anchor xml:id="__complex_throwable_8cs_source_1l00017"/><link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_complex_throwable_1a3767479e716ee64bf8f7b2d5d46c67b7">00017</link> &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keyword">enum</emphasis>&#32;<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_complex_throwable_1a3767479e716ee64bf8f7b2d5d46c67b7">AttachMode</link>
+00018 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00019 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;FixedJoint,
+00020 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;Force,
+00021 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00022 
+<anchor xml:id="__complex_throwable_8cs_source_1l00023"/><link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_complex_throwable_1ace78cebf2593395beda7aba6d483297a">00023</link> &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keywordtype">float</emphasis>&#32;<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_complex_throwable_1ace78cebf2593395beda7aba6d483297a">attachForce</link>&#32;=&#32;800.0f;
+<anchor xml:id="__complex_throwable_8cs_source_1l00024"/><link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_complex_throwable_1a9d6bb0fbd46399b63e2f491ba37d5dea">00024</link> &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keywordtype">float</emphasis>&#32;<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_complex_throwable_1a9d6bb0fbd46399b63e2f491ba37d5dea">attachForceDamper</link>&#32;=&#32;25.0f;
+00025 
+<anchor xml:id="__complex_throwable_8cs_source_1l00026"/><link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_complex_throwable_1a58b4bbb34394f119cfcf82f94a241cb1">00026</link> &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_complex_throwable_1a3767479e716ee64bf8f7b2d5d46c67b7">AttachMode</link>&#32;<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_complex_throwable_1a58b4bbb34394f119cfcf82f94a241cb1">attachMode</link>&#32;=&#32;<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_complex_throwable_1a3767479e716ee64bf8f7b2d5d46c67b7">AttachMode</link>.FixedJoint;
+00027 
+00028 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;[<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_enum_flags">EnumFlags</link>]
+<anchor xml:id="__complex_throwable_8cs_source_1l00029"/><link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_complex_throwable_1a362dd7342445f9dd29afb10efe2bbce7">00029</link> &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_hand">Hand</link>.<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_hand_1a61701f82b8f3fac8818954ec71804cb5">AttachmentFlags</link>&#32;<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_complex_throwable_1a362dd7342445f9dd29afb10efe2bbce7">attachmentFlags</link>&#32;=&#32;0;
+00030 
+00031 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;List&lt;Hand&gt;&#32;holdingHands&#32;=&#32;<emphasis role="keyword">new</emphasis>&#32;List&lt;Hand&gt;();
+00032 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;List&lt;Rigidbody&gt;&#32;holdingBodies&#32;=&#32;<emphasis role="keyword">new</emphasis>&#32;List&lt;Rigidbody&gt;();
+00033 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;List&lt;Vector3&gt;&#32;holdingPoints&#32;=&#32;<emphasis role="keyword">new</emphasis>&#32;List&lt;Vector3&gt;();
+00034 
+00035 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;List&lt;Rigidbody&gt;&#32;rigidBodies&#32;=&#32;<emphasis role="keyword">new</emphasis>&#32;List&lt;Rigidbody&gt;();
+00036 
+00037 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//-------------------------------------------------</emphasis>
+00038 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordtype">void</emphasis>&#32;Awake()
+00039 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00040 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;GetComponentsInChildren&lt;Rigidbody&gt;(&#32;rigidBodies&#32;);
+00041 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00042 
+00043 
+00044 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//-------------------------------------------------</emphasis>
+00045 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordtype">void</emphasis>&#32;Update()
+00046 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00047 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">for</emphasis>&#32;(&#32;<emphasis role="keywordtype">int</emphasis>&#32;i&#32;=&#32;0;&#32;i&#32;&lt;&#32;holdingHands.Count;&#32;i++&#32;)
+00048 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00049 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(holdingHands[i].IsGrabEnding(this.gameObject))
+00050 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00051 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;PhysicsDetach(&#32;holdingHands[i]&#32;);
+00052 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00053 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00054 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00055 
+00056 
+00057 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//-------------------------------------------------</emphasis>
+00058 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;OnHandHoverBegin(&#32;Hand&#32;hand&#32;)
+00059 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00060 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(&#32;holdingHands.IndexOf(&#32;hand&#32;)&#32;==&#32;-1&#32;)
+00061 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00062 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(&#32;hand.isActive&#32;)
+00063 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00064 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;hand.TriggerHapticPulse(&#32;800&#32;);
+00065 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00066 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00067 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00068 
+00069 
+00070 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//-------------------------------------------------</emphasis>
+00071 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;OnHandHoverEnd(&#32;Hand&#32;hand&#32;)
+00072 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00073 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(&#32;holdingHands.IndexOf(&#32;hand&#32;)&#32;==&#32;-1&#32;)
+00074 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00075 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(hand.isActive)
+00076 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00077 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;hand.TriggerHapticPulse(&#32;500&#32;);
+00078 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00079 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00080 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00081 
+00082 
+00083 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//-------------------------------------------------</emphasis>
+00084 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;HandHoverUpdate(&#32;Hand&#32;hand&#32;)
+00085 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00086 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_namespace_valve_1_1_v_r_1_1_interaction_system_1ae03ab84d315f5997fd000817bfb96a0f">GrabTypes</link>&#32;startingGrabType&#32;=&#32;hand.GetGrabStarting();
+00087 
+00088 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(startingGrabType&#32;!=&#32;<link linkend="_namespace_valve_1_1_v_r_1_1_interaction_system_1ae03ab84d315f5997fd000817bfb96a0f">GrabTypes</link>.None)
+00089 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00090 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;PhysicsAttach(&#32;hand,&#32;startingGrabType&#32;);
+00091 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00092 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00093 
+00094 
+00095 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//-------------------------------------------------</emphasis>
+00096 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;PhysicsAttach(&#32;Hand&#32;hand,&#32;<link linkend="_namespace_valve_1_1_v_r_1_1_interaction_system_1ae03ab84d315f5997fd000817bfb96a0f">GrabTypes</link>&#32;startingGrabType&#32;)
+00097 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00098 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;PhysicsDetach(&#32;hand&#32;);
+00099 
+00100 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;Rigidbody&#32;holdingBody&#32;=&#32;<emphasis role="keyword">null</emphasis>;
+00101 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;Vector3&#32;holdingPoint&#32;=&#32;Vector3.zero;
+00102 
+00103 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;The&#32;hand&#32;should&#32;grab&#32;onto&#32;the&#32;nearest&#32;rigid&#32;body</emphasis>
+00104 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordtype">float</emphasis>&#32;closestDistance&#32;=&#32;<emphasis role="keywordtype">float</emphasis>.MaxValue;
+00105 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">for</emphasis>&#32;(&#32;<emphasis role="keywordtype">int</emphasis>&#32;i&#32;=&#32;0;&#32;i&#32;&lt;&#32;rigidBodies.Count;&#32;i++&#32;)
+00106 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00107 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordtype">float</emphasis>&#32;distance&#32;=&#32;Vector3.Distance(&#32;rigidBodies[i].worldCenterOfMass,&#32;hand.transform.position&#32;);
+00108 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(&#32;distance&#32;&lt;&#32;closestDistance&#32;)
+00109 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00110 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;holdingBody&#32;=&#32;rigidBodies[i];
+00111 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;closestDistance&#32;=&#32;distance;
+00112 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00113 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00114 
+00115 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;Couldn&apos;t&#32;grab&#32;onto&#32;a&#32;body</emphasis>
+00116 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(&#32;holdingBody&#32;==&#32;<emphasis role="keyword">null</emphasis>&#32;)
+00117 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>;
+00118 
+00119 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;Create&#32;a&#32;fixed&#32;joint&#32;from&#32;the&#32;hand&#32;to&#32;the&#32;holding&#32;body</emphasis>
+00120 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(&#32;<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_complex_throwable_1a58b4bbb34394f119cfcf82f94a241cb1">attachMode</link>&#32;==&#32;<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_complex_throwable_1a3767479e716ee64bf8f7b2d5d46c67b7">AttachMode</link>.FixedJoint&#32;)
+00121 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00122 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;Rigidbody&#32;handRigidbody&#32;=&#32;Util.FindOrAddComponent&lt;Rigidbody&gt;(&#32;hand.gameObject&#32;);
+00123 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;handRigidbody.isKinematic&#32;=&#32;<emphasis role="keyword">true</emphasis>;
+00124 
+00125 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;FixedJoint&#32;handJoint&#32;=&#32;hand.gameObject.AddComponent&lt;FixedJoint&gt;();
+00126 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;handJoint.connectedBody&#32;=&#32;holdingBody;
+00127 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00128 
+00129 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;Don&apos;t&#32;let&#32;the&#32;hand&#32;interact&#32;with&#32;other&#32;things&#32;while&#32;it&apos;s&#32;holding&#32;us</emphasis>
+00130 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;hand.HoverLock(&#32;<emphasis role="keyword">null</emphasis>&#32;);
+00131 
+00132 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;Affix&#32;this&#32;point</emphasis>
+00133 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;Vector3&#32;offset&#32;=&#32;hand.transform.position&#32;-&#32;holdingBody.worldCenterOfMass;
+00134 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;offset&#32;=&#32;Mathf.Min(&#32;offset.magnitude,&#32;1.0f&#32;)&#32;*&#32;offset.normalized;
+00135 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;holdingPoint&#32;=&#32;holdingBody.transform.InverseTransformPoint(&#32;holdingBody.worldCenterOfMass&#32;+&#32;offset&#32;);
+00136 
+00137 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;hand.AttachObject(&#32;this.gameObject,&#32;startingGrabType,&#32;<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_complex_throwable_1a362dd7342445f9dd29afb10efe2bbce7">attachmentFlags</link>&#32;);
+00138 
+00139 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;Update&#32;holding&#32;list</emphasis>
+00140 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;holdingHands.Add(&#32;hand&#32;);
+00141 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;holdingBodies.Add(&#32;holdingBody&#32;);
+00142 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;holdingPoints.Add(&#32;holdingPoint&#32;);
+00143 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00144 
+00145 
+00146 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//-------------------------------------------------</emphasis>
+00147 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;<emphasis role="keywordtype">bool</emphasis>&#32;PhysicsDetach(&#32;Hand&#32;hand&#32;)
+00148 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00149 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordtype">int</emphasis>&#32;i&#32;=&#32;holdingHands.IndexOf(&#32;hand&#32;);
+00150 
+00151 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(&#32;i&#32;!=&#32;-1&#32;)
+00152 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00153 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;Detach&#32;this&#32;object&#32;from&#32;the&#32;hand</emphasis>
+00154 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;holdingHands[i].DetachObject(&#32;this.gameObject,&#32;<emphasis role="keyword">false</emphasis>&#32;);
+00155 
+00156 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;Allow&#32;the&#32;hand&#32;to&#32;do&#32;other&#32;things</emphasis>
+00157 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;holdingHands[i].HoverUnlock(&#32;<emphasis role="keyword">null</emphasis>&#32;);
+00158 
+00159 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;Delete&#32;any&#32;existing&#32;joints&#32;from&#32;the&#32;hand</emphasis>
+00160 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(&#32;<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_complex_throwable_1a58b4bbb34394f119cfcf82f94a241cb1">attachMode</link>&#32;==&#32;<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_complex_throwable_1a3767479e716ee64bf8f7b2d5d46c67b7">AttachMode</link>.FixedJoint&#32;)
+00161 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00162 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;Destroy(&#32;holdingHands[i].GetComponent&lt;FixedJoint&gt;()&#32;);
+00163 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00164 
+00165 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;Util.FastRemove(&#32;holdingHands,&#32;i&#32;);
+00166 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;Util.FastRemove(&#32;holdingBodies,&#32;i&#32;);
+00167 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;Util.FastRemove(&#32;holdingPoints,&#32;i&#32;);
+00168 
+00169 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;<emphasis role="keyword">true</emphasis>;
+00170 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00171 
+00172 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;<emphasis role="keyword">false</emphasis>;
+00173 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00174 
+00175 
+00176 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//-------------------------------------------------</emphasis>
+00177 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordtype">void</emphasis>&#32;FixedUpdate()
+00178 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00179 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(&#32;<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_complex_throwable_1a58b4bbb34394f119cfcf82f94a241cb1">attachMode</link>&#32;==&#32;<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_complex_throwable_1a3767479e716ee64bf8f7b2d5d46c67b7">AttachMode</link>.Force&#32;)
+00180 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00181 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">for</emphasis>&#32;(&#32;<emphasis role="keywordtype">int</emphasis>&#32;i&#32;=&#32;0;&#32;i&#32;&lt;&#32;holdingHands.Count;&#32;i++&#32;)
+00182 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00183 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;Vector3&#32;targetPoint&#32;=&#32;holdingBodies[i].transform.TransformPoint(&#32;holdingPoints[i]&#32;);
+00184 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;Vector3&#32;vdisplacement&#32;=&#32;holdingHands[i].transform.position&#32;-&#32;targetPoint;
+00185 
+00186 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;holdingBodies[i].AddForceAtPosition(&#32;<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_complex_throwable_1ace78cebf2593395beda7aba6d483297a">attachForce</link>&#32;*&#32;vdisplacement,&#32;targetPoint,&#32;ForceMode.Acceleration&#32;);
+00187 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;holdingBodies[i].AddForceAtPosition(&#32;-<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_complex_throwable_1a9d6bb0fbd46399b63e2f491ba37d5dea">attachForceDamper</link>&#32;*&#32;holdingBodies[i].GetPointVelocity(&#32;targetPoint&#32;),&#32;targetPoint,&#32;ForceMode.Acceleration&#32;);
+00188 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00189 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00190 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00191 &#32;&#32;&#32;&#32;}
+00192 }
+</programlisting></section>

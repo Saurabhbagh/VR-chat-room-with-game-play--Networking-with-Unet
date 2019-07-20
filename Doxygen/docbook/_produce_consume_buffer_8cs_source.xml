@@ -1,0 +1,126 @@
+<?xml version='1.0' encoding='UTF-8' standalone='no'?>
+<section xmlns="http://docbook.org/ns/docbook" version="5.0" xmlns:xlink="http://www.w3.org/1999/xlink" xml:id="__produce_consume_buffer_8cs_source">
+<title>ProduceConsumeBuffer.cs</title>
+<indexterm><primary>O:/GitHUBMINIPRoject/Assets/LeapMotion/Core/Scripts/DataStructures/ProduceConsumeBuffer.cs</primary></indexterm>
+<programlisting>00001 <emphasis role="comment">/******************************************************************************</emphasis>
+00002 <emphasis role="comment">&#32;*&#32;Copyright&#32;(C)&#32;Leap&#32;Motion,&#32;Inc.&#32;2011-2018.&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;*</emphasis>
+00003 <emphasis role="comment">&#32;*&#32;Leap&#32;Motion&#32;proprietary&#32;and&#32;confidential.&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;*</emphasis>
+00004 <emphasis role="comment">&#32;*&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;*</emphasis>
+00005 <emphasis role="comment">&#32;*&#32;Use&#32;subject&#32;to&#32;the&#32;terms&#32;of&#32;the&#32;Leap&#32;Motion&#32;SDK&#32;Agreement&#32;available&#32;at&#32;&#32;&#32;&#32;&#32;*</emphasis>
+00006 <emphasis role="comment">&#32;*&#32;https://developer.leapmotion.com/sdk_agreement,&#32;or&#32;another&#32;agreement&#32;&#32;&#32;&#32;&#32;&#32;&#32;*</emphasis>
+00007 <emphasis role="comment">&#32;*&#32;between&#32;Leap&#32;Motion&#32;and&#32;you,&#32;your&#32;company&#32;or&#32;other&#32;organization.&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;*</emphasis>
+00008 <emphasis role="comment">&#32;******************************************************************************/</emphasis>
+00009 
+00010 <emphasis role="keyword">using</emphasis>&#32;<link linkend="__balloon_8cs_1a7d67e097df9376eb709b6a23aa3c7d23">UnityEngine</link>;
+00011 <emphasis role="keyword">using</emphasis>&#32;System;
+00012 
+00013 <emphasis role="keyword">namespace&#32;</emphasis><link linkend="_namespace_leap_1_1_unity">Leap.Unity</link>&#32;{
+00014 
+<anchor xml:id="__produce_consume_buffer_8cs_source_1l00015"/><link linkend="_class_leap_1_1_unity_1_1_produce_consume_buffer">00015</link> &#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keyword">class&#32;</emphasis><link linkend="_class_leap_1_1_unity_1_1_produce_consume_buffer">ProduceConsumeBuffer</link>&lt;T&gt;&#32;{
+00016 &#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;T[]&#32;_buffer;
+00017 &#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;uint&#32;_bufferMask;
+00018 &#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;uint&#32;_head,&#32;_tail;
+00019 
+<anchor xml:id="__produce_consume_buffer_8cs_source_1l00030"/><link linkend="_class_leap_1_1_unity_1_1_produce_consume_buffer_1abb2dd45e9fdf9542e1392a16b5a19a9e">00030</link> &#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<link linkend="_class_leap_1_1_unity_1_1_produce_consume_buffer_1abb2dd45e9fdf9542e1392a16b5a19a9e">ProduceConsumeBuffer</link>(<emphasis role="keywordtype">int</emphasis>&#32;minCapacity)&#32;{
+00031 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(minCapacity&#32;&lt;=&#32;0)&#32;{
+00032 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">throw</emphasis>&#32;<emphasis role="keyword">new</emphasis>&#32;ArgumentOutOfRangeException(<emphasis role="stringliteral">&quot;The&#32;capacity&#32;of&#32;the&#32;ProduceConsumeBuffer&#32;must&#32;be&#32;positive&#32;and&#32;non-zero.&quot;</emphasis>);
+00033 &#32;&#32;&#32;&#32;&#32;&#32;}
+00034 
+00035 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordtype">int</emphasis>&#32;capacity;
+00036 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordtype">int</emphasis>&#32;closestPowerOfTwo&#32;=&#32;Mathf.ClosestPowerOfTwo(minCapacity);
+00037 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(closestPowerOfTwo&#32;==&#32;minCapacity)&#32;{
+00038 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;capacity&#32;=&#32;minCapacity;
+00039 &#32;&#32;&#32;&#32;&#32;&#32;}&#32;<emphasis role="keywordflow">else</emphasis>&#32;{
+00040 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(closestPowerOfTwo&#32;&lt;&#32;minCapacity)&#32;{
+00041 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;capacity&#32;=&#32;closestPowerOfTwo&#32;*&#32;2;
+00042 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}&#32;<emphasis role="keywordflow">else</emphasis>&#32;{
+00043 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;capacity&#32;=&#32;closestPowerOfTwo;
+00044 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00045 &#32;&#32;&#32;&#32;&#32;&#32;}
+00046 
+00047 &#32;&#32;&#32;&#32;&#32;&#32;_buffer&#32;=&#32;<emphasis role="keyword">new</emphasis>&#32;T[capacity];
+00048 &#32;&#32;&#32;&#32;&#32;&#32;_bufferMask&#32;=&#32;(uint)(capacity&#32;-&#32;1);
+00049 &#32;&#32;&#32;&#32;&#32;&#32;_head&#32;=&#32;0;
+00050 &#32;&#32;&#32;&#32;&#32;&#32;_tail&#32;=&#32;0;
+00051 &#32;&#32;&#32;&#32;}
+00052 
+<anchor xml:id="__produce_consume_buffer_8cs_source_1l00056"/><link linkend="_class_leap_1_1_unity_1_1_produce_consume_buffer_1a04753532a728b38e5cc0226c797fbef1">00056</link> &#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keywordtype">int</emphasis>&#32;<link linkend="_class_leap_1_1_unity_1_1_produce_consume_buffer_1a04753532a728b38e5cc0226c797fbef1">Capacity</link>&#32;{
+00057 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">get</emphasis>&#32;{
+00058 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;_buffer.Length;
+00059 &#32;&#32;&#32;&#32;&#32;&#32;}
+00060 &#32;&#32;&#32;&#32;}
+00061 
+<anchor xml:id="__produce_consume_buffer_8cs_source_1l00065"/><link linkend="_class_leap_1_1_unity_1_1_produce_consume_buffer_1ab7a378bf347d928035288ae0e790b938">00065</link> &#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keywordtype">int</emphasis>&#32;<link linkend="_class_leap_1_1_unity_1_1_produce_consume_buffer_1ab7a378bf347d928035288ae0e790b938">Count</link>&#32;{
+00066 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">get</emphasis>&#32;{
+00067 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordtype">int</emphasis>&#32;tail&#32;=&#32;(int)_tail;
+00068 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordtype">int</emphasis>&#32;head&#32;=&#32;(int)_head;
+00069 
+00070 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(tail&#32;&lt;&#32;head)&#32;{
+00071 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;tail&#32;+=&#32;<link linkend="_class_leap_1_1_unity_1_1_produce_consume_buffer_1a04753532a728b38e5cc0226c797fbef1">Capacity</link>;
+00072 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00073 
+00074 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;tail&#32;-&#32;head;
+00075 &#32;&#32;&#32;&#32;&#32;&#32;}
+00076 &#32;&#32;&#32;&#32;}
+00077 
+<anchor xml:id="__produce_consume_buffer_8cs_source_1l00083"/><link linkend="_class_leap_1_1_unity_1_1_produce_consume_buffer_1a2c3eaa1d8aafc68cf6d8d020ae47e4de">00083</link> &#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keywordtype">bool</emphasis>&#32;<link linkend="_class_leap_1_1_unity_1_1_produce_consume_buffer_1a2c3eaa1d8aafc68cf6d8d020ae47e4de">TryEnqueue</link>(ref&#32;T&#32;t)&#32;{
+00084 &#32;&#32;&#32;&#32;&#32;&#32;uint&#32;nextTail&#32;=&#32;(_tail&#32;+&#32;1)&#32;&amp;&#32;_bufferMask;
+00085 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(nextTail&#32;==&#32;_head)&#32;<emphasis role="keywordflow">return</emphasis>&#32;<emphasis role="keyword">false</emphasis>;
+00086 
+00087 &#32;&#32;&#32;&#32;&#32;&#32;_buffer[_tail]&#32;=&#32;t;
+00088 &#32;&#32;&#32;&#32;&#32;&#32;_tail&#32;=&#32;nextTail;
+00089 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;<emphasis role="keyword">true</emphasis>;
+00090 &#32;&#32;&#32;&#32;}
+00091 
+<anchor xml:id="__produce_consume_buffer_8cs_source_1l00097"/><link linkend="_class_leap_1_1_unity_1_1_produce_consume_buffer_1ae80a5be8a8e07eb8b922fdfca764f1da">00097</link> &#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keywordtype">bool</emphasis>&#32;<link linkend="_class_leap_1_1_unity_1_1_produce_consume_buffer_1ae80a5be8a8e07eb8b922fdfca764f1da">TryEnqueue</link>(T&#32;t)&#32;{
+00098 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;<link linkend="_class_leap_1_1_unity_1_1_produce_consume_buffer_1a2c3eaa1d8aafc68cf6d8d020ae47e4de">TryEnqueue</link>(ref&#32;t);
+00099 &#32;&#32;&#32;&#32;}
+00100 
+<anchor xml:id="__produce_consume_buffer_8cs_source_1l00109"/><link linkend="_class_leap_1_1_unity_1_1_produce_consume_buffer_1a4884c0e9c693c92439a2bc7fe99275e9">00109</link> &#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keywordtype">bool</emphasis>&#32;<link linkend="_class_leap_1_1_unity_1_1_produce_consume_buffer_1a4884c0e9c693c92439a2bc7fe99275e9">TryPeek</link>(out&#32;T&#32;t)&#32;{
+00110 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(<link linkend="_class_leap_1_1_unity_1_1_produce_consume_buffer_1ab7a378bf347d928035288ae0e790b938">Count</link>&#32;==&#32;0)&#32;{
+00111 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;t&#32;=&#32;<emphasis role="keywordflow">default</emphasis>(T);
+00112 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;<emphasis role="keyword">false</emphasis>;
+00113 &#32;&#32;&#32;&#32;&#32;&#32;}&#32;<emphasis role="keywordflow">else</emphasis>&#32;{
+00114 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//No&#32;risk&#32;of&#32;an&#32;enqueue&#32;corrupting&#32;this&#32;element&#32;</emphasis>
+00115 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//since&#32;we&#32;don&apos;t&#32;modify&#32;head&#32;or&#32;tail,&#32;an&#32;enqueue&#32;targeting&#32;this&#32;element</emphasis>
+00116 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//would&#32;fail.</emphasis>
+00117 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;t&#32;=&#32;_buffer[_head];
+00118 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;<emphasis role="keyword">true</emphasis>;
+00119 &#32;&#32;&#32;&#32;&#32;&#32;}
+00120 &#32;&#32;&#32;&#32;}
+00121 
+<anchor xml:id="__produce_consume_buffer_8cs_source_1l00127"/><link linkend="_class_leap_1_1_unity_1_1_produce_consume_buffer_1a8974fa947fcc940620300c54d3de6f1b">00127</link> &#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keywordtype">bool</emphasis>&#32;<link linkend="_class_leap_1_1_unity_1_1_produce_consume_buffer_1a8974fa947fcc940620300c54d3de6f1b">TryDequeue</link>(out&#32;T&#32;t)&#32;{
+00128 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(_tail&#32;==&#32;_head)&#32;{
+00129 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;t&#32;=&#32;<emphasis role="keywordflow">default</emphasis>(T);
+00130 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;<emphasis role="keyword">false</emphasis>;
+00131 &#32;&#32;&#32;&#32;&#32;&#32;}
+00132 
+00133 &#32;&#32;&#32;&#32;&#32;&#32;t&#32;=&#32;_buffer[_head];
+00134 &#32;&#32;&#32;&#32;&#32;&#32;_head&#32;=&#32;(_head&#32;+&#32;1)&#32;&amp;&#32;_bufferMask;
+00135 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;<emphasis role="keyword">true</emphasis>;
+00136 &#32;&#32;&#32;&#32;}
+00137 
+<anchor xml:id="__produce_consume_buffer_8cs_source_1l00143"/><link linkend="_class_leap_1_1_unity_1_1_produce_consume_buffer_1a0a756b193a73f2ab9dd21a89dce33b65">00143</link> &#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keywordtype">bool</emphasis>&#32;<link linkend="_class_leap_1_1_unity_1_1_produce_consume_buffer_1a0a756b193a73f2ab9dd21a89dce33b65">TryDequeue</link>()&#32;{
+00144 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(_tail&#32;==&#32;_head)&#32;{
+00145 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;<emphasis role="keyword">false</emphasis>;
+00146 &#32;&#32;&#32;&#32;&#32;&#32;}
+00147 
+00148 &#32;&#32;&#32;&#32;&#32;&#32;_head&#32;=&#32;(_head&#32;+&#32;1)&#32;&amp;&#32;_bufferMask;
+00149 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;<emphasis role="keyword">true</emphasis>;
+00150 &#32;&#32;&#32;&#32;}
+00151 
+<anchor xml:id="__produce_consume_buffer_8cs_source_1l00157"/><link linkend="_class_leap_1_1_unity_1_1_produce_consume_buffer_1a72a0d4ce3f8ec48ed46fa80f5944f988">00157</link> &#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keywordtype">bool</emphasis>&#32;<link linkend="_class_leap_1_1_unity_1_1_produce_consume_buffer_1a72a0d4ce3f8ec48ed46fa80f5944f988">TryDequeueAll</link>(out&#32;T&#32;mostRecent)&#32;{
+00158 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(!<link linkend="_class_leap_1_1_unity_1_1_produce_consume_buffer_1a0a756b193a73f2ab9dd21a89dce33b65">TryDequeue</link>(out&#32;mostRecent))&#32;{
+00159 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;<emphasis role="keyword">false</emphasis>;
+00160 &#32;&#32;&#32;&#32;&#32;&#32;}
+00161 
+00162 &#32;&#32;&#32;&#32;&#32;&#32;T&#32;temp;
+00163 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">while</emphasis>&#32;(<link linkend="_class_leap_1_1_unity_1_1_produce_consume_buffer_1a0a756b193a73f2ab9dd21a89dce33b65">TryDequeue</link>(out&#32;temp))&#32;{
+00164 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;mostRecent&#32;=&#32;temp;
+00165 &#32;&#32;&#32;&#32;&#32;&#32;}
+00166 
+00167 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;<emphasis role="keyword">true</emphasis>;
+00168 &#32;&#32;&#32;&#32;}
+00169 &#32;&#32;}
+00170 }
+</programlisting></section>

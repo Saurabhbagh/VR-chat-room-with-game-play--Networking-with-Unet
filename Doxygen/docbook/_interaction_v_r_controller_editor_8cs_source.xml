@@ -1,0 +1,105 @@
+<?xml version='1.0' encoding='UTF-8' standalone='no'?>
+<section xmlns="http://docbook.org/ns/docbook" version="5.0" xmlns:xlink="http://www.w3.org/1999/xlink" xml:id="__interaction_v_r_controller_editor_8cs_source">
+<title>InteractionVRControllerEditor.cs</title>
+<indexterm><primary>O:/GitHUBMINIPRoject/Assets/LeapMotion/Modules/InteractionEngine/Scripts/Editor/InteractionVRControllerEditor.cs</primary></indexterm>
+<programlisting>00001 <emphasis role="comment">/******************************************************************************</emphasis>
+00002 <emphasis role="comment">&#32;*&#32;Copyright&#32;(C)&#32;Leap&#32;Motion,&#32;Inc.&#32;2011-2018.&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;*</emphasis>
+00003 <emphasis role="comment">&#32;*&#32;Leap&#32;Motion&#32;proprietary&#32;and&#32;confidential.&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;*</emphasis>
+00004 <emphasis role="comment">&#32;*&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;*</emphasis>
+00005 <emphasis role="comment">&#32;*&#32;Use&#32;subject&#32;to&#32;the&#32;terms&#32;of&#32;the&#32;Leap&#32;Motion&#32;SDK&#32;Agreement&#32;available&#32;at&#32;&#32;&#32;&#32;&#32;*</emphasis>
+00006 <emphasis role="comment">&#32;*&#32;https://developer.leapmotion.com/sdk_agreement,&#32;or&#32;another&#32;agreement&#32;&#32;&#32;&#32;&#32;&#32;&#32;*</emphasis>
+00007 <emphasis role="comment">&#32;*&#32;between&#32;Leap&#32;Motion&#32;and&#32;you,&#32;your&#32;company&#32;or&#32;other&#32;organization.&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;*</emphasis>
+00008 <emphasis role="comment">&#32;******************************************************************************/</emphasis>
+00009 
+00010 <emphasis role="keyword">using</emphasis>&#32;<link linkend="_namespace_leap">Leap</link>.<link linkend="_namespace_leap_1_1_unity">Unity</link>.<link linkend="_namespace_leap_1_1_unity_1_1_query">Query</link>;
+00011 <emphasis role="keyword">using</emphasis>&#32;System;
+00012 <emphasis role="keyword">using</emphasis>&#32;System.Collections;
+00013 <emphasis role="keyword">using</emphasis>&#32;System.Collections.Generic;
+00014 <emphasis role="keyword">using</emphasis>&#32;<link linkend="_namespace_unity_editor">UnityEditor</link>;
+00015 <emphasis role="keyword">using</emphasis>&#32;<link linkend="__balloon_8cs_1a7d67e097df9376eb709b6a23aa3c7d23">UnityEngine</link>;
+00016 
+00017 <emphasis role="keyword">namespace&#32;</emphasis><link linkend="_namespace_leap_1_1_unity_1_1_interaction">Leap.Unity.Interaction</link>&#32;{
+00018 
+00019 &#32;&#32;[CanEditMultipleObjects]
+00020 &#32;&#32;[CustomEditor(typeof(InteractionXRController),&#32;<emphasis role="keyword">true</emphasis>)]
+<anchor xml:id="__interaction_v_r_controller_editor_8cs_source_1l00021"/><link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_v_r_controller_editor">00021</link> &#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keyword">class&#32;</emphasis><link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_v_r_controller_editor">InteractionVRControllerEditor</link>&#32;:&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_controller_editor">InteractionControllerEditor</link>&#32;{
+00022 
+00023 &#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;List&lt;InteractionXRController&gt;&#32;_vrControllers;
+00024 
+00025 &#32;&#32;&#32;&#32;<emphasis role="keywordtype">bool</emphasis>&#32;_pluralPossibleControllers&#32;=&#32;<emphasis role="keyword">false</emphasis>;
+00026 
+<anchor xml:id="__interaction_v_r_controller_editor_8cs_source_1l00027"/><link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_v_r_controller_editor_1a0f59ab3b008018e73fe47191667c07f2">00027</link> &#32;&#32;&#32;&#32;<emphasis role="keyword">protected</emphasis>&#32;<emphasis role="keyword">override</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_v_r_controller_editor_1a0f59ab3b008018e73fe47191667c07f2">OnEnable</link>()&#32;{
+00028 &#32;&#32;&#32;&#32;&#32;&#32;base.OnEnable();
+00029 
+00030 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//_vrController&#32;=&#32;(target&#32;as&#32;InteractionVRController);</emphasis>
+00031 &#32;&#32;&#32;&#32;&#32;&#32;_vrControllers&#32;=&#32;<link linkend="_class_leap_1_1_unity_1_1_custom_editor_base_1ab3c7d33ed1e58869160ccc7d1a189264">targets</link>.Query()
+00032 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;.Where(c&#32;=&gt;&#32;c&#32;is&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_x_r_controller">InteractionXRController</link>)
+00033 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;.Cast&lt;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_x_r_controller">InteractionXRController</link>&gt;()
+00034 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;.ToList();
+00035 &#32;&#32;&#32;&#32;&#32;&#32;_pluralPossibleControllers&#32;=&#32;_vrControllers.Count&#32;&gt;&#32;1;
+00036 
+00037 &#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_leap_1_1_unity_1_1_custom_editor_base_1a9b40a6fa85eec234563632935f08e7e1">specifyCustomPostDecorator</link>(<emphasis role="stringliteral">&quot;graspButtonAxis&quot;</emphasis>,&#32;drawGraspButtonAxisDecorator);
+00038 &#32;&#32;&#32;&#32;}
+00039 
+00040 &#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;drawGraspButtonAxisDecorator(SerializedProperty&#32;property)&#32;{
+00041 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;Whether&#32;the&#32;axis&#32;is&#32;overriden.</emphasis>
+00042 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordtype">int</emphasis>&#32;numGraspAxisOverrides&#32;=&#32;_vrControllers.Query()
+00043 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;.Where(c&#32;=&gt;&#32;c.graspAxisOverride&#32;!=&#32;<emphasis role="keyword">null</emphasis>)
+00044 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;.Count();
+00045 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordtype">bool</emphasis>&#32;anyGraspAxisOverrides&#32;=&#32;numGraspAxisOverrides&#32;&gt;&#32;0;
+00046 
+00047 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(anyGraspAxisOverrides)&#32;{
+00048 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordtype">string</emphasis>&#32;graspAxisOverrideMessage;
+00049 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(_pluralPossibleControllers)&#32;{
+00050 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;graspAxisOverrideMessage&#32;=&#32;<emphasis role="stringliteral">&quot;One&#32;or&#32;more&#32;currently&#32;selected&#32;interaction&#32;VR&#32;&quot;</emphasis>
+00051 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;+&#32;<emphasis role="stringliteral">&quot;controllers&#32;has&#32;their&#32;grasping&#32;axis&#32;overridden,&#32;&quot;</emphasis>
+00052 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;+&#32;<emphasis role="stringliteral">&quot;so&#32;their&#32;graspButtonAxis&#32;settings&#32;will&#32;be&#32;ignored.&quot;</emphasis>;
+00053 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00054 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">else</emphasis>&#32;{
+00055 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;graspAxisOverrideMessage&#32;=&#32;<emphasis role="stringliteral">&quot;This&#32;interaction&#32;VR&#32;controller&#32;has&#32;its&#32;grasping&#32;&quot;</emphasis>
+00056 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;+&#32;<emphasis role="stringliteral">&quot;axis&#32;overridden,&#32;so&#32;the&#32;graspButtonAxis&#32;setting&#32;&quot;</emphasis>
+00057 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;+&#32;<emphasis role="stringliteral">&quot;will&#32;be&#32;ignored.&quot;</emphasis>;
+00058 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00059 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;EditorGUILayout.HelpBox(graspAxisOverrideMessage,&#32;MessageType.Info);
+00060 &#32;&#32;&#32;&#32;&#32;&#32;}
+00061 
+00062 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;Whether&#32;the&#32;axis&#32;is&#32;valid.</emphasis>
+00063 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordtype">bool</emphasis>&#32;anyInvalidGraspAxes&#32;=&#32;_vrControllers.Query()
+00064 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;.Select(c&#32;=&gt;&#32;isGraspAxisConfigured(c))
+00065 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;.Where(b&#32;=&gt;&#32;b&#32;==&#32;<emphasis role="keyword">false</emphasis>)
+00066 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;.Any();
+00067 
+00068 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(anyInvalidGraspAxes)&#32;{
+00069 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordtype">string</emphasis>&#32;graspAxisInvalidMessage;
+00070 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(_pluralPossibleControllers)&#32;{
+00071 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;graspAxisInvalidMessage&#32;=&#32;<emphasis role="stringliteral">&quot;One&#32;or&#32;more&#32;currently&#32;selected&#32;interaction&#32;VR&#32;&quot;</emphasis>
+00072 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;+&#32;<emphasis role="stringliteral">&quot;controllers&#32;is&#32;configured&#32;with&#32;a&#32;grasping&#32;axis&#32;name&#32;&quot;</emphasis>
+00073 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;+&#32;<emphasis role="stringliteral">&quot;that&#32;is&#32;not&#32;set&#32;up&#32;in&#32;Unity&apos;s&#32;Input&#32;settings.&quot;</emphasis>;
+00074 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00075 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">else</emphasis>&#32;{
+00076 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;graspAxisInvalidMessage&#32;=&#32;<emphasis role="stringliteral">&quot;This&#32;interaction&#32;VR&#32;controller&#32;is&#32;configured&#32;with&#32;a&#32;&quot;</emphasis>
+00077 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;+&#32;<emphasis role="stringliteral">&quot;grasping&#32;axis&#32;name&#32;that&#32;is&#32;not&#32;set&#32;up&#32;in&#32;Unity&apos;s&#32;&quot;</emphasis>
+00078 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;+&#32;<emphasis role="stringliteral">&quot;Input&#32;settings.&quot;</emphasis>;
+00079 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00080 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;graspAxisInvalidMessage&#32;+=&#32;<emphasis role="stringliteral">&quot;&#32;Check&#32;your&#32;input&#32;settings&#32;via&#32;Edit&#32;-&gt;&#32;Project&#32;&quot;</emphasis>
+00081 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;+&#32;<emphasis role="stringliteral">&quot;Settings&#32;-&gt;&#32;Input.&#32;Otherwise,&#32;this&#32;interaction&#32;&quot;</emphasis>
+00082 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;+&#32;<emphasis role="stringliteral">&quot;controller&#32;will&#32;be&#32;unable&#32;to&#32;grasp&#32;objects.&quot;</emphasis>;
+00083 
+00084 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;EditorGUILayout.HelpBox(graspAxisInvalidMessage,&#32;MessageType.Warning);
+00085 &#32;&#32;&#32;&#32;&#32;&#32;}
+00086 &#32;&#32;&#32;&#32;}
+00087 
+00088 &#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;<emphasis role="keywordtype">bool</emphasis>&#32;isGraspAxisConfigured(InteractionXRController&#32;controller)&#32;{
+00089 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">try</emphasis>&#32;{
+00090 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;Input.GetAxis(controller.graspButtonAxis);
+00091 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;<emphasis role="keyword">true</emphasis>;
+00092 &#32;&#32;&#32;&#32;&#32;&#32;}
+00093 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">catch</emphasis>&#32;(ArgumentException)&#32;{
+00094 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;<emphasis role="keyword">false</emphasis>;
+00095 &#32;&#32;&#32;&#32;&#32;&#32;}
+00096 &#32;&#32;&#32;&#32;}
+00097 
+00098 &#32;&#32;}
+00099 
+00100 }
+</programlisting></section>

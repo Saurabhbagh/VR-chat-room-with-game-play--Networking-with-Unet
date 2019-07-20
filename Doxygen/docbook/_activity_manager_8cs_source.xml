@@ -1,0 +1,155 @@
+<?xml version='1.0' encoding='UTF-8' standalone='no'?>
+<section xmlns="http://docbook.org/ns/docbook" version="5.0" xmlns:xlink="http://www.w3.org/1999/xlink" xml:id="__activity_manager_8cs_source">
+<title>ActivityManager.cs</title>
+<indexterm><primary>O:/GitHUBMINIPRoject/Assets/LeapMotion/Modules/InteractionEngine/Scripts/Utility/ActivityManager.cs</primary></indexterm>
+<programlisting>00001 <emphasis role="comment">/******************************************************************************</emphasis>
+00002 <emphasis role="comment">&#32;*&#32;Copyright&#32;(C)&#32;Leap&#32;Motion,&#32;Inc.&#32;2011-2018.&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;*</emphasis>
+00003 <emphasis role="comment">&#32;*&#32;Leap&#32;Motion&#32;proprietary&#32;and&#32;confidential.&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;*</emphasis>
+00004 <emphasis role="comment">&#32;*&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;*</emphasis>
+00005 <emphasis role="comment">&#32;*&#32;Use&#32;subject&#32;to&#32;the&#32;terms&#32;of&#32;the&#32;Leap&#32;Motion&#32;SDK&#32;Agreement&#32;available&#32;at&#32;&#32;&#32;&#32;&#32;*</emphasis>
+00006 <emphasis role="comment">&#32;*&#32;https://developer.leapmotion.com/sdk_agreement,&#32;or&#32;another&#32;agreement&#32;&#32;&#32;&#32;&#32;&#32;&#32;*</emphasis>
+00007 <emphasis role="comment">&#32;*&#32;between&#32;Leap&#32;Motion&#32;and&#32;you,&#32;your&#32;company&#32;or&#32;other&#32;organization.&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;*</emphasis>
+00008 <emphasis role="comment">&#32;******************************************************************************/</emphasis>
+00009 
+00010 <emphasis role="keyword">using</emphasis>&#32;<link linkend="_namespace_leap">Leap</link>.<link linkend="_namespace_leap_1_1_unity">Unity</link>.<link linkend="_namespace_leap_1_1_unity_1_1_interaction">Interaction</link>.<link linkend="_namespace_leap_1_1_unity_1_1_interaction_1_1_internal">Internal</link>;
+00011 <emphasis role="keyword">using</emphasis>&#32;<link linkend="_namespace_leap">Leap</link>.<link linkend="_namespace_leap_1_1_unity">Unity</link>.<link linkend="_namespace_leap_1_1_unity_1_1_space">Space</link>;
+00012 <emphasis role="keyword">using</emphasis>&#32;System;
+00013 <emphasis role="keyword">using</emphasis>&#32;System.Collections.Generic;
+00014 <emphasis role="keyword">using</emphasis>&#32;<link linkend="__balloon_8cs_1a7d67e097df9376eb709b6a23aa3c7d23">UnityEngine</link>;
+00015 
+00016 <emphasis role="keyword">namespace&#32;</emphasis><link linkend="_namespace_leap_1_1_unity_1_1_interaction">Leap.Unity.Interaction</link>&#32;{
+00017 
+<anchor xml:id="__activity_manager_8cs_source_1l00024"/><link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_activity_manager">00024</link> &#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keyword">class&#32;</emphasis><link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_activity_manager">ActivityManager</link>&lt;T&gt;&#32;{
+00025 
+<anchor xml:id="__activity_manager_8cs_source_1l00027"/><link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_activity_manager_1ae47334dd4fde13e8908798fe74cb4e52">00027</link> &#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keywordtype">float</emphasis>&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_activity_manager_1ae47334dd4fde13e8908798fe74cb4e52">activationRadius</link>;
+00028 
+<anchor xml:id="__activity_manager_8cs_source_1l00038"/><link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_activity_manager_1a9309b4766f479c3fa53aedae93ccb060">00038</link> &#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keywordtype">int</emphasis>&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_activity_manager_1a9309b4766f479c3fa53aedae93ccb060">activationLayerMask</link>&#32;=&#32;~0;
+00039 
+<anchor xml:id="__activity_manager_8cs_source_1l00045"/><link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_activity_manager_1a37e3a110090bac9e2498bb3f978c823f">00045</link> &#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;Func&lt;int&gt;&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_activity_manager_1a37e3a110090bac9e2498bb3f978c823f">activationLayerFunction</link>&#32;=&#32;<emphasis role="keyword">null</emphasis>;
+00046 
+<anchor xml:id="__activity_manager_8cs_source_1l00054"/><link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_activity_manager_1ac8bb61c2fa074a351cfc4e7a44a0656b">00054</link> &#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;Func&lt;Collider,&#32;T&gt;&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_activity_manager_1ac8bb61c2fa074a351cfc4e7a44a0656b">filter</link>&#32;=&#32;<emphasis role="keyword">null</emphasis>;
+00055 
+00056 &#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;HashSet&lt;T&gt;&#32;_activeObjects&#32;=&#32;<emphasis role="keyword">new</emphasis>&#32;HashSet&lt;T&gt;();
+<anchor xml:id="__activity_manager_8cs_source_1l00060"/><link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_activity_manager_1a6eb798f1ce61155a8ae329cf61d750df">00060</link> &#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;HashSet&lt;T&gt;&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_activity_manager_1a6eb798f1ce61155a8ae329cf61d750df">ActiveObjects</link>&#32;{&#32;<emphasis role="keyword">get</emphasis>&#32;{&#32;<emphasis role="keywordflow">return</emphasis>&#32;_activeObjects;&#32;}&#32;}
+00061 
+<anchor xml:id="__activity_manager_8cs_source_1l00066"/><link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_activity_manager_1a0b0c3f27c558d986f943f9f3c1e914d3">00066</link> &#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keywordtype">bool</emphasis>&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_activity_manager_1a0b0c3f27c558d986f943f9f3c1e914d3">trackStateChanges</link>&#32;=&#32;<emphasis role="keyword">false</emphasis>;
+00067 &#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;HashSet&lt;T&gt;&#32;_activeObjectsLastFrame&#32;=&#32;<emphasis role="keyword">new</emphasis>&#32;HashSet&lt;T&gt;();
+00068 &#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;HashSet&lt;T&gt;&#32;_beganActiveObjects&#32;=&#32;<emphasis role="keyword">new</emphasis>&#32;HashSet&lt;T&gt;();
+<anchor xml:id="__activity_manager_8cs_source_1l00073"/><link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_activity_manager_1ac60a3543eabcf6162b4ded1d28e5fc0b">00073</link> &#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;HashSet&lt;T&gt;&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_activity_manager_1ac60a3543eabcf6162b4ded1d28e5fc0b">BeganActive</link>&#32;{
+00074 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">get</emphasis>&#32;{&#32;<emphasis role="keywordflow">return</emphasis>&#32;_beganActiveObjects;&#32;}
+00075 &#32;&#32;&#32;&#32;}
+00076 &#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;HashSet&lt;T&gt;&#32;_endedActiveObjects&#32;=&#32;<emphasis role="keyword">new</emphasis>&#32;HashSet&lt;T&gt;();
+<anchor xml:id="__activity_manager_8cs_source_1l00081"/><link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_activity_manager_1a8bb4ce485e63f6a02ddb97f8c420b72a">00081</link> &#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;HashSet&lt;T&gt;&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_activity_manager_1a8bb4ce485e63f6a02ddb97f8c420b72a">EndedActive</link>&#32;{
+00082 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">get</emphasis>&#32;{&#32;<emphasis role="keywordflow">return</emphasis>&#32;_endedActiveObjects;&#32;}
+00083 &#32;&#32;&#32;&#32;}
+00084 
+<anchor xml:id="__activity_manager_8cs_source_1l00085"/><link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_activity_manager_1a0cb68553a311b475892432f29e81804a">00085</link> &#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_activity_manager_1a0cb68553a311b475892432f29e81804a">ActivityManager</link>(<emphasis role="keywordtype">float</emphasis>&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_activity_manager_1ae47334dd4fde13e8908798fe74cb4e52">activationRadius</link>,&#32;Func&lt;Collider,&#32;T&gt;&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_activity_manager_1ac8bb61c2fa074a351cfc4e7a44a0656b">filter</link>)&#32;{
+00086 &#32;&#32;&#32;&#32;&#32;&#32;this.activationRadius&#32;=&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_activity_manager_1ae47334dd4fde13e8908798fe74cb4e52">activationRadius</link>;
+00087 &#32;&#32;&#32;&#32;&#32;&#32;this.filter&#32;=&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_activity_manager_1ac8bb61c2fa074a351cfc4e7a44a0656b">filter</link>;
+00088 &#32;&#32;&#32;&#32;}
+00089 
+00090 &#32;&#32;&#32;&#32;[ThreadStatic]
+00091 &#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;<emphasis role="keyword">static</emphasis>&#32;Collider[]&#32;s_colliderResultsBuffer&#32;=&#32;<emphasis role="keyword">new</emphasis>&#32;Collider[32];
+<anchor xml:id="__activity_manager_8cs_source_1l00092"/><link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_activity_manager_1a26118f4813558f0c2258acea8e47a0a0">00092</link> &#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_activity_manager_1a26118f4813558f0c2258acea8e47a0a0">UpdateActivityQuery</link>(Vector3?&#32;queryPosition,&#32;List&lt;LeapSpace&gt;&#32;spaces&#32;=&#32;<emphasis role="keyword">null</emphasis>)&#32;{
+00093 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">using</emphasis>&#32;(<emphasis role="keyword">new</emphasis>&#32;<link linkend="_struct_leap_1_1_unity_1_1_profiler_sample">ProfilerSample</link>(<emphasis role="stringliteral">&quot;Update&#32;Activity&#32;Manager&quot;</emphasis>))&#32;{
+00094 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">using</emphasis>&#32;(<emphasis role="keyword">new</emphasis>&#32;<link linkend="_struct_leap_1_1_unity_1_1_profiler_sample">ProfilerSample</link>(<emphasis role="stringliteral">&quot;Initialize&#32;Buffers&quot;</emphasis>))&#32;{
+00095 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;_activeObjects.Clear();
+00096 
+00097 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;Make&#32;sure&#32;collider&#32;results&#32;buffer&#32;exists&#32;(for&#32;other&#32;threads;&#32;see&#32;ThreadStatic)</emphasis>
+00098 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(s_colliderResultsBuffer&#32;==&#32;<emphasis role="keyword">null</emphasis>&#32;||&#32;s_colliderResultsBuffer.Length&#32;&lt;&#32;32)&#32;{
+00099 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;s_colliderResultsBuffer&#32;=&#32;<emphasis role="keyword">new</emphasis>&#32;Collider[32];
+00100 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00101 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00102 
+00103 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;Update&#32;object&#32;activity&#32;by&#32;activation&#32;radius&#32;around&#32;the&#32;query&#32;position&#32;(PhysX&#32;colliders&#32;necessary).</emphasis>
+00104 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;queryPosition&#32;can&#32;be&#32;null,&#32;in&#32;which&#32;case&#32;no&#32;objects&#32;will&#32;be&#32;found,&#32;and&#32;they&#32;will&#32;all&#32;become&#32;inactive.</emphasis>
+00105 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(queryPosition.HasValue)&#32;{
+00106 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;Vector3&#32;actualQueryPosition&#32;=&#32;queryPosition.GetValueOrDefault();
+00107 
+00108 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordtype">int</emphasis>&#32;count&#32;=&#32;GetSphereColliderResults(actualQueryPosition,&#32;ref&#32;s_colliderResultsBuffer);
+00109 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;UpdateActiveList(count,&#32;s_colliderResultsBuffer);
+00110 
+00111 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">using</emphasis>&#32;(<emphasis role="keyword">new</emphasis>&#32;<link linkend="_struct_leap_1_1_unity_1_1_profiler_sample">ProfilerSample</link>(<emphasis role="stringliteral">&quot;Check&#32;GUI&#32;Spaces&quot;</emphasis>))&#32;{
+00112 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(spaces&#32;!=&#32;<emphasis role="keyword">null</emphasis>)&#32;{
+00113 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//Check&#32;once&#32;in&#32;each&#32;of&#32;the&#32;GUI&apos;s&#32;subspaces</emphasis>
+00114 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">foreach</emphasis>&#32;(<link linkend="_class_leap_1_1_unity_1_1_space_1_1_leap_space">LeapSpace</link>&#32;space&#32;<emphasis role="keywordflow">in</emphasis>&#32;spaces)&#32;{
+00115 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;count&#32;=&#32;GetSphereColliderResults(transformPoint(actualQueryPosition,&#32;space),&#32;ref&#32;s_colliderResultsBuffer);
+00116 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;UpdateActiveList(count,&#32;s_colliderResultsBuffer);
+00117 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00118 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00119 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00120 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00121 
+00122 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">using</emphasis>&#32;(<emphasis role="keyword">new</emphasis>&#32;<link linkend="_struct_leap_1_1_unity_1_1_profiler_sample">ProfilerSample</link>(<emphasis role="stringliteral">&quot;Track&#32;State&#32;Changes&quot;</emphasis>))&#32;{
+00123 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_activity_manager_1a0b0c3f27c558d986f943f9f3c1e914d3">trackStateChanges</link>)&#32;{
+00124 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;_endedActiveObjects.Clear();
+00125 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;_beganActiveObjects.Clear();
+00126 
+00127 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">foreach</emphasis>&#32;(var&#32;behaviour&#32;<emphasis role="keywordflow">in</emphasis>&#32;_activeObjects)&#32;{
+00128 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(!_activeObjectsLastFrame.Contains(behaviour))&#32;{
+00129 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;_beganActiveObjects.Add(behaviour);
+00130 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00131 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00132 
+00133 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">foreach</emphasis>&#32;(var&#32;behaviour&#32;<emphasis role="keywordflow">in</emphasis>&#32;_activeObjectsLastFrame)&#32;{
+00134 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(!_activeObjects.Contains(behaviour))&#32;{
+00135 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;_endedActiveObjects.Add(behaviour);
+00136 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00137 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00138 
+00139 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;_activeObjectsLastFrame.Clear();
+00140 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">foreach</emphasis>&#32;(var&#32;behaviour&#32;<emphasis role="keywordflow">in</emphasis>&#32;_activeObjects)&#32;{
+00141 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;_activeObjectsLastFrame.Add(behaviour);
+00142 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00143 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00144 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00145 &#32;&#32;&#32;&#32;&#32;&#32;}
+00146 &#32;&#32;&#32;&#32;}
+00147 
+00148 &#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;<emphasis role="keywordtype">int</emphasis>&#32;GetSphereColliderResults(Vector3&#32;position,&#32;ref&#32;Collider[]&#32;resultsBuffer)&#32;{
+00149 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">using</emphasis>&#32;(<emphasis role="keyword">new</emphasis>&#32;<link linkend="_struct_leap_1_1_unity_1_1_profiler_sample">ProfilerSample</link>(<emphasis role="stringliteral">&quot;GetSphereColliderResults()&quot;</emphasis>))&#32;{
+00150 
+00151 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordtype">int</emphasis>&#32;layerMask&#32;=&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_activity_manager_1a37e3a110090bac9e2498bb3f978c823f">activationLayerFunction</link>&#32;==&#32;<emphasis role="keyword">null</emphasis>&#32;?&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_activity_manager_1a9309b4766f479c3fa53aedae93ccb060">activationLayerMask</link>&#32;:&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_activity_manager_1a37e3a110090bac9e2498bb3f978c823f">activationLayerFunction</link>();
+00152 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordtype">int</emphasis>&#32;overlapCount&#32;=&#32;0;
+00153 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">while</emphasis>&#32;(<emphasis role="keyword">true</emphasis>)&#32;{
+00154 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;overlapCount&#32;=&#32;<link linkend="_namespace_leap_1_1_unity_1a186e5eb0a2b743f1f6b79346f0ab8ad0a50ae99e9c35446c2580e4b540b0fd104">Physics</link>.OverlapSphereNonAlloc(position,
+00155 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_activity_manager_1ae47334dd4fde13e8908798fe74cb4e52">activationRadius</link>,
+00156 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;resultsBuffer,
+00157 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;layerMask,
+00158 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;QueryTriggerInteraction.Collide);
+00159 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(overlapCount&#32;&lt;&#32;resultsBuffer.Length)&#32;{
+00160 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">break</emphasis>;
+00161 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}&#32;<emphasis role="keywordflow">else</emphasis>&#32;{
+00162 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;Non-allocating&#32;sphere-overlap&#32;fills&#32;the&#32;existing&#32;_resultsBuffer&#32;array.</emphasis>
+00163 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;If&#32;the&#32;output&#32;overlapCount&#32;is&#32;equal&#32;to&#32;the&#32;array&apos;s&#32;length,&#32;there&#32;might&#32;be&#32;more&#32;collision&#32;results</emphasis>
+00164 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;that&#32;couldn&apos;t&#32;be&#32;returned&#32;because&#32;the&#32;array&#32;wasn&apos;t&#32;large&#32;enough,&#32;so&#32;try&#32;again&#32;with&#32;increased&#32;length.</emphasis>
+00165 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;The&#32;_in,&#32;_out&#32;argument&#32;setup&#32;allows&#32;allocating&#32;a&#32;new&#32;array&#32;from&#32;within&#32;this&#32;function.</emphasis>
+00166 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;resultsBuffer&#32;=&#32;<emphasis role="keyword">new</emphasis>&#32;Collider[resultsBuffer.Length&#32;*&#32;2];
+00167 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00168 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00169 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;overlapCount;
+00170 &#32;&#32;&#32;&#32;&#32;&#32;}
+00171 &#32;&#32;&#32;&#32;}
+00172 
+00173 &#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;UpdateActiveList(<emphasis role="keywordtype">int</emphasis>&#32;numResults,&#32;Collider[]&#32;results)&#32;{
+00174 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_activity_manager_1ac8bb61c2fa074a351cfc4e7a44a0656b">filter</link>&#32;==&#32;<emphasis role="keyword">null</emphasis>)&#32;{
+00175 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;Debug.LogWarning(<emphasis role="stringliteral">&quot;[ActivityManager]&#32;No&#32;filter&#32;provided&#32;for&#32;this&#32;ActivityManager;&#32;no&#32;objects&#32;will&#32;ever&#32;be&#32;returned.&quot;</emphasis>
+00176 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;+&#32;<emphasis role="stringliteral">&quot;Please&#32;make&#32;sure&#32;you&#32;specify&#32;a&#32;non-null&#32;filter&#32;property&#32;of&#32;any&#32;ActivityManagers&#32;you&#32;wish&#32;to&#32;use.&quot;</emphasis>);
+00177 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>;
+00178 &#32;&#32;&#32;&#32;&#32;&#32;}
+00179 
+00180 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">for</emphasis>&#32;(<emphasis role="keywordtype">int</emphasis>&#32;i&#32;=&#32;0;&#32;i&#32;&lt;&#32;numResults;&#32;i++)&#32;{
+00181 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;T&#32;obj&#32;=&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_activity_manager_1ac8bb61c2fa074a351cfc4e7a44a0656b">filter</link>(results[i]);
+00182 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(obj&#32;!=&#32;<emphasis role="keyword">null</emphasis>)&#32;{
+00183 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;_activeObjects.Add(obj);
+00184 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00185 &#32;&#32;&#32;&#32;&#32;&#32;}
+00186 &#32;&#32;&#32;&#32;}
+00187 
+00188 &#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;Vector3&#32;transformPoint(Vector3&#32;worldPoint,&#32;<link linkend="_class_leap_1_1_unity_1_1_space_1_1_leap_space">LeapSpace</link>&#32;space)&#32;{
+00189 &#32;&#32;&#32;&#32;&#32;&#32;Vector3&#32;localPalmPos&#32;=&#32;space.transform.InverseTransformPoint(worldPoint);
+00190 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;space.transform.TransformPoint(space.<link linkend="_class_leap_1_1_unity_1_1_space_1_1_leap_space_anchor_1a6f98d35d75f83e2ff2c978715520c836">transformer</link>.<link linkend="_interface_leap_1_1_unity_1_1_space_1_1_i_transformer_1ad919653073748169561e99cace4f5931">InverseTransformPoint</link>(localPalmPos));
+00191 &#32;&#32;&#32;&#32;}
+00192 &#32;&#32;}
+00193 }
+</programlisting></section>

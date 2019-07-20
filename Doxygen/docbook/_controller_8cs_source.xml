@@ -1,0 +1,388 @@
+<?xml version='1.0' encoding='UTF-8' standalone='no'?>
+<section xmlns="http://docbook.org/ns/docbook" version="5.0" xmlns:xlink="http://www.w3.org/1999/xlink" xml:id="__controller_8cs_source">
+<title>Controller.cs</title>
+<indexterm><primary>O:/GitHUBMINIPRoject/Assets/LeapMotion/Core/Plugins/LeapCSharp/Controller.cs</primary></indexterm>
+<programlisting>00001 <emphasis role="comment">/******************************************************************************</emphasis>
+00002 <emphasis role="comment">&#32;*&#32;Copyright&#32;(C)&#32;Leap&#32;Motion,&#32;Inc.&#32;2011-2018.&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;*</emphasis>
+00003 <emphasis role="comment">&#32;*&#32;Leap&#32;Motion&#32;proprietary&#32;and&#32;confidential.&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;*</emphasis>
+00004 <emphasis role="comment">&#32;*&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;*</emphasis>
+00005 <emphasis role="comment">&#32;*&#32;Use&#32;subject&#32;to&#32;the&#32;terms&#32;of&#32;the&#32;Leap&#32;Motion&#32;SDK&#32;Agreement&#32;available&#32;at&#32;&#32;&#32;&#32;&#32;*</emphasis>
+00006 <emphasis role="comment">&#32;*&#32;https://developer.leapmotion.com/sdk_agreement,&#32;or&#32;another&#32;agreement&#32;&#32;&#32;&#32;&#32;&#32;&#32;*</emphasis>
+00007 <emphasis role="comment">&#32;*&#32;between&#32;Leap&#32;Motion&#32;and&#32;you,&#32;your&#32;company&#32;or&#32;other&#32;organization.&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;*</emphasis>
+00008 <emphasis role="comment">&#32;******************************************************************************/</emphasis>
+00009 
+00010 <emphasis role="keyword">namespace&#32;</emphasis><link linkend="_namespace_leap">Leap</link>&#32;{
+00011 &#32;&#32;<emphasis role="keyword">using</emphasis>&#32;System;
+00012 &#32;&#32;<emphasis role="keyword">using</emphasis>&#32;System.<link linkend="_namespace_system_1_1_threading">Threading</link>;
+00013 
+00014 &#32;&#32;<emphasis role="keyword">using</emphasis>&#32;<link linkend="_namespace_leap_internal">LeapInternal</link>;
+00015 
+<anchor xml:id="__controller_8cs_source_1l00039"/><link linkend="_class_leap_1_1_controller">00039</link> &#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keyword">class&#32;</emphasis><link linkend="_class_leap_1_1_controller">Controller</link>&#32;:
+00040 &#32;&#32;&#32;&#32;<link linkend="_interface_leap_1_1_i_controller">IController</link>&#32;{
+00041 &#32;&#32;&#32;&#32;<link linkend="_class_leap_internal_1_1_connection">Connection</link>&#32;_connection;
+00042 &#32;&#32;&#32;&#32;<emphasis role="keywordtype">bool</emphasis>&#32;_disposed&#32;=&#32;<emphasis role="keyword">false</emphasis>;
+00043 &#32;&#32;&#32;&#32;<link linkend="_class_leap_1_1_config">Config</link>&#32;_config;
+00044 
+<anchor xml:id="__controller_8cs_source_1l00051"/><link linkend="_class_leap_1_1_controller_1afa47e4254ee6d9fa05ba485593b05e4e">00051</link> &#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;SynchronizationContext&#32;<link linkend="_class_leap_1_1_controller_1afa47e4254ee6d9fa05ba485593b05e4e">EventContext</link>&#32;{
+00052 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">get</emphasis>&#32;{
+00053 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;_connection.<link linkend="_class_leap_internal_1_1_connection_1a0b87a8b7adf1357944915bd206150db3">EventContext</link>;
+00054 &#32;&#32;&#32;&#32;&#32;&#32;}
+00055 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">set</emphasis>&#32;{
+00056 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;_connection.<link linkend="_class_leap_internal_1_1_connection_1a0b87a8b7adf1357944915bd206150db3">EventContext</link>&#32;=&#32;value;
+00057 &#32;&#32;&#32;&#32;&#32;&#32;}
+00058 &#32;&#32;&#32;&#32;}
+00059 
+<anchor xml:id="__controller_8cs_source_1l00066"/><link linkend="_class_leap_1_1_controller_1aeabfa1a25d7aa3724cb786885195e0b2">00066</link> &#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keyword">event</emphasis>&#32;EventHandler&lt;LeapEventArgs&gt;&#32;<link linkend="_class_leap_1_1_controller_1aeabfa1a25d7aa3724cb786885195e0b2">Init</link>&#32;{
+00067 &#32;&#32;&#32;&#32;&#32;&#32;add&#32;{
+00068 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(_hasInitialized)
+00069 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;value(<emphasis role="keyword">this</emphasis>,&#32;<emphasis role="keyword">new</emphasis>&#32;<link linkend="_class_leap_1_1_leap_event_args">LeapEventArgs</link>(<link linkend="_namespace_leap_1a5b8c8df3b9ace307e29863779a4ae85d">LeapEvent</link>.EVENT_INIT));
+00070 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;_init&#32;+=&#32;value;
+00071 &#32;&#32;&#32;&#32;&#32;&#32;}
+00072 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">remove</emphasis>&#32;{&#32;_init&#32;-=&#32;value;&#32;}
+00073 &#32;&#32;&#32;&#32;}
+00074 
+00075 &#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;<emphasis role="keywordtype">bool</emphasis>&#32;_hasInitialized&#32;=&#32;<emphasis role="keyword">false</emphasis>;
+00076 &#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;EventHandler&lt;LeapEventArgs&gt;&#32;_init;
+00077 
+<anchor xml:id="__controller_8cs_source_1l00082"/><link linkend="_class_leap_1_1_controller_1abc23a30fb9ef4327ab4c12dc90698f14">00082</link> &#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keyword">event</emphasis>&#32;EventHandler&lt;ConnectionEventArgs&gt;&#32;<link linkend="_class_leap_1_1_controller_1abc23a30fb9ef4327ab4c12dc90698f14">Connect</link>&#32;{
+00083 &#32;&#32;&#32;&#32;&#32;&#32;add&#32;{
+00084 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(_hasConnected)
+00085 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;value(<emphasis role="keyword">this</emphasis>,&#32;<emphasis role="keyword">new</emphasis>&#32;<link linkend="_class_leap_1_1_connection_event_args">ConnectionEventArgs</link>());
+00086 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;_connect&#32;+=&#32;value;
+00087 &#32;&#32;&#32;&#32;&#32;&#32;}
+00088 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">remove</emphasis>&#32;{&#32;_connect&#32;-=&#32;value;&#32;}
+00089 &#32;&#32;&#32;&#32;}
+00090 
+00091 &#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;<emphasis role="keywordtype">bool</emphasis>&#32;_hasConnected&#32;=&#32;<emphasis role="keyword">false</emphasis>;
+00092 &#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;EventHandler&lt;ConnectionEventArgs&gt;&#32;_connect;
+00093 
+<anchor xml:id="__controller_8cs_source_1l00098"/><link linkend="_class_leap_1_1_controller_1ac627061e99531a03874428bebc5f1111">00098</link> &#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keyword">event</emphasis>&#32;EventHandler&lt;ConnectionLostEventArgs&gt;&#32;<link linkend="_class_leap_1_1_controller_1ac627061e99531a03874428bebc5f1111">Disconnect</link>&#32;{
+00099 &#32;&#32;&#32;&#32;&#32;&#32;add&#32;{
+00100 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;_connection.<link linkend="_class_leap_internal_1_1_connection_1a352433b853a548790c8ad350e948fdd6">LeapConnectionLost</link>&#32;+=&#32;value;
+00101 &#32;&#32;&#32;&#32;&#32;&#32;}
+00102 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">remove</emphasis>&#32;{
+00103 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;_connection.<link linkend="_class_leap_internal_1_1_connection_1a352433b853a548790c8ad350e948fdd6">LeapConnectionLost</link>&#32;-=&#32;value;
+00104 &#32;&#32;&#32;&#32;&#32;&#32;}
+00105 &#32;&#32;&#32;&#32;}
+00106 
+<anchor xml:id="__controller_8cs_source_1l00111"/><link linkend="_class_leap_1_1_controller_1af401a79284cacb70afa71d0b109143fe">00111</link> &#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keyword">event</emphasis>&#32;EventHandler&lt;FrameEventArgs&gt;&#32;<link linkend="_class_leap_1_1_controller_1af401a79284cacb70afa71d0b109143fe">FrameReady</link>&#32;{
+00112 &#32;&#32;&#32;&#32;&#32;&#32;add&#32;{
+00113 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;_connection.<link linkend="_class_leap_internal_1_1_connection_1a66f84d7e27d1f9a33028ea0abbc89e6c">LeapFrame</link>&#32;+=&#32;value;
+00114 &#32;&#32;&#32;&#32;&#32;&#32;}
+00115 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">remove</emphasis>&#32;{
+00116 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;_connection.<link linkend="_class_leap_internal_1_1_connection_1a66f84d7e27d1f9a33028ea0abbc89e6c">LeapFrame</link>&#32;-=&#32;value;
+00117 &#32;&#32;&#32;&#32;&#32;&#32;}
+00118 &#32;&#32;&#32;&#32;}
+00119 
+<anchor xml:id="__controller_8cs_source_1l00124"/><link linkend="_class_leap_1_1_controller_1a0713d49768905ceba0ffb63ecc216aa1">00124</link> &#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keyword">event</emphasis>&#32;EventHandler&lt;InternalFrameEventArgs&gt;&#32;<link linkend="_class_leap_1_1_controller_1a0713d49768905ceba0ffb63ecc216aa1">InternalFrameReady</link>&#32;{
+00125 &#32;&#32;&#32;&#32;&#32;&#32;add&#32;{
+00126 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;_connection.<link linkend="_class_leap_internal_1_1_connection_1acbebf064965d68f74d4e851ee1c22bb1">LeapInternalFrame</link>&#32;+=&#32;value;
+00127 &#32;&#32;&#32;&#32;&#32;&#32;}
+00128 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">remove</emphasis>&#32;{
+00129 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;_connection.<link linkend="_class_leap_internal_1_1_connection_1acbebf064965d68f74d4e851ee1c22bb1">LeapInternalFrame</link>&#32;-=&#32;value;
+00130 &#32;&#32;&#32;&#32;&#32;&#32;}
+00131 &#32;&#32;&#32;&#32;}
+00132 
+<anchor xml:id="__controller_8cs_source_1l00137"/><link linkend="_class_leap_1_1_controller_1ac9a2f80c418e12b42b8331c0d5b116b1">00137</link> &#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keyword">event</emphasis>&#32;EventHandler&lt;DeviceEventArgs&gt;&#32;<link linkend="_class_leap_1_1_device">Device</link>&#32;{
+00138 &#32;&#32;&#32;&#32;&#32;&#32;add&#32;{
+00139 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;_connection.<link linkend="_class_leap_internal_1_1_connection_1ae1dd18505f75a72eea2abbeab57d7d01">LeapDevice</link>&#32;+=&#32;value;
+00140 &#32;&#32;&#32;&#32;&#32;&#32;}
+00141 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">remove</emphasis>&#32;{
+00142 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;_connection.<link linkend="_class_leap_internal_1_1_connection_1ae1dd18505f75a72eea2abbeab57d7d01">LeapDevice</link>&#32;-=&#32;value;
+00143 &#32;&#32;&#32;&#32;&#32;&#32;}
+00144 &#32;&#32;&#32;&#32;}
+00145 
+<anchor xml:id="__controller_8cs_source_1l00150"/><link linkend="_class_leap_1_1_controller_1a1f624439c16ddaf866ac657aa811a622">00150</link> &#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keyword">event</emphasis>&#32;EventHandler&lt;DeviceEventArgs&gt;&#32;<link linkend="_class_leap_1_1_controller_1a1f624439c16ddaf866ac657aa811a622">DeviceLost</link>&#32;{
+00151 &#32;&#32;&#32;&#32;&#32;&#32;add&#32;{
+00152 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;_connection.<link linkend="_class_leap_internal_1_1_connection_1a3c55a469e21efe1ceb92b90c636f9f67">LeapDeviceLost</link>&#32;+=&#32;value;
+00153 &#32;&#32;&#32;&#32;&#32;&#32;}
+00154 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">remove</emphasis>&#32;{
+00155 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;_connection.<link linkend="_class_leap_internal_1_1_connection_1a3c55a469e21efe1ceb92b90c636f9f67">LeapDeviceLost</link>&#32;-=&#32;value;
+00156 &#32;&#32;&#32;&#32;&#32;&#32;}
+00157 &#32;&#32;&#32;&#32;}
+00158 
+<anchor xml:id="__controller_8cs_source_1l00163"/><link linkend="_class_leap_1_1_controller_1aebe559b634e766a31c1f2041714313ca">00163</link> &#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keyword">event</emphasis>&#32;EventHandler&lt;DeviceFailureEventArgs&gt;&#32;<link linkend="_class_leap_1_1_controller_1aebe559b634e766a31c1f2041714313ca">DeviceFailure</link>&#32;{
+00164 &#32;&#32;&#32;&#32;&#32;&#32;add&#32;{
+00165 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;_connection.<link linkend="_class_leap_internal_1_1_connection_1a8f5dd0ee804342d59a2a28046a2c0e44">LeapDeviceFailure</link>&#32;+=&#32;value;
+00166 &#32;&#32;&#32;&#32;&#32;&#32;}
+00167 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">remove</emphasis>&#32;{
+00168 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;_connection.<link linkend="_class_leap_internal_1_1_connection_1a8f5dd0ee804342d59a2a28046a2c0e44">LeapDeviceFailure</link>&#32;-=&#32;value;
+00169 &#32;&#32;&#32;&#32;&#32;&#32;}
+00170 &#32;&#32;&#32;&#32;}
+00171 
+<anchor xml:id="__controller_8cs_source_1l00176"/><link linkend="_class_leap_1_1_controller_1a40c12ae7c232621b91f9bb40987a33a3">00176</link> &#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keyword">event</emphasis>&#32;EventHandler&lt;LogEventArgs&gt;&#32;<link linkend="_class_leap_1_1_controller_1a40c12ae7c232621b91f9bb40987a33a3">LogMessage</link>&#32;{
+00177 &#32;&#32;&#32;&#32;&#32;&#32;add&#32;{
+00178 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;_connection.<link linkend="_class_leap_internal_1_1_connection_1a435f5b54b81790b604a4ef1f9b630d5e">LeapLogEvent</link>&#32;+=&#32;value;
+00179 &#32;&#32;&#32;&#32;&#32;&#32;}
+00180 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">remove</emphasis>&#32;{
+00181 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;_connection.<link linkend="_class_leap_internal_1_1_connection_1a435f5b54b81790b604a4ef1f9b630d5e">LeapLogEvent</link>&#32;-=&#32;value;
+00182 &#32;&#32;&#32;&#32;&#32;&#32;}
+00183 &#32;&#32;&#32;&#32;}
+00184 
+<anchor xml:id="__controller_8cs_source_1l00189"/><link linkend="_class_leap_1_1_controller_1a0177e366833918615a05f1be4177c53b">00189</link> &#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keyword">event</emphasis>&#32;EventHandler&lt;PolicyEventArgs&gt;&#32;<link linkend="_class_leap_1_1_controller_1a0177e366833918615a05f1be4177c53b">PolicyChange</link>&#32;{
+00190 &#32;&#32;&#32;&#32;&#32;&#32;add&#32;{
+00191 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;_connection.<link linkend="_class_leap_internal_1_1_connection_1ac3d23b7ad9ca1224f70f1718873bb1c2">LeapPolicyChange</link>&#32;+=&#32;value;
+00192 &#32;&#32;&#32;&#32;&#32;&#32;}
+00193 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">remove</emphasis>&#32;{
+00194 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;_connection.<link linkend="_class_leap_internal_1_1_connection_1ac3d23b7ad9ca1224f70f1718873bb1c2">LeapPolicyChange</link>&#32;-=&#32;value;
+00195 &#32;&#32;&#32;&#32;&#32;&#32;}
+00196 &#32;&#32;&#32;&#32;}
+00197 
+<anchor xml:id="__controller_8cs_source_1l00202"/><link linkend="_class_leap_1_1_controller_1aa95b8d42774232245cd10c23d90d0343">00202</link> &#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keyword">event</emphasis>&#32;EventHandler&lt;ConfigChangeEventArgs&gt;&#32;<link linkend="_class_leap_1_1_controller_1aa95b8d42774232245cd10c23d90d0343">ConfigChange</link>&#32;{
+00203 &#32;&#32;&#32;&#32;&#32;&#32;add&#32;{
+00204 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;_connection.<link linkend="_class_leap_internal_1_1_connection_1a6f56c66bbecc957ca227d894dcf16e96">LeapConfigChange</link>&#32;+=&#32;value;
+00205 &#32;&#32;&#32;&#32;&#32;&#32;}
+00206 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">remove</emphasis>&#32;{
+00207 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;_connection.<link linkend="_class_leap_internal_1_1_connection_1a6f56c66bbecc957ca227d894dcf16e96">LeapConfigChange</link>&#32;-=&#32;value;
+00208 &#32;&#32;&#32;&#32;&#32;&#32;}
+00209 &#32;&#32;&#32;&#32;}
+00210 
+<anchor xml:id="__controller_8cs_source_1l00217"/><link linkend="_class_leap_1_1_controller_1a3a00d190090f618416c578d8615e4921">00217</link> &#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keyword">event</emphasis>&#32;EventHandler&lt;DistortionEventArgs&gt;&#32;<link linkend="_class_leap_1_1_controller_1a3a00d190090f618416c578d8615e4921">DistortionChange</link>&#32;{
+00218 &#32;&#32;&#32;&#32;&#32;&#32;add&#32;{
+00219 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;_connection.<link linkend="_class_leap_internal_1_1_connection_1ab1618ad3b9b1ed17ccd43a2461d277d7">LeapDistortionChange</link>&#32;+=&#32;value;
+00220 &#32;&#32;&#32;&#32;&#32;&#32;}
+00221 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">remove</emphasis>&#32;{
+00222 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;_connection.<link linkend="_class_leap_internal_1_1_connection_1ab1618ad3b9b1ed17ccd43a2461d277d7">LeapDistortionChange</link>&#32;-=&#32;value;
+00223 &#32;&#32;&#32;&#32;&#32;&#32;}
+00224 &#32;&#32;&#32;&#32;}
+00225 
+<anchor xml:id="__controller_8cs_source_1l00229"/><link linkend="_class_leap_1_1_controller_1ac9829d338d232ab7b09e59fadf2d24c5">00229</link> &#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keyword">event</emphasis>&#32;EventHandler&lt;DroppedFrameEventArgs&gt;&#32;<link linkend="_class_leap_1_1_controller_1ac9829d338d232ab7b09e59fadf2d24c5">DroppedFrame</link>&#32;{
+00230 &#32;&#32;&#32;&#32;&#32;&#32;add&#32;{
+00231 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;_connection.<link linkend="_class_leap_internal_1_1_connection_1a7542907a2116216ac90ab2a88599b3a6">LeapDroppedFrame</link>&#32;+=&#32;value;
+00232 &#32;&#32;&#32;&#32;&#32;&#32;}
+00233 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">remove</emphasis>&#32;{
+00234 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;_connection.<link linkend="_class_leap_internal_1_1_connection_1a7542907a2116216ac90ab2a88599b3a6">LeapDroppedFrame</link>&#32;-=&#32;value;
+00235 &#32;&#32;&#32;&#32;&#32;&#32;}
+00236 &#32;&#32;&#32;&#32;}
+00237 
+<anchor xml:id="__controller_8cs_source_1l00242"/><link linkend="_class_leap_1_1_controller_1ad76a140483ce708520eb0e940c345a1f">00242</link> &#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keyword">event</emphasis>&#32;EventHandler&lt;ImageEventArgs&gt;&#32;<link linkend="_class_leap_1_1_controller_1ad76a140483ce708520eb0e940c345a1f">ImageReady</link>&#32;{
+00243 &#32;&#32;&#32;&#32;&#32;&#32;add&#32;{
+00244 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;_connection.<link linkend="_class_leap_internal_1_1_connection_1a7ff7e1c77a92cba83e8d59e75f8074db">LeapImage</link>&#32;+=&#32;value;
+00245 &#32;&#32;&#32;&#32;&#32;&#32;}
+00246 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">remove</emphasis>&#32;{
+00247 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;_connection.<link linkend="_class_leap_internal_1_1_connection_1a7ff7e1c77a92cba83e8d59e75f8074db">LeapImage</link>&#32;-=&#32;value;
+00248 &#32;&#32;&#32;&#32;&#32;&#32;}
+00249 &#32;&#32;&#32;&#32;}
+00250 
+<anchor xml:id="__controller_8cs_source_1l00260"/><link linkend="_class_leap_1_1_controller_1a483c1f8ff0a5557ee0a609bfe242f01c">00260</link> &#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keyword">event</emphasis>&#32;Action&lt;BeginProfilingForThreadArgs&gt;&#32;<link linkend="_class_leap_1_1_controller_1a483c1f8ff0a5557ee0a609bfe242f01c">BeginProfilingForThread</link>&#32;{
+00261 &#32;&#32;&#32;&#32;&#32;&#32;add&#32;{
+00262 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;_connection.<link linkend="_class_leap_internal_1_1_connection_1a364051da7b95bc1487dac1d7538510b7">LeapBeginProfilingForThread</link>&#32;+=&#32;value;
+00263 &#32;&#32;&#32;&#32;&#32;&#32;}
+00264 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">remove</emphasis>&#32;{
+00265 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;_connection.<link linkend="_class_leap_internal_1_1_connection_1a364051da7b95bc1487dac1d7538510b7">LeapBeginProfilingForThread</link>&#32;-=&#32;value;
+00266 &#32;&#32;&#32;&#32;&#32;&#32;}
+00267 &#32;&#32;&#32;&#32;}
+00268 
+<anchor xml:id="__controller_8cs_source_1l00275"/><link linkend="_class_leap_1_1_controller_1a29354296ef9a6de70e2ce06db251c16b">00275</link> &#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keyword">event</emphasis>&#32;Action&lt;EndProfilingForThreadArgs&gt;&#32;<link linkend="_class_leap_1_1_controller_1a29354296ef9a6de70e2ce06db251c16b">EndProfilingForThread</link>&#32;{
+00276 &#32;&#32;&#32;&#32;&#32;&#32;add&#32;{
+00277 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;_connection.<link linkend="_class_leap_internal_1_1_connection_1a424896b5a35580707284fa570e40138a">LeapEndProfilingForThread</link>&#32;+=&#32;value;
+00278 &#32;&#32;&#32;&#32;&#32;&#32;}
+00279 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">remove</emphasis>&#32;{
+00280 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;_connection.<link linkend="_class_leap_internal_1_1_connection_1a424896b5a35580707284fa570e40138a">LeapEndProfilingForThread</link>&#32;-=&#32;value;
+00281 &#32;&#32;&#32;&#32;&#32;&#32;}
+00282 &#32;&#32;&#32;&#32;}
+00283 
+<anchor xml:id="__controller_8cs_source_1l00292"/><link linkend="_class_leap_1_1_controller_1a6195a732f3ce5a94f41bda37fecca548">00292</link> &#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keyword">event</emphasis>&#32;Action&lt;BeginProfilingBlockArgs&gt;&#32;<link linkend="_class_leap_1_1_controller_1a6195a732f3ce5a94f41bda37fecca548">BeginProfilingBlock</link>&#32;{
+00293 &#32;&#32;&#32;&#32;&#32;&#32;add&#32;{
+00294 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;_connection.<link linkend="_class_leap_internal_1_1_connection_1a377465e1fa8fffca68491ba5f52136a2">LeapBeginProfilingBlock</link>&#32;+=&#32;value;
+00295 &#32;&#32;&#32;&#32;&#32;&#32;}
+00296 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">remove</emphasis>&#32;{
+00297 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;_connection.<link linkend="_class_leap_internal_1_1_connection_1a377465e1fa8fffca68491ba5f52136a2">LeapBeginProfilingBlock</link>&#32;-=&#32;value;
+00298 &#32;&#32;&#32;&#32;&#32;&#32;}
+00299 &#32;&#32;&#32;&#32;}
+00300 
+<anchor xml:id="__controller_8cs_source_1l00309"/><link linkend="_class_leap_1_1_controller_1a47514a57487eb7543323ef7ca8f197e3">00309</link> &#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keyword">event</emphasis>&#32;Action&lt;EndProfilingBlockArgs&gt;&#32;<link linkend="_class_leap_1_1_controller_1a47514a57487eb7543323ef7ca8f197e3">EndProfilingBlock</link>&#32;{
+00310 &#32;&#32;&#32;&#32;&#32;&#32;add&#32;{
+00311 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;_connection.<link linkend="_class_leap_internal_1_1_connection_1a2983273b0360e53dc42a7d6c6d2e5893">LeapEndProfilingBlock</link>&#32;+=&#32;value;
+00312 &#32;&#32;&#32;&#32;&#32;&#32;}
+00313 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">remove</emphasis>&#32;{
+00314 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;_connection.<link linkend="_class_leap_internal_1_1_connection_1a2983273b0360e53dc42a7d6c6d2e5893">LeapEndProfilingBlock</link>&#32;-=&#32;value;
+00315 &#32;&#32;&#32;&#32;&#32;&#32;}
+00316 &#32;&#32;&#32;&#32;}
+00317 
+<anchor xml:id="__controller_8cs_source_1l00322"/><link linkend="_class_leap_1_1_controller_1a148e5d3bcc1f4e4d3c972d7482f1d1ab">00322</link> &#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keyword">event</emphasis>&#32;EventHandler&lt;PointMappingChangeEventArgs&gt;&#32;<link linkend="_class_leap_1_1_controller_1a148e5d3bcc1f4e4d3c972d7482f1d1ab">PointMappingChange</link>&#32;{
+00323 &#32;&#32;&#32;&#32;&#32;&#32;add&#32;{
+00324 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;_connection.<link linkend="_class_leap_internal_1_1_connection_1ae000281d4cf2fbced911ff97b31f4035">LeapPointMappingChange</link>&#32;+=&#32;value;
+00325 &#32;&#32;&#32;&#32;&#32;&#32;}
+00326 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">remove</emphasis>&#32;{
+00327 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;_connection.<link linkend="_class_leap_internal_1_1_connection_1ae000281d4cf2fbced911ff97b31f4035">LeapPointMappingChange</link>&#32;-=&#32;value;
+00328 &#32;&#32;&#32;&#32;&#32;&#32;}
+00329 &#32;&#32;&#32;&#32;}
+00330 
+<anchor xml:id="__controller_8cs_source_1l00334"/><link linkend="_class_leap_1_1_controller_1a8f102727031288a8b1c8f2583c31d161">00334</link> &#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keyword">event</emphasis>&#32;EventHandler&lt;HeadPoseEventArgs&gt;&#32;<link linkend="_class_leap_1_1_controller_1a8f102727031288a8b1c8f2583c31d161">HeadPoseChange</link>&#32;{
+00335 &#32;&#32;&#32;&#32;&#32;&#32;add&#32;{
+00336 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;_connection.<link linkend="_class_leap_internal_1_1_connection_1ae8fb7ce09bced652e319aada4a8e3755">LeapHeadPoseChange</link>&#32;+=&#32;value;
+00337 &#32;&#32;&#32;&#32;&#32;&#32;}
+00338 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">remove</emphasis>&#32;{
+00339 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;_connection.<link linkend="_class_leap_internal_1_1_connection_1ae8fb7ce09bced652e319aada4a8e3755">LeapHeadPoseChange</link>&#32;-=&#32;value;
+00340 &#32;&#32;&#32;&#32;&#32;&#32;}
+00341 &#32;&#32;&#32;&#32;}
+00342 
+<anchor xml:id="__controller_8cs_source_1l00343"/><link linkend="_class_leap_1_1_controller_1ad2b8546f002e50164178d1cb7fff4d57">00343</link> &#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;<link linkend="_class_leap_1_1_controller_1ad2b8546f002e50164178d1cb7fff4d57">Dispose</link>()&#32;{
+00344 &#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_leap_1_1_controller_1ad2b8546f002e50164178d1cb7fff4d57">Dispose</link>(<emphasis role="keyword">true</emphasis>);
+00345 &#32;&#32;&#32;&#32;&#32;&#32;GC.SuppressFinalize(<emphasis role="keyword">this</emphasis>);
+00346 &#32;&#32;&#32;&#32;}
+00347 
+00348 &#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;Protected&#32;implementation&#32;of&#32;Dispose&#32;pattern.</emphasis>
+<anchor xml:id="__controller_8cs_source_1l00349"/><link linkend="_class_leap_1_1_controller_1a491436d5722a11b55596f2f14434098b">00349</link> &#32;&#32;&#32;&#32;<emphasis role="keyword">protected</emphasis>&#32;<emphasis role="keyword">virtual</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;<link linkend="_class_leap_1_1_controller_1a491436d5722a11b55596f2f14434098b">Dispose</link>(<emphasis role="keywordtype">bool</emphasis>&#32;disposing)&#32;{
+00350 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(_disposed)&#32;{
+00351 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>;
+00352 &#32;&#32;&#32;&#32;&#32;&#32;}
+00353 
+00354 &#32;&#32;&#32;&#32;&#32;&#32;_disposed&#32;=&#32;<emphasis role="keyword">true</emphasis>;
+00355 &#32;&#32;&#32;&#32;}
+00356 
+<anchor xml:id="__controller_8cs_source_1l00364"/><link linkend="_class_leap_1_1_controller_1a55b80a043ff15459a08b60bf9f85a955">00364</link> &#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<link linkend="_class_leap_1_1_controller_1a55b80a043ff15459a08b60bf9f85a955">Controller</link>()&#32;:&#32;this(0)&#32;{&#32;}
+00365 
+<anchor xml:id="__controller_8cs_source_1l00378"/><link linkend="_class_leap_1_1_controller_1aa96fa3ac415fe7564a7a9578041d5fff">00378</link> &#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<link linkend="_class_leap_1_1_controller_1aa96fa3ac415fe7564a7a9578041d5fff">Controller</link>(<emphasis role="keywordtype">int</emphasis>&#32;connectionKey)&#32;{
+00379 &#32;&#32;&#32;&#32;&#32;&#32;_connection&#32;=&#32;<link linkend="_class_leap_internal_1_1_connection">Connection</link>.<link linkend="_class_leap_internal_1_1_connection_1a14b814a88c57b2dafafe72077211aa85">GetConnection</link>(connectionKey);
+00380 &#32;&#32;&#32;&#32;&#32;&#32;_connection.<link linkend="_class_leap_internal_1_1_connection_1a0b87a8b7adf1357944915bd206150db3">EventContext</link>&#32;=&#32;SynchronizationContext.Current;
+00381 
+00382 &#32;&#32;&#32;&#32;&#32;&#32;_connection.<link linkend="_class_leap_internal_1_1_connection_1a4ecba08b7b5d52a5d3c9822454cd1633">LeapInit</link>&#32;+=&#32;<link linkend="_class_leap_1_1_controller_1a0e0ce4c3c7526305c2a8c79c7f5cd1a7">OnInit</link>;
+00383 &#32;&#32;&#32;&#32;&#32;&#32;_connection.<link linkend="_class_leap_internal_1_1_connection_1a73e39e15e464b1c0b8a5394ecd085986">LeapConnection</link>&#32;+=&#32;<link linkend="_class_leap_1_1_controller_1afb73429c5375282477149dfbb9cc698f">OnConnect</link>;
+00384 &#32;&#32;&#32;&#32;&#32;&#32;_connection.<link linkend="_class_leap_internal_1_1_connection_1a352433b853a548790c8ad350e948fdd6">LeapConnectionLost</link>&#32;+=&#32;<link linkend="_class_leap_1_1_controller_1a06fff0c5313c992da0b84714f561acff">OnDisconnect</link>;
+00385 
+00386 &#32;&#32;&#32;&#32;&#32;&#32;_connection.<link linkend="_class_leap_internal_1_1_connection_1a33962c567068d008ec6779c2641584b0">Start</link>();
+00387 &#32;&#32;&#32;&#32;}
+00388 
+<anchor xml:id="__controller_8cs_source_1l00397"/><link linkend="_class_leap_1_1_controller_1a3e1e2694a23c62c79f9592217529e860">00397</link> &#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;<link linkend="_class_leap_1_1_controller_1a3e1e2694a23c62c79f9592217529e860">StartConnection</link>()&#32;{
+00398 &#32;&#32;&#32;&#32;&#32;&#32;_connection.<link linkend="_class_leap_internal_1_1_connection_1a33962c567068d008ec6779c2641584b0">Start</link>();
+00399 &#32;&#32;&#32;&#32;}
+00400 
+<anchor xml:id="__controller_8cs_source_1l00409"/><link linkend="_class_leap_1_1_controller_1a08c17e46012a2774afe1b5901e82ce6a">00409</link> &#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;<link linkend="_class_leap_1_1_controller_1a08c17e46012a2774afe1b5901e82ce6a">StopConnection</link>()&#32;{
+00410 &#32;&#32;&#32;&#32;&#32;&#32;_connection.<link linkend="_class_leap_internal_1_1_connection_1aea1fa03cd6daf0b54561ff2221a8f3be">Stop</link>();
+00411 &#32;&#32;&#32;&#32;}
+00412 
+<anchor xml:id="__controller_8cs_source_1l00418"/><link linkend="_class_leap_1_1_controller_1a8ecf0fd02e617da823b46b5f73b38eb0">00418</link> &#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keywordtype">bool</emphasis>&#32;<link linkend="_class_leap_1_1_controller_1a8ecf0fd02e617da823b46b5f73b38eb0">IsServiceConnected</link>&#32;{
+00419 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">get</emphasis>&#32;{
+00420 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;_connection.<link linkend="_class_leap_internal_1_1_connection_1a29fc660760e7b7de559f01aa11be1abe">IsServiceConnected</link>;
+00421 &#32;&#32;&#32;&#32;&#32;&#32;}
+00422 &#32;&#32;&#32;&#32;}
+00423 
+<anchor xml:id="__controller_8cs_source_1l00437"/><link linkend="_class_leap_1_1_controller_1a7e862547a7ea735203220e43c0e04a85">00437</link> &#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;<link linkend="_class_leap_1_1_controller_1a7e862547a7ea735203220e43c0e04a85">SetPolicy</link>(<link linkend="_class_leap_1_1_controller_1a0bdb49fa94aa2da8b098c1ac296528d6">PolicyFlag</link>&#32;policy)&#32;{
+00438 &#32;&#32;&#32;&#32;&#32;&#32;_connection.<link linkend="_class_leap_internal_1_1_connection_1a973bcc5a80165662305ca53cc153ffaf">SetPolicy</link>(policy);
+00439 &#32;&#32;&#32;&#32;}
+00440 
+<anchor xml:id="__controller_8cs_source_1l00450"/><link linkend="_class_leap_1_1_controller_1a78edc0a692fa7200a07eee4b651012a4">00450</link> &#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;<link linkend="_class_leap_1_1_controller_1a78edc0a692fa7200a07eee4b651012a4">ClearPolicy</link>(<link linkend="_class_leap_1_1_controller_1a0bdb49fa94aa2da8b098c1ac296528d6">PolicyFlag</link>&#32;policy)&#32;{
+00451 &#32;&#32;&#32;&#32;&#32;&#32;_connection.<link linkend="_class_leap_internal_1_1_connection_1add28c0b2f62ef7b394e194989ad3b424">ClearPolicy</link>(policy);
+00452 &#32;&#32;&#32;&#32;}
+00453 
+<anchor xml:id="__controller_8cs_source_1l00468"/><link linkend="_class_leap_1_1_controller_1af0f85f9c36a57143107952afc26ec5d4">00468</link> &#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keywordtype">bool</emphasis>&#32;<link linkend="_class_leap_1_1_controller_1af0f85f9c36a57143107952afc26ec5d4">IsPolicySet</link>(<link linkend="_class_leap_1_1_controller_1a0bdb49fa94aa2da8b098c1ac296528d6">PolicyFlag</link>&#32;policy)&#32;{
+00469 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;_connection.<link linkend="_class_leap_internal_1_1_connection_1a6e2e5ee305e33e8d8c3782708e53b95c">IsPolicySet</link>(policy);
+00470 &#32;&#32;&#32;&#32;}
+00471 
+<anchor xml:id="__controller_8cs_source_1l00491"/><link linkend="_class_leap_1_1_controller_1ac41dc9c50a3bd2a892cc44af0859ef0d">00491</link> &#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<link linkend="_class_leap_1_1_frame">Frame</link>&#32;<link linkend="_class_leap_1_1_controller_1ac41dc9c50a3bd2a892cc44af0859ef0d">Frame</link>(<emphasis role="keywordtype">int</emphasis>&#32;history&#32;=&#32;0)&#32;{
+00492 &#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_leap_1_1_frame">Frame</link>&#32;frame&#32;=&#32;<emphasis role="keyword">new</emphasis>&#32;<link linkend="_class_leap_1_1_controller_1ac41dc9c50a3bd2a892cc44af0859ef0d">Frame</link>();
+00493 &#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_leap_1_1_controller_1ac41dc9c50a3bd2a892cc44af0859ef0d">Frame</link>(frame,&#32;history);
+00494 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;frame;
+00495 &#32;&#32;&#32;&#32;}
+00496 
+<anchor xml:id="__controller_8cs_source_1l00501"/><link linkend="_class_leap_1_1_controller_1acab28236972c254e53d3508cb8aaa1cd">00501</link> &#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;<link linkend="_class_leap_1_1_controller_1acab28236972c254e53d3508cb8aaa1cd">Frame</link>(<link linkend="_class_leap_1_1_frame">Frame</link>&#32;toFill,&#32;<emphasis role="keywordtype">int</emphasis>&#32;history&#32;=&#32;0)&#32;{
+00502 &#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_struct_leap_internal_1_1_l_e_a_p___t_r_a_c_k_i_n_g___e_v_e_n_t">LEAP_TRACKING_EVENT</link>&#32;trackingEvent;
+00503 &#32;&#32;&#32;&#32;&#32;&#32;_connection.<link linkend="_class_leap_internal_1_1_connection_1a96db7c09526d9f356b88c0c9fe2dea25">Frames</link>.Get(out&#32;trackingEvent,&#32;history);
+00504 &#32;&#32;&#32;&#32;&#32;&#32;toFill.CopyFrom(ref&#32;trackingEvent);
+00505 &#32;&#32;&#32;&#32;}
+00506 
+<anchor xml:id="__controller_8cs_source_1l00514"/><link linkend="_class_leap_1_1_controller_1a3babd82558546e8bc5de90fb80d201ec">00514</link> &#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keywordtype">long</emphasis>&#32;<link linkend="_class_leap_1_1_controller_1a3babd82558546e8bc5de90fb80d201ec">FrameTimestamp</link>(<emphasis role="keywordtype">int</emphasis>&#32;history&#32;=&#32;0)&#32;{
+00515 &#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_struct_leap_internal_1_1_l_e_a_p___t_r_a_c_k_i_n_g___e_v_e_n_t">LEAP_TRACKING_EVENT</link>&#32;trackingEvent;
+00516 &#32;&#32;&#32;&#32;&#32;&#32;_connection.<link linkend="_class_leap_internal_1_1_connection_1a96db7c09526d9f356b88c0c9fe2dea25">Frames</link>.Get(out&#32;trackingEvent,&#32;history);
+00517 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;trackingEvent.info.timestamp;
+00518 &#32;&#32;&#32;&#32;}
+00519 
+<anchor xml:id="__controller_8cs_source_1l00524"/><link linkend="_class_leap_1_1_controller_1ac8b0d112dcaa36505057f7787a0dedda">00524</link> &#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<link linkend="_class_leap_1_1_frame">Frame</link>&#32;<link linkend="_class_leap_1_1_controller_1ac8b0d112dcaa36505057f7787a0dedda">GetTransformedFrame</link>(<link linkend="_struct_leap_1_1_leap_transform">LeapTransform</link>&#32;trs,&#32;<emphasis role="keywordtype">int</emphasis>&#32;history&#32;=&#32;0)&#32;{
+00525 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;<emphasis role="keyword">new</emphasis>&#32;<link linkend="_class_leap_1_1_controller_1ac41dc9c50a3bd2a892cc44af0859ef0d">Frame</link>().CopyFrom(<link linkend="_class_leap_1_1_controller_1ac41dc9c50a3bd2a892cc44af0859ef0d">Frame</link>(history)).Transform(trs);
+00526 &#32;&#32;&#32;&#32;}
+00527 
+<anchor xml:id="__controller_8cs_source_1l00531"/><link linkend="_class_leap_1_1_controller_1aa99cf433f25105c63083d9b6f6ded2e9">00531</link> &#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<link linkend="_class_leap_1_1_frame">Frame</link>&#32;<link linkend="_class_leap_1_1_controller_1aa99cf433f25105c63083d9b6f6ded2e9">GetInterpolatedFrame</link>(Int64&#32;time)&#32;{
+00532 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;_connection.<link linkend="_class_leap_internal_1_1_connection_1a6162a9db0b86aec5d517b316136c31c7">GetInterpolatedFrame</link>(time);
+00533 &#32;&#32;&#32;&#32;}
+00534 
+<anchor xml:id="__controller_8cs_source_1l00538"/><link linkend="_class_leap_1_1_controller_1a44c7a28591b2dab45849aa03640b4889">00538</link> &#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;<link linkend="_class_leap_1_1_controller_1a44c7a28591b2dab45849aa03640b4889">GetInterpolatedFrame</link>(<link linkend="_class_leap_1_1_frame">Frame</link>&#32;toFill,&#32;Int64&#32;time)&#32;{
+00539 &#32;&#32;&#32;&#32;&#32;&#32;_connection.<link linkend="_class_leap_internal_1_1_connection_1a6162a9db0b86aec5d517b316136c31c7">GetInterpolatedFrame</link>(toFill,&#32;time);
+00540 &#32;&#32;&#32;&#32;}
+00541 
+<anchor xml:id="__controller_8cs_source_1l00545"/><link linkend="_class_leap_1_1_controller_1a569698b8f3bfbf04216145f4c39d317a">00545</link> &#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<link linkend="_struct_leap_internal_1_1_l_e_a_p___h_e_a_d___p_o_s_e___e_v_e_n_t">LEAP_HEAD_POSE_EVENT</link>&#32;<link linkend="_class_leap_1_1_controller_1a569698b8f3bfbf04216145f4c39d317a">GetInterpolatedHeadPose</link>(Int64&#32;time)&#32;{
+00546 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;_connection.<link linkend="_class_leap_internal_1_1_connection_1a96355324ac7bacf3f563a45cebb5f878">GetInterpolatedHeadPose</link>(time);
+00547 &#32;&#32;&#32;&#32;}
+00548 
+<anchor xml:id="__controller_8cs_source_1l00549"/><link linkend="_class_leap_1_1_controller_1a3a249a28db2fc7e0088440d55a290638">00549</link> &#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;<link linkend="_class_leap_1_1_controller_1a3a249a28db2fc7e0088440d55a290638">GetInterpolatedHeadPose</link>(ref&#32;<link linkend="_struct_leap_internal_1_1_l_e_a_p___h_e_a_d___p_o_s_e___e_v_e_n_t">LEAP_HEAD_POSE_EVENT</link>&#32;toFill,&#32;Int64&#32;time)&#32;{
+00550 &#32;&#32;&#32;&#32;&#32;&#32;_connection.<link linkend="_class_leap_internal_1_1_connection_1a96355324ac7bacf3f563a45cebb5f878">GetInterpolatedHeadPose</link>(ref&#32;toFill,&#32;time);
+00551 &#32;&#32;&#32;&#32;}
+00552 
+<anchor xml:id="__controller_8cs_source_1l00553"/><link linkend="_class_leap_1_1_controller_1a0992fb52095c6948ab685dada1abfa2d">00553</link> &#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;<link linkend="_class_leap_1_1_controller_1a0992fb52095c6948ab685dada1abfa2d">TelemetryProfiling</link>(ref&#32;<link linkend="_struct_leap_internal_1_1_l_e_a_p___t_e_l_e_m_e_t_r_y___d_a_t_a">LEAP_TELEMETRY_DATA</link>&#32;telemetryData)&#32;{
+00554 &#32;&#32;&#32;&#32;&#32;&#32;_connection.<link linkend="_class_leap_internal_1_1_connection_1a26d1326d5ad65d3ac3daa5bc65e2d367">TelemetryProfiling</link>(ref&#32;telemetryData);
+00555 &#32;&#32;&#32;&#32;}
+00556 
+<anchor xml:id="__controller_8cs_source_1l00557"/><link linkend="_class_leap_1_1_controller_1a30f5d6dc2dfdce1cb56bcd8de049c38e">00557</link> &#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;UInt64&#32;<link linkend="_class_leap_1_1_controller_1a30f5d6dc2dfdce1cb56bcd8de049c38e">TelemetryGetNow</link>()&#32;{
+00558 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;<link linkend="_class_leap_internal_1_1_leap_c">LeapC</link>.<link linkend="_class_leap_internal_1_1_leap_c_1a415ed5d4673719ca1d3ed8c133416693">TelemetryGetNow</link>();
+00559 &#32;&#32;&#32;&#32;}
+00560 
+<anchor xml:id="__controller_8cs_source_1l00561"/><link linkend="_class_leap_1_1_controller_1a513b19658a9928fbcb338eda0dc49a13">00561</link> &#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;<link linkend="_class_leap_1_1_controller_1a513b19658a9928fbcb338eda0dc49a13">GetPointMapping</link>(ref&#32;<link linkend="_struct_leap_1_1_point_mapping">PointMapping</link>&#32;pointMapping)&#32;{
+00562 &#32;&#32;&#32;&#32;&#32;&#32;_connection.<link linkend="_class_leap_internal_1_1_connection_1ac5abf5861bb14690a4b6c84ca57c9c6e">GetPointMapping</link>(ref&#32;pointMapping);
+00563 &#32;&#32;&#32;&#32;}
+00564 
+<anchor xml:id="__controller_8cs_source_1l00574"/><link linkend="_class_leap_1_1_controller_1a10fe0670c31aa9c8193cde4abd57fcd7">00574</link> &#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;<link linkend="_class_leap_1_1_controller_1a10fe0670c31aa9c8193cde4abd57fcd7">GetInterpolatedLeftRightTransform</link>(Int64&#32;time,
+00575 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;Int64&#32;sourceTime,
+00576 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordtype">int</emphasis>&#32;leftId,
+00577 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordtype">int</emphasis>&#32;rightId,
+00578 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;out&#32;<link linkend="_struct_leap_1_1_leap_transform">LeapTransform</link>&#32;leftTransform,
+00579 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;out&#32;<link linkend="_struct_leap_1_1_leap_transform">LeapTransform</link>&#32;rightTransform)&#32;{
+00580 &#32;&#32;&#32;&#32;&#32;&#32;_connection.<link linkend="_class_leap_internal_1_1_connection_1a038ec58235de9d049bc3a11a07388403">GetInterpolatedLeftRightTransform</link>(time,&#32;sourceTime,&#32;leftId,&#32;rightId,&#32;out&#32;leftTransform,&#32;out&#32;rightTransform);
+00581 &#32;&#32;&#32;&#32;}
+00582 
+<anchor xml:id="__controller_8cs_source_1l00583"/><link linkend="_class_leap_1_1_controller_1ae025d7fd3e26a385907af50732d5cf6f">00583</link> &#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;<link linkend="_class_leap_1_1_controller_1ae025d7fd3e26a385907af50732d5cf6f">GetInterpolatedFrameFromTime</link>(<link linkend="_class_leap_1_1_frame">Frame</link>&#32;toFill,&#32;Int64&#32;time,&#32;Int64&#32;sourceTime)&#32;{
+00584 &#32;&#32;&#32;&#32;&#32;&#32;_connection.<link linkend="_class_leap_internal_1_1_connection_1a810b5d68c8fc21d2080a3cc60ad50520">GetInterpolatedFrameFromTime</link>(toFill,&#32;time,&#32;sourceTime);
+00585 &#32;&#32;&#32;&#32;}
+00586 
+<anchor xml:id="__controller_8cs_source_1l00593"/><link linkend="_class_leap_1_1_controller_1a57650944fa868adcfe4cea8608af5a03">00593</link> &#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keywordtype">long</emphasis>&#32;<link linkend="_class_leap_1_1_controller_1a57650944fa868adcfe4cea8608af5a03">Now</link>()&#32;{
+00594 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;<link linkend="_class_leap_internal_1_1_leap_c">LeapC</link>.<link linkend="_class_leap_internal_1_1_leap_c_1a92e9bb730041df4094e328bcf326da47">GetNow</link>();
+00595 &#32;&#32;&#32;&#32;}
+00596 
+<anchor xml:id="__controller_8cs_source_1l00612"/><link linkend="_class_leap_1_1_controller_1aac7cccf354ef1a6f1f01222a9b63d8bd">00612</link> &#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keywordtype">bool</emphasis>&#32;<link linkend="_class_leap_1_1_controller_1aac7cccf354ef1a6f1f01222a9b63d8bd">IsConnected</link>&#32;{
+00613 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">get</emphasis>&#32;{
+00614 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;<link linkend="_class_leap_1_1_controller_1a8ecf0fd02e617da823b46b5f73b38eb0">IsServiceConnected</link>&#32;&amp;&amp;&#32;<link linkend="_class_leap_1_1_controller_1aa5e641f54418e5194161ac45dc15c7fb">Devices</link>.Count&#32;&gt;&#32;0;
+00615 &#32;&#32;&#32;&#32;&#32;&#32;}
+00616 &#32;&#32;&#32;&#32;}
+00617 
+<anchor xml:id="__controller_8cs_source_1l00624"/><link linkend="_class_leap_1_1_controller_1a12503273371b21d58952a99b5fc5b0d9">00624</link> &#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<link linkend="_class_leap_1_1_config">Config</link>&#32;<link linkend="_class_leap_1_1_config">Config</link>&#32;{
+00625 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">get</emphasis>&#32;{
+00626 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(_config&#32;==&#32;<emphasis role="keyword">null</emphasis>)
+00627 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;_config&#32;=&#32;<emphasis role="keyword">new</emphasis>&#32;<link linkend="_class_leap_1_1_controller_1a12503273371b21d58952a99b5fc5b0d9">Config</link>(this._connection.<link linkend="_class_leap_internal_1_1_connection_1a57ca44db295ca2da43050d4eb608e23c">ConnectionKey</link>);
+00628 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;_config;
+00629 &#32;&#32;&#32;&#32;&#32;&#32;}
+00630 &#32;&#32;&#32;&#32;}
+00631 
+<anchor xml:id="__controller_8cs_source_1l00644"/><link linkend="_class_leap_1_1_controller_1aa5e641f54418e5194161ac45dc15c7fb">00644</link> &#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<link linkend="_class_leap_1_1_device_list">DeviceList</link>&#32;<link linkend="_class_leap_1_1_controller_1aa5e641f54418e5194161ac45dc15c7fb">Devices</link>&#32;{
+00645 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">get</emphasis>&#32;{
+00646 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;_connection.<link linkend="_class_leap_internal_1_1_connection_1a986b77cb70270ee5d44d1d83db845dfe">Devices</link>;
+00647 &#32;&#32;&#32;&#32;&#32;&#32;}
+00648 &#32;&#32;&#32;&#32;}
+00649 
+<anchor xml:id="__controller_8cs_source_1l00658"/><link linkend="_class_leap_1_1_controller_1ab73815d54d49bf570371fe1ec39fe770">00658</link> &#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<link linkend="_class_leap_1_1_failed_device_list">FailedDeviceList</link>&#32;<link linkend="_class_leap_1_1_controller_1ab73815d54d49bf570371fe1ec39fe770">FailedDevices</link>()&#32;{
+00659 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;_connection.<link linkend="_class_leap_internal_1_1_connection_1ae45e28603b9dd28c0c30b8f57f2a3366">FailedDevices</link>;
+00660 &#32;&#32;&#32;&#32;}
+00661 
+<anchor xml:id="__controller_8cs_source_1l00690"/><link linkend="_class_leap_1_1_controller_1a0bdb49fa94aa2da8b098c1ac296528d6">00690</link> &#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keyword">enum</emphasis>&#32;<link linkend="_class_leap_1_1_controller_1a0bdb49fa94aa2da8b098c1ac296528d6">PolicyFlag</link>&#32;{
+00694 &#32;&#32;&#32;&#32;&#32;&#32;POLICY_DEFAULT&#32;=&#32;0,
+00698 &#32;&#32;&#32;&#32;&#32;&#32;POLICY_BACKGROUND_FRAMES&#32;=&#32;(1&#32;&lt;&lt;&#32;0),
+00702 &#32;&#32;&#32;&#32;&#32;&#32;POLICY_IMAGES&#32;=&#32;(1&#32;&lt;&lt;&#32;1),
+00706 &#32;&#32;&#32;&#32;&#32;&#32;POLICY_OPTIMIZE_HMD&#32;=&#32;(1&#32;&lt;&lt;&#32;2),
+00710 &#32;&#32;&#32;&#32;&#32;&#32;POLICY_ALLOW_PAUSE_RESUME&#32;=&#32;(1&#32;&lt;&lt;&#32;3),
+00714 &#32;&#32;&#32;&#32;&#32;&#32;POLICY_MAP_POINTS&#32;=&#32;(1&#32;&lt;&lt;&#32;7),
+00715 &#32;&#32;&#32;&#32;}
+00716 
+<anchor xml:id="__controller_8cs_source_1l00717"/><link linkend="_class_leap_1_1_controller_1a0e0ce4c3c7526305c2a8c79c7f5cd1a7">00717</link> &#32;&#32;&#32;&#32;<emphasis role="keyword">protected</emphasis>&#32;<emphasis role="keyword">virtual</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;<link linkend="_class_leap_1_1_controller_1a0e0ce4c3c7526305c2a8c79c7f5cd1a7">OnInit</link>(<emphasis role="keywordtype">object</emphasis>&#32;sender,&#32;<link linkend="_class_leap_1_1_leap_event_args">LeapEventArgs</link>&#32;eventArgs)&#32;{
+00718 &#32;&#32;&#32;&#32;&#32;&#32;_hasInitialized&#32;=&#32;<emphasis role="keyword">true</emphasis>;
+00719 &#32;&#32;&#32;&#32;}
+00720 
+<anchor xml:id="__controller_8cs_source_1l00721"/><link linkend="_class_leap_1_1_controller_1afb73429c5375282477149dfbb9cc698f">00721</link> &#32;&#32;&#32;&#32;<emphasis role="keyword">protected</emphasis>&#32;<emphasis role="keyword">virtual</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;<link linkend="_class_leap_1_1_controller_1afb73429c5375282477149dfbb9cc698f">OnConnect</link>(<emphasis role="keywordtype">object</emphasis>&#32;sender,&#32;<link linkend="_class_leap_1_1_connection_event_args">ConnectionEventArgs</link>&#32;eventArgs)&#32;{
+00722 &#32;&#32;&#32;&#32;&#32;&#32;_hasConnected&#32;=&#32;<emphasis role="keyword">true</emphasis>;
+00723 &#32;&#32;&#32;&#32;}
+00724 
+<anchor xml:id="__controller_8cs_source_1l00725"/><link linkend="_class_leap_1_1_controller_1a06fff0c5313c992da0b84714f561acff">00725</link> &#32;&#32;&#32;&#32;<emphasis role="keyword">protected</emphasis>&#32;<emphasis role="keyword">virtual</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;<link linkend="_class_leap_1_1_controller_1a06fff0c5313c992da0b84714f561acff">OnDisconnect</link>(<emphasis role="keywordtype">object</emphasis>&#32;sender,&#32;<link linkend="_class_leap_1_1_connection_lost_event_args">ConnectionLostEventArgs</link>&#32;eventArgs)&#32;{
+00726 &#32;&#32;&#32;&#32;&#32;&#32;_hasInitialized&#32;=&#32;<emphasis role="keyword">false</emphasis>;
+00727 &#32;&#32;&#32;&#32;&#32;&#32;_hasConnected&#32;=&#32;<emphasis role="keyword">false</emphasis>;
+00728 &#32;&#32;&#32;&#32;}
+00729 &#32;&#32;}
+00730 }
+</programlisting></section>

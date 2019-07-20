@@ -1,0 +1,309 @@
+<?xml version='1.0' encoding='UTF-8' standalone='no'?>
+<section xmlns="http://docbook.org/ns/docbook" version="5.0" xmlns:xlink="http://www.w3.org/1999/xlink" xml:id="__t_m_pro___context_menus_8cs_source">
+<title>TMPro_ContextMenus.cs</title>
+<indexterm><primary>O:/GitHUBMINIPRoject/Library/PackageCache/com.unity.textmeshpro@1.3.0/Scripts/Editor/TMPro_ContextMenus.cs</primary></indexterm>
+<programlisting>00001 <emphasis role="keyword">using</emphasis>&#32;<link linkend="__balloon_8cs_1a7d67e097df9376eb709b6a23aa3c7d23">UnityEngine</link>;
+00002 <emphasis role="keyword">using</emphasis>&#32;<link linkend="_namespace_unity_editor">UnityEditor</link>;
+00003 <emphasis role="keyword">using</emphasis>&#32;System.IO;
+00004 <emphasis role="keyword">using</emphasis>&#32;System.Collections;
+00005 
+00006 
+00007 <emphasis role="keyword">namespace&#32;</emphasis><link linkend="_namespace_t_m_pro_1_1_editor_utilities">TMPro.EditorUtilities</link>
+00008 {
+00009 
+<anchor xml:id="__t_m_pro___context_menus_8cs_source_1l00010"/><link linkend="_class_t_m_pro_1_1_editor_utilities_1_1_t_m_p___context_menus">00010</link> &#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keyword">class&#32;</emphasis><link linkend="_class_t_m_pro_1_1_editor_utilities_1_1_t_m_p___context_menus">TMP_ContextMenus</link>&#32;:&#32;Editor
+00011 &#32;&#32;&#32;&#32;{
+00012 
+00013 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;<emphasis role="keyword">static</emphasis>&#32;Texture&#32;m_copiedTexture;
+00014 
+00015 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;<emphasis role="keyword">static</emphasis>&#32;Material&#32;m_copiedProperties;
+00016 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;<emphasis role="keyword">static</emphasis>&#32;Material&#32;m_copiedAtlasProperties;
+00017 
+00018 
+00019 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;Add&#32;a&#32;Context&#32;Menu&#32;to&#32;the&#32;Texture&#32;Editor&#32;Panel&#32;to&#32;allow&#32;Copy&#32;/&#32;Paste&#32;of&#32;Texture.</emphasis>
+00020 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;[MenuItem(<emphasis role="stringliteral">&quot;CONTEXT/Texture/Copy&quot;</emphasis>,&#32;<emphasis role="keyword">false</emphasis>,&#32;2000)]
+00021 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">static</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;CopyTexture(MenuCommand&#32;command)
+00022 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00023 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;m_copiedTexture&#32;=&#32;command.context&#32;as&#32;Texture;
+00024 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00025 
+00026 
+00027 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;Select&#32;the&#32;currently&#32;assigned&#32;material&#32;or&#32;material&#32;preset.</emphasis>
+00028 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;[MenuItem(<emphasis role="stringliteral">&quot;CONTEXT/Material/Select&#32;Material&quot;</emphasis>,&#32;<emphasis role="keyword">false</emphasis>,&#32;500)]
+00029 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">static</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;SelectMaterial(MenuCommand&#32;command)
+00030 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00031 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;Material&#32;mat&#32;=&#32;command.context&#32;as&#32;Material;
+00032 
+00033 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;Select&#32;current&#32;material</emphasis>
+00034 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;EditorUtility.FocusProjectWindow();
+00035 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;EditorGUIUtility.PingObject(mat);
+00036 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00037 
+00038 
+00039 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;Add&#32;a&#32;Context&#32;Menu&#32;to&#32;allow&#32;easy&#32;duplication&#32;of&#32;the&#32;Material.</emphasis>
+00040 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;[MenuItem(<emphasis role="stringliteral">&quot;CONTEXT/Material/Create&#32;Material&#32;Preset&quot;</emphasis>,&#32;<emphasis role="keyword">false</emphasis>)]
+00041 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">static</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;DuplicateMaterial(MenuCommand&#32;command)
+00042 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00043 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;Get&#32;the&#32;type&#32;of&#32;text&#32;object</emphasis>
+00044 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;If&#32;material&#32;is&#32;not&#32;a&#32;base&#32;material,&#32;we&#32;get&#32;material&#32;leaks...</emphasis>
+00045 
+00046 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;Material&#32;source_Mat&#32;=&#32;(Material)command.context;
+00047 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;if&#32;(!EditorUtility.IsPersistent(source_Mat))
+00048 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00049 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;Debug.LogWarning(<emphasis role="stringliteral">&quot;Material&#32;is&#32;an&#32;instance&#32;and&#32;cannot&#32;be&#32;converted&#32;into&#32;a&#32;permanent&#32;asset.&quot;</emphasis>);
+00050 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>;
+00051 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00052 
+00053 
+00054 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordtype">string</emphasis>&#32;assetPath&#32;=&#32;AssetDatabase.GetAssetPath(source_Mat).Split(<emphasis role="charliteral">&apos;.&apos;</emphasis>)[0];
+00055 
+00056 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;Material&#32;duplicate&#32;=&#32;<emphasis role="keyword">new</emphasis>&#32;Material(source_Mat);
+00057 
+00058 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;Need&#32;to&#32;manually&#32;copy&#32;the&#32;shader&#32;keywords</emphasis>
+00059 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;duplicate.shaderKeywords&#32;=&#32;source_Mat.shaderKeywords;
+00060 
+00061 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;AssetDatabase.CreateAsset(duplicate,&#32;AssetDatabase.GenerateUniqueAssetPath(assetPath&#32;+&#32;<emphasis role="stringliteral">&quot;.mat&quot;</emphasis>));
+00062 
+00063 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;Assign&#32;duplicate&#32;Material&#32;to&#32;selected&#32;object&#32;(if&#32;one&#32;is)</emphasis>
+00064 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(Selection.activeGameObject&#32;!=&#32;<emphasis role="keyword">null</emphasis>)
+00065 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00066 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_t_m_pro_1_1_t_m_p___text">TMP_Text</link>&#32;textObject&#32;=&#32;Selection.activeGameObject.GetComponent&lt;<link linkend="_class_t_m_pro_1_1_t_m_p___text">TMP_Text</link>&gt;();
+00067 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(textObject&#32;!=&#32;<emphasis role="keyword">null</emphasis>)
+00068 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00069 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;textObject.<link linkend="_class_t_m_pro_1_1_t_m_p___text_1ae8499604279c5c7af4ce94b3ba839a32">fontSharedMaterial</link>&#32;=&#32;duplicate;
+00070 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00071 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">else</emphasis>
+00072 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00073 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_t_m_pro_1_1_t_m_p___sub_mesh">TMP_SubMesh</link>&#32;subMeshObject&#32;=&#32;Selection.activeGameObject.GetComponent&lt;<link linkend="_class_t_m_pro_1_1_t_m_p___sub_mesh">TMP_SubMesh</link>&gt;();
+00074 
+00075 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(subMeshObject&#32;!=&#32;<emphasis role="keyword">null</emphasis>)
+00076 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;subMeshObject.<link linkend="_class_t_m_pro_1_1_t_m_p___sub_mesh_1ac9177ee19f2dc7501888f62ad5c8798d">sharedMaterial</link>&#32;=&#32;duplicate;
+00077 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">else</emphasis>
+00078 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00079 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_t_m_pro_1_1_t_m_p___sub_mesh_u_i">TMP_SubMeshUI</link>&#32;subMeshUIObject&#32;=&#32;Selection.activeGameObject.GetComponent&lt;<link linkend="_class_t_m_pro_1_1_t_m_p___sub_mesh_u_i">TMP_SubMeshUI</link>&gt;();
+00080 
+00081 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(subMeshUIObject&#32;!=&#32;<emphasis role="keyword">null</emphasis>)
+00082 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;subMeshUIObject.<link linkend="_class_t_m_pro_1_1_t_m_p___sub_mesh_u_i_1a05ed962e084767f371f3971078a84ec7">sharedMaterial</link>&#32;=&#32;duplicate;
+00083 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00084 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00085 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00086 
+00087 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;Ping&#32;newly&#32;created&#32;Material&#32;Preset.</emphasis>
+00088 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;EditorUtility.FocusProjectWindow();
+00089 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;EditorGUIUtility.PingObject(duplicate);
+00090 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00091 
+00092 
+00093 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//[MenuItem(&quot;CONTEXT/MaterialComponent/Copy&#32;Material&#32;Properties&quot;,&#32;false)]</emphasis>
+00094 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;[MenuItem(<emphasis role="stringliteral">&quot;CONTEXT/Material/Copy&#32;Material&#32;Properties&quot;</emphasis>,&#32;<emphasis role="keyword">false</emphasis>)]
+00095 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">static</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;CopyMaterialProperties(MenuCommand&#32;command)
+00096 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00097 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;Material&#32;mat&#32;=&#32;<emphasis role="keyword">null</emphasis>;
+00098 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(command.context.GetType()&#32;==&#32;typeof(Material))
+00099 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;mat&#32;=&#32;(Material)command.context;
+00100 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">else</emphasis>
+00101 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00102 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;mat&#32;=&#32;Selection.activeGameObject.GetComponent&lt;CanvasRenderer&gt;().GetMaterial();
+00103 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00104 
+00105 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;m_copiedProperties&#32;=&#32;<emphasis role="keyword">new</emphasis>&#32;Material(mat);
+00106 
+00107 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;m_copiedProperties.shaderKeywords&#32;=&#32;mat.shaderKeywords;
+00108 
+00109 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;m_copiedProperties.hideFlags&#32;=&#32;HideFlags.DontSave;
+00110 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00111 
+00112 
+00113 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;PASTE&#32;MATERIAL</emphasis>
+00114 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//[MenuItem(&quot;CONTEXT/MaterialComponent/Paste&#32;Material&#32;Properties&quot;,&#32;false)]</emphasis>
+00115 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;[MenuItem(<emphasis role="stringliteral">&quot;CONTEXT/Material/Paste&#32;Material&#32;Properties&quot;</emphasis>,&#32;<emphasis role="keyword">false</emphasis>)]
+00116 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">static</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;PasteMaterialProperties(MenuCommand&#32;command)
+00117 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00118 
+00119 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(m_copiedProperties&#32;==&#32;<emphasis role="keyword">null</emphasis>)
+00120 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00121 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;Debug.LogWarning(<emphasis role="stringliteral">&quot;No&#32;Material&#32;Properties&#32;to&#32;Paste.&#32;Use&#32;Copy&#32;Material&#32;Properties&#32;first.&quot;</emphasis>);
+00122 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>;
+00123 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00124 
+00125 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;Material&#32;mat&#32;=&#32;<emphasis role="keyword">null</emphasis>;
+00126 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(command.context.GetType()&#32;==&#32;typeof(Material))
+00127 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;mat&#32;=&#32;(Material)command.context;
+00128 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">else</emphasis>
+00129 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00130 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;mat&#32;=&#32;Selection.activeGameObject.GetComponent&lt;CanvasRenderer&gt;().GetMaterial();
+00131 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00132 
+00133 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;Undo.RecordObject(mat,&#32;<emphasis role="stringliteral">&quot;Paste&#32;Material&quot;</emphasis>);
+00134 
+00135 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;ShaderUtilities.GetShaderPropertyIDs();&#32;<emphasis role="comment">//&#32;Make&#32;sure&#32;we&#32;have&#32;valid&#32;Property&#32;IDs</emphasis>
+00136 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(mat.HasProperty(ShaderUtilities.ID_GradientScale))
+00137 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00138 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;Preserve&#32;unique&#32;SDF&#32;properties&#32;from&#32;destination&#32;material.</emphasis>
+00139 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;m_copiedProperties.SetTexture(ShaderUtilities.ID_MainTex,&#32;mat.GetTexture(ShaderUtilities.ID_MainTex));
+00140 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;m_copiedProperties.SetFloat(ShaderUtilities.ID_GradientScale,&#32;mat.GetFloat(ShaderUtilities.ID_GradientScale));
+00141 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;m_copiedProperties.SetFloat(ShaderUtilities.ID_TextureWidth,&#32;mat.GetFloat(ShaderUtilities.ID_TextureWidth));
+00142 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;m_copiedProperties.SetFloat(ShaderUtilities.ID_TextureHeight,&#32;mat.GetFloat(ShaderUtilities.ID_TextureHeight));
+00143 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00144 
+00145 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;EditorShaderUtilities.CopyMaterialProperties(m_copiedProperties,&#32;mat);
+00146 
+00147 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;Copy&#32;ShaderKeywords&#32;from&#32;one&#32;material&#32;to&#32;the&#32;other.</emphasis>
+00148 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;mat.shaderKeywords&#32;=&#32;m_copiedProperties.shaderKeywords;
+00149 
+00150 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;Let&#32;TextMeshPro&#32;Objects&#32;that&#32;this&#32;mat&#32;has&#32;changed.</emphasis>
+00151 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;TMPro_EventManager.ON_MATERIAL_PROPERTY_CHANGED(<emphasis role="keyword">true</emphasis>,&#32;mat);
+00152 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00153 
+00154 
+00155 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;Enable&#32;Resetting&#32;of&#32;Material&#32;properties&#32;without&#32;losing&#32;unique&#32;properties&#32;of&#32;the&#32;font&#32;atlas.</emphasis>
+00156 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//[MenuItem(&quot;CONTEXT/MaterialComponent/Reset&quot;,&#32;false,&#32;2100)]</emphasis>
+00157 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;[MenuItem(<emphasis role="stringliteral">&quot;CONTEXT/Material/Reset&quot;</emphasis>,&#32;<emphasis role="keyword">false</emphasis>,&#32;2100)]
+00158 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">static</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;ResetSettings(MenuCommand&#32;command)
+00159 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00160 
+00161 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;Material&#32;mat&#32;=&#32;<emphasis role="keyword">null</emphasis>;
+00162 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(command.context.GetType()&#32;==&#32;typeof(Material))
+00163 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;mat&#32;=&#32;(Material)command.context;
+00164 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">else</emphasis>
+00165 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00166 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;mat&#32;=&#32;Selection.activeGameObject.GetComponent&lt;CanvasRenderer&gt;().GetMaterial();
+00167 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00168 
+00169 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;Undo.RecordObject(mat,&#32;<emphasis role="stringliteral">&quot;Reset&#32;Material&quot;</emphasis>);
+00170 
+00171 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;ShaderUtilities.GetShaderPropertyIDs();&#32;<emphasis role="comment">//&#32;Make&#32;sure&#32;we&#32;have&#32;valid&#32;Property&#32;IDs</emphasis>
+00172 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(mat.HasProperty(ShaderUtilities.ID_GradientScale))
+00173 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00174 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;Copy&#32;unique&#32;properties&#32;of&#32;the&#32;SDF&#32;Material</emphasis>
+00175 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;var&#32;texture&#32;=&#32;mat.GetTexture(ShaderUtilities.ID_MainTex);
+00176 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;var&#32;gradientScale&#32;=&#32;mat.GetFloat(ShaderUtilities.ID_GradientScale);
+00177 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;var&#32;texWidth&#32;=&#32;mat.GetFloat(ShaderUtilities.ID_TextureWidth);
+00178 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;var&#32;texHeight&#32;=&#32;mat.GetFloat(ShaderUtilities.ID_TextureHeight);
+00179 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;var&#32;stencilId&#32;=&#32;mat.GetFloat(ShaderUtilities.ID_StencilID);
+00180 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;var&#32;stencilComp&#32;=&#32;mat.GetFloat(ShaderUtilities.ID_StencilComp);
+00181 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;var&#32;normalWeight&#32;=&#32;mat.GetFloat(ShaderUtilities.ID_WeightNormal);
+00182 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;var&#32;boldWeight&#32;=&#32;mat.GetFloat(ShaderUtilities.ID_WeightBold);
+00183 
+00184 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;Reset&#32;the&#32;material</emphasis>
+00185 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;Unsupported.SmartReset(mat);
+00186 
+00187 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;Reset&#32;ShaderKeywords</emphasis>
+00188 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;mat.shaderKeywords&#32;=&#32;<emphasis role="keyword">new</emphasis>&#32;<emphasis role="keywordtype">string</emphasis>[0];&#32;<emphasis role="comment">//&#32;{&#32;&quot;BEVEL_OFF&quot;,&#32;&quot;GLOW_OFF&quot;,&#32;&quot;UNDERLAY_OFF&quot;&#32;};</emphasis>
+00189 
+00190 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;Copy&#32;unique&#32;material&#32;properties&#32;back&#32;to&#32;the&#32;material.</emphasis>
+00191 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;mat.SetTexture(ShaderUtilities.ID_MainTex,&#32;texture);
+00192 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;mat.SetFloat(ShaderUtilities.ID_GradientScale,&#32;gradientScale);
+00193 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;mat.SetFloat(ShaderUtilities.ID_TextureWidth,&#32;texWidth);
+00194 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;mat.SetFloat(ShaderUtilities.ID_TextureHeight,&#32;texHeight);
+00195 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;mat.SetFloat(ShaderUtilities.ID_StencilID,&#32;stencilId);
+00196 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;mat.SetFloat(ShaderUtilities.ID_StencilComp,&#32;stencilComp);
+00197 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;mat.SetFloat(ShaderUtilities.ID_WeightNormal,&#32;normalWeight);
+00198 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;mat.SetFloat(ShaderUtilities.ID_WeightBold,&#32;boldWeight);
+00199 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00200 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">else</emphasis>
+00201 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00202 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;Unsupported.SmartReset(mat);
+00203 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00204 
+00205 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;TMPro_EventManager.ON_MATERIAL_PROPERTY_CHANGED(<emphasis role="keyword">true</emphasis>,&#32;mat);
+00206 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00207 
+00208 
+00209 
+00210 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//This&#32;function&#32;is&#32;used&#32;for&#32;debugging&#32;and&#32;fixing&#32;potentially&#32;broken&#32;font&#32;atlas&#32;links.</emphasis>
+00211 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;[MenuItem(<emphasis role="stringliteral">&quot;CONTEXT/Material/Copy&#32;Atlas&quot;</emphasis>,&#32;<emphasis role="keyword">false</emphasis>,&#32;2000)]
+00212 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">static</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;CopyAtlas(MenuCommand&#32;command)
+00213 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00214 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;Material&#32;mat&#32;=&#32;command.context&#32;as&#32;Material;
+00215 
+00216 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;m_copiedAtlasProperties&#32;=&#32;<emphasis role="keyword">new</emphasis>&#32;Material(mat);
+00217 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;m_copiedAtlasProperties.hideFlags&#32;=&#32;HideFlags.DontSave;
+00218 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00219 
+00220 
+00221 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;This&#32;function&#32;is&#32;used&#32;for&#32;debugging&#32;and&#32;fixing&#32;potentially&#32;broken&#32;font&#32;atlas&#32;links</emphasis>
+00222 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;[MenuItem(<emphasis role="stringliteral">&quot;CONTEXT/Material/Paste&#32;Atlas&quot;</emphasis>,&#32;<emphasis role="keyword">false</emphasis>,&#32;2001)]
+00223 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">static</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;PasteAtlas(MenuCommand&#32;command)
+00224 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00225 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;Material&#32;mat&#32;=&#32;command.context&#32;as&#32;Material;
+00226 
+00227 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(m_copiedAtlasProperties&#32;!=&#32;<emphasis role="keyword">null</emphasis>)
+00228 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00229 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;Undo.RecordObject(mat,&#32;<emphasis role="stringliteral">&quot;Paste&#32;Texture&quot;</emphasis>);
+00230 
+00231 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;ShaderUtilities.GetShaderPropertyIDs();&#32;<emphasis role="comment">//&#32;Make&#32;sure&#32;we&#32;have&#32;valid&#32;Property&#32;IDs</emphasis>
+00232 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;mat.SetTexture(ShaderUtilities.ID_MainTex,&#32;m_copiedAtlasProperties.GetTexture(ShaderUtilities.ID_MainTex));
+00233 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;mat.SetFloat(ShaderUtilities.ID_GradientScale,&#32;m_copiedAtlasProperties.GetFloat(ShaderUtilities.ID_GradientScale));
+00234 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;mat.SetFloat(ShaderUtilities.ID_TextureWidth,&#32;m_copiedAtlasProperties.GetFloat(ShaderUtilities.ID_TextureWidth));
+00235 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;mat.SetFloat(ShaderUtilities.ID_TextureHeight,&#32;m_copiedAtlasProperties.GetFloat(ShaderUtilities.ID_TextureHeight));
+00236 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00237 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">else</emphasis>&#32;<emphasis role="keywordflow">if</emphasis>&#32;(m_copiedTexture&#32;!=&#32;<emphasis role="keyword">null</emphasis>)
+00238 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00239 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;Undo.RecordObject(mat,&#32;<emphasis role="stringliteral">&quot;Paste&#32;Texture&quot;</emphasis>);
+00240 
+00241 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;mat.SetTexture(ShaderUtilities.ID_MainTex,&#32;m_copiedTexture);
+00242 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00243 
+00244 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//DestroyImmediate(m_copiedAtlasProperties);</emphasis>
+00245 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00246 
+00247 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;Context&#32;Menus&#32;for&#32;TMPro&#32;Font&#32;Assets</emphasis>
+00248 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//This&#32;function&#32;is&#32;used&#32;for&#32;debugging&#32;and&#32;fixing&#32;potentially&#32;broken&#32;font&#32;atlas&#32;links.</emphasis>
+00249 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;[MenuItem(<emphasis role="stringliteral">&quot;CONTEXT/TMP_FontAsset/Extract&#32;Atlas&quot;</emphasis>,&#32;<emphasis role="keyword">false</emphasis>,&#32;2100)]
+00250 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">static</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;ExtractAtlas(MenuCommand&#32;command)
+00251 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00252 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_t_m_pro_1_1_t_m_p___font_asset">TMP_FontAsset</link>&#32;font&#32;=&#32;command.context&#32;as&#32;<link linkend="_class_t_m_pro_1_1_t_m_p___font_asset">TMP_FontAsset</link>;
+00253 
+00254 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordtype">string</emphasis>&#32;fontPath&#32;=&#32;AssetDatabase.GetAssetPath(font);
+00255 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordtype">string</emphasis>&#32;texPath&#32;=&#32;Path.GetDirectoryName(fontPath)&#32;+&#32;<emphasis role="stringliteral">&quot;/&quot;</emphasis>&#32;+&#32;Path.GetFileNameWithoutExtension(fontPath)&#32;+&#32;<emphasis role="stringliteral">&quot;&#32;Atlas.png&quot;</emphasis>;
+00256 
+00257 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;Create&#32;a&#32;Serialized&#32;Object&#32;of&#32;the&#32;texture&#32;to&#32;allow&#32;us&#32;to&#32;make&#32;it&#32;readable.</emphasis>
+00258 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;SerializedObject&#32;texprop&#32;=&#32;<emphasis role="keyword">new</emphasis>&#32;SerializedObject(font.<link linkend="_class_t_m_pro_1_1_t_m_p___asset_1a8dcd405969e8c3aaa441c0fe3b0b6eaa">material</link>.GetTexture(ShaderUtilities.ID_MainTex));
+00259 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;texprop.FindProperty(<emphasis role="stringliteral">&quot;m_IsReadable&quot;</emphasis>).boolValue&#32;=&#32;<emphasis role="keyword">true</emphasis>;
+00260 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;texprop.ApplyModifiedProperties();
+00261 
+00262 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;Create&#32;a&#32;copy&#32;of&#32;the&#32;texture.</emphasis>
+00263 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;Texture2D&#32;tex&#32;=&#32;Instantiate(font.<link linkend="_class_t_m_pro_1_1_t_m_p___asset_1a8dcd405969e8c3aaa441c0fe3b0b6eaa">material</link>.GetTexture(ShaderUtilities.ID_MainTex))&#32;as&#32;Texture2D;
+00264 
+00265 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;Set&#32;the&#32;texture&#32;to&#32;not&#32;readable&#32;again.</emphasis>
+00266 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;texprop.FindProperty(<emphasis role="stringliteral">&quot;m_IsReadable&quot;</emphasis>).boolValue&#32;=&#32;<emphasis role="keyword">false</emphasis>;
+00267 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;texprop.ApplyModifiedProperties();
+00268 
+00269 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;Debug.Log(texPath);
+00270 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;Saving&#32;File&#32;for&#32;Debug</emphasis>
+00271 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;var&#32;pngData&#32;=&#32;tex.EncodeToPNG();
+00272 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;File.WriteAllBytes(texPath,&#32;pngData);
+00273 
+00274 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;AssetDatabase.Refresh();
+00275 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;DestroyImmediate(tex);
+00276 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00277 
+00282 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;[MenuItem(<emphasis role="stringliteral">&quot;CONTEXT/TMP_FontAsset/Update&#32;Atlas&#32;Texture...&quot;</emphasis>,&#32;<emphasis role="keyword">false</emphasis>,&#32;2000)]
+00283 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">static</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;RegenerateFontAsset(MenuCommand&#32;command)
+00284 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00285 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_t_m_pro_1_1_t_m_p___font_asset">TMP_FontAsset</link>&#32;fontAsset&#32;=&#32;command.context&#32;as&#32;<link linkend="_class_t_m_pro_1_1_t_m_p___font_asset">TMP_FontAsset</link>;
+00286 
+00287 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(fontAsset&#32;!=&#32;<emphasis role="keyword">null</emphasis>)
+00288 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00289 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_t_m_pro_1_1_editor_utilities_1_1_t_m_pro___font_asset_creator_window">TMPro_FontAssetCreatorWindow</link>.<link linkend="_class_t_m_pro_1_1_editor_utilities_1_1_t_m_pro___font_asset_creator_window_1add90ea25a2962e0e7bd63e59da7e7cef">ShowFontAtlasCreatorWindow</link>(fontAsset);
+00290 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00291 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00292 
+00293 
+00294 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;[MenuItem(<emphasis role="stringliteral">&quot;CONTEXT/TrueTypeFontImporter/Create&#32;TMP&#32;Font&#32;Asset...&quot;</emphasis>,&#32;<emphasis role="keyword">false</emphasis>,&#32;200)]
+00295 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">static</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;CreateFontAsset(MenuCommand&#32;command)
+00296 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00297 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;TrueTypeFontImporter&#32;importer&#32;=&#32;command.context&#32;as&#32;TrueTypeFontImporter;
+00298 
+00299 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(importer&#32;!=&#32;<emphasis role="keyword">null</emphasis>)
+00300 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00301 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;Font&#32;sourceFontFile&#32;=&#32;AssetDatabase.LoadAssetAtPath&lt;Font&gt;(importer.assetPath);
+00302 
+00303 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(sourceFontFile)
+00304 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_t_m_pro_1_1_editor_utilities_1_1_t_m_pro___font_asset_creator_window">TMPro_FontAssetCreatorWindow</link>.<link linkend="_class_t_m_pro_1_1_editor_utilities_1_1_t_m_pro___font_asset_creator_window_1add90ea25a2962e0e7bd63e59da7e7cef">ShowFontAtlasCreatorWindow</link>(sourceFontFile);
+00305 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00306 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00307 &#32;&#32;&#32;&#32;}
+00308 }
+</programlisting></section>

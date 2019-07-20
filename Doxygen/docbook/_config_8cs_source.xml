@@ -1,0 +1,144 @@
+<?xml version='1.0' encoding='UTF-8' standalone='no'?>
+<section xmlns="http://docbook.org/ns/docbook" version="5.0" xmlns:xlink="http://www.w3.org/1999/xlink" xml:id="__config_8cs_source">
+<title>Config.cs</title>
+<indexterm><primary>O:/GitHUBMINIPRoject/Assets/LeapMotion/Core/Plugins/LeapCSharp/Config.cs</primary></indexterm>
+<programlisting>00001 <emphasis role="comment">/******************************************************************************</emphasis>
+00002 <emphasis role="comment">&#32;*&#32;Copyright&#32;(C)&#32;Leap&#32;Motion,&#32;Inc.&#32;2011-2018.&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;*</emphasis>
+00003 <emphasis role="comment">&#32;*&#32;Leap&#32;Motion&#32;proprietary&#32;and&#32;confidential.&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;*</emphasis>
+00004 <emphasis role="comment">&#32;*&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;*</emphasis>
+00005 <emphasis role="comment">&#32;*&#32;Use&#32;subject&#32;to&#32;the&#32;terms&#32;of&#32;the&#32;Leap&#32;Motion&#32;SDK&#32;Agreement&#32;available&#32;at&#32;&#32;&#32;&#32;&#32;*</emphasis>
+00006 <emphasis role="comment">&#32;*&#32;https://developer.leapmotion.com/sdk_agreement,&#32;or&#32;another&#32;agreement&#32;&#32;&#32;&#32;&#32;&#32;&#32;*</emphasis>
+00007 <emphasis role="comment">&#32;*&#32;between&#32;Leap&#32;Motion&#32;and&#32;you,&#32;your&#32;company&#32;or&#32;other&#32;organization.&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;*</emphasis>
+00008 <emphasis role="comment">&#32;******************************************************************************/</emphasis>
+00009 
+00010 <emphasis role="keyword">namespace&#32;</emphasis><link linkend="_namespace_leap">Leap</link>&#32;{
+00011 
+00012 &#32;&#32;<emphasis role="keyword">using</emphasis>&#32;System;
+00013 &#32;&#32;<emphasis role="keyword">using</emphasis>&#32;System.Collections.<link linkend="_namespace_system_1_1_collections_1_1_generic">Generic</link>;
+00014 &#32;&#32;<emphasis role="keyword">using</emphasis>&#32;<link linkend="_namespace_leap_internal">LeapInternal</link>;
+00015 
+<anchor xml:id="__config_8cs_source_1l00021"/><link linkend="_class_leap_1_1_config">00021</link> &#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keyword">class&#32;</emphasis><link linkend="_class_leap_1_1_config">Config</link>&#32;{
+00022 &#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;<link linkend="_class_leap_internal_1_1_connection">Connection</link>&#32;_connection;
+00023 &#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;Dictionary&lt;UInt32,&#32;object&gt;&#32;_transactions&#32;=&#32;<emphasis role="keyword">new</emphasis>&#32;Dictionary&lt;UInt32,&#32;object&gt;();
+00024 
+<anchor xml:id="__config_8cs_source_1l00031"/><link linkend="_class_leap_1_1_config_1a5e0c85350a233e20b508189204fde82f">00031</link> &#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<link linkend="_class_leap_1_1_config_1a5e0c85350a233e20b508189204fde82f">Config</link>(<emphasis role="keywordtype">int</emphasis>&#32;connectionKey)&#32;{
+00032 &#32;&#32;&#32;&#32;&#32;&#32;_connection&#32;=&#32;<link linkend="_class_leap_internal_1_1_connection">Connection</link>.<link linkend="_class_leap_internal_1_1_connection_1a14b814a88c57b2dafafe72077211aa85">GetConnection</link>(connectionKey);
+00033 &#32;&#32;&#32;&#32;&#32;&#32;_connection.<link linkend="_class_leap_internal_1_1_connection_1a6f56c66bbecc957ca227d894dcf16e96">LeapConfigChange</link>&#32;+=&#32;handleConfigChange;
+00034 &#32;&#32;&#32;&#32;&#32;&#32;_connection.<link linkend="_class_leap_internal_1_1_connection_1a87dae2d17dfa76d622d710bf69c08c82">LeapConfigResponse</link>&#32;+=&#32;handleConfigResponse;
+00035 &#32;&#32;&#32;&#32;}
+00036 
+00037 &#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;handleConfigChange(<emphasis role="keywordtype">object</emphasis>&#32;sender,&#32;<link linkend="_class_leap_1_1_config_change_event_args">ConfigChangeEventArgs</link>&#32;eventArgs)&#32;{
+00038 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordtype">object</emphasis>&#32;actionDelegate;
+00039 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(_transactions.TryGetValue(eventArgs.<link linkend="_class_leap_1_1_config_change_event_args_1aab8a8f32a9a3e45499f01d73855b2284">RequestId</link>,&#32;out&#32;actionDelegate))&#32;{
+00040 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;Action&lt;bool&gt;&#32;changeAction&#32;=&#32;actionDelegate&#32;as&#32;Action&lt;bool&gt;;
+00041 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;changeAction(eventArgs.<link linkend="_class_leap_1_1_config_change_event_args_1a2f9277cd05efe549b4da2d9f45afd7c9">Succeeded</link>);
+00042 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;_transactions.Remove(eventArgs.<link linkend="_class_leap_1_1_config_change_event_args_1aab8a8f32a9a3e45499f01d73855b2284">RequestId</link>);
+00043 &#32;&#32;&#32;&#32;&#32;&#32;}
+00044 &#32;&#32;&#32;&#32;}
+00045 
+00046 &#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;handleConfigResponse(<emphasis role="keywordtype">object</emphasis>&#32;sender,&#32;SetConfigResponseEventArgs&#32;eventArgs)&#32;{
+00047 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordtype">object</emphasis>&#32;actionDelegate&#32;=&#32;<emphasis role="keyword">new</emphasis>&#32;object();
+00048 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(_transactions.TryGetValue(eventArgs.RequestId,&#32;out&#32;actionDelegate))&#32;{
+00049 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">switch</emphasis>&#32;(eventArgs.DataType)&#32;{
+00050 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">case</emphasis>&#32;<link linkend="_class_leap_1_1_config_1aee9819af7eacacc324aa72619310a9d8">ValueType</link>.TYPE_BOOLEAN:
+00051 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;Action&lt;bool&gt;&#32;boolAction&#32;=&#32;actionDelegate&#32;as&#32;Action&lt;bool&gt;;
+00052 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;boolAction((<emphasis role="keywordtype">int</emphasis>)eventArgs.Value&#32;!=&#32;0);
+00053 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">break</emphasis>;
+00054 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">case</emphasis>&#32;<link linkend="_class_leap_1_1_config_1aee9819af7eacacc324aa72619310a9d8">ValueType</link>.TYPE_FLOAT:
+00055 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;Action&lt;float&gt;&#32;floatAction&#32;=&#32;actionDelegate&#32;as&#32;Action&lt;float&gt;;
+00056 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;floatAction((<emphasis role="keywordtype">float</emphasis>)eventArgs.Value);
+00057 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">break</emphasis>;
+00058 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">case</emphasis>&#32;<link linkend="_class_leap_1_1_config_1aee9819af7eacacc324aa72619310a9d8">ValueType</link>.TYPE_INT32:
+00059 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;Action&lt;Int32&gt;&#32;intAction&#32;=&#32;actionDelegate&#32;as&#32;Action&lt;Int32&gt;;
+00060 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;intAction((Int32)eventArgs.Value);
+00061 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">break</emphasis>;
+00062 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">case</emphasis>&#32;<link linkend="_class_leap_1_1_config_1aee9819af7eacacc324aa72619310a9d8">ValueType</link>.TYPE_STRING:
+00063 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;Action&lt;string&gt;&#32;stringAction&#32;=&#32;actionDelegate&#32;as&#32;Action&lt;string&gt;;
+00064 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;stringAction((<emphasis role="keywordtype">string</emphasis>)eventArgs.Value);
+00065 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">break</emphasis>;
+00066 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">default</emphasis>:
+00067 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">break</emphasis>;
+00068 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00069 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;_transactions.Remove(eventArgs.RequestId);
+00070 &#32;&#32;&#32;&#32;&#32;&#32;}
+00071 &#32;&#32;&#32;&#32;}
+00072 
+<anchor xml:id="__config_8cs_source_1l00082"/><link linkend="_class_leap_1_1_config_1a4196147f26b176afb93dc165fedfc8d0">00082</link> &#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keywordtype">bool</emphasis>&#32;<link linkend="_class_leap_1_1_config_1a4196147f26b176afb93dc165fedfc8d0">Get&lt;T&gt;</link>(<emphasis role="keywordtype">string</emphasis>&#32;key,&#32;Action&lt;T&gt;&#32;onResult)&#32;{
+00083 &#32;&#32;&#32;&#32;&#32;&#32;uint&#32;requestId&#32;=&#32;_connection.<link linkend="_class_leap_internal_1_1_connection_1a3083380baac8141b0d5bdf28a5f0666e">GetConfigValue</link>(key);
+00084 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(requestId&#32;&gt;&#32;0)&#32;{
+00085 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;_transactions.Add(requestId,&#32;onResult);
+00086 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;<emphasis role="keyword">true</emphasis>;
+00087 &#32;&#32;&#32;&#32;&#32;&#32;}
+00088 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;<emphasis role="keyword">false</emphasis>;
+00089 &#32;&#32;&#32;&#32;}
+00090 
+<anchor xml:id="__config_8cs_source_1l00100"/><link linkend="_class_leap_1_1_config_1acd77254986861d4e7592b5a619a82388">00100</link> &#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keywordtype">bool</emphasis>&#32;<link linkend="_class_leap_1_1_config_1acd77254986861d4e7592b5a619a82388">Set&lt;T&gt;</link>(<emphasis role="keywordtype">string</emphasis>&#32;key,&#32;T&#32;value,&#32;Action&lt;bool&gt;&#32;onResult)&#32;where&#32;T&#32;:&#32;IConvertible&#32;{
+00101 &#32;&#32;&#32;&#32;&#32;&#32;uint&#32;requestId&#32;=&#32;_connection.SetConfigValue&lt;T&gt;(key,&#32;value);
+00102 
+00103 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(requestId&#32;&gt;&#32;0)&#32;{
+00104 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;_transactions.Add(requestId,&#32;onResult);
+00105 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;<emphasis role="keyword">true</emphasis>;
+00106 &#32;&#32;&#32;&#32;&#32;&#32;}
+00107 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;<emphasis role="keyword">false</emphasis>;
+00108 &#32;&#32;&#32;&#32;}
+00109 
+00110 &#32;&#32;&#32;&#32;[Obsolete(<emphasis role="stringliteral">&quot;Use&#32;the&#32;generic&#32;Set&lt;T&gt;&#32;method&#32;instead.&quot;</emphasis>)]
+<anchor xml:id="__config_8cs_source_1l00111"/><link linkend="_class_leap_1_1_config_1a2fa1a76ec4aecb9d7a01aba0a2de4e00">00111</link> &#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<link linkend="_class_leap_1_1_config_1aee9819af7eacacc324aa72619310a9d8">ValueType</link>&#32;<link linkend="_class_leap_1_1_config_1a2fa1a76ec4aecb9d7a01aba0a2de4e00">Type</link>(<emphasis role="keywordtype">string</emphasis>&#32;key)&#32;{
+00112 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;<link linkend="_class_leap_1_1_config_1aee9819af7eacacc324aa72619310a9d8">ValueType</link>.TYPE_UNKNOWN;
+00113 &#32;&#32;&#32;&#32;}
+00114 
+00115 &#32;&#32;&#32;&#32;[Obsolete(<emphasis role="stringliteral">&quot;Use&#32;the&#32;generic&#32;Get&lt;T&gt;&#32;method&#32;instead.&quot;</emphasis>)]
+<anchor xml:id="__config_8cs_source_1l00116"/><link linkend="_class_leap_1_1_config_1abad3addef437788d854f8fd5fcd5f6be">00116</link> &#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keywordtype">bool</emphasis>&#32;<link linkend="_class_leap_1_1_config_1abad3addef437788d854f8fd5fcd5f6be">GetBool</link>(<emphasis role="keywordtype">string</emphasis>&#32;key)&#32;{
+00117 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;<emphasis role="keyword">false</emphasis>;
+00118 &#32;&#32;&#32;&#32;}
+00119 
+00120 &#32;&#32;&#32;&#32;[Obsolete(<emphasis role="stringliteral">&quot;Use&#32;the&#32;generic&#32;Set&lt;T&gt;&#32;method&#32;instead.&quot;</emphasis>)]
+<anchor xml:id="__config_8cs_source_1l00121"/><link linkend="_class_leap_1_1_config_1a48ee08f47555ecc07da20e24c64a34b4">00121</link> &#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keywordtype">bool</emphasis>&#32;<link linkend="_class_leap_1_1_config_1a48ee08f47555ecc07da20e24c64a34b4">SetBool</link>(<emphasis role="keywordtype">string</emphasis>&#32;key,&#32;<emphasis role="keywordtype">bool</emphasis>&#32;value)&#32;{
+00122 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;<emphasis role="keyword">false</emphasis>;
+00123 &#32;&#32;&#32;&#32;}
+00124 
+00125 &#32;&#32;&#32;&#32;[Obsolete(<emphasis role="stringliteral">&quot;Use&#32;the&#32;generic&#32;Get&lt;T&gt;&#32;method&#32;instead.&quot;</emphasis>)]
+<anchor xml:id="__config_8cs_source_1l00126"/><link linkend="_class_leap_1_1_config_1abd25aba72fa00937fbec3d499f52a70a">00126</link> &#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keywordtype">bool</emphasis>&#32;<link linkend="_class_leap_1_1_config_1abd25aba72fa00937fbec3d499f52a70a">GetInt32</link>(<emphasis role="keywordtype">string</emphasis>&#32;key)&#32;{
+00127 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;<emphasis role="keyword">false</emphasis>;
+00128 &#32;&#32;&#32;&#32;}
+00129 
+00130 &#32;&#32;&#32;&#32;[Obsolete(<emphasis role="stringliteral">&quot;Use&#32;the&#32;generic&#32;Set&lt;T&gt;&#32;method&#32;instead.&quot;</emphasis>)]
+<anchor xml:id="__config_8cs_source_1l00131"/><link linkend="_class_leap_1_1_config_1a787f4eb383b5e56216345227efb6d378">00131</link> &#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keywordtype">bool</emphasis>&#32;<link linkend="_class_leap_1_1_config_1a787f4eb383b5e56216345227efb6d378">SetInt32</link>(<emphasis role="keywordtype">string</emphasis>&#32;key,&#32;<emphasis role="keywordtype">int</emphasis>&#32;value)&#32;{
+00132 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;<emphasis role="keyword">false</emphasis>;
+00133 &#32;&#32;&#32;&#32;}
+00134 
+00135 &#32;&#32;&#32;&#32;[Obsolete(<emphasis role="stringliteral">&quot;Use&#32;the&#32;generic&#32;Get&lt;T&gt;&#32;method&#32;instead.&quot;</emphasis>)]
+<anchor xml:id="__config_8cs_source_1l00136"/><link linkend="_class_leap_1_1_config_1aead7d2a5648223fe040b3b53e51ac5b6">00136</link> &#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keywordtype">bool</emphasis>&#32;<link linkend="_class_leap_1_1_config_1aead7d2a5648223fe040b3b53e51ac5b6">GetFloat</link>(<emphasis role="keywordtype">string</emphasis>&#32;key)&#32;{
+00137 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;<emphasis role="keyword">false</emphasis>;
+00138 &#32;&#32;&#32;&#32;}
+00139 
+00140 &#32;&#32;&#32;&#32;[Obsolete(<emphasis role="stringliteral">&quot;Use&#32;the&#32;generic&#32;Set&lt;T&gt;&#32;method&#32;instead.&quot;</emphasis>)]
+<anchor xml:id="__config_8cs_source_1l00141"/><link linkend="_class_leap_1_1_config_1aea39b0e2cb819f87d8356ac216a525cb">00141</link> &#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keywordtype">bool</emphasis>&#32;<link linkend="_class_leap_1_1_config_1aea39b0e2cb819f87d8356ac216a525cb">SetFloat</link>(<emphasis role="keywordtype">string</emphasis>&#32;key,&#32;<emphasis role="keywordtype">float</emphasis>&#32;value)&#32;{
+00142 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;<emphasis role="keyword">false</emphasis>;
+00143 &#32;&#32;&#32;&#32;}
+00144 
+00145 &#32;&#32;&#32;&#32;[Obsolete(<emphasis role="stringliteral">&quot;Use&#32;the&#32;generic&#32;Get&lt;T&gt;&#32;method&#32;instead.&quot;</emphasis>)]
+<anchor xml:id="__config_8cs_source_1l00146"/><link linkend="_class_leap_1_1_config_1a50bd7b7209f1d9428910e88278c6b750">00146</link> &#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keywordtype">bool</emphasis>&#32;<link linkend="_class_leap_1_1_config_1a50bd7b7209f1d9428910e88278c6b750">GetString</link>(<emphasis role="keywordtype">string</emphasis>&#32;key)&#32;{
+00147 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;<emphasis role="keyword">false</emphasis>;
+00148 &#32;&#32;&#32;&#32;}
+00149 
+00150 &#32;&#32;&#32;&#32;[Obsolete(<emphasis role="stringliteral">&quot;Use&#32;the&#32;generic&#32;Set&lt;T&gt;&#32;method&#32;instead.&quot;</emphasis>)]
+<anchor xml:id="__config_8cs_source_1l00151"/><link linkend="_class_leap_1_1_config_1a1fc49204d44638f4ffe3ea91449a2492">00151</link> &#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keywordtype">bool</emphasis>&#32;<link linkend="_class_leap_1_1_config_1a1fc49204d44638f4ffe3ea91449a2492">SetString</link>(<emphasis role="keywordtype">string</emphasis>&#32;key,&#32;<emphasis role="keywordtype">string</emphasis>&#32;value)&#32;{
+00152 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;<emphasis role="keyword">false</emphasis>;
+00153 &#32;&#32;&#32;&#32;}
+00154 
+00155 &#32;&#32;&#32;&#32;[Obsolete]
+<anchor xml:id="__config_8cs_source_1l00156"/><link linkend="_class_leap_1_1_config_1a631db08c670e9df74b6873669d9636eb">00156</link> &#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keywordtype">bool</emphasis>&#32;<link linkend="_class_leap_1_1_config_1a631db08c670e9df74b6873669d9636eb">Save</link>()&#32;{
+00157 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;<emphasis role="keyword">false</emphasis>;
+00158 &#32;&#32;&#32;&#32;}
+00159 
+<anchor xml:id="__config_8cs_source_1l00164"/><link linkend="_class_leap_1_1_config_1aee9819af7eacacc324aa72619310a9d8">00164</link> &#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keyword">enum</emphasis>&#32;<link linkend="_class_leap_1_1_config_1aee9819af7eacacc324aa72619310a9d8">ValueType</link>&#32;{
+00165 &#32;&#32;&#32;&#32;&#32;&#32;TYPE_UNKNOWN&#32;=&#32;0,
+00166 &#32;&#32;&#32;&#32;&#32;&#32;TYPE_BOOLEAN&#32;=&#32;1,
+00167 &#32;&#32;&#32;&#32;&#32;&#32;TYPE_INT32&#32;=&#32;2,
+00168 &#32;&#32;&#32;&#32;&#32;&#32;TYPE_FLOAT&#32;=&#32;6,
+00169 &#32;&#32;&#32;&#32;&#32;&#32;TYPE_STRING&#32;=&#32;8,
+00170 &#32;&#32;&#32;&#32;}
+00171 &#32;&#32;}
+00172 }
+</programlisting></section>

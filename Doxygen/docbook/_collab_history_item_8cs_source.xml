@@ -1,0 +1,234 @@
+<?xml version='1.0' encoding='UTF-8' standalone='no'?>
+<section xmlns="http://docbook.org/ns/docbook" version="5.0" xmlns:xlink="http://www.w3.org/1999/xlink" xml:id="__collab_history_item_8cs_source">
+<title>CollabHistoryItem.cs</title>
+<indexterm><primary>O:/GitHUBMINIPRoject/Library/PackageCache/com.unity.collab-proxy@1.2.15/Editor/Collab/Views/CollabHistoryItem.cs</primary></indexterm>
+<programlisting>00001 <emphasis role="keyword">using</emphasis>&#32;System;
+00002 <emphasis role="keyword">using</emphasis>&#32;System.Linq;
+00003 <emphasis role="keyword">using</emphasis>&#32;System.Security.Cryptography;
+00004 <emphasis role="keyword">using</emphasis>&#32;<link linkend="_namespace_unity_editor">UnityEditor</link>.Connect;
+00005 <emphasis role="keyword">using</emphasis>&#32;<link linkend="_namespace_unity_editor">UnityEditor</link>.Web;
+00006 <emphasis role="keyword">using</emphasis>&#32;<link linkend="__balloon_8cs_1a7d67e097df9376eb709b6a23aa3c7d23">UnityEngine</link>;
+00007 
+00008 <emphasis role="preprocessor">#if&#32;UNITY_2019_1_OR_NEWER</emphasis>
+00009 <emphasis role="keyword">using</emphasis>&#32;<link linkend="_namespace_unity_engine">UnityEngine</link>.UIElements;
+00010 <emphasis role="preprocessor">#else</emphasis>
+00011 <emphasis role="keyword">using</emphasis>&#32;<link linkend="_namespace_unity_engine">UnityEngine</link>.Experimental.UIElements;
+00012 <emphasis role="keyword">using</emphasis>&#32;<link linkend="_namespace_unity_engine">UnityEngine</link>.Experimental.UIElements.StyleEnums;
+00013 <emphasis role="preprocessor">#endif</emphasis>
+00014 
+00015 <emphasis role="keyword">namespace&#32;</emphasis><link linkend="_namespace_unity_editor_1_1_collaboration">UnityEditor.Collaboration</link>
+00016 {
+<anchor xml:id="__collab_history_item_8cs_source_1l00017"/><link linkend="_class_unity_editor_1_1_collaboration_1_1_collab_history_item">00017</link> &#32;&#32;&#32;&#32;<emphasis role="keyword">internal</emphasis>&#32;<emphasis role="keyword">class&#32;</emphasis><link linkend="_class_unity_editor_1_1_collaboration_1_1_collab_history_item">CollabHistoryItem</link>&#32;:&#32;VisualElement
+00018 &#32;&#32;&#32;&#32;{
+<anchor xml:id="__collab_history_item_8cs_source_1l00019"/><link linkend="_class_unity_editor_1_1_collaboration_1_1_collab_history_item_1a611b29e426e89f88e0ef2912f0c00a3b">00019</link> &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keyword">static</emphasis>&#32;RevisionAction&#32;<link linkend="_class_unity_editor_1_1_collaboration_1_1_collab_history_item_1a611b29e426e89f88e0ef2912f0c00a3b">s_OnRestore</link>;
+<anchor xml:id="__collab_history_item_8cs_source_1l00020"/><link linkend="_class_unity_editor_1_1_collaboration_1_1_collab_history_item_1aa4e10c99eb580749cd5a09e24ba73ddc">00020</link> &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keyword">static</emphasis>&#32;RevisionAction&#32;<link linkend="_class_unity_editor_1_1_collaboration_1_1_collab_history_item_1aa4e10c99eb580749cd5a09e24ba73ddc">s_OnGoBack</link>;
+<anchor xml:id="__collab_history_item_8cs_source_1l00021"/><link linkend="_class_unity_editor_1_1_collaboration_1_1_collab_history_item_1aa6ebbd9cb61bc7c87744da31fd0f811b">00021</link> &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keyword">static</emphasis>&#32;RevisionAction&#32;<link linkend="_class_unity_editor_1_1_collaboration_1_1_collab_history_item_1aa6ebbd9cb61bc7c87744da31fd0f811b">s_OnUpdate</link>;
+<anchor xml:id="__collab_history_item_8cs_source_1l00022"/><link linkend="_class_unity_editor_1_1_collaboration_1_1_collab_history_item_1a7cca2902c20361359e73939c38793869">00022</link> &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keyword">static</emphasis>&#32;ShowBuildAction&#32;<link linkend="_class_unity_editor_1_1_collaboration_1_1_collab_history_item_1a7cca2902c20361359e73939c38793869">s_OnShowBuild</link>;
+<anchor xml:id="__collab_history_item_8cs_source_1l00023"/><link linkend="_class_unity_editor_1_1_collaboration_1_1_collab_history_item_1a7f081c104fab7cb3794d9e0eea69e1f4">00023</link> &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keyword">static</emphasis>&#32;Action&#32;<link linkend="_class_unity_editor_1_1_collaboration_1_1_collab_history_item_1a7f081c104fab7cb3794d9e0eea69e1f4">s_OnShowServices</link>;
+00024 
+00025 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;readonly&#32;<emphasis role="keywordtype">string</emphasis>&#32;m_RevisionId;
+00026 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;readonly&#32;<emphasis role="keywordtype">string</emphasis>&#32;m_FullDescription;
+00027 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;readonly&#32;DateTime&#32;m_TimeStamp;
+00028 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;readonly&#32;Button&#32;m_Button;
+00029 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;readonly&#32;<link linkend="_class_unity_editor_1_1_collaboration_1_1_history_progress_spinner">HistoryProgressSpinner</link>&#32;m_ProgressSpinner;
+00030 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;VisualElement&#32;m_ActionsTray;
+00031 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;VisualElement&#32;m_Details;
+00032 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;Label&#32;m_Description;
+00033 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;Label&#32;m_TimeAgo;
+00034 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;readonly&#32;Button&#32;m_ExpandCollapseButton;
+00035 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;<emphasis role="keywordtype">bool</emphasis>&#32;m_Expanded;
+00036 
+00037 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;<emphasis role="keyword">const</emphasis>&#32;<emphasis role="keywordtype">int</emphasis>&#32;kMaxDescriptionChars&#32;=&#32;500;
+00038 
+00039 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keywordtype">bool</emphasis>&#32;<link linkend="_class_unity_editor_1_1_collaboration_1_1_collab_history_item_1a7f0d37abb3de32fec8b5b6ce53e4eedc">RevisionActionsEnabled</link>
+<anchor xml:id="__collab_history_item_8cs_source_1l00040"/><link linkend="_class_unity_editor_1_1_collaboration_1_1_collab_history_item_1a7f0d37abb3de32fec8b5b6ce53e4eedc">00040</link> &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00041 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">set</emphasis>
+00042 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00043 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;m_Button.SetEnabled(value);
+00044 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00045 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00046 
+00047 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;DateTime&#32;<link linkend="_class_unity_editor_1_1_collaboration_1_1_collab_history_item_1af1e6d8e67a2c5a071fb8624d404aea11">timeStamp</link>
+<anchor xml:id="__collab_history_item_8cs_source_1l00048"/><link linkend="_class_unity_editor_1_1_collaboration_1_1_collab_history_item_1af1e6d8e67a2c5a071fb8624d404aea11">00048</link> &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00049 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">get</emphasis>&#32;{&#32;<emphasis role="keywordflow">return</emphasis>&#32;m_TimeStamp;&#32;}
+00050 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00051 
+<anchor xml:id="__collab_history_item_8cs_source_1l00052"/><link linkend="_class_unity_editor_1_1_collaboration_1_1_collab_history_item_1a4f57052c02c99bd8d57e25fb7f33fc97">00052</link> &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<link linkend="_class_unity_editor_1_1_collaboration_1_1_collab_history_item_1a4f57052c02c99bd8d57e25fb7f33fc97">CollabHistoryItem</link>(RevisionData&#32;data)
+00053 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00054 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;m_RevisionId&#32;=&#32;data.id;
+00055 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;m_TimeStamp&#32;=&#32;data.timeStamp;
+00056 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;name&#32;=&#32;<emphasis role="stringliteral">&quot;HistoryItem&quot;</emphasis>;
+00057 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;m_ActionsTray&#32;=&#32;<emphasis role="keyword">new</emphasis>&#32;VisualElement&#32;{name&#32;=&#32;<emphasis role="stringliteral">&quot;HistoryItemActionsTray&quot;</emphasis>};
+00058 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;m_ProgressSpinner&#32;=&#32;<emphasis role="keyword">new</emphasis>&#32;<link linkend="_class_unity_editor_1_1_collaboration_1_1_history_progress_spinner">HistoryProgressSpinner</link>();
+00059 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;m_Details&#32;=&#32;<emphasis role="keyword">new</emphasis>&#32;VisualElement&#32;{name&#32;=&#32;<emphasis role="stringliteral">&quot;HistoryDetail&quot;</emphasis>};
+00060 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;var&#32;author&#32;=&#32;<emphasis role="keyword">new</emphasis>&#32;Label(data.authorName)&#32;{name&#32;=&#32;<emphasis role="stringliteral">&quot;Author&quot;</emphasis>};
+00061 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;m_TimeAgo&#32;=&#32;<emphasis role="keyword">new</emphasis>&#32;Label(TimeAgo.GetString(m_TimeStamp));
+00062 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;m_FullDescription&#32;=&#32;data.comment;
+00063 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;var&#32;shouldTruncate&#32;=&#32;ShouldTruncateDescription(m_FullDescription);
+00064 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(shouldTruncate)
+00065 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00066 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;m_Description&#32;=&#32;<emphasis role="keyword">new</emphasis>&#32;Label(GetTruncatedDescription(m_FullDescription));
+00067 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00068 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">else</emphasis>
+00069 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00070 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;m_Description&#32;=&#32;<emphasis role="keyword">new</emphasis>&#32;Label(m_FullDescription);
+00071 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00072 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;m_Description.name&#32;=&#32;<emphasis role="stringliteral">&quot;RevisionDescription&quot;</emphasis>;
+00073 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;var&#32;dropdown&#32;=&#32;<emphasis role="keyword">new</emphasis>&#32;<link linkend="_class_unity_editor_1_1_collaboration_1_1_collab_history_drop_down">CollabHistoryDropDown</link>(data.changes,&#32;data.changesTotal,&#32;data.changesTruncated,&#32;data.id);
+00074 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(data.current)
+00075 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00076 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;m_Button&#32;=&#32;<emphasis role="keyword">new</emphasis>&#32;Button(Restore)&#32;{name&#32;=&#32;<emphasis role="stringliteral">&quot;ActionButton&quot;</emphasis>,&#32;text&#32;=&#32;<emphasis role="stringliteral">&quot;Restore&quot;</emphasis>};
+00077 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00078 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">else</emphasis>&#32;<emphasis role="keywordflow">if</emphasis>&#32;(data.obtained)
+00079 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00080 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;m_Button&#32;=&#32;<emphasis role="keyword">new</emphasis>&#32;Button(GoBackTo)&#32;{name&#32;=&#32;<emphasis role="stringliteral">&quot;ActionButton&quot;</emphasis>,&#32;text&#32;=&#32;<emphasis role="stringliteral">&quot;Go&#32;back&#32;to...&quot;</emphasis>};
+00081 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00082 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">else</emphasis>
+00083 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00084 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;m_Button&#32;=&#32;<emphasis role="keyword">new</emphasis>&#32;Button(UpdateTo)&#32;{name&#32;=&#32;<emphasis role="stringliteral">&quot;ActionButton&quot;</emphasis>,&#32;text&#32;=&#32;<emphasis role="stringliteral">&quot;Update&quot;</emphasis>};
+00085 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00086 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;m_Button.SetEnabled(data.enabled);
+00087 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;m_ProgressSpinner.ProgressEnabled&#32;=&#32;data.inProgress;
+00088 
+00089 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;m_ActionsTray.Add(m_ProgressSpinner);
+00090 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;m_ActionsTray.Add(m_Button);
+00091 
+00092 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;m_Details.Add(author);
+00093 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;m_Details.Add(m_TimeAgo);
+00094 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;m_Details.Add(m_Description);
+00095 
+00096 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(shouldTruncate)
+00097 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00098 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;m_ExpandCollapseButton&#32;=&#32;<emphasis role="keyword">new</emphasis>&#32;Button(ToggleDescription)&#32;{&#32;name&#32;=&#32;<emphasis role="stringliteral">&quot;ToggleDescription&quot;</emphasis>,&#32;text&#32;=&#32;<emphasis role="stringliteral">&quot;Show&#32;More&quot;</emphasis>&#32;};
+00099 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;m_Details.Add(m_ExpandCollapseButton);
+00100 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00101 
+00102 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(data.buildState&#32;!=&#32;BuildState.None)
+00103 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00104 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_unity_editor_1_1_collaboration_1_1_build_status_button">BuildStatusButton</link>&#32;buildButton;
+00105 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(data.buildState&#32;==&#32;BuildState.Configure)
+00106 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;buildButton&#32;=&#32;<emphasis role="keyword">new</emphasis>&#32;<link linkend="_class_unity_editor_1_1_collaboration_1_1_build_status_button">BuildStatusButton</link>(ShowServicePage);
+00107 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">else</emphasis>
+00108 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;buildButton&#32;=&#32;<emphasis role="keyword">new</emphasis>&#32;<link linkend="_class_unity_editor_1_1_collaboration_1_1_build_status_button">BuildStatusButton</link>(ShowBuildForCommit,&#32;data.buildState,&#32;data.buildFailures);
+00109 
+00110 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;m_Details.Add(buildButton);
+00111 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00112 
+00113 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;m_Details.Add(m_ActionsTray);
+00114 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;m_Details.Add(dropdown);
+00115 
+00116 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;Add(m_Details);
+00117 
+00118 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;this.schedule.Execute(UpdateTimeAgo).Every(1000&#32;*&#32;20);
+00119 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00120 
+<anchor xml:id="__collab_history_item_8cs_source_1l00121"/><link linkend="_class_unity_editor_1_1_collaboration_1_1_collab_history_item_1a83f34e69f82829b893034e23379c1dc8">00121</link> &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keyword">static</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;<link linkend="_class_unity_editor_1_1_collaboration_1_1_collab_history_item_1a83f34e69f82829b893034e23379c1dc8">SetUpCallbacks</link>(RevisionAction&#32;Restore,&#32;RevisionAction&#32;GoBack,&#32;RevisionAction&#32;Update)
+00122 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00123 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_unity_editor_1_1_collaboration_1_1_collab_history_item_1a611b29e426e89f88e0ef2912f0c00a3b">s_OnRestore</link>&#32;=&#32;Restore;
+00124 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_unity_editor_1_1_collaboration_1_1_collab_history_item_1aa4e10c99eb580749cd5a09e24ba73ddc">s_OnGoBack</link>&#32;=&#32;GoBack;
+00125 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_unity_editor_1_1_collaboration_1_1_collab_history_item_1aa6ebbd9cb61bc7c87744da31fd0f811b">s_OnUpdate</link>&#32;=&#32;Update;
+00126 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00127 
+<anchor xml:id="__collab_history_item_8cs_source_1l00128"/><link linkend="_class_unity_editor_1_1_collaboration_1_1_collab_history_item_1aa341dac7ad719513071adcce064ad566">00128</link> &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;<link linkend="_class_unity_editor_1_1_collaboration_1_1_collab_history_item_1aa341dac7ad719513071adcce064ad566">SetInProgressStatus</link>(<emphasis role="keywordtype">string</emphasis>&#32;revisionIdInProgress)
+00129 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00130 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(String.IsNullOrEmpty(revisionIdInProgress))
+00131 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00132 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;m_Button.SetEnabled(<emphasis role="keyword">true</emphasis>);
+00133 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;m_ProgressSpinner.ProgressEnabled&#32;=&#32;<emphasis role="keyword">false</emphasis>;
+00134 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00135 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">else</emphasis>
+00136 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00137 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;m_Button.SetEnabled(<emphasis role="keyword">false</emphasis>);
+00138 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(m_RevisionId.Equals(revisionIdInProgress))
+00139 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00140 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;m_ProgressSpinner.ProgressEnabled&#32;=&#32;<emphasis role="keyword">true</emphasis>;
+00141 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00142 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00143 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00144 
+00145 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordtype">void</emphasis>&#32;ShowBuildForCommit()
+00146 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00147 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;CollabAnalytics.SendUserAction(CollabAnalytics.historyCategoryString,&#32;<emphasis role="stringliteral">&quot;ShowBuild&quot;</emphasis>);
+00148 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(<link linkend="_class_unity_editor_1_1_collaboration_1_1_collab_history_item_1a7cca2902c20361359e73939c38793869">s_OnShowBuild</link>&#32;!=&#32;<emphasis role="keyword">null</emphasis>)
+00149 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00150 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_unity_editor_1_1_collaboration_1_1_collab_history_item_1a7cca2902c20361359e73939c38793869">s_OnShowBuild</link>(m_RevisionId);
+00151 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00152 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00153 
+00154 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordtype">void</emphasis>&#32;ShowServicePage()
+00155 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00156 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;CollabAnalytics.SendUserAction(CollabAnalytics.historyCategoryString,&#32;<emphasis role="stringliteral">&quot;ShowServices&quot;</emphasis>);
+00157 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(<link linkend="_class_unity_editor_1_1_collaboration_1_1_collab_history_item_1a7f081c104fab7cb3794d9e0eea69e1f4">s_OnShowServices</link>&#32;!=&#32;<emphasis role="keyword">null</emphasis>)
+00158 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00159 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_unity_editor_1_1_collaboration_1_1_collab_history_item_1a7f081c104fab7cb3794d9e0eea69e1f4">s_OnShowServices</link>();
+00160 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00161 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00162 
+00163 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordtype">void</emphasis>&#32;Restore()
+00164 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00165 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;CollabAnalytics.SendUserAction(CollabAnalytics.historyCategoryString,&#32;<emphasis role="stringliteral">&quot;Restore&quot;</emphasis>);
+00166 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(<link linkend="_class_unity_editor_1_1_collaboration_1_1_collab_history_item_1a611b29e426e89f88e0ef2912f0c00a3b">s_OnRestore</link>&#32;!=&#32;<emphasis role="keyword">null</emphasis>)
+00167 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00168 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_unity_editor_1_1_collaboration_1_1_collab_history_item_1a611b29e426e89f88e0ef2912f0c00a3b">s_OnRestore</link>(m_RevisionId,&#32;<emphasis role="keyword">false</emphasis>);
+00169 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00170 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00171 
+00172 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordtype">void</emphasis>&#32;GoBackTo()
+00173 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00174 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;CollabAnalytics.SendUserAction(CollabAnalytics.historyCategoryString,&#32;<emphasis role="stringliteral">&quot;GoBackTo&quot;</emphasis>);
+00175 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(<link linkend="_class_unity_editor_1_1_collaboration_1_1_collab_history_item_1aa4e10c99eb580749cd5a09e24ba73ddc">s_OnGoBack</link>&#32;!=&#32;<emphasis role="keyword">null</emphasis>)
+00176 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00177 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_unity_editor_1_1_collaboration_1_1_collab_history_item_1aa4e10c99eb580749cd5a09e24ba73ddc">s_OnGoBack</link>(m_RevisionId,&#32;<emphasis role="keyword">false</emphasis>);
+00178 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00179 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00180 
+00181 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordtype">void</emphasis>&#32;UpdateTo()
+00182 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00183 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;CollabAnalytics.SendUserAction(CollabAnalytics.historyCategoryString,&#32;<emphasis role="stringliteral">&quot;Update&quot;</emphasis>);
+00184 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(<link linkend="_class_unity_editor_1_1_collaboration_1_1_collab_history_item_1aa6ebbd9cb61bc7c87744da31fd0f811b">s_OnUpdate</link>&#32;!=&#32;<emphasis role="keyword">null</emphasis>)
+00185 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00186 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_unity_editor_1_1_collaboration_1_1_collab_history_item_1aa6ebbd9cb61bc7c87744da31fd0f811b">s_OnUpdate</link>(m_RevisionId,&#32;<emphasis role="keyword">true</emphasis>);
+00187 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00188 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00189 
+00190 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordtype">void</emphasis>&#32;UpdateTimeAgo()
+00191 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00192 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;m_TimeAgo.text&#32;=&#32;TimeAgo.GetString(m_TimeStamp);
+00193 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00194 
+00195 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordtype">bool</emphasis>&#32;ShouldTruncateDescription(<emphasis role="keywordtype">string</emphasis>&#32;description)
+00196 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00197 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;description.Contains(Environment.NewLine)&#32;||&#32;description.Length&#32;&gt;&#32;kMaxDescriptionChars;
+00198 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00199 
+00200 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordtype">string</emphasis>&#32;GetTruncatedDescription(<emphasis role="keywordtype">string</emphasis>&#32;description)
+00201 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00202 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordtype">string</emphasis>&#32;result&#32;=&#32;description.Contains(Environment.NewLine)&#32;?
+00203 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;description.Substring(0,&#32;description.IndexOf(Environment.NewLine))&#32;:&#32;description;
+00204 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(result.Length&#32;&gt;&#32;kMaxDescriptionChars)
+00205 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00206 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;result&#32;=&#32;result.Substring(0,&#32;kMaxDescriptionChars)&#32;+&#32;<emphasis role="stringliteral">&quot;...&quot;</emphasis>;
+00207 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00208 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;result;
+00209 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00210 
+00211 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordtype">void</emphasis>&#32;ToggleDescription()
+00212 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00213 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(m_Expanded)
+00214 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00215 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;CollabAnalytics.SendUserAction(CollabAnalytics.historyCategoryString,&#32;<emphasis role="stringliteral">&quot;CollapseDescription&quot;</emphasis>);
+00216 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;m_Expanded&#32;=&#32;<emphasis role="keyword">false</emphasis>;
+00217 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;m_ExpandCollapseButton.text&#32;=&#32;<emphasis role="stringliteral">&quot;Show&#32;More&quot;</emphasis>;
+00218 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;m_Description.text&#32;=&#32;GetTruncatedDescription(m_FullDescription);
+00219 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00220 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">else</emphasis>
+00221 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00222 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;CollabAnalytics.SendUserAction(CollabAnalytics.historyCategoryString,&#32;<emphasis role="stringliteral">&quot;ExpandDescription&quot;</emphasis>);
+00223 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;m_Expanded&#32;=&#32;<emphasis role="keyword">true</emphasis>;
+00224 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;m_ExpandCollapseButton.text&#32;=&#32;<emphasis role="stringliteral">&quot;Show&#32;Less&quot;</emphasis>;
+00225 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;m_Description.text&#32;=&#32;m_FullDescription;
+00226 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00227 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00228 &#32;&#32;&#32;&#32;}
+00229 }
+</programlisting></section>

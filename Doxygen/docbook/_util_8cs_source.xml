@@ -1,0 +1,740 @@
+<?xml version='1.0' encoding='UTF-8' standalone='no'?>
+<section xmlns="http://docbook.org/ns/docbook" version="5.0" xmlns:xlink="http://www.w3.org/1999/xlink" xml:id="__util_8cs_source">
+<title>Util.cs</title>
+<indexterm><primary>O:/GitHUBMINIPRoject/Assets/SteamVR/InteractionSystem/Core/Scripts/Util.cs</primary></indexterm>
+<programlisting>00001 <emphasis role="comment">//=======&#32;Copyright&#32;(c)&#32;Valve&#32;Corporation,&#32;All&#32;rights&#32;reserved.&#32;===============</emphasis>
+00002 <emphasis role="comment">//</emphasis>
+00003 <emphasis role="comment">//&#32;Purpose:&#32;Utility&#32;functions&#32;used&#32;in&#32;several&#32;places</emphasis>
+00004 <emphasis role="comment">//</emphasis>
+00005 <emphasis role="comment">//=============================================================================</emphasis>
+00006 
+00007 <emphasis role="keyword">using</emphasis>&#32;<link linkend="__balloon_8cs_1a7d67e097df9376eb709b6a23aa3c7d23">UnityEngine</link>;
+00008 <emphasis role="keyword">using</emphasis>&#32;System;
+00009 <emphasis role="keyword">using</emphasis>&#32;System.Collections;
+00010 <emphasis role="keyword">using</emphasis>&#32;System.Collections.Generic;
+00011 <emphasis role="keyword">using</emphasis>&#32;System.IO;
+00012 <emphasis role="keyword">using</emphasis>&#32;System.Linq;
+00013 
+00014 <emphasis role="keyword">namespace&#32;</emphasis><link linkend="_namespace_valve_1_1_v_r_1_1_interaction_system">Valve.VR.InteractionSystem</link>
+00015 {
+00016 &#32;&#32;&#32;&#32;<emphasis role="comment">//-------------------------------------------------------------------------</emphasis>
+00017 &#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keyword">static</emphasis>&#32;<emphasis role="keyword">class&#32;</emphasis>Util
+00018 &#32;&#32;&#32;&#32;{
+00019 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keyword">const</emphasis>&#32;<emphasis role="keywordtype">float</emphasis>&#32;FeetToMeters&#32;=&#32;0.3048f;
+00020 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keyword">const</emphasis>&#32;<emphasis role="keywordtype">float</emphasis>&#32;FeetToCentimeters&#32;=&#32;30.48f;
+00021 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keyword">const</emphasis>&#32;<emphasis role="keywordtype">float</emphasis>&#32;InchesToMeters&#32;=&#32;0.0254f;
+00022 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keyword">const</emphasis>&#32;<emphasis role="keywordtype">float</emphasis>&#32;InchesToCentimeters&#32;=&#32;2.54f;
+00023 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keyword">const</emphasis>&#32;<emphasis role="keywordtype">float</emphasis>&#32;MetersToFeet&#32;=&#32;3.28084f;
+00024 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keyword">const</emphasis>&#32;<emphasis role="keywordtype">float</emphasis>&#32;MetersToInches&#32;=&#32;39.3701f;
+00025 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keyword">const</emphasis>&#32;<emphasis role="keywordtype">float</emphasis>&#32;CentimetersToFeet&#32;=&#32;0.0328084f;
+00026 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keyword">const</emphasis>&#32;<emphasis role="keywordtype">float</emphasis>&#32;CentimetersToInches&#32;=&#32;0.393701f;
+00027 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keyword">const</emphasis>&#32;<emphasis role="keywordtype">float</emphasis>&#32;KilometersToMiles&#32;=&#32;0.621371f;
+00028 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keyword">const</emphasis>&#32;<emphasis role="keywordtype">float</emphasis>&#32;MilesToKilometers&#32;=&#32;1.60934f;
+00029 
+00030 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//-------------------------------------------------</emphasis>
+00031 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;Remap&#32;num&#32;from&#32;range&#32;1&#32;to&#32;range&#32;2</emphasis>
+00032 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//-------------------------------------------------</emphasis>
+00033 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keyword">static</emphasis>&#32;<emphasis role="keywordtype">float</emphasis>&#32;RemapNumber(&#32;<emphasis role="keywordtype">float</emphasis>&#32;num,&#32;<emphasis role="keywordtype">float</emphasis>&#32;low1,&#32;<emphasis role="keywordtype">float</emphasis>&#32;high1,&#32;<emphasis role="keywordtype">float</emphasis>&#32;low2,&#32;<emphasis role="keywordtype">float</emphasis>&#32;high2&#32;)
+00034 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00035 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;low2&#32;+&#32;(&#32;num&#32;-&#32;low1&#32;)&#32;*&#32;(&#32;high2&#32;-&#32;low2&#32;)&#32;/&#32;(&#32;high1&#32;-&#32;low1&#32;);
+00036 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00037 
+00038 
+00039 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//-------------------------------------------------</emphasis>
+00040 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keyword">static</emphasis>&#32;<emphasis role="keywordtype">float</emphasis>&#32;RemapNumberClamped(&#32;<emphasis role="keywordtype">float</emphasis>&#32;num,&#32;<emphasis role="keywordtype">float</emphasis>&#32;low1,&#32;<emphasis role="keywordtype">float</emphasis>&#32;high1,&#32;<emphasis role="keywordtype">float</emphasis>&#32;low2,&#32;<emphasis role="keywordtype">float</emphasis>&#32;high2&#32;)
+00041 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00042 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;Mathf.Clamp(&#32;RemapNumber(&#32;num,&#32;low1,&#32;high1,&#32;low2,&#32;high2&#32;),&#32;Mathf.Min(&#32;low2,&#32;high2&#32;),&#32;Mathf.Max(&#32;low2,&#32;high2&#32;)&#32;);
+00043 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00044 
+00045 
+00046 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//-------------------------------------------------</emphasis>
+00047 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keyword">static</emphasis>&#32;<emphasis role="keywordtype">float</emphasis>&#32;Approach(&#32;<emphasis role="keywordtype">float</emphasis>&#32;target,&#32;<emphasis role="keywordtype">float</emphasis>&#32;value,&#32;<emphasis role="keywordtype">float</emphasis>&#32;speed&#32;)
+00048 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00049 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordtype">float</emphasis>&#32;delta&#32;=&#32;target&#32;-&#32;value;
+00050 
+00051 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(&#32;delta&#32;&gt;&#32;speed&#32;)
+00052 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;value&#32;+=&#32;speed;
+00053 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">else</emphasis>&#32;<emphasis role="keywordflow">if</emphasis>&#32;(&#32;delta&#32;&lt;&#32;-speed&#32;)
+00054 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;value&#32;-=&#32;speed;
+00055 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">else</emphasis>
+00056 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;value&#32;=&#32;target;
+00057 
+00058 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;value;
+00059 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00060 
+00061 
+00062 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//-------------------------------------------------</emphasis>
+00063 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keyword">static</emphasis>&#32;Vector3&#32;BezierInterpolate3(&#32;Vector3&#32;p0,&#32;Vector3&#32;c0,&#32;Vector3&#32;p1,&#32;<emphasis role="keywordtype">float</emphasis>&#32;t&#32;)
+00064 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00065 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;Vector3&#32;p0c0&#32;=&#32;Vector3.Lerp(&#32;p0,&#32;c0,&#32;t&#32;);
+00066 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;Vector3&#32;c0p1&#32;=&#32;Vector3.Lerp(&#32;c0,&#32;p1,&#32;t&#32;);
+00067 
+00068 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;Vector3.Lerp(&#32;p0c0,&#32;c0p1,&#32;t&#32;);
+00069 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00070 
+00071 
+00072 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//-------------------------------------------------</emphasis>
+00073 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keyword">static</emphasis>&#32;Vector3&#32;BezierInterpolate4(&#32;Vector3&#32;p0,&#32;Vector3&#32;c0,&#32;Vector3&#32;c1,&#32;Vector3&#32;p1,&#32;<emphasis role="keywordtype">float</emphasis>&#32;t&#32;)
+00074 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00075 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;Vector3&#32;p0c0&#32;=&#32;Vector3.Lerp(&#32;p0,&#32;c0,&#32;t&#32;);
+00076 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;Vector3&#32;c0c1&#32;=&#32;Vector3.Lerp(&#32;c0,&#32;c1,&#32;t&#32;);
+00077 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;Vector3&#32;c1p1&#32;=&#32;Vector3.Lerp(&#32;c1,&#32;p1,&#32;t&#32;);
+00078 
+00079 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;Vector3&#32;x&#32;=&#32;Vector3.Lerp(&#32;p0c0,&#32;c0c1,&#32;t&#32;);
+00080 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;Vector3&#32;y&#32;=&#32;Vector3.Lerp(&#32;c0c1,&#32;c1p1,&#32;t&#32;);
+00081 
+00082 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//Debug.DrawRay(p0,&#32;Vector3.forward);</emphasis>
+00083 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//Debug.DrawRay(c0,&#32;Vector3.forward);</emphasis>
+00084 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//Debug.DrawRay(c1,&#32;Vector3.forward);</emphasis>
+00085 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//Debug.DrawRay(p1,&#32;Vector3.forward);</emphasis>
+00086 
+00087 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//Gizmos.DrawSphere(p0c0,&#32;0.5F);</emphasis>
+00088 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//Gizmos.DrawSphere(c0c1,&#32;0.5F);</emphasis>
+00089 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//Gizmos.DrawSphere(c1p1,&#32;0.5F);</emphasis>
+00090 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//Gizmos.DrawSphere(x,&#32;0.5F);</emphasis>
+00091 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//Gizmos.DrawSphere(y,&#32;0.5F);</emphasis>
+00092 
+00093 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;Vector3.Lerp(&#32;x,&#32;y,&#32;t&#32;);
+00094 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00095 
+00096 
+00097 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//-------------------------------------------------</emphasis>
+00098 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keyword">static</emphasis>&#32;Vector3&#32;Vector3FromString(&#32;<emphasis role="keywordtype">string</emphasis>&#32;szString&#32;)
+00099 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00100 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordtype">string</emphasis>[]&#32;szParseString&#32;=&#32;szString.Substring(&#32;1,&#32;szString.Length&#32;-&#32;1&#32;).Split(&#32;<emphasis role="charliteral">&apos;,&apos;</emphasis>&#32;);
+00101 
+00102 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordtype">float</emphasis>&#32;x&#32;=&#32;<emphasis role="keywordtype">float</emphasis>.Parse(&#32;szParseString[0]&#32;);
+00103 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordtype">float</emphasis>&#32;y&#32;=&#32;<emphasis role="keywordtype">float</emphasis>.Parse(&#32;szParseString[1]&#32;);
+00104 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordtype">float</emphasis>&#32;z&#32;=&#32;<emphasis role="keywordtype">float</emphasis>.Parse(&#32;szParseString[2]&#32;);
+00105 
+00106 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;Vector3&#32;vReturn&#32;=&#32;<emphasis role="keyword">new</emphasis>&#32;Vector3(&#32;x,&#32;y,&#32;z&#32;);
+00107 
+00108 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;vReturn;
+00109 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00110 
+00111 
+00112 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//-------------------------------------------------</emphasis>
+00113 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keyword">static</emphasis>&#32;Vector2&#32;Vector2FromString(&#32;<emphasis role="keywordtype">string</emphasis>&#32;szString&#32;)
+00114 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00115 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordtype">string</emphasis>[]&#32;szParseString&#32;=&#32;szString.Substring(&#32;1,&#32;szString.Length&#32;-&#32;1&#32;).Split(&#32;<emphasis role="charliteral">&apos;,&apos;</emphasis>&#32;);
+00116 
+00117 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordtype">float</emphasis>&#32;x&#32;=&#32;<emphasis role="keywordtype">float</emphasis>.Parse(&#32;szParseString[0]&#32;);
+00118 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordtype">float</emphasis>&#32;y&#32;=&#32;<emphasis role="keywordtype">float</emphasis>.Parse(&#32;szParseString[1]&#32;);
+00119 
+00120 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;Vector3&#32;vReturn&#32;=&#32;<emphasis role="keyword">new</emphasis>&#32;Vector2(&#32;x,&#32;y&#32;);
+00121 
+00122 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;vReturn;
+00123 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00124 
+00125 
+00126 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//-------------------------------------------------</emphasis>
+00127 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keyword">static</emphasis>&#32;<emphasis role="keywordtype">float</emphasis>&#32;Normalize(&#32;<emphasis role="keywordtype">float</emphasis>&#32;value,&#32;<emphasis role="keywordtype">float</emphasis>&#32;min,&#32;<emphasis role="keywordtype">float</emphasis>&#32;max&#32;)
+00128 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00129 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordtype">float</emphasis>&#32;normalizedValue&#32;=&#32;(&#32;value&#32;-&#32;min&#32;)&#32;/&#32;(&#32;max&#32;-&#32;min&#32;);
+00130 
+00131 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;normalizedValue;
+00132 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00133 
+00134 
+00135 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//-------------------------------------------------</emphasis>
+00136 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keyword">static</emphasis>&#32;Vector3&#32;Vector2AsVector3(&#32;Vector2&#32;v&#32;)
+00137 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00138 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;<emphasis role="keyword">new</emphasis>&#32;Vector3(&#32;v.x,&#32;0.0f,&#32;v.y&#32;);
+00139 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00140 
+00141 
+00142 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//-------------------------------------------------</emphasis>
+00143 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keyword">static</emphasis>&#32;Vector2&#32;Vector3AsVector2(&#32;Vector3&#32;v&#32;)
+00144 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00145 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;<emphasis role="keyword">new</emphasis>&#32;Vector2(&#32;v.x,&#32;v.z&#32;);
+00146 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00147 
+00148 
+00149 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//-------------------------------------------------</emphasis>
+00150 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keyword">static</emphasis>&#32;<emphasis role="keywordtype">float</emphasis>&#32;AngleOf(&#32;Vector2&#32;v&#32;)
+00151 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00152 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordtype">float</emphasis>&#32;fDist&#32;=&#32;v.magnitude;
+00153 
+00154 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(&#32;v.y&#32;&gt;=&#32;0.0f&#32;)
+00155 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00156 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;Mathf.Acos(&#32;v.x&#32;/&#32;fDist&#32;);
+00157 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00158 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">else</emphasis>
+00159 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00160 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;Mathf.Acos(&#32;-v.x&#32;/&#32;fDist&#32;)&#32;+&#32;Mathf.PI;
+00161 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00162 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00163 
+00164 
+00165 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//-------------------------------------------------</emphasis>
+00166 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keyword">static</emphasis>&#32;<emphasis role="keywordtype">float</emphasis>&#32;YawOf(&#32;Vector3&#32;v&#32;)
+00167 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00168 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordtype">float</emphasis>&#32;fDist&#32;=&#32;v.magnitude;
+00169 
+00170 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(&#32;v.z&#32;&gt;=&#32;0.0f&#32;)
+00171 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00172 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;Mathf.Acos(&#32;v.x&#32;/&#32;fDist&#32;);
+00173 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00174 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">else</emphasis>
+00175 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00176 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;Mathf.Acos(&#32;-v.x&#32;/&#32;fDist&#32;)&#32;+&#32;Mathf.PI;
+00177 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00178 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00179 
+00180 
+00181 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//-------------------------------------------------</emphasis>
+00182 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keyword">static</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;Swap&lt;T&gt;(&#32;ref&#32;T&#32;lhs,&#32;ref&#32;T&#32;rhs&#32;)
+00183 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00184 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;T&#32;temp&#32;=&#32;lhs;
+00185 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;lhs&#32;=&#32;rhs;
+00186 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;rhs&#32;=&#32;temp;
+00187 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00188 
+00189 
+00190 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//-------------------------------------------------</emphasis>
+00191 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keyword">static</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;Shuffle&lt;T&gt;(&#32;T[]&#32;array&#32;)
+00192 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00193 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">for</emphasis>&#32;(&#32;<emphasis role="keywordtype">int</emphasis>&#32;i&#32;=&#32;array.Length&#32;-&#32;1;&#32;i&#32;&gt;&#32;0;&#32;i--&#32;)
+00194 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00195 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordtype">int</emphasis>&#32;r&#32;=&#32;<link linkend="_namespace_unity_engine">UnityEngine</link>.Random.Range(&#32;0,&#32;i&#32;);
+00196 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;Swap(&#32;ref&#32;array[i],&#32;ref&#32;array[r]&#32;);
+00197 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00198 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00199 
+00200 
+00201 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//-------------------------------------------------</emphasis>
+00202 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keyword">static</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;Shuffle&lt;T&gt;(&#32;List&lt;T&gt;&#32;list&#32;)
+00203 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00204 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">for</emphasis>&#32;(&#32;<emphasis role="keywordtype">int</emphasis>&#32;i&#32;=&#32;list.Count&#32;-&#32;1;&#32;i&#32;&gt;&#32;0;&#32;i--&#32;)
+00205 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00206 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordtype">int</emphasis>&#32;r&#32;=&#32;<link linkend="_namespace_unity_engine">UnityEngine</link>.Random.Range(&#32;0,&#32;i&#32;);
+00207 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;T&#32;temp&#32;=&#32;list[i];
+00208 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;list[i]&#32;=&#32;list[r];
+00209 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;list[r]&#32;=&#32;temp;
+00210 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00211 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00212 
+00213 
+00214 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//-------------------------------------------------</emphasis>
+00215 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keyword">static</emphasis>&#32;<emphasis role="keywordtype">int</emphasis>&#32;RandomWithLookback(&#32;<emphasis role="keywordtype">int</emphasis>&#32;min,&#32;<emphasis role="keywordtype">int</emphasis>&#32;max,&#32;List&lt;int&gt;&#32;history,&#32;<emphasis role="keywordtype">int</emphasis>&#32;historyCount&#32;)
+00216 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00217 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordtype">int</emphasis>&#32;<link linkend="_namespace_valve_1_1_v_r_1ac40c4bdf0a3dcd6e69cad2d85f287c67a6a992d5529f459a44fee58c733255e86">index</link>&#32;=&#32;<link linkend="_namespace_unity_engine">UnityEngine</link>.Random.Range(&#32;min,&#32;max&#32;-&#32;history.Count&#32;);
+00218 
+00219 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">for</emphasis>&#32;(&#32;<emphasis role="keywordtype">int</emphasis>&#32;i&#32;=&#32;0;&#32;i&#32;&lt;&#32;history.Count;&#32;i++&#32;)
+00220 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00221 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(&#32;index&#32;&gt;=&#32;history[i]&#32;)
+00222 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00223 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_namespace_valve_1_1_v_r_1ac40c4bdf0a3dcd6e69cad2d85f287c67a6a992d5529f459a44fee58c733255e86">index</link>++;
+00224 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00225 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00226 
+00227 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;history.Add(&#32;index&#32;);
+00228 
+00229 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(&#32;history.Count&#32;&gt;&#32;historyCount&#32;)
+00230 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00231 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;history.RemoveRange(&#32;0,&#32;history.Count&#32;-&#32;historyCount&#32;);
+00232 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00233 
+00234 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;<link linkend="_namespace_valve_1_1_v_r_1ac40c4bdf0a3dcd6e69cad2d85f287c67a6a992d5529f459a44fee58c733255e86">index</link>;
+00235 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00236 
+00237 
+00238 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//-------------------------------------------------</emphasis>
+00239 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keyword">static</emphasis>&#32;Transform&#32;FindChild(&#32;Transform&#32;parent,&#32;<emphasis role="keywordtype">string</emphasis>&#32;name&#32;)
+00240 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00241 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(&#32;parent.name&#32;==&#32;name&#32;)
+00242 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;parent;
+00243 
+00244 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">foreach</emphasis>&#32;(&#32;Transform&#32;child&#32;<emphasis role="keywordflow">in</emphasis>&#32;parent&#32;)
+00245 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00246 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;var&#32;found&#32;=&#32;FindChild(&#32;child,&#32;name&#32;);
+00247 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(&#32;found&#32;!=&#32;<emphasis role="keyword">null</emphasis>&#32;)
+00248 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;found;
+00249 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00250 
+00251 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;<emphasis role="keyword">null</emphasis>;
+00252 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00253 
+00254 
+00255 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//-------------------------------------------------</emphasis>
+00256 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keyword">static</emphasis>&#32;<emphasis role="keywordtype">bool</emphasis>&#32;IsNullOrEmpty&lt;T&gt;(&#32;T[]&#32;array&#32;)
+00257 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00258 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(&#32;array&#32;==&#32;<emphasis role="keyword">null</emphasis>&#32;)
+00259 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;<emphasis role="keyword">true</emphasis>;
+00260 
+00261 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(&#32;array.Length&#32;==&#32;0&#32;)
+00262 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;<emphasis role="keyword">true</emphasis>;
+00263 
+00264 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;<emphasis role="keyword">false</emphasis>;
+00265 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00266 
+00267 
+00268 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//-------------------------------------------------</emphasis>
+00269 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keyword">static</emphasis>&#32;<emphasis role="keywordtype">bool</emphasis>&#32;IsValidIndex&lt;T&gt;(&#32;T[]&#32;array,&#32;<emphasis role="keywordtype">int</emphasis>&#32;i&#32;)
+00270 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00271 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(&#32;array&#32;==&#32;<emphasis role="keyword">null</emphasis>&#32;)
+00272 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;<emphasis role="keyword">false</emphasis>;
+00273 
+00274 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;(&#32;i&#32;&gt;=&#32;0&#32;)&#32;&amp;&amp;&#32;(&#32;i&#32;&lt;&#32;array.Length&#32;);
+00275 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00276 
+00277 
+00278 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//-------------------------------------------------</emphasis>
+00279 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keyword">static</emphasis>&#32;<emphasis role="keywordtype">bool</emphasis>&#32;IsValidIndex&lt;T&gt;(&#32;List&lt;T&gt;&#32;list,&#32;<emphasis role="keywordtype">int</emphasis>&#32;i&#32;)
+00280 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00281 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(&#32;list&#32;==&#32;<emphasis role="keyword">null</emphasis>&#32;||&#32;list.Count&#32;==&#32;0&#32;)
+00282 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;<emphasis role="keyword">false</emphasis>;
+00283 
+00284 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;(&#32;i&#32;&gt;=&#32;0&#32;)&#32;&amp;&amp;&#32;(&#32;i&#32;&lt;&#32;list.Count&#32;);
+00285 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00286 
+00287 
+00288 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//-------------------------------------------------</emphasis>
+00289 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keyword">static</emphasis>&#32;<emphasis role="keywordtype">int</emphasis>&#32;FindOrAdd&lt;T&gt;(&#32;List&lt;T&gt;&#32;list,&#32;T&#32;item&#32;)
+00290 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00291 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordtype">int</emphasis>&#32;<link linkend="_namespace_valve_1_1_v_r_1ac40c4bdf0a3dcd6e69cad2d85f287c67a6a992d5529f459a44fee58c733255e86">index</link>&#32;=&#32;list.IndexOf(&#32;item&#32;);
+00292 
+00293 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(&#32;index&#32;==&#32;-1&#32;)
+00294 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00295 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;list.Add(&#32;item&#32;);
+00296 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_namespace_valve_1_1_v_r_1ac40c4bdf0a3dcd6e69cad2d85f287c67a6a992d5529f459a44fee58c733255e86">index</link>&#32;=&#32;list.Count&#32;-&#32;1;
+00297 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00298 
+00299 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;<link linkend="_namespace_valve_1_1_v_r_1ac40c4bdf0a3dcd6e69cad2d85f287c67a6a992d5529f459a44fee58c733255e86">index</link>;
+00300 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00301 
+00302 
+00303 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//-------------------------------------------------</emphasis>
+00304 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keyword">static</emphasis>&#32;List&lt;T&gt;&#32;FindAndRemove&lt;T&gt;(&#32;List&lt;T&gt;&#32;list,&#32;System.Predicate&lt;T&gt;&#32;match&#32;)
+00305 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00306 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;List&lt;T&gt;&#32;retVal&#32;=&#32;list.FindAll(&#32;match&#32;);
+00307 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;list.RemoveAll(&#32;match&#32;);
+00308 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;retVal;
+00309 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00310 
+00311 
+00312 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//-------------------------------------------------</emphasis>
+00313 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keyword">static</emphasis>&#32;T&#32;FindOrAddComponent&lt;T&gt;(&#32;GameObject&#32;gameObject&#32;)&#32;where&#32;T&#32;:&#32;Component
+00314 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00315 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;T&#32;component&#32;=&#32;gameObject.GetComponent&lt;T&gt;();
+00316 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(&#32;component&#32;)
+00317 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;component;
+00318 
+00319 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;gameObject.AddComponent&lt;T&gt;();
+00320 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00321 
+00322 
+00323 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//-------------------------------------------------</emphasis>
+00324 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keyword">static</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;FastRemove&lt;T&gt;(&#32;List&lt;T&gt;&#32;list,&#32;<emphasis role="keywordtype">int</emphasis>&#32;index&#32;)
+00325 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00326 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;list[<link linkend="_namespace_valve_1_1_v_r_1ac40c4bdf0a3dcd6e69cad2d85f287c67a6a992d5529f459a44fee58c733255e86">index</link>]&#32;=&#32;list[list.Count&#32;-&#32;1];
+00327 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;list.RemoveAt(&#32;list.Count&#32;-&#32;1&#32;);
+00328 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00329 
+00330 
+00331 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//-------------------------------------------------</emphasis>
+00332 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keyword">static</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;ReplaceGameObject&lt;T,&#32;U&gt;(&#32;T&#32;replace,&#32;U&#32;replaceWith&#32;)
+00333 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;where&#32;T&#32;:&#32;MonoBehaviour
+00334 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;where&#32;U&#32;:&#32;MonoBehaviour
+00335 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00336 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;replace.gameObject.SetActive(&#32;<emphasis role="keyword">false</emphasis>&#32;);
+00337 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;replaceWith.gameObject.SetActive(&#32;<emphasis role="keyword">true</emphasis>&#32;);
+00338 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00339 
+00340 
+00341 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//-------------------------------------------------</emphasis>
+00342 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keyword">static</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;SwitchLayerRecursively(&#32;Transform&#32;transform,&#32;<emphasis role="keywordtype">int</emphasis>&#32;fromLayer,&#32;<emphasis role="keywordtype">int</emphasis>&#32;toLayer&#32;)
+00343 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00344 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(&#32;transform.gameObject.layer&#32;==&#32;fromLayer&#32;)
+00345 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;transform.gameObject.layer&#32;=&#32;toLayer;
+00346 
+00347 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordtype">int</emphasis>&#32;childCount&#32;=&#32;transform.childCount;
+00348 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">for</emphasis>&#32;(&#32;<emphasis role="keywordtype">int</emphasis>&#32;i&#32;=&#32;0;&#32;i&#32;&lt;&#32;childCount;&#32;i++&#32;)
+00349 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00350 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;SwitchLayerRecursively(&#32;transform.GetChild(&#32;i&#32;),&#32;fromLayer,&#32;toLayer&#32;);
+00351 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00352 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00353 
+00354 
+00355 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//-------------------------------------------------</emphasis>
+00356 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keyword">static</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;DrawCross(&#32;Vector3&#32;origin,&#32;Color&#32;crossColor,&#32;<emphasis role="keywordtype">float</emphasis>&#32;size&#32;)
+00357 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00358 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;Vector3&#32;line1Start&#32;=&#32;origin&#32;+&#32;(&#32;Vector3.right&#32;*&#32;size&#32;);
+00359 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;Vector3&#32;line1End&#32;=&#32;origin&#32;-&#32;(&#32;Vector3.right&#32;*&#32;size&#32;);
+00360 
+00361 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;Debug.DrawLine(&#32;line1Start,&#32;line1End,&#32;crossColor&#32;);
+00362 
+00363 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;Vector3&#32;line2Start&#32;=&#32;origin&#32;+&#32;(&#32;Vector3.up&#32;*&#32;size&#32;);
+00364 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;Vector3&#32;line2End&#32;=&#32;origin&#32;-&#32;(&#32;Vector3.up&#32;*&#32;size&#32;);
+00365 
+00366 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;Debug.DrawLine(&#32;line2Start,&#32;line2End,&#32;crossColor&#32;);
+00367 
+00368 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;Vector3&#32;line3Start&#32;=&#32;origin&#32;+&#32;(&#32;Vector3.forward&#32;*&#32;size&#32;);
+00369 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;Vector3&#32;line3End&#32;=&#32;origin&#32;-&#32;(&#32;Vector3.forward&#32;*&#32;size&#32;);
+00370 
+00371 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;Debug.DrawLine(&#32;line3Start,&#32;line3End,&#32;crossColor&#32;);
+00372 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00373 
+00374 
+00375 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//-------------------------------------------------</emphasis>
+00376 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keyword">static</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;ResetTransform(&#32;Transform&#32;t,&#32;<emphasis role="keywordtype">bool</emphasis>&#32;resetScale&#32;=&#32;<emphasis role="keyword">true</emphasis>&#32;)
+00377 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00378 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;t.localPosition&#32;=&#32;Vector3.zero;
+00379 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;t.localRotation&#32;=&#32;Quaternion.identity;
+00380 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(&#32;resetScale&#32;)
+00381 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00382 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;t.localScale&#32;=&#32;<emphasis role="keyword">new</emphasis>&#32;Vector3(&#32;1f,&#32;1f,&#32;1f&#32;);
+00383 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00384 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00385 
+00386 
+00387 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//-------------------------------------------------</emphasis>
+00388 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keyword">static</emphasis>&#32;Vector3&#32;ClosestPointOnLine(&#32;Vector3&#32;vA,&#32;Vector3&#32;vB,&#32;Vector3&#32;vPoint&#32;)
+00389 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00390 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;var&#32;vVector1&#32;=&#32;vPoint&#32;-&#32;vA;
+00391 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;var&#32;vVector2&#32;=&#32;(&#32;vB&#32;-&#32;vA&#32;).normalized;
+00392 
+00393 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;var&#32;d&#32;=&#32;Vector3.Distance(&#32;vA,&#32;vB&#32;);
+00394 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;var&#32;t&#32;=&#32;Vector3.Dot(&#32;vVector2,&#32;vVector1&#32;);
+00395 
+00396 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(&#32;t&#32;&lt;=&#32;0&#32;)
+00397 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;vA;
+00398 
+00399 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(&#32;t&#32;&gt;=&#32;d&#32;)
+00400 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;vB;
+00401 
+00402 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;var&#32;vVector3&#32;=&#32;vVector2&#32;*&#32;t;
+00403 
+00404 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;var&#32;vClosestPoint&#32;=&#32;vA&#32;+&#32;vVector3;
+00405 
+00406 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;vClosestPoint;
+00407 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00408 
+00409 
+00410 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//-------------------------------------------------</emphasis>
+00411 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keyword">static</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;AfterTimer(&#32;GameObject&#32;go,&#32;<emphasis role="keywordtype">float</emphasis>&#32;_time,&#32;System.Action&#32;callback,&#32;<emphasis role="keywordtype">bool</emphasis>&#32;trigger_if_destroyed_early&#32;=&#32;<emphasis role="keyword">false</emphasis>&#32;)
+00412 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00413 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;AfterTimer_Component&#32;afterTimer_component&#32;=&#32;go.AddComponent&lt;AfterTimer_Component&gt;();
+00414 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;afterTimer_component.Init(&#32;_time,&#32;callback,&#32;trigger_if_destroyed_early&#32;);
+00415 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00416 
+00417 
+00418 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//-------------------------------------------------</emphasis>
+00419 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keyword">static</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;SendPhysicsMessage(&#32;Collider&#32;collider,&#32;<emphasis role="keywordtype">string</emphasis>&#32;message,&#32;SendMessageOptions&#32;sendMessageOptions&#32;)
+00420 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00421 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;Rigidbody&#32;rb&#32;=&#32;collider.attachedRigidbody;
+00422 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(&#32;rb&#32;&amp;&amp;&#32;rb.gameObject&#32;!=&#32;collider.gameObject&#32;)
+00423 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00424 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;rb.SendMessage(&#32;message,&#32;sendMessageOptions&#32;);
+00425 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00426 
+00427 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;collider.SendMessage(&#32;message,&#32;sendMessageOptions&#32;);
+00428 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00429 
+00430 
+00431 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//-------------------------------------------------</emphasis>
+00432 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keyword">static</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;SendPhysicsMessage(&#32;Collider&#32;collider,&#32;<emphasis role="keywordtype">string</emphasis>&#32;message,&#32;<emphasis role="keywordtype">object</emphasis>&#32;arg,&#32;SendMessageOptions&#32;sendMessageOptions&#32;)
+00433 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00434 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;Rigidbody&#32;rb&#32;=&#32;collider.attachedRigidbody;
+00435 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(&#32;rb&#32;&amp;&amp;&#32;rb.gameObject&#32;!=&#32;collider.gameObject&#32;)
+00436 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00437 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;rb.SendMessage(&#32;message,&#32;arg,&#32;sendMessageOptions&#32;);
+00438 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00439 
+00440 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;collider.SendMessage(&#32;message,&#32;arg,&#32;sendMessageOptions&#32;);
+00441 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00442 
+00443 
+00444 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//-------------------------------------------------</emphasis>
+00445 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keyword">static</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;IgnoreCollisions(&#32;GameObject&#32;goA,&#32;GameObject&#32;goB&#32;)
+00446 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00447 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;Collider[]&#32;goA_colliders&#32;=&#32;goA.GetComponentsInChildren&lt;Collider&gt;();
+00448 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;Collider[]&#32;goB_colliders&#32;=&#32;goB.GetComponentsInChildren&lt;Collider&gt;();
+00449 
+00450 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(&#32;goA_colliders.Length&#32;==&#32;0&#32;||&#32;goB_colliders.Length&#32;==&#32;0&#32;)
+00451 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00452 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>;
+00453 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00454 
+00455 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">foreach</emphasis>&#32;(&#32;Collider&#32;cA&#32;<emphasis role="keywordflow">in</emphasis>&#32;goA_colliders&#32;)
+00456 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00457 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">foreach</emphasis>&#32;(&#32;Collider&#32;cB&#32;<emphasis role="keywordflow">in</emphasis>&#32;goB_colliders&#32;)
+00458 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00459 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(&#32;cA.enabled&#32;&amp;&amp;&#32;cB.enabled&#32;)
+00460 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00461 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_namespace_leap_1_1_unity_1a186e5eb0a2b743f1f6b79346f0ab8ad0a50ae99e9c35446c2580e4b540b0fd104">Physics</link>.IgnoreCollision(&#32;cA,&#32;cB,&#32;<emphasis role="keyword">true</emphasis>&#32;);
+00462 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00463 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00464 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00465 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00466 
+00467 
+00468 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//-------------------------------------------------</emphasis>
+00469 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keyword">static</emphasis>&#32;IEnumerator&#32;WrapCoroutine(&#32;IEnumerator&#32;coroutine,&#32;System.Action&#32;onCoroutineFinished&#32;)
+00470 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00471 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">while</emphasis>&#32;(&#32;coroutine.MoveNext()&#32;)
+00472 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00473 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;yield&#32;<emphasis role="keywordflow">return</emphasis>&#32;coroutine.Current;
+00474 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00475 
+00476 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;onCoroutineFinished();
+00477 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00478 
+00479 
+00480 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//-------------------------------------------------</emphasis>
+00481 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keyword">static</emphasis>&#32;Color&#32;ColorWithAlpha(&#32;<emphasis role="keyword">this</emphasis>&#32;Color&#32;color,&#32;<emphasis role="keywordtype">float</emphasis>&#32;alpha&#32;)
+00482 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00483 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;color.a&#32;=&#32;alpha;
+00484 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;color;
+00485 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00486 
+00487 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//-------------------------------------------------</emphasis>
+00488 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;Exits&#32;the&#32;application&#32;if&#32;running&#32;standalone,&#32;or&#32;stops&#32;playback&#32;if&#32;running&#32;in&#32;the&#32;editor.</emphasis>
+00489 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//-------------------------------------------------</emphasis>
+00490 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keyword">static</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;Quit()
+00491 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00492 <emphasis role="preprocessor">#if&#32;UNITY_EDITOR</emphasis>
+00493 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_namespace_unity_editor">UnityEditor</link>.EditorApplication.isPlaying&#32;=&#32;<emphasis role="keyword">false</emphasis>;
+00494 <emphasis role="preprocessor">#else</emphasis>
+00495 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;NOTE:&#32;The&#32;recommended&#32;call&#32;for&#32;exiting&#32;a&#32;Unity&#32;app&#32;is&#32;UnityEngine.Application.Quit(),&#32;but&#32;as</emphasis>
+00496 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;of&#32;5.1.0f3&#32;this&#32;was&#32;causing&#32;the&#32;application&#32;to&#32;crash.&#32;The&#32;following&#32;works&#32;without&#32;crashing:</emphasis>
+00497 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;System.Diagnostics.Process.GetCurrentProcess().Kill();
+00498 <emphasis role="preprocessor">#endif</emphasis>
+00499 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00500 
+00501 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//-------------------------------------------------</emphasis>
+00502 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;Truncate&#32;floats&#32;to&#32;the&#32;specified&#32;#&#32;of&#32;decimal&#32;places&#32;when&#32;you&#32;want&#32;easier-to-read&#32;numbers&#32;without&#32;clamping&#32;to&#32;an&#32;int</emphasis>
+00503 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//-------------------------------------------------</emphasis>
+00504 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keyword">static</emphasis>&#32;decimal&#32;FloatToDecimal(&#32;<emphasis role="keywordtype">float</emphasis>&#32;value,&#32;<emphasis role="keywordtype">int</emphasis>&#32;decimalPlaces&#32;=&#32;2&#32;)
+00505 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00506 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;Math.Round(&#32;(decimal)value,&#32;decimalPlaces&#32;);
+00507 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00508 
+00509 
+00510 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//-------------------------------------------------</emphasis>
+00511 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keyword">static</emphasis>&#32;T&#32;Median&lt;T&gt;(&#32;<emphasis role="keyword">this</emphasis>&#32;IEnumerable&lt;T&gt;&#32;source&#32;)
+00512 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00513 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(&#32;source&#32;==&#32;<emphasis role="keyword">null</emphasis>&#32;)
+00514 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00515 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">throw</emphasis>&#32;<emphasis role="keyword">new</emphasis>&#32;ArgumentException(&#32;<emphasis role="stringliteral">&quot;Argument&#32;cannot&#32;be&#32;null.&quot;</emphasis>,&#32;<emphasis role="stringliteral">&quot;source&quot;</emphasis>&#32;);
+00516 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00517 
+00518 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordtype">int</emphasis>&#32;count&#32;=&#32;source.Count();
+00519 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(&#32;count&#32;==&#32;0&#32;)
+00520 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00521 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">throw</emphasis>&#32;<emphasis role="keyword">new</emphasis>&#32;InvalidOperationException(&#32;<emphasis role="stringliteral">&quot;Enumerable&#32;must&#32;contain&#32;at&#32;least&#32;one&#32;element.&quot;</emphasis>&#32;);
+00522 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00523 
+00524 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;source.OrderBy(&#32;x&#32;=&gt;&#32;x&#32;).ElementAt(&#32;count&#32;/&#32;2&#32;);
+00525 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00526 
+00527 
+00528 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//-------------------------------------------------</emphasis>
+00529 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keyword">static</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;ForEach&lt;T&gt;(&#32;<emphasis role="keyword">this</emphasis>&#32;IEnumerable&lt;T&gt;&#32;source,&#32;Action&lt;T&gt;&#32;action&#32;)
+00530 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00531 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(&#32;source&#32;==&#32;<emphasis role="keyword">null</emphasis>&#32;)
+00532 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00533 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">throw</emphasis>&#32;<emphasis role="keyword">new</emphasis>&#32;ArgumentException(&#32;<emphasis role="stringliteral">&quot;Argument&#32;cannot&#32;be&#32;null.&quot;</emphasis>,&#32;<emphasis role="stringliteral">&quot;source&quot;</emphasis>&#32;);
+00534 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00535 
+00536 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">foreach</emphasis>&#32;(&#32;T&#32;value&#32;<emphasis role="keywordflow">in</emphasis>&#32;source&#32;)
+00537 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00538 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;action(&#32;value&#32;);
+00539 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00540 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00541 
+00542 
+00543 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//-------------------------------------------------</emphasis>
+00544 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;In&#32;some&#32;cases&#32;Unity/C#&#32;don&apos;t&#32;correctly&#32;interpret&#32;the&#32;newline&#32;control&#32;character&#32;(\n).</emphasis>
+00545 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;This&#32;function&#32;replaces&#32;every&#32;instance&#32;of&#32;&quot;\\n&quot;&#32;with&#32;the&#32;actual&#32;newline&#32;control&#32;character.</emphasis>
+00546 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//-------------------------------------------------</emphasis>
+00547 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keyword">static</emphasis>&#32;<emphasis role="keywordtype">string</emphasis>&#32;FixupNewlines(&#32;<emphasis role="keywordtype">string</emphasis>&#32;text&#32;)
+00548 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00549 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordtype">bool</emphasis>&#32;newLinesRemaining&#32;=&#32;<emphasis role="keyword">true</emphasis>;
+00550 
+00551 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">while</emphasis>&#32;(&#32;newLinesRemaining&#32;)
+00552 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00553 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordtype">int</emphasis>&#32;CIndex&#32;=&#32;text.IndexOf(&#32;<emphasis role="stringliteral">&quot;\\n&quot;</emphasis>&#32;);
+00554 
+00555 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(&#32;CIndex&#32;==&#32;-1&#32;)
+00556 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00557 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;newLinesRemaining&#32;=&#32;<emphasis role="keyword">false</emphasis>;
+00558 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00559 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">else</emphasis>
+00560 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00561 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;text&#32;=&#32;text.Remove(&#32;CIndex&#32;-&#32;1,&#32;3&#32;);
+00562 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;text&#32;=&#32;text.Insert(&#32;CIndex&#32;-&#32;1,&#32;<emphasis role="stringliteral">&quot;\n&quot;</emphasis>&#32;);
+00563 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00564 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00565 
+00566 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;text;
+00567 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00568 
+00569 
+00570 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//-------------------------------------------------</emphasis>
+00571 <emphasis role="preprocessor">#if&#32;(&#32;UNITY_5_4&#32;)</emphasis>
+00572 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keyword">static</emphasis>&#32;<emphasis role="keywordtype">float</emphasis>&#32;PathLength(&#32;NavMeshPath&#32;path&#32;)
+00573 <emphasis role="preprocessor">#else</emphasis>
+00574 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keyword">static</emphasis>&#32;<emphasis role="keywordtype">float</emphasis>&#32;PathLength(&#32;<link linkend="_namespace_unity_engine">UnityEngine</link>.AI.NavMeshPath&#32;path&#32;)
+00575 <emphasis role="preprocessor">#endif</emphasis>
+00576 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00577 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(&#32;path.corners.Length&#32;&lt;&#32;2&#32;)
+00578 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;0;
+00579 
+00580 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;Vector3&#32;previousCorner&#32;=&#32;path.corners[0];
+00581 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordtype">float</emphasis>&#32;lengthSoFar&#32;=&#32;0.0f;
+00582 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordtype">int</emphasis>&#32;i&#32;=&#32;1;
+00583 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">while</emphasis>&#32;(&#32;i&#32;&lt;&#32;path.corners.Length&#32;)
+00584 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00585 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;Vector3&#32;currentCorner&#32;=&#32;path.corners[i];
+00586 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;lengthSoFar&#32;+=&#32;Vector3.Distance(&#32;previousCorner,&#32;currentCorner&#32;);
+00587 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;previousCorner&#32;=&#32;currentCorner;
+00588 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;i++;
+00589 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00590 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;lengthSoFar;
+00591 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00592 
+00593 
+00594 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//-------------------------------------------------</emphasis>
+00595 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keyword">static</emphasis>&#32;<emphasis role="keywordtype">bool</emphasis>&#32;HasCommandLineArgument(&#32;<emphasis role="keywordtype">string</emphasis>&#32;argumentName&#32;)
+00596 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00597 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordtype">string</emphasis>[]&#32;args&#32;=&#32;System.Environment.GetCommandLineArgs();
+00598 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">for</emphasis>&#32;(&#32;<emphasis role="keywordtype">int</emphasis>&#32;i&#32;=&#32;0;&#32;i&#32;&lt;&#32;args.Length;&#32;i++&#32;)
+00599 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00600 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(&#32;args[i].Equals(&#32;argumentName&#32;)&#32;)
+00601 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00602 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;<emphasis role="keyword">true</emphasis>;
+00603 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00604 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00605 
+00606 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;<emphasis role="keyword">false</emphasis>;
+00607 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00608 
+00609 
+00610 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//-------------------------------------------------</emphasis>
+00611 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keyword">static</emphasis>&#32;<emphasis role="keywordtype">int</emphasis>&#32;GetCommandLineArgValue(&#32;<emphasis role="keywordtype">string</emphasis>&#32;argumentName,&#32;<emphasis role="keywordtype">int</emphasis>&#32;nDefaultValue&#32;)
+00612 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00613 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordtype">string</emphasis>[]&#32;args&#32;=&#32;System.Environment.GetCommandLineArgs();
+00614 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">for</emphasis>&#32;(&#32;<emphasis role="keywordtype">int</emphasis>&#32;i&#32;=&#32;0;&#32;i&#32;&lt;&#32;args.Length;&#32;i++&#32;)
+00615 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00616 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(&#32;args[i].Equals(&#32;argumentName&#32;)&#32;)
+00617 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00618 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(&#32;i&#32;==&#32;(&#32;args.Length&#32;-&#32;1&#32;)&#32;)&#32;<emphasis role="comment">//&#32;Last&#32;arg,&#32;return&#32;default</emphasis>
+00619 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00620 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;nDefaultValue;
+00621 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00622 
+00623 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;System.Int32.Parse(&#32;args[i&#32;+&#32;1]&#32;);
+00624 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00625 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00626 
+00627 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;nDefaultValue;
+00628 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00629 
+00630 
+00631 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//-------------------------------------------------</emphasis>
+00632 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keyword">static</emphasis>&#32;<emphasis role="keywordtype">float</emphasis>&#32;GetCommandLineArgValue(&#32;<emphasis role="keywordtype">string</emphasis>&#32;argumentName,&#32;<emphasis role="keywordtype">float</emphasis>&#32;flDefaultValue&#32;)
+00633 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00634 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordtype">string</emphasis>[]&#32;args&#32;=&#32;System.Environment.GetCommandLineArgs();
+00635 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">for</emphasis>&#32;(&#32;<emphasis role="keywordtype">int</emphasis>&#32;i&#32;=&#32;0;&#32;i&#32;&lt;&#32;args.Length;&#32;i++&#32;)
+00636 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00637 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(&#32;args[i].Equals(&#32;argumentName&#32;)&#32;)
+00638 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00639 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(&#32;i&#32;==&#32;(&#32;args.Length&#32;-&#32;1&#32;)&#32;)&#32;<emphasis role="comment">//&#32;Last&#32;arg,&#32;return&#32;default</emphasis>
+00640 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00641 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;flDefaultValue;
+00642 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00643 
+00644 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;(<emphasis role="keywordtype">float</emphasis>)Double.Parse(&#32;args[i&#32;+&#32;1]&#32;);
+00645 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00646 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00647 
+00648 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;flDefaultValue;
+00649 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00650 
+00651 
+00652 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//-------------------------------------------------</emphasis>
+00653 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keyword">static</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;SetActive(&#32;GameObject&#32;gameObject,&#32;<emphasis role="keywordtype">bool</emphasis>&#32;active&#32;)
+00654 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00655 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(&#32;gameObject&#32;!=&#32;<emphasis role="keyword">null</emphasis>&#32;)
+00656 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00657 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;gameObject.SetActive(&#32;active&#32;);
+00658 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00659 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00660 
+00661 
+00662 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//-------------------------------------------------</emphasis>
+00663 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;The&#32;version&#32;of&#32;Path.Combine()&#32;included&#32;with&#32;Unity&#32;can&#32;only&#32;combine&#32;two&#32;paths.</emphasis>
+00664 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;This&#32;version&#32;mimics&#32;the&#32;modern&#32;.NET&#32;version,&#32;which&#32;allows&#32;for&#32;any&#32;number&#32;of</emphasis>
+00665 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;paths&#32;to&#32;be&#32;combined.</emphasis>
+00666 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//-------------------------------------------------</emphasis>
+00667 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keyword">static</emphasis>&#32;<emphasis role="keywordtype">string</emphasis>&#32;CombinePaths(&#32;params&#32;<emphasis role="keywordtype">string</emphasis>[]&#32;paths&#32;)
+00668 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00669 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(&#32;paths.Length&#32;==&#32;0&#32;)
+00670 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00671 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;<emphasis role="stringliteral">&quot;&quot;</emphasis>;
+00672 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00673 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">else</emphasis>
+00674 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00675 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordtype">string</emphasis>&#32;combinedPath&#32;=&#32;paths[0];
+00676 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">for</emphasis>&#32;(&#32;<emphasis role="keywordtype">int</emphasis>&#32;i&#32;=&#32;1;&#32;i&#32;&lt;&#32;paths.Length;&#32;i++&#32;)
+00677 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00678 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;combinedPath&#32;=&#32;Path.Combine(&#32;combinedPath,&#32;paths[i]&#32;);
+00679 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00680 
+00681 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;combinedPath;
+00682 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00683 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00684 &#32;&#32;&#32;&#32;}
+00685 
+00686 
+00687 &#32;&#32;&#32;&#32;<emphasis role="comment">//-------------------------------------------------------------------------</emphasis>
+00688 &#32;&#32;&#32;&#32;<emphasis role="comment">//Component&#32;used&#32;by&#32;the&#32;static&#32;AfterTimer&#32;function</emphasis>
+00689 &#32;&#32;&#32;&#32;<emphasis role="comment">//-------------------------------------------------------------------------</emphasis>
+00690 &#32;&#32;&#32;&#32;[System.Serializable]
+<anchor xml:id="__util_8cs_source_1l00691"/><link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_after_timer___component">00691</link> &#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keyword">class&#32;</emphasis><link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_after_timer___component">AfterTimer_Component</link>&#32;:&#32;MonoBehaviour
+00692 &#32;&#32;&#32;&#32;{
+00693 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;System.Action&#32;callback;
+00694 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;<emphasis role="keywordtype">float</emphasis>&#32;triggerTime;
+00695 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;<emphasis role="keywordtype">bool</emphasis>&#32;timerActive&#32;=&#32;<emphasis role="keyword">false</emphasis>;
+00696 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;<emphasis role="keywordtype">bool</emphasis>&#32;triggerOnEarlyDestroy&#32;=&#32;<emphasis role="keyword">false</emphasis>;
+00697 
+00698 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//-------------------------------------------------</emphasis>
+<anchor xml:id="__util_8cs_source_1l00699"/><link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_after_timer___component_1a4edf98fcac31c68457596f928c12204c">00699</link> &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_after_timer___component_1a4edf98fcac31c68457596f928c12204c">Init</link>(&#32;<emphasis role="keywordtype">float</emphasis>&#32;_time,&#32;System.Action&#32;_callback,&#32;<emphasis role="keywordtype">bool</emphasis>&#32;earlydestroy&#32;)
+00700 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00701 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;triggerTime&#32;=&#32;_time;
+00702 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;callback&#32;=&#32;_callback;
+00703 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;triggerOnEarlyDestroy&#32;=&#32;earlydestroy;
+00704 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;timerActive&#32;=&#32;<emphasis role="keyword">true</emphasis>;
+00705 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;StartCoroutine(&#32;Wait()&#32;);
+00706 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00707 
+00708 
+00709 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//-------------------------------------------------</emphasis>
+00710 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;IEnumerator&#32;Wait()
+00711 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00712 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;yield&#32;<emphasis role="keywordflow">return</emphasis>&#32;<emphasis role="keyword">new</emphasis>&#32;WaitForSeconds(&#32;triggerTime&#32;);
+00713 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;timerActive&#32;=&#32;<emphasis role="keyword">false</emphasis>;
+00714 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;callback.Invoke();
+00715 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;Destroy(&#32;<emphasis role="keyword">this</emphasis>&#32;);
+00716 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00717 
+00718 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;
+00719 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//-------------------------------------------------</emphasis>
+00720 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordtype">void</emphasis>&#32;OnDestroy()
+00721 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00722 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(&#32;timerActive&#32;)
+00723 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00724 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//If&#32;the&#32;component&#32;or&#32;its&#32;GameObject&#32;get&#32;destroyed&#32;before&#32;the&#32;timer&#32;is&#32;complete,&#32;clean&#32;up</emphasis>
+00725 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;StopCoroutine(&#32;Wait()&#32;);
+00726 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;timerActive&#32;=&#32;<emphasis role="keyword">false</emphasis>;
+00727 
+00728 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(&#32;triggerOnEarlyDestroy&#32;)
+00729 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00730 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;callback.Invoke();
+00731 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00732 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00733 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00734 &#32;&#32;&#32;&#32;}
+00735 }
+</programlisting></section>

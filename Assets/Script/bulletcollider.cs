@@ -11,7 +11,7 @@ public class bulletcollider : NetworkBehaviour {
   /// This function works  when there is collision with the shootable layer and calls the TakeDamage function.
   /// </summary>
   /// <param name="collision"></param>
-	void OnCollisionEnter(Collision collision)
+	public void OnCollisionEnter(Collision collision)
 	{
    
 		GameObject hit = collision.transform.parent.gameObject;

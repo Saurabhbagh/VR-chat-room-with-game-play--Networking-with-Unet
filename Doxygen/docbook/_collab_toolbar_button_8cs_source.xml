@@ -1,0 +1,302 @@
+<?xml version='1.0' encoding='UTF-8' standalone='no'?>
+<section xmlns="http://docbook.org/ns/docbook" version="5.0" xmlns:xlink="http://www.w3.org/1999/xlink" xml:id="__collab_toolbar_button_8cs_source">
+<title>CollabToolbarButton.cs</title>
+<indexterm><primary>O:/GitHUBMINIPRoject/Library/PackageCache/com.unity.collab-proxy@1.2.15/Editor/Collab/CollabToolbarButton.cs</primary></indexterm>
+<programlisting>00001 <emphasis role="keyword">using</emphasis>&#32;System;
+00002 <emphasis role="keyword">using</emphasis>&#32;System.Collections.Generic;
+00003 <emphasis role="keyword">using</emphasis>&#32;System.Linq;
+00004 <emphasis role="keyword">using</emphasis>&#32;<link linkend="_namespace_unity_editor">UnityEditor</link>.<link linkend="_namespace_unity_editor_1_1_collaboration">Collaboration</link>;
+00005 <emphasis role="keyword">using</emphasis>&#32;<link linkend="_namespace_unity_editor">UnityEditor</link>.Connect;
+00006 <emphasis role="keyword">using</emphasis>&#32;<link linkend="_namespace_unity_editor">UnityEditor</link>.Web;
+00007 <emphasis role="keyword">using</emphasis>&#32;<link linkend="__balloon_8cs_1a7d67e097df9376eb709b6a23aa3c7d23">UnityEngine</link>;
+00008 
+00009 <emphasis role="keyword">namespace&#32;</emphasis><link linkend="_namespace_unity_editor">UnityEditor</link>
+00010 {
+<anchor xml:id="__collab_toolbar_button_8cs_source_1l00011"/><link linkend="_class_unity_editor_1_1_collab_toolbar_button">00011</link> &#32;&#32;&#32;&#32;<emphasis role="keyword">internal</emphasis>&#32;<emphasis role="keyword">class&#32;</emphasis><link linkend="_class_unity_editor_1_1_collab_toolbar_button">CollabToolbarButton</link>&#32;:&#32;SubToolbar,&#32;IDisposable
+00012 &#32;&#32;&#32;&#32;{
+00013 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;Must&#32;match&#32;s_CollabIcon&#32;array</emphasis>
+00014 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">enum</emphasis>&#32;CollabToolbarState
+00015 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00016 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;NeedToEnableCollab,
+00017 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;UpToDate,
+00018 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;Conflict,
+00019 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;OperationError,
+00020 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;ServerHasChanges,
+00021 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;FilesToPush,
+00022 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;InProgress,
+00023 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;Disabled,
+00024 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;Offline
+00025 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00026 
+00027 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;<emphasis role="keyword">class&#32;</emphasis>CollabToolbarContent
+00028 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00029 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;readonly&#32;<emphasis role="keywordtype">string</emphasis>&#32;m_iconName;
+00030 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;readonly&#32;<emphasis role="keywordtype">string</emphasis>&#32;m_toolTip;
+00031 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;readonly&#32;CollabToolbarState&#32;m_state;
+00032 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;
+00033 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">static</emphasis>&#32;Dictionary&lt;CollabToolbarContent,&#32;GUIContent&gt;&#32;m_CollabIcons;
+00034 
+00035 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;CollabToolbarState&#32;RegisteredForState
+00036 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00037 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">get</emphasis>&#32;{&#32;<emphasis role="keywordflow">return</emphasis>&#32;m_state;&#32;}
+00038 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00039 
+00040 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;GUIContent&#32;GuiContent
+00041 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00042 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">get</emphasis>
+00043 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00044 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(m_CollabIcons&#32;==&#32;<emphasis role="keyword">null</emphasis>)
+00045 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00046 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;m_CollabIcons&#32;=&#32;<emphasis role="keyword">new</emphasis>&#32;Dictionary&lt;CollabToolbarContent,&#32;GUIContent&gt;();
+00047 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00048 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;
+00049 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(!m_CollabIcons.ContainsKey(<emphasis role="keyword">this</emphasis>))
+00050 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00051 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;m_CollabIcons.Add(<emphasis role="keyword">this</emphasis>,&#32;EditorGUIUtility.TrTextContentWithIcon(<emphasis role="stringliteral">&quot;Collab&quot;</emphasis>,&#32;m_toolTip,&#32;m_iconName));
+00052 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00053 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;
+00054 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;m_CollabIcons[<emphasis role="keyword">this</emphasis>];
+00055 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00056 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00057 
+00058 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;CollabToolbarContent(CollabToolbarState&#32;state,&#32;<emphasis role="keywordtype">string</emphasis>&#32;iconName,&#32;<emphasis role="keywordtype">string</emphasis>&#32;toolTip)
+00059 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00060 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;m_state&#32;=&#32;state;
+00061 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;m_iconName&#32;=&#32;iconName;
+00062 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;m_toolTip&#32;=&#32;toolTip;
+00063 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00064 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00065 
+00066 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;CollabToolbarContent[]&#32;m_toolbarContents;
+00067 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;CollabToolbarState&#32;m_CollabToolbarState&#32;=&#32;CollabToolbarState.UpToDate;
+00068 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">const</emphasis>&#32;<emphasis role="keywordtype">float</emphasis>&#32;kCollabButtonWidth&#32;=&#32;78.0f;
+00069 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;ButtonWithAnimatedIconRotation&#32;m_CollabButton;
+00070 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordtype">string</emphasis>&#32;m_DynamicTooltip;
+00071 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">static</emphasis>&#32;<emphasis role="keywordtype">bool</emphasis>&#32;m_ShowCollabTooltip&#32;=&#32;<emphasis role="keyword">false</emphasis>;
+00072 
+00073 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;GUIContent&#32;currentCollabContent
+00074 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00075 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">get</emphasis>
+00076 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00077 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;CollabToolbarContent&#32;toolbarContent&#32;=
+00078 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;m_toolbarContents.FirstOrDefault(c&#32;=&gt;&#32;c.RegisteredForState.Equals(m_CollabToolbarState));
+00079 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;GUIContent&#32;content&#32;=&#32;<emphasis role="keyword">new</emphasis>&#32;GUIContent(toolbarContent&#32;==&#32;<emphasis role="keyword">null</emphasis>?&#32;m_toolbarContents.First().GuiContent&#32;:&#32;toolbarContent.GuiContent);
+00080 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(!m_ShowCollabTooltip)
+00081 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00082 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;content.tooltip&#32;=&#32;<emphasis role="keyword">null</emphasis>;
+00083 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00084 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">else</emphasis>&#32;<emphasis role="keywordflow">if</emphasis>&#32;(m_DynamicTooltip&#32;!=&#32;<emphasis role="stringliteral">&quot;&quot;</emphasis>)
+00085 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00086 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;content.tooltip&#32;=&#32;m_DynamicTooltip;
+00087 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00088 
+00089 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(Collab.instance.AreTestsRunning())
+00090 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00091 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;content.text&#32;=&#32;<emphasis role="stringliteral">&quot;CTF&quot;</emphasis>;
+00092 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00093 
+00094 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;content;
+00095 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00096 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00097 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;
+<anchor xml:id="__collab_toolbar_button_8cs_source_1l00098"/><link linkend="_class_unity_editor_1_1_collab_toolbar_button_1a6495491ce0577c6e269320479c1cd39e">00098</link> &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<link linkend="_class_unity_editor_1_1_collab_toolbar_button_1a6495491ce0577c6e269320479c1cd39e">CollabToolbarButton</link>()
+00099 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00100 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;m_toolbarContents&#32;=&#32;<emphasis role="keyword">new</emphasis>[]
+00101 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00102 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">new</emphasis>&#32;CollabToolbarContent(CollabToolbarState.NeedToEnableCollab,&#32;<emphasis role="stringliteral">&quot;CollabNew&quot;</emphasis>,&#32;<emphasis role="stringliteral">&quot;&#32;You&#32;need&#32;to&#32;enable&#32;collab.&quot;</emphasis>),
+00103 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">new</emphasis>&#32;CollabToolbarContent(CollabToolbarState.UpToDate,&#32;<emphasis role="stringliteral">&quot;Collab&quot;</emphasis>,&#32;<emphasis role="stringliteral">&quot;&#32;You&#32;are&#32;up&#32;to&#32;date.&quot;</emphasis>),
+00104 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">new</emphasis>&#32;CollabToolbarContent(CollabToolbarState.Conflict,&#32;<emphasis role="stringliteral">&quot;CollabConflict&quot;</emphasis>,&#32;<emphasis role="stringliteral">&quot;&#32;Please&#32;fix&#32;your&#32;conflicts&#32;prior&#32;to&#32;publishing.&quot;</emphasis>),
+00105 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">new</emphasis>&#32;CollabToolbarContent(CollabToolbarState.OperationError,&#32;<emphasis role="stringliteral">&quot;CollabError&quot;</emphasis>,&#32;<emphasis role="stringliteral">&quot;&#32;Last&#32;operation&#32;failed.&#32;Please&#32;retry&#32;later.&quot;</emphasis>),
+00106 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">new</emphasis>&#32;CollabToolbarContent(CollabToolbarState.ServerHasChanges,&#32;<emphasis role="stringliteral">&quot;CollabPull&quot;</emphasis>,&#32;<emphasis role="stringliteral">&quot;&#32;Please&#32;update,&#32;there&#32;are&#32;server&#32;changes.&quot;</emphasis>),
+00107 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">new</emphasis>&#32;CollabToolbarContent(CollabToolbarState.FilesToPush,&#32;<emphasis role="stringliteral">&quot;CollabPush&quot;</emphasis>,&#32;<emphasis role="stringliteral">&quot;&#32;You&#32;have&#32;files&#32;to&#32;publish.&quot;</emphasis>),
+00108 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">new</emphasis>&#32;CollabToolbarContent(CollabToolbarState.InProgress,&#32;<emphasis role="stringliteral">&quot;CollabProgress&quot;</emphasis>,&#32;<emphasis role="stringliteral">&quot;&#32;Operation&#32;in&#32;progress.&quot;</emphasis>),
+00109 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">new</emphasis>&#32;CollabToolbarContent(CollabToolbarState.Disabled,&#32;<emphasis role="stringliteral">&quot;CollabNew&quot;</emphasis>,&#32;<emphasis role="stringliteral">&quot;&#32;Collab&#32;is&#32;disabled.&quot;</emphasis>),
+00110 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">new</emphasis>&#32;CollabToolbarContent(CollabToolbarState.Offline,&#32;<emphasis role="stringliteral">&quot;CollabNew&quot;</emphasis>,&#32;<emphasis role="stringliteral">&quot;&#32;Please&#32;check&#32;your&#32;network&#32;connection.&quot;</emphasis>)
+00111 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;};
+00112 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;
+00113 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;Collab.instance.StateChanged&#32;+=&#32;<link linkend="_class_unity_editor_1_1_collab_toolbar_button_1afc002429a2ef73b47d0f54972333537b">OnCollabStateChanged</link>;
+00114 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;UnityConnect.instance.StateChanged&#32;+=&#32;OnUnityConnectStateChanged;
+00115 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;UnityConnect.instance.UserStateChanged&#32;+=&#32;OnUnityConnectUserStateChanged;
+00116 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00117 
+00118 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordtype">void</emphasis>&#32;OnUnityConnectUserStateChanged(UserInfo&#32;state)
+00119 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00120 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_unity_editor_1_1_collab_toolbar_button_1ac0b3213298e3dead1742c10e9b65f5f9">UpdateCollabToolbarState</link>();
+00121 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00122 
+00123 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordtype">void</emphasis>&#32;OnUnityConnectStateChanged(ConnectInfo&#32;state)
+00124 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00125 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_unity_editor_1_1_collab_toolbar_button_1ac0b3213298e3dead1742c10e9b65f5f9">UpdateCollabToolbarState</link>();
+00126 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00127 
+<anchor xml:id="__collab_toolbar_button_8cs_source_1l00128"/><link linkend="_class_unity_editor_1_1_collab_toolbar_button_1aa3c538550fba2437f689458095cc5979">00128</link> &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keyword">override</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;<link linkend="_class_unity_editor_1_1_collab_toolbar_button_1aa3c538550fba2437f689458095cc5979">OnGUI</link>(Rect&#32;rect)
+00129 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00130 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;DoCollabDropDown(rect);
+00131 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00132 
+00133 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;Rect&#32;GUIToScreenRect(Rect&#32;guiRect)
+00134 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00135 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;Vector2&#32;screenPoint&#32;=&#32;GUIUtility.GUIToScreenPoint(<emphasis role="keyword">new</emphasis>&#32;Vector2(guiRect.x,&#32;guiRect.y));
+00136 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;guiRect.x&#32;=&#32;screenPoint.x;
+00137 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;guiRect.y&#32;=&#32;screenPoint.y;
+00138 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;guiRect;
+00139 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00140 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;
+00141 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordtype">void</emphasis>&#32;ShowPopup(Rect&#32;rect)
+00142 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00143 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;window&#32;should&#32;be&#32;centered&#32;on&#32;the&#32;button</emphasis>
+00144 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;ReserveRight(kCollabButtonWidth&#32;/&#32;2,&#32;ref&#32;rect);
+00145 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;ReserveBottom(5,&#32;ref&#32;rect);
+00146 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;calculate&#32;screen&#32;rect&#32;before&#32;saving&#32;assets&#32;since&#32;it&#32;might&#32;open&#32;the&#32;AssetSaveDialog&#32;window</emphasis>
+00147 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;var&#32;screenRect&#32;=&#32;GUIToScreenRect(rect);
+00148 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;save&#32;all&#32;the&#32;assets</emphasis>
+00149 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;AssetDatabase.SaveAssets();
+00150 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(Collab.ShowToolbarAtPosition&#32;!=&#32;<emphasis role="keyword">null</emphasis>&#32;&amp;&amp;&#32;Collab.ShowToolbarAtPosition(screenRect))
+00151 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00152 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;GUIUtility.ExitGUI();
+00153 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00154 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00155 
+00156 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordtype">void</emphasis>&#32;DoCollabDropDown(Rect&#32;rect)
+00157 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00158 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_unity_editor_1_1_collab_toolbar_button_1ac0b3213298e3dead1742c10e9b65f5f9">UpdateCollabToolbarState</link>();
+00159 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;GUIStyle&#32;collabButtonStyle&#32;=&#32;<emphasis role="stringliteral">&quot;OffsetDropDown&quot;</emphasis>;
+00160 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordtype">bool</emphasis>&#32;showPopup&#32;=&#32;Toolbar.requestShowCollabToolbar;
+00161 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;Toolbar.requestShowCollabToolbar&#32;=&#32;<emphasis role="keyword">false</emphasis>;
+00162 
+00163 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordtype">bool</emphasis>&#32;enable&#32;=&#32;!EditorApplication.isPlaying;
+00164 
+00165 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">using</emphasis>&#32;(<emphasis role="keyword">new</emphasis>&#32;EditorGUI.DisabledScope(!enable))
+00166 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00167 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordtype">bool</emphasis>&#32;animate&#32;=&#32;m_CollabToolbarState&#32;==&#32;CollabToolbarState.InProgress;
+00168 
+00169 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;EditorGUIUtility.SetIconSize(<emphasis role="keyword">new</emphasis>&#32;Vector2(12,&#32;12));
+00170 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(GetCollabButton().<link linkend="_class_unity_editor_1_1_collab_toolbar_button_1aa3c538550fba2437f689458095cc5979">OnGUI</link>(rect,&#32;currentCollabContent,&#32;animate,&#32;collabButtonStyle))
+00171 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00172 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;showPopup&#32;=&#32;<emphasis role="keyword">true</emphasis>;
+00173 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00174 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;EditorGUIUtility.SetIconSize(Vector2.zero);
+00175 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00176 
+00177 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(m_CollabToolbarState&#32;==&#32;CollabToolbarState.Disabled)
+00178 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>;
+00179 
+00180 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(showPopup)
+00181 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00182 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;ShowPopup(rect);
+00183 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00184 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00185 
+<anchor xml:id="__collab_toolbar_button_8cs_source_1l00186"/><link linkend="_class_unity_editor_1_1_collab_toolbar_button_1afc002429a2ef73b47d0f54972333537b">00186</link> &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;<link linkend="_class_unity_editor_1_1_collab_toolbar_button_1afc002429a2ef73b47d0f54972333537b">OnCollabStateChanged</link>(CollabInfo&#32;info)
+00187 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00188 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_unity_editor_1_1_collab_toolbar_button_1ac0b3213298e3dead1742c10e9b65f5f9">UpdateCollabToolbarState</link>();
+00189 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00190 
+<anchor xml:id="__collab_toolbar_button_8cs_source_1l00191"/><link linkend="_class_unity_editor_1_1_collab_toolbar_button_1ac0b3213298e3dead1742c10e9b65f5f9">00191</link> &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;<link linkend="_class_unity_editor_1_1_collab_toolbar_button_1ac0b3213298e3dead1742c10e9b65f5f9">UpdateCollabToolbarState</link>()
+00192 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00193 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;var&#32;currentCollabState&#32;=&#32;CollabToolbarState.UpToDate;
+00194 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordtype">bool</emphasis>&#32;networkAvailable&#32;=&#32;UnityConnect.instance.connectInfo.online&#32;&amp;&amp;&#32;UnityConnect.instance.connectInfo.loggedIn;
+00195 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;m_DynamicTooltip&#32;=&#32;<emphasis role="stringliteral">&quot;&quot;</emphasis>;
+00196 
+00197 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(UnityConnect.instance.isDisableCollabWindow)
+00198 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00199 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;currentCollabState&#32;=&#32;CollabToolbarState.Disabled;
+00200 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00201 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">else</emphasis>&#32;<emphasis role="keywordflow">if</emphasis>&#32;(networkAvailable)
+00202 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00203 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;Collab&#32;collab&#32;=&#32;Collab.instance;
+00204 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;CollabInfo&#32;currentInfo&#32;=&#32;collab.collabInfo;
+00205 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;UnityErrorInfo&#32;errInfo;
+00206 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordtype">bool</emphasis>&#32;error&#32;=&#32;<emphasis role="keyword">false</emphasis>;
+00207 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(collab.GetError((UnityConnect.UnityErrorFilter.ByContext&#32;|&#32;UnityConnect.UnityErrorFilter.ByChild),&#32;out&#32;errInfo))
+00208 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00209 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;error&#32;=&#32;(errInfo.priority&#32;&lt;=&#32;(int)UnityConnect.UnityErrorPriority.Error);
+00210 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;m_DynamicTooltip&#32;=&#32;errInfo.shortMsg;
+00211 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00212 
+00213 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(!currentInfo.ready)
+00214 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00215 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;currentCollabState&#32;=&#32;CollabToolbarState.InProgress;
+00216 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00217 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">else</emphasis>&#32;<emphasis role="keywordflow">if</emphasis>&#32;(error)
+00218 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00219 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;currentCollabState&#32;=&#32;CollabToolbarState.OperationError;
+00220 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00221 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">else</emphasis>&#32;<emphasis role="keywordflow">if</emphasis>&#32;(currentInfo.inProgress)
+00222 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00223 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;currentCollabState&#32;=&#32;CollabToolbarState.InProgress;
+00224 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00225 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">else</emphasis>
+00226 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00227 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordtype">bool</emphasis>&#32;collabEnable&#32;=&#32;Collab.instance.IsCollabEnabledForCurrentProject();
+00228 
+00229 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(UnityConnect.instance.projectInfo.projectBound&#32;==&#32;<emphasis role="keyword">false</emphasis>&#32;||&#32;!collabEnable)
+00230 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00231 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;currentCollabState&#32;=&#32;CollabToolbarState.NeedToEnableCollab;
+00232 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00233 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">else</emphasis>&#32;<emphasis role="keywordflow">if</emphasis>&#32;(currentInfo.update)
+00234 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00235 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;currentCollabState&#32;=&#32;CollabToolbarState.ServerHasChanges;
+00236 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00237 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">else</emphasis>&#32;<emphasis role="keywordflow">if</emphasis>&#32;(currentInfo.conflict)
+00238 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00239 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;currentCollabState&#32;=&#32;CollabToolbarState.Conflict;
+00240 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00241 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">else</emphasis>&#32;<emphasis role="keywordflow">if</emphasis>&#32;(currentInfo.publish)
+00242 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00243 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;currentCollabState&#32;=&#32;CollabToolbarState.FilesToPush;
+00244 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00245 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00246 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00247 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">else</emphasis>
+00248 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00249 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;currentCollabState&#32;=&#32;CollabToolbarState.Offline;
+00250 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00251 
+00252 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(Collab.IsToolbarVisible&#32;!=&#32;<emphasis role="keyword">null</emphasis>)
+00253 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00254 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(currentCollabState&#32;!=&#32;m_CollabToolbarState&#32;||
+00255 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;Collab.IsToolbarVisible()&#32;==&#32;m_ShowCollabTooltip)
+00256 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00257 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;m_CollabToolbarState&#32;=&#32;currentCollabState;
+00258 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;m_ShowCollabTooltip&#32;=&#32;!Collab.IsToolbarVisible();
+00259 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;Toolbar.RepaintToolbar();
+00260 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00261 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00262 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00263 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;
+00264 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordtype">void</emphasis>&#32;ReserveRight(<emphasis role="keywordtype">float</emphasis>&#32;width,&#32;ref&#32;Rect&#32;pos)
+00265 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00266 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;pos.x&#32;+=&#32;width;
+00267 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00268 
+00269 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordtype">void</emphasis>&#32;ReserveBottom(<emphasis role="keywordtype">float</emphasis>&#32;height,&#32;ref&#32;Rect&#32;pos)
+00270 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00271 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;pos.y&#32;+=&#32;height;
+00272 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00273 
+00274 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;ButtonWithAnimatedIconRotation&#32;GetCollabButton()
+00275 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00276 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(m_CollabButton&#32;==&#32;<emphasis role="keyword">null</emphasis>)
+00277 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00278 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">const</emphasis>&#32;<emphasis role="keywordtype">int</emphasis>&#32;repaintsPerSecond&#32;=&#32;20;
+00279 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">const</emphasis>&#32;<emphasis role="keywordtype">float</emphasis>&#32;animSpeed&#32;=&#32;500f;
+00280 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">const</emphasis>&#32;<emphasis role="keywordtype">bool</emphasis>&#32;mouseDownButton&#32;=&#32;<emphasis role="keyword">true</emphasis>;
+00281 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;m_CollabButton&#32;=&#32;<emphasis role="keyword">new</emphasis>&#32;ButtonWithAnimatedIconRotation(()&#32;=&gt;&#32;(<emphasis role="keywordtype">float</emphasis>)EditorApplication.timeSinceStartup&#32;*&#32;animSpeed,&#32;Toolbar.RepaintToolbar,&#32;repaintsPerSecond,&#32;mouseDownButton);
+00282 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00283 
+00284 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;m_CollabButton;
+00285 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00286 
+<anchor xml:id="__collab_toolbar_button_8cs_source_1l00287"/><link linkend="_class_unity_editor_1_1_collab_toolbar_button_1a09ef0c4fd1ad2688bba4a07197c21e05">00287</link> &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;<link linkend="_class_unity_editor_1_1_collab_toolbar_button_1a09ef0c4fd1ad2688bba4a07197c21e05">Dispose</link>()
+00288 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00289 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;Collab.instance.StateChanged&#32;-=&#32;<link linkend="_class_unity_editor_1_1_collab_toolbar_button_1afc002429a2ef73b47d0f54972333537b">OnCollabStateChanged</link>;
+00290 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;UnityConnect.instance.StateChanged&#32;-=&#32;OnUnityConnectStateChanged;
+00291 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;UnityConnect.instance.UserStateChanged&#32;-=&#32;OnUnityConnectUserStateChanged;
+00292 
+00293 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(m_CollabButton&#32;!=&#32;<emphasis role="keyword">null</emphasis>)
+00294 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;m_CollabButton.Clear();
+00295 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00296 &#32;&#32;&#32;&#32;}
+00297 }&#32;<emphasis role="comment">//&#32;namespace</emphasis>
+</programlisting></section>

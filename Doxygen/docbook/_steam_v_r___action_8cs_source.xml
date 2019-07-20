@@ -1,0 +1,600 @@
+<?xml version='1.0' encoding='UTF-8' standalone='no'?>
+<section xmlns="http://docbook.org/ns/docbook" version="5.0" xmlns:xlink="http://www.w3.org/1999/xlink" xml:id="__steam_v_r___action_8cs_source">
+<title>SteamVR_Action.cs</title>
+<indexterm><primary>O:/GitHUBMINIPRoject/Assets/SteamVR/Input/SteamVR_Action.cs</primary></indexterm>
+<programlisting>00001 <emphasis role="comment">//=======&#32;Copyright&#32;(c)&#32;Valve&#32;Corporation,&#32;All&#32;rights&#32;reserved.&#32;===============</emphasis>
+00002 <emphasis role="comment">//&#32;Action&#32;implementation&#32;overview:</emphasis>
+00003 <emphasis role="comment">//&#32;Actions&#32;are&#32;split&#32;into&#32;three&#32;parts:</emphasis>
+00004 <emphasis role="comment">//&#32;&#32;&#32;&#32;&#32;*&#32;Action:&#32;The&#32;user-accessible&#32;class&#32;that&#32;is&#32;the&#32;interface&#32;for&#32;accessing&#32;action&#32;data.&#32;</emphasis>
+00005 <emphasis role="comment">//&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;There&#32;may&#32;be&#32;many&#32;Action&#32;instances&#32;per&#32;Actual&#32;SteamVR&#32;Action,&#32;but&#32;these&#32;instances&#32;are&#32;just&#32;interfaces&#32;to&#32;the&#32;data&#32;and&#32;should&#32;have&#32;virtually&#32;no&#32;overhead.</emphasis>
+00006 <emphasis role="comment">//&#32;&#32;&#32;&#32;&#32;*&#32;Action&#32;Map:&#32;This&#32;is&#32;basically&#32;a&#32;wrapper&#32;for&#32;a&#32;list&#32;of&#32;Action_Source&#32;instances.&#32;</emphasis>
+00007 <emphasis role="comment">//&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;The&#32;idea&#32;being&#32;there&#32;is&#32;one&#32;Map&#32;per&#32;Actual&#32;SteamVR&#32;Action.&#32;</emphasis>
+00008 <emphasis role="comment">//&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;These&#32;maps&#32;can&#32;be&#32;retrieved&#32;from&#32;a&#32;static&#32;store&#32;in&#32;SteamVR_Input&#32;so&#32;we&apos;re&#32;not&#32;duplicating&#32;data.</emphasis>
+00009 <emphasis role="comment">//&#32;&#32;&#32;&#32;&#32;*&#32;Action&#32;Source:&#32;This&#32;is&#32;a&#32;collection&#32;of&#32;cached&#32;data&#32;retrieved&#32;by&#32;calls&#32;to&#32;the&#32;underlying&#32;SteamVR&#32;Input&#32;system.&#32;</emphasis>
+00010 <emphasis role="comment">//&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;Each&#32;Action&#32;Source&#32;has&#32;an&#32;inputSource&#32;that&#32;it&#32;is&#32;associated&#32;with.</emphasis>
+00011 
+00012 <emphasis role="keyword">using</emphasis>&#32;<link linkend="__balloon_8cs_1a7d67e097df9376eb709b6a23aa3c7d23">UnityEngine</link>;
+00013 <emphasis role="keyword">using</emphasis>&#32;System.Collections;
+00014 <emphasis role="keyword">using</emphasis>&#32;System;
+00015 <emphasis role="keyword">using</emphasis>&#32;<link linkend="_namespace_valve">Valve</link>.<link linkend="_namespace_valve_1_1_v_r">VR</link>;
+00016 <emphasis role="keyword">using</emphasis>&#32;System.Runtime.InteropServices;
+00017 <emphasis role="keyword">using</emphasis>&#32;System.Collections.Generic;
+00018 
+00019 <emphasis role="keyword">namespace&#32;</emphasis><link linkend="_namespace_valve_1_1_v_r">Valve.VR</link>
+00020 {
+00021 &#32;&#32;&#32;&#32;[Serializable]
+<anchor xml:id="__steam_v_r___action_8cs_source_1l00026"/><link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___action">00026</link> &#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keyword">abstract</emphasis>&#32;<emphasis role="keyword">class&#32;</emphasis><link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___action">SteamVR_Action</link>&lt;SourceMap,&#32;SourceElement&gt;&#32;:&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___action">SteamVR_Action</link>,&#32;<link linkend="_interface_valve_1_1_v_r_1_1_i_steam_v_r___action">ISteamVR_Action</link>&#32;where&#32;SourceMap&#32;:&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___action___source___map">SteamVR_Action_Source_Map</link>&lt;SourceElement&gt;,&#32;new()&#32;where&#32;SourceElement&#32;:&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___action___source">SteamVR_Action_Source</link>,&#32;new()
+00027 &#32;&#32;&#32;&#32;{
+00031 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;[NonSerialized]
+<anchor xml:id="__steam_v_r___action_8cs_source_1l00032"/><link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___action_1a70a7f08d07c54c294f26441619352401">00032</link> &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">protected</emphasis>&#32;SourceMap&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___action_1a70a7f08d07c54c294f26441619352401">sourceMap</link>;
+00033 
+00038 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keyword">virtual</emphasis>&#32;SourceElement&#32;<emphasis role="keyword">this</emphasis>[<link linkend="_namespace_valve_1_1_v_r_1a82e5bf501cc3aa155444ee3f0662853f">SteamVR_Input_Sources</link>&#32;inputSource]
+<anchor xml:id="__steam_v_r___action_8cs_source_1l00039"/><link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___action_1abdb54a9331f280213d28abe5ef78ec07">00039</link> &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00040 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">get</emphasis>
+00041 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00042 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___action_1a70a7f08d07c54c294f26441619352401">sourceMap</link>[inputSource];
+00043 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00044 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00045 
+00047 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keyword">override</emphasis>&#32;<emphasis role="keywordtype">string</emphasis>&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___action_1a765a5c4c2de688392f4968fa3dcf2703">fullPath</link>
+<anchor xml:id="__steam_v_r___action_8cs_source_1l00048"/><link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___action_1a765a5c4c2de688392f4968fa3dcf2703">00048</link> &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00049 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">get</emphasis>
+00050 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00051 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___action_1a70a7f08d07c54c294f26441619352401">sourceMap</link>.fullPath;
+00052 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00053 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00054 
+<anchor xml:id="__steam_v_r___action_8cs_source_1l00056"/><link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___action_1abb2ae18798c46b03be6c44872f3da084">00056</link> &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keyword">override</emphasis>&#32;ulong&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___action_1abb2ae18798c46b03be6c44872f3da084">handle</link>&#32;{&#32;<emphasis role="keyword">get</emphasis>&#32;{&#32;<emphasis role="keywordflow">return</emphasis>&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___action_1a70a7f08d07c54c294f26441619352401">sourceMap</link>.handle;&#32;}&#32;}
+00057 
+00059 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keyword">override</emphasis>&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___action_set">SteamVR_ActionSet</link>&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___action_1ad4b01239b68cfa6a4b0daa1c91e2f134">actionSet</link>
+<anchor xml:id="__steam_v_r___action_8cs_source_1l00060"/><link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___action_1ad4b01239b68cfa6a4b0daa1c91e2f134">00060</link> &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00061 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">get</emphasis>
+00062 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00063 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___action_1a70a7f08d07c54c294f26441619352401">sourceMap</link>.actionSet;
+00064 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00065 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00066 
+00068 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keyword">override</emphasis>&#32;<link linkend="_namespace_valve_1_1_v_r_1a1e6192cb5ddaf204afab87ccb5728780">SteamVR_ActionDirections</link>&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___action_1aee8591fed8be32dde8c11ab75b830323">direction</link>
+<anchor xml:id="__steam_v_r___action_8cs_source_1l00069"/><link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___action_1aee8591fed8be32dde8c11ab75b830323">00069</link> &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00070 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">get</emphasis>
+00071 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00072 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___action_1a70a7f08d07c54c294f26441619352401">sourceMap</link>.direction;
+00073 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00074 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00075 
+<anchor xml:id="__steam_v_r___action_8cs_source_1l00077"/><link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___action_1a4737fe5382afbd927eb06bdcadbbbbf4">00077</link> &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keyword">override</emphasis>&#32;<emphasis role="keywordtype">bool</emphasis>&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___action_1a4737fe5382afbd927eb06bdcadbbbbf4">active</link>&#32;{&#32;<emphasis role="keyword">get</emphasis>&#32;{&#32;<emphasis role="keywordflow">return</emphasis>&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___action_1a70a7f08d07c54c294f26441619352401">sourceMap</link>[<link linkend="_namespace_valve_1_1_v_r_1a82e5bf501cc3aa155444ee3f0662853f">SteamVR_Input_Sources</link>.Any].active;&#32;}&#32;}
+00078 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;
+<anchor xml:id="__steam_v_r___action_8cs_source_1l00080"/><link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___action_1a99ec33a591be6c792dff8c13b32fe675">00080</link> &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keyword">override</emphasis>&#32;<emphasis role="keywordtype">bool</emphasis>&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___action_1a99ec33a591be6c792dff8c13b32fe675">lastActive</link>&#32;{&#32;<emphasis role="keyword">get</emphasis>&#32;{&#32;<emphasis role="keywordflow">return</emphasis>&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___action_1a70a7f08d07c54c294f26441619352401">sourceMap</link>[<link linkend="_namespace_valve_1_1_v_r_1a82e5bf501cc3aa155444ee3f0662853f">SteamVR_Input_Sources</link>.Any].lastActive;&#32;}&#32;}
+00081 
+<anchor xml:id="__steam_v_r___action_8cs_source_1l00083"/><link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___action_1ad275cb288073b48f2b0e92a4cc797014">00083</link> &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keyword">override</emphasis>&#32;<emphasis role="keywordtype">bool</emphasis>&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___action_1ad275cb288073b48f2b0e92a4cc797014">activeBinding</link>&#32;{&#32;<emphasis role="keyword">get</emphasis>&#32;{&#32;<emphasis role="keywordflow">return</emphasis>&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___action_1a70a7f08d07c54c294f26441619352401">sourceMap</link>[<link linkend="_namespace_valve_1_1_v_r_1a82e5bf501cc3aa155444ee3f0662853f">SteamVR_Input_Sources</link>.Any].activeBinding;&#32;}&#32;}
+00084 
+<anchor xml:id="__steam_v_r___action_8cs_source_1l00086"/><link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___action_1ad45e21db94737a22efd0efcab6401fec">00086</link> &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keyword">override</emphasis>&#32;<emphasis role="keywordtype">bool</emphasis>&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___action_1ad45e21db94737a22efd0efcab6401fec">lastActiveBinding</link>&#32;{&#32;<emphasis role="keyword">get</emphasis>&#32;{&#32;<emphasis role="keywordflow">return</emphasis>&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___action_1a70a7f08d07c54c294f26441619352401">sourceMap</link>[<link linkend="_namespace_valve_1_1_v_r_1a82e5bf501cc3aa155444ee3f0662853f">SteamVR_Input_Sources</link>.Any].lastActiveBinding;&#32;}&#32;}
+00087 
+00088 
+00089 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;[NonSerialized]
+<anchor xml:id="__steam_v_r___action_8cs_source_1l00090"/><link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___action_1ab8b674e7217eb047723b26597088c703">00090</link> &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">protected</emphasis>&#32;<emphasis role="keywordtype">bool</emphasis>&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___action_1ab8b674e7217eb047723b26597088c703">initialized</link>&#32;=&#32;<emphasis role="keyword">false</emphasis>;
+00091 
+<anchor xml:id="__steam_v_r___action_8cs_source_1l00095"/><link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___action_1ae3ab26df1e48bd668134f71845cf727a">00095</link> &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keyword">override</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___action_1ae3ab26df1e48bd668134f71845cf727a">PreInitialize</link>(<emphasis role="keywordtype">string</emphasis>&#32;newActionPath)
+00096 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00097 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___action_1a75a8c6b9641982a47e32039b131e3eca">actionPath</link>&#32;=&#32;newActionPath;
+00098 
+00099 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___action_1a70a7f08d07c54c294f26441619352401">sourceMap</link>&#32;=&#32;<emphasis role="keyword">new</emphasis>&#32;SourceMap();
+00100 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___action_1a70a7f08d07c54c294f26441619352401">sourceMap</link>.PreInitialize(<emphasis role="keyword">this</emphasis>,&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___action_1a75a8c6b9641982a47e32039b131e3eca">actionPath</link>);
+00101 
+00102 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___action_1ab8b674e7217eb047723b26597088c703">initialized</link>&#32;=&#32;<emphasis role="keyword">true</emphasis>;
+00103 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00104 
+<anchor xml:id="__steam_v_r___action_8cs_source_1l00105"/><link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___action_1af69bed4c4b5b9640c2cac9e118743df3">00105</link> &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">protected</emphasis>&#32;<emphasis role="keyword">override</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___action_1af69bed4c4b5b9640c2cac9e118743df3">CreateUninitialized</link>(<emphasis role="keywordtype">string</emphasis>&#32;newActionPath,&#32;<emphasis role="keywordtype">bool</emphasis>&#32;caseSensitive)
+00106 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00107 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___action_1a75a8c6b9641982a47e32039b131e3eca">actionPath</link>&#32;=&#32;newActionPath;
+00108 
+00109 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___action_1a70a7f08d07c54c294f26441619352401">sourceMap</link>&#32;=&#32;<emphasis role="keyword">new</emphasis>&#32;SourceMap();
+00110 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___action_1a70a7f08d07c54c294f26441619352401">sourceMap</link>.PreInitialize(<emphasis role="keyword">this</emphasis>,&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___action_1a75a8c6b9641982a47e32039b131e3eca">actionPath</link>,&#32;<emphasis role="keyword">false</emphasis>);
+00111 
+00112 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___action_1a361379ce58b79d870a16b3a07cabcdbf">needsReinit</link>&#32;=&#32;<emphasis role="keyword">true</emphasis>;
+00113 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___action_1ab8b674e7217eb047723b26597088c703">initialized</link>&#32;=&#32;<emphasis role="keyword">false</emphasis>;
+00114 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00115 
+<anchor xml:id="__steam_v_r___action_8cs_source_1l00116"/><link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___action_1a3ef78876da16318e17896536ae380e0a">00116</link> &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">protected</emphasis>&#32;<emphasis role="keyword">override</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___action_1a3ef78876da16318e17896536ae380e0a">CreateUninitialized</link>(<emphasis role="keywordtype">string</emphasis>&#32;newActionSet,&#32;<link linkend="_namespace_valve_1_1_v_r_1a1e6192cb5ddaf204afab87ccb5728780">SteamVR_ActionDirections</link>&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___action_1aee8591fed8be32dde8c11ab75b830323">direction</link>,&#32;<emphasis role="keywordtype">string</emphasis>&#32;newAction,&#32;<emphasis role="keywordtype">bool</emphasis>&#32;caseSensitive)
+00117 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00118 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___action_1a75a8c6b9641982a47e32039b131e3eca">actionPath</link>&#32;=&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___input___action_file___action">SteamVR_Input_ActionFile_Action</link>.<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___input___action_file___action_1ac8aa08124febad10a50b8bd6900809bb">CreateNewName</link>(newActionSet,&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___action_1aee8591fed8be32dde8c11ab75b830323">direction</link>,&#32;newAction);
+00119 
+00120 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___action_1a70a7f08d07c54c294f26441619352401">sourceMap</link>&#32;=&#32;<emphasis role="keyword">new</emphasis>&#32;SourceMap();
+00121 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___action_1a70a7f08d07c54c294f26441619352401">sourceMap</link>.PreInitialize(<emphasis role="keyword">this</emphasis>,&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___action_1a75a8c6b9641982a47e32039b131e3eca">actionPath</link>,&#32;<emphasis role="keyword">false</emphasis>);
+00122 
+00123 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___action_1a361379ce58b79d870a16b3a07cabcdbf">needsReinit</link>&#32;=&#32;<emphasis role="keyword">true</emphasis>;
+00124 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___action_1ab8b674e7217eb047723b26597088c703">initialized</link>&#32;=&#32;<emphasis role="keyword">false</emphasis>;
+00125 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00126 
+<anchor xml:id="__steam_v_r___action_8cs_source_1l00130"/><link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___action_1aab211e4315d3a39b4db1e033ae1e353b">00130</link> &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keyword">override</emphasis>&#32;<emphasis role="keywordtype">string</emphasis>&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___action_1aab211e4315d3a39b4db1e033ae1e353b">TryNeedsInitData</link>()
+00131 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00132 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___action_1a361379ce58b79d870a16b3a07cabcdbf">needsReinit</link>&#32;&amp;&amp;&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___action_1a75a8c6b9641982a47e32039b131e3eca">actionPath</link>&#32;!=&#32;<emphasis role="keyword">null</emphasis>)
+00133 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00134 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___action">SteamVR_Action</link>&#32;existingAction&#32;=&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___action_1aa10a1be562d9c134f16601b579ec6e65">FindExistingActionForPartialPath</link>(<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___action_1a75a8c6b9641982a47e32039b131e3eca">actionPath</link>);
+00135 
+00136 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(existingAction&#32;==&#32;<emphasis role="keyword">null</emphasis>)
+00137 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00138 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;this.sourceMap&#32;=&#32;<emphasis role="keyword">null</emphasis>;
+00139 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00140 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">else</emphasis>
+00141 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{&#32;
+00142 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;this.<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___action_1a75a8c6b9641982a47e32039b131e3eca">actionPath</link>&#32;=&#32;existingAction.<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___action_1a765a5c4c2de688392f4968fa3dcf2703">fullPath</link>;
+00143 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;this.sourceMap&#32;=&#32;(SourceMap)existingAction.<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___action_1a948d9db18a20fde79dd442cd0e119fa6">GetSourceMap</link>();
+00144 
+00145 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___action_1ab8b674e7217eb047723b26597088c703">initialized</link>&#32;=&#32;<emphasis role="keyword">true</emphasis>;
+00146 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___action_1a361379ce58b79d870a16b3a07cabcdbf">needsReinit</link>&#32;=&#32;<emphasis role="keyword">false</emphasis>;
+00147 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___action_1a75a8c6b9641982a47e32039b131e3eca">actionPath</link>;
+00148 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00149 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00150 
+00151 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;<emphasis role="keyword">null</emphasis>;
+00152 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00153 
+00154 
+<anchor xml:id="__steam_v_r___action_8cs_source_1l00159"/><link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___action_1a5f4858a566f91219d4896161c346f9f3">00159</link> &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keyword">override</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___action_1a5f4858a566f91219d4896161c346f9f3">Initialize</link>(<emphasis role="keywordtype">bool</emphasis>&#32;createNew&#32;=&#32;<emphasis role="keyword">false</emphasis>,&#32;<emphasis role="keywordtype">bool</emphasis>&#32;throwErrors&#32;=&#32;<emphasis role="keyword">true</emphasis>)
+00160 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00161 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___action_1a361379ce58b79d870a16b3a07cabcdbf">needsReinit</link>)
+00162 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00163 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___action_1aab211e4315d3a39b4db1e033ae1e353b">TryNeedsInitData</link>();
+00164 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00165 
+00166 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(createNew)
+00167 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00168 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___action_1a70a7f08d07c54c294f26441619352401">sourceMap</link>.Initialize();
+00169 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00170 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">else</emphasis>
+00171 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00172 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___action_1a70a7f08d07c54c294f26441619352401">sourceMap</link>&#32;=&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___input">SteamVR_Input</link>.GetActionDataFromPath&lt;SourceMap&gt;(<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___action_1a75a8c6b9641982a47e32039b131e3eca">actionPath</link>);
+00173 
+00174 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___action_1a70a7f08d07c54c294f26441619352401">sourceMap</link>&#32;==&#32;<emphasis role="keyword">null</emphasis>)
+00175 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00176 <emphasis role="preprocessor">#if&#32;UNITY_EDITOR</emphasis>
+00177 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(throwErrors)
+00178 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00179 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(<emphasis role="keywordtype">string</emphasis>.IsNullOrEmpty(<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___action_1a75a8c6b9641982a47e32039b131e3eca">actionPath</link>))
+00180 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00181 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;Debug.LogError(<emphasis role="stringliteral">&quot;&lt;b&gt;[SteamVR]&lt;/b&gt;&#32;Action&#32;has&#32;not&#32;been&#32;assigned.&quot;</emphasis>);
+00182 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00183 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">else</emphasis>
+00184 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00185 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;Debug.LogError(<emphasis role="stringliteral">&quot;&lt;b&gt;[SteamVR]&lt;/b&gt;&#32;Could&#32;not&#32;find&#32;action&#32;with&#32;path:&#32;&quot;</emphasis>&#32;+&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___action_1a75a8c6b9641982a47e32039b131e3eca">actionPath</link>);
+00186 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00187 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00188 <emphasis role="preprocessor">#endif</emphasis>
+00189 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00190 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00191 
+00192 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___action_1ab8b674e7217eb047723b26597088c703">initialized</link>&#32;=&#32;<emphasis role="keyword">true</emphasis>;
+00193 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00194 
+<anchor xml:id="__steam_v_r___action_8cs_source_1l00199"/><link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___action_1a948d9db18a20fde79dd442cd0e119fa6">00199</link> &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keyword">override</emphasis>&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___action___source___map">SteamVR_Action_Source_Map</link>&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___action_1a948d9db18a20fde79dd442cd0e119fa6">GetSourceMap</link>()
+00200 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00201 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___action_1a70a7f08d07c54c294f26441619352401">sourceMap</link>;
+00202 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00203 
+<anchor xml:id="__steam_v_r___action_8cs_source_1l00204"/><link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___action_1af28d577bb913087c833873e4a66e9b2f">00204</link> &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">protected</emphasis>&#32;<emphasis role="keyword">override</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___action_1af28d577bb913087c833873e4a66e9b2f">InitializeCopy</link>(<emphasis role="keywordtype">string</emphasis>&#32;newActionPath,&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___action___source___map">SteamVR_Action_Source_Map</link>&#32;newData)
+00205 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00206 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;this.<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___action_1a75a8c6b9641982a47e32039b131e3eca">actionPath</link>&#32;=&#32;newActionPath;
+00207 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;this.sourceMap&#32;=&#32;(SourceMap)newData;
+00208 
+00209 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___action_1ab8b674e7217eb047723b26597088c703">initialized</link>&#32;=&#32;<emphasis role="keyword">true</emphasis>;
+00210 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00211 
+<anchor xml:id="__steam_v_r___action_8cs_source_1l00212"/><link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___action_1ac3195ebfd368a3ee5673d792b9e08eba">00212</link> &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">protected</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___action_1ac3195ebfd368a3ee5673d792b9e08eba">InitAfterDeserialize</link>()
+00213 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00214 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___action_1a70a7f08d07c54c294f26441619352401">sourceMap</link>&#32;!=&#32;<emphasis role="keyword">null</emphasis>)
+00215 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00216 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___action_1a70a7f08d07c54c294f26441619352401">sourceMap</link>.fullPath&#32;!=&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___action_1a75a8c6b9641982a47e32039b131e3eca">actionPath</link>)
+00217 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00218 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___action_1a361379ce58b79d870a16b3a07cabcdbf">needsReinit</link>&#32;=&#32;<emphasis role="keyword">true</emphasis>;
+00219 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___action_1aab211e4315d3a39b4db1e033ae1e353b">TryNeedsInitData</link>();
+00220 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00221 
+00222 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(<emphasis role="keywordtype">string</emphasis>.IsNullOrEmpty(<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___action_1a75a8c6b9641982a47e32039b131e3eca">actionPath</link>))
+00223 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___action_1a70a7f08d07c54c294f26441619352401">sourceMap</link>&#32;=&#32;<emphasis role="keyword">null</emphasis>;
+00224 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00225 
+00226 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___action_1ab8b674e7217eb047723b26597088c703">initialized</link>&#32;==&#32;<emphasis role="keyword">false</emphasis>)
+00227 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00228 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___action_1a5f4858a566f91219d4896161c346f9f3">Initialize</link>(<emphasis role="keyword">false</emphasis>,&#32;<emphasis role="keyword">false</emphasis>);
+00229 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00230 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00231 
+00232 
+<anchor xml:id="__steam_v_r___action_8cs_source_1l00237"/><link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___action_1a76c9b93e06e87e5fa861423bd4102c4c">00237</link> &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keyword">override</emphasis>&#32;<emphasis role="keywordtype">bool</emphasis>&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___action_1a76c9b93e06e87e5fa861423bd4102c4c">GetActive</link>(<link linkend="_namespace_valve_1_1_v_r_1a82e5bf501cc3aa155444ee3f0662853f">SteamVR_Input_Sources</link>&#32;inputSource)
+00238 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00239 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___action_1a70a7f08d07c54c294f26441619352401">sourceMap</link>[inputSource].active;
+00240 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00241 
+<anchor xml:id="__steam_v_r___action_8cs_source_1l00246"/><link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___action_1adb510f6f020a3023d6bbfa59110edf58">00246</link> &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keyword">override</emphasis>&#32;<emphasis role="keywordtype">bool</emphasis>&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___action_1adb510f6f020a3023d6bbfa59110edf58">GetActiveBinding</link>(<link linkend="_namespace_valve_1_1_v_r_1a82e5bf501cc3aa155444ee3f0662853f">SteamVR_Input_Sources</link>&#32;inputSource)
+00247 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00248 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___action_1a70a7f08d07c54c294f26441619352401">sourceMap</link>[inputSource].activeBinding;
+00249 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00250 
+00251 
+<anchor xml:id="__steam_v_r___action_8cs_source_1l00256"/><link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___action_1a24bb49705ffd97a432add0cb2233ff91">00256</link> &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keyword">override</emphasis>&#32;<emphasis role="keywordtype">bool</emphasis>&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___action_1a24bb49705ffd97a432add0cb2233ff91">GetLastActive</link>(<link linkend="_namespace_valve_1_1_v_r_1a82e5bf501cc3aa155444ee3f0662853f">SteamVR_Input_Sources</link>&#32;inputSource)
+00257 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00258 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___action_1a70a7f08d07c54c294f26441619352401">sourceMap</link>[inputSource].lastActive;
+00259 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00260 
+<anchor xml:id="__steam_v_r___action_8cs_source_1l00265"/><link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___action_1a9f6a753a369e7932e99aebd540bdf886">00265</link> &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keyword">override</emphasis>&#32;<emphasis role="keywordtype">bool</emphasis>&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___action_1a9f6a753a369e7932e99aebd540bdf886">GetLastActiveBinding</link>(<link linkend="_namespace_valve_1_1_v_r_1a82e5bf501cc3aa155444ee3f0662853f">SteamVR_Input_Sources</link>&#32;inputSource)
+00266 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00267 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___action_1a70a7f08d07c54c294f26441619352401">sourceMap</link>[inputSource].lastActiveBinding;
+00268 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00269 &#32;&#32;&#32;&#32;}
+00270 
+00271 
+00272 &#32;&#32;&#32;&#32;[Serializable]
+00273 &#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keyword">abstract</emphasis>&#32;<emphasis role="keyword">class&#32;</emphasis><link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___action">SteamVR_Action</link>&#32;:&#32;IEquatable&lt;SteamVR_Action&gt;,&#32;<link linkend="_interface_valve_1_1_v_r_1_1_i_steam_v_r___action">ISteamVR_Action</link>
+00274 &#32;&#32;&#32;&#32;{
+<anchor xml:id="__steam_v_r___action_8cs_source_1l00275"/><link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___action_1af433e8fb310a9f16c274341055fe025f">00275</link> &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___action_1af433e8fb310a9f16c274341055fe025f">SteamVR_Action</link>()&#32;{&#32;}
+00276 
+00277 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;[SerializeField]
+<anchor xml:id="__steam_v_r___action_8cs_source_1l00278"/><link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___action_1a75a8c6b9641982a47e32039b131e3eca">00278</link> &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">protected</emphasis>&#32;<emphasis role="keywordtype">string</emphasis>&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___action_1a75a8c6b9641982a47e32039b131e3eca">actionPath</link>;
+00279 
+00280 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;[SerializeField]
+<anchor xml:id="__steam_v_r___action_8cs_source_1l00281"/><link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___action_1a361379ce58b79d870a16b3a07cabcdbf">00281</link> &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">protected</emphasis>&#32;<emphasis role="keywordtype">bool</emphasis>&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___action_1a361379ce58b79d870a16b3a07cabcdbf">needsReinit</link>;
+00282 
+<anchor xml:id="__steam_v_r___action_8cs_source_1l00286"/><link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___action_1ae27e9858dec18a4307cca7779ed87ad8">00286</link> &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keyword">static</emphasis>&#32;<emphasis role="keywordtype">bool</emphasis>&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___action_1ae27e9858dec18a4307cca7779ed87ad8">startUpdatingSourceOnAccess</link>&#32;=&#32;<emphasis role="keyword">true</emphasis>;
+00287 
+<anchor xml:id="__steam_v_r___action_8cs_source_1l00291"/><link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___action_1a75746fdff4c10e89c9e43bd598a106f0">00291</link> &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keyword">static</emphasis>&#32;CreateType&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___action_1a75746fdff4c10e89c9e43bd598a106f0">Create&lt;CreateType&gt;</link>(<emphasis role="keywordtype">string</emphasis>&#32;newActionPath)&#32;where&#32;CreateType&#32;:&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___action_1af433e8fb310a9f16c274341055fe025f">SteamVR_Action</link>,&#32;<emphasis role="keyword">new</emphasis>()
+00292 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00293 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;CreateType&#32;action&#32;=&#32;<emphasis role="keyword">new</emphasis>&#32;CreateType();
+00294 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;action.PreInitialize(newActionPath);
+00295 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;action;
+00296 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00297 
+<anchor xml:id="__steam_v_r___action_8cs_source_1l00301"/><link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___action_1a22efd6a86141fef284c6de86ba31f75e">00301</link> &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keyword">static</emphasis>&#32;CreateType&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___action_1a22efd6a86141fef284c6de86ba31f75e">CreateUninitialized&lt;CreateType&gt;</link>(<emphasis role="keywordtype">string</emphasis>&#32;setName,&#32;<link linkend="_namespace_valve_1_1_v_r_1a1e6192cb5ddaf204afab87ccb5728780">SteamVR_ActionDirections</link>&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___action_1aee8591fed8be32dde8c11ab75b830323">direction</link>,&#32;<emphasis role="keywordtype">string</emphasis>&#32;newActionName,&#32;<emphasis role="keywordtype">bool</emphasis>&#32;caseSensitive)&#32;where&#32;CreateType&#32;:&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___action_1af433e8fb310a9f16c274341055fe025f">SteamVR_Action</link>,&#32;<emphasis role="keyword">new</emphasis>()
+00302 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00303 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;CreateType&#32;action&#32;=&#32;<emphasis role="keyword">new</emphasis>&#32;CreateType();
+00304 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;action.CreateUninitialized(setName,&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___action_1aee8591fed8be32dde8c11ab75b830323">direction</link>,&#32;newActionName,&#32;caseSensitive);
+00305 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;action;
+00306 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00307 
+<anchor xml:id="__steam_v_r___action_8cs_source_1l00311"/><link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___action_1ad9e9c7d4a4f472f28dfa9d787919384a">00311</link> &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keyword">static</emphasis>&#32;CreateType&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___action_1a22efd6a86141fef284c6de86ba31f75e">CreateUninitialized&lt;CreateType&gt;</link>(<emphasis role="keywordtype">string</emphasis>&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___action_1a75a8c6b9641982a47e32039b131e3eca">actionPath</link>,&#32;<emphasis role="keywordtype">bool</emphasis>&#32;caseSensitive)&#32;where&#32;CreateType&#32;:&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___action_1af433e8fb310a9f16c274341055fe025f">SteamVR_Action</link>,&#32;<emphasis role="keyword">new</emphasis>()
+00312 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00313 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;CreateType&#32;action&#32;=&#32;<emphasis role="keyword">new</emphasis>&#32;CreateType();
+00314 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;action.CreateUninitialized(<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___action_1a75a8c6b9641982a47e32039b131e3eca">actionPath</link>,&#32;caseSensitive);
+00315 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;action;
+00316 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00317 
+<anchor xml:id="__steam_v_r___action_8cs_source_1l00321"/><link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___action_1a641a73a51f3dc9509bbaf48667c47b71">00321</link> &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;CreateType&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___action_1a641a73a51f3dc9509bbaf48667c47b71">GetCopy&lt;CreateType&gt;</link>()&#32;where&#32;CreateType&#32;:&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___action">SteamVR_Action</link>,&#32;new()
+00322 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00323 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;CreateType&#32;action&#32;=&#32;<emphasis role="keyword">new</emphasis>&#32;CreateType();
+00324 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;action.InitializeCopy(this.actionPath,&#32;this.<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___action_1a948d9db18a20fde79dd442cd0e119fa6">GetSourceMap</link>());
+00325 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;action;
+00326 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//return&#32;(CreateType)this;&#32;//no&#32;need&#32;to&#32;make&#32;copies&#32;in&#32;builds&#32;-&#32;will&#32;reduce&#32;memory&#32;alloc&#32;//todo:&#32;having&#32;this&#32;enabled&#32;was&#32;not&#32;working.&#32;all&#32;sets&#32;were&#32;the&#32;same&#32;(maybe&#32;actions&#32;too)</emphasis>
+00327 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00328 
+00329 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keyword">abstract</emphasis>&#32;<emphasis role="keywordtype">string</emphasis>&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___action_1aab211e4315d3a39b4db1e033ae1e353b">TryNeedsInitData</link>();
+00330 
+00331 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">protected</emphasis>&#32;<emphasis role="keyword">abstract</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___action_1af28d577bb913087c833873e4a66e9b2f">InitializeCopy</link>(<emphasis role="keywordtype">string</emphasis>&#32;newActionPath,&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___action___source___map">SteamVR_Action_Source_Map</link>&#32;newData);
+00332 
+<anchor xml:id="__steam_v_r___action_8cs_source_1l00334"/><link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___action_1a7e982d8e80fc65827cce3b141e360413">00334</link> &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keyword">abstract</emphasis>&#32;<emphasis role="keywordtype">string</emphasis>&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___action_1a765a5c4c2de688392f4968fa3dcf2703">fullPath</link>&#32;{&#32;<emphasis role="keyword">get</emphasis>;&#32;}
+00335 
+<anchor xml:id="__steam_v_r___action_8cs_source_1l00337"/><link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___action_1abfacc5556f01d13474d68dff1b649b64">00337</link> &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keyword">abstract</emphasis>&#32;ulong&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___action_1abb2ae18798c46b03be6c44872f3da084">handle</link>&#32;{&#32;<emphasis role="keyword">get</emphasis>;&#32;}
+00338 
+<anchor xml:id="__steam_v_r___action_8cs_source_1l00340"/><link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___action_1a136c44b47df0a9380c4488059b125fd3">00340</link> &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keyword">abstract</emphasis>&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___action_set">SteamVR_ActionSet</link>&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___action_1ad4b01239b68cfa6a4b0daa1c91e2f134">actionSet</link>&#32;{&#32;<emphasis role="keyword">get</emphasis>;&#32;}
+00341 
+<anchor xml:id="__steam_v_r___action_8cs_source_1l00343"/><link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___action_1aa47ba3da1a7fa07d5f4d70fcae84f778">00343</link> &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keyword">abstract</emphasis>&#32;<link linkend="_namespace_valve_1_1_v_r_1a1e6192cb5ddaf204afab87ccb5728780">SteamVR_ActionDirections</link>&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___action_1aee8591fed8be32dde8c11ab75b830323">direction</link>&#32;{&#32;<emphasis role="keyword">get</emphasis>;&#32;}
+00344 
+<anchor xml:id="__steam_v_r___action_8cs_source_1l00346"/><link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___action_1ad92856584dc24071f25b610fe237e4ee">00346</link> &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keywordtype">bool</emphasis>&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___action_1ad92856584dc24071f25b610fe237e4ee">setActive</link>&#32;{&#32;<emphasis role="keyword">get</emphasis>&#32;{&#32;<emphasis role="keywordflow">return</emphasis>&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___action_1ad4b01239b68cfa6a4b0daa1c91e2f134">actionSet</link>.<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___action_set_1a90637da41a53066829ee8bd3e06a3ce9">IsActive</link>(<link linkend="_namespace_valve_1_1_v_r_1a82e5bf501cc3aa155444ee3f0662853f">SteamVR_Input_Sources</link>.Any);&#32;}&#32;}
+00347 
+<anchor xml:id="__steam_v_r___action_8cs_source_1l00349"/><link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___action_1a0fd56f7ca6074a8320738f50c8d43844">00349</link> &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keyword">abstract</emphasis>&#32;<emphasis role="keywordtype">bool</emphasis>&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___action_1a4737fe5382afbd927eb06bdcadbbbbf4">active</link>&#32;{&#32;<emphasis role="keyword">get</emphasis>;&#32;}
+00350 
+<anchor xml:id="__steam_v_r___action_8cs_source_1l00352"/><link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___action_1a66107ca9c11bd18775b0e1bf794d3568">00352</link> &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keyword">abstract</emphasis>&#32;<emphasis role="keywordtype">bool</emphasis>&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___action_1ad275cb288073b48f2b0e92a4cc797014">activeBinding</link>&#32;{&#32;<emphasis role="keyword">get</emphasis>;&#32;}
+00353 
+<anchor xml:id="__steam_v_r___action_8cs_source_1l00355"/><link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___action_1a38ff81951fad828a51df2bdd1f3f50f6">00355</link> &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keyword">abstract</emphasis>&#32;<emphasis role="keywordtype">bool</emphasis>&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___action_1a99ec33a591be6c792dff8c13b32fe675">lastActive</link>&#32;{&#32;<emphasis role="keyword">get</emphasis>;&#32;}
+00356 
+<anchor xml:id="__steam_v_r___action_8cs_source_1l00360"/><link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___action_1a679b7a902fc8c53b9bf421c6e96bc26a">00360</link> &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keyword">abstract</emphasis>&#32;<emphasis role="keywordtype">bool</emphasis>&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___action_1ad45e21db94737a22efd0efcab6401fec">lastActiveBinding</link>&#32;{&#32;<emphasis role="keyword">get</emphasis>;&#32;}
+00361 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;
+00365 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keyword">abstract</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___action_1ae3ab26df1e48bd668134f71845cf727a">PreInitialize</link>(<emphasis role="keywordtype">string</emphasis>&#32;newActionPath);
+00366 
+00367 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">protected</emphasis>&#32;<emphasis role="keyword">abstract</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___action_1af69bed4c4b5b9640c2cac9e118743df3">CreateUninitialized</link>(<emphasis role="keywordtype">string</emphasis>&#32;newActionPath,&#32;<emphasis role="keywordtype">bool</emphasis>&#32;caseSensitive);
+00368 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;
+00369 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">protected</emphasis>&#32;<emphasis role="keyword">abstract</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___action_1af69bed4c4b5b9640c2cac9e118743df3">CreateUninitialized</link>(<emphasis role="keywordtype">string</emphasis>&#32;newActionSet,&#32;<link linkend="_namespace_valve_1_1_v_r_1a1e6192cb5ddaf204afab87ccb5728780">SteamVR_ActionDirections</link>&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___action_1aee8591fed8be32dde8c11ab75b830323">direction</link>,&#32;<emphasis role="keywordtype">string</emphasis>&#32;newAction,&#32;<emphasis role="keywordtype">bool</emphasis>&#32;caseSensitive);
+00370 
+00374 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keyword">abstract</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___action_1a5f4858a566f91219d4896161c346f9f3">Initialize</link>(<emphasis role="keywordtype">bool</emphasis>&#32;createNew&#32;=&#32;<emphasis role="keyword">false</emphasis>,&#32;<emphasis role="keywordtype">bool</emphasis>&#32;throwNotSetError&#32;=&#32;<emphasis role="keyword">true</emphasis>);
+00375 
+00378 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keyword">abstract</emphasis>&#32;<emphasis role="keywordtype">float</emphasis>&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___action_1ac8b7caef88740be5ec2ff78fd8fcbfad">GetTimeLastChanged</link>(<link linkend="_namespace_valve_1_1_v_r_1a82e5bf501cc3aa155444ee3f0662853f">SteamVR_Input_Sources</link>&#32;inputSource);
+00379 
+00380 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keyword">abstract</emphasis>&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___action___source___map">SteamVR_Action_Source_Map</link>&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___action_1a948d9db18a20fde79dd442cd0e119fa6">GetSourceMap</link>();
+00381 
+00382 
+00387 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keyword">abstract</emphasis>&#32;<emphasis role="keywordtype">bool</emphasis>&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___action_1a76c9b93e06e87e5fa861423bd4102c4c">GetActive</link>(<link linkend="_namespace_valve_1_1_v_r_1a82e5bf501cc3aa155444ee3f0662853f">SteamVR_Input_Sources</link>&#32;inputSource);
+00388 
+00389 
+<anchor xml:id="__steam_v_r___action_8cs_source_1l00394"/><link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___action_1a78c588d2687e397766adb5f004e3597d">00394</link> &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keywordtype">bool</emphasis>&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___action_1a78c588d2687e397766adb5f004e3597d">GetSetActive</link>(<link linkend="_namespace_valve_1_1_v_r_1a82e5bf501cc3aa155444ee3f0662853f">SteamVR_Input_Sources</link>&#32;inputSource)
+00395 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00396 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___action_1ad4b01239b68cfa6a4b0daa1c91e2f134">actionSet</link>.<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___action_set_1a90637da41a53066829ee8bd3e06a3ce9">IsActive</link>(inputSource);
+00397 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00398 
+00403 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keyword">abstract</emphasis>&#32;<emphasis role="keywordtype">bool</emphasis>&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___action_1adb510f6f020a3023d6bbfa59110edf58">GetActiveBinding</link>(<link linkend="_namespace_valve_1_1_v_r_1a82e5bf501cc3aa155444ee3f0662853f">SteamVR_Input_Sources</link>&#32;inputSource);
+00404 
+00405 
+00410 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keyword">abstract</emphasis>&#32;<emphasis role="keywordtype">bool</emphasis>&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___action_1a24bb49705ffd97a432add0cb2233ff91">GetLastActive</link>(<link linkend="_namespace_valve_1_1_v_r_1a82e5bf501cc3aa155444ee3f0662853f">SteamVR_Input_Sources</link>&#32;inputSource);
+00411 
+00416 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keyword">abstract</emphasis>&#32;<emphasis role="keywordtype">bool</emphasis>&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___action_1a9f6a753a369e7932e99aebd540bdf886">GetLastActiveBinding</link>(<link linkend="_namespace_valve_1_1_v_r_1a82e5bf501cc3aa155444ee3f0662853f">SteamVR_Input_Sources</link>&#32;inputSource);
+00417 
+<anchor xml:id="__steam_v_r___action_8cs_source_1l00419"/><link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___action_1aa6babacca9654f7d8184b281b99fa004">00419</link> &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keywordtype">string</emphasis>&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___action_1aa6babacca9654f7d8184b281b99fa004">GetPath</link>()
+00420 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00421 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___action_1a75a8c6b9641982a47e32039b131e3eca">actionPath</link>;
+00422 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00423 
+00427 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keyword">abstract</emphasis>&#32;<emphasis role="keywordtype">bool</emphasis>&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___action_1ade2f7fe24302b71484c25419fd94271d">IsUpdating</link>(<link linkend="_namespace_valve_1_1_v_r_1a82e5bf501cc3aa155444ee3f0662853f">SteamVR_Input_Sources</link>&#32;inputSource);
+00428 
+00429 
+<anchor xml:id="__steam_v_r___action_8cs_source_1l00433"/><link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___action_1ae10204d3c1c0f5e01fee7e22c8d56a15">00433</link> &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keyword">override</emphasis>&#32;<emphasis role="keywordtype">int</emphasis>&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___action_1ae10204d3c1c0f5e01fee7e22c8d56a15">GetHashCode</link>()
+00434 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00435 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___action_1a75a8c6b9641982a47e32039b131e3eca">actionPath</link>&#32;==&#32;<emphasis role="keyword">null</emphasis>)
+00436 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;0;
+00437 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">else</emphasis>
+00438 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___action_1a75a8c6b9641982a47e32039b131e3eca">actionPath</link>.GetHashCode();
+00439 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00440 
+<anchor xml:id="__steam_v_r___action_8cs_source_1l00444"/><link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___action_1a47cd704e2eab7d9ea4ac09fb257ba4cb">00444</link> &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keywordtype">bool</emphasis>&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___action_1a47cd704e2eab7d9ea4ac09fb257ba4cb">Equals</link>(<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___action">SteamVR_Action</link>&#32;other)
+00445 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00446 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(ReferenceEquals(<emphasis role="keyword">null</emphasis>,&#32;other))
+00447 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;<emphasis role="keyword">false</emphasis>;
+00448 
+00449 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;this.actionPath&#32;==&#32;other.<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___action_1a75a8c6b9641982a47e32039b131e3eca">actionPath</link>;
+00450 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00451 
+<anchor xml:id="__steam_v_r___action_8cs_source_1l00455"/><link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___action_1ac09cc52154a6418bb9782117f519c3b5">00455</link> &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keyword">override</emphasis>&#32;<emphasis role="keywordtype">bool</emphasis>&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___action_1ac09cc52154a6418bb9782117f519c3b5">Equals</link>(<emphasis role="keywordtype">object</emphasis>&#32;other)
+00456 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00457 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(ReferenceEquals(<emphasis role="keyword">null</emphasis>,&#32;other))
+00458 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00459 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(<emphasis role="keywordtype">string</emphasis>.IsNullOrEmpty(this.actionPath))&#32;<emphasis role="comment">//if&#32;we&#32;haven&apos;t&#32;set&#32;a&#32;path,&#32;say&#32;this&#32;action&#32;is&#32;equal&#32;to&#32;null</emphasis>
+00460 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;<emphasis role="keyword">true</emphasis>;
+00461 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(this.<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___action_1a948d9db18a20fde79dd442cd0e119fa6">GetSourceMap</link>()&#32;==&#32;<emphasis role="keyword">null</emphasis>)
+00462 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;<emphasis role="keyword">true</emphasis>;
+00463 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;
+00464 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;<emphasis role="keyword">false</emphasis>;
+00465 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00466 
+00467 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(ReferenceEquals(<emphasis role="keyword">this</emphasis>,&#32;other))
+00468 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;<emphasis role="keyword">true</emphasis>;
+00469 
+00470 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(other&#32;is&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___action">SteamVR_Action</link>)
+00471 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;this.<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___action_1a47cd704e2eab7d9ea4ac09fb257ba4cb">Equals</link>((SteamVR_Action)other);
+00472 
+00473 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;<emphasis role="keyword">false</emphasis>;
+00474 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00475 
+<anchor xml:id="__steam_v_r___action_8cs_source_1l00479"/><link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___action_1ad7b81277f914a527971510f8c1b3f38d">00479</link> &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keyword">static</emphasis>&#32;<emphasis role="keywordtype">bool</emphasis>&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___action_1ad7b81277f914a527971510f8c1b3f38d">operator !=</link>(<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___action">SteamVR_Action</link>&#32;action1,&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___action">SteamVR_Action</link>&#32;action2)
+00480 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00481 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;!(action1&#32;==&#32;action2);
+00482 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00483 
+<anchor xml:id="__steam_v_r___action_8cs_source_1l00487"/><link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___action_1a58a25d1d89f51b0ddcc65ebf6c1e8e54">00487</link> &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keyword">static</emphasis>&#32;<emphasis role="keywordtype">bool</emphasis>&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___action_1a58a25d1d89f51b0ddcc65ebf6c1e8e54">operator ==</link>(<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___action">SteamVR_Action</link>&#32;action1,&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___action">SteamVR_Action</link>&#32;action2)
+00488 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00489 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordtype">bool</emphasis>&#32;action1null&#32;=&#32;(ReferenceEquals(<emphasis role="keyword">null</emphasis>,&#32;action1)&#32;||&#32;<emphasis role="keywordtype">string</emphasis>.IsNullOrEmpty(action1.<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___action_1a75a8c6b9641982a47e32039b131e3eca">actionPath</link>)&#32;||&#32;action1.<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___action_1a948d9db18a20fde79dd442cd0e119fa6">GetSourceMap</link>()&#32;==&#32;<emphasis role="keyword">null</emphasis>);
+00490 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordtype">bool</emphasis>&#32;action2null&#32;=&#32;(ReferenceEquals(<emphasis role="keyword">null</emphasis>,&#32;action2)&#32;||&#32;<emphasis role="keywordtype">string</emphasis>.IsNullOrEmpty(action2.<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___action_1a75a8c6b9641982a47e32039b131e3eca">actionPath</link>)&#32;||&#32;action2.<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___action_1a948d9db18a20fde79dd442cd0e119fa6">GetSourceMap</link>()&#32;==&#32;<emphasis role="keyword">null</emphasis>);
+00491 
+00492 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(action1null&#32;&amp;&amp;&#32;action2null)
+00493 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;<emphasis role="keyword">true</emphasis>;
+00494 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">else</emphasis>&#32;<emphasis role="keywordflow">if</emphasis>&#32;(action1null&#32;!=&#32;action2null)
+00495 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;<emphasis role="keyword">false</emphasis>;
+00496 
+00497 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;action1.<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___action_1a47cd704e2eab7d9ea4ac09fb257ba4cb">Equals</link>(action2);
+00498 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00499 
+<anchor xml:id="__steam_v_r___action_8cs_source_1l00503"/><link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___action_1aa10a1be562d9c134f16601b579ec6e65">00503</link> &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keyword">static</emphasis>&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___action">SteamVR_Action</link>&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___action_1aa10a1be562d9c134f16601b579ec6e65">FindExistingActionForPartialPath</link>(<emphasis role="keywordtype">string</emphasis>&#32;path)
+00504 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00505 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(<emphasis role="keywordtype">string</emphasis>.IsNullOrEmpty(path)&#32;||&#32;path.IndexOf(<emphasis role="charliteral">&apos;/&apos;</emphasis>)&#32;==&#32;-1)
+00506 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;<emphasis role="keyword">null</emphasis>;
+00507 
+00508 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;&#32;&#32;0&#32;&#32;&#32;&#32;1&#32;&#32;&#32;&#32;&#32;&#32;&#32;2&#32;&#32;&#32;&#32;&#32;3&#32;&#32;&#32;4</emphasis>
+00509 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;&#32;&#32;&#32;/actions/default/in/foobar</emphasis>
+00510 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordtype">string</emphasis>[]&#32;pathParts&#32;=&#32;path.Split(<emphasis role="charliteral">&apos;/&apos;</emphasis>);
+00511 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___action">SteamVR_Action</link>&#32;existingAction;
+00512 
+00513 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(pathParts.Length&#32;&gt;=&#32;2&#32;&amp;&amp;&#32;<emphasis role="keywordtype">string</emphasis>.IsNullOrEmpty(pathParts[2]))
+00514 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00515 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordtype">string</emphasis>&#32;<emphasis role="keyword">set</emphasis>&#32;=&#32;pathParts[2];
+00516 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordtype">string</emphasis>&#32;name&#32;=&#32;pathParts[4];
+00517 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;existingAction&#32;=&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___input">SteamVR_Input</link>.<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___input_1a635ec3bc7211d524ccd9bf463b5346e3">GetBaseAction</link>(<emphasis role="keyword">set</emphasis>,&#32;name);
+00518 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00519 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">else</emphasis>
+00520 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00521 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;existingAction&#32;=&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___input">SteamVR_Input</link>.<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___input_1ab209d6c5f511a9a334f1138cb66aa2fb">GetBaseActionFromPath</link>(path);
+00522 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00523 
+00524 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;existingAction;
+00525 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00526 
+00527 
+00528 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;[NonSerialized]
+00529 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;<emphasis role="keywordtype">string</emphasis>&#32;cachedShortName;
+00530 
+<anchor xml:id="__steam_v_r___action_8cs_source_1l00532"/><link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___action_1a94911ac96600a93ce23790166435b593">00532</link> &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keywordtype">string</emphasis>&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___action_1a94911ac96600a93ce23790166435b593">GetShortName</link>()
+00533 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00534 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(cachedShortName&#32;==&#32;<emphasis role="keyword">null</emphasis>)
+00535 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00536 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;cachedShortName&#32;=&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___input___action_file">SteamVR_Input_ActionFile</link>.<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___input___action_file_1a881f0a23ed6e2fed60e2184aef07035f">GetShortName</link>(<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___action_1a765a5c4c2de688392f4968fa3dcf2703">fullPath</link>);
+00537 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00538 
+00539 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;cachedShortName;
+00540 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00541 &#32;&#32;&#32;&#32;}
+00542 
+<anchor xml:id="__steam_v_r___action_8cs_source_1l00543"/><link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___action___source___map">00543</link> &#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keyword">abstract</emphasis>&#32;<emphasis role="keyword">class&#32;</emphasis><link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___action___source___map">SteamVR_Action_Source_Map</link>&lt;SourceElement&gt;&#32;:&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___action___source___map">SteamVR_Action_Source_Map</link>&#32;where&#32;SourceElement&#32;:&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___action___source">SteamVR_Action_Source</link>,&#32;new()
+00544 &#32;&#32;&#32;&#32;{
+00549 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;SourceElement&#32;<emphasis role="keyword">this</emphasis>[<link linkend="_namespace_valve_1_1_v_r_1a82e5bf501cc3aa155444ee3f0662853f">SteamVR_Input_Sources</link>&#32;inputSource]
+<anchor xml:id="__steam_v_r___action_8cs_source_1l00550"/><link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___action___source___map_1a71b9fc1c80b8d185d7f07833f18cadc5">00550</link> &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00551 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">get</emphasis>
+00552 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00553 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___action___source___map_1a31d4929590d0a63ae7693b87424e9990">GetSourceElementForIndexer</link>(inputSource);
+00554 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00555 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00556 
+<anchor xml:id="__steam_v_r___action_8cs_source_1l00557"/><link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___action___source___map_1a2a6c76774adb5719065c870202c4f29a">00557</link> &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">protected</emphasis>&#32;<emphasis role="keyword">virtual</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___action___source___map_1a2a6c76774adb5719065c870202c4f29a">OnAccessSource</link>(<link linkend="_namespace_valve_1_1_v_r_1a82e5bf501cc3aa155444ee3f0662853f">SteamVR_Input_Sources</link>&#32;inputSource)&#32;{&#32;}
+00558 
+<anchor xml:id="__steam_v_r___action_8cs_source_1l00559"/><link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___action___source___map_1a7a426e28fb44538575b06892049cd122">00559</link> &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">protected</emphasis>&#32;Dictionary&lt;SteamVR_Input_Sources,&#32;SourceElement&gt;&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___action___source___map_1a7a426e28fb44538575b06892049cd122">sources</link>&#32;=&#32;<emphasis role="keyword">new</emphasis>&#32;Dictionary&lt;SteamVR_Input_Sources,&#32;SourceElement&gt;(<emphasis role="keyword">new</emphasis>&#32;<link linkend="_struct_valve_1_1_v_r_1_1_steam_v_r___input___sources___comparer">SteamVR_Input_Sources_Comparer</link>());
+00560 
+<anchor xml:id="__steam_v_r___action_8cs_source_1l00564"/><link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___action___source___map_1af035d2609891383f3735ced3cfa1b9ab">00564</link> &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keyword">override</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___action___source___map_1af035d2609891383f3735ced3cfa1b9ab">Initialize</link>()
+00565 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00566 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;base.Initialize();
+00567 
+00568 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;var&#32;sourceEnumerator&#32;=&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___action___source___map_1a7a426e28fb44538575b06892049cd122">sources</link>.GetEnumerator();
+00569 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">while</emphasis>&#32;(sourceEnumerator.MoveNext())
+00570 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00571 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;var&#32;sourceElement&#32;=&#32;sourceEnumerator.Current;
+00572 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;sourceElement.Value.Initialize();
+00573 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00574 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00575 
+<anchor xml:id="__steam_v_r___action_8cs_source_1l00576"/><link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___action___source___map_1ace2286a1aca371f6229a7f15c82f6329">00576</link> &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">protected</emphasis>&#32;<emphasis role="keyword">override</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___action___source___map_1ace2286a1aca371f6229a7f15c82f6329">PreinitializeMap</link>(<link linkend="_namespace_valve_1_1_v_r_1a82e5bf501cc3aa155444ee3f0662853f">SteamVR_Input_Sources</link>&#32;inputSource,&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___action">SteamVR_Action</link>&#32;wrappingAction)
+00577 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00578 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___action___source___map_1a7a426e28fb44538575b06892049cd122">sources</link>.Add(inputSource,&#32;<emphasis role="keyword">new</emphasis>&#32;SourceElement());
+00579 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___action___source___map_1a7a426e28fb44538575b06892049cd122">sources</link>[inputSource].Preinitialize(wrappingAction,&#32;inputSource);
+00580 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00581 
+00582 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;Normally&#32;I&apos;d&#32;just&#32;make&#32;the&#32;indexer&#32;virtual&#32;and&#32;override&#32;that&#32;but&#32;some&#32;unity&#32;versions&#32;don&apos;t&#32;like&#32;that</emphasis>
+<anchor xml:id="__steam_v_r___action_8cs_source_1l00583"/><link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___action___source___map_1a31d4929590d0a63ae7693b87424e9990">00583</link> &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">protected</emphasis>&#32;<emphasis role="keyword">virtual</emphasis>&#32;SourceElement&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___action___source___map_1a31d4929590d0a63ae7693b87424e9990">GetSourceElementForIndexer</link>(<link linkend="_namespace_valve_1_1_v_r_1a82e5bf501cc3aa155444ee3f0662853f">SteamVR_Input_Sources</link>&#32;inputSource)
+00584 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00585 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___action___source___map_1a2a6c76774adb5719065c870202c4f29a">OnAccessSource</link>(inputSource);
+00586 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___action___source___map_1a7a426e28fb44538575b06892049cd122">sources</link>[inputSource];
+00587 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00588 &#32;&#32;&#32;&#32;}
+00589 
+00590 &#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keyword">abstract</emphasis>&#32;<emphasis role="keyword">class&#32;</emphasis><link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___action___source___map">SteamVR_Action_Source_Map</link>
+00591 &#32;&#32;&#32;&#32;{
+<anchor xml:id="__steam_v_r___action_8cs_source_1l00593"/><link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___action___source___map_1a720b5bdedf05f98826a8a9e12b8b9364">00593</link> &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keywordtype">string</emphasis>&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___action___source___map_1a720b5bdedf05f98826a8a9e12b8b9364">fullPath</link>&#32;{&#32;<emphasis role="keyword">get</emphasis>;&#32;<emphasis role="keyword">protected</emphasis>&#32;<emphasis role="keyword">set</emphasis>;&#32;}
+00594 
+<anchor xml:id="__steam_v_r___action_8cs_source_1l00596"/><link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___action___source___map_1a6bc926f32341c260d49d8f270993adf0">00596</link> &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;ulong&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___action___source___map_1a6bc926f32341c260d49d8f270993adf0">handle</link>&#32;{&#32;<emphasis role="keyword">get</emphasis>;&#32;<emphasis role="keyword">protected</emphasis>&#32;<emphasis role="keyword">set</emphasis>;&#32;}
+00597 
+<anchor xml:id="__steam_v_r___action_8cs_source_1l00599"/><link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___action___source___map_1a8a4f51dad7abd9b5b646ab3dc05f50ac">00599</link> &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___action_set">SteamVR_ActionSet</link>&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___action___source___map_1a8a4f51dad7abd9b5b646ab3dc05f50ac">actionSet</link>&#32;{&#32;<emphasis role="keyword">get</emphasis>;&#32;<emphasis role="keyword">protected</emphasis>&#32;<emphasis role="keyword">set</emphasis>;&#32;}
+00600 
+<anchor xml:id="__steam_v_r___action_8cs_source_1l00602"/><link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___action___source___map_1a905ff9619f4ff10696ac1ebff4d5d574">00602</link> &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<link linkend="_namespace_valve_1_1_v_r_1a1e6192cb5ddaf204afab87ccb5728780">SteamVR_ActionDirections</link>&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___action___source___map_1a905ff9619f4ff10696ac1ebff4d5d574">direction</link>&#32;{&#32;<emphasis role="keyword">get</emphasis>;&#32;<emphasis role="keyword">protected</emphasis>&#32;<emphasis role="keyword">set</emphasis>;&#32;}
+00603 
+<anchor xml:id="__steam_v_r___action_8cs_source_1l00605"/><link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___action___source___map_1a7ddefadc173dfeee8e2c423552283d80">00605</link> &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___action">SteamVR_Action</link>&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___action___source___map_1a7ddefadc173dfeee8e2c423552283d80">action</link>;
+00606 
+<anchor xml:id="__steam_v_r___action_8cs_source_1l00607"/><link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___action___source___map_1a8c5843be007a5e7a7bb2a5ad9a4451d7">00607</link> &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keyword">virtual</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___action___source___map_1a8c5843be007a5e7a7bb2a5ad9a4451d7">PreInitialize</link>(<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___action">SteamVR_Action</link>&#32;wrappingAction,&#32;<emphasis role="keywordtype">string</emphasis>&#32;actionPath,&#32;<emphasis role="keywordtype">bool</emphasis>&#32;throwErrors&#32;=&#32;<emphasis role="keyword">true</emphasis>)
+00608 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00609 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___action___source___map_1a720b5bdedf05f98826a8a9e12b8b9364">fullPath</link>&#32;=&#32;actionPath;
+00610 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___action___source___map_1a7ddefadc173dfeee8e2c423552283d80">action</link>&#32;=&#32;wrappingAction;
+00611 
+00612 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___action___source___map_1a8a4f51dad7abd9b5b646ab3dc05f50ac">actionSet</link>&#32;=&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___input">SteamVR_Input</link>.<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___input_1ae8457bd35fd6eb86e62371d56af44254">GetActionSetFromPath</link>(GetActionSetPath());
+00613 
+00614 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___action___source___map_1a905ff9619f4ff10696ac1ebff4d5d574">direction</link>&#32;=&#32;GetActionDirection();
+00615 
+00616 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_namespace_valve_1_1_v_r_1a82e5bf501cc3aa155444ee3f0662853f">SteamVR_Input_Sources</link>[]&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___action___source___map_1a7a426e28fb44538575b06892049cd122">sources</link>&#32;=&#32;SteamVR_Input_Source.GetAllSources();
+00617 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">for</emphasis>&#32;(<emphasis role="keywordtype">int</emphasis>&#32;sourceIndex&#32;=&#32;0;&#32;sourceIndex&#32;&lt;&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___action___source___map_1a7a426e28fb44538575b06892049cd122">sources</link>.Length;&#32;sourceIndex++)
+00618 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00619 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___action___source___map_1ace2286a1aca371f6229a7f15c82f6329">PreinitializeMap</link>(<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___action___source___map_1a7a426e28fb44538575b06892049cd122">sources</link>[sourceIndex],&#32;wrappingAction);
+00620 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00621 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00622 
+00626 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">protected</emphasis>&#32;<emphasis role="keyword">abstract</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___action___source___map_1ace2286a1aca371f6229a7f15c82f6329">PreinitializeMap</link>(<link linkend="_namespace_valve_1_1_v_r_1a82e5bf501cc3aa155444ee3f0662853f">SteamVR_Input_Sources</link>&#32;inputSource,&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___action">SteamVR_Action</link>&#32;wrappingAction);
+00627 
+<anchor xml:id="__steam_v_r___action_8cs_source_1l00631"/><link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___action___source___map_1aa673cb451bc9b3fcc7ce8a7b95d407d6">00631</link> &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keyword">virtual</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___action___source___map_1aa673cb451bc9b3fcc7ce8a7b95d407d6">Initialize</link>()
+00632 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00633 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;ulong&#32;newHandle&#32;=&#32;0;
+00634 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_namespace_valve_1_1_v_r_1a592d7f4189b8346d6c96dbdbaa35bc1b">EVRInputError</link>&#32;err&#32;=&#32;<link linkend="_class_valve_1_1_v_r_1_1_open_v_r">OpenVR</link>.<link linkend="_class_valve_1_1_v_r_1_1_open_v_r_1a7654f626318585e535bbcdca6a2b01ec">Input</link>.<link linkend="_class_valve_1_1_v_r_1_1_c_v_r_input_1a8db69981ead338c62f3955e9b3a1ac66">GetActionHandle</link>(<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___action___source___map_1a720b5bdedf05f98826a8a9e12b8b9364">fullPath</link>.ToLower(),&#32;ref&#32;newHandle);
+00635 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___action___source___map_1a6bc926f32341c260d49d8f270993adf0">handle</link>&#32;=&#32;newHandle;
+00636 
+00637 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(err&#32;!=&#32;<link linkend="_namespace_valve_1_1_v_r_1a592d7f4189b8346d6c96dbdbaa35bc1b">EVRInputError</link>.None)
+00638 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;Debug.LogError(<emphasis role="stringliteral">&quot;&lt;b&gt;[SteamVR]&lt;/b&gt;&#32;GetActionHandle&#32;(&quot;</emphasis>&#32;+&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___action___source___map_1a720b5bdedf05f98826a8a9e12b8b9364">fullPath</link>.ToLower()&#32;+&#32;<emphasis role="stringliteral">&quot;)&#32;error:&#32;&quot;</emphasis>&#32;+&#32;err.ToString());
+00639 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00640 
+00641 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;<emphasis role="keywordtype">string</emphasis>&#32;GetActionSetPath()
+00642 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00643 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordtype">int</emphasis>&#32;actionsEndIndex&#32;=&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___action___source___map_1a720b5bdedf05f98826a8a9e12b8b9364">fullPath</link>.IndexOf(<emphasis role="charliteral">&apos;/&apos;</emphasis>,&#32;1);
+00644 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordtype">int</emphasis>&#32;setStartIndex&#32;=&#32;actionsEndIndex&#32;+&#32;1;
+00645 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordtype">int</emphasis>&#32;setEndIndex&#32;=&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___action___source___map_1a720b5bdedf05f98826a8a9e12b8b9364">fullPath</link>.IndexOf(<emphasis role="charliteral">&apos;/&apos;</emphasis>,&#32;setStartIndex);
+00646 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordtype">int</emphasis>&#32;count&#32;=&#32;setEndIndex;
+00647 
+00648 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___action___source___map_1a720b5bdedf05f98826a8a9e12b8b9364">fullPath</link>.Substring(0,&#32;count);
+00649 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00650 
+00651 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;<link linkend="_namespace_valve_1_1_v_r_1a1e6192cb5ddaf204afab87ccb5728780">SteamVR_ActionDirections</link>&#32;GetActionDirection()
+00652 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00653 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordtype">int</emphasis>&#32;actionsEndIndex&#32;=&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___action___source___map_1a720b5bdedf05f98826a8a9e12b8b9364">fullPath</link>.IndexOf(<emphasis role="charliteral">&apos;/&apos;</emphasis>,&#32;1);
+00654 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordtype">int</emphasis>&#32;setStartIndex&#32;=&#32;actionsEndIndex&#32;+&#32;1;
+00655 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordtype">int</emphasis>&#32;setEndIndex&#32;=&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___action___source___map_1a720b5bdedf05f98826a8a9e12b8b9364">fullPath</link>.IndexOf(<emphasis role="charliteral">&apos;/&apos;</emphasis>,&#32;setStartIndex);
+00656 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordtype">int</emphasis>&#32;directionEndIndex&#32;=&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___action___source___map_1a720b5bdedf05f98826a8a9e12b8b9364">fullPath</link>.IndexOf(<emphasis role="charliteral">&apos;/&apos;</emphasis>,&#32;setEndIndex&#32;+&#32;1);
+00657 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordtype">int</emphasis>&#32;count&#32;=&#32;directionEndIndex&#32;-&#32;setEndIndex&#32;-&#32;1;
+00658 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordtype">string</emphasis>&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___action___source___map_1a905ff9619f4ff10696ac1ebff4d5d574">direction</link>&#32;=&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___action___source___map_1a720b5bdedf05f98826a8a9e12b8b9364">fullPath</link>.Substring(setEndIndex&#32;+&#32;1,&#32;count);
+00659 
+00660 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___action___source___map_1a905ff9619f4ff10696ac1ebff4d5d574">direction</link>&#32;==&#32;<emphasis role="stringliteral">&quot;in&quot;</emphasis>)
+00661 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;<link linkend="_namespace_valve_1_1_v_r_1a1e6192cb5ddaf204afab87ccb5728780">SteamVR_ActionDirections</link>.In;
+00662 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">else</emphasis>&#32;<emphasis role="keywordflow">if</emphasis>&#32;(<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___action___source___map_1a905ff9619f4ff10696ac1ebff4d5d574">direction</link>&#32;==&#32;<emphasis role="stringliteral">&quot;out&quot;</emphasis>)
+00663 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;<link linkend="_namespace_valve_1_1_v_r_1a1e6192cb5ddaf204afab87ccb5728780">SteamVR_ActionDirections</link>.Out;
+00664 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">else</emphasis>
+00665 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;Debug.LogError(<emphasis role="stringliteral">&quot;Could&#32;not&#32;find&#32;match&#32;for&#32;direction:&#32;&quot;</emphasis>&#32;+&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___action___source___map_1a905ff9619f4ff10696ac1ebff4d5d574">direction</link>);
+00666 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;<link linkend="_namespace_valve_1_1_v_r_1a1e6192cb5ddaf204afab87ccb5728780">SteamVR_ActionDirections</link>.In;
+00667 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00668 &#32;&#32;&#32;&#32;}
+00669 
+<anchor xml:id="__steam_v_r___action_8cs_source_1l00670"/><link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___action___source">00670</link> &#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keyword">abstract</emphasis>&#32;<emphasis role="keyword">class&#32;</emphasis><link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___action___source">SteamVR_Action_Source</link>&#32;:&#32;<link linkend="_interface_valve_1_1_v_r_1_1_i_steam_v_r___action___source">ISteamVR_Action_Source</link>
+00671 &#32;&#32;&#32;&#32;{
+<anchor xml:id="__steam_v_r___action_8cs_source_1l00673"/><link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___action___source_1acc5b9a83a017ceda67f3454bb6cefe25">00673</link> &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keywordtype">string</emphasis>&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___action___source_1acc5b9a83a017ceda67f3454bb6cefe25">fullPath</link>&#32;{&#32;<emphasis role="keyword">get</emphasis>&#32;{&#32;<emphasis role="keywordflow">return</emphasis>&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___action___source_1aa38bfb4ea2779a73aa3285f861e2462e">action</link>.<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___action_1a765a5c4c2de688392f4968fa3dcf2703">fullPath</link>;&#32;}&#32;}
+00674 
+<anchor xml:id="__steam_v_r___action_8cs_source_1l00676"/><link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___action___source_1a3b11b02fd911ae14ceac84478c5fe986">00676</link> &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;ulong&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___action___source_1a3b11b02fd911ae14ceac84478c5fe986">handle</link>&#32;{&#32;<emphasis role="keyword">get</emphasis>&#32;{&#32;<emphasis role="keywordflow">return</emphasis>&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___action___source_1aa38bfb4ea2779a73aa3285f861e2462e">action</link>.<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___action_1abb2ae18798c46b03be6c44872f3da084">handle</link>;&#32;}&#32;}
+00677 
+<anchor xml:id="__steam_v_r___action_8cs_source_1l00679"/><link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___action___source_1aa26748aead4336e028834777336636bb">00679</link> &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___action_set">SteamVR_ActionSet</link>&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___action___source_1aa26748aead4336e028834777336636bb">actionSet</link>&#32;{&#32;<emphasis role="keyword">get</emphasis>&#32;{&#32;<emphasis role="keywordflow">return</emphasis>&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___action___source_1aa38bfb4ea2779a73aa3285f861e2462e">action</link>.<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___action_1ad4b01239b68cfa6a4b0daa1c91e2f134">actionSet</link>;&#32;}&#32;}
+00680 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;
+<anchor xml:id="__steam_v_r___action_8cs_source_1l00682"/><link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___action___source_1a67903c42bb717287d4a1a4a0f972537a">00682</link> &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<link linkend="_namespace_valve_1_1_v_r_1a1e6192cb5ddaf204afab87ccb5728780">SteamVR_ActionDirections</link>&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___action___source_1a67903c42bb717287d4a1a4a0f972537a">direction</link>&#32;{&#32;<emphasis role="keyword">get</emphasis>&#32;{&#32;<emphasis role="keywordflow">return</emphasis>&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___action___source_1aa38bfb4ea2779a73aa3285f861e2462e">action</link>.<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___action_1aee8591fed8be32dde8c11ab75b830323">direction</link>;&#32;}&#32;}
+00683 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;
+<anchor xml:id="__steam_v_r___action_8cs_source_1l00685"/><link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___action___source_1a8610e78de0430e918d74119fe0913697">00685</link> &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<link linkend="_namespace_valve_1_1_v_r_1a82e5bf501cc3aa155444ee3f0662853f">SteamVR_Input_Sources</link>&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___action___source_1a8610e78de0430e918d74119fe0913697">inputSource</link>&#32;{&#32;<emphasis role="keyword">get</emphasis>;&#32;<emphasis role="keyword">protected</emphasis>&#32;<emphasis role="keyword">set</emphasis>;&#32;}
+00686 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;
+<anchor xml:id="__steam_v_r___action_8cs_source_1l00688"/><link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___action___source_1aafaed73b850687ab90ecbb2398df57e2">00688</link> &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keywordtype">bool</emphasis>&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___action___source_1aafaed73b850687ab90ecbb2398df57e2">setActive</link>&#32;{&#32;<emphasis role="keyword">get</emphasis>&#32;{&#32;<emphasis role="keywordflow">return</emphasis>&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___action___source_1aa26748aead4336e028834777336636bb">actionSet</link>.<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___action_set_1a90637da41a53066829ee8bd3e06a3ce9">IsActive</link>(<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___action___source_1a8610e78de0430e918d74119fe0913697">inputSource</link>);&#32;}&#32;}
+00689 
+00690 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;
+<anchor xml:id="__steam_v_r___action_8cs_source_1l00692"/><link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___action___source_1ade25c2814f3dc4b59888e8dc2a36cf3c">00692</link> &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keyword">abstract</emphasis>&#32;<emphasis role="keywordtype">bool</emphasis>&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___action___source_1ade25c2814f3dc4b59888e8dc2a36cf3c">active</link>&#32;{&#32;<emphasis role="keyword">get</emphasis>;&#32;}
+00693 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;
+<anchor xml:id="__steam_v_r___action_8cs_source_1l00695"/><link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___action___source_1a170594d0fcc97fba3bf7545851d63c11">00695</link> &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keyword">abstract</emphasis>&#32;<emphasis role="keywordtype">bool</emphasis>&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___action___source_1a170594d0fcc97fba3bf7545851d63c11">activeBinding</link>&#32;{&#32;<emphasis role="keyword">get</emphasis>;&#32;}
+00696 
+<anchor xml:id="__steam_v_r___action_8cs_source_1l00698"/><link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___action___source_1abcc77ca7d5edf240c2d517c84fc7e828">00698</link> &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keyword">abstract</emphasis>&#32;<emphasis role="keywordtype">bool</emphasis>&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___action___source_1abcc77ca7d5edf240c2d517c84fc7e828">lastActive</link>&#32;{&#32;<emphasis role="keyword">get</emphasis>;&#32;<emphasis role="keyword">protected</emphasis>&#32;<emphasis role="keyword">set</emphasis>;&#32;}
+00699 
+<anchor xml:id="__steam_v_r___action_8cs_source_1l00701"/><link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___action___source_1a16bf2a670aa67fad39e7b5bb17664926">00701</link> &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keyword">abstract</emphasis>&#32;<emphasis role="keywordtype">bool</emphasis>&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___action___source_1a16bf2a670aa67fad39e7b5bb17664926">lastActiveBinding</link>&#32;{&#32;<emphasis role="keyword">get</emphasis>;&#32;}
+00702 
+00703 
+<anchor xml:id="__steam_v_r___action_8cs_source_1l00704"/><link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___action___source_1a427286fbd3c70da9333dc3f513e30e1c">00704</link> &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">protected</emphasis>&#32;ulong&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___action___source_1a427286fbd3c70da9333dc3f513e30e1c">inputSourceHandle</link>;
+00705 
+<anchor xml:id="__steam_v_r___action_8cs_source_1l00706"/><link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___action___source_1aa38bfb4ea2779a73aa3285f861e2462e">00706</link> &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">protected</emphasis>&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___action">SteamVR_Action</link>&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___action___source_1aa38bfb4ea2779a73aa3285f861e2462e">action</link>;
+00707 
+<anchor xml:id="__steam_v_r___action_8cs_source_1l00711"/><link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___action___source_1aa2bec7f32b37595de01f1456a3fa5bfe">00711</link> &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keyword">virtual</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___action___source_1aa2bec7f32b37595de01f1456a3fa5bfe">Preinitialize</link>(<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___action">SteamVR_Action</link>&#32;wrappingAction,&#32;<link linkend="_namespace_valve_1_1_v_r_1a82e5bf501cc3aa155444ee3f0662853f">SteamVR_Input_Sources</link>&#32;forInputSource)
+00712 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00713 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___action___source_1aa38bfb4ea2779a73aa3285f861e2462e">action</link>&#32;=&#32;wrappingAction;
+00714 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___action___source_1a8610e78de0430e918d74119fe0913697">inputSource</link>&#32;=&#32;forInputSource;
+00715 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00716 
+<anchor xml:id="__steam_v_r___action_8cs_source_1l00717"/><link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___action___source_1afe35f80548857d2da588f8a0c036e3e3">00717</link> &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___action___source_1afe35f80548857d2da588f8a0c036e3e3">SteamVR_Action_Source</link>()&#32;{&#32;}
+00718 
+<anchor xml:id="__steam_v_r___action_8cs_source_1l00723"/><link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___action___source_1aa4784c092cc0a4372812834bfcceab6d">00723</link> &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keyword">virtual</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___action___source_1aa4784c092cc0a4372812834bfcceab6d">Initialize</link>()
+00724 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00725 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___action___source_1a427286fbd3c70da9333dc3f513e30e1c">inputSourceHandle</link>&#32;=&#32;SteamVR_Input_Source.GetHandle(<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___action___source_1a8610e78de0430e918d74119fe0913697">inputSource</link>);
+00726 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00727 &#32;&#32;&#32;&#32;}
+00728 
+00729 
+<anchor xml:id="__steam_v_r___action_8cs_source_1l00730"/><link linkend="_interface_valve_1_1_v_r_1_1_i_steam_v_r___action">00730</link> &#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keyword">interface&#32;</emphasis><link linkend="_interface_valve_1_1_v_r_1_1_i_steam_v_r___action">ISteamVR_Action</link>&#32;:&#32;<link linkend="_interface_valve_1_1_v_r_1_1_i_steam_v_r___action___source">ISteamVR_Action_Source</link>
+00731 &#32;&#32;&#32;&#32;{
+00734 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordtype">bool</emphasis>&#32;<link linkend="_interface_valve_1_1_v_r_1_1_i_steam_v_r___action_1ad8d90df47697c9e5b43a0a46a241aa85">GetActive</link>(<link linkend="_namespace_valve_1_1_v_r_1a82e5bf501cc3aa155444ee3f0662853f">SteamVR_Input_Sources</link>&#32;inputSource);
+00735 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;
+00737 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordtype">string</emphasis>&#32;<link linkend="_interface_valve_1_1_v_r_1_1_i_steam_v_r___action_1ae21f01096754a807c68543f61e63bf1c">GetShortName</link>();
+00738 &#32;&#32;&#32;&#32;}
+00739 
+00740 
+<anchor xml:id="__steam_v_r___action_8cs_source_1l00741"/><link linkend="_interface_valve_1_1_v_r_1_1_i_steam_v_r___action___source">00741</link> &#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keyword">interface&#32;</emphasis><link linkend="_interface_valve_1_1_v_r_1_1_i_steam_v_r___action___source">ISteamVR_Action_Source</link>
+00742 &#32;&#32;&#32;&#32;{
+<anchor xml:id="__steam_v_r___action_8cs_source_1l00744"/><link linkend="_interface_valve_1_1_v_r_1_1_i_steam_v_r___action___source_1a529749f5fa62c29a4faac767cd9ece8d">00744</link> &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordtype">bool</emphasis>&#32;<link linkend="_interface_valve_1_1_v_r_1_1_i_steam_v_r___action___source_1a529749f5fa62c29a4faac767cd9ece8d">active</link>&#32;{&#32;<emphasis role="keyword">get</emphasis>;&#32;}
+00745 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;
+<anchor xml:id="__steam_v_r___action_8cs_source_1l00747"/><link linkend="_interface_valve_1_1_v_r_1_1_i_steam_v_r___action___source_1a304d2c626023c9dea73f4289c57975b3">00747</link> &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordtype">bool</emphasis>&#32;<link linkend="_interface_valve_1_1_v_r_1_1_i_steam_v_r___action___source_1a304d2c626023c9dea73f4289c57975b3">activeBinding</link>&#32;{&#32;<emphasis role="keyword">get</emphasis>;&#32;}
+00748 
+<anchor xml:id="__steam_v_r___action_8cs_source_1l00750"/><link linkend="_interface_valve_1_1_v_r_1_1_i_steam_v_r___action___source_1ad1f350e66dccb7f9124446967e856500">00750</link> &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordtype">bool</emphasis>&#32;<link linkend="_interface_valve_1_1_v_r_1_1_i_steam_v_r___action___source_1ad1f350e66dccb7f9124446967e856500">lastActive</link>&#32;{&#32;<emphasis role="keyword">get</emphasis>;&#32;}
+00751 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;
+<anchor xml:id="__steam_v_r___action_8cs_source_1l00753"/><link linkend="_interface_valve_1_1_v_r_1_1_i_steam_v_r___action___source_1af78f7edb626305afcd4cbccf10e14b0f">00753</link> &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordtype">bool</emphasis>&#32;<link linkend="_interface_valve_1_1_v_r_1_1_i_steam_v_r___action___source_1af78f7edb626305afcd4cbccf10e14b0f">lastActiveBinding</link>&#32;{&#32;<emphasis role="keyword">get</emphasis>;&#32;}
+00754 
+<anchor xml:id="__steam_v_r___action_8cs_source_1l00756"/><link linkend="_interface_valve_1_1_v_r_1_1_i_steam_v_r___action___source_1aecfcecacdabb3ca489a137a30f9b1728">00756</link> &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordtype">string</emphasis>&#32;<link linkend="_interface_valve_1_1_v_r_1_1_i_steam_v_r___action___source_1aecfcecacdabb3ca489a137a30f9b1728">fullPath</link>&#32;{&#32;<emphasis role="keyword">get</emphasis>;&#32;}
+00757 
+<anchor xml:id="__steam_v_r___action_8cs_source_1l00759"/><link linkend="_interface_valve_1_1_v_r_1_1_i_steam_v_r___action___source_1a8f32f3e77335f4266e326200072a216c">00759</link> &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;ulong&#32;<link linkend="_interface_valve_1_1_v_r_1_1_i_steam_v_r___action___source_1a8f32f3e77335f4266e326200072a216c">handle</link>&#32;{&#32;<emphasis role="keyword">get</emphasis>;&#32;}
+00760 
+<anchor xml:id="__steam_v_r___action_8cs_source_1l00762"/><link linkend="_interface_valve_1_1_v_r_1_1_i_steam_v_r___action___source_1a85095931b202ff69185fceaf75e5503a">00762</link> &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___action_set">SteamVR_ActionSet</link>&#32;<link linkend="_interface_valve_1_1_v_r_1_1_i_steam_v_r___action___source_1a85095931b202ff69185fceaf75e5503a">actionSet</link>&#32;{&#32;<emphasis role="keyword">get</emphasis>;&#32;}
+00763 
+<anchor xml:id="__steam_v_r___action_8cs_source_1l00765"/><link linkend="_interface_valve_1_1_v_r_1_1_i_steam_v_r___action___source_1ad1fb56d52a28f0c621007a6b3ea7a71b">00765</link> &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_namespace_valve_1_1_v_r_1a1e6192cb5ddaf204afab87ccb5728780">SteamVR_ActionDirections</link>&#32;<link linkend="_interface_valve_1_1_v_r_1_1_i_steam_v_r___action___source_1ad1fb56d52a28f0c621007a6b3ea7a71b">direction</link>&#32;{&#32;<emphasis role="keyword">get</emphasis>;&#32;}
+00766 &#32;&#32;&#32;&#32;}
+00767 }
+</programlisting></section>

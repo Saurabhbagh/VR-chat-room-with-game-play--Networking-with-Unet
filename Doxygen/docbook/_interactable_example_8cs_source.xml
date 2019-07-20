@@ -1,0 +1,154 @@
+<?xml version='1.0' encoding='UTF-8' standalone='no'?>
+<section xmlns="http://docbook.org/ns/docbook" version="5.0" xmlns:xlink="http://www.w3.org/1999/xlink" xml:id="__interactable_example_8cs_source">
+<title>InteractableExample.cs</title>
+<indexterm><primary>O:/GitHUBMINIPRoject/Assets/SteamVR/InteractionSystem/Samples/Scripts/InteractableExample.cs</primary></indexterm>
+<programlisting>00001 <emphasis role="comment">//=======&#32;Copyright&#32;(c)&#32;Valve&#32;Corporation,&#32;All&#32;rights&#32;reserved.&#32;===============</emphasis>
+00002 <emphasis role="comment">//</emphasis>
+00003 <emphasis role="comment">//&#32;Purpose:&#32;Demonstrates&#32;how&#32;to&#32;create&#32;a&#32;simple&#32;interactable&#32;object</emphasis>
+00004 <emphasis role="comment">//</emphasis>
+00005 <emphasis role="comment">//=============================================================================</emphasis>
+00006 
+00007 <emphasis role="keyword">using</emphasis>&#32;<link linkend="__balloon_8cs_1a7d67e097df9376eb709b6a23aa3c7d23">UnityEngine</link>;
+00008 <emphasis role="keyword">using</emphasis>&#32;System.Collections;
+00009 
+00010 <emphasis role="keyword">namespace&#32;</emphasis><link linkend="_namespace_valve_1_1_v_r_1_1_interaction_system_1_1_sample">Valve.VR.InteractionSystem.Sample</link>
+00011 {
+00012 &#32;&#32;&#32;&#32;<emphasis role="comment">//-------------------------------------------------------------------------</emphasis>
+00013 &#32;&#32;&#32;&#32;[RequireComponent(&#32;typeof(&#32;Interactable&#32;)&#32;)]
+<anchor xml:id="__interactable_example_8cs_source_1l00014"/><link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_sample_1_1_interactable_example">00014</link> &#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keyword">class&#32;</emphasis><link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_sample_1_1_interactable_example">InteractableExample</link>&#32;:&#32;MonoBehaviour
+00015 &#32;&#32;&#32;&#32;{
+00016 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;TextMesh&#32;generalText;
+00017 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;TextMesh&#32;hoveringText;
+00018 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;Vector3&#32;oldPosition;
+00019 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;Quaternion&#32;oldRotation;
+00020 
+00021 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;<emphasis role="keywordtype">float</emphasis>&#32;attachTime;
+00022 
+00023 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_hand">Hand</link>.<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_hand_1a61701f82b8f3fac8818954ec71804cb5">AttachmentFlags</link>&#32;attachmentFlags&#32;=&#32;<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_hand">Hand</link>.<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_hand_1a836a6cb55d2514dbed680981dfcc5505">defaultAttachmentFlags</link>&#32;&amp;&#32;(&#32;~<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_hand">Hand</link>.<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_hand_1a61701f82b8f3fac8818954ec71804cb5">AttachmentFlags</link>.SnapOnAttach&#32;)&#32;&amp;&#32;(~<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_hand">Hand</link>.<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_hand_1a61701f82b8f3fac8818954ec71804cb5">AttachmentFlags</link>.DetachOthers)&#32;&amp;&#32;(~<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_hand">Hand</link>.<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_hand_1a61701f82b8f3fac8818954ec71804cb5">AttachmentFlags</link>.VelocityMovement);
+00024 
+00025 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_interactable">Interactable</link>&#32;interactable;
+00026 
+00027 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//-------------------------------------------------</emphasis>
+00028 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordtype">void</emphasis>&#32;Awake()
+00029 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00030 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;var&#32;textMeshs&#32;=&#32;GetComponentsInChildren&lt;TextMesh&gt;();
+00031 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;generalText&#32;=&#32;textMeshs[0];
+00032 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;hoveringText&#32;=&#32;textMeshs[1];
+00033 
+00034 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;generalText.text&#32;=&#32;<emphasis role="stringliteral">&quot;No&#32;Hand&#32;Hovering&quot;</emphasis>;
+00035 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;hoveringText.text&#32;=&#32;<emphasis role="stringliteral">&quot;Hovering:&#32;False&quot;</emphasis>;
+00036 
+00037 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;interactable&#32;=&#32;this.GetComponent&lt;Interactable&gt;();
+00038 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00039 
+00040 
+00041 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//-------------------------------------------------</emphasis>
+00042 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;Called&#32;when&#32;a&#32;Hand&#32;starts&#32;hovering&#32;over&#32;this&#32;object</emphasis>
+00043 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//-------------------------------------------------</emphasis>
+00044 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;OnHandHoverBegin(&#32;<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_hand">Hand</link>&#32;hand&#32;)
+00045 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00046 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;generalText.text&#32;=&#32;<emphasis role="stringliteral">&quot;Hovering&#32;hand:&#32;&quot;</emphasis>&#32;+&#32;hand.name;
+00047 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00048 
+00049 
+00050 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//-------------------------------------------------</emphasis>
+00051 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;Called&#32;when&#32;a&#32;Hand&#32;stops&#32;hovering&#32;over&#32;this&#32;object</emphasis>
+00052 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//-------------------------------------------------</emphasis>
+00053 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;OnHandHoverEnd(&#32;<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_hand">Hand</link>&#32;hand&#32;)
+00054 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00055 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;generalText.text&#32;=&#32;<emphasis role="stringliteral">&quot;No&#32;Hand&#32;Hovering&quot;</emphasis>;
+00056 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00057 
+00058 
+00059 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//-------------------------------------------------</emphasis>
+00060 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;Called&#32;every&#32;Update()&#32;while&#32;a&#32;Hand&#32;is&#32;hovering&#32;over&#32;this&#32;object</emphasis>
+00061 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//-------------------------------------------------</emphasis>
+00062 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;HandHoverUpdate(&#32;<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_hand">Hand</link>&#32;hand&#32;)
+00063 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00064 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_namespace_valve_1_1_v_r_1_1_interaction_system_1ae03ab84d315f5997fd000817bfb96a0f">GrabTypes</link>&#32;startingGrabType&#32;=&#32;hand.<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_hand_1a3708622be32d8aaca12d368c0fed2047">GetGrabStarting</link>();
+00065 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordtype">bool</emphasis>&#32;isGrabEnding&#32;=&#32;hand.<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_hand_1af0f01b740ecc869ae14ec6c1be426461">IsGrabEnding</link>(this.gameObject);
+00066 
+00067 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(interactable.<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_interactable_1a1980377b09ca72c574f045e7d6aac17f">attachedToHand</link>&#32;==&#32;<emphasis role="keyword">null</emphasis>&#32;&amp;&amp;&#32;startingGrabType&#32;!=&#32;<link linkend="_namespace_valve_1_1_v_r_1_1_interaction_system_1ae03ab84d315f5997fd000817bfb96a0f">GrabTypes</link>.None)
+00068 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00069 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;Save&#32;our&#32;position/rotation&#32;so&#32;that&#32;we&#32;can&#32;restore&#32;it&#32;when&#32;we&#32;detach</emphasis>
+00070 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;oldPosition&#32;=&#32;transform.position;
+00071 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;oldRotation&#32;=&#32;transform.rotation;
+00072 
+00073 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;Call&#32;this&#32;to&#32;continue&#32;receiving&#32;HandHoverUpdate&#32;messages,</emphasis>
+00074 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;and&#32;prevent&#32;the&#32;hand&#32;from&#32;hovering&#32;over&#32;anything&#32;else</emphasis>
+00075 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;hand.<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_hand_1a07600fb46d1bdbf3a02e70197d471134">HoverLock</link>(interactable);
+00076 
+00077 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;Attach&#32;this&#32;object&#32;to&#32;the&#32;hand</emphasis>
+00078 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;hand.<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_hand_1a73b0ea1d5b037fca1b7cb453061d98d6">AttachObject</link>(gameObject,&#32;startingGrabType,&#32;attachmentFlags);
+00079 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00080 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">else</emphasis>&#32;<emphasis role="keywordflow">if</emphasis>&#32;(isGrabEnding)
+00081 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00082 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;Detach&#32;this&#32;object&#32;from&#32;the&#32;hand</emphasis>
+00083 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;hand.<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_hand_1ab0bccf232d1291c6c3000d9a967635ca">DetachObject</link>(gameObject);
+00084 
+00085 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;Call&#32;this&#32;to&#32;undo&#32;HoverLock</emphasis>
+00086 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;hand.<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_hand_1aebd333682282351892fcc4b9df395e30">HoverUnlock</link>(interactable);
+00087 
+00088 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;Restore&#32;position/rotation</emphasis>
+00089 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;transform.position&#32;=&#32;oldPosition;
+00090 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;transform.rotation&#32;=&#32;oldRotation;
+00091 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00092 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00093 
+00094 
+00095 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//-------------------------------------------------</emphasis>
+00096 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;Called&#32;when&#32;this&#32;GameObject&#32;becomes&#32;attached&#32;to&#32;the&#32;hand</emphasis>
+00097 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//-------------------------------------------------</emphasis>
+00098 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;OnAttachedToHand(&#32;<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_hand">Hand</link>&#32;hand&#32;)
+00099 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00100 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;generalText.text&#32;=&#32;<emphasis role="keywordtype">string</emphasis>.Format(<emphasis role="stringliteral">&quot;Attached:&#32;{0}&quot;</emphasis>,&#32;hand.name);
+00101 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;attachTime&#32;=&#32;Time.time;
+00102 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00103 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;
+00104 
+00105 
+00106 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//-------------------------------------------------</emphasis>
+00107 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;Called&#32;when&#32;this&#32;GameObject&#32;is&#32;detached&#32;from&#32;the&#32;hand</emphasis>
+00108 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//-------------------------------------------------</emphasis>
+00109 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;OnDetachedFromHand(&#32;<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_hand">Hand</link>&#32;hand&#32;)
+00110 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00111 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;generalText.text&#32;=&#32;<emphasis role="keywordtype">string</emphasis>.Format(<emphasis role="stringliteral">&quot;Detached:&#32;{0}&quot;</emphasis>,&#32;hand.name);
+00112 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00113 
+00114 
+00115 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//-------------------------------------------------</emphasis>
+00116 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;Called&#32;every&#32;Update()&#32;while&#32;this&#32;GameObject&#32;is&#32;attached&#32;to&#32;the&#32;hand</emphasis>
+00117 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//-------------------------------------------------</emphasis>
+00118 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;HandAttachedUpdate(&#32;<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_hand">Hand</link>&#32;hand&#32;)
+00119 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00120 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;generalText.text&#32;=&#32;<emphasis role="keywordtype">string</emphasis>.Format(<emphasis role="stringliteral">&quot;Attached:&#32;{0}&#32;::&#32;Time:&#32;{1:F2}&quot;</emphasis>,&#32;hand.name,&#32;(Time.time&#32;-&#32;attachTime));
+00121 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00122 
+00123 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;<emphasis role="keywordtype">bool</emphasis>&#32;lastHovering&#32;=&#32;<emphasis role="keyword">false</emphasis>;
+00124 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;Update()
+00125 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00126 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(interactable.<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_interactable_1aded7f16cb07fa8238e399ea8d69f8c28">isHovering</link>&#32;!=&#32;lastHovering)&#32;<emphasis role="comment">//save&#32;on&#32;the&#32;.tostrings&#32;a&#32;bit</emphasis>
+00127 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00128 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;hoveringText.text&#32;=&#32;<emphasis role="keywordtype">string</emphasis>.Format(<emphasis role="stringliteral">&quot;Hovering:&#32;{0}&quot;</emphasis>,&#32;interactable.<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_interactable_1aded7f16cb07fa8238e399ea8d69f8c28">isHovering</link>);
+00129 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;lastHovering&#32;=&#32;interactable.<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_interactable_1aded7f16cb07fa8238e399ea8d69f8c28">isHovering</link>;
+00130 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00131 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00132 
+00133 
+00134 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//-------------------------------------------------</emphasis>
+00135 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;Called&#32;when&#32;this&#32;attached&#32;GameObject&#32;becomes&#32;the&#32;primary&#32;attached&#32;object</emphasis>
+00136 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//-------------------------------------------------</emphasis>
+00137 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;OnHandFocusAcquired(&#32;<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_hand">Hand</link>&#32;hand&#32;)
+00138 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00139 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00140 
+00141 
+00142 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//-------------------------------------------------</emphasis>
+00143 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;Called&#32;when&#32;another&#32;attached&#32;GameObject&#32;becomes&#32;the&#32;primary&#32;attached&#32;object</emphasis>
+00144 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//-------------------------------------------------</emphasis>
+00145 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;OnHandFocusLost(&#32;<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_hand">Hand</link>&#32;hand&#32;)
+00146 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00147 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00148 &#32;&#32;&#32;&#32;}
+00149 }
+</programlisting></section>

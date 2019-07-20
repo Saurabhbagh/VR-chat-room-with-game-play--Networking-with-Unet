@@ -1,0 +1,850 @@
+<?xml version='1.0' encoding='UTF-8' standalone='no'?>
+<section xmlns="http://docbook.org/ns/docbook" version="5.0" xmlns:xlink="http://www.w3.org/1999/xlink" xml:id="__connection_8cs_source">
+<title>Connection.cs</title>
+<indexterm><primary>O:/GitHUBMINIPRoject/Assets/LeapMotion/Core/Plugins/LeapCSharp/Connection.cs</primary></indexterm>
+<programlisting>00001 <emphasis role="comment">/******************************************************************************</emphasis>
+00002 <emphasis role="comment">&#32;*&#32;Copyright&#32;(C)&#32;Leap&#32;Motion,&#32;Inc.&#32;2011-2018.&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;*</emphasis>
+00003 <emphasis role="comment">&#32;*&#32;Leap&#32;Motion&#32;proprietary&#32;and&#32;confidential.&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;*</emphasis>
+00004 <emphasis role="comment">&#32;*&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;*</emphasis>
+00005 <emphasis role="comment">&#32;*&#32;Use&#32;subject&#32;to&#32;the&#32;terms&#32;of&#32;the&#32;Leap&#32;Motion&#32;SDK&#32;Agreement&#32;available&#32;at&#32;&#32;&#32;&#32;&#32;*</emphasis>
+00006 <emphasis role="comment">&#32;*&#32;https://developer.leapmotion.com/sdk_agreement,&#32;or&#32;another&#32;agreement&#32;&#32;&#32;&#32;&#32;&#32;&#32;*</emphasis>
+00007 <emphasis role="comment">&#32;*&#32;between&#32;Leap&#32;Motion&#32;and&#32;you,&#32;your&#32;company&#32;or&#32;other&#32;organization.&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;*</emphasis>
+00008 <emphasis role="comment">&#32;******************************************************************************/</emphasis>
+00009 
+00010 <emphasis role="keyword">namespace&#32;</emphasis><link linkend="_namespace_leap_internal">LeapInternal</link>&#32;{
+00011 &#32;&#32;<emphasis role="keyword">using</emphasis>&#32;System;
+00012 &#32;&#32;<emphasis role="keyword">using</emphasis>&#32;System.Collections.<link linkend="_namespace_system_1_1_collections_1_1_generic">Generic</link>;
+00013 &#32;&#32;<emphasis role="keyword">using</emphasis>&#32;System.Runtime.InteropServices;
+00014 &#32;&#32;<emphasis role="keyword">using</emphasis>&#32;System.Threading;
+00015 
+00016 &#32;&#32;<emphasis role="keyword">using</emphasis>&#32;<link linkend="_namespace_leap">Leap</link>;
+00017 
+<anchor xml:id="__connection_8cs_source_1l00018"/><link linkend="_class_leap_internal_1_1_connection">00018</link> &#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keyword">class&#32;</emphasis><link linkend="_class_leap_internal_1_1_connection">Connection</link>&#32;{
+00019 &#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;<emphasis role="keyword">static</emphasis>&#32;Dictionary&lt;int,&#32;Connection&gt;&#32;connectionDictionary&#32;=&#32;<emphasis role="keyword">new</emphasis>&#32;Dictionary&lt;int,&#32;Connection&gt;();
+00020 
+00021 &#32;&#32;&#32;&#32;<emphasis role="comment">//Left-right&#32;precalculated&#32;offsets</emphasis>
+00022 &#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;<emphasis role="keyword">static</emphasis>&#32;<emphasis role="keywordtype">long</emphasis>&#32;_handIdOffset;
+00023 &#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;<emphasis role="keyword">static</emphasis>&#32;<emphasis role="keywordtype">long</emphasis>&#32;_handPositionOffset;
+00024 &#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;<emphasis role="keyword">static</emphasis>&#32;<emphasis role="keywordtype">long</emphasis>&#32;_handOrientationOffset;
+00025 
+00026 &#32;&#32;&#32;&#32;<emphasis role="keyword">static</emphasis>&#32;<link linkend="_class_leap_internal_1_1_connection">Connection</link>()&#32;{
+00027 &#32;&#32;&#32;&#32;&#32;&#32;_handIdOffset&#32;=&#32;Marshal.OffsetOf(typeof(<link linkend="_struct_leap_internal_1_1_l_e_a_p___h_a_n_d">LEAP_HAND</link>),&#32;<emphasis role="stringliteral">&quot;id&quot;</emphasis>).ToInt64();
+00028 
+00029 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordtype">long</emphasis>&#32;palmOffset&#32;=&#32;Marshal.OffsetOf(typeof(<link linkend="_struct_leap_internal_1_1_l_e_a_p___h_a_n_d">LEAP_HAND</link>),&#32;<emphasis role="stringliteral">&quot;palm&quot;</emphasis>).ToInt64();
+00030 &#32;&#32;&#32;&#32;&#32;&#32;_handPositionOffset&#32;=&#32;Marshal.OffsetOf(typeof(<link linkend="_struct_leap_internal_1_1_l_e_a_p___p_a_l_m">LEAP_PALM</link>),&#32;<emphasis role="stringliteral">&quot;position&quot;</emphasis>).ToInt64()&#32;+&#32;palmOffset;
+00031 &#32;&#32;&#32;&#32;&#32;&#32;_handOrientationOffset&#32;=&#32;Marshal.OffsetOf(typeof(<link linkend="_struct_leap_internal_1_1_l_e_a_p___p_a_l_m">LEAP_PALM</link>),&#32;<emphasis role="stringliteral">&quot;orientation&quot;</emphasis>).ToInt64()&#32;+&#32;palmOffset;
+00032 &#32;&#32;&#32;&#32;}
+00033 
+<anchor xml:id="__connection_8cs_source_1l00034"/><link linkend="_class_leap_internal_1_1_connection_1a14b814a88c57b2dafafe72077211aa85">00034</link> &#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keyword">static</emphasis>&#32;<link linkend="_class_leap_internal_1_1_connection">Connection</link>&#32;<link linkend="_class_leap_internal_1_1_connection_1a14b814a88c57b2dafafe72077211aa85">GetConnection</link>(<emphasis role="keywordtype">int</emphasis>&#32;connectionKey&#32;=&#32;0)&#32;{
+00035 &#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_leap_internal_1_1_connection">Connection</link>&#32;conn;
+00036 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(!connectionDictionary.TryGetValue(connectionKey,&#32;out&#32;conn))&#32;{
+00037 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;conn&#32;=&#32;<emphasis role="keyword">new</emphasis>&#32;<link linkend="_class_leap_internal_1_1_connection">Connection</link>(connectionKey);
+00038 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;connectionDictionary.Add(connectionKey,&#32;conn);
+00039 &#32;&#32;&#32;&#32;&#32;&#32;}
+00040 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;conn;
+00041 &#32;&#32;&#32;&#32;}
+00042 
+<anchor xml:id="__connection_8cs_source_1l00043"/><link linkend="_class_leap_internal_1_1_connection_1a57ca44db295ca2da43050d4eb608e23c">00043</link> &#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keywordtype">int</emphasis>&#32;<link linkend="_class_leap_internal_1_1_connection_1a57ca44db295ca2da43050d4eb608e23c">ConnectionKey</link>&#32;{&#32;<emphasis role="keyword">get</emphasis>;&#32;<emphasis role="keyword">private</emphasis>&#32;<emphasis role="keyword">set</emphasis>;&#32;}
+<anchor xml:id="__connection_8cs_source_1l00044"/><link linkend="_class_leap_internal_1_1_connection_1a96db7c09526d9f356b88c0c9fe2dea25">00044</link> &#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<link linkend="_class_leap_internal_1_1_circular_object_buffer">CircularObjectBuffer&lt;LEAP_TRACKING_EVENT&gt;</link>&#32;<link linkend="_class_leap_internal_1_1_connection_1a96db7c09526d9f356b88c0c9fe2dea25">Frames</link>&#32;{&#32;<emphasis role="keyword">get</emphasis>;&#32;<emphasis role="keyword">set</emphasis>;&#32;}
+00045 
+00046 &#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;<link linkend="_class_leap_1_1_device_list">DeviceList</link>&#32;_devices&#32;=&#32;<emphasis role="keyword">new</emphasis>&#32;<link linkend="_class_leap_1_1_device_list">DeviceList</link>();
+00047 &#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;<link linkend="_class_leap_1_1_failed_device_list">FailedDeviceList</link>&#32;_failedDevices;
+00048 
+00049 &#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;<link linkend="_class_leap_1_1_distortion_data">DistortionData</link>&#32;_currentLeftDistortionData&#32;=&#32;<emphasis role="keyword">new</emphasis>&#32;<link linkend="_class_leap_1_1_distortion_data">DistortionData</link>();
+00050 &#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;<link linkend="_class_leap_1_1_distortion_data">DistortionData</link>&#32;_currentRightDistortionData&#32;=&#32;<emphasis role="keyword">new</emphasis>&#32;<link linkend="_class_leap_1_1_distortion_data">DistortionData</link>();
+00051 &#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;<emphasis role="keywordtype">int</emphasis>&#32;_frameBufferLength&#32;=&#32;60;&#32;<emphasis role="comment">//TODO,&#32;surface&#32;this&#32;value&#32;in&#32;LeapC,&#32;currently&#32;hardcoded!</emphasis>
+00052 
+00053 &#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;IntPtr&#32;_leapConnection;
+00054 &#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;<emphasis role="keywordtype">bool</emphasis>&#32;_isRunning&#32;=&#32;<emphasis role="keyword">false</emphasis>;
+00055 &#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;Thread&#32;_polster;
+00056 
+00057 &#32;&#32;&#32;&#32;<emphasis role="comment">//Policy&#32;and&#32;enabled&#32;features</emphasis>
+00058 &#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;UInt64&#32;_requestedPolicies&#32;=&#32;0;
+00059 &#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;UInt64&#32;_activePolicies&#32;=&#32;0;
+00060 
+00061 &#32;&#32;&#32;&#32;<emphasis role="comment">//Config&#32;change&#32;status</emphasis>
+00062 &#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;Dictionary&lt;uint,&#32;string&gt;&#32;_configRequests&#32;=&#32;<emphasis role="keyword">new</emphasis>&#32;Dictionary&lt;uint,&#32;string&gt;();
+00063 
+00064 &#32;&#32;&#32;&#32;<emphasis role="comment">//Connection&#32;events</emphasis>
+<anchor xml:id="__connection_8cs_source_1l00065"/><link linkend="_class_leap_internal_1_1_connection_1a0b87a8b7adf1357944915bd206150db3">00065</link> &#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;SynchronizationContext&#32;<link linkend="_class_leap_internal_1_1_connection_1a0b87a8b7adf1357944915bd206150db3">EventContext</link>&#32;{&#32;<emphasis role="keyword">get</emphasis>;&#32;<emphasis role="keyword">set</emphasis>;&#32;}
+00066 
+00067 &#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;EventHandler&lt;LeapEventArgs&gt;&#32;_leapInit;
+<anchor xml:id="__connection_8cs_source_1l00068"/><link linkend="_class_leap_internal_1_1_connection_1a4ecba08b7b5d52a5d3c9822454cd1633">00068</link> &#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keyword">event</emphasis>&#32;EventHandler&lt;LeapEventArgs&gt;&#32;<link linkend="_class_leap_internal_1_1_connection_1a4ecba08b7b5d52a5d3c9822454cd1633">LeapInit</link>&#32;{
+00069 &#32;&#32;&#32;&#32;&#32;&#32;add&#32;{
+00070 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;_leapInit&#32;+=&#32;value;
+00071 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(_leapConnection&#32;!=&#32;IntPtr.Zero)
+00072 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;value(<emphasis role="keyword">this</emphasis>,&#32;<emphasis role="keyword">new</emphasis>&#32;<link linkend="_class_leap_1_1_leap_event_args">LeapEventArgs</link>(<link linkend="_namespace_leap_1a5b8c8df3b9ace307e29863779a4ae85d">LeapEvent</link>.EVENT_INIT));
+00073 &#32;&#32;&#32;&#32;&#32;&#32;}
+00074 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">remove</emphasis>&#32;{&#32;_leapInit&#32;-=&#32;value;&#32;}
+00075 &#32;&#32;&#32;&#32;}
+00076 
+00077 &#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;EventHandler&lt;ConnectionEventArgs&gt;&#32;_leapConnectionEvent;
+<anchor xml:id="__connection_8cs_source_1l00078"/><link linkend="_class_leap_internal_1_1_connection_1a73e39e15e464b1c0b8a5394ecd085986">00078</link> &#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keyword">event</emphasis>&#32;EventHandler&lt;ConnectionEventArgs&gt;&#32;<link linkend="_class_leap_internal_1_1_connection_1a73e39e15e464b1c0b8a5394ecd085986">LeapConnection</link>&#32;{
+00079 &#32;&#32;&#32;&#32;&#32;&#32;add&#32;{
+00080 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;_leapConnectionEvent&#32;+=&#32;value;
+00081 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(<link linkend="_class_leap_internal_1_1_connection_1a29fc660760e7b7de559f01aa11be1abe">IsServiceConnected</link>)
+00082 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;value(<emphasis role="keyword">this</emphasis>,&#32;<emphasis role="keyword">new</emphasis>&#32;<link linkend="_class_leap_1_1_connection_event_args">ConnectionEventArgs</link>());
+00083 &#32;&#32;&#32;&#32;&#32;&#32;}
+00084 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">remove</emphasis>&#32;{&#32;_leapConnectionEvent&#32;-=&#32;value;&#32;}
+00085 &#32;&#32;&#32;&#32;}
+<anchor xml:id="__connection_8cs_source_1l00086"/><link linkend="_class_leap_internal_1_1_connection_1a352433b853a548790c8ad350e948fdd6">00086</link> &#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;EventHandler&lt;ConnectionLostEventArgs&gt;&#32;<link linkend="_class_leap_internal_1_1_connection_1a352433b853a548790c8ad350e948fdd6">LeapConnectionLost</link>;
+<anchor xml:id="__connection_8cs_source_1l00087"/><link linkend="_class_leap_internal_1_1_connection_1ae1dd18505f75a72eea2abbeab57d7d01">00087</link> &#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;EventHandler&lt;DeviceEventArgs&gt;&#32;<link linkend="_class_leap_internal_1_1_connection_1ae1dd18505f75a72eea2abbeab57d7d01">LeapDevice</link>;
+<anchor xml:id="__connection_8cs_source_1l00088"/><link linkend="_class_leap_internal_1_1_connection_1a3c55a469e21efe1ceb92b90c636f9f67">00088</link> &#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;EventHandler&lt;DeviceEventArgs&gt;&#32;<link linkend="_class_leap_internal_1_1_connection_1a3c55a469e21efe1ceb92b90c636f9f67">LeapDeviceLost</link>;
+<anchor xml:id="__connection_8cs_source_1l00089"/><link linkend="_class_leap_internal_1_1_connection_1a8f5dd0ee804342d59a2a28046a2c0e44">00089</link> &#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;EventHandler&lt;DeviceFailureEventArgs&gt;&#32;<link linkend="_class_leap_internal_1_1_connection_1a8f5dd0ee804342d59a2a28046a2c0e44">LeapDeviceFailure</link>;
+<anchor xml:id="__connection_8cs_source_1l00090"/><link linkend="_class_leap_internal_1_1_connection_1ac3d23b7ad9ca1224f70f1718873bb1c2">00090</link> &#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;EventHandler&lt;PolicyEventArgs&gt;&#32;<link linkend="_class_leap_internal_1_1_connection_1ac3d23b7ad9ca1224f70f1718873bb1c2">LeapPolicyChange</link>;
+<anchor xml:id="__connection_8cs_source_1l00091"/><link linkend="_class_leap_internal_1_1_connection_1a66f84d7e27d1f9a33028ea0abbc89e6c">00091</link> &#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;EventHandler&lt;FrameEventArgs&gt;&#32;<link linkend="_class_leap_internal_1_1_connection_1a66f84d7e27d1f9a33028ea0abbc89e6c">LeapFrame</link>;
+<anchor xml:id="__connection_8cs_source_1l00092"/><link linkend="_class_leap_internal_1_1_connection_1acbebf064965d68f74d4e851ee1c22bb1">00092</link> &#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;EventHandler&lt;InternalFrameEventArgs&gt;&#32;<link linkend="_class_leap_internal_1_1_connection_1acbebf064965d68f74d4e851ee1c22bb1">LeapInternalFrame</link>;
+<anchor xml:id="__connection_8cs_source_1l00093"/><link linkend="_class_leap_internal_1_1_connection_1a435f5b54b81790b604a4ef1f9b630d5e">00093</link> &#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;EventHandler&lt;LogEventArgs&gt;&#32;<link linkend="_class_leap_internal_1_1_connection_1a435f5b54b81790b604a4ef1f9b630d5e">LeapLogEvent</link>;
+<anchor xml:id="__connection_8cs_source_1l00094"/><link linkend="_class_leap_internal_1_1_connection_1a87dae2d17dfa76d622d710bf69c08c82">00094</link> &#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;EventHandler&lt;SetConfigResponseEventArgs&gt;&#32;<link linkend="_class_leap_internal_1_1_connection_1a87dae2d17dfa76d622d710bf69c08c82">LeapConfigResponse</link>;
+<anchor xml:id="__connection_8cs_source_1l00095"/><link linkend="_class_leap_internal_1_1_connection_1a6f56c66bbecc957ca227d894dcf16e96">00095</link> &#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;EventHandler&lt;ConfigChangeEventArgs&gt;&#32;<link linkend="_class_leap_internal_1_1_connection_1a6f56c66bbecc957ca227d894dcf16e96">LeapConfigChange</link>;
+<anchor xml:id="__connection_8cs_source_1l00096"/><link linkend="_class_leap_internal_1_1_connection_1ab1618ad3b9b1ed17ccd43a2461d277d7">00096</link> &#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;EventHandler&lt;DistortionEventArgs&gt;&#32;<link linkend="_class_leap_internal_1_1_connection_1ab1618ad3b9b1ed17ccd43a2461d277d7">LeapDistortionChange</link>;
+<anchor xml:id="__connection_8cs_source_1l00097"/><link linkend="_class_leap_internal_1_1_connection_1a7542907a2116216ac90ab2a88599b3a6">00097</link> &#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;EventHandler&lt;DroppedFrameEventArgs&gt;&#32;<link linkend="_class_leap_internal_1_1_connection_1a7542907a2116216ac90ab2a88599b3a6">LeapDroppedFrame</link>;
+<anchor xml:id="__connection_8cs_source_1l00098"/><link linkend="_class_leap_internal_1_1_connection_1a7ff7e1c77a92cba83e8d59e75f8074db">00098</link> &#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;EventHandler&lt;ImageEventArgs&gt;&#32;<link linkend="_class_leap_internal_1_1_connection_1a7ff7e1c77a92cba83e8d59e75f8074db">LeapImage</link>;
+<anchor xml:id="__connection_8cs_source_1l00099"/><link linkend="_class_leap_internal_1_1_connection_1ae000281d4cf2fbced911ff97b31f4035">00099</link> &#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;EventHandler&lt;PointMappingChangeEventArgs&gt;&#32;<link linkend="_class_leap_internal_1_1_connection_1ae000281d4cf2fbced911ff97b31f4035">LeapPointMappingChange</link>;
+<anchor xml:id="__connection_8cs_source_1l00100"/><link linkend="_class_leap_internal_1_1_connection_1ae8fb7ce09bced652e319aada4a8e3755">00100</link> &#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;EventHandler&lt;HeadPoseEventArgs&gt;&#32;<link linkend="_class_leap_internal_1_1_connection_1ae8fb7ce09bced652e319aada4a8e3755">LeapHeadPoseChange</link>;
+00101 
+<anchor xml:id="__connection_8cs_source_1l00102"/><link linkend="_class_leap_internal_1_1_connection_1a364051da7b95bc1487dac1d7538510b7">00102</link> &#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;Action&lt;BeginProfilingForThreadArgs&gt;&#32;<link linkend="_class_leap_internal_1_1_connection_1a364051da7b95bc1487dac1d7538510b7">LeapBeginProfilingForThread</link>;
+<anchor xml:id="__connection_8cs_source_1l00103"/><link linkend="_class_leap_internal_1_1_connection_1a424896b5a35580707284fa570e40138a">00103</link> &#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;Action&lt;EndProfilingForThreadArgs&gt;&#32;<link linkend="_class_leap_internal_1_1_connection_1a424896b5a35580707284fa570e40138a">LeapEndProfilingForThread</link>;
+<anchor xml:id="__connection_8cs_source_1l00104"/><link linkend="_class_leap_internal_1_1_connection_1a377465e1fa8fffca68491ba5f52136a2">00104</link> &#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;Action&lt;BeginProfilingBlockArgs&gt;&#32;<link linkend="_class_leap_internal_1_1_connection_1a377465e1fa8fffca68491ba5f52136a2">LeapBeginProfilingBlock</link>;
+<anchor xml:id="__connection_8cs_source_1l00105"/><link linkend="_class_leap_internal_1_1_connection_1a2983273b0360e53dc42a7d6c6d2e5893">00105</link> &#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;Action&lt;EndProfilingBlockArgs&gt;&#32;<link linkend="_class_leap_internal_1_1_connection_1a2983273b0360e53dc42a7d6c6d2e5893">LeapEndProfilingBlock</link>;
+00106 
+00107 &#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;<emphasis role="keywordtype">bool</emphasis>&#32;_disposed&#32;=&#32;<emphasis role="keyword">false</emphasis>;
+00108 
+<anchor xml:id="__connection_8cs_source_1l00109"/><link linkend="_class_leap_internal_1_1_connection_1a6cb6643d7795ebf5be07be51d8150dbf">00109</link> &#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;<link linkend="_class_leap_internal_1_1_connection_1a6cb6643d7795ebf5be07be51d8150dbf">Dispose</link>()&#32;{
+00110 &#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_leap_internal_1_1_connection_1a6cb6643d7795ebf5be07be51d8150dbf">Dispose</link>(<emphasis role="keyword">true</emphasis>);
+00111 &#32;&#32;&#32;&#32;&#32;&#32;GC.SuppressFinalize(<emphasis role="keyword">this</emphasis>);
+00112 &#32;&#32;&#32;&#32;}
+00113 
+00114 &#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;Protected&#32;implementation&#32;of&#32;Dispose&#32;pattern.</emphasis>
+<anchor xml:id="__connection_8cs_source_1l00115"/><link linkend="_class_leap_internal_1_1_connection_1a64cbbc4a16c8719a250dac019872556d">00115</link> &#32;&#32;&#32;&#32;<emphasis role="keyword">protected</emphasis>&#32;<emphasis role="keyword">virtual</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;<link linkend="_class_leap_internal_1_1_connection_1a64cbbc4a16c8719a250dac019872556d">Dispose</link>(<emphasis role="keywordtype">bool</emphasis>&#32;disposing)&#32;{
+00116 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(_disposed)
+00117 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>;
+00118 
+00119 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(disposing)&#32;{
+00120 &#32;&#32;&#32;&#32;&#32;&#32;}
+00121 
+00122 &#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_leap_internal_1_1_connection_1aea1fa03cd6daf0b54561ff2221a8f3be">Stop</link>();
+00123 &#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_leap_internal_1_1_leap_c">LeapC</link>.<link linkend="_class_leap_internal_1_1_leap_c_1aa8924a99915ab03a814c211b9a9536c3">DestroyConnection</link>(_leapConnection);
+00124 &#32;&#32;&#32;&#32;&#32;&#32;_leapConnection&#32;=&#32;IntPtr.Zero;
+00125 
+00126 &#32;&#32;&#32;&#32;&#32;&#32;_disposed&#32;=&#32;<emphasis role="keyword">true</emphasis>;
+00127 &#32;&#32;&#32;&#32;}
+00128 
+00129 &#32;&#32;&#32;&#32;~<link linkend="_class_leap_internal_1_1_connection">Connection</link>()&#32;{
+00130 &#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_leap_internal_1_1_connection_1a6cb6643d7795ebf5be07be51d8150dbf">Dispose</link>(<emphasis role="keyword">false</emphasis>);
+00131 &#32;&#32;&#32;&#32;}
+00132 
+00133 &#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;Connection(<emphasis role="keywordtype">int</emphasis>&#32;connectionKey)&#32;{
+00134 &#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_leap_internal_1_1_connection_1a57ca44db295ca2da43050d4eb608e23c">ConnectionKey</link>&#32;=&#32;connectionKey;
+00135 &#32;&#32;&#32;&#32;&#32;&#32;_leapConnection&#32;=&#32;IntPtr.Zero;
+00136 
+00137 &#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_leap_internal_1_1_connection_1a96db7c09526d9f356b88c0c9fe2dea25">Frames</link>&#32;=&#32;<emphasis role="keyword">new</emphasis>&#32;CircularObjectBuffer&lt;LEAP_TRACKING_EVENT&gt;(_frameBufferLength);
+00138 &#32;&#32;&#32;&#32;}
+00139 
+00140 &#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;LEAP_ALLOCATOR&#32;_pLeapAllocator&#32;=&#32;<emphasis role="keyword">new</emphasis>&#32;LEAP_ALLOCATOR();
+00141 
+<anchor xml:id="__connection_8cs_source_1l00142"/><link linkend="_class_leap_internal_1_1_connection_1a33962c567068d008ec6779c2641584b0">00142</link> &#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;<link linkend="_class_leap_internal_1_1_connection_1a33962c567068d008ec6779c2641584b0">Start</link>()&#32;{
+00143 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(_isRunning)
+00144 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>;
+00145 
+00146 &#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_namespace_leap_internal_1ae50b07d24c508b84273392b6dcbea1d9">eLeapRS</link>&#32;result;
+00147 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(_leapConnection&#32;==&#32;IntPtr.Zero)&#32;{
+00148 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;result&#32;=&#32;<link linkend="_class_leap_internal_1_1_leap_c">LeapC</link>.<link linkend="_class_leap_internal_1_1_leap_c_1a2a35287387889d78359ce9d0965fa706">CreateConnection</link>(out&#32;_leapConnection);
+00149 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(result&#32;!=&#32;<link linkend="_namespace_leap_internal_1ae50b07d24c508b84273392b6dcbea1d9">eLeapRS</link>.eLeapRS_Success&#32;||&#32;_leapConnection&#32;==&#32;IntPtr.Zero)&#32;{
+00150 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;reportAbnormalResults(<emphasis role="stringliteral">&quot;LeapC&#32;CreateConnection&#32;call&#32;was&#32;&quot;</emphasis>,&#32;result);
+00151 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>;
+00152 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00153 &#32;&#32;&#32;&#32;&#32;&#32;}
+00154 &#32;&#32;&#32;&#32;&#32;&#32;result&#32;=&#32;<link linkend="_class_leap_internal_1_1_leap_c">LeapC</link>.<link linkend="_class_leap_internal_1_1_leap_c_1a18543f45477c803f6858299f5b942f5a">OpenConnection</link>(_leapConnection);
+00155 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(result&#32;!=&#32;<link linkend="_namespace_leap_internal_1ae50b07d24c508b84273392b6dcbea1d9">eLeapRS</link>.eLeapRS_Success)&#32;{
+00156 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;reportAbnormalResults(<emphasis role="stringliteral">&quot;LeapC&#32;OpenConnection&#32;call&#32;was&#32;&quot;</emphasis>,&#32;result);
+00157 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>;
+00158 &#32;&#32;&#32;&#32;&#32;&#32;}
+00159 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;The&#32;Allocator&#32;must&#32;persist&#32;the&#32;lifetime&#32;of&#32;the&#32;connection</emphasis>
+00160 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(_pLeapAllocator.allocate&#32;==&#32;<emphasis role="keyword">null</emphasis>)&#32;{
+00161 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;_pLeapAllocator.allocate&#32;=&#32;MemoryManager.Pin;
+00162 &#32;&#32;&#32;&#32;&#32;&#32;}
+00163 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(_pLeapAllocator.deallocate&#32;==&#32;<emphasis role="keyword">null</emphasis>)&#32;{
+00164 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;_pLeapAllocator.deallocate&#32;=&#32;MemoryManager.Unpin;
+00165 &#32;&#32;&#32;&#32;&#32;&#32;}
+00166 &#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_leap_internal_1_1_leap_c">LeapC</link>.<link linkend="_class_leap_internal_1_1_leap_c_1affea4fe6155597b63cde13664955920d">SetAllocator</link>(_leapConnection,&#32;ref&#32;_pLeapAllocator);
+00167 
+00168 &#32;&#32;&#32;&#32;&#32;&#32;_isRunning&#32;=&#32;<emphasis role="keyword">true</emphasis>;
+00169 &#32;&#32;&#32;&#32;&#32;&#32;AppDomain.CurrentDomain.DomainUnload&#32;+=&#32;(arg1,&#32;arg2)&#32;=&gt;&#32;<link linkend="_class_leap_internal_1_1_connection_1a6cb6643d7795ebf5be07be51d8150dbf">Dispose</link>(<emphasis role="keyword">true</emphasis>);
+00170 
+00171 &#32;&#32;&#32;&#32;&#32;&#32;_polster&#32;=&#32;<emphasis role="keyword">new</emphasis>&#32;Thread(<emphasis role="keyword">new</emphasis>&#32;ThreadStart(this.processMessages));
+00172 &#32;&#32;&#32;&#32;&#32;&#32;_polster.Name&#32;=&#32;<emphasis role="stringliteral">&quot;LeapC&#32;Worker&quot;</emphasis>;
+00173 &#32;&#32;&#32;&#32;&#32;&#32;_polster.IsBackground&#32;=&#32;<emphasis role="keyword">true</emphasis>;
+00174 &#32;&#32;&#32;&#32;&#32;&#32;_polster.Start();
+00175 &#32;&#32;&#32;&#32;}
+00176 
+<anchor xml:id="__connection_8cs_source_1l00177"/><link linkend="_class_leap_internal_1_1_connection_1aea1fa03cd6daf0b54561ff2221a8f3be">00177</link> &#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;<link linkend="_class_leap_internal_1_1_connection_1aea1fa03cd6daf0b54561ff2221a8f3be">Stop</link>()&#32;{
+00178 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(!_isRunning)
+00179 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>;
+00180 
+00181 &#32;&#32;&#32;&#32;&#32;&#32;_isRunning&#32;=&#32;<emphasis role="keyword">false</emphasis>;
+00182 
+00183 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//Very&#32;important&#32;to&#32;close&#32;the&#32;connection&#32;before&#32;we&#32;try&#32;to&#32;join&#32;the</emphasis>
+00184 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//worker&#32;thread!&#32;&#32;The&#32;call&#32;to&#32;PollConnection&#32;can&#32;sometimes&#32;block,</emphasis>
+00185 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//despite&#32;the&#32;timeout,&#32;causing&#32;an&#32;attempt&#32;to&#32;join&#32;the&#32;thread&#32;waiting</emphasis>
+00186 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//forever&#32;and&#32;preventing&#32;the&#32;connection&#32;from&#32;stopping.</emphasis>
+00187 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//</emphasis>
+00188 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//It&#32;seems&#32;that&#32;closing&#32;the&#32;connection&#32;causes&#32;PollConnection&#32;to&#32;</emphasis>
+00189 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//unblock&#32;in&#32;these&#32;cases,&#32;so&#32;just&#32;make&#32;sure&#32;to&#32;close&#32;the&#32;connection</emphasis>
+00190 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//before&#32;trying&#32;to&#32;join&#32;the&#32;worker&#32;thread.</emphasis>
+00191 &#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_leap_internal_1_1_leap_c">LeapC</link>.<link linkend="_class_leap_internal_1_1_leap_c_1af70ec130834b0aa68d9bc8a35d17cc7b">CloseConnection</link>(_leapConnection);
+00192 
+00193 &#32;&#32;&#32;&#32;&#32;&#32;_polster.Join();
+00194 &#32;&#32;&#32;&#32;}
+00195 
+00196 &#32;&#32;&#32;&#32;<emphasis role="comment">//Run&#32;in&#32;Polster&#32;thread,&#32;fills&#32;in&#32;object&#32;queues</emphasis>
+00197 &#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;processMessages()&#32;{
+00198 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//Only&#32;profiling&#32;block&#32;currently&#32;is&#32;the&#32;Handle&#32;Event&#32;block</emphasis>
+00199 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">const</emphasis>&#32;<emphasis role="keywordtype">string</emphasis>&#32;HANDLE_EVENT_PROFILER_BLOCK&#32;=&#32;<emphasis role="stringliteral">&quot;Handle&#32;Event&quot;</emphasis>;
+00200 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordtype">bool</emphasis>&#32;hasBegunProfilingForThread&#32;=&#32;<emphasis role="keyword">false</emphasis>;
+00201 
+00202 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">try</emphasis>&#32;{
+00203 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_namespace_leap_internal_1ae50b07d24c508b84273392b6dcbea1d9">eLeapRS</link>&#32;result;
+00204 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;_leapInit.DispatchOnContext(<emphasis role="keyword">this</emphasis>,&#32;<link linkend="_class_leap_internal_1_1_connection_1a0b87a8b7adf1357944915bd206150db3">EventContext</link>,&#32;<emphasis role="keyword">new</emphasis>&#32;<link linkend="_class_leap_1_1_leap_event_args">LeapEventArgs</link>(<link linkend="_namespace_leap_1a5b8c8df3b9ace307e29863779a4ae85d">LeapEvent</link>.EVENT_INIT));
+00205 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">while</emphasis>&#32;(_isRunning)&#32;{
+00206 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(<link linkend="_class_leap_internal_1_1_connection_1a364051da7b95bc1487dac1d7538510b7">LeapBeginProfilingForThread</link>&#32;!=&#32;<emphasis role="keyword">null</emphasis>&#32;&amp;&amp;&#32;!hasBegunProfilingForThread)&#32;{
+00207 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_leap_internal_1_1_connection_1a364051da7b95bc1487dac1d7538510b7">LeapBeginProfilingForThread</link>(<emphasis role="keyword">new</emphasis>&#32;<link linkend="_struct_leap_1_1_begin_profiling_for_thread_args">BeginProfilingForThreadArgs</link>(<emphasis role="stringliteral">&quot;Worker&#32;Thread&quot;</emphasis>,
+00208 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;HANDLE_EVENT_PROFILER_BLOCK));
+00209 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;hasBegunProfilingForThread&#32;=&#32;<emphasis role="keyword">true</emphasis>;
+00210 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00211 
+00212 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;LEAP_CONNECTION_MESSAGE&#32;_msg&#32;=&#32;<emphasis role="keyword">new</emphasis>&#32;LEAP_CONNECTION_MESSAGE();
+00213 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;uint&#32;timeout&#32;=&#32;150;
+00214 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;result&#32;=&#32;LeapC.PollConnection(_leapConnection,&#32;timeout,&#32;ref&#32;_msg);
+00215 
+00216 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(result&#32;!=&#32;<link linkend="_namespace_leap_internal_1ae50b07d24c508b84273392b6dcbea1d9">eLeapRS</link>.eLeapRS_Success)&#32;{
+00217 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;reportAbnormalResults(<emphasis role="stringliteral">&quot;LeapC&#32;PollConnection&#32;call&#32;was&#32;&quot;</emphasis>,&#32;result);
+00218 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">continue</emphasis>;
+00219 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00220 
+00221 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(<link linkend="_class_leap_internal_1_1_connection_1a377465e1fa8fffca68491ba5f52136a2">LeapBeginProfilingBlock</link>&#32;!=&#32;<emphasis role="keyword">null</emphasis>&#32;&amp;&amp;&#32;hasBegunProfilingForThread)&#32;{
+00222 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_leap_internal_1_1_connection_1a377465e1fa8fffca68491ba5f52136a2">LeapBeginProfilingBlock</link>(<emphasis role="keyword">new</emphasis>&#32;BeginProfilingBlockArgs(HANDLE_EVENT_PROFILER_BLOCK));
+00223 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00224 
+00225 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">switch</emphasis>&#32;(_msg.type)&#32;{
+00226 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">case</emphasis>&#32;<link linkend="_namespace_leap_internal_1aa0ca3ef781ee69ce6a3cee33d6067d1a">eLeapEventType</link>.eLeapEventType_None:
+00227 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">break</emphasis>;
+00228 
+00229 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">case</emphasis>&#32;<link linkend="_namespace_leap_internal_1aa0ca3ef781ee69ce6a3cee33d6067d1a">eLeapEventType</link>.eLeapEventType_Connection:
+00230 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;LEAP_CONNECTION_EVENT&#32;connection_evt;
+00231 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;StructMarshal&lt;LEAP_CONNECTION_EVENT&gt;.PtrToStruct(_msg.eventStructPtr,&#32;out&#32;connection_evt);
+00232 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;handleConnection(ref&#32;connection_evt);
+00233 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">break</emphasis>;
+00234 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">case</emphasis>&#32;<link linkend="_namespace_leap_internal_1aa0ca3ef781ee69ce6a3cee33d6067d1a">eLeapEventType</link>.eLeapEventType_ConnectionLost:
+00235 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;LEAP_CONNECTION_LOST_EVENT&#32;connection_lost_evt;
+00236 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;StructMarshal&lt;LEAP_CONNECTION_LOST_EVENT&gt;.PtrToStruct(_msg.eventStructPtr,&#32;out&#32;connection_lost_evt);
+00237 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;handleConnectionLost(ref&#32;connection_lost_evt);
+00238 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">break</emphasis>;
+00239 
+00240 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">case</emphasis>&#32;<link linkend="_namespace_leap_internal_1aa0ca3ef781ee69ce6a3cee33d6067d1a">eLeapEventType</link>.eLeapEventType_Device:
+00241 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;LEAP_DEVICE_EVENT&#32;device_evt;
+00242 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;StructMarshal&lt;LEAP_DEVICE_EVENT&gt;.PtrToStruct(_msg.eventStructPtr,&#32;out&#32;device_evt);
+00243 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;handleDevice(ref&#32;device_evt);
+00244 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">break</emphasis>;
+00245 
+00246 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;Note&#32;that&#32;unplugging&#32;a&#32;device&#32;generates&#32;an&#32;eLeapEventType_DeviceLost&#32;event</emphasis>
+00247 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;message,&#32;not&#32;a&#32;failure&#32;message.&#32;DeviceLost&#32;is&#32;further&#32;down.</emphasis>
+00248 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">case</emphasis>&#32;<link linkend="_namespace_leap_internal_1aa0ca3ef781ee69ce6a3cee33d6067d1a">eLeapEventType</link>.eLeapEventType_DeviceFailure:
+00249 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;LEAP_DEVICE_FAILURE_EVENT&#32;device_failure_evt;
+00250 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;StructMarshal&lt;LEAP_DEVICE_FAILURE_EVENT&gt;.PtrToStruct(_msg.eventStructPtr,&#32;out&#32;device_failure_evt);
+00251 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;handleFailedDevice(ref&#32;device_failure_evt);
+00252 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">break</emphasis>;
+00253 
+00254 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">case</emphasis>&#32;<link linkend="_namespace_leap_internal_1aa0ca3ef781ee69ce6a3cee33d6067d1a">eLeapEventType</link>.eLeapEventType_Policy:
+00255 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;LEAP_POLICY_EVENT&#32;policy_evt;
+00256 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;StructMarshal&lt;LEAP_POLICY_EVENT&gt;.PtrToStruct(_msg.eventStructPtr,&#32;out&#32;policy_evt);
+00257 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;handlePolicyChange(ref&#32;policy_evt);
+00258 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">break</emphasis>;
+00259 
+00260 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">case</emphasis>&#32;<link linkend="_namespace_leap_internal_1aa0ca3ef781ee69ce6a3cee33d6067d1a">eLeapEventType</link>.eLeapEventType_Tracking:
+00261 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;LEAP_TRACKING_EVENT&#32;tracking_evt;
+00262 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;StructMarshal&lt;LEAP_TRACKING_EVENT&gt;.PtrToStruct(_msg.eventStructPtr,&#32;out&#32;tracking_evt);
+00263 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;handleTrackingMessage(ref&#32;tracking_evt);
+00264 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">break</emphasis>;
+00265 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">case</emphasis>&#32;<link linkend="_namespace_leap_internal_1aa0ca3ef781ee69ce6a3cee33d6067d1a">eLeapEventType</link>.eLeapEventType_LogEvent:
+00266 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;LEAP_LOG_EVENT&#32;log_evt;
+00267 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;StructMarshal&lt;LEAP_LOG_EVENT&gt;.PtrToStruct(_msg.eventStructPtr,&#32;out&#32;log_evt);
+00268 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;reportLogMessage(ref&#32;log_evt);
+00269 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">break</emphasis>;
+00270 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">case</emphasis>&#32;<link linkend="_namespace_leap_internal_1aa0ca3ef781ee69ce6a3cee33d6067d1a">eLeapEventType</link>.eLeapEventType_DeviceLost:
+00271 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;LEAP_DEVICE_EVENT&#32;device_lost_evt;
+00272 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;StructMarshal&lt;LEAP_DEVICE_EVENT&gt;.PtrToStruct(_msg.eventStructPtr,&#32;out&#32;device_lost_evt);
+00273 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;handleLostDevice(ref&#32;device_lost_evt);
+00274 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">break</emphasis>;
+00275 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">case</emphasis>&#32;<link linkend="_namespace_leap_internal_1aa0ca3ef781ee69ce6a3cee33d6067d1a">eLeapEventType</link>.eLeapEventType_ConfigChange:
+00276 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;LEAP_CONFIG_CHANGE_EVENT&#32;config_change_evt;
+00277 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;StructMarshal&lt;LEAP_CONFIG_CHANGE_EVENT&gt;.PtrToStruct(_msg.eventStructPtr,&#32;out&#32;config_change_evt);
+00278 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;handleConfigChange(ref&#32;config_change_evt);
+00279 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">break</emphasis>;
+00280 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">case</emphasis>&#32;<link linkend="_namespace_leap_internal_1aa0ca3ef781ee69ce6a3cee33d6067d1a">eLeapEventType</link>.eLeapEventType_ConfigResponse:
+00281 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;handleConfigResponse(ref&#32;_msg);
+00282 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">break</emphasis>;
+00283 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">case</emphasis>&#32;<link linkend="_namespace_leap_internal_1aa0ca3ef781ee69ce6a3cee33d6067d1a">eLeapEventType</link>.eLeapEventType_DroppedFrame:
+00284 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;LEAP_DROPPED_FRAME_EVENT&#32;dropped_frame_evt;
+00285 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;StructMarshal&lt;LEAP_DROPPED_FRAME_EVENT&gt;.PtrToStruct(_msg.eventStructPtr,&#32;out&#32;dropped_frame_evt);
+00286 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;handleDroppedFrame(ref&#32;dropped_frame_evt);
+00287 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">break</emphasis>;
+00288 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">case</emphasis>&#32;<link linkend="_namespace_leap_internal_1aa0ca3ef781ee69ce6a3cee33d6067d1a">eLeapEventType</link>.eLeapEventType_Image:
+00289 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;LEAP_IMAGE_EVENT&#32;image_evt;
+00290 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;StructMarshal&lt;LEAP_IMAGE_EVENT&gt;.PtrToStruct(_msg.eventStructPtr,&#32;out&#32;image_evt);
+00291 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;handleImage(ref&#32;image_evt);
+00292 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">break</emphasis>;
+00293 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">case</emphasis>&#32;<link linkend="_namespace_leap_internal_1aa0ca3ef781ee69ce6a3cee33d6067d1a">eLeapEventType</link>.eLeapEventType_PointMappingChange:
+00294 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;LEAP_POINT_MAPPING_CHANGE_EVENT&#32;point_mapping_change_evt;
+00295 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;StructMarshal&lt;LEAP_POINT_MAPPING_CHANGE_EVENT&gt;.PtrToStruct(_msg.eventStructPtr,&#32;out&#32;point_mapping_change_evt);
+00296 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;handlePointMappingChange(ref&#32;point_mapping_change_evt);
+00297 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">break</emphasis>;
+00298 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">case</emphasis>&#32;<link linkend="_namespace_leap_internal_1aa0ca3ef781ee69ce6a3cee33d6067d1a">eLeapEventType</link>.eLeapEventType_HeadPose:
+00299 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;LEAP_HEAD_POSE_EVENT&#32;head_pose_event;
+00300 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;StructMarshal&lt;LEAP_HEAD_POSE_EVENT&gt;.PtrToStruct(_msg.eventStructPtr,&#32;out&#32;head_pose_event);
+00301 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;handleHeadPoseChange(ref&#32;head_pose_event);
+00302 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">break</emphasis>;
+00303 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}&#32;<emphasis role="comment">//switch&#32;on&#32;_msg.type</emphasis>
+00304 
+00305 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(<link linkend="_class_leap_internal_1_1_connection_1a2983273b0360e53dc42a7d6c6d2e5893">LeapEndProfilingBlock</link>&#32;!=&#32;<emphasis role="keyword">null</emphasis>&#32;&amp;&amp;&#32;hasBegunProfilingForThread)&#32;{
+00306 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_leap_internal_1_1_connection_1a2983273b0360e53dc42a7d6c6d2e5893">LeapEndProfilingBlock</link>(<emphasis role="keyword">new</emphasis>&#32;EndProfilingBlockArgs(HANDLE_EVENT_PROFILER_BLOCK));
+00307 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00308 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}&#32;<emphasis role="comment">//while&#32;running</emphasis>
+00309 &#32;&#32;&#32;&#32;&#32;&#32;}&#32;<emphasis role="keywordflow">catch</emphasis>&#32;(Exception&#32;e)&#32;{
+00310 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;Logger.Log(<emphasis role="stringliteral">&quot;Exception:&#32;&quot;</emphasis>&#32;+&#32;e);
+00311 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;_isRunning&#32;=&#32;<emphasis role="keyword">false</emphasis>;
+00312 &#32;&#32;&#32;&#32;&#32;&#32;}&#32;<emphasis role="keywordflow">finally</emphasis>&#32;{
+00313 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(<link linkend="_class_leap_internal_1_1_connection_1a424896b5a35580707284fa570e40138a">LeapEndProfilingForThread</link>&#32;!=&#32;<emphasis role="keyword">null</emphasis>&#32;&amp;&amp;&#32;hasBegunProfilingForThread)&#32;{
+00314 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_leap_internal_1_1_connection_1a424896b5a35580707284fa570e40138a">LeapEndProfilingForThread</link>(<emphasis role="keyword">new</emphasis>&#32;EndProfilingForThreadArgs());
+00315 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00316 &#32;&#32;&#32;&#32;&#32;&#32;}
+00317 &#32;&#32;&#32;&#32;}
+00318 
+00319 &#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;handleTrackingMessage(ref&#32;LEAP_TRACKING_EVENT&#32;trackingMsg)&#32;{
+00320 &#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_leap_internal_1_1_connection_1a96db7c09526d9f356b88c0c9fe2dea25">Frames</link>.Put(ref&#32;trackingMsg);
+00321 
+00322 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(<link linkend="_class_leap_internal_1_1_connection_1a66f84d7e27d1f9a33028ea0abbc89e6c">LeapFrame</link>&#32;!=&#32;<emphasis role="keyword">null</emphasis>)&#32;{
+00323 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_leap_internal_1_1_connection_1a66f84d7e27d1f9a33028ea0abbc89e6c">LeapFrame</link>.DispatchOnContext(<emphasis role="keyword">this</emphasis>,&#32;<link linkend="_class_leap_internal_1_1_connection_1a0b87a8b7adf1357944915bd206150db3">EventContext</link>,&#32;<emphasis role="keyword">new</emphasis>&#32;FrameEventArgs(<emphasis role="keyword">new</emphasis>&#32;Frame().CopyFrom(ref&#32;trackingMsg)));
+00324 &#32;&#32;&#32;&#32;&#32;&#32;}
+00325 &#32;&#32;&#32;&#32;}
+00326 
+<anchor xml:id="__connection_8cs_source_1l00327"/><link linkend="_class_leap_internal_1_1_connection_1aa148c941081bf9d79516bdba29f4195a">00327</link> &#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;UInt64&#32;<link linkend="_class_leap_internal_1_1_connection_1aa148c941081bf9d79516bdba29f4195a">GetInterpolatedFrameSize</link>(Int64&#32;time)&#32;{
+00328 &#32;&#32;&#32;&#32;&#32;&#32;UInt64&#32;size&#32;=&#32;0;
+00329 &#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_namespace_leap_internal_1ae50b07d24c508b84273392b6dcbea1d9">eLeapRS</link>&#32;result&#32;=&#32;<link linkend="_class_leap_internal_1_1_leap_c">LeapC</link>.<link linkend="_class_leap_internal_1_1_leap_c_1af4b7756a3307a082b6160d6e06d7f187">GetFrameSize</link>(_leapConnection,&#32;time,&#32;out&#32;size);
+00330 &#32;&#32;&#32;&#32;&#32;&#32;reportAbnormalResults(<emphasis role="stringliteral">&quot;LeapC&#32;get&#32;interpolated&#32;frame&#32;call&#32;was&#32;&quot;</emphasis>,&#32;result);
+00331 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;size;
+00332 &#32;&#32;&#32;&#32;}
+00333 
+<anchor xml:id="__connection_8cs_source_1l00334"/><link linkend="_class_leap_internal_1_1_connection_1a6162a9db0b86aec5d517b316136c31c7">00334</link> &#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;<link linkend="_class_leap_internal_1_1_connection_1a6162a9db0b86aec5d517b316136c31c7">GetInterpolatedFrame</link>(<link linkend="_class_leap_1_1_frame">Frame</link>&#32;toFill,&#32;Int64&#32;time)&#32;{
+00335 &#32;&#32;&#32;&#32;&#32;&#32;UInt64&#32;size&#32;=&#32;<link linkend="_class_leap_internal_1_1_connection_1aa148c941081bf9d79516bdba29f4195a">GetInterpolatedFrameSize</link>(time);
+00336 &#32;&#32;&#32;&#32;&#32;&#32;IntPtr&#32;trackingBuffer&#32;=&#32;Marshal.AllocHGlobal((Int32)size);
+00337 &#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_namespace_leap_internal_1ae50b07d24c508b84273392b6dcbea1d9">eLeapRS</link>&#32;result&#32;=&#32;<link linkend="_class_leap_internal_1_1_leap_c">LeapC</link>.<link linkend="_class_leap_internal_1_1_leap_c_1a37b93d6d332a4fb88714b1a7583c3ce8">InterpolateFrame</link>(_leapConnection,&#32;time,&#32;trackingBuffer,&#32;size);
+00338 &#32;&#32;&#32;&#32;&#32;&#32;reportAbnormalResults(<emphasis role="stringliteral">&quot;LeapC&#32;get&#32;interpolated&#32;frame&#32;call&#32;was&#32;&quot;</emphasis>,&#32;result);
+00339 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(result&#32;==&#32;<link linkend="_namespace_leap_internal_1ae50b07d24c508b84273392b6dcbea1d9">eLeapRS</link>.eLeapRS_Success)&#32;{
+00340 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_struct_leap_internal_1_1_l_e_a_p___t_r_a_c_k_i_n_g___e_v_e_n_t">LEAP_TRACKING_EVENT</link>&#32;tracking_evt;
+00341 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;StructMarshal&lt;LEAP_TRACKING_EVENT&gt;.PtrToStruct(trackingBuffer,&#32;out&#32;tracking_evt);
+00342 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;toFill.CopyFrom(ref&#32;tracking_evt);
+00343 &#32;&#32;&#32;&#32;&#32;&#32;}
+00344 &#32;&#32;&#32;&#32;&#32;&#32;Marshal.FreeHGlobal(trackingBuffer);
+00345 &#32;&#32;&#32;&#32;}
+00346 
+<anchor xml:id="__connection_8cs_source_1l00347"/><link linkend="_class_leap_internal_1_1_connection_1a810b5d68c8fc21d2080a3cc60ad50520">00347</link> &#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;<link linkend="_class_leap_internal_1_1_connection_1a810b5d68c8fc21d2080a3cc60ad50520">GetInterpolatedFrameFromTime</link>(<link linkend="_class_leap_1_1_frame">Frame</link>&#32;toFill,&#32;Int64&#32;time,&#32;Int64&#32;sourceTime)&#32;{
+00348 &#32;&#32;&#32;&#32;&#32;&#32;UInt64&#32;size&#32;=&#32;<link linkend="_class_leap_internal_1_1_connection_1aa148c941081bf9d79516bdba29f4195a">GetInterpolatedFrameSize</link>(time);
+00349 &#32;&#32;&#32;&#32;&#32;&#32;IntPtr&#32;trackingBuffer&#32;=&#32;Marshal.AllocHGlobal((Int32)size);
+00350 &#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_namespace_leap_internal_1ae50b07d24c508b84273392b6dcbea1d9">eLeapRS</link>&#32;result&#32;=&#32;<link linkend="_class_leap_internal_1_1_leap_c">LeapC</link>.<link linkend="_class_leap_internal_1_1_leap_c_1abfff5fb5bc86a2a4ddf10cdda77af006">InterpolateFrameFromTime</link>(_leapConnection,&#32;time,&#32;sourceTime,&#32;trackingBuffer,&#32;size);
+00351 &#32;&#32;&#32;&#32;&#32;&#32;reportAbnormalResults(<emphasis role="stringliteral">&quot;LeapC&#32;get&#32;interpolated&#32;frame&#32;from&#32;time&#32;call&#32;was&#32;&quot;</emphasis>,&#32;result);
+00352 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(result&#32;==&#32;<link linkend="_namespace_leap_internal_1ae50b07d24c508b84273392b6dcbea1d9">eLeapRS</link>.eLeapRS_Success)&#32;{
+00353 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_struct_leap_internal_1_1_l_e_a_p___t_r_a_c_k_i_n_g___e_v_e_n_t">LEAP_TRACKING_EVENT</link>&#32;tracking_evt;
+00354 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;StructMarshal&lt;LEAP_TRACKING_EVENT&gt;.PtrToStruct(trackingBuffer,&#32;out&#32;tracking_evt);
+00355 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;toFill.CopyFrom(ref&#32;tracking_evt);
+00356 &#32;&#32;&#32;&#32;&#32;&#32;}
+00357 &#32;&#32;&#32;&#32;&#32;&#32;Marshal.FreeHGlobal(trackingBuffer);
+00358 &#32;&#32;&#32;&#32;}
+00359 
+<anchor xml:id="__connection_8cs_source_1l00360"/><link linkend="_class_leap_internal_1_1_connection_1af2f03c0120eeadd2c5c4b394b0991a14">00360</link> &#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<link linkend="_class_leap_1_1_frame">Frame</link>&#32;<link linkend="_class_leap_internal_1_1_connection_1af2f03c0120eeadd2c5c4b394b0991a14">GetInterpolatedFrame</link>(Int64&#32;time)&#32;{
+00361 &#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_leap_1_1_frame">Frame</link>&#32;frame&#32;=&#32;<emphasis role="keyword">new</emphasis>&#32;<link linkend="_class_leap_1_1_frame">Frame</link>();
+00362 &#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_leap_internal_1_1_connection_1a6162a9db0b86aec5d517b316136c31c7">GetInterpolatedFrame</link>(frame,&#32;time);
+00363 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;frame;
+00364 &#32;&#32;&#32;&#32;}
+00365 
+<anchor xml:id="__connection_8cs_source_1l00366"/><link linkend="_class_leap_internal_1_1_connection_1a96355324ac7bacf3f563a45cebb5f878">00366</link> &#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;<link linkend="_class_leap_internal_1_1_connection_1a96355324ac7bacf3f563a45cebb5f878">GetInterpolatedHeadPose</link>(ref&#32;<link linkend="_struct_leap_internal_1_1_l_e_a_p___h_e_a_d___p_o_s_e___e_v_e_n_t">LEAP_HEAD_POSE_EVENT</link>&#32;toFill,&#32;Int64&#32;time)&#32;{
+00367 &#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_namespace_leap_internal_1ae50b07d24c508b84273392b6dcbea1d9">eLeapRS</link>&#32;result&#32;=&#32;<link linkend="_class_leap_internal_1_1_leap_c">LeapC</link>.<link linkend="_class_leap_internal_1_1_leap_c_1a392940c3224b3a95959cd96789902f4c">InterpolateHeadPose</link>(_leapConnection,&#32;time,&#32;ref&#32;toFill);
+00368 &#32;&#32;&#32;&#32;&#32;&#32;reportAbnormalResults(<emphasis role="stringliteral">&quot;LeapC&#32;get&#32;interpolated&#32;head&#32;pose&#32;call&#32;was&#32;&quot;</emphasis>,&#32;result);
+00369 &#32;&#32;&#32;&#32;}
+00370 
+<anchor xml:id="__connection_8cs_source_1l00371"/><link linkend="_class_leap_internal_1_1_connection_1a996b3f40f20bb45366b2f3b063b720b4">00371</link> &#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<link linkend="_struct_leap_internal_1_1_l_e_a_p___h_e_a_d___p_o_s_e___e_v_e_n_t">LEAP_HEAD_POSE_EVENT</link>&#32;<link linkend="_class_leap_internal_1_1_connection_1a996b3f40f20bb45366b2f3b063b720b4">GetInterpolatedHeadPose</link>(Int64&#32;time)&#32;{
+00372 &#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_struct_leap_internal_1_1_l_e_a_p___h_e_a_d___p_o_s_e___e_v_e_n_t">LEAP_HEAD_POSE_EVENT</link>&#32;headPoseEvent&#32;=&#32;<emphasis role="keyword">new</emphasis>&#32;<link linkend="_struct_leap_internal_1_1_l_e_a_p___h_e_a_d___p_o_s_e___e_v_e_n_t">LEAP_HEAD_POSE_EVENT</link>();
+00373 &#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_leap_internal_1_1_connection_1a96355324ac7bacf3f563a45cebb5f878">GetInterpolatedHeadPose</link>(ref&#32;headPoseEvent,&#32;time);
+00374 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;headPoseEvent;
+00375 &#32;&#32;&#32;&#32;}
+00376 
+<anchor xml:id="__connection_8cs_source_1l00377"/><link linkend="_class_leap_internal_1_1_connection_1a038ec58235de9d049bc3a11a07388403">00377</link> &#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;<link linkend="_class_leap_internal_1_1_connection_1a038ec58235de9d049bc3a11a07388403">GetInterpolatedLeftRightTransform</link>(Int64&#32;time,
+00378 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;Int64&#32;sourceTime,
+00379 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;Int64&#32;leftId,
+00380 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;Int64&#32;rightId,
+00381 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;out&#32;<link linkend="_struct_leap_1_1_leap_transform">LeapTransform</link>&#32;leftTransform,
+00382 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;out&#32;<link linkend="_struct_leap_1_1_leap_transform">LeapTransform</link>&#32;rightTransform)&#32;{
+00383 &#32;&#32;&#32;&#32;&#32;&#32;leftTransform&#32;=&#32;<link linkend="_struct_leap_1_1_leap_transform">LeapTransform</link>.<link linkend="_struct_leap_1_1_leap_transform_1a10de68df5cf1afa89c273a33d0629f16">Identity</link>;
+00384 &#32;&#32;&#32;&#32;&#32;&#32;rightTransform&#32;=&#32;<link linkend="_struct_leap_1_1_leap_transform">LeapTransform</link>.<link linkend="_struct_leap_1_1_leap_transform_1a10de68df5cf1afa89c273a33d0629f16">Identity</link>;
+00385 
+00386 &#32;&#32;&#32;&#32;&#32;&#32;UInt64&#32;size&#32;=&#32;<link linkend="_class_leap_internal_1_1_connection_1aa148c941081bf9d79516bdba29f4195a">GetInterpolatedFrameSize</link>(time);
+00387 &#32;&#32;&#32;&#32;&#32;&#32;IntPtr&#32;trackingBuffer&#32;=&#32;Marshal.AllocHGlobal((Int32)size);
+00388 &#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_namespace_leap_internal_1ae50b07d24c508b84273392b6dcbea1d9">eLeapRS</link>&#32;result&#32;=&#32;<link linkend="_class_leap_internal_1_1_leap_c">LeapC</link>.<link linkend="_class_leap_internal_1_1_leap_c_1abfff5fb5bc86a2a4ddf10cdda77af006">InterpolateFrameFromTime</link>(_leapConnection,&#32;time,&#32;sourceTime,&#32;trackingBuffer,&#32;size);
+00389 &#32;&#32;&#32;&#32;&#32;&#32;reportAbnormalResults(<emphasis role="stringliteral">&quot;LeapC&#32;get&#32;interpolated&#32;frame&#32;from&#32;time&#32;call&#32;was&#32;&quot;</emphasis>,&#32;result);
+00390 
+00391 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(result&#32;==&#32;<link linkend="_namespace_leap_internal_1ae50b07d24c508b84273392b6dcbea1d9">eLeapRS</link>.eLeapRS_Success)&#32;{
+00392 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_struct_leap_internal_1_1_l_e_a_p___t_r_a_c_k_i_n_g___e_v_e_n_t">LEAP_TRACKING_EVENT</link>&#32;tracking_evt;
+00393 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;StructMarshal&lt;LEAP_TRACKING_EVENT&gt;.PtrToStruct(trackingBuffer,&#32;out&#32;tracking_evt);
+00394 
+00395 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordtype">int</emphasis>&#32;id;
+00396 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_struct_leap_internal_1_1_l_e_a_p___v_e_c_t_o_r">LEAP_VECTOR</link>&#32;position;
+00397 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_struct_leap_internal_1_1_l_e_a_p___q_u_a_t_e_r_n_i_o_n">LEAP_QUATERNION</link>&#32;orientation;
+00398 
+00399 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordtype">long</emphasis>&#32;handPtr&#32;=&#32;tracking_evt.pHands.ToInt64();
+00400 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordtype">long</emphasis>&#32;idPtr&#32;=&#32;handPtr&#32;+&#32;_handIdOffset;
+00401 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordtype">long</emphasis>&#32;posPtr&#32;=&#32;handPtr&#32;+&#32;_handPositionOffset;
+00402 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordtype">long</emphasis>&#32;rotPtr&#32;=&#32;handPtr&#32;+&#32;_handOrientationOffset;
+00403 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordtype">int</emphasis>&#32;stride&#32;=&#32;StructMarshal&lt;LEAP_HAND&gt;.Size;
+00404 
+00405 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">for</emphasis>&#32;(uint&#32;i&#32;=&#32;tracking_evt.nHands;&#32;i--&#32;!=&#32;0;&#32;idPtr&#32;+=&#32;stride,&#32;posPtr&#32;+=&#32;stride,&#32;rotPtr&#32;+=&#32;stride)&#32;{
+00406 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordtype">id</emphasis>&#32;=&#32;Marshal.ReadInt32(<emphasis role="keyword">new</emphasis>&#32;IntPtr(idPtr));
+00407 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;StructMarshal&lt;LEAP_VECTOR&gt;.PtrToStruct(<emphasis role="keyword">new</emphasis>&#32;IntPtr(posPtr),&#32;out&#32;position);
+00408 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;StructMarshal&lt;LEAP_QUATERNION&gt;.PtrToStruct(<emphasis role="keyword">new</emphasis>&#32;IntPtr(rotPtr),&#32;out&#32;orientation);
+00409 
+00410 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_struct_leap_1_1_leap_transform">LeapTransform</link>&#32;transform&#32;=&#32;<emphasis role="keyword">new</emphasis>&#32;<link linkend="_struct_leap_1_1_leap_transform">LeapTransform</link>(position.ToLeapVector(),&#32;orientation.ToLeapQuaternion());
+00411 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(<emphasis role="keywordtype">id</emphasis>&#32;==&#32;leftId)&#32;{
+00412 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;leftTransform&#32;=&#32;transform;
+00413 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}&#32;<emphasis role="keywordflow">else</emphasis>&#32;<emphasis role="keywordflow">if</emphasis>&#32;(<emphasis role="keywordtype">id</emphasis>&#32;==&#32;rightId)&#32;{
+00414 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;rightTransform&#32;=&#32;transform;
+00415 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00416 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00417 &#32;&#32;&#32;&#32;&#32;&#32;}
+00418 
+00419 &#32;&#32;&#32;&#32;&#32;&#32;Marshal.FreeHGlobal(trackingBuffer);
+00420 &#32;&#32;&#32;&#32;}
+00421 
+00422 &#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;handleConnection(ref&#32;<link linkend="_struct_leap_internal_1_1_l_e_a_p___c_o_n_n_e_c_t_i_o_n___e_v_e_n_t">LEAP_CONNECTION_EVENT</link>&#32;connectionMsg)&#32;{
+00423 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(_leapConnectionEvent&#32;!=&#32;<emphasis role="keyword">null</emphasis>)&#32;{
+00424 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;_leapConnectionEvent.DispatchOnContext(<emphasis role="keyword">this</emphasis>,&#32;<link linkend="_class_leap_internal_1_1_connection_1a0b87a8b7adf1357944915bd206150db3">EventContext</link>,&#32;<emphasis role="keyword">new</emphasis>&#32;<link linkend="_class_leap_1_1_connection_event_args">ConnectionEventArgs</link>());
+00425 &#32;&#32;&#32;&#32;&#32;&#32;}
+00426 &#32;&#32;&#32;&#32;}
+00427 
+00428 &#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;handleConnectionLost(ref&#32;LEAP_CONNECTION_LOST_EVENT&#32;connectionMsg)&#32;{
+00429 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(<link linkend="_class_leap_internal_1_1_connection_1a352433b853a548790c8ad350e948fdd6">LeapConnectionLost</link>&#32;!=&#32;<emphasis role="keyword">null</emphasis>)&#32;{
+00430 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_leap_internal_1_1_connection_1a352433b853a548790c8ad350e948fdd6">LeapConnectionLost</link>.DispatchOnContext(<emphasis role="keyword">this</emphasis>,&#32;<link linkend="_class_leap_internal_1_1_connection_1a0b87a8b7adf1357944915bd206150db3">EventContext</link>,&#32;<emphasis role="keyword">new</emphasis>&#32;ConnectionLostEventArgs());
+00431 &#32;&#32;&#32;&#32;&#32;&#32;}
+00432 &#32;&#32;&#32;&#32;}
+00433 
+00434 &#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;handleDevice(ref&#32;LEAP_DEVICE_EVENT&#32;deviceMsg)&#32;{
+00435 &#32;&#32;&#32;&#32;&#32;&#32;IntPtr&#32;deviceHandle&#32;=&#32;deviceMsg.device.handle;
+00436 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(deviceHandle&#32;==&#32;IntPtr.Zero)
+00437 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>;
+00438 
+00439 &#32;&#32;&#32;&#32;&#32;&#32;LEAP_DEVICE_INFO&#32;deviceInfo&#32;=&#32;<emphasis role="keyword">new</emphasis>&#32;LEAP_DEVICE_INFO();
+00440 &#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_namespace_leap_internal_1ae50b07d24c508b84273392b6dcbea1d9">eLeapRS</link>&#32;result;
+00441 
+00442 &#32;&#32;&#32;&#32;&#32;&#32;IntPtr&#32;device;
+00443 &#32;&#32;&#32;&#32;&#32;&#32;result&#32;=&#32;LeapC.OpenDevice(deviceMsg.device,&#32;out&#32;device);
+00444 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(result&#32;!=&#32;<link linkend="_namespace_leap_internal_1ae50b07d24c508b84273392b6dcbea1d9">eLeapRS</link>.eLeapRS_Success)
+00445 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>;
+00446 
+00447 &#32;&#32;&#32;&#32;&#32;&#32;deviceInfo.serial&#32;=&#32;IntPtr.Zero;
+00448 &#32;&#32;&#32;&#32;&#32;&#32;deviceInfo.size&#32;=&#32;(uint)Marshal.SizeOf(deviceInfo);
+00449 &#32;&#32;&#32;&#32;&#32;&#32;result&#32;=&#32;LeapC.GetDeviceInfo(device,&#32;ref&#32;deviceInfo);&#32;<emphasis role="comment">//Query&#32;the&#32;serial&#32;length</emphasis>
+00450 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(result&#32;!=&#32;<link linkend="_namespace_leap_internal_1ae50b07d24c508b84273392b6dcbea1d9">eLeapRS</link>.eLeapRS_Success)
+00451 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>;
+00452 
+00453 &#32;&#32;&#32;&#32;&#32;&#32;deviceInfo.serial&#32;=&#32;Marshal.AllocCoTaskMem((<emphasis role="keywordtype">int</emphasis>)deviceInfo.serial_length);
+00454 &#32;&#32;&#32;&#32;&#32;&#32;result&#32;=&#32;LeapC.GetDeviceInfo(device,&#32;ref&#32;deviceInfo);&#32;<emphasis role="comment">//Query&#32;the&#32;serial</emphasis>
+00455 
+00456 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(result&#32;==&#32;<link linkend="_namespace_leap_internal_1ae50b07d24c508b84273392b6dcbea1d9">eLeapRS</link>.eLeapRS_Success)&#32;{
+00457 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;Device&#32;apiDevice&#32;=&#32;<emphasis role="keyword">new</emphasis>&#32;Device(deviceHandle,
+00458 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;deviceInfo.h_fov,&#32;<emphasis role="comment">//radians</emphasis>
+00459 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;deviceInfo.v_fov,&#32;<emphasis role="comment">//radians</emphasis>
+00460 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;deviceInfo.range&#32;/&#32;1000.0f,&#32;<emphasis role="comment">//to&#32;mm</emphasis>
+00461 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;deviceInfo.baseline&#32;/&#32;1000.0f,&#32;<emphasis role="comment">//to&#32;mm</emphasis>
+00462 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;(Device.DeviceType)deviceInfo.type,
+00463 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;(deviceInfo.status&#32;==&#32;<link linkend="_namespace_leap_internal_1a16b28ea79f39b6205c514b3e9b075bed">eLeapDeviceStatus</link>.eLeapDeviceStatus_Streaming),
+00464 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;Marshal.PtrToStringAnsi(deviceInfo.serial));
+00465 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;Marshal.FreeCoTaskMem(deviceInfo.serial);
+00466 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;_devices.<link linkend="_class_leap_1_1_device_list_1aaa399a6ea7549f315760300e5f07fa19">AddOrUpdate</link>(apiDevice);
+00467 
+00468 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(<link linkend="_class_leap_internal_1_1_connection_1ae1dd18505f75a72eea2abbeab57d7d01">LeapDevice</link>&#32;!=&#32;<emphasis role="keyword">null</emphasis>)&#32;{
+00469 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_leap_internal_1_1_connection_1ae1dd18505f75a72eea2abbeab57d7d01">LeapDevice</link>.DispatchOnContext(<emphasis role="keyword">this</emphasis>,&#32;<link linkend="_class_leap_internal_1_1_connection_1a0b87a8b7adf1357944915bd206150db3">EventContext</link>,&#32;<emphasis role="keyword">new</emphasis>&#32;DeviceEventArgs(apiDevice));
+00470 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00471 &#32;&#32;&#32;&#32;&#32;&#32;}
+00472 &#32;&#32;&#32;&#32;}
+00473 
+00474 &#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;handleLostDevice(ref&#32;LEAP_DEVICE_EVENT&#32;deviceMsg)&#32;{
+00475 &#32;&#32;&#32;&#32;&#32;&#32;Device&#32;lost&#32;=&#32;_devices.<link linkend="_class_leap_1_1_device_list_1a99b8acd4484498cc197520a89f287f78">FindDeviceByHandle</link>(deviceMsg.device.handle);
+00476 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(lost&#32;!=&#32;<emphasis role="keyword">null</emphasis>)&#32;{
+00477 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;_devices.Remove(lost);
+00478 
+00479 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(<link linkend="_class_leap_internal_1_1_connection_1a3c55a469e21efe1ceb92b90c636f9f67">LeapDeviceLost</link>&#32;!=&#32;<emphasis role="keyword">null</emphasis>)&#32;{
+00480 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_leap_internal_1_1_connection_1a3c55a469e21efe1ceb92b90c636f9f67">LeapDeviceLost</link>.DispatchOnContext(<emphasis role="keyword">this</emphasis>,&#32;<link linkend="_class_leap_internal_1_1_connection_1a0b87a8b7adf1357944915bd206150db3">EventContext</link>,&#32;<emphasis role="keyword">new</emphasis>&#32;DeviceEventArgs(lost));
+00481 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00482 &#32;&#32;&#32;&#32;&#32;&#32;}
+00483 &#32;&#32;&#32;&#32;}
+00484 
+00485 &#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;handleFailedDevice(ref&#32;LEAP_DEVICE_FAILURE_EVENT&#32;deviceMsg)&#32;{
+00486 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordtype">string</emphasis>&#32;failureMessage;
+00487 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordtype">string</emphasis>&#32;failedSerialNumber&#32;=&#32;<emphasis role="stringliteral">&quot;Unavailable&quot;</emphasis>;
+00488 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">switch</emphasis>&#32;(deviceMsg.status)&#32;{
+00489 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">case</emphasis>&#32;<link linkend="_namespace_leap_internal_1a16b28ea79f39b6205c514b3e9b075bed">eLeapDeviceStatus</link>.eLeapDeviceStatus_BadCalibration:
+00490 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;failureMessage&#32;=&#32;<emphasis role="stringliteral">&quot;Bad&#32;Calibration.&#32;Device&#32;failed&#32;because&#32;of&#32;a&#32;bad&#32;calibration&#32;record.&quot;</emphasis>;
+00491 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">break</emphasis>;
+00492 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">case</emphasis>&#32;<link linkend="_namespace_leap_internal_1a16b28ea79f39b6205c514b3e9b075bed">eLeapDeviceStatus</link>.eLeapDeviceStatus_BadControl:
+00493 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;failureMessage&#32;=&#32;<emphasis role="stringliteral">&quot;Bad&#32;Control&#32;Interface.&#32;Device&#32;failed&#32;because&#32;of&#32;a&#32;USB&#32;control&#32;interface&#32;error.&quot;</emphasis>;
+00494 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">break</emphasis>;
+00495 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">case</emphasis>&#32;<link linkend="_namespace_leap_internal_1a16b28ea79f39b6205c514b3e9b075bed">eLeapDeviceStatus</link>.eLeapDeviceStatus_BadFirmware:
+00496 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;failureMessage&#32;=&#32;<emphasis role="stringliteral">&quot;Bad&#32;Firmware.&#32;Device&#32;failed&#32;because&#32;of&#32;a&#32;firmware&#32;error.&quot;</emphasis>;
+00497 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">break</emphasis>;
+00498 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">case</emphasis>&#32;<link linkend="_namespace_leap_internal_1a16b28ea79f39b6205c514b3e9b075bed">eLeapDeviceStatus</link>.eLeapDeviceStatus_BadTransport:
+00499 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;failureMessage&#32;=&#32;<emphasis role="stringliteral">&quot;Bad&#32;Transport.&#32;Device&#32;failed&#32;because&#32;of&#32;a&#32;USB&#32;communication&#32;error.&quot;</emphasis>;
+00500 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">break</emphasis>;
+00501 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">default</emphasis>:
+00502 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;failureMessage&#32;=&#32;<emphasis role="stringliteral">&quot;Device&#32;failed&#32;for&#32;an&#32;unknown&#32;reason&quot;</emphasis>;
+00503 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">break</emphasis>;
+00504 &#32;&#32;&#32;&#32;&#32;&#32;}
+00505 &#32;&#32;&#32;&#32;&#32;&#32;Device&#32;failed&#32;=&#32;_devices.<link linkend="_class_leap_1_1_device_list_1a99b8acd4484498cc197520a89f287f78">FindDeviceByHandle</link>(deviceMsg.hDevice);
+00506 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(failed&#32;!=&#32;<emphasis role="keyword">null</emphasis>)&#32;{
+00507 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;_devices.Remove(failed);
+00508 &#32;&#32;&#32;&#32;&#32;&#32;}
+00509 
+00510 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(<link linkend="_class_leap_internal_1_1_connection_1a8f5dd0ee804342d59a2a28046a2c0e44">LeapDeviceFailure</link>&#32;!=&#32;<emphasis role="keyword">null</emphasis>)&#32;{
+00511 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_leap_internal_1_1_connection_1a8f5dd0ee804342d59a2a28046a2c0e44">LeapDeviceFailure</link>.DispatchOnContext(<emphasis role="keyword">this</emphasis>,&#32;<link linkend="_class_leap_internal_1_1_connection_1a0b87a8b7adf1357944915bd206150db3">EventContext</link>,
+00512 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">new</emphasis>&#32;DeviceFailureEventArgs((uint)deviceMsg.status,&#32;failureMessage,&#32;failedSerialNumber));
+00513 &#32;&#32;&#32;&#32;&#32;&#32;}
+00514 &#32;&#32;&#32;&#32;}
+00515 
+00516 &#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;handleConfigChange(ref&#32;LEAP_CONFIG_CHANGE_EVENT&#32;configEvent)&#32;{
+00517 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordtype">string</emphasis>&#32;config_key&#32;=&#32;<emphasis role="stringliteral">&quot;&quot;</emphasis>;
+00518 &#32;&#32;&#32;&#32;&#32;&#32;_configRequests.TryGetValue(configEvent.requestId,&#32;out&#32;config_key);
+00519 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(config_key&#32;!=&#32;<emphasis role="keyword">null</emphasis>)
+00520 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;_configRequests.Remove(configEvent.requestId);
+00521 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(<link linkend="_class_leap_internal_1_1_connection_1a6f56c66bbecc957ca227d894dcf16e96">LeapConfigChange</link>&#32;!=&#32;<emphasis role="keyword">null</emphasis>)&#32;{
+00522 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_leap_internal_1_1_connection_1a6f56c66bbecc957ca227d894dcf16e96">LeapConfigChange</link>.DispatchOnContext(<emphasis role="keyword">this</emphasis>,&#32;<link linkend="_class_leap_internal_1_1_connection_1a0b87a8b7adf1357944915bd206150db3">EventContext</link>,
+00523 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">new</emphasis>&#32;ConfigChangeEventArgs(config_key,&#32;configEvent.status&#32;!=&#32;<emphasis role="keyword">false</emphasis>,&#32;configEvent.requestId));
+00524 &#32;&#32;&#32;&#32;&#32;&#32;}
+00525 &#32;&#32;&#32;&#32;}
+00526 
+00527 &#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;handleConfigResponse(ref&#32;LEAP_CONNECTION_MESSAGE&#32;configMsg)&#32;{
+00528 &#32;&#32;&#32;&#32;&#32;&#32;LEAP_CONFIG_RESPONSE_EVENT&#32;config_response_evt;
+00529 &#32;&#32;&#32;&#32;&#32;&#32;StructMarshal&lt;LEAP_CONFIG_RESPONSE_EVENT&gt;.PtrToStruct(configMsg.eventStructPtr,&#32;out&#32;config_response_evt);
+00530 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordtype">string</emphasis>&#32;config_key&#32;=&#32;<emphasis role="stringliteral">&quot;&quot;</emphasis>;
+00531 &#32;&#32;&#32;&#32;&#32;&#32;_configRequests.TryGetValue(config_response_evt.requestId,&#32;out&#32;config_key);
+00532 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(config_key&#32;!=&#32;<emphasis role="keyword">null</emphasis>)
+00533 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;_configRequests.Remove(config_response_evt.requestId);
+00534 
+00535 &#32;&#32;&#32;&#32;&#32;&#32;Config.ValueType&#32;dataType;
+00536 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordtype">object</emphasis>&#32;value;
+00537 &#32;&#32;&#32;&#32;&#32;&#32;uint&#32;requestId&#32;=&#32;config_response_evt.requestId;
+00538 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(config_response_evt.value.type&#32;!=&#32;<link linkend="_namespace_leap_internal_1a9c15e305893cd05c1ec6d65cea48737c">eLeapValueType</link>.eLeapValueType_String)&#32;{
+00539 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">switch</emphasis>&#32;(config_response_evt.value.type)&#32;{
+00540 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">case</emphasis>&#32;<link linkend="_namespace_leap_internal_1a9c15e305893cd05c1ec6d65cea48737c">eLeapValueType</link>.eLeapValueType_Boolean:
+00541 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;dataType&#32;=&#32;Config.ValueType.TYPE_BOOLEAN;
+00542 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;value&#32;=&#32;config_response_evt.value.boolValue;
+00543 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">break</emphasis>;
+00544 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">case</emphasis>&#32;<link linkend="_namespace_leap_internal_1a9c15e305893cd05c1ec6d65cea48737c">eLeapValueType</link>.eLeapValueType_Int32:
+00545 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;dataType&#32;=&#32;Config.ValueType.TYPE_INT32;
+00546 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;value&#32;=&#32;config_response_evt.value.intValue;
+00547 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">break</emphasis>;
+00548 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">case</emphasis>&#32;<link linkend="_namespace_leap_internal_1a9c15e305893cd05c1ec6d65cea48737c">eLeapValueType</link>.eLeapValueType_Float:
+00549 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;dataType&#32;=&#32;Config.ValueType.TYPE_FLOAT;
+00550 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;value&#32;=&#32;config_response_evt.value.floatValue;
+00551 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">break</emphasis>;
+00552 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">default</emphasis>:
+00553 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;dataType&#32;=&#32;Config.ValueType.TYPE_UNKNOWN;
+00554 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;value&#32;=&#32;<emphasis role="keyword">new</emphasis>&#32;object();
+00555 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">break</emphasis>;
+00556 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00557 &#32;&#32;&#32;&#32;&#32;&#32;}&#32;<emphasis role="keywordflow">else</emphasis>&#32;{
+00558 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;LEAP_CONFIG_RESPONSE_EVENT_WITH_REF_TYPE&#32;config_ref_value;
+00559 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;StructMarshal&lt;LEAP_CONFIG_RESPONSE_EVENT_WITH_REF_TYPE&gt;.PtrToStruct(configMsg.eventStructPtr,&#32;out&#32;config_ref_value);
+00560 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;dataType&#32;=&#32;Config.ValueType.TYPE_STRING;
+00561 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;value&#32;=&#32;config_ref_value.value.stringValue;
+00562 &#32;&#32;&#32;&#32;&#32;&#32;}
+00563 &#32;&#32;&#32;&#32;&#32;&#32;SetConfigResponseEventArgs&#32;args&#32;=&#32;<emphasis role="keyword">new</emphasis>&#32;SetConfigResponseEventArgs(config_key,&#32;dataType,&#32;value,&#32;requestId);
+00564 
+00565 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(<link linkend="_class_leap_internal_1_1_connection_1a87dae2d17dfa76d622d710bf69c08c82">LeapConfigResponse</link>&#32;!=&#32;<emphasis role="keyword">null</emphasis>)&#32;{
+00566 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_leap_internal_1_1_connection_1a87dae2d17dfa76d622d710bf69c08c82">LeapConfigResponse</link>.DispatchOnContext(<emphasis role="keyword">this</emphasis>,&#32;<link linkend="_class_leap_internal_1_1_connection_1a0b87a8b7adf1357944915bd206150db3">EventContext</link>,&#32;args);
+00567 &#32;&#32;&#32;&#32;&#32;&#32;}
+00568 &#32;&#32;&#32;&#32;}
+00569 
+00570 &#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;reportLogMessage(ref&#32;LEAP_LOG_EVENT&#32;logMsg)&#32;{
+00571 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(<link linkend="_class_leap_internal_1_1_connection_1a435f5b54b81790b604a4ef1f9b630d5e">LeapLogEvent</link>&#32;!=&#32;<emphasis role="keyword">null</emphasis>)&#32;{
+00572 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_leap_internal_1_1_connection_1a435f5b54b81790b604a4ef1f9b630d5e">LeapLogEvent</link>.DispatchOnContext(<emphasis role="keyword">this</emphasis>,&#32;<link linkend="_class_leap_internal_1_1_connection_1a0b87a8b7adf1357944915bd206150db3">EventContext</link>,&#32;<emphasis role="keyword">new</emphasis>&#32;LogEventArgs(publicSeverity(logMsg.severity),&#32;logMsg.timestamp,&#32;Marshal.PtrToStringAnsi(logMsg.message)));
+00573 &#32;&#32;&#32;&#32;&#32;&#32;}
+00574 &#32;&#32;&#32;&#32;}
+00575 
+00576 &#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;<link linkend="_namespace_leap_1a4341f6495947222d3a86fcbb0c2b629d">MessageSeverity</link>&#32;publicSeverity(<link linkend="_namespace_leap_internal_1ae47258155c35d1f200b0dd25bd0adb5b">eLeapLogSeverity</link>&#32;leapCSeverity)&#32;{
+00577 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">switch</emphasis>&#32;(leapCSeverity)&#32;{
+00578 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">case</emphasis>&#32;<link linkend="_namespace_leap_internal_1ae47258155c35d1f200b0dd25bd0adb5b">eLeapLogSeverity</link>.eLeapLogSeverity_Unknown:
+00579 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;<link linkend="_namespace_leap_1a4341f6495947222d3a86fcbb0c2b629d">MessageSeverity</link>.MESSAGE_UNKNOWN;
+00580 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">case</emphasis>&#32;<link linkend="_namespace_leap_internal_1ae47258155c35d1f200b0dd25bd0adb5b">eLeapLogSeverity</link>.eLeapLogSeverity_Information:
+00581 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;<link linkend="_namespace_leap_1a4341f6495947222d3a86fcbb0c2b629d">MessageSeverity</link>.MESSAGE_INFORMATION;
+00582 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">case</emphasis>&#32;<link linkend="_namespace_leap_internal_1ae47258155c35d1f200b0dd25bd0adb5b">eLeapLogSeverity</link>.eLeapLogSeverity_Warning:
+00583 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;<link linkend="_namespace_leap_1a4341f6495947222d3a86fcbb0c2b629d">MessageSeverity</link>.MESSAGE_WARNING;
+00584 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">case</emphasis>&#32;<link linkend="_namespace_leap_internal_1ae47258155c35d1f200b0dd25bd0adb5b">eLeapLogSeverity</link>.eLeapLogSeverity_Critical:
+00585 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;<link linkend="_namespace_leap_1a4341f6495947222d3a86fcbb0c2b629d">MessageSeverity</link>.MESSAGE_CRITICAL;
+00586 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">default</emphasis>:
+00587 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;<link linkend="_namespace_leap_1a4341f6495947222d3a86fcbb0c2b629d">MessageSeverity</link>.MESSAGE_UNKNOWN;
+00588 &#32;&#32;&#32;&#32;&#32;&#32;}
+00589 &#32;&#32;&#32;&#32;}
+00590 
+00591 &#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;handlePointMappingChange(ref&#32;LEAP_POINT_MAPPING_CHANGE_EVENT&#32;pointMapping)&#32;{
+00592 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(<link linkend="_class_leap_internal_1_1_connection_1ae000281d4cf2fbced911ff97b31f4035">LeapPointMappingChange</link>&#32;!=&#32;<emphasis role="keyword">null</emphasis>)&#32;{
+00593 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_leap_internal_1_1_connection_1ae000281d4cf2fbced911ff97b31f4035">LeapPointMappingChange</link>.DispatchOnContext(<emphasis role="keyword">this</emphasis>,&#32;<link linkend="_class_leap_internal_1_1_connection_1a0b87a8b7adf1357944915bd206150db3">EventContext</link>,&#32;<emphasis role="keyword">new</emphasis>&#32;PointMappingChangeEventArgs(pointMapping.frame_id,&#32;pointMapping.timestamp,&#32;pointMapping.nPoints));
+00594 &#32;&#32;&#32;&#32;&#32;&#32;}
+00595 &#32;&#32;&#32;&#32;}
+00596 
+00597 &#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;handleDroppedFrame(ref&#32;LEAP_DROPPED_FRAME_EVENT&#32;droppedFrame)&#32;{
+00598 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(<link linkend="_class_leap_internal_1_1_connection_1a7542907a2116216ac90ab2a88599b3a6">LeapDroppedFrame</link>&#32;!=&#32;<emphasis role="keyword">null</emphasis>)&#32;{
+00599 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_leap_internal_1_1_connection_1a7542907a2116216ac90ab2a88599b3a6">LeapDroppedFrame</link>.DispatchOnContext(<emphasis role="keyword">this</emphasis>,&#32;<link linkend="_class_leap_internal_1_1_connection_1a0b87a8b7adf1357944915bd206150db3">EventContext</link>,&#32;<emphasis role="keyword">new</emphasis>&#32;DroppedFrameEventArgs(droppedFrame.frame_id,&#32;droppedFrame.reason));
+00600 &#32;&#32;&#32;&#32;&#32;&#32;}
+00601 &#32;&#32;&#32;&#32;}
+00602 
+00603 &#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;handleHeadPoseChange(ref&#32;LEAP_HEAD_POSE_EVENT&#32;headPose)&#32;{
+00604 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(<link linkend="_class_leap_internal_1_1_connection_1ae8fb7ce09bced652e319aada4a8e3755">LeapHeadPoseChange</link>&#32;!=&#32;<emphasis role="keyword">null</emphasis>)&#32;{
+00605 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_leap_internal_1_1_connection_1ae8fb7ce09bced652e319aada4a8e3755">LeapHeadPoseChange</link>.DispatchOnContext(<emphasis role="keyword">this</emphasis>,&#32;<link linkend="_class_leap_internal_1_1_connection_1a0b87a8b7adf1357944915bd206150db3">EventContext</link>,&#32;<emphasis role="keyword">new</emphasis>&#32;HeadPoseEventArgs(headPose.head_position,&#32;headPose.head_orientation));
+00606 &#32;&#32;&#32;&#32;&#32;&#32;}
+00607 &#32;&#32;&#32;&#32;}
+00608 
+00609 &#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;DistortionData&#32;createDistortionData(LEAP_IMAGE&#32;image,&#32;Image.CameraType&#32;camera)&#32;{
+00610 &#32;&#32;&#32;&#32;&#32;&#32;DistortionData&#32;distortionData&#32;=&#32;<emphasis role="keyword">new</emphasis>&#32;DistortionData();
+00611 &#32;&#32;&#32;&#32;&#32;&#32;distortionData.Version&#32;=&#32;image.matrix_version;
+00612 &#32;&#32;&#32;&#32;&#32;&#32;distortionData.Width&#32;=&#32;LeapC.DistortionSize;&#32;<emphasis role="comment">//fixed&#32;value&#32;for&#32;now</emphasis>
+00613 &#32;&#32;&#32;&#32;&#32;&#32;distortionData.Height&#32;=&#32;LeapC.DistortionSize;&#32;<emphasis role="comment">//fixed&#32;value&#32;for&#32;now</emphasis>
+00614 
+00615 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//Visit&#32;LeapC.h&#32;for&#32;more&#32;details.&#32;&#32;We&#32;need&#32;to&#32;marshal&#32;the&#32;float&#32;data&#32;manually</emphasis>
+00616 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//since&#32;the&#32;distortion&#32;struct&#32;cannot&#32;be&#32;represented&#32;safely&#32;in&#32;c#</emphasis>
+00617 &#32;&#32;&#32;&#32;&#32;&#32;distortionData.Data&#32;=&#32;<emphasis role="keyword">new</emphasis>&#32;<emphasis role="keywordtype">float</emphasis>[(int)(distortionData.Width&#32;*&#32;distortionData.Height&#32;*&#32;2)];&#32;<emphasis role="comment">//2&#32;float&#32;values&#32;per&#32;map&#32;point</emphasis>
+00618 &#32;&#32;&#32;&#32;&#32;&#32;Marshal.Copy(image.distortionMatrix,&#32;distortionData.Data,&#32;0,&#32;distortionData.Data.Length);
+00619 
+00620 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(<link linkend="_class_leap_internal_1_1_connection_1ab1618ad3b9b1ed17ccd43a2461d277d7">LeapDistortionChange</link>&#32;!=&#32;<emphasis role="keyword">null</emphasis>)&#32;{
+00621 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_leap_internal_1_1_connection_1ab1618ad3b9b1ed17ccd43a2461d277d7">LeapDistortionChange</link>.DispatchOnContext(<emphasis role="keyword">this</emphasis>,&#32;<link linkend="_class_leap_internal_1_1_connection_1a0b87a8b7adf1357944915bd206150db3">EventContext</link>,&#32;<emphasis role="keyword">new</emphasis>&#32;DistortionEventArgs(distortionData,&#32;camera));
+00622 &#32;&#32;&#32;&#32;&#32;&#32;}
+00623 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;distortionData;
+00624 &#32;&#32;&#32;&#32;}
+00625 
+00626 &#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;handleImage(ref&#32;LEAP_IMAGE_EVENT&#32;imageMsg)&#32;{
+00627 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(<link linkend="_class_leap_internal_1_1_connection_1a7ff7e1c77a92cba83e8d59e75f8074db">LeapImage</link>&#32;!=&#32;<emphasis role="keyword">null</emphasis>)&#32;{
+00628 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//Update&#32;distortion&#32;data,&#32;if&#32;changed</emphasis>
+00629 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;((_currentLeftDistortionData.<link linkend="_class_leap_1_1_distortion_data_1a60b1ec4aa610af0fcf89a78df52b9c17">Version</link>&#32;!=&#32;imageMsg.leftImage.matrix_version)&#32;||&#32;!_currentLeftDistortionData.<link linkend="_class_leap_1_1_distortion_data_1aeb36d5a10f923ea3067bce076c69e3fd">IsValid</link>)&#32;{
+00630 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;_currentLeftDistortionData&#32;=&#32;createDistortionData(imageMsg.leftImage,&#32;Image.CameraType.LEFT);
+00631 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00632 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;((_currentRightDistortionData.<link linkend="_class_leap_1_1_distortion_data_1a60b1ec4aa610af0fcf89a78df52b9c17">Version</link>&#32;!=&#32;imageMsg.rightImage.matrix_version)&#32;||&#32;!_currentRightDistortionData.<link linkend="_class_leap_1_1_distortion_data_1aeb36d5a10f923ea3067bce076c69e3fd">IsValid</link>)&#32;{
+00633 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;_currentRightDistortionData&#32;=&#32;createDistortionData(imageMsg.rightImage,&#32;Image.CameraType.RIGHT);
+00634 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00635 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;ImageData&#32;leftImage&#32;=&#32;<emphasis role="keyword">new</emphasis>&#32;ImageData(Image.CameraType.LEFT,&#32;imageMsg.leftImage,&#32;_currentLeftDistortionData);
+00636 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;ImageData&#32;rightImage&#32;=&#32;<emphasis role="keyword">new</emphasis>&#32;ImageData(Image.CameraType.RIGHT,&#32;imageMsg.rightImage,&#32;_currentRightDistortionData);
+00637 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;Image&#32;stereoImage&#32;=&#32;<emphasis role="keyword">new</emphasis>&#32;Image(imageMsg.info.frame_id,&#32;imageMsg.info.timestamp,&#32;leftImage,&#32;rightImage);
+00638 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_leap_internal_1_1_connection_1a7ff7e1c77a92cba83e8d59e75f8074db">LeapImage</link>.DispatchOnContext(<emphasis role="keyword">this</emphasis>,&#32;<link linkend="_class_leap_internal_1_1_connection_1a0b87a8b7adf1357944915bd206150db3">EventContext</link>,&#32;<emphasis role="keyword">new</emphasis>&#32;ImageEventArgs(stereoImage));
+00639 &#32;&#32;&#32;&#32;&#32;&#32;}
+00640 &#32;&#32;&#32;&#32;}
+00641 
+00642 &#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;handlePolicyChange(ref&#32;LEAP_POLICY_EVENT&#32;policyMsg)&#32;{
+00643 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(<link linkend="_class_leap_internal_1_1_connection_1ac3d23b7ad9ca1224f70f1718873bb1c2">LeapPolicyChange</link>&#32;!=&#32;<emphasis role="keyword">null</emphasis>)&#32;{
+00644 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_leap_internal_1_1_connection_1ac3d23b7ad9ca1224f70f1718873bb1c2">LeapPolicyChange</link>.DispatchOnContext(<emphasis role="keyword">this</emphasis>,&#32;<link linkend="_class_leap_internal_1_1_connection_1a0b87a8b7adf1357944915bd206150db3">EventContext</link>,&#32;<emphasis role="keyword">new</emphasis>&#32;PolicyEventArgs(policyMsg.current_policy,&#32;_activePolicies));
+00645 &#32;&#32;&#32;&#32;&#32;&#32;}
+00646 
+00647 &#32;&#32;&#32;&#32;&#32;&#32;_activePolicies&#32;=&#32;policyMsg.current_policy;
+00648 
+00649 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(_activePolicies&#32;!=&#32;_requestedPolicies)&#32;{
+00650 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;This&#32;could&#32;happen&#32;when&#32;config&#32;is&#32;turned&#32;off,&#32;or</emphasis>
+00651 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;this&#32;is&#32;the&#32;policy&#32;change&#32;event&#32;from&#32;the&#32;last&#32;SetPolicy,&#32;after&#32;that,&#32;the&#32;user&#32;called&#32;SetPolicy&#32;again</emphasis>
+00652 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//TODO&#32;handle&#32;failure&#32;to&#32;set&#32;desired&#32;policy&#32;--&#32;maybe&#32;a&#32;PolicyDenied&#32;event</emphasis>
+00653 &#32;&#32;&#32;&#32;&#32;&#32;}
+00654 &#32;&#32;&#32;&#32;}
+00655 
+<anchor xml:id="__connection_8cs_source_1l00656"/><link linkend="_class_leap_internal_1_1_connection_1a973bcc5a80165662305ca53cc153ffaf">00656</link> &#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;<link linkend="_class_leap_internal_1_1_connection_1a973bcc5a80165662305ca53cc153ffaf">SetPolicy</link>(<link linkend="_class_leap_1_1_controller">Controller</link>.<link linkend="_class_leap_1_1_controller_1a0bdb49fa94aa2da8b098c1ac296528d6">PolicyFlag</link>&#32;policy)&#32;{
+00657 &#32;&#32;&#32;&#32;&#32;&#32;UInt64&#32;setFlags&#32;=&#32;(ulong)flagForPolicy(policy);
+00658 &#32;&#32;&#32;&#32;&#32;&#32;_requestedPolicies&#32;=&#32;_requestedPolicies&#32;|&#32;setFlags;
+00659 &#32;&#32;&#32;&#32;&#32;&#32;setFlags&#32;=&#32;_requestedPolicies;
+00660 &#32;&#32;&#32;&#32;&#32;&#32;UInt64&#32;clearFlags&#32;=&#32;~_requestedPolicies;&#32;<emphasis role="comment">//inverse&#32;of&#32;desired&#32;policies</emphasis>
+00661 
+00662 &#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_namespace_leap_internal_1ae50b07d24c508b84273392b6dcbea1d9">eLeapRS</link>&#32;result&#32;=&#32;<link linkend="_class_leap_internal_1_1_leap_c">LeapC</link>.<link linkend="_class_leap_internal_1_1_leap_c_1aeba99ff7b5740de9709a1535ca6d8ae4">SetPolicyFlags</link>(_leapConnection,&#32;setFlags,&#32;clearFlags);
+00663 &#32;&#32;&#32;&#32;&#32;&#32;reportAbnormalResults(<emphasis role="stringliteral">&quot;LeapC&#32;SetPolicyFlags&#32;call&#32;was&#32;&quot;</emphasis>,&#32;result);
+00664 &#32;&#32;&#32;&#32;}
+00665 
+<anchor xml:id="__connection_8cs_source_1l00666"/><link linkend="_class_leap_internal_1_1_connection_1add28c0b2f62ef7b394e194989ad3b424">00666</link> &#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;<link linkend="_class_leap_internal_1_1_connection_1add28c0b2f62ef7b394e194989ad3b424">ClearPolicy</link>(<link linkend="_class_leap_1_1_controller">Controller</link>.<link linkend="_class_leap_1_1_controller_1a0bdb49fa94aa2da8b098c1ac296528d6">PolicyFlag</link>&#32;policy)&#32;{
+00667 &#32;&#32;&#32;&#32;&#32;&#32;UInt64&#32;clearFlags&#32;=&#32;(ulong)flagForPolicy(policy);
+00668 &#32;&#32;&#32;&#32;&#32;&#32;_requestedPolicies&#32;=&#32;_requestedPolicies&#32;&amp;&#32;~clearFlags;
+00669 &#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_namespace_leap_internal_1ae50b07d24c508b84273392b6dcbea1d9">eLeapRS</link>&#32;result&#32;=&#32;<link linkend="_class_leap_internal_1_1_leap_c">LeapC</link>.<link linkend="_class_leap_internal_1_1_leap_c_1aeba99ff7b5740de9709a1535ca6d8ae4">SetPolicyFlags</link>(_leapConnection,&#32;_requestedPolicies,&#32;~_requestedPolicies);
+00670 &#32;&#32;&#32;&#32;&#32;&#32;reportAbnormalResults(<emphasis role="stringliteral">&quot;LeapC&#32;SetPolicyFlags&#32;call&#32;was&#32;&quot;</emphasis>,&#32;result);
+00671 &#32;&#32;&#32;&#32;}
+00672 
+00673 &#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;<link linkend="_namespace_leap_internal_1abf43a1780899ea756a686f838b7117be">eLeapPolicyFlag</link>&#32;flagForPolicy(<link linkend="_class_leap_1_1_controller">Controller</link>.<link linkend="_class_leap_1_1_controller_1a0bdb49fa94aa2da8b098c1ac296528d6">PolicyFlag</link>&#32;singlePolicy)&#32;{
+00674 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">switch</emphasis>&#32;(singlePolicy)&#32;{
+00675 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">case</emphasis>&#32;<link linkend="_class_leap_1_1_controller">Controller</link>.<link linkend="_class_leap_1_1_controller_1a0bdb49fa94aa2da8b098c1ac296528d6">PolicyFlag</link>.POLICY_BACKGROUND_FRAMES:
+00676 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;<link linkend="_namespace_leap_internal_1abf43a1780899ea756a686f838b7117be">eLeapPolicyFlag</link>.eLeapPolicyFlag_BackgroundFrames;
+00677 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">case</emphasis>&#32;<link linkend="_class_leap_1_1_controller">Controller</link>.<link linkend="_class_leap_1_1_controller_1a0bdb49fa94aa2da8b098c1ac296528d6">PolicyFlag</link>.POLICY_IMAGES:
+00678 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;<link linkend="_namespace_leap_internal_1abf43a1780899ea756a686f838b7117be">eLeapPolicyFlag</link>.eLeapPolicyFlag_Images;
+00679 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">case</emphasis>&#32;<link linkend="_class_leap_1_1_controller">Controller</link>.<link linkend="_class_leap_1_1_controller_1a0bdb49fa94aa2da8b098c1ac296528d6">PolicyFlag</link>.POLICY_OPTIMIZE_HMD:
+00680 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;<link linkend="_namespace_leap_internal_1abf43a1780899ea756a686f838b7117be">eLeapPolicyFlag</link>.eLeapPolicyFlag_OptimizeHMD;
+00681 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">case</emphasis>&#32;<link linkend="_class_leap_1_1_controller">Controller</link>.<link linkend="_class_leap_1_1_controller_1a0bdb49fa94aa2da8b098c1ac296528d6">PolicyFlag</link>.POLICY_ALLOW_PAUSE_RESUME:
+00682 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;<link linkend="_namespace_leap_internal_1abf43a1780899ea756a686f838b7117be">eLeapPolicyFlag</link>.eLeapPolicyFlag_AllowPauseResume;
+00683 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">case</emphasis>&#32;<link linkend="_class_leap_1_1_controller">Controller</link>.<link linkend="_class_leap_1_1_controller_1a0bdb49fa94aa2da8b098c1ac296528d6">PolicyFlag</link>.POLICY_MAP_POINTS:
+00684 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;<link linkend="_namespace_leap_internal_1abf43a1780899ea756a686f838b7117be">eLeapPolicyFlag</link>.eLeapPolicyFlag_MapPoints;
+00685 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">case</emphasis>&#32;<link linkend="_class_leap_1_1_controller">Controller</link>.<link linkend="_class_leap_1_1_controller_1a0bdb49fa94aa2da8b098c1ac296528d6">PolicyFlag</link>.POLICY_DEFAULT:
+00686 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;0;
+00687 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">default</emphasis>:
+00688 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;0;
+00689 &#32;&#32;&#32;&#32;&#32;&#32;}
+00690 &#32;&#32;&#32;&#32;}
+00691 
+<anchor xml:id="__connection_8cs_source_1l00707"/><link linkend="_class_leap_internal_1_1_connection_1a6e2e5ee305e33e8d8c3782708e53b95c">00707</link> &#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keywordtype">bool</emphasis>&#32;<link linkend="_class_leap_internal_1_1_connection_1a6e2e5ee305e33e8d8c3782708e53b95c">IsPolicySet</link>(<link linkend="_class_leap_1_1_controller">Controller</link>.<link linkend="_class_leap_1_1_controller_1a0bdb49fa94aa2da8b098c1ac296528d6">PolicyFlag</link>&#32;policy)&#32;{
+00708 &#32;&#32;&#32;&#32;&#32;&#32;UInt64&#32;policyToCheck&#32;=&#32;(ulong)flagForPolicy(policy);
+00709 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;(_activePolicies&#32;&amp;&#32;policyToCheck)&#32;==&#32;policyToCheck;
+00710 &#32;&#32;&#32;&#32;}
+00711 
+<anchor xml:id="__connection_8cs_source_1l00712"/><link linkend="_class_leap_internal_1_1_connection_1a3083380baac8141b0d5bdf28a5f0666e">00712</link> &#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;uint&#32;<link linkend="_class_leap_internal_1_1_connection_1a3083380baac8141b0d5bdf28a5f0666e">GetConfigValue</link>(<emphasis role="keywordtype">string</emphasis>&#32;config_key)&#32;{
+00713 &#32;&#32;&#32;&#32;&#32;&#32;uint&#32;requestId&#32;=&#32;0;
+00714 &#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_namespace_leap_internal_1ae50b07d24c508b84273392b6dcbea1d9">eLeapRS</link>&#32;result&#32;=&#32;<link linkend="_class_leap_internal_1_1_leap_c">LeapC</link>.<link linkend="_class_leap_internal_1_1_leap_c_1a9dd1b57cd651b609b45e8e476802f86b">RequestConfigValue</link>(_leapConnection,&#32;config_key,&#32;out&#32;requestId);
+00715 &#32;&#32;&#32;&#32;&#32;&#32;reportAbnormalResults(<emphasis role="stringliteral">&quot;LeapC&#32;RequestConfigValue&#32;call&#32;was&#32;&quot;</emphasis>,&#32;result);
+00716 &#32;&#32;&#32;&#32;&#32;&#32;_configRequests[requestId]&#32;=&#32;config_key;
+00717 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;requestId;
+00718 &#32;&#32;&#32;&#32;}
+00719 
+<anchor xml:id="__connection_8cs_source_1l00720"/><link linkend="_class_leap_internal_1_1_connection_1ae223cb1838efbbe1cb1f65fcd970fe05">00720</link> &#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;uint&#32;<link linkend="_class_leap_internal_1_1_connection_1ae223cb1838efbbe1cb1f65fcd970fe05">SetConfigValue&lt;T&gt;</link>(<emphasis role="keywordtype">string</emphasis>&#32;config_key,&#32;T&#32;value)&#32;where&#32;T&#32;:&#32;IConvertible&#32;{
+00721 &#32;&#32;&#32;&#32;&#32;&#32;uint&#32;requestId&#32;=&#32;0;
+00722 &#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_namespace_leap_internal_1ae50b07d24c508b84273392b6dcbea1d9">eLeapRS</link>&#32;result;
+00723 &#32;&#32;&#32;&#32;&#32;&#32;Type&#32;dataType&#32;=&#32;value.GetType();
+00724 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(dataType&#32;==&#32;typeof(<emphasis role="keywordtype">bool</emphasis>))&#32;{
+00725 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;result&#32;=&#32;<link linkend="_class_leap_internal_1_1_leap_c">LeapC</link>.SaveConfigValue(_leapConnection,&#32;config_key,&#32;Convert.ToBoolean(value),&#32;out&#32;requestId);
+00726 &#32;&#32;&#32;&#32;&#32;&#32;}&#32;<emphasis role="keywordflow">else</emphasis>&#32;<emphasis role="keywordflow">if</emphasis>&#32;(dataType&#32;==&#32;typeof(Int32))&#32;{
+00727 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;result&#32;=&#32;<link linkend="_class_leap_internal_1_1_leap_c">LeapC</link>.SaveConfigValue(_leapConnection,&#32;config_key,&#32;Convert.ToInt32(value),&#32;out&#32;requestId);
+00728 &#32;&#32;&#32;&#32;&#32;&#32;}&#32;<emphasis role="keywordflow">else</emphasis>&#32;<emphasis role="keywordflow">if</emphasis>&#32;(dataType&#32;==&#32;typeof(<emphasis role="keywordtype">float</emphasis>))&#32;{
+00729 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;result&#32;=&#32;<link linkend="_class_leap_internal_1_1_leap_c">LeapC</link>.SaveConfigValue(_leapConnection,&#32;config_key,&#32;Convert.ToSingle(value),&#32;out&#32;requestId);
+00730 &#32;&#32;&#32;&#32;&#32;&#32;}&#32;<emphasis role="keywordflow">else</emphasis>&#32;<emphasis role="keywordflow">if</emphasis>&#32;(dataType&#32;==&#32;typeof(<emphasis role="keywordtype">string</emphasis>))&#32;{
+00731 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;result&#32;=&#32;<link linkend="_class_leap_internal_1_1_leap_c">LeapC</link>.SaveConfigValue(_leapConnection,&#32;config_key,&#32;Convert.ToString(value),&#32;out&#32;requestId);
+00732 &#32;&#32;&#32;&#32;&#32;&#32;}&#32;<emphasis role="keywordflow">else</emphasis>&#32;{
+00733 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">throw</emphasis>&#32;<emphasis role="keyword">new</emphasis>&#32;ArgumentException(<emphasis role="stringliteral">&quot;Only&#32;boolean,&#32;Int32,&#32;float,&#32;and&#32;string&#32;types&#32;are&#32;supported.&quot;</emphasis>);
+00734 &#32;&#32;&#32;&#32;&#32;&#32;}
+00735 &#32;&#32;&#32;&#32;&#32;&#32;reportAbnormalResults(<emphasis role="stringliteral">&quot;LeapC&#32;SaveConfigValue&#32;call&#32;was&#32;&quot;</emphasis>,&#32;result);
+00736 &#32;&#32;&#32;&#32;&#32;&#32;_configRequests[requestId]&#32;=&#32;config_key;
+00737 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;requestId;
+00738 &#32;&#32;&#32;&#32;}
+00739 
+<anchor xml:id="__connection_8cs_source_1l00745"/><link linkend="_class_leap_internal_1_1_connection_1a29fc660760e7b7de559f01aa11be1abe">00745</link> &#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keywordtype">bool</emphasis>&#32;<link linkend="_class_leap_internal_1_1_connection_1a29fc660760e7b7de559f01aa11be1abe">IsServiceConnected</link>&#32;{
+00746 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">get</emphasis>&#32;{
+00747 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(_leapConnection&#32;==&#32;IntPtr.Zero)
+00748 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;<emphasis role="keyword">false</emphasis>;
+00749 
+00750 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_struct_leap_internal_1_1_l_e_a_p___c_o_n_n_e_c_t_i_o_n___i_n_f_o">LEAP_CONNECTION_INFO</link>&#32;pInfo&#32;=&#32;<emphasis role="keyword">new</emphasis>&#32;<link linkend="_struct_leap_internal_1_1_l_e_a_p___c_o_n_n_e_c_t_i_o_n___i_n_f_o">LEAP_CONNECTION_INFO</link>();
+00751 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;pInfo.<link linkend="_struct_leap_internal_1_1_l_e_a_p___c_o_n_n_e_c_t_i_o_n___i_n_f_o_1a5428e50901ec7335e8450706a26e180a">size</link>&#32;=&#32;(uint)Marshal.SizeOf(pInfo);
+00752 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_namespace_leap_internal_1ae50b07d24c508b84273392b6dcbea1d9">eLeapRS</link>&#32;result&#32;=&#32;<link linkend="_class_leap_internal_1_1_leap_c">LeapC</link>.<link linkend="_class_leap_internal_1_1_leap_c_1abaf56f46dac48027a36aa0c08d94abbf">GetConnectionInfo</link>(_leapConnection,&#32;ref&#32;pInfo);
+00753 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;reportAbnormalResults(<emphasis role="stringliteral">&quot;LeapC&#32;GetConnectionInfo&#32;call&#32;was&#32;&quot;</emphasis>,&#32;result);
+00754 
+00755 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(pInfo.status&#32;==&#32;<link linkend="_namespace_leap_internal_1a98a6a4220fcab393d11bf4ec2eecdea6">eLeapConnectionStatus</link>.eLeapConnectionStatus_Connected)
+00756 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;<emphasis role="keyword">true</emphasis>;
+00757 
+00758 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;<emphasis role="keyword">false</emphasis>;
+00759 &#32;&#32;&#32;&#32;&#32;&#32;}
+00760 &#32;&#32;&#32;&#32;}
+00761 
+<anchor xml:id="__connection_8cs_source_1l00775"/><link linkend="_class_leap_internal_1_1_connection_1a986b77cb70270ee5d44d1d83db845dfe">00775</link> &#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<link linkend="_class_leap_1_1_device_list">DeviceList</link>&#32;<link linkend="_class_leap_internal_1_1_connection_1a986b77cb70270ee5d44d1d83db845dfe">Devices</link>&#32;{
+00776 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">get</emphasis>&#32;{
+00777 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(_devices&#32;==&#32;<emphasis role="keyword">null</emphasis>)&#32;{
+00778 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;_devices&#32;=&#32;<emphasis role="keyword">new</emphasis>&#32;<link linkend="_class_leap_1_1_device_list">DeviceList</link>();
+00779 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00780 
+00781 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;_devices;
+00782 &#32;&#32;&#32;&#32;&#32;&#32;}
+00783 &#32;&#32;&#32;&#32;}
+00784 
+<anchor xml:id="__connection_8cs_source_1l00785"/><link linkend="_class_leap_internal_1_1_connection_1ae45e28603b9dd28c0c30b8f57f2a3366">00785</link> &#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<link linkend="_class_leap_1_1_failed_device_list">FailedDeviceList</link>&#32;<link linkend="_class_leap_internal_1_1_connection_1ae45e28603b9dd28c0c30b8f57f2a3366">FailedDevices</link>&#32;{
+00786 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">get</emphasis>&#32;{
+00787 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(_failedDevices&#32;==&#32;<emphasis role="keyword">null</emphasis>)&#32;{
+00788 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;_failedDevices&#32;=&#32;<emphasis role="keyword">new</emphasis>&#32;<link linkend="_class_leap_1_1_failed_device_list">FailedDeviceList</link>();
+00789 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00790 
+00791 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;_failedDevices;
+00792 &#32;&#32;&#32;&#32;&#32;&#32;}
+00793 &#32;&#32;&#32;&#32;}
+00794 
+<anchor xml:id="__connection_8cs_source_1l00795"/><link linkend="_class_leap_internal_1_1_connection_1ac5ddffb50ba506fb3465c8a966beca95">00795</link> &#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<link linkend="_struct_leap_1_1_vector">Vector</link>&#32;<link linkend="_class_leap_internal_1_1_connection_1ac5ddffb50ba506fb3465c8a966beca95">PixelToRectilinear</link>(<link linkend="_class_leap_1_1_image">Image</link>.<link linkend="_class_leap_1_1_image_1a28310e43e0f2d7f7117e1b45330bdc38">CameraType</link>&#32;camera,&#32;<link linkend="_struct_leap_1_1_vector">Vector</link>&#32;pixel)&#32;{
+00796 &#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_struct_leap_internal_1_1_l_e_a_p___v_e_c_t_o_r">LEAP_VECTOR</link>&#32;pixelStruct&#32;=&#32;<emphasis role="keyword">new</emphasis>&#32;<link linkend="_struct_leap_internal_1_1_l_e_a_p___v_e_c_t_o_r">LEAP_VECTOR</link>(pixel);
+00797 &#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_struct_leap_internal_1_1_l_e_a_p___v_e_c_t_o_r">LEAP_VECTOR</link>&#32;ray&#32;=&#32;<link linkend="_class_leap_internal_1_1_leap_c">LeapC</link>.<link linkend="_class_leap_internal_1_1_leap_c_1ab1e8d614352632f79ca05e23a617ceb3">LeapPixelToRectilinear</link>(_leapConnection,
+00798 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;(camera&#32;==&#32;<link linkend="_class_leap_1_1_image">Image</link>.<link linkend="_class_leap_1_1_image_1a28310e43e0f2d7f7117e1b45330bdc38">CameraType</link>.LEFT&#32;?
+00799 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_namespace_leap_internal_1af2a2bc35637b8a453ff772a09a0987a1">eLeapPerspectiveType</link>.eLeapPerspectiveType_stereo_left&#32;:
+00800 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_namespace_leap_internal_1af2a2bc35637b8a453ff772a09a0987a1">eLeapPerspectiveType</link>.eLeapPerspectiveType_stereo_right),
+00801 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;pixelStruct);
+00802 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;<emphasis role="keyword">new</emphasis>&#32;<link linkend="_struct_leap_1_1_vector">Vector</link>(ray.<link linkend="_struct_leap_internal_1_1_l_e_a_p___v_e_c_t_o_r_1a5a641abc075b71fc0a9f3bed31a2d0f0">x</link>,&#32;ray.<link linkend="_struct_leap_internal_1_1_l_e_a_p___v_e_c_t_o_r_1a590c426ffd4e8ade9475dba1e85433dd">y</link>,&#32;ray.<link linkend="_struct_leap_internal_1_1_l_e_a_p___v_e_c_t_o_r_1af1fc4bf9c27138af9d077175709c68ef">z</link>);
+00803 &#32;&#32;&#32;&#32;}
+00804 
+<anchor xml:id="__connection_8cs_source_1l00805"/><link linkend="_class_leap_internal_1_1_connection_1ac5c43c1a0c01488e8f67935e9d412117">00805</link> &#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<link linkend="_struct_leap_1_1_vector">Vector</link>&#32;<link linkend="_class_leap_internal_1_1_connection_1ac5c43c1a0c01488e8f67935e9d412117">RectilinearToPixel</link>(<link linkend="_class_leap_1_1_image">Image</link>.<link linkend="_class_leap_1_1_image_1a28310e43e0f2d7f7117e1b45330bdc38">CameraType</link>&#32;camera,&#32;<link linkend="_struct_leap_1_1_vector">Vector</link>&#32;ray)&#32;{
+00806 &#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_struct_leap_internal_1_1_l_e_a_p___v_e_c_t_o_r">LEAP_VECTOR</link>&#32;rayStruct&#32;=&#32;<emphasis role="keyword">new</emphasis>&#32;<link linkend="_struct_leap_internal_1_1_l_e_a_p___v_e_c_t_o_r">LEAP_VECTOR</link>(ray);
+00807 &#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_struct_leap_internal_1_1_l_e_a_p___v_e_c_t_o_r">LEAP_VECTOR</link>&#32;pixel&#32;=&#32;<link linkend="_class_leap_internal_1_1_leap_c">LeapC</link>.<link linkend="_class_leap_internal_1_1_leap_c_1a5703368f930a99b4f05a475273eb90b9">LeapRectilinearToPixel</link>(_leapConnection,
+00808 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;(camera&#32;==&#32;<link linkend="_class_leap_1_1_image">Image</link>.<link linkend="_class_leap_1_1_image_1a28310e43e0f2d7f7117e1b45330bdc38">CameraType</link>.LEFT&#32;?
+00809 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_namespace_leap_internal_1af2a2bc35637b8a453ff772a09a0987a1">eLeapPerspectiveType</link>.eLeapPerspectiveType_stereo_left&#32;:
+00810 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_namespace_leap_internal_1af2a2bc35637b8a453ff772a09a0987a1">eLeapPerspectiveType</link>.eLeapPerspectiveType_stereo_right),
+00811 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;rayStruct);
+00812 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;<emphasis role="keyword">new</emphasis>&#32;<link linkend="_struct_leap_1_1_vector">Vector</link>(pixel.<link linkend="_struct_leap_internal_1_1_l_e_a_p___v_e_c_t_o_r_1a5a641abc075b71fc0a9f3bed31a2d0f0">x</link>,&#32;pixel.<link linkend="_struct_leap_internal_1_1_l_e_a_p___v_e_c_t_o_r_1a590c426ffd4e8ade9475dba1e85433dd">y</link>,&#32;pixel.<link linkend="_struct_leap_internal_1_1_l_e_a_p___v_e_c_t_o_r_1af1fc4bf9c27138af9d077175709c68ef">z</link>);
+00813 &#32;&#32;&#32;&#32;}
+00814 
+<anchor xml:id="__connection_8cs_source_1l00815"/><link linkend="_class_leap_internal_1_1_connection_1a26d1326d5ad65d3ac3daa5bc65e2d367">00815</link> &#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;<link linkend="_class_leap_internal_1_1_connection_1a26d1326d5ad65d3ac3daa5bc65e2d367">TelemetryProfiling</link>(ref&#32;<link linkend="_struct_leap_internal_1_1_l_e_a_p___t_e_l_e_m_e_t_r_y___d_a_t_a">LEAP_TELEMETRY_DATA</link>&#32;telemetryData)&#32;{
+00816 &#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_namespace_leap_internal_1ae50b07d24c508b84273392b6dcbea1d9">eLeapRS</link>&#32;result&#32;=&#32;<link linkend="_class_leap_internal_1_1_leap_c">LeapC</link>.<link linkend="_class_leap_internal_1_1_leap_c_1a8c04b0435063d992e7fba8815547fa5e">LeapTelemetryProfiling</link>(_leapConnection,&#32;ref&#32;telemetryData);
+00817 &#32;&#32;&#32;&#32;&#32;&#32;reportAbnormalResults(<emphasis role="stringliteral">&quot;LeapC&#32;TelemetryProfiling&#32;call&#32;was&#32;&quot;</emphasis>,&#32;result);
+00818 &#32;&#32;&#32;&#32;}
+00819 
+<anchor xml:id="__connection_8cs_source_1l00820"/><link linkend="_class_leap_internal_1_1_connection_1ac5abf5861bb14690a4b6c84ca57c9c6e">00820</link> &#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;<link linkend="_class_leap_internal_1_1_connection_1ac5abf5861bb14690a4b6c84ca57c9c6e">GetPointMapping</link>(ref&#32;<link linkend="_struct_leap_1_1_point_mapping">PointMapping</link>&#32;pm)&#32;{
+00821 &#32;&#32;&#32;&#32;&#32;&#32;UInt64&#32;size&#32;=&#32;0;
+00822 &#32;&#32;&#32;&#32;&#32;&#32;IntPtr&#32;buffer&#32;=&#32;IntPtr.Zero;
+00823 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">while</emphasis>&#32;(<emphasis role="keyword">true</emphasis>)&#32;{
+00824 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_namespace_leap_internal_1ae50b07d24c508b84273392b6dcbea1d9">eLeapRS</link>&#32;result&#32;=&#32;<link linkend="_class_leap_internal_1_1_leap_c">LeapC</link>.<link linkend="_class_leap_internal_1_1_leap_c_1a39052bbaaa77cce6bf489a8cdc57d12a">GetPointMapping</link>(_leapConnection,&#32;buffer,&#32;ref&#32;size);
+00825 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(result&#32;==&#32;<link linkend="_namespace_leap_internal_1ae50b07d24c508b84273392b6dcbea1d9">eLeapRS</link>.eLeapRS_InsufficientBuffer)&#32;{
+00826 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(buffer&#32;!=&#32;IntPtr.Zero)
+00827 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;Marshal.FreeHGlobal(buffer);
+00828 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;buffer&#32;=&#32;Marshal.AllocHGlobal((Int32)size);
+00829 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">continue</emphasis>;
+00830 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00831 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;reportAbnormalResults(<emphasis role="stringliteral">&quot;LeapC&#32;get&#32;point&#32;mapping&#32;call&#32;was&#32;&quot;</emphasis>,&#32;result);
+00832 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(result&#32;!=&#32;<link linkend="_namespace_leap_internal_1ae50b07d24c508b84273392b6dcbea1d9">eLeapRS</link>.eLeapRS_Success)&#32;{
+00833 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;pm.points&#32;=&#32;<emphasis role="keyword">null</emphasis>;
+00834 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;pm.ids&#32;=&#32;<emphasis role="keyword">null</emphasis>;
+00835 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>;
+00836 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00837 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">break</emphasis>;
+00838 &#32;&#32;&#32;&#32;&#32;&#32;}
+00839 &#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_struct_leap_internal_1_1_l_e_a_p___p_o_i_n_t___m_a_p_p_i_n_g">LEAP_POINT_MAPPING</link>&#32;pmi;
+00840 &#32;&#32;&#32;&#32;&#32;&#32;StructMarshal&lt;LEAP_POINT_MAPPING&gt;.PtrToStruct(buffer,&#32;out&#32;pmi);
+00841 &#32;&#32;&#32;&#32;&#32;&#32;Int32&#32;nPoints&#32;=&#32;(Int32)pmi.<link linkend="_struct_leap_internal_1_1_l_e_a_p___p_o_i_n_t___m_a_p_p_i_n_g_1af98fd422b5a03bbce6185c9cac581e53">nPoints</link>;
+00842 
+00843 &#32;&#32;&#32;&#32;&#32;&#32;pm.frameId&#32;=&#32;pmi.frame_id;
+00844 &#32;&#32;&#32;&#32;&#32;&#32;pm.timestamp&#32;=&#32;pmi.timestamp;
+00845 &#32;&#32;&#32;&#32;&#32;&#32;pm.points&#32;=&#32;<emphasis role="keyword">new</emphasis>&#32;<link linkend="_struct_leap_1_1_vector">Vector</link>[nPoints];
+00846 &#32;&#32;&#32;&#32;&#32;&#32;pm.ids&#32;=&#32;<emphasis role="keyword">new</emphasis>&#32;UInt32[nPoints];
+00847 
+00848 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordtype">float</emphasis>[]&#32;points&#32;=&#32;<emphasis role="keyword">new</emphasis>&#32;<emphasis role="keywordtype">float</emphasis>[3&#32;*&#32;nPoints];
+00849 &#32;&#32;&#32;&#32;&#32;&#32;Int32[]&#32;ids&#32;=&#32;<emphasis role="keyword">new</emphasis>&#32;Int32[nPoints];
+00850 &#32;&#32;&#32;&#32;&#32;&#32;Marshal.Copy(pmi.points,&#32;points,&#32;0,&#32;3&#32;*&#32;nPoints);
+00851 &#32;&#32;&#32;&#32;&#32;&#32;Marshal.Copy(pmi.ids,&#32;ids,&#32;0,&#32;nPoints);
+00852 
+00853 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordtype">int</emphasis>&#32;j&#32;=&#32;0;
+00854 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">for</emphasis>&#32;(<emphasis role="keywordtype">int</emphasis>&#32;i&#32;=&#32;0;&#32;i&#32;&lt;&#32;nPoints;&#32;i++)&#32;{
+00855 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;pm.points[i].<link linkend="_struct_leap_1_1_vector_1aa567a19970c776ccb9ebe9a09cb14828">x</link>&#32;=&#32;points[j++];
+00856 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;pm.points[i].y&#32;=&#32;points[j++];
+00857 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;pm.points[i].z&#32;=&#32;points[j++];
+00858 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;pm.ids[i]&#32;=&#32;unchecked((UInt32)ids[i]);
+00859 &#32;&#32;&#32;&#32;&#32;&#32;}
+00860 &#32;&#32;&#32;&#32;&#32;&#32;Marshal.FreeHGlobal(buffer);
+00861 &#32;&#32;&#32;&#32;}
+00862 
+00863 &#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;<link linkend="_namespace_leap_internal_1ae50b07d24c508b84273392b6dcbea1d9">eLeapRS</link>&#32;_lastResult;&#32;<emphasis role="comment">//Used&#32;to&#32;avoid&#32;repeating&#32;the&#32;same&#32;log&#32;message,&#32;ie.&#32;for&#32;events&#32;like&#32;time&#32;out</emphasis>
+00864 &#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;reportAbnormalResults(<emphasis role="keywordtype">string</emphasis>&#32;context,&#32;<link linkend="_namespace_leap_internal_1ae50b07d24c508b84273392b6dcbea1d9">eLeapRS</link>&#32;result)&#32;{
+00865 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(result&#32;!=&#32;<link linkend="_namespace_leap_internal_1ae50b07d24c508b84273392b6dcbea1d9">eLeapRS</link>.eLeapRS_Success&#32;&amp;&amp;
+00866 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;result&#32;!=&#32;_lastResult)&#32;{
+00867 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordtype">string</emphasis>&#32;msg&#32;=&#32;context&#32;+&#32;<emphasis role="stringliteral">&quot;&#32;&quot;</emphasis>&#32;+&#32;result;
+00868 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(<link linkend="_class_leap_internal_1_1_connection_1a435f5b54b81790b604a4ef1f9b630d5e">LeapLogEvent</link>&#32;!=&#32;<emphasis role="keyword">null</emphasis>)&#32;{
+00869 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_leap_internal_1_1_connection_1a435f5b54b81790b604a4ef1f9b630d5e">LeapLogEvent</link>.DispatchOnContext(<emphasis role="keyword">this</emphasis>,&#32;<link linkend="_class_leap_internal_1_1_connection_1a0b87a8b7adf1357944915bd206150db3">EventContext</link>,
+00870 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">new</emphasis>&#32;<link linkend="_class_leap_1_1_log_event_args">LogEventArgs</link>(<link linkend="_namespace_leap_1a4341f6495947222d3a86fcbb0c2b629d">MessageSeverity</link>.MESSAGE_CRITICAL,
+00871 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_leap_internal_1_1_leap_c">LeapC</link>.<link linkend="_class_leap_internal_1_1_leap_c_1a92e9bb730041df4094e328bcf326da47">GetNow</link>(),
+00872 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;msg));
+00873 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00874 &#32;&#32;&#32;&#32;&#32;&#32;}
+00875 &#32;&#32;&#32;&#32;&#32;&#32;_lastResult&#32;=&#32;result;
+00876 &#32;&#32;&#32;&#32;}
+00877 &#32;&#32;}
+00878 }
+</programlisting></section>

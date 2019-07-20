@@ -1,0 +1,958 @@
+<?xml version='1.0' encoding='UTF-8' standalone='no'?>
+<section xmlns="http://docbook.org/ns/docbook" version="5.0" xmlns:xlink="http://www.w3.org/1999/xlink" xml:id="__runtime_gizmo_manager_8cs_source">
+<title>RuntimeGizmoManager.cs</title>
+<indexterm><primary>O:/GitHUBMINIPRoject/Assets/LeapMotion/Core/Scripts/Utils/RuntimeGizmoManager.cs</primary></indexterm>
+<programlisting>00001 <emphasis role="comment">/******************************************************************************</emphasis>
+00002 <emphasis role="comment">&#32;*&#32;Copyright&#32;(C)&#32;Leap&#32;Motion,&#32;Inc.&#32;2011-2018.&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;*</emphasis>
+00003 <emphasis role="comment">&#32;*&#32;Leap&#32;Motion&#32;proprietary&#32;and&#32;confidential.&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;*</emphasis>
+00004 <emphasis role="comment">&#32;*&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;*</emphasis>
+00005 <emphasis role="comment">&#32;*&#32;Use&#32;subject&#32;to&#32;the&#32;terms&#32;of&#32;the&#32;Leap&#32;Motion&#32;SDK&#32;Agreement&#32;available&#32;at&#32;&#32;&#32;&#32;&#32;*</emphasis>
+00006 <emphasis role="comment">&#32;*&#32;https://developer.leapmotion.com/sdk_agreement,&#32;or&#32;another&#32;agreement&#32;&#32;&#32;&#32;&#32;&#32;&#32;*</emphasis>
+00007 <emphasis role="comment">&#32;*&#32;between&#32;Leap&#32;Motion&#32;and&#32;you,&#32;your&#32;company&#32;or&#32;other&#32;organization.&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;*</emphasis>
+00008 <emphasis role="comment">&#32;******************************************************************************/</emphasis>
+00009 
+00010 <emphasis role="keyword">using</emphasis>&#32;<link linkend="__balloon_8cs_1a7d67e097df9376eb709b6a23aa3c7d23">UnityEngine</link>;
+00011 <emphasis role="keyword">using</emphasis>&#32;<link linkend="_namespace_unity_engine">UnityEngine</link>.SceneManagement;
+00012 <emphasis role="keyword">using</emphasis>&#32;System;
+00013 <emphasis role="keyword">using</emphasis>&#32;System.Collections.Generic;
+00014 <emphasis role="keyword">using</emphasis>&#32;<link linkend="_namespace_leap">Leap</link>.<link linkend="_namespace_leap_1_1_unity">Unity</link>.<link linkend="_namespace_leap_1_1_unity_1_1_infix">Infix</link>;
+00015 
+00016 <emphasis role="keyword">namespace&#32;</emphasis><link linkend="_namespace_leap_1_1_unity_1_1_runtime_gizmos">Leap.Unity.RuntimeGizmos</link>&#32;{
+00017 
+<anchor xml:id="__runtime_gizmo_manager_8cs_source_1l00022"/><link linkend="_interface_leap_1_1_unity_1_1_runtime_gizmos_1_1_i_runtime_gizmo_component">00022</link> &#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keyword">interface&#32;</emphasis><link linkend="_interface_leap_1_1_unity_1_1_runtime_gizmos_1_1_i_runtime_gizmo_component">IRuntimeGizmoComponent</link>&#32;{
+00023 &#32;&#32;&#32;&#32;<emphasis role="keywordtype">void</emphasis>&#32;<link linkend="_interface_leap_1_1_unity_1_1_runtime_gizmos_1_1_i_runtime_gizmo_component_1abaa7cf174480d957b48d0023df50291d">OnDrawRuntimeGizmos</link>(<link linkend="_class_leap_1_1_unity_1_1_runtime_gizmos_1_1_runtime_gizmo_drawer">RuntimeGizmoDrawer</link>&#32;drawer);
+00024 &#32;&#32;}
+00025 
+00026 &#32;&#32;[ExecuteInEditMode]
+<anchor xml:id="__runtime_gizmo_manager_8cs_source_1l00027"/><link linkend="_class_leap_1_1_unity_1_1_runtime_gizmos_1_1_runtime_gizmo_manager">00027</link> &#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keyword">class&#32;</emphasis><link linkend="_class_leap_1_1_unity_1_1_runtime_gizmos_1_1_runtime_gizmo_manager">RuntimeGizmoManager</link>&#32;:&#32;MonoBehaviour&#32;{
+<anchor xml:id="__runtime_gizmo_manager_8cs_source_1l00028"/><link linkend="_class_leap_1_1_unity_1_1_runtime_gizmos_1_1_runtime_gizmo_manager_1a9908e17033f014eb3d4212ee7b87e137">00028</link> &#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keyword">const</emphasis>&#32;<emphasis role="keywordtype">string</emphasis>&#32;<link linkend="_class_leap_1_1_unity_1_1_runtime_gizmos_1_1_runtime_gizmo_manager_1a9908e17033f014eb3d4212ee7b87e137">DEFAULT_SHADER_NAME</link>&#32;=&#32;<emphasis role="stringliteral">&quot;Hidden/Runtime&#32;Gizmos&quot;</emphasis>;
+<anchor xml:id="__runtime_gizmo_manager_8cs_source_1l00029"/><link linkend="_class_leap_1_1_unity_1_1_runtime_gizmos_1_1_runtime_gizmo_manager_1ab07fd22968543ebaa1b62765221a0341">00029</link> &#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keyword">const</emphasis>&#32;<emphasis role="keywordtype">int</emphasis>&#32;<link linkend="_class_leap_1_1_unity_1_1_runtime_gizmos_1_1_runtime_gizmo_manager_1ab07fd22968543ebaa1b62765221a0341">CIRCLE_RESOLUTION</link>&#32;=&#32;32;
+00030 
+00031 &#32;&#32;&#32;&#32;[Tooltip(<emphasis role="stringliteral">&quot;Should&#32;the&#32;gizmos&#32;be&#32;visible&#32;in&#32;the&#32;game&#32;view.&quot;</emphasis>)]
+00032 &#32;&#32;&#32;&#32;[SerializeField]
+<anchor xml:id="__runtime_gizmo_manager_8cs_source_1l00033"/><link linkend="_class_leap_1_1_unity_1_1_runtime_gizmos_1_1_runtime_gizmo_manager_1ab534fdb082ce7c5a75833ae7e08ed5da">00033</link> &#32;&#32;&#32;&#32;<emphasis role="keyword">protected</emphasis>&#32;<emphasis role="keywordtype">bool</emphasis>&#32;<link linkend="_class_leap_1_1_unity_1_1_runtime_gizmos_1_1_runtime_gizmo_manager_1ab534fdb082ce7c5a75833ae7e08ed5da">_displayInGameView</link>&#32;=&#32;<emphasis role="keyword">true</emphasis>;
+00034 
+00035 &#32;&#32;&#32;&#32;[Tooltip(<emphasis role="stringliteral">&quot;Should&#32;the&#32;gizmos&#32;be&#32;visible&#32;in&#32;a&#32;build.&quot;</emphasis>)]
+00036 &#32;&#32;&#32;&#32;[SerializeField]
+<anchor xml:id="__runtime_gizmo_manager_8cs_source_1l00037"/><link linkend="_class_leap_1_1_unity_1_1_runtime_gizmos_1_1_runtime_gizmo_manager_1a7bf0918df0d852a8de47a79d031dd77d">00037</link> &#32;&#32;&#32;&#32;<emphasis role="keyword">protected</emphasis>&#32;<emphasis role="keywordtype">bool</emphasis>&#32;<link linkend="_class_leap_1_1_unity_1_1_runtime_gizmos_1_1_runtime_gizmo_manager_1a7bf0918df0d852a8de47a79d031dd77d">_enabledForBuild</link>&#32;=&#32;<emphasis role="keyword">true</emphasis>;
+00038 
+00039 &#32;&#32;&#32;&#32;[Tooltip(<emphasis role="stringliteral">&quot;The&#32;mesh&#32;to&#32;use&#32;for&#32;the&#32;filled&#32;sphere&#32;gizmo.&quot;</emphasis>)]
+00040 &#32;&#32;&#32;&#32;[SerializeField]
+<anchor xml:id="__runtime_gizmo_manager_8cs_source_1l00041"/><link linkend="_class_leap_1_1_unity_1_1_runtime_gizmos_1_1_runtime_gizmo_manager_1a0742e61b770f3d116bfbfd36a271bdf6">00041</link> &#32;&#32;&#32;&#32;<emphasis role="keyword">protected</emphasis>&#32;Mesh&#32;<link linkend="_class_leap_1_1_unity_1_1_runtime_gizmos_1_1_runtime_gizmo_manager_1a0742e61b770f3d116bfbfd36a271bdf6">_sphereMesh</link>;
+00042 
+00043 &#32;&#32;&#32;&#32;[Tooltip(<emphasis role="stringliteral">&quot;The&#32;shader&#32;to&#32;use&#32;for&#32;rendering&#32;gizmos.&quot;</emphasis>)]
+00044 &#32;&#32;&#32;&#32;[SerializeField]
+<anchor xml:id="__runtime_gizmo_manager_8cs_source_1l00045"/><link linkend="_class_leap_1_1_unity_1_1_runtime_gizmos_1_1_runtime_gizmo_manager_1a5573de0ed368c2ff35447e1d8e6401b6">00045</link> &#32;&#32;&#32;&#32;<emphasis role="keyword">protected</emphasis>&#32;Shader&#32;<link linkend="_class_leap_1_1_unity_1_1_runtime_gizmos_1_1_runtime_gizmo_manager_1a5573de0ed368c2ff35447e1d8e6401b6">_gizmoShader</link>;
+00046 
+<anchor xml:id="__runtime_gizmo_manager_8cs_source_1l00047"/><link linkend="_class_leap_1_1_unity_1_1_runtime_gizmos_1_1_runtime_gizmo_manager_1ab0fa01c61a6fe164f4023641378780a8">00047</link> &#32;&#32;&#32;&#32;<emphasis role="keyword">protected</emphasis>&#32;Mesh&#32;<link linkend="_class_leap_1_1_unity_1_1_runtime_gizmos_1_1_runtime_gizmo_manager_1ab0fa01c61a6fe164f4023641378780a8">_cubeMesh</link>,&#32;_wireCubeMesh,&#32;_wireSphereMesh;
+00048 
+<anchor xml:id="__runtime_gizmo_manager_8cs_source_1l00049"/><link linkend="_class_leap_1_1_unity_1_1_runtime_gizmos_1_1_runtime_gizmo_manager_1aa0126efce88d0031b0c24c9a1d53bc61">00049</link> &#32;&#32;&#32;&#32;<emphasis role="keyword">protected</emphasis>&#32;<emphasis role="keyword">static</emphasis>&#32;<link linkend="_class_leap_1_1_unity_1_1_runtime_gizmos_1_1_runtime_gizmo_drawer">RuntimeGizmoDrawer</link>&#32;<link linkend="_class_leap_1_1_unity_1_1_runtime_gizmos_1_1_runtime_gizmo_manager_1aa0126efce88d0031b0c24c9a1d53bc61">_backDrawer</link>&#32;=&#32;<emphasis role="keyword">null</emphasis>;
+<anchor xml:id="__runtime_gizmo_manager_8cs_source_1l00050"/><link linkend="_class_leap_1_1_unity_1_1_runtime_gizmos_1_1_runtime_gizmo_manager_1a0d7047698652234b6d6394adca102748">00050</link> &#32;&#32;&#32;&#32;<emphasis role="keyword">protected</emphasis>&#32;<emphasis role="keyword">static</emphasis>&#32;<link linkend="_class_leap_1_1_unity_1_1_runtime_gizmos_1_1_runtime_gizmo_drawer">RuntimeGizmoDrawer</link>&#32;<link linkend="_class_leap_1_1_unity_1_1_runtime_gizmos_1_1_runtime_gizmo_manager_1a0d7047698652234b6d6394adca102748">_frontDrawer</link>&#32;=&#32;<emphasis role="keyword">null</emphasis>;
+00051 &#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;<emphasis role="keywordtype">bool</emphasis>&#32;_readyForSwap&#32;=&#32;<emphasis role="keyword">false</emphasis>;
+00052 
+<anchor xml:id="__runtime_gizmo_manager_8cs_source_1l00057"/><link linkend="_class_leap_1_1_unity_1_1_runtime_gizmos_1_1_runtime_gizmo_manager_1a604c94ac5df754c6b7c7edbbedb8c004">00057</link> &#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keyword">static</emphasis>&#32;<emphasis role="keyword">event</emphasis>&#32;Action&lt;RuntimeGizmoDrawer&gt;&#32;<link linkend="_class_leap_1_1_unity_1_1_runtime_gizmos_1_1_runtime_gizmo_manager_1a604c94ac5df754c6b7c7edbbedb8c004">OnPostRenderGizmos</link>;
+00058 
+<anchor xml:id="__runtime_gizmo_manager_8cs_source_1l00066"/><link linkend="_class_leap_1_1_unity_1_1_runtime_gizmos_1_1_runtime_gizmo_manager_1a01d7d6c28b7ce9f019f8e2f8f55fa644">00066</link> &#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keyword">static</emphasis>&#32;<emphasis role="keywordtype">bool</emphasis>&#32;<link linkend="_class_leap_1_1_unity_1_1_runtime_gizmos_1_1_runtime_gizmo_manager_1a01d7d6c28b7ce9f019f8e2f8f55fa644">TryGetGizmoDrawer</link>(out&#32;<link linkend="_class_leap_1_1_unity_1_1_runtime_gizmos_1_1_runtime_gizmo_drawer">RuntimeGizmoDrawer</link>&#32;drawer)&#32;{
+00067 &#32;&#32;&#32;&#32;&#32;&#32;drawer&#32;=&#32;<link linkend="_class_leap_1_1_unity_1_1_runtime_gizmos_1_1_runtime_gizmo_manager_1aa0126efce88d0031b0c24c9a1d53bc61">_backDrawer</link>;
+00068 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(drawer&#32;!=&#32;<emphasis role="keyword">null</emphasis>)&#32;{
+00069 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;drawer.<link linkend="_class_leap_1_1_unity_1_1_runtime_gizmos_1_1_runtime_gizmo_drawer_1a92de6abecce2909ecf3acdc5e4e93e37">ResetMatrixAndColorState</link>();
+00070 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;<emphasis role="keyword">true</emphasis>;
+00071 &#32;&#32;&#32;&#32;&#32;&#32;}&#32;<emphasis role="keywordflow">else</emphasis>&#32;{
+00072 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;<emphasis role="keyword">false</emphasis>;
+00073 &#32;&#32;&#32;&#32;&#32;&#32;}
+00074 &#32;&#32;&#32;&#32;}
+00075 
+<anchor xml:id="__runtime_gizmo_manager_8cs_source_1l00084"/><link linkend="_class_leap_1_1_unity_1_1_runtime_gizmos_1_1_runtime_gizmo_manager_1ae97fb1a40050e95d69d5cf7796ae3579">00084</link> &#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keyword">static</emphasis>&#32;<emphasis role="keywordtype">bool</emphasis>&#32;<link linkend="_class_leap_1_1_unity_1_1_runtime_gizmos_1_1_runtime_gizmo_manager_1ae97fb1a40050e95d69d5cf7796ae3579">TryGetGizmoDrawer</link>(GameObject&#32;attatchedGameObject,&#32;out&#32;<link linkend="_class_leap_1_1_unity_1_1_runtime_gizmos_1_1_runtime_gizmo_drawer">RuntimeGizmoDrawer</link>&#32;drawer)&#32;{
+00085 &#32;&#32;&#32;&#32;&#32;&#32;drawer&#32;=&#32;<link linkend="_class_leap_1_1_unity_1_1_runtime_gizmos_1_1_runtime_gizmo_manager_1aa0126efce88d0031b0c24c9a1d53bc61">_backDrawer</link>;
+00086 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(drawer&#32;!=&#32;<emphasis role="keyword">null</emphasis>&#32;&amp;&amp;&#32;!<link linkend="_class_leap_1_1_unity_1_1_runtime_gizmos_1_1_runtime_gizmo_manager_1a5feff734a890dfa873db6eb6ec63ed0c">areGizmosDisabled</link>(attatchedGameObject.transform))&#32;{
+00087 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;drawer.<link linkend="_class_leap_1_1_unity_1_1_runtime_gizmos_1_1_runtime_gizmo_drawer_1a92de6abecce2909ecf3acdc5e4e93e37">ResetMatrixAndColorState</link>();
+00088 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;<emphasis role="keyword">true</emphasis>;
+00089 &#32;&#32;&#32;&#32;&#32;&#32;}&#32;<emphasis role="keywordflow">else</emphasis>&#32;{
+00090 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;<emphasis role="keyword">false</emphasis>;
+00091 &#32;&#32;&#32;&#32;&#32;&#32;}
+00092 &#32;&#32;&#32;&#32;}
+00093 
+<anchor xml:id="__runtime_gizmo_manager_8cs_source_1l00094"/><link linkend="_class_leap_1_1_unity_1_1_runtime_gizmos_1_1_runtime_gizmo_manager_1a18d37fc9f8c4a472da2a506047997be3">00094</link> &#32;&#32;&#32;&#32;<emphasis role="keyword">protected</emphasis>&#32;<emphasis role="keyword">virtual</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;<link linkend="_class_leap_1_1_unity_1_1_runtime_gizmos_1_1_runtime_gizmo_manager_1a18d37fc9f8c4a472da2a506047997be3">OnValidate</link>()&#32;{
+00095 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(<link linkend="_class_leap_1_1_unity_1_1_runtime_gizmos_1_1_runtime_gizmo_manager_1a5573de0ed368c2ff35447e1d8e6401b6">_gizmoShader</link>&#32;==&#32;<emphasis role="keyword">null</emphasis>)&#32;{
+00096 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_leap_1_1_unity_1_1_runtime_gizmos_1_1_runtime_gizmo_manager_1a5573de0ed368c2ff35447e1d8e6401b6">_gizmoShader</link>&#32;=&#32;Shader.Find(<link linkend="_class_leap_1_1_unity_1_1_runtime_gizmos_1_1_runtime_gizmo_manager_1a9908e17033f014eb3d4212ee7b87e137">DEFAULT_SHADER_NAME</link>);
+00097 &#32;&#32;&#32;&#32;&#32;&#32;}
+00098 
+00099 &#32;&#32;&#32;&#32;&#32;&#32;Material&#32;tempMat&#32;=&#32;<emphasis role="keyword">new</emphasis>&#32;Material(<link linkend="_class_leap_1_1_unity_1_1_runtime_gizmos_1_1_runtime_gizmo_manager_1a5573de0ed368c2ff35447e1d8e6401b6">_gizmoShader</link>);
+00100 &#32;&#32;&#32;&#32;&#32;&#32;tempMat.hideFlags&#32;=&#32;HideFlags.HideAndDontSave;
+00101 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(tempMat.passCount&#32;!=&#32;4)&#32;{
+00102 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;Debug.LogError(<emphasis role="stringliteral">&quot;Shader&#32;&quot;</emphasis>&#32;+&#32;<link linkend="_class_leap_1_1_unity_1_1_runtime_gizmos_1_1_runtime_gizmo_manager_1a5573de0ed368c2ff35447e1d8e6401b6">_gizmoShader</link>&#32;+&#32;<emphasis role="stringliteral">&quot;&#32;does&#32;not&#32;have&#32;4&#32;passes&#32;and&#32;cannot&#32;be&#32;used&#32;as&#32;a&#32;gizmo&#32;shader.&quot;</emphasis>);
+00103 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_leap_1_1_unity_1_1_runtime_gizmos_1_1_runtime_gizmo_manager_1a5573de0ed368c2ff35447e1d8e6401b6">_gizmoShader</link>&#32;=&#32;Shader.Find(<link linkend="_class_leap_1_1_unity_1_1_runtime_gizmos_1_1_runtime_gizmo_manager_1a9908e17033f014eb3d4212ee7b87e137">DEFAULT_SHADER_NAME</link>);
+00104 &#32;&#32;&#32;&#32;&#32;&#32;}
+00105 
+00106 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(<link linkend="_class_leap_1_1_unity_1_1_runtime_gizmos_1_1_runtime_gizmo_manager_1a0d7047698652234b6d6394adca102748">_frontDrawer</link>&#32;!=&#32;<emphasis role="keyword">null</emphasis>&#32;&amp;&amp;&#32;<link linkend="_class_leap_1_1_unity_1_1_runtime_gizmos_1_1_runtime_gizmo_manager_1aa0126efce88d0031b0c24c9a1d53bc61">_backDrawer</link>&#32;!=&#32;<emphasis role="keyword">null</emphasis>)&#32;{
+00107 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;assignDrawerParams();
+00108 &#32;&#32;&#32;&#32;&#32;&#32;}
+00109 &#32;&#32;&#32;&#32;}
+00110 
+<anchor xml:id="__runtime_gizmo_manager_8cs_source_1l00111"/><link linkend="_class_leap_1_1_unity_1_1_runtime_gizmos_1_1_runtime_gizmo_manager_1a970144ca56c74a639e83eea587cc9429">00111</link> &#32;&#32;&#32;&#32;<emphasis role="keyword">protected</emphasis>&#32;<emphasis role="keyword">virtual</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;<link linkend="_class_leap_1_1_unity_1_1_runtime_gizmos_1_1_runtime_gizmo_manager_1a970144ca56c74a639e83eea587cc9429">Reset</link>()&#32;{
+00112 &#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_leap_1_1_unity_1_1_runtime_gizmos_1_1_runtime_gizmo_manager_1a5573de0ed368c2ff35447e1d8e6401b6">_gizmoShader</link>&#32;=&#32;Shader.Find(<link linkend="_class_leap_1_1_unity_1_1_runtime_gizmos_1_1_runtime_gizmo_manager_1a9908e17033f014eb3d4212ee7b87e137">DEFAULT_SHADER_NAME</link>);
+00113 &#32;&#32;&#32;&#32;}
+00114 
+<anchor xml:id="__runtime_gizmo_manager_8cs_source_1l00115"/><link linkend="_class_leap_1_1_unity_1_1_runtime_gizmos_1_1_runtime_gizmo_manager_1a56dfb214066df20bdaac0240e08d50f0">00115</link> &#32;&#32;&#32;&#32;<emphasis role="keyword">protected</emphasis>&#32;<emphasis role="keyword">virtual</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;<link linkend="_class_leap_1_1_unity_1_1_runtime_gizmos_1_1_runtime_gizmo_manager_1a56dfb214066df20bdaac0240e08d50f0">OnEnable</link>()&#32;{
+00116 <emphasis role="preprocessor">#if&#32;!UNITY_EDITOR</emphasis>
+00117 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(!<link linkend="_class_leap_1_1_unity_1_1_runtime_gizmos_1_1_runtime_gizmo_manager_1a7bf0918df0d852a8de47a79d031dd77d">_enabledForBuild</link>)&#32;{
+00118 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;enabled&#32;=&#32;<emphasis role="keyword">false</emphasis>;
+00119 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>;
+00120 &#32;&#32;&#32;&#32;&#32;&#32;}
+00121 <emphasis role="preprocessor">#endif</emphasis>
+00122 
+00123 &#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_leap_1_1_unity_1_1_runtime_gizmos_1_1_runtime_gizmo_manager_1a0d7047698652234b6d6394adca102748">_frontDrawer</link>&#32;=&#32;<emphasis role="keyword">new</emphasis>&#32;<link linkend="_class_leap_1_1_unity_1_1_runtime_gizmos_1_1_runtime_gizmo_drawer">RuntimeGizmoDrawer</link>();
+00124 &#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_leap_1_1_unity_1_1_runtime_gizmos_1_1_runtime_gizmo_manager_1aa0126efce88d0031b0c24c9a1d53bc61">_backDrawer</link>&#32;=&#32;<emphasis role="keyword">new</emphasis>&#32;<link linkend="_class_leap_1_1_unity_1_1_runtime_gizmos_1_1_runtime_gizmo_drawer">RuntimeGizmoDrawer</link>();
+00125 
+00126 &#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_leap_1_1_unity_1_1_runtime_gizmos_1_1_runtime_gizmo_manager_1a0d7047698652234b6d6394adca102748">_frontDrawer</link>.<link linkend="_class_leap_1_1_unity_1_1_runtime_gizmos_1_1_runtime_gizmo_drawer_1aabd29ab232c427c79545ceaa2b35a609">BeginGuard</link>();
+00127 
+00128 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(<link linkend="_class_leap_1_1_unity_1_1_runtime_gizmos_1_1_runtime_gizmo_manager_1a5573de0ed368c2ff35447e1d8e6401b6">_gizmoShader</link>&#32;==&#32;<emphasis role="keyword">null</emphasis>)&#32;{
+00129 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_leap_1_1_unity_1_1_runtime_gizmos_1_1_runtime_gizmo_manager_1a5573de0ed368c2ff35447e1d8e6401b6">_gizmoShader</link>&#32;=&#32;Shader.Find(<link linkend="_class_leap_1_1_unity_1_1_runtime_gizmos_1_1_runtime_gizmo_manager_1a9908e17033f014eb3d4212ee7b87e137">DEFAULT_SHADER_NAME</link>);
+00130 &#32;&#32;&#32;&#32;&#32;&#32;}
+00131 
+00132 &#32;&#32;&#32;&#32;&#32;&#32;generateMeshes();
+00133 &#32;&#32;&#32;&#32;&#32;&#32;assignDrawerParams();
+00134 
+00135 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//Unsubscribe&#32;to&#32;prevent&#32;double-subscription</emphasis>
+00136 &#32;&#32;&#32;&#32;&#32;&#32;Camera.onPostRender&#32;-=&#32;<link linkend="_class_leap_1_1_unity_1_1_runtime_gizmos_1_1_runtime_gizmo_manager_1a7efd4c7507a95cd49a44487057e69d2f">onPostRender</link>;
+00137 &#32;&#32;&#32;&#32;&#32;&#32;Camera.onPostRender&#32;+=&#32;<link linkend="_class_leap_1_1_unity_1_1_runtime_gizmos_1_1_runtime_gizmo_manager_1a7efd4c7507a95cd49a44487057e69d2f">onPostRender</link>;
+00138 &#32;&#32;&#32;&#32;}
+00139 
+<anchor xml:id="__runtime_gizmo_manager_8cs_source_1l00140"/><link linkend="_class_leap_1_1_unity_1_1_runtime_gizmos_1_1_runtime_gizmo_manager_1af968360bff9091bc59085c515db0e081">00140</link> &#32;&#32;&#32;&#32;<emphasis role="keyword">protected</emphasis>&#32;<emphasis role="keyword">virtual</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;<link linkend="_class_leap_1_1_unity_1_1_runtime_gizmos_1_1_runtime_gizmo_manager_1af968360bff9091bc59085c515db0e081">OnDisable</link>()&#32;{
+00141 &#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_leap_1_1_unity_1_1_runtime_gizmos_1_1_runtime_gizmo_manager_1a0d7047698652234b6d6394adca102748">_frontDrawer</link>&#32;=&#32;<emphasis role="keyword">null</emphasis>;
+00142 &#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_leap_1_1_unity_1_1_runtime_gizmos_1_1_runtime_gizmo_manager_1aa0126efce88d0031b0c24c9a1d53bc61">_backDrawer</link>&#32;=&#32;<emphasis role="keyword">null</emphasis>;
+00143 
+00144 &#32;&#32;&#32;&#32;&#32;&#32;Camera.onPostRender&#32;-=&#32;<link linkend="_class_leap_1_1_unity_1_1_runtime_gizmos_1_1_runtime_gizmo_manager_1a7efd4c7507a95cd49a44487057e69d2f">onPostRender</link>;
+00145 &#32;&#32;&#32;&#32;}
+00146 
+00147 &#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;List&lt;GameObject&gt;&#32;_objList&#32;=&#32;<emphasis role="keyword">new</emphasis>&#32;List&lt;GameObject&gt;();
+00148 &#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;List&lt;IRuntimeGizmoComponent&gt;&#32;_gizmoList&#32;=&#32;<emphasis role="keyword">new</emphasis>&#32;List&lt;IRuntimeGizmoComponent&gt;();
+<anchor xml:id="__runtime_gizmo_manager_8cs_source_1l00149"/><link linkend="_class_leap_1_1_unity_1_1_runtime_gizmos_1_1_runtime_gizmo_manager_1ad20940078be021e8ccc8a96d74c49984">00149</link> &#32;&#32;&#32;&#32;<emphasis role="keyword">protected</emphasis>&#32;<emphasis role="keyword">virtual</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;<link linkend="_class_leap_1_1_unity_1_1_runtime_gizmos_1_1_runtime_gizmo_manager_1ad20940078be021e8ccc8a96d74c49984">Update</link>()&#32;{
+00150 &#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_namespace_leap_1_1_unity_1_1_attributes_1a4b8f0ac9a7b74b480178dc5fb4069a89a9ead0d38e06ec253ca0ecbf6ea56e59b">Scene</link>&#32;scene&#32;=&#32;SceneManager.GetActiveScene();
+00151 &#32;&#32;&#32;&#32;&#32;&#32;scene.GetRootGameObjects(_objList);
+00152 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">for</emphasis>&#32;(<emphasis role="keywordtype">int</emphasis>&#32;i&#32;=&#32;0;&#32;i&#32;&lt;&#32;_objList.Count;&#32;i++)&#32;{
+00153 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;GameObject&#32;obj&#32;=&#32;_objList[i];
+00154 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;obj.GetComponentsInChildren(<emphasis role="keyword">false</emphasis>,&#32;_gizmoList);
+00155 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">for</emphasis>&#32;(<emphasis role="keywordtype">int</emphasis>&#32;j&#32;=&#32;0;&#32;j&#32;&lt;&#32;_gizmoList.Count;&#32;j++)&#32;{
+00156 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(<link linkend="_class_leap_1_1_unity_1_1_runtime_gizmos_1_1_runtime_gizmo_manager_1a5feff734a890dfa873db6eb6ec63ed0c">areGizmosDisabled</link>((_gizmoList[j]&#32;as&#32;Component).transform))&#32;{
+00157 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">continue</emphasis>;
+00158 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00159 
+00160 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_leap_1_1_unity_1_1_runtime_gizmos_1_1_runtime_gizmo_manager_1aa0126efce88d0031b0c24c9a1d53bc61">_backDrawer</link>.<link linkend="_class_leap_1_1_unity_1_1_runtime_gizmos_1_1_runtime_gizmo_drawer_1a92de6abecce2909ecf3acdc5e4e93e37">ResetMatrixAndColorState</link>();
+00161 
+00162 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">try</emphasis>&#32;{
+00163 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;_gizmoList[j].OnDrawRuntimeGizmos(<link linkend="_class_leap_1_1_unity_1_1_runtime_gizmos_1_1_runtime_gizmo_manager_1aa0126efce88d0031b0c24c9a1d53bc61">_backDrawer</link>);
+00164 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}&#32;<emphasis role="keywordflow">catch</emphasis>&#32;(Exception&#32;e)&#32;{
+00165 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;Debug.LogException(e);
+00166 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00167 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00168 &#32;&#32;&#32;&#32;&#32;&#32;}
+00169 
+00170 &#32;&#32;&#32;&#32;&#32;&#32;_readyForSwap&#32;=&#32;<emphasis role="keyword">true</emphasis>;
+00171 &#32;&#32;&#32;&#32;}
+00172 
+<anchor xml:id="__runtime_gizmo_manager_8cs_source_1l00173"/><link linkend="_class_leap_1_1_unity_1_1_runtime_gizmos_1_1_runtime_gizmo_manager_1a7efd4c7507a95cd49a44487057e69d2f">00173</link> &#32;&#32;&#32;&#32;<emphasis role="keyword">protected</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;<link linkend="_class_leap_1_1_unity_1_1_runtime_gizmos_1_1_runtime_gizmo_manager_1a7efd4c7507a95cd49a44487057e69d2f">onPostRender</link>(Camera&#32;camera)&#32;{
+00174 <emphasis role="preprocessor">#if&#32;UNITY_EDITOR</emphasis>
+00175 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//Always&#32;draw&#32;scene&#32;view</emphasis>
+00176 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//Never&#32;draw&#32;preview&#32;or&#32;reflection</emphasis>
+00177 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">switch</emphasis>&#32;(camera.cameraType)&#32;{
+00178 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">case</emphasis>&#32;CameraType.Preview:
+00179 <emphasis role="preprocessor">#if&#32;UNITY_2017_1_OR_NEWER</emphasis>
+00180 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">case</emphasis>&#32;CameraType.Reflection:
+00181 <emphasis role="preprocessor">#endif</emphasis>
+00182 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>;
+00183 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">case</emphasis>&#32;CameraType.Game:
+00184 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">case</emphasis>&#32;CameraType.VR:
+00185 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(!<link linkend="_class_leap_1_1_unity_1_1_runtime_gizmos_1_1_runtime_gizmo_manager_1ab534fdb082ce7c5a75833ae7e08ed5da">_displayInGameView</link>)&#32;{
+00186 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>;
+00187 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00188 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">break</emphasis>;
+00189 &#32;&#32;&#32;&#32;&#32;&#32;}
+00190 <emphasis role="preprocessor">#endif</emphasis>
+00191 
+00192 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(_readyForSwap)&#32;{
+00193 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(<link linkend="_class_leap_1_1_unity_1_1_runtime_gizmos_1_1_runtime_gizmo_manager_1a604c94ac5df754c6b7c7edbbedb8c004">OnPostRenderGizmos</link>&#32;!=&#32;<emphasis role="keyword">null</emphasis>)&#32;{
+00194 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_leap_1_1_unity_1_1_runtime_gizmos_1_1_runtime_gizmo_manager_1aa0126efce88d0031b0c24c9a1d53bc61">_backDrawer</link>.<link linkend="_class_leap_1_1_unity_1_1_runtime_gizmos_1_1_runtime_gizmo_drawer_1a92de6abecce2909ecf3acdc5e4e93e37">ResetMatrixAndColorState</link>();
+00195 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_leap_1_1_unity_1_1_runtime_gizmos_1_1_runtime_gizmo_manager_1a604c94ac5df754c6b7c7edbbedb8c004">OnPostRenderGizmos</link>(<link linkend="_class_leap_1_1_unity_1_1_runtime_gizmos_1_1_runtime_gizmo_manager_1aa0126efce88d0031b0c24c9a1d53bc61">_backDrawer</link>);
+00196 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00197 
+00198 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_leap_1_1_unity_1_1_runtime_gizmos_1_1_runtime_gizmo_drawer">RuntimeGizmoDrawer</link>&#32;tempDrawer&#32;=&#32;<link linkend="_class_leap_1_1_unity_1_1_runtime_gizmos_1_1_runtime_gizmo_manager_1aa0126efce88d0031b0c24c9a1d53bc61">_backDrawer</link>;
+00199 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_leap_1_1_unity_1_1_runtime_gizmos_1_1_runtime_gizmo_manager_1aa0126efce88d0031b0c24c9a1d53bc61">_backDrawer</link>&#32;=&#32;<link linkend="_class_leap_1_1_unity_1_1_runtime_gizmos_1_1_runtime_gizmo_manager_1a0d7047698652234b6d6394adca102748">_frontDrawer</link>;
+00200 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_leap_1_1_unity_1_1_runtime_gizmos_1_1_runtime_gizmo_manager_1a0d7047698652234b6d6394adca102748">_frontDrawer</link>&#32;=&#32;tempDrawer;
+00201 
+00202 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//Guard&#32;the&#32;front&#32;drawer&#32;for&#32;rendering</emphasis>
+00203 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_leap_1_1_unity_1_1_runtime_gizmos_1_1_runtime_gizmo_manager_1a0d7047698652234b6d6394adca102748">_frontDrawer</link>.<link linkend="_class_leap_1_1_unity_1_1_runtime_gizmos_1_1_runtime_gizmo_drawer_1aabd29ab232c427c79545ceaa2b35a609">BeginGuard</link>();
+00204 
+00205 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//Unguard&#32;the&#32;back&#32;drawer&#32;to&#32;allow&#32;gizmos&#32;to&#32;be&#32;drawn&#32;to&#32;it</emphasis>
+00206 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_leap_1_1_unity_1_1_runtime_gizmos_1_1_runtime_gizmo_manager_1aa0126efce88d0031b0c24c9a1d53bc61">_backDrawer</link>.<link linkend="_class_leap_1_1_unity_1_1_runtime_gizmos_1_1_runtime_gizmo_drawer_1af48e1fd2f99c0ae9f58d0441ce35028b">EndGuard</link>();
+00207 
+00208 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;_readyForSwap&#32;=&#32;<emphasis role="keyword">false</emphasis>;
+00209 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_leap_1_1_unity_1_1_runtime_gizmos_1_1_runtime_gizmo_manager_1aa0126efce88d0031b0c24c9a1d53bc61">_backDrawer</link>.<link linkend="_class_leap_1_1_unity_1_1_runtime_gizmos_1_1_runtime_gizmo_drawer_1a3997e67f725121479b6d305b02defe79">ClearAllGizmos</link>();
+00210 &#32;&#32;&#32;&#32;&#32;&#32;}
+00211 
+00212 &#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_leap_1_1_unity_1_1_runtime_gizmos_1_1_runtime_gizmo_manager_1a0d7047698652234b6d6394adca102748">_frontDrawer</link>.<link linkend="_class_leap_1_1_unity_1_1_runtime_gizmos_1_1_runtime_gizmo_drawer_1ae75ab0c30034af8cbc2aaf967c2136c3">DrawAllGizmosToScreen</link>();
+00213 &#32;&#32;&#32;&#32;}
+00214 
+<anchor xml:id="__runtime_gizmo_manager_8cs_source_1l00215"/><link linkend="_class_leap_1_1_unity_1_1_runtime_gizmos_1_1_runtime_gizmo_manager_1a5feff734a890dfa873db6eb6ec63ed0c">00215</link> &#32;&#32;&#32;&#32;<emphasis role="keyword">protected</emphasis>&#32;<emphasis role="keyword">static</emphasis>&#32;<emphasis role="keywordtype">bool</emphasis>&#32;<link linkend="_class_leap_1_1_unity_1_1_runtime_gizmos_1_1_runtime_gizmo_manager_1a5feff734a890dfa873db6eb6ec63ed0c">areGizmosDisabled</link>(Transform&#32;transform)&#32;{
+00216 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordtype">bool</emphasis>&#32;isDisabled&#32;=&#32;<emphasis role="keyword">false</emphasis>;
+00217 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">do</emphasis>&#32;{
+00218 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;var&#32;toggle&#32;=&#32;transform.GetComponentInParent&lt;<link linkend="_class_leap_1_1_unity_1_1_runtime_gizmos_1_1_runtime_gizmo_toggle">RuntimeGizmoToggle</link>&gt;();
+00219 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(toggle&#32;==&#32;<emphasis role="keyword">null</emphasis>)&#32;{
+00220 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">break</emphasis>;
+00221 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00222 
+00223 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(!toggle.enabled)&#32;{
+00224 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;isDisabled&#32;=&#32;<emphasis role="keyword">true</emphasis>;
+00225 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">break</emphasis>;
+00226 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00227 
+00228 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;transform&#32;=&#32;transform.parent;
+00229 &#32;&#32;&#32;&#32;&#32;&#32;}&#32;<emphasis role="keywordflow">while</emphasis>&#32;(transform&#32;!=&#32;<emphasis role="keyword">null</emphasis>);
+00230 
+00231 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;isDisabled;
+00232 &#32;&#32;&#32;&#32;}
+00233 
+00234 &#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;assignDrawerParams()&#32;{
+00235 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(<link linkend="_class_leap_1_1_unity_1_1_runtime_gizmos_1_1_runtime_gizmo_manager_1a5573de0ed368c2ff35447e1d8e6401b6">_gizmoShader</link>&#32;!=&#32;<emphasis role="keyword">null</emphasis>)&#32;{
+00236 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_leap_1_1_unity_1_1_runtime_gizmos_1_1_runtime_gizmo_manager_1a0d7047698652234b6d6394adca102748">_frontDrawer</link>.<link linkend="_class_leap_1_1_unity_1_1_runtime_gizmos_1_1_runtime_gizmo_drawer_1a664625e49da1d01e3e4520cccc31247d">gizmoShader</link>&#32;=&#32;<link linkend="_class_leap_1_1_unity_1_1_runtime_gizmos_1_1_runtime_gizmo_manager_1a5573de0ed368c2ff35447e1d8e6401b6">_gizmoShader</link>;
+00237 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_leap_1_1_unity_1_1_runtime_gizmos_1_1_runtime_gizmo_manager_1aa0126efce88d0031b0c24c9a1d53bc61">_backDrawer</link>.<link linkend="_class_leap_1_1_unity_1_1_runtime_gizmos_1_1_runtime_gizmo_drawer_1a664625e49da1d01e3e4520cccc31247d">gizmoShader</link>&#32;=&#32;<link linkend="_class_leap_1_1_unity_1_1_runtime_gizmos_1_1_runtime_gizmo_manager_1a5573de0ed368c2ff35447e1d8e6401b6">_gizmoShader</link>;
+00238 &#32;&#32;&#32;&#32;&#32;&#32;}
+00239 
+00240 &#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_leap_1_1_unity_1_1_runtime_gizmos_1_1_runtime_gizmo_manager_1a0d7047698652234b6d6394adca102748">_frontDrawer</link>.sphereMesh&#32;=&#32;<link linkend="_class_leap_1_1_unity_1_1_runtime_gizmos_1_1_runtime_gizmo_manager_1a0742e61b770f3d116bfbfd36a271bdf6">_sphereMesh</link>;
+00241 &#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_leap_1_1_unity_1_1_runtime_gizmos_1_1_runtime_gizmo_manager_1a0d7047698652234b6d6394adca102748">_frontDrawer</link>.<link linkend="_class_leap_1_1_unity_1_1_runtime_gizmos_1_1_runtime_gizmo_drawer_1a88620e1b82672b2a25157d2ebf542aaf">cubeMesh</link>&#32;=&#32;<link linkend="_class_leap_1_1_unity_1_1_runtime_gizmos_1_1_runtime_gizmo_manager_1ab0fa01c61a6fe164f4023641378780a8">_cubeMesh</link>;
+00242 &#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_leap_1_1_unity_1_1_runtime_gizmos_1_1_runtime_gizmo_manager_1a0d7047698652234b6d6394adca102748">_frontDrawer</link>.wireSphereMesh&#32;=&#32;_wireSphereMesh;
+00243 &#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_leap_1_1_unity_1_1_runtime_gizmos_1_1_runtime_gizmo_manager_1a0d7047698652234b6d6394adca102748">_frontDrawer</link>.wireCubeMesh&#32;=&#32;_wireCubeMesh;
+00244 
+00245 &#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_leap_1_1_unity_1_1_runtime_gizmos_1_1_runtime_gizmo_manager_1aa0126efce88d0031b0c24c9a1d53bc61">_backDrawer</link>.sphereMesh&#32;=&#32;<link linkend="_class_leap_1_1_unity_1_1_runtime_gizmos_1_1_runtime_gizmo_manager_1a0742e61b770f3d116bfbfd36a271bdf6">_sphereMesh</link>;
+00246 &#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_leap_1_1_unity_1_1_runtime_gizmos_1_1_runtime_gizmo_manager_1aa0126efce88d0031b0c24c9a1d53bc61">_backDrawer</link>.<link linkend="_class_leap_1_1_unity_1_1_runtime_gizmos_1_1_runtime_gizmo_drawer_1a88620e1b82672b2a25157d2ebf542aaf">cubeMesh</link>&#32;=&#32;<link linkend="_class_leap_1_1_unity_1_1_runtime_gizmos_1_1_runtime_gizmo_manager_1ab0fa01c61a6fe164f4023641378780a8">_cubeMesh</link>;
+00247 &#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_leap_1_1_unity_1_1_runtime_gizmos_1_1_runtime_gizmo_manager_1aa0126efce88d0031b0c24c9a1d53bc61">_backDrawer</link>.wireSphereMesh&#32;=&#32;_wireSphereMesh;
+00248 &#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_leap_1_1_unity_1_1_runtime_gizmos_1_1_runtime_gizmo_manager_1aa0126efce88d0031b0c24c9a1d53bc61">_backDrawer</link>.wireCubeMesh&#32;=&#32;_wireCubeMesh;
+00249 &#32;&#32;&#32;&#32;}
+00250 
+00251 &#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;generateMeshes()&#32;{
+00252 &#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_leap_1_1_unity_1_1_runtime_gizmos_1_1_runtime_gizmo_manager_1ab0fa01c61a6fe164f4023641378780a8">_cubeMesh</link>&#32;=&#32;<emphasis role="keyword">new</emphasis>&#32;Mesh();
+00253 &#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_leap_1_1_unity_1_1_runtime_gizmos_1_1_runtime_gizmo_manager_1ab0fa01c61a6fe164f4023641378780a8">_cubeMesh</link>.name&#32;=&#32;<emphasis role="stringliteral">&quot;RuntimeGizmoCube&quot;</emphasis>;
+00254 &#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_leap_1_1_unity_1_1_runtime_gizmos_1_1_runtime_gizmo_manager_1ab0fa01c61a6fe164f4023641378780a8">_cubeMesh</link>.hideFlags&#32;=&#32;HideFlags.HideAndDontSave;
+00255 
+00256 &#32;&#32;&#32;&#32;&#32;&#32;List&lt;Vector3&gt;&#32;verts&#32;=&#32;<emphasis role="keyword">new</emphasis>&#32;List&lt;Vector3&gt;();
+00257 &#32;&#32;&#32;&#32;&#32;&#32;List&lt;int&gt;&#32;indexes&#32;=&#32;<emphasis role="keyword">new</emphasis>&#32;List&lt;int&gt;();
+00258 
+00259 &#32;&#32;&#32;&#32;&#32;&#32;Vector3[]&#32;faces&#32;=&#32;<emphasis role="keyword">new</emphasis>&#32;Vector3[]&#32;{&#32;Vector3.forward,&#32;Vector3.right,&#32;Vector3.up&#32;};
+00260 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">for</emphasis>&#32;(<emphasis role="keywordtype">int</emphasis>&#32;i&#32;=&#32;0;&#32;i&#32;&lt;&#32;3;&#32;i++)&#32;{
+00261 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;addQuad(verts,&#32;indexes,&#32;faces[(i&#32;+&#32;0)&#32;%&#32;3],&#32;-faces[(i&#32;+&#32;1)&#32;%&#32;3],&#32;faces[(i&#32;+&#32;2)&#32;%&#32;3]);
+00262 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;addQuad(verts,&#32;indexes,&#32;-faces[(i&#32;+&#32;0)&#32;%&#32;3],&#32;faces[(i&#32;+&#32;1)&#32;%&#32;3],&#32;faces[(i&#32;+&#32;2)&#32;%&#32;3]);
+00263 &#32;&#32;&#32;&#32;&#32;&#32;}
+00264 
+00265 &#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_leap_1_1_unity_1_1_runtime_gizmos_1_1_runtime_gizmo_manager_1ab0fa01c61a6fe164f4023641378780a8">_cubeMesh</link>.SetVertices(verts);
+00266 &#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_leap_1_1_unity_1_1_runtime_gizmos_1_1_runtime_gizmo_manager_1ab0fa01c61a6fe164f4023641378780a8">_cubeMesh</link>.SetIndices(indexes.ToArray(),&#32;MeshTopology.Quads,&#32;0);
+00267 &#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_leap_1_1_unity_1_1_runtime_gizmos_1_1_runtime_gizmo_manager_1ab0fa01c61a6fe164f4023641378780a8">_cubeMesh</link>.RecalculateNormals();
+00268 &#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_leap_1_1_unity_1_1_runtime_gizmos_1_1_runtime_gizmo_manager_1ab0fa01c61a6fe164f4023641378780a8">_cubeMesh</link>.RecalculateBounds();
+00269 &#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_leap_1_1_unity_1_1_runtime_gizmos_1_1_runtime_gizmo_manager_1ab0fa01c61a6fe164f4023641378780a8">_cubeMesh</link>.UploadMeshData(<emphasis role="keyword">true</emphasis>);
+00270 
+00271 &#32;&#32;&#32;&#32;&#32;&#32;_wireCubeMesh&#32;=&#32;<emphasis role="keyword">new</emphasis>&#32;Mesh();
+00272 &#32;&#32;&#32;&#32;&#32;&#32;_wireCubeMesh.name&#32;=&#32;<emphasis role="stringliteral">&quot;RuntimeWireCubeMesh&quot;</emphasis>;
+00273 &#32;&#32;&#32;&#32;&#32;&#32;_wireCubeMesh.hideFlags&#32;=&#32;HideFlags.HideAndDontSave;
+00274 
+00275 &#32;&#32;&#32;&#32;&#32;&#32;verts.Clear();
+00276 &#32;&#32;&#32;&#32;&#32;&#32;indexes.Clear();
+00277 
+00278 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">for</emphasis>&#32;(<emphasis role="keywordtype">int</emphasis>&#32;dx&#32;=&#32;1;&#32;dx&#32;&gt;=&#32;-1;&#32;dx&#32;-=&#32;2)&#32;{
+00279 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">for</emphasis>&#32;(<emphasis role="keywordtype">int</emphasis>&#32;dy&#32;=&#32;1;&#32;dy&#32;&gt;=&#32;-1;&#32;dy&#32;-=&#32;2)&#32;{
+00280 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">for</emphasis>&#32;(<emphasis role="keywordtype">int</emphasis>&#32;dz&#32;=&#32;1;&#32;dz&#32;&gt;=&#32;-1;&#32;dz&#32;-=&#32;2)&#32;{
+00281 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;verts.Add(0.5f&#32;*&#32;<emphasis role="keyword">new</emphasis>&#32;Vector3(dx,&#32;dy,&#32;dz));
+00282 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00283 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00284 &#32;&#32;&#32;&#32;&#32;&#32;}
+00285 
+00286 &#32;&#32;&#32;&#32;&#32;&#32;addCorner(indexes,&#32;0,&#32;1,&#32;2,&#32;4);
+00287 &#32;&#32;&#32;&#32;&#32;&#32;addCorner(indexes,&#32;3,&#32;1,&#32;2,&#32;7);
+00288 &#32;&#32;&#32;&#32;&#32;&#32;addCorner(indexes,&#32;5,&#32;1,&#32;4,&#32;7);
+00289 &#32;&#32;&#32;&#32;&#32;&#32;addCorner(indexes,&#32;6,&#32;2,&#32;4,&#32;7);
+00290 
+00291 &#32;&#32;&#32;&#32;&#32;&#32;_wireCubeMesh.SetVertices(verts);
+00292 &#32;&#32;&#32;&#32;&#32;&#32;_wireCubeMesh.SetIndices(indexes.ToArray(),&#32;MeshTopology.Lines,&#32;0);
+00293 &#32;&#32;&#32;&#32;&#32;&#32;_wireCubeMesh.RecalculateBounds();
+00294 &#32;&#32;&#32;&#32;&#32;&#32;_wireCubeMesh.UploadMeshData(<emphasis role="keyword">true</emphasis>);
+00295 
+00296 &#32;&#32;&#32;&#32;&#32;&#32;_wireSphereMesh&#32;=&#32;<emphasis role="keyword">new</emphasis>&#32;Mesh();
+00297 &#32;&#32;&#32;&#32;&#32;&#32;_wireSphereMesh.name&#32;=&#32;<emphasis role="stringliteral">&quot;RuntimeWireSphereMesh&quot;</emphasis>;
+00298 &#32;&#32;&#32;&#32;&#32;&#32;_wireSphereMesh.hideFlags&#32;=&#32;HideFlags.HideAndDontSave;
+00299 
+00300 &#32;&#32;&#32;&#32;&#32;&#32;verts.Clear();
+00301 &#32;&#32;&#32;&#32;&#32;&#32;indexes.Clear();
+00302 
+00303 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordtype">int</emphasis>&#32;totalVerts&#32;=&#32;<link linkend="_class_leap_1_1_unity_1_1_runtime_gizmos_1_1_runtime_gizmo_manager_1ab07fd22968543ebaa1b62765221a0341">CIRCLE_RESOLUTION</link>&#32;*&#32;3;
+00304 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">for</emphasis>&#32;(<emphasis role="keywordtype">int</emphasis>&#32;i&#32;=&#32;0;&#32;i&#32;&lt;&#32;<link linkend="_class_leap_1_1_unity_1_1_runtime_gizmos_1_1_runtime_gizmo_manager_1ab07fd22968543ebaa1b62765221a0341">CIRCLE_RESOLUTION</link>;&#32;i++)&#32;{
+00305 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordtype">float</emphasis>&#32;angle&#32;=&#32;Mathf.PI&#32;*&#32;2&#32;*&#32;i&#32;/&#32;<link linkend="_class_leap_1_1_unity_1_1_runtime_gizmos_1_1_runtime_gizmo_manager_1ab07fd22968543ebaa1b62765221a0341">CIRCLE_RESOLUTION</link>;
+00306 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordtype">float</emphasis>&#32;dx&#32;=&#32;0.5f&#32;*&#32;Mathf.Cos(angle);
+00307 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordtype">float</emphasis>&#32;dy&#32;=&#32;0.5f&#32;*&#32;Mathf.Sin(angle);
+00308 
+00309 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">for</emphasis>&#32;(<emphasis role="keywordtype">int</emphasis>&#32;j&#32;=&#32;0;&#32;j&#32;&lt;&#32;3;&#32;j++)&#32;{
+00310 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;indexes.Add((i&#32;*&#32;3&#32;+&#32;j&#32;+&#32;0)&#32;%&#32;totalVerts);
+00311 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;indexes.Add((i&#32;*&#32;3&#32;+&#32;j&#32;+&#32;3)&#32;%&#32;totalVerts);
+00312 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00313 
+00314 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;verts.Add(<emphasis role="keyword">new</emphasis>&#32;Vector3(dx,&#32;dy,&#32;0));
+00315 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;verts.Add(<emphasis role="keyword">new</emphasis>&#32;Vector3(0,&#32;dx,&#32;dy));
+00316 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;verts.Add(<emphasis role="keyword">new</emphasis>&#32;Vector3(dx,&#32;0,&#32;dy));
+00317 &#32;&#32;&#32;&#32;&#32;&#32;}
+00318 
+00319 &#32;&#32;&#32;&#32;&#32;&#32;_wireSphereMesh.SetVertices(verts);
+00320 &#32;&#32;&#32;&#32;&#32;&#32;_wireSphereMesh.SetIndices(indexes.ToArray(),&#32;MeshTopology.Lines,&#32;0);
+00321 &#32;&#32;&#32;&#32;&#32;&#32;_wireSphereMesh.RecalculateBounds();
+00322 &#32;&#32;&#32;&#32;&#32;&#32;_wireSphereMesh.UploadMeshData(<emphasis role="keyword">true</emphasis>);
+00323 &#32;&#32;&#32;&#32;}
+00324 
+00325 &#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;addQuad(List&lt;Vector3&gt;&#32;verts,&#32;List&lt;int&gt;&#32;indexes,&#32;Vector3&#32;normal,&#32;Vector3&#32;axis1,&#32;Vector3&#32;axis2)&#32;{
+00326 &#32;&#32;&#32;&#32;&#32;&#32;indexes.Add(verts.Count&#32;+&#32;0);
+00327 &#32;&#32;&#32;&#32;&#32;&#32;indexes.Add(verts.Count&#32;+&#32;1);
+00328 &#32;&#32;&#32;&#32;&#32;&#32;indexes.Add(verts.Count&#32;+&#32;2);
+00329 &#32;&#32;&#32;&#32;&#32;&#32;indexes.Add(verts.Count&#32;+&#32;3);
+00330 
+00331 &#32;&#32;&#32;&#32;&#32;&#32;verts.Add(0.5f&#32;*&#32;(normal&#32;+&#32;axis1&#32;+&#32;axis2));
+00332 &#32;&#32;&#32;&#32;&#32;&#32;verts.Add(0.5f&#32;*&#32;(normal&#32;+&#32;axis1&#32;-&#32;axis2));
+00333 &#32;&#32;&#32;&#32;&#32;&#32;verts.Add(0.5f&#32;*&#32;(normal&#32;-&#32;axis1&#32;-&#32;axis2));
+00334 &#32;&#32;&#32;&#32;&#32;&#32;verts.Add(0.5f&#32;*&#32;(normal&#32;-&#32;axis1&#32;+&#32;axis2));
+00335 &#32;&#32;&#32;&#32;}
+00336 
+00337 &#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;addCorner(List&lt;int&gt;&#32;indexes,&#32;<emphasis role="keywordtype">int</emphasis>&#32;a,&#32;<emphasis role="keywordtype">int</emphasis>&#32;b,&#32;<emphasis role="keywordtype">int</emphasis>&#32;c,&#32;<emphasis role="keywordtype">int</emphasis>&#32;d)&#32;{
+00338 &#32;&#32;&#32;&#32;&#32;&#32;indexes.Add(a);&#32;indexes.Add(b);
+00339 &#32;&#32;&#32;&#32;&#32;&#32;indexes.Add(a);&#32;indexes.Add(c);
+00340 &#32;&#32;&#32;&#32;&#32;&#32;indexes.Add(a);&#32;indexes.Add(d);
+00341 &#32;&#32;&#32;&#32;}
+00342 &#32;&#32;}
+00343 
+<anchor xml:id="__runtime_gizmo_manager_8cs_source_1l00344"/><link linkend="_class_leap_1_1_unity_1_1_runtime_gizmos_1_1_runtime_gizmo_drawer">00344</link> &#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keyword">class&#32;</emphasis><link linkend="_class_leap_1_1_unity_1_1_runtime_gizmos_1_1_runtime_gizmo_drawer">RuntimeGizmoDrawer</link>&#32;{
+<anchor xml:id="__runtime_gizmo_manager_8cs_source_1l00345"/><link linkend="_class_leap_1_1_unity_1_1_runtime_gizmos_1_1_runtime_gizmo_drawer_1ac17adbc2827a23b0ab6220fff79c6d0f">00345</link> &#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keyword">const</emphasis>&#32;<emphasis role="keywordtype">int</emphasis>&#32;<link linkend="_class_leap_1_1_unity_1_1_runtime_gizmos_1_1_runtime_gizmo_drawer_1ac17adbc2827a23b0ab6220fff79c6d0f">UNLIT_SOLID_PASS</link>&#32;=&#32;0;
+<anchor xml:id="__runtime_gizmo_manager_8cs_source_1l00346"/><link linkend="_class_leap_1_1_unity_1_1_runtime_gizmos_1_1_runtime_gizmo_drawer_1aacc946cead4467dc85fedd17d79be28b">00346</link> &#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keyword">const</emphasis>&#32;<emphasis role="keywordtype">int</emphasis>&#32;<link linkend="_class_leap_1_1_unity_1_1_runtime_gizmos_1_1_runtime_gizmo_drawer_1aacc946cead4467dc85fedd17d79be28b">UNLIT_TRANSPARENT_PASS</link>&#32;=&#32;1;
+<anchor xml:id="__runtime_gizmo_manager_8cs_source_1l00347"/><link linkend="_class_leap_1_1_unity_1_1_runtime_gizmos_1_1_runtime_gizmo_drawer_1a2dfec095c4320e0e304acf49be0c8ae3">00347</link> &#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keyword">const</emphasis>&#32;<emphasis role="keywordtype">int</emphasis>&#32;<link linkend="_class_leap_1_1_unity_1_1_runtime_gizmos_1_1_runtime_gizmo_drawer_1a2dfec095c4320e0e304acf49be0c8ae3">SHADED_SOLID_PASS</link>&#32;=&#32;2;
+<anchor xml:id="__runtime_gizmo_manager_8cs_source_1l00348"/><link linkend="_class_leap_1_1_unity_1_1_runtime_gizmos_1_1_runtime_gizmo_drawer_1a63404963de208ae8f163224716852a2d">00348</link> &#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keyword">const</emphasis>&#32;<emphasis role="keywordtype">int</emphasis>&#32;<link linkend="_class_leap_1_1_unity_1_1_runtime_gizmos_1_1_runtime_gizmo_drawer_1a63404963de208ae8f163224716852a2d">SHADED_TRANSPARENT_PASS</link>&#32;=&#32;3;
+00349 
+00350 &#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;List&lt;OperationType&gt;&#32;_operations&#32;=&#32;<emphasis role="keyword">new</emphasis>&#32;List&lt;OperationType&gt;();
+00351 &#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;List&lt;Matrix4x4&gt;&#32;_matrices&#32;=&#32;<emphasis role="keyword">new</emphasis>&#32;List&lt;Matrix4x4&gt;();
+00352 &#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;List&lt;Color&gt;&#32;_colors&#32;=&#32;<emphasis role="keyword">new</emphasis>&#32;List&lt;Color&gt;();
+00353 &#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;List&lt;Line&gt;&#32;_lines&#32;=&#32;<emphasis role="keyword">new</emphasis>&#32;List&lt;Line&gt;();
+00354 &#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;List&lt;WireSphere&gt;&#32;_wireSpheres&#32;=&#32;<emphasis role="keyword">new</emphasis>&#32;List&lt;WireSphere&gt;();
+00355 &#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;List&lt;Mesh&gt;&#32;_meshes&#32;=&#32;<emphasis role="keyword">new</emphasis>&#32;List&lt;Mesh&gt;();
+00356 
+00357 &#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;Color&#32;_currColor&#32;=&#32;Color.white;
+00358 &#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;Matrix4x4&#32;_currMatrix&#32;=&#32;Matrix4x4.identity;
+00359 &#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;Stack&lt;Matrix4x4&gt;&#32;_matrixStack&#32;=&#32;<emphasis role="keyword">new</emphasis>&#32;Stack&lt;Matrix4x4&gt;();
+00360 
+00361 &#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;<emphasis role="keywordtype">bool</emphasis>&#32;_isInWireMode&#32;=&#32;<emphasis role="keyword">false</emphasis>;
+00362 &#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;Material&#32;_gizmoMaterial;
+00363 &#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;<emphasis role="keywordtype">int</emphasis>&#32;_operationCountOnGuard&#32;=&#32;-1;
+00364 
+<anchor xml:id="__runtime_gizmo_manager_8cs_source_1l00365"/><link linkend="_class_leap_1_1_unity_1_1_runtime_gizmos_1_1_runtime_gizmo_drawer_1a664625e49da1d01e3e4520cccc31247d">00365</link> &#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;Shader&#32;<link linkend="_class_leap_1_1_unity_1_1_runtime_gizmos_1_1_runtime_gizmo_drawer_1a664625e49da1d01e3e4520cccc31247d">gizmoShader</link>&#32;{
+00366 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">get</emphasis>&#32;{
+00367 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(_gizmoMaterial&#32;==&#32;<emphasis role="keyword">null</emphasis>)&#32;{
+00368 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;<emphasis role="keyword">null</emphasis>;
+00369 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}&#32;<emphasis role="keywordflow">else</emphasis>&#32;{
+00370 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;_gizmoMaterial.shader;
+00371 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00372 &#32;&#32;&#32;&#32;&#32;&#32;}
+00373 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">set</emphasis>&#32;{
+00374 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(_gizmoMaterial&#32;==&#32;<emphasis role="keyword">null</emphasis>)&#32;{
+00375 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;_gizmoMaterial&#32;=&#32;<emphasis role="keyword">new</emphasis>&#32;Material(value);
+00376 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;_gizmoMaterial.name&#32;=&#32;<emphasis role="stringliteral">&quot;Runtime&#32;Gizmo&#32;Material&quot;</emphasis>;
+00377 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;_gizmoMaterial.hideFlags&#32;=&#32;HideFlags.HideAndDontSave;
+00378 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}&#32;<emphasis role="keywordflow">else</emphasis>&#32;{
+00379 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;_gizmoMaterial.shader&#32;=&#32;value;
+00380 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00381 &#32;&#32;&#32;&#32;&#32;&#32;}
+00382 &#32;&#32;&#32;&#32;}
+00383 
+<anchor xml:id="__runtime_gizmo_manager_8cs_source_1l00384"/><link linkend="_class_leap_1_1_unity_1_1_runtime_gizmos_1_1_runtime_gizmo_drawer_1a88620e1b82672b2a25157d2ebf542aaf">00384</link> &#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;Mesh&#32;<link linkend="_class_leap_1_1_unity_1_1_runtime_gizmos_1_1_runtime_gizmo_drawer_1a88620e1b82672b2a25157d2ebf542aaf">cubeMesh</link>,&#32;wireCubeMesh,&#32;sphereMesh,&#32;wireSphereMesh;
+00385 
+<anchor xml:id="__runtime_gizmo_manager_8cs_source_1l00389"/><link linkend="_class_leap_1_1_unity_1_1_runtime_gizmos_1_1_runtime_gizmo_drawer_1aabd29ab232c427c79545ceaa2b35a609">00389</link> &#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;<link linkend="_class_leap_1_1_unity_1_1_runtime_gizmos_1_1_runtime_gizmo_drawer_1aabd29ab232c427c79545ceaa2b35a609">BeginGuard</link>()&#32;{
+00390 &#32;&#32;&#32;&#32;&#32;&#32;_operationCountOnGuard&#32;=&#32;_operations.Count;
+00391 &#32;&#32;&#32;&#32;}
+00392 
+<anchor xml:id="__runtime_gizmo_manager_8cs_source_1l00396"/><link linkend="_class_leap_1_1_unity_1_1_runtime_gizmos_1_1_runtime_gizmo_drawer_1af48e1fd2f99c0ae9f58d0441ce35028b">00396</link> &#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;<link linkend="_class_leap_1_1_unity_1_1_runtime_gizmos_1_1_runtime_gizmo_drawer_1af48e1fd2f99c0ae9f58d0441ce35028b">EndGuard</link>()&#32;{
+00397 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordtype">bool</emphasis>&#32;wereGizmosDrawn&#32;=&#32;_operations.Count&#32;&gt;&#32;_operationCountOnGuard;
+00398 &#32;&#32;&#32;&#32;&#32;&#32;_operationCountOnGuard&#32;=&#32;-1;
+00399 
+00400 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(wereGizmosDrawn)&#32;{
+00401 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;Debug.LogError(<emphasis role="stringliteral">&quot;New&#32;gizmos&#32;were&#32;drawn&#32;to&#32;the&#32;front&#32;buffer!&#32;&#32;Make&#32;sure&#32;to&#32;never&#32;keep&#32;a&#32;reference&#32;to&#32;a&#32;Drawer,&#32;always&#32;get&#32;a&#32;new&#32;one&#32;every&#32;time&#32;you&#32;want&#32;to&#32;start&#32;drawing.&quot;</emphasis>);
+00402 &#32;&#32;&#32;&#32;&#32;&#32;}
+00403 &#32;&#32;&#32;&#32;}
+00404 
+<anchor xml:id="__runtime_gizmo_manager_8cs_source_1l00408"/><link linkend="_class_leap_1_1_unity_1_1_runtime_gizmos_1_1_runtime_gizmo_drawer_1a4b64f55ea3bb3996b33e12cfaa8e04bd">00408</link> &#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;<link linkend="_class_leap_1_1_unity_1_1_runtime_gizmos_1_1_runtime_gizmo_drawer_1a4b64f55ea3bb3996b33e12cfaa8e04bd">RelativeTo</link>(Transform&#32;transform)&#32;{
+00409 &#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_leap_1_1_unity_1_1_runtime_gizmos_1_1_runtime_gizmo_drawer_1a816acf5a1da53536a8d86d050ca213b6">matrix</link>&#32;=&#32;transform.localToWorldMatrix;
+00410 &#32;&#32;&#32;&#32;}
+00411 
+<anchor xml:id="__runtime_gizmo_manager_8cs_source_1l00415"/><link linkend="_class_leap_1_1_unity_1_1_runtime_gizmos_1_1_runtime_gizmo_drawer_1a38f0b9ad5162a609201eff87a19e205e">00415</link> &#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;<link linkend="_class_leap_1_1_unity_1_1_runtime_gizmos_1_1_runtime_gizmo_drawer_1a38f0b9ad5162a609201eff87a19e205e">PushMatrix</link>()&#32;{
+00416 &#32;&#32;&#32;&#32;&#32;&#32;_matrixStack.Push(_currMatrix);
+00417 &#32;&#32;&#32;&#32;}
+00418 
+<anchor xml:id="__runtime_gizmo_manager_8cs_source_1l00422"/><link linkend="_class_leap_1_1_unity_1_1_runtime_gizmos_1_1_runtime_gizmo_drawer_1a6a0c428dd1c24aa043eabc5f4869d48e">00422</link> &#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;<link linkend="_class_leap_1_1_unity_1_1_runtime_gizmos_1_1_runtime_gizmo_drawer_1a6a0c428dd1c24aa043eabc5f4869d48e">PopMatrix</link>()&#32;{
+00423 &#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_leap_1_1_unity_1_1_runtime_gizmos_1_1_runtime_gizmo_drawer_1a816acf5a1da53536a8d86d050ca213b6">matrix</link>&#32;=&#32;_matrixStack.Pop();
+00424 &#32;&#32;&#32;&#32;}
+00425 
+<anchor xml:id="__runtime_gizmo_manager_8cs_source_1l00429"/><link linkend="_class_leap_1_1_unity_1_1_runtime_gizmos_1_1_runtime_gizmo_drawer_1a92de6abecce2909ecf3acdc5e4e93e37">00429</link> &#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;<link linkend="_class_leap_1_1_unity_1_1_runtime_gizmos_1_1_runtime_gizmo_drawer_1a92de6abecce2909ecf3acdc5e4e93e37">ResetMatrixAndColorState</link>()&#32;{
+00430 &#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_leap_1_1_unity_1_1_runtime_gizmos_1_1_runtime_gizmo_drawer_1a816acf5a1da53536a8d86d050ca213b6">matrix</link>&#32;=&#32;Matrix4x4.identity;
+00431 &#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_leap_1_1_unity_1_1_runtime_gizmos_1_1_runtime_gizmo_drawer_1abc3204be6b869c39d35876457ce8c9f0">color</link>&#32;=&#32;Color.white;
+00432 &#32;&#32;&#32;&#32;}
+00433 
+<anchor xml:id="__runtime_gizmo_manager_8cs_source_1l00437"/><link linkend="_class_leap_1_1_unity_1_1_runtime_gizmos_1_1_runtime_gizmo_drawer_1abc3204be6b869c39d35876457ce8c9f0">00437</link> &#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;Color&#32;<link linkend="_class_leap_1_1_unity_1_1_runtime_gizmos_1_1_runtime_gizmo_drawer_1abc3204be6b869c39d35876457ce8c9f0">color</link>&#32;{
+00438 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">get</emphasis>&#32;{
+00439 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;_currColor;
+00440 &#32;&#32;&#32;&#32;&#32;&#32;}
+00441 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">set</emphasis>&#32;{
+00442 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(_currColor&#32;==&#32;value)&#32;{
+00443 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>;
+00444 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00445 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;_currColor&#32;=&#32;value;
+00446 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;_operations.Add(OperationType.SetColor);
+00447 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;_colors.Add(_currColor);
+00448 &#32;&#32;&#32;&#32;&#32;&#32;}
+00449 &#32;&#32;&#32;&#32;}
+00450 
+<anchor xml:id="__runtime_gizmo_manager_8cs_source_1l00454"/><link linkend="_class_leap_1_1_unity_1_1_runtime_gizmos_1_1_runtime_gizmo_drawer_1a816acf5a1da53536a8d86d050ca213b6">00454</link> &#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;Matrix4x4&#32;<link linkend="_class_leap_1_1_unity_1_1_runtime_gizmos_1_1_runtime_gizmo_drawer_1a816acf5a1da53536a8d86d050ca213b6">matrix</link>&#32;{
+00455 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">get</emphasis>&#32;{
+00456 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;_currMatrix;
+00457 &#32;&#32;&#32;&#32;&#32;&#32;}
+00458 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">set</emphasis>&#32;{
+00459 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(_currMatrix&#32;==&#32;value)&#32;{
+00460 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>;
+00461 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00462 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;_currMatrix&#32;=&#32;value;
+00463 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;_operations.Add(OperationType.SetMatrix);
+00464 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;_matrices.Add(_currMatrix);
+00465 &#32;&#32;&#32;&#32;&#32;&#32;}
+00466 &#32;&#32;&#32;&#32;}
+00467 
+<anchor xml:id="__runtime_gizmo_manager_8cs_source_1l00471"/><link linkend="_class_leap_1_1_unity_1_1_runtime_gizmos_1_1_runtime_gizmo_drawer_1abf1d16a9f0fdf0bc3d28c4d2d0084f81">00471</link> &#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;<link linkend="_class_leap_1_1_unity_1_1_runtime_gizmos_1_1_runtime_gizmo_drawer_1abf1d16a9f0fdf0bc3d28c4d2d0084f81">DrawMesh</link>(Mesh&#32;mesh,&#32;Matrix4x4&#32;<link linkend="_class_leap_1_1_unity_1_1_runtime_gizmos_1_1_runtime_gizmo_drawer_1a816acf5a1da53536a8d86d050ca213b6">matrix</link>)&#32;{
+00472 &#32;&#32;&#32;&#32;&#32;&#32;setWireMode(<emphasis role="keyword">false</emphasis>);
+00473 &#32;&#32;&#32;&#32;&#32;&#32;drawMeshInternal(mesh,&#32;<link linkend="_class_leap_1_1_unity_1_1_runtime_gizmos_1_1_runtime_gizmo_drawer_1a816acf5a1da53536a8d86d050ca213b6">matrix</link>);
+00474 &#32;&#32;&#32;&#32;}
+00475 
+<anchor xml:id="__runtime_gizmo_manager_8cs_source_1l00479"/><link linkend="_class_leap_1_1_unity_1_1_runtime_gizmos_1_1_runtime_gizmo_drawer_1adf5c5b247aef1a68afdcdabdd3254f1c">00479</link> &#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;<link linkend="_class_leap_1_1_unity_1_1_runtime_gizmos_1_1_runtime_gizmo_drawer_1adf5c5b247aef1a68afdcdabdd3254f1c">DrawMesh</link>(Mesh&#32;mesh,&#32;Vector3&#32;position,&#32;Quaternion&#32;rotation,&#32;Vector3&#32;scale)&#32;{
+00480 &#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_leap_1_1_unity_1_1_runtime_gizmos_1_1_runtime_gizmo_drawer_1abf1d16a9f0fdf0bc3d28c4d2d0084f81">DrawMesh</link>(mesh,&#32;Matrix4x4.TRS(position,&#32;rotation,&#32;scale));
+00481 &#32;&#32;&#32;&#32;}
+00482 
+<anchor xml:id="__runtime_gizmo_manager_8cs_source_1l00486"/><link linkend="_class_leap_1_1_unity_1_1_runtime_gizmos_1_1_runtime_gizmo_drawer_1af700d140db83b67ab51956c436a76e82">00486</link> &#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;<link linkend="_class_leap_1_1_unity_1_1_runtime_gizmos_1_1_runtime_gizmo_drawer_1af700d140db83b67ab51956c436a76e82">DrawWireMesh</link>(Mesh&#32;mesh,&#32;Matrix4x4&#32;<link linkend="_class_leap_1_1_unity_1_1_runtime_gizmos_1_1_runtime_gizmo_drawer_1a816acf5a1da53536a8d86d050ca213b6">matrix</link>)&#32;{
+00487 &#32;&#32;&#32;&#32;&#32;&#32;setWireMode(<emphasis role="keyword">true</emphasis>);
+00488 &#32;&#32;&#32;&#32;&#32;&#32;drawMeshInternal(mesh,&#32;<link linkend="_class_leap_1_1_unity_1_1_runtime_gizmos_1_1_runtime_gizmo_drawer_1a816acf5a1da53536a8d86d050ca213b6">matrix</link>);
+00489 &#32;&#32;&#32;&#32;}
+00490 
+<anchor xml:id="__runtime_gizmo_manager_8cs_source_1l00494"/><link linkend="_class_leap_1_1_unity_1_1_runtime_gizmos_1_1_runtime_gizmo_drawer_1a38092dc098f2c70e15b14e671e3213a4">00494</link> &#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;<link linkend="_class_leap_1_1_unity_1_1_runtime_gizmos_1_1_runtime_gizmo_drawer_1a38092dc098f2c70e15b14e671e3213a4">DrawWireMesh</link>(Mesh&#32;mesh,&#32;Vector3&#32;position,&#32;Quaternion&#32;rotation,&#32;Vector3&#32;scale)&#32;{
+00495 &#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_leap_1_1_unity_1_1_runtime_gizmos_1_1_runtime_gizmo_drawer_1af700d140db83b67ab51956c436a76e82">DrawWireMesh</link>(mesh,&#32;Matrix4x4.TRS(position,&#32;rotation,&#32;scale));
+00496 &#32;&#32;&#32;&#32;}
+00497 
+<anchor xml:id="__runtime_gizmo_manager_8cs_source_1l00501"/><link linkend="_class_leap_1_1_unity_1_1_runtime_gizmos_1_1_runtime_gizmo_drawer_1a7e1e78b8cec3277c218cf05af7b43aae">00501</link> &#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;<link linkend="_class_leap_1_1_unity_1_1_runtime_gizmos_1_1_runtime_gizmo_drawer_1a7e1e78b8cec3277c218cf05af7b43aae">DrawLine</link>(Vector3&#32;a,&#32;Vector3&#32;b)&#32;{
+00502 &#32;&#32;&#32;&#32;&#32;&#32;_operations.Add(OperationType.DrawLine);
+00503 &#32;&#32;&#32;&#32;&#32;&#32;_lines.Add(<emphasis role="keyword">new</emphasis>&#32;Line(a,&#32;b));
+00504 &#32;&#32;&#32;&#32;}
+00505 
+<anchor xml:id="__runtime_gizmo_manager_8cs_source_1l00509"/><link linkend="_class_leap_1_1_unity_1_1_runtime_gizmos_1_1_runtime_gizmo_drawer_1a82095c769cf2c976da1174211b71e9ae">00509</link> &#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;<link linkend="_class_leap_1_1_unity_1_1_runtime_gizmos_1_1_runtime_gizmo_drawer_1a82095c769cf2c976da1174211b71e9ae">DrawCube</link>(Vector3&#32;position,&#32;Vector3&#32;size)&#32;{
+00510 &#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_leap_1_1_unity_1_1_runtime_gizmos_1_1_runtime_gizmo_drawer_1abf1d16a9f0fdf0bc3d28c4d2d0084f81">DrawMesh</link>(<link linkend="_class_leap_1_1_unity_1_1_runtime_gizmos_1_1_runtime_gizmo_drawer_1a88620e1b82672b2a25157d2ebf542aaf">cubeMesh</link>,&#32;position,&#32;Quaternion.identity,&#32;size);
+00511 &#32;&#32;&#32;&#32;}
+00512 
+<anchor xml:id="__runtime_gizmo_manager_8cs_source_1l00516"/><link linkend="_class_leap_1_1_unity_1_1_runtime_gizmos_1_1_runtime_gizmo_drawer_1a21e5f710bde78731cd5061a45b3869c6">00516</link> &#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;<link linkend="_class_leap_1_1_unity_1_1_runtime_gizmos_1_1_runtime_gizmo_drawer_1a21e5f710bde78731cd5061a45b3869c6">DrawWireCube</link>(Vector3&#32;position,&#32;Vector3&#32;size)&#32;{
+00517 &#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_leap_1_1_unity_1_1_runtime_gizmos_1_1_runtime_gizmo_drawer_1af700d140db83b67ab51956c436a76e82">DrawWireMesh</link>(wireCubeMesh,&#32;position,&#32;Quaternion.identity,&#32;size);
+00518 &#32;&#32;&#32;&#32;}
+00519 
+<anchor xml:id="__runtime_gizmo_manager_8cs_source_1l00523"/><link linkend="_class_leap_1_1_unity_1_1_runtime_gizmos_1_1_runtime_gizmo_drawer_1acdd890c95db06e3d95bbafd740ed11ef">00523</link> &#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;<link linkend="_class_leap_1_1_unity_1_1_runtime_gizmos_1_1_runtime_gizmo_drawer_1acdd890c95db06e3d95bbafd740ed11ef">DrawSphere</link>(Vector3&#32;center,&#32;<emphasis role="keywordtype">float</emphasis>&#32;radius)&#32;{
+00524 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//Throw&#32;an&#32;error&#32;here&#32;so&#32;we&#32;can&#32;give&#32;a&#32;more&#32;specific&#32;error&#32;than&#32;the&#32;more</emphasis>
+00525 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//general&#32;one&#32;which&#32;will&#32;be&#32;thrown&#32;later&#32;for&#32;a&#32;null&#32;mesh.</emphasis>
+00526 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(sphereMesh&#32;==&#32;<emphasis role="keyword">null</emphasis>)&#32;{
+00527 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">throw</emphasis>&#32;<emphasis role="keyword">new</emphasis>&#32;InvalidOperationException(<emphasis role="stringliteral">&quot;Cannot&#32;draw&#32;a&#32;sphere&#32;because&#32;the&#32;Runtime&#32;Gizmo&#32;Manager&#32;does&#32;not&#32;have&#32;a&#32;sphere&#32;mesh&#32;assigned!&quot;</emphasis>);
+00528 &#32;&#32;&#32;&#32;&#32;&#32;}
+00529 
+00530 &#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_leap_1_1_unity_1_1_runtime_gizmos_1_1_runtime_gizmo_drawer_1abf1d16a9f0fdf0bc3d28c4d2d0084f81">DrawMesh</link>(sphereMesh,&#32;center,&#32;Quaternion.identity,&#32;Vector3.one&#32;*&#32;radius&#32;*&#32;2);
+00531 &#32;&#32;&#32;&#32;}
+00532 
+<anchor xml:id="__runtime_gizmo_manager_8cs_source_1l00533"/><link linkend="_class_leap_1_1_unity_1_1_runtime_gizmos_1_1_runtime_gizmo_drawer_1a37f724a49840d699acbfb538883132ef">00533</link> &#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;<link linkend="_class_leap_1_1_unity_1_1_runtime_gizmos_1_1_runtime_gizmo_drawer_1a37f724a49840d699acbfb538883132ef">DrawWireSphere</link>(<link linkend="_struct_leap_1_1_unity_1_1_pose">Pose</link>&#32;pose,&#32;<emphasis role="keywordtype">float</emphasis>&#32;radius,&#32;<emphasis role="keywordtype">int</emphasis>&#32;numSegments&#32;=&#32;32)&#32;{
+00534 &#32;&#32;&#32;&#32;&#32;&#32;_operations.Add(OperationType.DrawWireSphere);
+00535 &#32;&#32;&#32;&#32;&#32;&#32;_wireSpheres.Add(<emphasis role="keyword">new</emphasis>&#32;WireSphere()&#32;{
+00536 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;pose&#32;=&#32;pose,
+00537 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;radius&#32;=&#32;radius,
+00538 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;numSegments&#32;=&#32;numSegments
+00539 &#32;&#32;&#32;&#32;&#32;&#32;});
+00540 &#32;&#32;&#32;&#32;}
+00541 
+<anchor xml:id="__runtime_gizmo_manager_8cs_source_1l00545"/><link linkend="_class_leap_1_1_unity_1_1_runtime_gizmos_1_1_runtime_gizmo_drawer_1a39a6bcebf95fe56c25c228b2909fe77e">00545</link> &#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;<link linkend="_class_leap_1_1_unity_1_1_runtime_gizmos_1_1_runtime_gizmo_drawer_1a39a6bcebf95fe56c25c228b2909fe77e">DrawWireSphere</link>(Vector3&#32;center,&#32;<emphasis role="keywordtype">float</emphasis>&#32;radius,&#32;<emphasis role="keywordtype">int</emphasis>&#32;numSegments&#32;=&#32;32)&#32;{
+00546 &#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_leap_1_1_unity_1_1_runtime_gizmos_1_1_runtime_gizmo_drawer_1a37f724a49840d699acbfb538883132ef">DrawWireSphere</link>(<emphasis role="keyword">new</emphasis>&#32;<link linkend="_struct_leap_1_1_unity_1_1_pose">Pose</link>(center,&#32;Quaternion.identity),&#32;radius,&#32;numSegments);
+00547 &#32;&#32;&#32;&#32;}
+00548 
+<anchor xml:id="__runtime_gizmo_manager_8cs_source_1l00553"/><link linkend="_class_leap_1_1_unity_1_1_runtime_gizmos_1_1_runtime_gizmo_drawer_1ace421278133ab90a03ed16b9016778f0">00553</link> &#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;<link linkend="_class_leap_1_1_unity_1_1_runtime_gizmos_1_1_runtime_gizmo_drawer_1ace421278133ab90a03ed16b9016778f0">DrawEllipsoid</link>(Vector3&#32;foci1,&#32;Vector3&#32;foci2,&#32;<emphasis role="keywordtype">float</emphasis>&#32;minorAxis)&#32;{
+00554 &#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_leap_1_1_unity_1_1_runtime_gizmos_1_1_runtime_gizmo_drawer_1a38f0b9ad5162a609201eff87a19e205e">PushMatrix</link>();
+00555 &#32;&#32;&#32;&#32;&#32;&#32;Vector3&#32;ellipseCenter&#32;=&#32;(foci1&#32;+&#32;foci2)&#32;/&#32;2f;
+00556 &#32;&#32;&#32;&#32;&#32;&#32;Quaternion&#32;ellipseRotation&#32;=&#32;Quaternion.LookRotation(foci1&#32;-&#32;foci2);
+00557 &#32;&#32;&#32;&#32;&#32;&#32;var&#32;majorAxis&#32;=&#32;Mathf.Sqrt(Mathf.Pow(Vector3.Distance(foci1,&#32;foci2)&#32;/&#32;2f,&#32;2f)
+00558 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;+&#32;Mathf.Pow(minorAxis&#32;/&#32;2f,&#32;2f))&#32;*&#32;2f;
+00559 &#32;&#32;&#32;&#32;&#32;&#32;Vector3&#32;ellipseScale&#32;=&#32;<emphasis role="keyword">new</emphasis>&#32;Vector3(minorAxis,&#32;minorAxis,&#32;majorAxis);
+00560 
+00561 &#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_leap_1_1_unity_1_1_runtime_gizmos_1_1_runtime_gizmo_drawer_1a816acf5a1da53536a8d86d050ca213b6">matrix</link>&#32;=&#32;Matrix4x4.TRS(ellipseCenter,&#32;ellipseRotation,&#32;ellipseScale);
+00562 
+00563 &#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_leap_1_1_unity_1_1_runtime_gizmos_1_1_runtime_gizmo_drawer_1a37f724a49840d699acbfb538883132ef">DrawWireSphere</link>(Vector3.zero,&#32;0.5f);
+00564 &#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_leap_1_1_unity_1_1_runtime_gizmos_1_1_runtime_gizmo_drawer_1a6a0c428dd1c24aa043eabc5f4869d48e">PopMatrix</link>();
+00565 &#32;&#32;&#32;&#32;}
+00566 
+<anchor xml:id="__runtime_gizmo_manager_8cs_source_1l00571"/><link linkend="_class_leap_1_1_unity_1_1_runtime_gizmos_1_1_runtime_gizmo_drawer_1a42b99c3009d495968bde636b7a88ea23">00571</link> &#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;<link linkend="_class_leap_1_1_unity_1_1_runtime_gizmos_1_1_runtime_gizmo_drawer_1a42b99c3009d495968bde636b7a88ea23">DrawWireCapsule</link>(Vector3&#32;start,&#32;Vector3&#32;end,&#32;<emphasis role="keywordtype">float</emphasis>&#32;radius)&#32;{
+00572 &#32;&#32;&#32;&#32;&#32;&#32;Vector3&#32;up&#32;=&#32;(end&#32;-&#32;start).normalized&#32;*&#32;radius;
+00573 &#32;&#32;&#32;&#32;&#32;&#32;Vector3&#32;forward&#32;=&#32;Vector3.Slerp(up,&#32;-up,&#32;0.5F);
+00574 &#32;&#32;&#32;&#32;&#32;&#32;Vector3&#32;right&#32;=&#32;Vector3.Cross(up,&#32;forward).normalized&#32;*&#32;radius;
+00575 
+00576 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordtype">float</emphasis>&#32;height&#32;=&#32;(start&#32;-&#32;end).magnitude;
+00577 
+00578 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;Radial&#32;circles</emphasis>
+00579 &#32;&#32;&#32;&#32;&#32;&#32;DrawLineWireCircle(start,&#32;up,&#32;radius,&#32;8);
+00580 &#32;&#32;&#32;&#32;&#32;&#32;DrawLineWireCircle(end,&#32;-up,&#32;radius,&#32;8);
+00581 
+00582 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;Sides</emphasis>
+00583 &#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_leap_1_1_unity_1_1_runtime_gizmos_1_1_runtime_gizmo_drawer_1a7e1e78b8cec3277c218cf05af7b43aae">DrawLine</link>(start&#32;+&#32;right,&#32;end&#32;+&#32;right);
+00584 &#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_leap_1_1_unity_1_1_runtime_gizmos_1_1_runtime_gizmo_drawer_1a7e1e78b8cec3277c218cf05af7b43aae">DrawLine</link>(start&#32;-&#32;right,&#32;end&#32;-&#32;right);
+00585 &#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_leap_1_1_unity_1_1_runtime_gizmos_1_1_runtime_gizmo_drawer_1a7e1e78b8cec3277c218cf05af7b43aae">DrawLine</link>(start&#32;+&#32;forward,&#32;end&#32;+&#32;forward);
+00586 &#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_leap_1_1_unity_1_1_runtime_gizmos_1_1_runtime_gizmo_drawer_1a7e1e78b8cec3277c218cf05af7b43aae">DrawLine</link>(start&#32;-&#32;forward,&#32;end&#32;-&#32;forward);
+00587 
+00588 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;Endcaps</emphasis>
+00589 &#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_leap_1_1_unity_1_1_runtime_gizmos_1_1_runtime_gizmo_drawer_1a03a1f0a8e07e77a5d33cbd11efd7066e">DrawWireArc</link>(start,&#32;right,&#32;forward,&#32;radius,&#32;0.5F,&#32;8);
+00590 &#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_leap_1_1_unity_1_1_runtime_gizmos_1_1_runtime_gizmo_drawer_1a03a1f0a8e07e77a5d33cbd11efd7066e">DrawWireArc</link>(start,&#32;forward,&#32;-right,&#32;radius,&#32;0.5F,&#32;8);
+00591 &#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_leap_1_1_unity_1_1_runtime_gizmos_1_1_runtime_gizmo_drawer_1a03a1f0a8e07e77a5d33cbd11efd7066e">DrawWireArc</link>(end,&#32;right,&#32;-forward,&#32;radius,&#32;0.5F,&#32;8);
+00592 &#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_leap_1_1_unity_1_1_runtime_gizmos_1_1_runtime_gizmo_drawer_1a03a1f0a8e07e77a5d33cbd11efd7066e">DrawWireArc</link>(end,&#32;forward,&#32;right,&#32;radius,&#32;0.5F,&#32;8);
+00593 &#32;&#32;&#32;&#32;}
+00594 
+00595 &#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;DrawLineWireCircle(Vector3&#32;center,&#32;Vector3&#32;normal,&#32;<emphasis role="keywordtype">float</emphasis>&#32;radius,&#32;<emphasis role="keywordtype">int</emphasis>&#32;numCircleSegments&#32;=&#32;16)&#32;{
+00596 &#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_leap_1_1_unity_1_1_runtime_gizmos_1_1_runtime_gizmo_drawer_1a03a1f0a8e07e77a5d33cbd11efd7066e">DrawWireArc</link>(center,&#32;normal,&#32;Vector3.Slerp(normal,&#32;-normal,&#32;0.5F),&#32;radius,&#32;1.0F,&#32;numCircleSegments);
+00597 &#32;&#32;&#32;&#32;}
+00598 
+<anchor xml:id="__runtime_gizmo_manager_8cs_source_1l00599"/><link linkend="_class_leap_1_1_unity_1_1_runtime_gizmos_1_1_runtime_gizmo_drawer_1a03a1f0a8e07e77a5d33cbd11efd7066e">00599</link> &#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;<link linkend="_class_leap_1_1_unity_1_1_runtime_gizmos_1_1_runtime_gizmo_drawer_1a03a1f0a8e07e77a5d33cbd11efd7066e">DrawWireArc</link>(Vector3&#32;center,&#32;Vector3&#32;normal,&#32;Vector3&#32;radialStartDirection,
+00600 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordtype">float</emphasis>&#32;radius,&#32;<emphasis role="keywordtype">float</emphasis>&#32;fractionOfCircleToDraw,&#32;<emphasis role="keywordtype">int</emphasis>&#32;numCircleSegments&#32;=&#32;16)&#32;{
+00601 &#32;&#32;&#32;&#32;&#32;&#32;normal&#32;=&#32;normal.normalized;
+00602 &#32;&#32;&#32;&#32;&#32;&#32;Vector3&#32;radiusVector&#32;=&#32;radialStartDirection.normalized&#32;*&#32;radius;
+00603 &#32;&#32;&#32;&#32;&#32;&#32;Vector3&#32;nextVector;
+00604 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordtype">int</emphasis>&#32;numSegmentsToDraw&#32;=&#32;(int)(numCircleSegments&#32;*&#32;fractionOfCircleToDraw);
+00605 &#32;&#32;&#32;&#32;&#32;&#32;Quaternion&#32;rotator&#32;=&#32;Quaternion.AngleAxis(360f&#32;/&#32;numCircleSegments,&#32;normal);
+00606 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">for</emphasis>&#32;(<emphasis role="keywordtype">int</emphasis>&#32;i&#32;=&#32;0;&#32;i&#32;&lt;&#32;numSegmentsToDraw;&#32;i++)&#32;{
+00607 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;nextVector&#32;=&#32;rotator&#32;*&#32;radiusVector;
+00608 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_leap_1_1_unity_1_1_runtime_gizmos_1_1_runtime_gizmo_drawer_1a7e1e78b8cec3277c218cf05af7b43aae">DrawLine</link>(center&#32;+&#32;radiusVector,&#32;center&#32;+&#32;nextVector);
+00609 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;radiusVector&#32;=&#32;nextVector;
+00610 &#32;&#32;&#32;&#32;&#32;&#32;}
+00611 &#32;&#32;&#32;&#32;}
+00612 
+00613 &#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;List&lt;Collider&gt;&#32;_colliderList&#32;=&#32;<emphasis role="keyword">new</emphasis>&#32;List&lt;Collider&gt;();
+<anchor xml:id="__runtime_gizmo_manager_8cs_source_1l00614"/><link linkend="_class_leap_1_1_unity_1_1_runtime_gizmos_1_1_runtime_gizmo_drawer_1a16bef61806ee819707718cf4f347cd29">00614</link> &#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;<link linkend="_class_leap_1_1_unity_1_1_runtime_gizmos_1_1_runtime_gizmo_drawer_1a16bef61806ee819707718cf4f347cd29">DrawColliders</link>(GameObject&#32;gameObject,&#32;<emphasis role="keywordtype">bool</emphasis>&#32;useWireframe&#32;=&#32;<emphasis role="keyword">true</emphasis>,
+00615 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordtype">bool</emphasis>&#32;traverseHierarchy&#32;=&#32;<emphasis role="keyword">true</emphasis>,
+00616 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordtype">bool</emphasis>&#32;drawTriggers&#32;=&#32;<emphasis role="keyword">false</emphasis>)&#32;{
+00617 &#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_leap_1_1_unity_1_1_runtime_gizmos_1_1_runtime_gizmo_drawer_1a38f0b9ad5162a609201eff87a19e205e">PushMatrix</link>();
+00618 
+00619 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(traverseHierarchy)&#32;{
+00620 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;gameObject.GetComponentsInChildren(_colliderList);
+00621 &#32;&#32;&#32;&#32;&#32;&#32;}&#32;<emphasis role="keywordflow">else</emphasis>&#32;{
+00622 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;gameObject.GetComponents(_colliderList);
+00623 &#32;&#32;&#32;&#32;&#32;&#32;}
+00624 
+00625 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">for</emphasis>&#32;(<emphasis role="keywordtype">int</emphasis>&#32;i&#32;=&#32;0;&#32;i&#32;&lt;&#32;_colliderList.Count;&#32;i++)&#32;{
+00626 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;Collider&#32;collider&#32;=&#32;_colliderList[i];
+00627 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_leap_1_1_unity_1_1_runtime_gizmos_1_1_runtime_gizmo_drawer_1a4b64f55ea3bb3996b33e12cfaa8e04bd">RelativeTo</link>(collider.transform);
+00628 
+00629 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(collider.isTrigger&#32;&amp;&amp;&#32;!drawTriggers)&#32;{&#32;<emphasis role="keywordflow">continue</emphasis>;&#32;}
+00630 
+00631 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_leap_1_1_unity_1_1_runtime_gizmos_1_1_runtime_gizmo_drawer_1a4f7c328555af1aa997feb8eca14639e3">DrawCollider</link>(collider,&#32;skipMatrixSetup:&#32;<emphasis role="keyword">true</emphasis>);
+00632 &#32;&#32;&#32;&#32;&#32;&#32;}
+00633 
+00634 &#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_leap_1_1_unity_1_1_runtime_gizmos_1_1_runtime_gizmo_drawer_1a6a0c428dd1c24aa043eabc5f4869d48e">PopMatrix</link>();
+00635 &#32;&#32;&#32;&#32;}
+00636 
+<anchor xml:id="__runtime_gizmo_manager_8cs_source_1l00637"/><link linkend="_class_leap_1_1_unity_1_1_runtime_gizmos_1_1_runtime_gizmo_drawer_1a4f7c328555af1aa997feb8eca14639e3">00637</link> &#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;<link linkend="_class_leap_1_1_unity_1_1_runtime_gizmos_1_1_runtime_gizmo_drawer_1a4f7c328555af1aa997feb8eca14639e3">DrawCollider</link>(Collider&#32;collider,&#32;<emphasis role="keywordtype">bool</emphasis>&#32;useWireframe&#32;=&#32;<emphasis role="keyword">true</emphasis>,
+00638 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordtype">bool</emphasis>&#32;skipMatrixSetup&#32;=&#32;<emphasis role="keyword">false</emphasis>)&#32;{
+00639 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(!skipMatrixSetup)&#32;{
+00640 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_leap_1_1_unity_1_1_runtime_gizmos_1_1_runtime_gizmo_drawer_1a38f0b9ad5162a609201eff87a19e205e">PushMatrix</link>();
+00641 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_leap_1_1_unity_1_1_runtime_gizmos_1_1_runtime_gizmo_drawer_1a4b64f55ea3bb3996b33e12cfaa8e04bd">RelativeTo</link>(collider.transform);
+00642 &#32;&#32;&#32;&#32;&#32;&#32;}
+00643 
+00644 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(collider&#32;is&#32;BoxCollider)&#32;{
+00645 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;BoxCollider&#32;box&#32;=&#32;collider&#32;as&#32;BoxCollider;
+00646 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(useWireframe)&#32;{
+00647 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_leap_1_1_unity_1_1_runtime_gizmos_1_1_runtime_gizmo_drawer_1a21e5f710bde78731cd5061a45b3869c6">DrawWireCube</link>(box.center,&#32;box.size);
+00648 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00649 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">else</emphasis>&#32;{
+00650 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_leap_1_1_unity_1_1_runtime_gizmos_1_1_runtime_gizmo_drawer_1a82095c769cf2c976da1174211b71e9ae">DrawCube</link>(box.center,&#32;box.size);
+00651 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00652 &#32;&#32;&#32;&#32;&#32;&#32;}
+00653 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">else</emphasis>&#32;<emphasis role="keywordflow">if</emphasis>&#32;(collider&#32;is&#32;SphereCollider)&#32;{
+00654 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;SphereCollider&#32;sphere&#32;=&#32;collider&#32;as&#32;SphereCollider;
+00655 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(useWireframe)&#32;{
+00656 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_leap_1_1_unity_1_1_runtime_gizmos_1_1_runtime_gizmo_drawer_1a37f724a49840d699acbfb538883132ef">DrawWireSphere</link>(sphere.center,&#32;sphere.radius);
+00657 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00658 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">else</emphasis>&#32;{
+00659 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_leap_1_1_unity_1_1_runtime_gizmos_1_1_runtime_gizmo_drawer_1acdd890c95db06e3d95bbafd740ed11ef">DrawSphere</link>(sphere.center,&#32;sphere.radius);
+00660 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00661 &#32;&#32;&#32;&#32;&#32;&#32;}
+00662 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">else</emphasis>&#32;<emphasis role="keywordflow">if</emphasis>&#32;(collider&#32;is&#32;CapsuleCollider)&#32;{
+00663 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;CapsuleCollider&#32;capsule&#32;=&#32;collider&#32;as&#32;CapsuleCollider;
+00664 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(useWireframe)&#32;{
+00665 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;Vector3&#32;capsuleDir;
+00666 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">switch</emphasis>&#32;(capsule.direction)&#32;{
+00667 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">case</emphasis>&#32;0:&#32;capsuleDir&#32;=&#32;Vector3.right;&#32;<emphasis role="keywordflow">break</emphasis>;
+00668 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">case</emphasis>&#32;1:&#32;capsuleDir&#32;=&#32;Vector3.up;&#32;<emphasis role="keywordflow">break</emphasis>;
+00669 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">case</emphasis>&#32;2:&#32;<emphasis role="keywordflow">default</emphasis>:&#32;capsuleDir&#32;=&#32;Vector3.forward;&#32;<emphasis role="keywordflow">break</emphasis>;
+00670 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00671 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_leap_1_1_unity_1_1_runtime_gizmos_1_1_runtime_gizmo_drawer_1a42b99c3009d495968bde636b7a88ea23">DrawWireCapsule</link>(capsule.center&#32;+&#32;capsuleDir&#32;*&#32;(capsule.height&#32;/&#32;2F&#32;-&#32;capsule.radius),
+00672 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;capsule.center&#32;-&#32;capsuleDir&#32;*&#32;(capsule.height&#32;/&#32;2F&#32;-&#32;capsule.radius),&#32;capsule.radius);
+00673 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00674 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">else</emphasis>&#32;{
+00675 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;Vector3&#32;size&#32;=&#32;Vector3.zero;
+00676 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;size&#32;+=&#32;Vector3.one&#32;*&#32;capsule.radius&#32;*&#32;2;
+00677 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;size&#32;+=&#32;<emphasis role="keyword">new</emphasis>&#32;Vector3(capsule.direction&#32;==&#32;0&#32;?&#32;1&#32;:&#32;0,
+00678 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;capsule.direction&#32;==&#32;1&#32;?&#32;1&#32;:&#32;0,
+00679 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;capsule.direction&#32;==&#32;2&#32;?&#32;1&#32;:&#32;0)&#32;*&#32;(capsule.height&#32;-&#32;capsule.radius&#32;*&#32;2);
+00680 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_leap_1_1_unity_1_1_runtime_gizmos_1_1_runtime_gizmo_drawer_1a82095c769cf2c976da1174211b71e9ae">DrawCube</link>(capsule.center,&#32;size);
+00681 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00682 &#32;&#32;&#32;&#32;&#32;&#32;}
+00683 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">else</emphasis>&#32;<emphasis role="keywordflow">if</emphasis>&#32;(collider&#32;is&#32;MeshCollider)&#32;{
+00684 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;MeshCollider&#32;mesh&#32;=&#32;collider&#32;as&#32;MeshCollider;
+00685 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(mesh.sharedMesh&#32;!=&#32;<emphasis role="keyword">null</emphasis>)&#32;{
+00686 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(useWireframe)&#32;{
+00687 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_leap_1_1_unity_1_1_runtime_gizmos_1_1_runtime_gizmo_drawer_1af700d140db83b67ab51956c436a76e82">DrawWireMesh</link>(mesh.sharedMesh,&#32;Matrix4x4.identity);
+00688 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00689 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">else</emphasis>&#32;{
+00690 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_leap_1_1_unity_1_1_runtime_gizmos_1_1_runtime_gizmo_drawer_1abf1d16a9f0fdf0bc3d28c4d2d0084f81">DrawMesh</link>(mesh.sharedMesh,&#32;Matrix4x4.identity);
+00691 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00692 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00693 &#32;&#32;&#32;&#32;&#32;&#32;}
+00694 
+00695 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(!skipMatrixSetup)&#32;{
+00696 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_leap_1_1_unity_1_1_runtime_gizmos_1_1_runtime_gizmo_drawer_1a6a0c428dd1c24aa043eabc5f4869d48e">PopMatrix</link>();
+00697 &#32;&#32;&#32;&#32;&#32;&#32;}
+00698 &#32;&#32;&#32;&#32;}
+00699 
+<anchor xml:id="__runtime_gizmo_manager_8cs_source_1l00710"/><link linkend="_class_leap_1_1_unity_1_1_runtime_gizmos_1_1_runtime_gizmo_drawer_1afdee9da9941fbd020b25ef9c0ee2b73b">00710</link> &#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;<link linkend="_class_leap_1_1_unity_1_1_runtime_gizmos_1_1_runtime_gizmo_drawer_1afdee9da9941fbd020b25ef9c0ee2b73b">DrawPosition</link>(Vector3&#32;pos,&#32;Color&#32;lerpColor,&#32;<emphasis role="keywordtype">float</emphasis>&#32;lerpCoeff,&#32;<emphasis role="keywordtype">float</emphasis>?&#32;overrideScale&#32;=&#32;<emphasis role="keyword">null</emphasis>)&#32;{
+00711 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordtype">float</emphasis>&#32;targetScale;
+00712 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(overrideScale.HasValue)&#32;{
+00713 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;targetScale&#32;=&#32;overrideScale.Value;
+00714 &#32;&#32;&#32;&#32;&#32;&#32;}
+00715 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">else</emphasis>&#32;{
+00716 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;targetScale&#32;=&#32;0.06f;&#32;<emphasis role="comment">//&#32;6&#32;cm&#32;at&#32;1m&#32;away.</emphasis>
+00717 
+00718 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;var&#32;curCam&#32;=&#32;Camera.current;
+00719 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;var&#32;posWorldSpace&#32;=&#32;<link linkend="_class_leap_1_1_unity_1_1_runtime_gizmos_1_1_runtime_gizmo_drawer_1a816acf5a1da53536a8d86d050ca213b6">matrix</link>&#32;*&#32;pos;
+00720 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(curCam&#32;!=&#32;<emphasis role="keyword">null</emphasis>)&#32;{
+00721 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordtype">float</emphasis>&#32;camDistance&#32;=&#32;Vector3.Distance(posWorldSpace,&#32;curCam.transform.position);
+00722 
+00723 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;targetScale&#32;*=&#32;camDistance;
+00724 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00725 &#32;&#32;&#32;&#32;&#32;&#32;}
+00726 
+00727 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordtype">float</emphasis>&#32;extent&#32;=&#32;(targetScale&#32;/&#32;2f);
+00728 
+00729 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordtype">float</emphasis>&#32;negativeAlpha&#32;=&#32;0.6f;
+00730 
+00731 &#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_leap_1_1_unity_1_1_runtime_gizmos_1_1_runtime_gizmo_drawer_1abc3204be6b869c39d35876457ce8c9f0">color</link>&#32;=&#32;Color.red;
+00732 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(lerpCoeff&#32;!=&#32;0f)&#32;{&#32;<link linkend="_class_leap_1_1_unity_1_1_runtime_gizmos_1_1_runtime_gizmo_drawer_1abc3204be6b869c39d35876457ce8c9f0">color</link>&#32;=&#32;<link linkend="_class_leap_1_1_unity_1_1_runtime_gizmos_1_1_runtime_gizmo_drawer_1abc3204be6b869c39d35876457ce8c9f0">color</link>.LerpHSV(lerpColor,&#32;lerpCoeff);&#32;}
+00733 &#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_leap_1_1_unity_1_1_runtime_gizmos_1_1_runtime_gizmo_drawer_1a7e1e78b8cec3277c218cf05af7b43aae">DrawLine</link>(pos,&#32;pos&#32;+&#32;Vector3.right&#32;*&#32;extent);
+00734 &#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_leap_1_1_unity_1_1_runtime_gizmos_1_1_runtime_gizmo_drawer_1abc3204be6b869c39d35876457ce8c9f0">color</link>&#32;=&#32;Color.black.WithAlpha(negativeAlpha);
+00735 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(lerpCoeff&#32;!=&#32;0f)&#32;{&#32;<link linkend="_class_leap_1_1_unity_1_1_runtime_gizmos_1_1_runtime_gizmo_drawer_1abc3204be6b869c39d35876457ce8c9f0">color</link>&#32;=&#32;<link linkend="_class_leap_1_1_unity_1_1_runtime_gizmos_1_1_runtime_gizmo_drawer_1abc3204be6b869c39d35876457ce8c9f0">color</link>.LerpHSV(lerpColor,&#32;lerpCoeff);&#32;}
+00736 &#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_leap_1_1_unity_1_1_runtime_gizmos_1_1_runtime_gizmo_drawer_1a7e1e78b8cec3277c218cf05af7b43aae">DrawLine</link>(pos,&#32;pos&#32;-&#32;Vector3.right&#32;*&#32;extent);
+00737 
+00738 &#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_leap_1_1_unity_1_1_runtime_gizmos_1_1_runtime_gizmo_drawer_1abc3204be6b869c39d35876457ce8c9f0">color</link>&#32;=&#32;Color.green;
+00739 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(lerpCoeff&#32;!=&#32;0f)&#32;{&#32;<link linkend="_class_leap_1_1_unity_1_1_runtime_gizmos_1_1_runtime_gizmo_drawer_1abc3204be6b869c39d35876457ce8c9f0">color</link>&#32;=&#32;<link linkend="_class_leap_1_1_unity_1_1_runtime_gizmos_1_1_runtime_gizmo_drawer_1abc3204be6b869c39d35876457ce8c9f0">color</link>.LerpHSV(lerpColor,&#32;lerpCoeff);&#32;}
+00740 &#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_leap_1_1_unity_1_1_runtime_gizmos_1_1_runtime_gizmo_drawer_1a7e1e78b8cec3277c218cf05af7b43aae">DrawLine</link>(pos,&#32;pos&#32;+&#32;Vector3.up&#32;*&#32;extent);
+00741 &#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_leap_1_1_unity_1_1_runtime_gizmos_1_1_runtime_gizmo_drawer_1abc3204be6b869c39d35876457ce8c9f0">color</link>&#32;=&#32;Color.black.WithAlpha(negativeAlpha);
+00742 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(lerpCoeff&#32;!=&#32;0f)&#32;{&#32;<link linkend="_class_leap_1_1_unity_1_1_runtime_gizmos_1_1_runtime_gizmo_drawer_1abc3204be6b869c39d35876457ce8c9f0">color</link>&#32;=&#32;<link linkend="_class_leap_1_1_unity_1_1_runtime_gizmos_1_1_runtime_gizmo_drawer_1abc3204be6b869c39d35876457ce8c9f0">color</link>.LerpHSV(lerpColor,&#32;lerpCoeff);&#32;}
+00743 &#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_leap_1_1_unity_1_1_runtime_gizmos_1_1_runtime_gizmo_drawer_1a7e1e78b8cec3277c218cf05af7b43aae">DrawLine</link>(pos,&#32;pos&#32;-&#32;Vector3.up&#32;*&#32;extent);
+00744 
+00745 &#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_leap_1_1_unity_1_1_runtime_gizmos_1_1_runtime_gizmo_drawer_1abc3204be6b869c39d35876457ce8c9f0">color</link>&#32;=&#32;Color.blue;
+00746 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(lerpCoeff&#32;!=&#32;0f)&#32;{&#32;<link linkend="_class_leap_1_1_unity_1_1_runtime_gizmos_1_1_runtime_gizmo_drawer_1abc3204be6b869c39d35876457ce8c9f0">color</link>&#32;=&#32;<link linkend="_class_leap_1_1_unity_1_1_runtime_gizmos_1_1_runtime_gizmo_drawer_1abc3204be6b869c39d35876457ce8c9f0">color</link>.LerpHSV(lerpColor,&#32;lerpCoeff);&#32;}
+00747 &#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_leap_1_1_unity_1_1_runtime_gizmos_1_1_runtime_gizmo_drawer_1a7e1e78b8cec3277c218cf05af7b43aae">DrawLine</link>(pos,&#32;pos&#32;+&#32;Vector3.forward&#32;*&#32;extent);
+00748 &#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_leap_1_1_unity_1_1_runtime_gizmos_1_1_runtime_gizmo_drawer_1abc3204be6b869c39d35876457ce8c9f0">color</link>&#32;=&#32;Color.black.WithAlpha(negativeAlpha);
+00749 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(lerpCoeff&#32;!=&#32;0f)&#32;{&#32;<link linkend="_class_leap_1_1_unity_1_1_runtime_gizmos_1_1_runtime_gizmo_drawer_1abc3204be6b869c39d35876457ce8c9f0">color</link>&#32;=&#32;<link linkend="_class_leap_1_1_unity_1_1_runtime_gizmos_1_1_runtime_gizmo_drawer_1abc3204be6b869c39d35876457ce8c9f0">color</link>.LerpHSV(lerpColor,&#32;lerpCoeff);&#32;}
+00750 &#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_leap_1_1_unity_1_1_runtime_gizmos_1_1_runtime_gizmo_drawer_1a7e1e78b8cec3277c218cf05af7b43aae">DrawLine</link>(pos,&#32;pos&#32;-&#32;Vector3.forward&#32;*&#32;extent);
+00751 &#32;&#32;&#32;&#32;}
+00752 
+<anchor xml:id="__runtime_gizmo_manager_8cs_source_1l00758"/><link linkend="_class_leap_1_1_unity_1_1_runtime_gizmos_1_1_runtime_gizmo_drawer_1a16125428988c795ef3da1b83af7dc63d">00758</link> &#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;<link linkend="_class_leap_1_1_unity_1_1_runtime_gizmos_1_1_runtime_gizmo_drawer_1a16125428988c795ef3da1b83af7dc63d">DrawPosition</link>(Vector3&#32;pos)&#32;{
+00759 &#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_leap_1_1_unity_1_1_runtime_gizmos_1_1_runtime_gizmo_drawer_1afdee9da9941fbd020b25ef9c0ee2b73b">DrawPosition</link>(pos,&#32;Color.white,&#32;0f);
+00760 &#32;&#32;&#32;&#32;}
+00761 
+<anchor xml:id="__runtime_gizmo_manager_8cs_source_1l00762"/><link linkend="_class_leap_1_1_unity_1_1_runtime_gizmos_1_1_runtime_gizmo_drawer_1a6902f972fcd982162b60aee63490fecc">00762</link> &#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;<link linkend="_class_leap_1_1_unity_1_1_runtime_gizmos_1_1_runtime_gizmo_drawer_1a6902f972fcd982162b60aee63490fecc">DrawPosition</link>(Vector3&#32;pos,&#32;<emphasis role="keywordtype">float</emphasis>&#32;overrideScale)&#32;{
+00763 &#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_leap_1_1_unity_1_1_runtime_gizmos_1_1_runtime_gizmo_drawer_1afdee9da9941fbd020b25ef9c0ee2b73b">DrawPosition</link>(pos,&#32;Color.white,&#32;0f,&#32;overrideScale);
+00764 &#32;&#32;&#32;&#32;}
+00765 
+<anchor xml:id="__runtime_gizmo_manager_8cs_source_1l00766"/><link linkend="_class_leap_1_1_unity_1_1_runtime_gizmos_1_1_runtime_gizmo_drawer_1a9f67b07d4720921c38ec3c6f0aa0f9fa">00766</link> &#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;<link linkend="_class_leap_1_1_unity_1_1_runtime_gizmos_1_1_runtime_gizmo_drawer_1a9f67b07d4720921c38ec3c6f0aa0f9fa">DrawRect</link>(Transform&#32;frame,&#32;Rect&#32;rect)&#32;{
+00767 &#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_leap_1_1_unity_1_1_runtime_gizmos_1_1_runtime_gizmo_drawer_1a38f0b9ad5162a609201eff87a19e205e">PushMatrix</link>();
+00768 
+00769 &#32;&#32;&#32;&#32;&#32;&#32;this.<link linkend="_class_leap_1_1_unity_1_1_runtime_gizmos_1_1_runtime_gizmo_drawer_1a816acf5a1da53536a8d86d050ca213b6">matrix</link>&#32;=&#32;frame.localToWorldMatrix;
+00770 &#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_leap_1_1_unity_1_1_runtime_gizmos_1_1_runtime_gizmo_drawer_1a7e1e78b8cec3277c218cf05af7b43aae">DrawLine</link>(rect.Corner00(),&#32;rect.Corner01());
+00771 &#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_leap_1_1_unity_1_1_runtime_gizmos_1_1_runtime_gizmo_drawer_1a7e1e78b8cec3277c218cf05af7b43aae">DrawLine</link>(rect.Corner01(),&#32;rect.Corner11());
+00772 &#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_leap_1_1_unity_1_1_runtime_gizmos_1_1_runtime_gizmo_drawer_1a7e1e78b8cec3277c218cf05af7b43aae">DrawLine</link>(rect.Corner11(),&#32;rect.Corner10());
+00773 &#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_leap_1_1_unity_1_1_runtime_gizmos_1_1_runtime_gizmo_drawer_1a7e1e78b8cec3277c218cf05af7b43aae">DrawLine</link>(rect.Corner10(),&#32;rect.Corner00());
+00774 
+00775 &#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_leap_1_1_unity_1_1_runtime_gizmos_1_1_runtime_gizmo_drawer_1a6a0c428dd1c24aa043eabc5f4869d48e">PopMatrix</link>();
+00776 &#32;&#32;&#32;&#32;}
+00777 
+<anchor xml:id="__runtime_gizmo_manager_8cs_source_1l00778"/><link linkend="_class_leap_1_1_unity_1_1_runtime_gizmos_1_1_runtime_gizmo_drawer_1a3997e67f725121479b6d305b02defe79">00778</link> &#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;<link linkend="_class_leap_1_1_unity_1_1_runtime_gizmos_1_1_runtime_gizmo_drawer_1a3997e67f725121479b6d305b02defe79">ClearAllGizmos</link>()&#32;{
+00779 &#32;&#32;&#32;&#32;&#32;&#32;_operations.Clear();
+00780 &#32;&#32;&#32;&#32;&#32;&#32;_matrices.Clear();
+00781 &#32;&#32;&#32;&#32;&#32;&#32;_colors.Clear();
+00782 &#32;&#32;&#32;&#32;&#32;&#32;_lines.Clear();
+00783 &#32;&#32;&#32;&#32;&#32;&#32;_wireSpheres.Clear();
+00784 &#32;&#32;&#32;&#32;&#32;&#32;_meshes.Clear();
+00785 &#32;&#32;&#32;&#32;&#32;&#32;_isInWireMode&#32;=&#32;<emphasis role="keyword">false</emphasis>;
+00786 &#32;&#32;&#32;&#32;&#32;&#32;_currMatrix&#32;=&#32;Matrix4x4.identity;
+00787 &#32;&#32;&#32;&#32;&#32;&#32;_currColor&#32;=&#32;Color.white;
+00788 &#32;&#32;&#32;&#32;}
+00789 
+<anchor xml:id="__runtime_gizmo_manager_8cs_source_1l00790"/><link linkend="_class_leap_1_1_unity_1_1_runtime_gizmos_1_1_runtime_gizmo_drawer_1ae75ab0c30034af8cbc2aaf967c2136c3">00790</link> &#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;<link linkend="_class_leap_1_1_unity_1_1_runtime_gizmos_1_1_runtime_gizmo_drawer_1ae75ab0c30034af8cbc2aaf967c2136c3">DrawAllGizmosToScreen</link>()&#32;{
+00791 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">try</emphasis>&#32;{
+00792 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordtype">int</emphasis>&#32;matrixIndex&#32;=&#32;0;
+00793 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordtype">int</emphasis>&#32;colorIndex&#32;=&#32;0;
+00794 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordtype">int</emphasis>&#32;lineIndex&#32;=&#32;0;
+00795 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordtype">int</emphasis>&#32;wireSphereIndex&#32;=&#32;0;
+00796 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordtype">int</emphasis>&#32;meshIndex&#32;=&#32;0;
+00797 
+00798 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordtype">int</emphasis>&#32;currPass&#32;=&#32;-1;
+00799 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;_currMatrix&#32;=&#32;Matrix4x4.identity;
+00800 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;_currColor&#32;=&#32;Color.white;
+00801 
+00802 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;GL.wireframe&#32;=&#32;<emphasis role="keyword">false</emphasis>;
+00803 
+00804 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">for</emphasis>&#32;(<emphasis role="keywordtype">int</emphasis>&#32;i&#32;=&#32;0;&#32;i&#32;&lt;&#32;_operations.Count;&#32;i++)&#32;{
+00805 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;OperationType&#32;type&#32;=&#32;_operations[i];
+00806 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">switch</emphasis>&#32;(type)&#32;{
+00807 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">case</emphasis>&#32;OperationType.SetMatrix:
+00808 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;_currMatrix&#32;=&#32;_matrices[matrixIndex++];
+00809 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">break</emphasis>;
+00810 
+00811 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">case</emphasis>&#32;OperationType.SetColor:
+00812 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;_currColor&#32;=&#32;_colors[colorIndex++];
+00813 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;currPass&#32;=&#32;-1;&#32;<emphasis role="comment">//force&#32;pass&#32;to&#32;be&#32;set&#32;the&#32;next&#32;time&#32;we&#32;need&#32;to&#32;draw</emphasis>
+00814 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">break</emphasis>;
+00815 
+00816 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">case</emphasis>&#32;OperationType.ToggleWireframe:
+00817 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;GL.wireframe&#32;=&#32;!GL.wireframe;
+00818 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">break</emphasis>;
+00819 
+00820 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">case</emphasis>&#32;OperationType.DrawLine:
+00821 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;setPass(ref&#32;currPass,&#32;isUnlit:&#32;<emphasis role="keyword">true</emphasis>);
+00822 
+00823 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;GL.Begin(GL.LINES);
+00824 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;Line&#32;line&#32;=&#32;_lines[lineIndex++];
+00825 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;GL.Vertex(_currMatrix.MultiplyPoint(line.a));
+00826 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;GL.Vertex(_currMatrix.MultiplyPoint(line.b));
+00827 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;GL.End();
+00828 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">break</emphasis>;
+00829 
+00830 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">case</emphasis>&#32;OperationType.DrawWireSphere:
+00831 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;setPass(ref&#32;currPass,&#32;isUnlit:&#32;<emphasis role="keyword">true</emphasis>);
+00832 
+00833 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;GL.Begin(GL.LINES);
+00834 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;WireSphere&#32;wireSphere&#32;=&#32;_wireSpheres[wireSphereIndex++];
+00835 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;drawWireSphereNow(wireSphere,&#32;ref&#32;currPass);
+00836 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;GL.End();
+00837 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">break</emphasis>;
+00838 
+00839 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">case</emphasis>&#32;OperationType.DrawMesh:
+00840 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(GL.wireframe)&#32;{
+00841 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;setPass(ref&#32;currPass,&#32;isUnlit:&#32;<emphasis role="keyword">true</emphasis>);
+00842 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}&#32;<emphasis role="keywordflow">else</emphasis>&#32;{
+00843 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;setPass(ref&#32;currPass,&#32;isUnlit:&#32;<emphasis role="keyword">false</emphasis>);
+00844 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00845 
+00846 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_namespace_leap_1_1_unity_1a186e5eb0a2b743f1f6b79346f0ab8ad0ad334dfcea59127bedfcdbe0a3ee7f494">Graphics</link>.DrawMeshNow(_meshes[meshIndex++],
+00847 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;_currMatrix&#32;*&#32;_matrices[matrixIndex++]);
+00848 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">break</emphasis>;
+00849 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;
+00850 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">default</emphasis>:
+00851 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">throw</emphasis>&#32;<emphasis role="keyword">new</emphasis>&#32;InvalidOperationException(<emphasis role="stringliteral">&quot;Unexpected&#32;operation&#32;type&#32;&quot;</emphasis>&#32;+&#32;type);
+00852 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00853 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00854 &#32;&#32;&#32;&#32;&#32;&#32;}&#32;<emphasis role="keywordflow">finally</emphasis>&#32;{
+00855 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;GL.wireframe&#32;=&#32;<emphasis role="keyword">false</emphasis>;
+00856 &#32;&#32;&#32;&#32;&#32;&#32;}
+00857 &#32;&#32;&#32;&#32;}
+00858 
+00859 &#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;drawLineNow(Vector3&#32;a,&#32;Vector3&#32;b)&#32;{
+00860 &#32;&#32;&#32;&#32;&#32;&#32;GL.Vertex(_currMatrix.MultiplyPoint(a));
+00861 &#32;&#32;&#32;&#32;&#32;&#32;GL.Vertex(_currMatrix.MultiplyPoint(b));
+00862 &#32;&#32;&#32;&#32;}
+00863 
+00864 &#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;drawWireArcNow(Vector3&#32;center,&#32;Vector3&#32;normal,
+00865 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;Vector3&#32;radialStartDirection,&#32;<emphasis role="keywordtype">float</emphasis>&#32;radius,
+00866 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordtype">float</emphasis>&#32;fractionOfCircleToDraw,&#32;<emphasis role="keywordtype">int</emphasis>&#32;numCircleSegments&#32;=&#32;16)&#32;{
+00867 &#32;&#32;&#32;&#32;&#32;&#32;normal&#32;=&#32;normal.normalized;
+00868 &#32;&#32;&#32;&#32;&#32;&#32;Vector3&#32;radiusVector&#32;=&#32;radialStartDirection.normalized&#32;*&#32;radius;
+00869 &#32;&#32;&#32;&#32;&#32;&#32;Vector3&#32;nextVector;
+00870 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordtype">int</emphasis>&#32;numSegmentsToDraw&#32;=&#32;(int)(numCircleSegments&#32;*&#32;fractionOfCircleToDraw);
+00871 &#32;&#32;&#32;&#32;&#32;&#32;Quaternion&#32;rotator&#32;=&#32;Quaternion.AngleAxis(360f&#32;/&#32;numCircleSegments,&#32;normal);
+00872 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">for</emphasis>&#32;(<emphasis role="keywordtype">int</emphasis>&#32;i&#32;=&#32;0;&#32;i&#32;&lt;&#32;numSegmentsToDraw;&#32;i++)&#32;{
+00873 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;nextVector&#32;=&#32;rotator&#32;*&#32;radiusVector;
+00874 
+00875 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;drawLineNow(center&#32;+&#32;radiusVector,&#32;center&#32;+&#32;nextVector);
+00876 
+00877 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;radiusVector&#32;=&#32;nextVector;
+00878 &#32;&#32;&#32;&#32;&#32;&#32;}
+00879 &#32;&#32;&#32;&#32;}
+00880 
+00881 &#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;setCurrentPassColorIfNew(Color&#32;desiredColor,&#32;ref&#32;<emphasis role="keywordtype">int</emphasis>&#32;curPass)&#32;{
+00882 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(_currColor&#32;!=&#32;desiredColor)&#32;{
+00883 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;_currColor&#32;=&#32;desiredColor;
+00884 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;setPass(ref&#32;curPass,&#32;isUnlit:&#32;<emphasis role="keyword">true</emphasis>);
+00885 &#32;&#32;&#32;&#32;&#32;&#32;}
+00886 &#32;&#32;&#32;&#32;}
+00887 
+00888 &#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;drawPlaneSoftenedWireArcNow(Vector3&#32;position,
+00889 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;Vector3&#32;circleNormal,
+00890 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;Vector3&#32;radialStartDirection,
+00891 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordtype">float</emphasis>&#32;radius,
+00892 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;Color&#32;inFrontOfPlaneColor,
+00893 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;Color&#32;behindPlaneColor,
+00894 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;Vector3&#32;planeNormal,
+00895 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;ref&#32;<emphasis role="keywordtype">int</emphasis>&#32;curPass,
+00896 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordtype">float</emphasis>&#32;fractionOfCircleToDraw&#32;=&#32;1.0f,
+00897 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordtype">int</emphasis>&#32;numCircleSegments&#32;=&#32;16)&#32;{
+00898 &#32;&#32;&#32;&#32;&#32;&#32;var&#32;origCurrColor&#32;=&#32;_currColor;
+00899 
+00900 &#32;&#32;&#32;&#32;&#32;&#32;var&#32;onPlaneDir&#32;=&#32;planeNormal.Cross(circleNormal);
+00901 &#32;&#32;&#32;&#32;&#32;&#32;var&#32;Q&#32;=&#32;Quaternion.AngleAxis(360f&#32;/&#32;numCircleSegments,&#32;circleNormal);
+00902 &#32;&#32;&#32;&#32;&#32;&#32;var&#32;r&#32;=&#32;radialStartDirection&#32;*&#32;radius;
+00903 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">for</emphasis>&#32;(<emphasis role="keywordtype">int</emphasis>&#32;i&#32;=&#32;0;&#32;i&#32;&lt;&#32;numCircleSegments&#32;+&#32;1;&#32;i++)&#32;{
+00904 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;var&#32;nextR&#32;=&#32;Q&#32;*&#32;r;
+00905 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;var&#32;onPlaneAngle&#32;=&#32;Infix.Infix.SignedAngle(r,&#32;onPlaneDir,&#32;circleNormal);
+00906 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;var&#32;nextOnPlaneAngle&#32;=&#32;Infix.Infix.SignedAngle(nextR,&#32;onPlaneDir,&#32;circleNormal);
+00907 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;var&#32;front&#32;=&#32;onPlaneAngle&#32;&lt;&#32;0;
+00908 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;var&#32;nextFront&#32;=&#32;nextOnPlaneAngle&#32;&lt;&#32;0;
+00909 
+00910 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(front&#32;!=&#32;nextFront)&#32;{
+00911 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;var&#32;targetColor&#32;=&#32;Color.Lerp(inFrontOfPlaneColor,&#32;behindPlaneColor,&#32;0.5f);
+00912 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;GL.End();
+00913 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;setPass(ref&#32;curPass,&#32;isUnlit:&#32;<emphasis role="keyword">true</emphasis>,&#32;desiredCurrColor:&#32;targetColor);
+00914 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;GL.Begin(GL.LINES);
+00915 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00916 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">else</emphasis>&#32;<emphasis role="keywordflow">if</emphasis>&#32;(front)&#32;{
+00917 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;var&#32;targetColor&#32;=&#32;inFrontOfPlaneColor;
+00918 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;GL.End();
+00919 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;setPass(ref&#32;curPass,&#32;isUnlit:&#32;<emphasis role="keyword">true</emphasis>,&#32;desiredCurrColor:&#32;targetColor);
+00920 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;GL.Begin(GL.LINES);
+00921 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00922 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">else</emphasis>&#32;{
+00923 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;var&#32;targetColor&#32;=&#32;behindPlaneColor;
+00924 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;GL.End();
+00925 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;setPass(ref&#32;curPass,&#32;isUnlit:&#32;<emphasis role="keyword">true</emphasis>,&#32;desiredCurrColor:&#32;targetColor);
+00926 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;GL.Begin(GL.LINES);
+00927 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00928 
+00929 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;drawLineNow(r,&#32;nextR);
+00930 
+00931 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;r&#32;=&#32;nextR;
+00932 &#32;&#32;&#32;&#32;&#32;&#32;}
+00933 
+00934 &#32;&#32;&#32;&#32;&#32;&#32;_currColor&#32;=&#32;origCurrColor;
+00935 &#32;&#32;&#32;&#32;}
+00936 
+00937 &#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;drawWireSphereNow(WireSphere&#32;wireSphere,
+00938 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;ref&#32;<emphasis role="keywordtype">int</emphasis>&#32;curPass)&#32;{
+00939 &#32;&#32;&#32;&#32;&#32;&#32;var&#32;position&#32;=&#32;wireSphere.pose.position;
+00940 &#32;&#32;&#32;&#32;&#32;&#32;var&#32;rotation&#32;=&#32;wireSphere.pose.rotation;
+00941 
+00942 &#32;&#32;&#32;&#32;&#32;&#32;var&#32;worldPosition&#32;=&#32;_currMatrix.MultiplyPoint3x4(position);
+00943 
+00944 &#32;&#32;&#32;&#32;&#32;&#32;var&#32;dirToCamera&#32;=&#32;(<link linkend="_namespace_valve_1_1_v_r_1a82e5bf501cc3aa155444ee3f0662853fa967d35e40f3f95b1f538bd248640bf3b">Camera</link>.current.transform.position&#32;-&#32;worldPosition).normalized;
+00945 &#32;&#32;&#32;&#32;&#32;&#32;var&#32;dirToCameraInMatrix&#32;=&#32;_currMatrix.inverse.MultiplyVector(dirToCamera);
+00946 
+00947 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;Wire&#32;sphere&#32;outline.&#32;This&#32;is&#32;just&#32;a&#32;wire&#32;sphere&#32;that&#32;faces&#32;the&#32;camera.</emphasis>
+00948 &#32;&#32;&#32;&#32;&#32;&#32;drawWireArcNow(position,&#32;dirToCameraInMatrix,&#32;dirToCameraInMatrix.Perpendicular(),
+00949 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;wireSphere.radius,&#32;1.0f,
+00950 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;numCircleSegments:&#32;wireSphere.numSegments);
+00951 
+00952 
+00953 &#32;&#32;&#32;&#32;&#32;&#32;var&#32;x&#32;=&#32;rotation&#32;*&#32;Vector3.right;
+00954 &#32;&#32;&#32;&#32;&#32;&#32;var&#32;y&#32;=&#32;rotation&#32;*&#32;Vector3.up;
+00955 &#32;&#32;&#32;&#32;&#32;&#32;var&#32;z&#32;=&#32;rotation&#32;*&#32;Vector3.forward;
+00956 
+00957 &#32;&#32;&#32;&#32;&#32;&#32;drawPlaneSoftenedWireArcNow(position,&#32;y,&#32;x,&#32;wireSphere.radius,
+00958 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;inFrontOfPlaneColor:&#32;_currColor,
+00959 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;behindPlaneColor:&#32;_currColor.WithAlpha(_currColor.a&#32;*&#32;0.1f),
+00960 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;planeNormal:&#32;dirToCameraInMatrix,
+00961 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;curPass:&#32;ref&#32;curPass,
+00962 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;fractionOfCircleToDraw:&#32;1.0f,
+00963 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;numCircleSegments:&#32;wireSphere.numSegments);
+00964 &#32;&#32;&#32;&#32;&#32;&#32;drawPlaneSoftenedWireArcNow(position,&#32;z,&#32;y,&#32;wireSphere.radius,
+00965 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;inFrontOfPlaneColor:&#32;_currColor,
+00966 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;behindPlaneColor:&#32;_currColor.WithAlpha(_currColor.a&#32;*&#32;0.1f),
+00967 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;planeNormal:&#32;dirToCameraInMatrix,
+00968 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;curPass:&#32;ref&#32;curPass,
+00969 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;fractionOfCircleToDraw:&#32;1.0f,
+00970 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;numCircleSegments:&#32;wireSphere.numSegments);
+00971 &#32;&#32;&#32;&#32;&#32;&#32;drawPlaneSoftenedWireArcNow(position,&#32;x,&#32;z,&#32;wireSphere.radius,
+00972 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;inFrontOfPlaneColor:&#32;_currColor,
+00973 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;behindPlaneColor:&#32;_currColor.WithAlpha(_currColor.a&#32;*&#32;0.1f),
+00974 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;planeNormal:&#32;dirToCameraInMatrix,
+00975 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;curPass:&#32;ref&#32;curPass,
+00976 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;fractionOfCircleToDraw:&#32;1.0f,
+00977 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;numCircleSegments:&#32;wireSphere.numSegments);
+00978 &#32;&#32;&#32;&#32;}
+00979 
+00980 &#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;setPass(ref&#32;<emphasis role="keywordtype">int</emphasis>&#32;currPass,&#32;<emphasis role="keywordtype">bool</emphasis>&#32;isUnlit,&#32;Color?&#32;desiredCurrColor&#32;=&#32;<emphasis role="keyword">null</emphasis>)&#32;{
+00981 
+00982 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordtype">bool</emphasis>&#32;needToUpdateColor&#32;=&#32;<emphasis role="keyword">false</emphasis>;
+00983 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(desiredCurrColor.HasValue)&#32;{
+00984 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;needToUpdateColor&#32;=&#32;_currColor&#32;!=&#32;desiredCurrColor.Value;
+00985 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;_currColor&#32;=&#32;desiredCurrColor.Value;
+00986 &#32;&#32;&#32;&#32;&#32;&#32;}
+00987 
+00988 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordtype">int</emphasis>&#32;newPass;
+00989 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(isUnlit)&#32;{
+00990 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(_currColor.a&#32;&lt;&#32;1)&#32;{
+00991 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;newPass&#32;=&#32;<link linkend="_class_leap_1_1_unity_1_1_runtime_gizmos_1_1_runtime_gizmo_drawer_1aacc946cead4467dc85fedd17d79be28b">UNLIT_TRANSPARENT_PASS</link>;
+00992 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}&#32;<emphasis role="keywordflow">else</emphasis>&#32;{
+00993 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;newPass&#32;=&#32;<link linkend="_class_leap_1_1_unity_1_1_runtime_gizmos_1_1_runtime_gizmo_drawer_1ac17adbc2827a23b0ab6220fff79c6d0f">UNLIT_SOLID_PASS</link>;
+00994 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00995 &#32;&#32;&#32;&#32;&#32;&#32;}&#32;<emphasis role="keywordflow">else</emphasis>&#32;{
+00996 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(_currColor.a&#32;&lt;&#32;1)&#32;{
+00997 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;newPass&#32;=&#32;<link linkend="_class_leap_1_1_unity_1_1_runtime_gizmos_1_1_runtime_gizmo_drawer_1a63404963de208ae8f163224716852a2d">SHADED_TRANSPARENT_PASS</link>;
+00998 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}&#32;<emphasis role="keywordflow">else</emphasis>&#32;{
+00999 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;newPass&#32;=&#32;<link linkend="_class_leap_1_1_unity_1_1_runtime_gizmos_1_1_runtime_gizmo_drawer_1a2dfec095c4320e0e304acf49be0c8ae3">SHADED_SOLID_PASS</link>;
+01000 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+01001 &#32;&#32;&#32;&#32;&#32;&#32;}
+01002 
+01003 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(currPass&#32;!=&#32;newPass&#32;||&#32;needToUpdateColor)&#32;{
+01004 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;currPass&#32;=&#32;newPass;
+01005 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;_gizmoMaterial.color&#32;=&#32;_currColor;
+01006 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;_gizmoMaterial.SetPass(currPass);
+01007 &#32;&#32;&#32;&#32;&#32;&#32;}
+01008 &#32;&#32;&#32;&#32;}
+01009 
+01010 &#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;drawMeshInternal(Mesh&#32;mesh,&#32;Matrix4x4&#32;<link linkend="_class_leap_1_1_unity_1_1_runtime_gizmos_1_1_runtime_gizmo_drawer_1a816acf5a1da53536a8d86d050ca213b6">matrix</link>)&#32;{
+01011 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(mesh&#32;==&#32;<emphasis role="keyword">null</emphasis>)&#32;{
+01012 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">throw</emphasis>&#32;<emphasis role="keyword">new</emphasis>&#32;InvalidOperationException(<emphasis role="stringliteral">&quot;Mesh&#32;cannot&#32;be&#32;null!&quot;</emphasis>);
+01013 &#32;&#32;&#32;&#32;&#32;&#32;}
+01014 &#32;&#32;&#32;&#32;&#32;&#32;_operations.Add(OperationType.DrawMesh);
+01015 &#32;&#32;&#32;&#32;&#32;&#32;_meshes.Add(mesh);
+01016 &#32;&#32;&#32;&#32;&#32;&#32;_matrices.Add(<link linkend="_class_leap_1_1_unity_1_1_runtime_gizmos_1_1_runtime_gizmo_drawer_1a816acf5a1da53536a8d86d050ca213b6">matrix</link>);
+01017 &#32;&#32;&#32;&#32;}
+01018 
+01019 &#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;setWireMode(<emphasis role="keywordtype">bool</emphasis>&#32;wireMode)&#32;{
+01020 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(_isInWireMode&#32;!=&#32;wireMode)&#32;{
+01021 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;_operations.Add(OperationType.ToggleWireframe);
+01022 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;_isInWireMode&#32;=&#32;wireMode;
+01023 &#32;&#32;&#32;&#32;&#32;&#32;}
+01024 &#32;&#32;&#32;&#32;}
+01025 
+01026 &#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;<emphasis role="keyword">enum</emphasis>&#32;OperationType&#32;{
+01027 &#32;&#32;&#32;&#32;&#32;&#32;SetMatrix,
+01028 &#32;&#32;&#32;&#32;&#32;&#32;ToggleWireframe,
+01029 &#32;&#32;&#32;&#32;&#32;&#32;SetColor,
+01030 &#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_leap_1_1_unity_1_1_runtime_gizmos_1_1_runtime_gizmo_drawer_1a7e1e78b8cec3277c218cf05af7b43aae">DrawLine</link>,
+01031 &#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_leap_1_1_unity_1_1_runtime_gizmos_1_1_runtime_gizmo_drawer_1a37f724a49840d699acbfb538883132ef">DrawWireSphere</link>,
+01032 &#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_leap_1_1_unity_1_1_runtime_gizmos_1_1_runtime_gizmo_drawer_1abf1d16a9f0fdf0bc3d28c4d2d0084f81">DrawMesh</link>
+01033 &#32;&#32;&#32;&#32;}
+01034 
+01035 &#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;<emphasis role="keyword">struct&#32;</emphasis><link linkend="_namespace_t_m_pro_1ab5c7877e6f736cba8b501c877bf5b612a4803e6b9e63dabf04de980788d6a13c4">Line</link>&#32;{
+01036 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;Vector3&#32;a,&#32;b;
+01037 
+01038 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<link linkend="_namespace_t_m_pro_1ab5c7877e6f736cba8b501c877bf5b612a4803e6b9e63dabf04de980788d6a13c4">Line</link>(Vector3&#32;a,&#32;Vector3&#32;b)&#32;{
+01039 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;this.a&#32;=&#32;a;
+01040 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;this.b&#32;=&#32;b;
+01041 &#32;&#32;&#32;&#32;&#32;&#32;}
+01042 &#32;&#32;&#32;&#32;}
+01043 
+01044 &#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;<emphasis role="keyword">struct&#32;</emphasis>WireSphere&#32;{
+01045 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;Pose&#32;&#32;pose;
+01046 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keywordtype">float</emphasis>&#32;radius;
+01047 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keywordtype">int</emphasis>&#32;numSegments;
+01048 &#32;&#32;&#32;&#32;}
+01049 &#32;&#32;}
+01050 }
+</programlisting></section>

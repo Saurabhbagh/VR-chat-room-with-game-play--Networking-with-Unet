@@ -1,0 +1,134 @@
+<?xml version='1.0' encoding='UTF-8' standalone='no'?>
+<section xmlns="http://docbook.org/ns/docbook" version="5.0" xmlns:xlink="http://www.w3.org/1999/xlink" xml:id="__steam_v_r___fade_8cs_source">
+<title>SteamVR_Fade.cs</title>
+<indexterm><primary>O:/GitHUBMINIPRoject/Assets/SteamVR/Scripts/SteamVR_Fade.cs</primary></indexterm>
+<programlisting>00001 <emphasis role="comment">//=======&#32;Copyright&#32;(c)&#32;Valve&#32;Corporation,&#32;All&#32;rights&#32;reserved.&#32;===============</emphasis>
+00002 <emphasis role="comment">//</emphasis>
+00003 <emphasis role="comment">//&#32;Purpose:&#32;CameraFade&#32;script&#32;adapted&#32;to&#32;work&#32;with&#32;SteamVR.</emphasis>
+00004 <emphasis role="comment">//</emphasis>
+00005 <emphasis role="comment">//&#32;Usage:&#32;&#32;&#32;Add&#32;to&#32;your&#32;top&#32;level&#32;SteamVR_Camera&#32;(the&#32;one&#32;with&#32;ApplyDistoration</emphasis>
+00006 <emphasis role="comment">//&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;checked)&#32;and&#32;drag&#32;a&#32;reference&#32;to&#32;this&#32;component&#32;into&#32;SteamVR_Camera</emphasis>
+00007 <emphasis role="comment">//&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;RenderComponents&#32;list.&#32;&#32;Then&#32;call&#32;the&#32;static&#32;helper&#32;function</emphasis>
+00008 <emphasis role="comment">//&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;SteamVR_Fade.Start&#32;with&#32;the&#32;desired&#32;color&#32;and&#32;duration.</emphasis>
+00009 <emphasis role="comment">//&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;Use&#32;a&#32;duration&#32;of&#32;zero&#32;to&#32;set&#32;the&#32;start&#32;color.</emphasis>
+00010 <emphasis role="comment">//</emphasis>
+00011 <emphasis role="comment">//&#32;Example:&#32;Fade&#32;down&#32;from&#32;black&#32;over&#32;one&#32;second.</emphasis>
+00012 <emphasis role="comment">//&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;SteamVR_Fade.Start(Color.black,&#32;0);</emphasis>
+00013 <emphasis role="comment">//&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;SteamVR_Fade.Start(Color.clear,&#32;1);</emphasis>
+00014 <emphasis role="comment">//</emphasis>
+00015 <emphasis role="comment">//&#32;Note:&#32;&#32;&#32;&#32;This&#32;component&#32;is&#32;provided&#32;to&#32;fade&#32;out&#32;a&#32;single&#32;camera&#32;layer&apos;s</emphasis>
+00016 <emphasis role="comment">//&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;scene&#32;view.&#32;&#32;If&#32;instead&#32;you&#32;want&#32;to&#32;fade&#32;the&#32;entire&#32;view,&#32;use:</emphasis>
+00017 <emphasis role="comment">//&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;SteamVR_Fade.View(Color.black,&#32;1);</emphasis>
+00018 <emphasis role="comment">//&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;(Does&#32;not&#32;affect&#32;the&#32;game&#32;view,&#32;however.)</emphasis>
+00019 <emphasis role="comment">//</emphasis>
+00020 <emphasis role="comment">//=============================================================================</emphasis>
+00021 
+00022 <emphasis role="keyword">using</emphasis>&#32;<link linkend="__balloon_8cs_1a7d67e097df9376eb709b6a23aa3c7d23">UnityEngine</link>;
+00023 <emphasis role="keyword">using</emphasis>&#32;<link linkend="_namespace_valve">Valve</link>.<link linkend="_namespace_valve_1_1_v_r">VR</link>;
+00024 
+00025 <emphasis role="keyword">namespace&#32;</emphasis><link linkend="_namespace_valve_1_1_v_r">Valve.VR</link>
+00026 {
+<anchor xml:id="__steam_v_r___fade_8cs_source_1l00027"/><link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___fade">00027</link> &#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keyword">class&#32;</emphasis><link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___fade">SteamVR_Fade</link>&#32;:&#32;MonoBehaviour
+00028 &#32;&#32;&#32;&#32;{
+00029 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;Color&#32;currentColor&#32;=&#32;<emphasis role="keyword">new</emphasis>&#32;Color(0,&#32;0,&#32;0,&#32;0);&#32;<emphasis role="comment">//&#32;default&#32;starting&#32;color:&#32;black&#32;and&#32;fully&#32;transparent</emphasis>
+00030 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;Color&#32;targetColor&#32;=&#32;<emphasis role="keyword">new</emphasis>&#32;Color(0,&#32;0,&#32;0,&#32;0);&#32;&#32;<emphasis role="comment">//&#32;default&#32;target&#32;color:&#32;black&#32;and&#32;fully&#32;transparent</emphasis>
+00031 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;Color&#32;deltaColor&#32;=&#32;<emphasis role="keyword">new</emphasis>&#32;Color(0,&#32;0,&#32;0,&#32;0);&#32;&#32;&#32;<emphasis role="comment">//&#32;the&#32;delta-color&#32;is&#32;basically&#32;the&#32;&quot;speed&#32;/&#32;second&quot;&#32;at&#32;which&#32;the&#32;current&#32;color&#32;should&#32;change</emphasis>
+00032 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;<emphasis role="keywordtype">bool</emphasis>&#32;fadeOverlay&#32;=&#32;<emphasis role="keyword">false</emphasis>;
+00033 
+<anchor xml:id="__steam_v_r___fade_8cs_source_1l00034"/><link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___fade_1abe8618dbc6e97b16736f6104b9509369">00034</link> &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">static</emphasis>&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___fade_1abe8618dbc6e97b16736f6104b9509369">Start</link>(Color&#32;newColor,&#32;<emphasis role="keywordtype">float</emphasis>&#32;duration,&#32;<emphasis role="keywordtype">bool</emphasis>&#32;fadeOverlay&#32;=&#32;<emphasis role="keyword">false</emphasis>)
+00035 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00036 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;SteamVR_Events.Fade.Send(newColor,&#32;duration,&#32;fadeOverlay);
+00037 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00038 
+<anchor xml:id="__steam_v_r___fade_8cs_source_1l00039"/><link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___fade_1ae0cfe117cbc12abb4317801382ad5c07">00039</link> &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">static</emphasis>&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___fade_1ae0cfe117cbc12abb4317801382ad5c07">View</link>(Color&#32;newColor,&#32;<emphasis role="keywordtype">float</emphasis>&#32;duration)
+00040 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00041 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;var&#32;compositor&#32;=&#32;<link linkend="_class_valve_1_1_v_r_1_1_open_v_r">OpenVR</link>.<link linkend="_class_valve_1_1_v_r_1_1_open_v_r_1a398bc817d8516416f480aed933599ac5">Compositor</link>;
+00042 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(compositor&#32;!=&#32;<emphasis role="keyword">null</emphasis>)
+00043 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;compositor.<link linkend="_class_valve_1_1_v_r_1_1_c_v_r_compositor_1a3fbfe2e11f720a212192694e79d3171e">FadeToColor</link>(duration,&#32;newColor.r,&#32;newColor.g,&#32;newColor.b,&#32;newColor.a,&#32;<emphasis role="keyword">false</emphasis>);
+00044 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00045 
+00046 <emphasis role="preprocessor">#if&#32;TEST_FADE_VIEW</emphasis>
+00047 &#32;&#32;&#32;&#32;<emphasis role="keywordtype">void</emphasis>&#32;Update()
+00048 &#32;&#32;&#32;&#32;{
+00049 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(Input.GetKeyDown(KeyCode.Space))
+00050 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00051 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___fade">SteamVR_Fade</link>.<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___fade_1ae0cfe117cbc12abb4317801382ad5c07">View</link>(Color.black,&#32;0);
+00052 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___fade">SteamVR_Fade</link>.<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___fade_1ae0cfe117cbc12abb4317801382ad5c07">View</link>(Color.clear,&#32;1);
+00053 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00054 &#32;&#32;&#32;&#32;}
+00055 <emphasis role="preprocessor">#endif</emphasis>
+00056 
+<anchor xml:id="__steam_v_r___fade_8cs_source_1l00057"/><link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___fade_1aa3a0bdfba958d100b5bc7a0a7aca3fb1">00057</link> &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___fade_1aa3a0bdfba958d100b5bc7a0a7aca3fb1">OnStartFade</link>(Color&#32;newColor,&#32;<emphasis role="keywordtype">float</emphasis>&#32;duration,&#32;<emphasis role="keywordtype">bool</emphasis>&#32;fadeOverlay)
+00058 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00059 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(duration&#32;&gt;&#32;0.0f)
+00060 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00061 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;targetColor&#32;=&#32;newColor;
+00062 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;deltaColor&#32;=&#32;(targetColor&#32;-&#32;currentColor)&#32;/&#32;duration;
+00063 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00064 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">else</emphasis>
+00065 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00066 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;currentColor&#32;=&#32;newColor;
+00067 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00068 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00069 
+00070 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">static</emphasis>&#32;Material&#32;fadeMaterial&#32;=&#32;<emphasis role="keyword">null</emphasis>;
+00071 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">static</emphasis>&#32;<emphasis role="keywordtype">int</emphasis>&#32;fadeMaterialColorID&#32;=&#32;-1;
+00072 
+00073 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordtype">void</emphasis>&#32;OnEnable()
+00074 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00075 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(fadeMaterial&#32;==&#32;<emphasis role="keyword">null</emphasis>)
+00076 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00077 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;fadeMaterial&#32;=&#32;<emphasis role="keyword">new</emphasis>&#32;Material(Shader.Find(<emphasis role="stringliteral">&quot;Custom/SteamVR_Fade&quot;</emphasis>));
+00078 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;fadeMaterialColorID&#32;=&#32;Shader.PropertyToID(<emphasis role="stringliteral">&quot;fadeColor&quot;</emphasis>);
+00079 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00080 
+00081 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;SteamVR_Events.Fade.Listen(<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___fade_1aa3a0bdfba958d100b5bc7a0a7aca3fb1">OnStartFade</link>);
+00082 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;SteamVR_Events.FadeReady.Send();
+00083 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00084 
+00085 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordtype">void</emphasis>&#32;OnDisable()
+00086 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00087 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;SteamVR_Events.Fade.Remove(<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___fade_1aa3a0bdfba958d100b5bc7a0a7aca3fb1">OnStartFade</link>);
+00088 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00089 
+00090 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordtype">void</emphasis>&#32;OnPostRender()
+00091 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00092 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(currentColor&#32;!=&#32;targetColor)
+00093 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00094 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;if&#32;the&#32;difference&#32;between&#32;the&#32;current&#32;alpha&#32;and&#32;the&#32;desired&#32;alpha&#32;is&#32;smaller&#32;than&#32;delta-alpha&#32;*&#32;deltaTime,&#32;then&#32;we&apos;re&#32;pretty&#32;much&#32;done&#32;fading:</emphasis>
+00095 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(Mathf.Abs(currentColor.a&#32;-&#32;targetColor.a)&#32;&lt;&#32;Mathf.Abs(deltaColor.a)&#32;*&#32;Time.deltaTime)
+00096 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00097 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;currentColor&#32;=&#32;targetColor;
+00098 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;deltaColor&#32;=&#32;<emphasis role="keyword">new</emphasis>&#32;Color(0,&#32;0,&#32;0,&#32;0);
+00099 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00100 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">else</emphasis>
+00101 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00102 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;currentColor&#32;+=&#32;deltaColor&#32;*&#32;Time.deltaTime;
+00103 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00104 
+00105 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(fadeOverlay)
+00106 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00107 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;var&#32;overlay&#32;=&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___overlay">SteamVR_Overlay</link>.<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___overlay_1aad1019110da831b03ec485056f846822">instance</link>;
+00108 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(overlay&#32;!=&#32;<emphasis role="keyword">null</emphasis>)
+00109 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00110 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;overlay.<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___overlay_1ac2832ae5e87b5dd56011f407a0fef979">alpha</link>&#32;=&#32;1.0f&#32;-&#32;currentColor.a;
+00111 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00112 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00113 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00114 
+00115 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(currentColor.a&#32;&gt;&#32;0&#32;&amp;&amp;&#32;fadeMaterial)
+00116 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00117 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;fadeMaterial.SetColor(fadeMaterialColorID,&#32;currentColor);
+00118 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;fadeMaterial.SetPass(0);
+00119 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;GL.Begin(GL.QUADS);
+00120 
+00121 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;GL.Vertex3(-1,&#32;-1,&#32;0);
+00122 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;GL.Vertex3(1,&#32;-1,&#32;0);
+00123 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;GL.Vertex3(1,&#32;1,&#32;0);
+00124 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;GL.Vertex3(-1,&#32;1,&#32;0);
+00125 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;GL.End();
+00126 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00127 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00128 &#32;&#32;&#32;&#32;}
+00129 }
+</programlisting></section>

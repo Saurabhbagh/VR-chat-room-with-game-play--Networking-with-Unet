@@ -1,0 +1,200 @@
+<?xml version='1.0' encoding='UTF-8' standalone='no'?>
+<section xmlns="http://docbook.org/ns/docbook" version="5.0" xmlns:xlink="http://www.w3.org/1999/xlink" xml:id="__fast_i_k_8cs_source">
+<title>FastIK.cs</title>
+<indexterm><primary>O:/GitHUBMINIPRoject/Assets/FastIK/Scripts/FastIK/FastIK.cs</primary></indexterm>
+<programlisting>00001 <emphasis role="keyword">using</emphasis>&#32;<link linkend="_namespace_unity_editor">UnityEditor</link>;
+00002 <emphasis role="keyword">using</emphasis>&#32;<link linkend="__balloon_8cs_1a7d67e097df9376eb709b6a23aa3c7d23">UnityEngine</link>;
+00003 <emphasis role="keyword">using</emphasis>&#32;<link linkend="_namespace_unity_engine">UnityEngine</link>.Networking;
+<anchor xml:id="__fast_i_k_8cs_source_1l00004"/><link linkend="_namespace_ditzel_games_1_1_fast_i_k">00004</link> <emphasis role="keyword">namespace&#32;</emphasis><link linkend="_namespace_ditzel_games_1_1_fast_i_k">DitzelGames.FastIK</link>
+00005 {
+<anchor xml:id="__fast_i_k_8cs_source_1l00009"/><link linkend="_class_ditzel_games_1_1_fast_i_k_1_1_fast_i_k">00009</link> &#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keyword">class&#32;</emphasis><link linkend="_class_ditzel_games_1_1_fast_i_k_1_1_fast_i_k">FastIK</link>&#32;:&#32;NetworkBehaviour
+00010 &#32;&#32;&#32;&#32;{
+00011 
+<anchor xml:id="__fast_i_k_8cs_source_1l00012"/><link linkend="_class_ditzel_games_1_1_fast_i_k_1_1_fast_i_k_1aeb4c85ea42386056407d55a6f8ce53f0">00012</link> &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;GameObject&#32;<link linkend="_class_ditzel_games_1_1_fast_i_k_1_1_fast_i_k_1aeb4c85ea42386056407d55a6f8ce53f0">Bone</link>;
+00013 
+<anchor xml:id="__fast_i_k_8cs_source_1l00017"/><link linkend="_class_ditzel_games_1_1_fast_i_k_1_1_fast_i_k_1a9fceb1a8efe626157b523c4100b3805e">00017</link> &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keywordtype">int</emphasis>&#32;<link linkend="_class_ditzel_games_1_1_fast_i_k_1_1_fast_i_k_1a9fceb1a8efe626157b523c4100b3805e">ChainLength</link>&#32;=&#32;2;
+00018 
+<anchor xml:id="__fast_i_k_8cs_source_1l00022"/><link linkend="_class_ditzel_games_1_1_fast_i_k_1_1_fast_i_k_1acc174a0910d921eb1a14fb857cef9341">00022</link> &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;Transform&#32;<link linkend="_class_ditzel_games_1_1_fast_i_k_1_1_fast_i_k_1acc174a0910d921eb1a14fb857cef9341">Target</link>;
+<anchor xml:id="__fast_i_k_8cs_source_1l00023"/><link linkend="_class_ditzel_games_1_1_fast_i_k_1_1_fast_i_k_1ab01d74cb07843603e8958a6e8f029091">00023</link> &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;Transform&#32;<link linkend="_class_ditzel_games_1_1_fast_i_k_1_1_fast_i_k_1ab01d74cb07843603e8958a6e8f029091">Pole</link>;
+00024 
+00028 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;[Header(<emphasis role="stringliteral">&quot;Solver&#32;Parameters&quot;</emphasis>)]
+<anchor xml:id="__fast_i_k_8cs_source_1l00029"/><link linkend="_class_ditzel_games_1_1_fast_i_k_1_1_fast_i_k_1a6bc8f292922a3e2649c2ef363b1b222f">00029</link> &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keywordtype">int</emphasis>&#32;<link linkend="_class_ditzel_games_1_1_fast_i_k_1_1_fast_i_k_1a6bc8f292922a3e2649c2ef363b1b222f">Iterations</link>&#32;=&#32;10;
+00030 
+<anchor xml:id="__fast_i_k_8cs_source_1l00034"/><link linkend="_class_ditzel_games_1_1_fast_i_k_1_1_fast_i_k_1a9f34b9c0fbf01891b864c7b938b6f677">00034</link> &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keywordtype">float</emphasis>&#32;<link linkend="_class_ditzel_games_1_1_fast_i_k_1_1_fast_i_k_1a9f34b9c0fbf01891b864c7b938b6f677">Delta</link>&#32;=&#32;0.001f;
+00035 
+00039 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;[Range(0,&#32;1)]
+<anchor xml:id="__fast_i_k_8cs_source_1l00040"/><link linkend="_class_ditzel_games_1_1_fast_i_k_1_1_fast_i_k_1a683d2c8ba51d312472f67d42d3652cfe">00040</link> &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keywordtype">float</emphasis>&#32;<link linkend="_class_ditzel_games_1_1_fast_i_k_1_1_fast_i_k_1a683d2c8ba51d312472f67d42d3652cfe">SnapBackStrength</link>&#32;=&#32;1f;
+00041 
+00042 
+<anchor xml:id="__fast_i_k_8cs_source_1l00043"/><link linkend="_class_ditzel_games_1_1_fast_i_k_1_1_fast_i_k_1a8fcd9f2d928b2015875e668f6e57cd76">00043</link> &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">protected</emphasis>&#32;<emphasis role="keywordtype">float</emphasis>[]&#32;<link linkend="_class_ditzel_games_1_1_fast_i_k_1_1_fast_i_k_1a8fcd9f2d928b2015875e668f6e57cd76">BonesLength</link>;&#32;<emphasis role="comment">//Target&#32;to&#32;Origin</emphasis>
+<anchor xml:id="__fast_i_k_8cs_source_1l00044"/><link linkend="_class_ditzel_games_1_1_fast_i_k_1_1_fast_i_k_1a02bb8c322cc2eca1cdca8a48854e352d">00044</link> &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">protected</emphasis>&#32;<emphasis role="keywordtype">float</emphasis>&#32;<link linkend="_class_ditzel_games_1_1_fast_i_k_1_1_fast_i_k_1a02bb8c322cc2eca1cdca8a48854e352d">CompleteLength</link>;
+<anchor xml:id="__fast_i_k_8cs_source_1l00045"/><link linkend="_class_ditzel_games_1_1_fast_i_k_1_1_fast_i_k_1ad0b624fb1ec7f670b8a4b823f1ae2a8a">00045</link> &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">protected</emphasis>&#32;Transform[]&#32;<link linkend="_class_ditzel_games_1_1_fast_i_k_1_1_fast_i_k_1ad0b624fb1ec7f670b8a4b823f1ae2a8a">Bones</link>;
+<anchor xml:id="__fast_i_k_8cs_source_1l00046"/><link linkend="_class_ditzel_games_1_1_fast_i_k_1_1_fast_i_k_1a8843cd0bd4516ee662f995a0b3d03fc0">00046</link> &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">protected</emphasis>&#32;Vector3[]&#32;<link linkend="_class_ditzel_games_1_1_fast_i_k_1_1_fast_i_k_1a8843cd0bd4516ee662f995a0b3d03fc0">Positions</link>;
+<anchor xml:id="__fast_i_k_8cs_source_1l00047"/><link linkend="_class_ditzel_games_1_1_fast_i_k_1_1_fast_i_k_1aa771c38a09f4d5dd662fd4e21d6c8b1a">00047</link> &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">protected</emphasis>&#32;Vector3[]&#32;<link linkend="_class_ditzel_games_1_1_fast_i_k_1_1_fast_i_k_1aa771c38a09f4d5dd662fd4e21d6c8b1a">StartDirectionSucc</link>;
+<anchor xml:id="__fast_i_k_8cs_source_1l00048"/><link linkend="_class_ditzel_games_1_1_fast_i_k_1_1_fast_i_k_1a7d7a97dbc072ae01257ea829448f3804">00048</link> &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">protected</emphasis>&#32;Quaternion[]&#32;<link linkend="_class_ditzel_games_1_1_fast_i_k_1_1_fast_i_k_1a7d7a97dbc072ae01257ea829448f3804">StartRotationBone</link>;
+<anchor xml:id="__fast_i_k_8cs_source_1l00049"/><link linkend="_class_ditzel_games_1_1_fast_i_k_1_1_fast_i_k_1a9b58bd4e05eec6ab27ca4b38ef97b8ee">00049</link> &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">protected</emphasis>&#32;Quaternion&#32;<link linkend="_class_ditzel_games_1_1_fast_i_k_1_1_fast_i_k_1a9b58bd4e05eec6ab27ca4b38ef97b8ee">StartRotationTarget</link>;
+<anchor xml:id="__fast_i_k_8cs_source_1l00050"/><link linkend="_class_ditzel_games_1_1_fast_i_k_1_1_fast_i_k_1a95f5d9b28b12e95d86a0cb78411d49e1">00050</link> &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">protected</emphasis>&#32;Quaternion&#32;<link linkend="_class_ditzel_games_1_1_fast_i_k_1_1_fast_i_k_1a95f5d9b28b12e95d86a0cb78411d49e1">StartRotationRoot</link>;
+00051 
+00052 
+00053 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;Start&#32;is&#32;called&#32;before&#32;the&#32;first&#32;frame&#32;update</emphasis>
+00054 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordtype">void</emphasis>&#32;Start()
+00055 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00056 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;Init();
+00057 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00058 
+00059 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordtype">void</emphasis>&#32;Init()
+00060 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00061 
+00062 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//initial&#32;array</emphasis>
+00063 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_ditzel_games_1_1_fast_i_k_1_1_fast_i_k_1ad0b624fb1ec7f670b8a4b823f1ae2a8a">Bones</link>&#32;=&#32;<emphasis role="keyword">new</emphasis>&#32;Transform[<link linkend="_class_ditzel_games_1_1_fast_i_k_1_1_fast_i_k_1a9fceb1a8efe626157b523c4100b3805e">ChainLength</link>&#32;+&#32;1];
+00064 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_ditzel_games_1_1_fast_i_k_1_1_fast_i_k_1a8843cd0bd4516ee662f995a0b3d03fc0">Positions</link>&#32;=&#32;<emphasis role="keyword">new</emphasis>&#32;Vector3[<link linkend="_class_ditzel_games_1_1_fast_i_k_1_1_fast_i_k_1a9fceb1a8efe626157b523c4100b3805e">ChainLength</link>&#32;+&#32;1];
+00065 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_ditzel_games_1_1_fast_i_k_1_1_fast_i_k_1a8fcd9f2d928b2015875e668f6e57cd76">BonesLength</link>&#32;=&#32;<emphasis role="keyword">new</emphasis>&#32;<emphasis role="keywordtype">float</emphasis>[<link linkend="_class_ditzel_games_1_1_fast_i_k_1_1_fast_i_k_1a9fceb1a8efe626157b523c4100b3805e">ChainLength</link>];
+00066 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_ditzel_games_1_1_fast_i_k_1_1_fast_i_k_1aa771c38a09f4d5dd662fd4e21d6c8b1a">StartDirectionSucc</link>&#32;=&#32;<emphasis role="keyword">new</emphasis>&#32;Vector3[<link linkend="_class_ditzel_games_1_1_fast_i_k_1_1_fast_i_k_1a9fceb1a8efe626157b523c4100b3805e">ChainLength</link>&#32;+&#32;1];
+00067 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_ditzel_games_1_1_fast_i_k_1_1_fast_i_k_1a7d7a97dbc072ae01257ea829448f3804">StartRotationBone</link>&#32;=&#32;<emphasis role="keyword">new</emphasis>&#32;Quaternion[<link linkend="_class_ditzel_games_1_1_fast_i_k_1_1_fast_i_k_1a9fceb1a8efe626157b523c4100b3805e">ChainLength</link>&#32;+&#32;1];
+00068 
+00069 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//init&#32;fields</emphasis>
+00070 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(<link linkend="_class_ditzel_games_1_1_fast_i_k_1_1_fast_i_k_1acc174a0910d921eb1a14fb857cef9341">Target</link>&#32;==&#32;<emphasis role="keyword">null</emphasis>)
+00071 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00072 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_ditzel_games_1_1_fast_i_k_1_1_fast_i_k_1acc174a0910d921eb1a14fb857cef9341">Target</link>&#32;=&#32;<emphasis role="keyword">new</emphasis>&#32;GameObject(gameObject.name&#32;+&#32;<emphasis role="stringliteral">&quot;&#32;Target&quot;</emphasis>).transform;
+00073 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_ditzel_games_1_1_fast_i_k_1_1_fast_i_k_1acc174a0910d921eb1a14fb857cef9341">Target</link>.position&#32;=&#32;transform.position;
+00074 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00075 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_ditzel_games_1_1_fast_i_k_1_1_fast_i_k_1a9b58bd4e05eec6ab27ca4b38ef97b8ee">StartRotationTarget</link>&#32;=&#32;<link linkend="_class_ditzel_games_1_1_fast_i_k_1_1_fast_i_k_1acc174a0910d921eb1a14fb857cef9341">Target</link>.rotation;
+00076 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_ditzel_games_1_1_fast_i_k_1_1_fast_i_k_1a02bb8c322cc2eca1cdca8a48854e352d">CompleteLength</link>&#32;=&#32;0;
+00077 
+00078 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//init&#32;data</emphasis>
+00079 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;var&#32;current&#32;=&#32;<link linkend="_class_ditzel_games_1_1_fast_i_k_1_1_fast_i_k_1aeb4c85ea42386056407d55a6f8ce53f0">Bone</link>.transform;
+00080 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">for</emphasis>&#32;(var&#32;i&#32;=&#32;<link linkend="_class_ditzel_games_1_1_fast_i_k_1_1_fast_i_k_1ad0b624fb1ec7f670b8a4b823f1ae2a8a">Bones</link>.Length&#32;-&#32;1;&#32;i&#32;&gt;=&#32;0;&#32;i--)
+00081 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00082 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_ditzel_games_1_1_fast_i_k_1_1_fast_i_k_1ad0b624fb1ec7f670b8a4b823f1ae2a8a">Bones</link>[i]&#32;=&#32;current;
+00083 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_ditzel_games_1_1_fast_i_k_1_1_fast_i_k_1a7d7a97dbc072ae01257ea829448f3804">StartRotationBone</link>[i]&#32;=&#32;current.rotation;
+00084 
+00085 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(i&#32;==&#32;<link linkend="_class_ditzel_games_1_1_fast_i_k_1_1_fast_i_k_1ad0b624fb1ec7f670b8a4b823f1ae2a8a">Bones</link>.Length&#32;-&#32;1)
+00086 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00087 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//leaf</emphasis>
+00088 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_ditzel_games_1_1_fast_i_k_1_1_fast_i_k_1aa771c38a09f4d5dd662fd4e21d6c8b1a">StartDirectionSucc</link>[i]&#32;=&#32;<link linkend="_class_ditzel_games_1_1_fast_i_k_1_1_fast_i_k_1acc174a0910d921eb1a14fb857cef9341">Target</link>.position&#32;-&#32;current.position;
+00089 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00090 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">else</emphasis>
+00091 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00092 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//mid&#32;bone</emphasis>
+00093 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_ditzel_games_1_1_fast_i_k_1_1_fast_i_k_1aa771c38a09f4d5dd662fd4e21d6c8b1a">StartDirectionSucc</link>[i]&#32;=&#32;<link linkend="_class_ditzel_games_1_1_fast_i_k_1_1_fast_i_k_1ad0b624fb1ec7f670b8a4b823f1ae2a8a">Bones</link>[i&#32;+&#32;1].position&#32;-&#32;current.position;
+00094 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_ditzel_games_1_1_fast_i_k_1_1_fast_i_k_1a8fcd9f2d928b2015875e668f6e57cd76">BonesLength</link>[i]&#32;=&#32;<link linkend="_class_ditzel_games_1_1_fast_i_k_1_1_fast_i_k_1aa771c38a09f4d5dd662fd4e21d6c8b1a">StartDirectionSucc</link>[i].magnitude;
+00095 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_ditzel_games_1_1_fast_i_k_1_1_fast_i_k_1a02bb8c322cc2eca1cdca8a48854e352d">CompleteLength</link>&#32;+=&#32;<link linkend="_class_ditzel_games_1_1_fast_i_k_1_1_fast_i_k_1a8fcd9f2d928b2015875e668f6e57cd76">BonesLength</link>[i];
+00096 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00097 
+00098 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;current&#32;=&#32;current.parent;
+00099 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00100 
+00101 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(<link linkend="_class_ditzel_games_1_1_fast_i_k_1_1_fast_i_k_1ad0b624fb1ec7f670b8a4b823f1ae2a8a">Bones</link>[0]&#32;==&#32;<emphasis role="keyword">null</emphasis>)
+00102 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">throw</emphasis>&#32;<emphasis role="keyword">new</emphasis>&#32;UnityException(<emphasis role="stringliteral">&quot;The&#32;chain&#32;value&#32;is&#32;longer&#32;than&#32;the&#32;ancestor&#32;chain!&quot;</emphasis>);
+00103 
+00104 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_ditzel_games_1_1_fast_i_k_1_1_fast_i_k_1a95f5d9b28b12e95d86a0cb78411d49e1">StartRotationRoot</link>&#32;=&#32;(<link linkend="_class_ditzel_games_1_1_fast_i_k_1_1_fast_i_k_1ad0b624fb1ec7f670b8a4b823f1ae2a8a">Bones</link>[0].parent&#32;!=&#32;<emphasis role="keyword">null</emphasis>)&#32;?&#32;<link linkend="_class_ditzel_games_1_1_fast_i_k_1_1_fast_i_k_1ad0b624fb1ec7f670b8a4b823f1ae2a8a">Bones</link>[0].parent.rotation&#32;:&#32;Quaternion.identity;
+00105 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00106 
+00107 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;Update&#32;is&#32;called&#32;once&#32;per&#32;frame</emphasis>
+00108 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordtype">void</emphasis>&#32;LateUpdate()
+00109 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00110 
+00111 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;ResolveIK();
+00112 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00113 
+00114 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;ResolveIK()
+00115 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00116 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(<link linkend="_class_ditzel_games_1_1_fast_i_k_1_1_fast_i_k_1acc174a0910d921eb1a14fb857cef9341">Target</link>&#32;==&#32;<emphasis role="keyword">null</emphasis>)
+00117 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>;
+00118 
+00119 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(<link linkend="_class_ditzel_games_1_1_fast_i_k_1_1_fast_i_k_1a8fcd9f2d928b2015875e668f6e57cd76">BonesLength</link>.Length&#32;!=&#32;<link linkend="_class_ditzel_games_1_1_fast_i_k_1_1_fast_i_k_1a9fceb1a8efe626157b523c4100b3805e">ChainLength</link>)
+00120 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;Init();
+00121 
+00122 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//Fabric</emphasis>
+00123 
+00124 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;&#32;(bone0)&#32;(bonelen&#32;0)&#32;(bone1)&#32;(bonelen&#32;1)&#32;(bone2)...</emphasis>
+00125 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;&#32;&#32;x--------------------x--------------------x---...</emphasis>
+00126 
+00127 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//get&#32;position</emphasis>
+00128 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">for</emphasis>&#32;(<emphasis role="keywordtype">int</emphasis>&#32;i&#32;=&#32;0;&#32;i&#32;&lt;&#32;<link linkend="_class_ditzel_games_1_1_fast_i_k_1_1_fast_i_k_1ad0b624fb1ec7f670b8a4b823f1ae2a8a">Bones</link>.Length;&#32;i++)
+00129 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_ditzel_games_1_1_fast_i_k_1_1_fast_i_k_1a8843cd0bd4516ee662f995a0b3d03fc0">Positions</link>[i]&#32;=&#32;<link linkend="_class_ditzel_games_1_1_fast_i_k_1_1_fast_i_k_1ad0b624fb1ec7f670b8a4b823f1ae2a8a">Bones</link>[i].position;
+00130 
+00131 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;var&#32;RootRot&#32;=&#32;(<link linkend="_class_ditzel_games_1_1_fast_i_k_1_1_fast_i_k_1ad0b624fb1ec7f670b8a4b823f1ae2a8a">Bones</link>[0].parent&#32;!=&#32;<emphasis role="keyword">null</emphasis>)&#32;?&#32;<link linkend="_class_ditzel_games_1_1_fast_i_k_1_1_fast_i_k_1ad0b624fb1ec7f670b8a4b823f1ae2a8a">Bones</link>[0].parent.rotation&#32;:&#32;Quaternion.identity;
+00132 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;var&#32;RootRotDiff&#32;=&#32;RootRot&#32;*&#32;Quaternion.Inverse(<link linkend="_class_ditzel_games_1_1_fast_i_k_1_1_fast_i_k_1a95f5d9b28b12e95d86a0cb78411d49e1">StartRotationRoot</link>);
+00133 
+00134 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//1st&#32;is&#32;possible&#32;to&#32;reach?</emphasis>
+00135 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;((<link linkend="_class_ditzel_games_1_1_fast_i_k_1_1_fast_i_k_1acc174a0910d921eb1a14fb857cef9341">Target</link>.position&#32;-&#32;<link linkend="_class_ditzel_games_1_1_fast_i_k_1_1_fast_i_k_1ad0b624fb1ec7f670b8a4b823f1ae2a8a">Bones</link>[0].position).sqrMagnitude&#32;&gt;=&#32;<link linkend="_class_ditzel_games_1_1_fast_i_k_1_1_fast_i_k_1a02bb8c322cc2eca1cdca8a48854e352d">CompleteLength</link>&#32;*&#32;<link linkend="_class_ditzel_games_1_1_fast_i_k_1_1_fast_i_k_1a02bb8c322cc2eca1cdca8a48854e352d">CompleteLength</link>)
+00136 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00137 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//just&#32;strech&#32;it</emphasis>
+00138 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;var&#32;direction&#32;=&#32;(<link linkend="_class_ditzel_games_1_1_fast_i_k_1_1_fast_i_k_1acc174a0910d921eb1a14fb857cef9341">Target</link>.position&#32;-&#32;<link linkend="_class_ditzel_games_1_1_fast_i_k_1_1_fast_i_k_1a8843cd0bd4516ee662f995a0b3d03fc0">Positions</link>[0]).normalized;
+00139 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//set&#32;everything&#32;after&#32;root</emphasis>
+00140 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">for</emphasis>&#32;(<emphasis role="keywordtype">int</emphasis>&#32;i&#32;=&#32;1;&#32;i&#32;&lt;&#32;<link linkend="_class_ditzel_games_1_1_fast_i_k_1_1_fast_i_k_1a8843cd0bd4516ee662f995a0b3d03fc0">Positions</link>.Length;&#32;i++)
+00141 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_ditzel_games_1_1_fast_i_k_1_1_fast_i_k_1a8843cd0bd4516ee662f995a0b3d03fc0">Positions</link>[i]&#32;=&#32;<link linkend="_class_ditzel_games_1_1_fast_i_k_1_1_fast_i_k_1a8843cd0bd4516ee662f995a0b3d03fc0">Positions</link>[i&#32;-&#32;1]&#32;+&#32;direction&#32;*&#32;<link linkend="_class_ditzel_games_1_1_fast_i_k_1_1_fast_i_k_1a8fcd9f2d928b2015875e668f6e57cd76">BonesLength</link>[i&#32;-&#32;1];
+00142 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00143 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">else</emphasis>
+00144 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00145 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">for</emphasis>&#32;(<emphasis role="keywordtype">int</emphasis>&#32;i&#32;=&#32;0;&#32;i&#32;&lt;&#32;<link linkend="_class_ditzel_games_1_1_fast_i_k_1_1_fast_i_k_1a8843cd0bd4516ee662f995a0b3d03fc0">Positions</link>.Length&#32;-&#32;1;&#32;i++)
+00146 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_ditzel_games_1_1_fast_i_k_1_1_fast_i_k_1a8843cd0bd4516ee662f995a0b3d03fc0">Positions</link>[i&#32;+&#32;1]&#32;=&#32;Vector3.Lerp(<link linkend="_class_ditzel_games_1_1_fast_i_k_1_1_fast_i_k_1a8843cd0bd4516ee662f995a0b3d03fc0">Positions</link>[i&#32;+&#32;1],&#32;<link linkend="_class_ditzel_games_1_1_fast_i_k_1_1_fast_i_k_1a8843cd0bd4516ee662f995a0b3d03fc0">Positions</link>[i]&#32;+&#32;RootRotDiff&#32;*&#32;<link linkend="_class_ditzel_games_1_1_fast_i_k_1_1_fast_i_k_1aa771c38a09f4d5dd662fd4e21d6c8b1a">StartDirectionSucc</link>[i],&#32;<link linkend="_class_ditzel_games_1_1_fast_i_k_1_1_fast_i_k_1a683d2c8ba51d312472f67d42d3652cfe">SnapBackStrength</link>);
+00147 
+00148 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">for</emphasis>&#32;(<emphasis role="keywordtype">int</emphasis>&#32;iteration&#32;=&#32;0;&#32;iteration&#32;&lt;&#32;<link linkend="_class_ditzel_games_1_1_fast_i_k_1_1_fast_i_k_1a6bc8f292922a3e2649c2ef363b1b222f">Iterations</link>;&#32;iteration++)
+00149 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00150 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//https://www.youtube.com/watch?v=UNoX65PRehA</emphasis>
+00151 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//back</emphasis>
+00152 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">for</emphasis>&#32;(<emphasis role="keywordtype">int</emphasis>&#32;i&#32;=&#32;<link linkend="_class_ditzel_games_1_1_fast_i_k_1_1_fast_i_k_1a8843cd0bd4516ee662f995a0b3d03fc0">Positions</link>.Length&#32;-&#32;1;&#32;i&#32;&gt;&#32;0;&#32;i--)
+00153 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00154 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(i&#32;==&#32;<link linkend="_class_ditzel_games_1_1_fast_i_k_1_1_fast_i_k_1a8843cd0bd4516ee662f995a0b3d03fc0">Positions</link>.Length&#32;-&#32;1)
+00155 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_ditzel_games_1_1_fast_i_k_1_1_fast_i_k_1a8843cd0bd4516ee662f995a0b3d03fc0">Positions</link>[i]&#32;=&#32;<link linkend="_class_ditzel_games_1_1_fast_i_k_1_1_fast_i_k_1acc174a0910d921eb1a14fb857cef9341">Target</link>.position;&#32;<emphasis role="comment">//set&#32;it&#32;to&#32;target</emphasis>
+00156 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">else</emphasis>
+00157 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_ditzel_games_1_1_fast_i_k_1_1_fast_i_k_1a8843cd0bd4516ee662f995a0b3d03fc0">Positions</link>[i]&#32;=&#32;<link linkend="_class_ditzel_games_1_1_fast_i_k_1_1_fast_i_k_1a8843cd0bd4516ee662f995a0b3d03fc0">Positions</link>[i&#32;+&#32;1]&#32;+&#32;(<link linkend="_class_ditzel_games_1_1_fast_i_k_1_1_fast_i_k_1a8843cd0bd4516ee662f995a0b3d03fc0">Positions</link>[i]&#32;-&#32;<link linkend="_class_ditzel_games_1_1_fast_i_k_1_1_fast_i_k_1a8843cd0bd4516ee662f995a0b3d03fc0">Positions</link>[i&#32;+&#32;1]).normalized&#32;*&#32;<link linkend="_class_ditzel_games_1_1_fast_i_k_1_1_fast_i_k_1a8fcd9f2d928b2015875e668f6e57cd76">BonesLength</link>[i];&#32;<emphasis role="comment">//set&#32;in&#32;line&#32;on&#32;distance</emphasis>
+00158 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00159 
+00160 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//forward</emphasis>
+00161 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">for</emphasis>&#32;(<emphasis role="keywordtype">int</emphasis>&#32;i&#32;=&#32;1;&#32;i&#32;&lt;&#32;<link linkend="_class_ditzel_games_1_1_fast_i_k_1_1_fast_i_k_1a8843cd0bd4516ee662f995a0b3d03fc0">Positions</link>.Length;&#32;i++)
+00162 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_ditzel_games_1_1_fast_i_k_1_1_fast_i_k_1a8843cd0bd4516ee662f995a0b3d03fc0">Positions</link>[i]&#32;=&#32;<link linkend="_class_ditzel_games_1_1_fast_i_k_1_1_fast_i_k_1a8843cd0bd4516ee662f995a0b3d03fc0">Positions</link>[i&#32;-&#32;1]&#32;+&#32;(<link linkend="_class_ditzel_games_1_1_fast_i_k_1_1_fast_i_k_1a8843cd0bd4516ee662f995a0b3d03fc0">Positions</link>[i]&#32;-&#32;<link linkend="_class_ditzel_games_1_1_fast_i_k_1_1_fast_i_k_1a8843cd0bd4516ee662f995a0b3d03fc0">Positions</link>[i&#32;-&#32;1]).normalized&#32;*&#32;<link linkend="_class_ditzel_games_1_1_fast_i_k_1_1_fast_i_k_1a8fcd9f2d928b2015875e668f6e57cd76">BonesLength</link>[i&#32;-&#32;1];
+00163 
+00164 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//close&#32;enough?</emphasis>
+00165 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;((<link linkend="_class_ditzel_games_1_1_fast_i_k_1_1_fast_i_k_1a8843cd0bd4516ee662f995a0b3d03fc0">Positions</link>[<link linkend="_class_ditzel_games_1_1_fast_i_k_1_1_fast_i_k_1a8843cd0bd4516ee662f995a0b3d03fc0">Positions</link>.Length&#32;-&#32;1]&#32;-&#32;<link linkend="_class_ditzel_games_1_1_fast_i_k_1_1_fast_i_k_1acc174a0910d921eb1a14fb857cef9341">Target</link>.position).sqrMagnitude&#32;&lt;&#32;<link linkend="_class_ditzel_games_1_1_fast_i_k_1_1_fast_i_k_1a9f34b9c0fbf01891b864c7b938b6f677">Delta</link>&#32;*&#32;<link linkend="_class_ditzel_games_1_1_fast_i_k_1_1_fast_i_k_1a9f34b9c0fbf01891b864c7b938b6f677">Delta</link>)
+00166 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">break</emphasis>;
+00167 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00168 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00169 
+00170 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//move&#32;towards&#32;pole</emphasis>
+00171 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(<link linkend="_class_ditzel_games_1_1_fast_i_k_1_1_fast_i_k_1ab01d74cb07843603e8958a6e8f029091">Pole</link>&#32;!=&#32;<emphasis role="keyword">null</emphasis>)
+00172 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00173 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">for</emphasis>&#32;(<emphasis role="keywordtype">int</emphasis>&#32;i&#32;=&#32;1;&#32;i&#32;&lt;&#32;<link linkend="_class_ditzel_games_1_1_fast_i_k_1_1_fast_i_k_1a8843cd0bd4516ee662f995a0b3d03fc0">Positions</link>.Length&#32;-&#32;1;&#32;i++)
+00174 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00175 
+00176 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;var&#32;plane&#32;=&#32;<emphasis role="keyword">new</emphasis>&#32;Plane(<link linkend="_class_ditzel_games_1_1_fast_i_k_1_1_fast_i_k_1a8843cd0bd4516ee662f995a0b3d03fc0">Positions</link>[i&#32;+&#32;1]&#32;-&#32;<link linkend="_class_ditzel_games_1_1_fast_i_k_1_1_fast_i_k_1a8843cd0bd4516ee662f995a0b3d03fc0">Positions</link>[i&#32;-&#32;1],&#32;<link linkend="_class_ditzel_games_1_1_fast_i_k_1_1_fast_i_k_1a8843cd0bd4516ee662f995a0b3d03fc0">Positions</link>[i&#32;-&#32;1]);
+00177 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;var&#32;projectedPole&#32;=&#32;plane.ClosestPointOnPlane(<link linkend="_class_ditzel_games_1_1_fast_i_k_1_1_fast_i_k_1ab01d74cb07843603e8958a6e8f029091">Pole</link>.position);
+00178 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;var&#32;projectedBone&#32;=&#32;plane.ClosestPointOnPlane(<link linkend="_class_ditzel_games_1_1_fast_i_k_1_1_fast_i_k_1a8843cd0bd4516ee662f995a0b3d03fc0">Positions</link>[i]);
+00179 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;var&#32;angle&#32;=&#32;Vector3.SignedAngle(projectedBone&#32;-&#32;<link linkend="_class_ditzel_games_1_1_fast_i_k_1_1_fast_i_k_1a8843cd0bd4516ee662f995a0b3d03fc0">Positions</link>[i&#32;-&#32;1],&#32;projectedPole&#32;-&#32;<link linkend="_class_ditzel_games_1_1_fast_i_k_1_1_fast_i_k_1a8843cd0bd4516ee662f995a0b3d03fc0">Positions</link>[i&#32;-&#32;1],&#32;plane.normal);
+00180 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_ditzel_games_1_1_fast_i_k_1_1_fast_i_k_1a8843cd0bd4516ee662f995a0b3d03fc0">Positions</link>[i]&#32;=&#32;Quaternion.AngleAxis(angle,&#32;plane.normal)&#32;*&#32;(<link linkend="_class_ditzel_games_1_1_fast_i_k_1_1_fast_i_k_1a8843cd0bd4516ee662f995a0b3d03fc0">Positions</link>[i]&#32;-&#32;<link linkend="_class_ditzel_games_1_1_fast_i_k_1_1_fast_i_k_1a8843cd0bd4516ee662f995a0b3d03fc0">Positions</link>[i&#32;-&#32;1])&#32;+&#32;<link linkend="_class_ditzel_games_1_1_fast_i_k_1_1_fast_i_k_1a8843cd0bd4516ee662f995a0b3d03fc0">Positions</link>[i&#32;-&#32;1];
+00181 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00182 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00183 
+00184 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//set&#32;position&#32;&amp;&#32;rotation</emphasis>
+00185 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">for</emphasis>&#32;(<emphasis role="keywordtype">int</emphasis>&#32;i&#32;=&#32;0;&#32;i&#32;&lt;&#32;<link linkend="_class_ditzel_games_1_1_fast_i_k_1_1_fast_i_k_1a8843cd0bd4516ee662f995a0b3d03fc0">Positions</link>.Length;&#32;i++)
+00186 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00187 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(i&#32;==&#32;<link linkend="_class_ditzel_games_1_1_fast_i_k_1_1_fast_i_k_1a8843cd0bd4516ee662f995a0b3d03fc0">Positions</link>.Length&#32;-&#32;1)
+00188 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_ditzel_games_1_1_fast_i_k_1_1_fast_i_k_1ad0b624fb1ec7f670b8a4b823f1ae2a8a">Bones</link>[i].rotation&#32;=&#32;<link linkend="_class_ditzel_games_1_1_fast_i_k_1_1_fast_i_k_1acc174a0910d921eb1a14fb857cef9341">Target</link>.rotation&#32;*&#32;Quaternion.Inverse(<link linkend="_class_ditzel_games_1_1_fast_i_k_1_1_fast_i_k_1a9b58bd4e05eec6ab27ca4b38ef97b8ee">StartRotationTarget</link>)&#32;*&#32;<link linkend="_class_ditzel_games_1_1_fast_i_k_1_1_fast_i_k_1a7d7a97dbc072ae01257ea829448f3804">StartRotationBone</link>[i];
+00189 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">else</emphasis>
+00190 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_ditzel_games_1_1_fast_i_k_1_1_fast_i_k_1ad0b624fb1ec7f670b8a4b823f1ae2a8a">Bones</link>[i].rotation&#32;=&#32;Quaternion.FromToRotation(<link linkend="_class_ditzel_games_1_1_fast_i_k_1_1_fast_i_k_1aa771c38a09f4d5dd662fd4e21d6c8b1a">StartDirectionSucc</link>[i],&#32;<link linkend="_class_ditzel_games_1_1_fast_i_k_1_1_fast_i_k_1a8843cd0bd4516ee662f995a0b3d03fc0">Positions</link>[i&#32;+&#32;1]&#32;-&#32;<link linkend="_class_ditzel_games_1_1_fast_i_k_1_1_fast_i_k_1a8843cd0bd4516ee662f995a0b3d03fc0">Positions</link>[i])&#32;*&#32;<link linkend="_class_ditzel_games_1_1_fast_i_k_1_1_fast_i_k_1a7d7a97dbc072ae01257ea829448f3804">StartRotationBone</link>[i];
+00191 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_ditzel_games_1_1_fast_i_k_1_1_fast_i_k_1ad0b624fb1ec7f670b8a4b823f1ae2a8a">Bones</link>[i].position&#32;=&#32;<link linkend="_class_ditzel_games_1_1_fast_i_k_1_1_fast_i_k_1a8843cd0bd4516ee662f995a0b3d03fc0">Positions</link>[i];
+00192 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00193 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00194 
+00195 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordtype">void</emphasis>&#32;OnDrawGizmos()
+00196 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00197 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;var&#32;current&#32;=&#32;this.transform;
+00198 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">for</emphasis>&#32;(<emphasis role="keywordtype">int</emphasis>&#32;i&#32;=&#32;0;&#32;i&#32;&lt;&#32;<link linkend="_class_ditzel_games_1_1_fast_i_k_1_1_fast_i_k_1a9fceb1a8efe626157b523c4100b3805e">ChainLength</link>&#32;&amp;&amp;&#32;current&#32;!=&#32;<emphasis role="keyword">null</emphasis>&#32;&amp;&amp;&#32;current.parent&#32;!=&#32;<emphasis role="keyword">null</emphasis>;&#32;i++)
+00199 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00200 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;var&#32;scale&#32;=&#32;Vector3.Distance(current.position,&#32;current.parent.position)&#32;*&#32;0.1f;
+00201 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;&#32;&#32;Handles.matrix&#32;=&#32;Matrix4x4.TRS(current.position,&#32;Quaternion.FromToRotation(Vector3.up,&#32;current.parent.position&#32;-&#32;current.position),&#32;new&#32;Vector3(scale,&#32;Vector3.Distance(current.parent.position,&#32;current.position),&#32;scale));</emphasis>
+00202 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;&#32;Handles.color&#32;=&#32;Color.green;</emphasis>
+00203 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;Handles.DrawWireCube(Vector3.up&#32;*&#32;0.5f,&#32;Vector3.one);</emphasis>
+00204 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;current&#32;=&#32;current.parent;
+00205 
+00206 
+00207 
+00208 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00209 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00210 
+00211 
+00212 &#32;&#32;&#32;&#32;}
+00213 }
+</programlisting></section>

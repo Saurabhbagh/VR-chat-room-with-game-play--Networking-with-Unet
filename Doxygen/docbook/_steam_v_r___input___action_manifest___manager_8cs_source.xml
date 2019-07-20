@@ -1,0 +1,876 @@
+<?xml version='1.0' encoding='UTF-8' standalone='no'?>
+<section xmlns="http://docbook.org/ns/docbook" version="5.0" xmlns:xlink="http://www.w3.org/1999/xlink" xml:id="__steam_v_r___input___action_manifest___manager_8cs_source">
+<title>SteamVR_Input_ActionManifest_Manager.cs</title>
+<indexterm><primary>O:/GitHUBMINIPRoject/Assets/SteamVR/Input/Editor/SteamVR_Input_ActionManifest_Manager.cs</primary></indexterm>
+<programlisting>00001 <emphasis role="keyword">using</emphasis>&#32;System;
+00002 <emphasis role="keyword">using</emphasis>&#32;System.Collections.Generic;
+00003 <emphasis role="keyword">using</emphasis>&#32;System.IO;
+00004 <emphasis role="keyword">using</emphasis>&#32;System.Linq;
+00005 <emphasis role="keyword">using</emphasis>&#32;System.Text;
+00006 <emphasis role="keyword">using</emphasis>&#32;<link linkend="_namespace_unity_editor">UnityEditor</link>;
+00007 <emphasis role="keyword">using</emphasis>&#32;<link linkend="__balloon_8cs_1a7d67e097df9376eb709b6a23aa3c7d23">UnityEngine</link>;
+00008 <emphasis role="keyword">using</emphasis>&#32;<link linkend="_namespace_valve">Valve</link>.Newtonsoft.Json;
+00009 
+00010 <emphasis role="keyword">namespace&#32;</emphasis><link linkend="_namespace_valve_1_1_v_r">Valve.VR</link>
+00011 {
+<anchor xml:id="__steam_v_r___input___action_manifest___manager_8cs_source_1l00012"/><link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___input___action_manifest___manager">00012</link> &#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keyword">class&#32;</emphasis><link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___input___action_manifest___manager">SteamVR_Input_ActionManifest_Manager</link>&#32;:&#32;AssetPostprocessor
+00013 &#32;&#32;&#32;&#32;{
+00014 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;<emphasis role="keyword">static</emphasis>&#32;<emphasis role="keywordtype">bool</emphasis>&#32;importing&#32;=&#32;<emphasis role="keyword">false</emphasis>;
+00015 
+00016 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">static</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;OnPostprocessAllAssets(<emphasis role="keywordtype">string</emphasis>[]&#32;importedAssets,&#32;<emphasis role="keywordtype">string</emphasis>[]&#32;deletedAssets,&#32;<emphasis role="keywordtype">string</emphasis>[]&#32;movedAssets,&#32;<emphasis role="keywordtype">string</emphasis>[]&#32;movedFromAssetPaths)
+00017 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00018 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(importing)
+00019 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>;
+00020 
+00021 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;importing&#32;=&#32;<emphasis role="keyword">true</emphasis>;
+00022 
+00023 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;Dictionary&lt;string,&#32;List&lt;SteamVR_PartialInputBindings&gt;&gt;&#32;partials&#32;=&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___input___action_manifest___manager_1a7bba008b67bd60cfb82994486c11fab0">ScanForPartials</link>();
+00024 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(partials&#32;!=&#32;<emphasis role="keyword">null</emphasis>)
+00025 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00026 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">foreach</emphasis>&#32;(var&#32;element&#32;<emphasis role="keywordflow">in</emphasis>&#32;partials)
+00027 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00028 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(element.Value&#32;!=&#32;<emphasis role="keyword">null</emphasis>&#32;&amp;&amp;&#32;element.Value.Count&#32;&gt;&#32;0&#32;&amp;&amp;&#32;element.Value[0].imported&#32;==&#32;<emphasis role="keyword">false</emphasis>)
+00029 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___input___action_manifest___manager_1af7cc91f9ef9ac980e2895ee1e749a77b">ConfirmImport</link>(element.Value);
+00030 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00031 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00032 
+00033 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;importing&#32;=&#32;<emphasis role="keyword">false</emphasis>;
+00034 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00035 
+<anchor xml:id="__steam_v_r___input___action_manifest___manager_8cs_source_1l00036"/><link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___input___action_manifest___manager_1a88936a6c601772bc5f87cac96ae8ea64">00036</link> &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keyword">const</emphasis>&#32;<emphasis role="keywordtype">string</emphasis>&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___input___action_manifest___manager_1a88936a6c601772bc5f87cac96ae8ea64">partialManifestFilename</link>&#32;=&#32;<emphasis role="stringliteral">&quot;steamvr_partial_manifest.json&quot;</emphasis>;
+<anchor xml:id="__steam_v_r___input___action_manifest___manager_8cs_source_1l00037"/><link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___input___action_manifest___manager_1a7b709e81ad8ce36517b9aa1e29f58ae0">00037</link> &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keyword">static</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___input___action_manifest___manager_1a7b709e81ad8ce36517b9aa1e29f58ae0">CreatePartial</link>(<emphasis role="keywordtype">string</emphasis>&#32;name,&#32;<emphasis role="keywordtype">int</emphasis>&#32;version,&#32;<emphasis role="keywordtype">bool</emphasis>&#32;overwriteOld,&#32;<emphasis role="keywordtype">bool</emphasis>&#32;removeUnused)
+00038 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00039 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___input">SteamVR_Input</link>.<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___input_1a72db21f575efb1323adffa0a93c70471">actionFile</link>.<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___input___action_file_1a4a87ed8dd184895ed7b4117a60dd2589">action_sets</link>.Any(<emphasis role="keyword">set</emphasis>&#32;=&gt;&#32;<emphasis role="keyword">set</emphasis>.name&#32;==&#32;<emphasis role="stringliteral">&quot;default&quot;</emphasis>))
+00040 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00041 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordtype">bool</emphasis>&#32;confirm&#32;=&#32;EditorUtility.DisplayDialog(<emphasis role="stringliteral">&quot;Confirmation&quot;</emphasis>,&#32;<emphasis role="stringliteral">&quot;We&#32;don&apos;t&#32;recommend&#32;you&#32;create&#32;a&#32;partial&#32;binding&#32;manifest&#32;with&#32;an&#32;action&#32;set&#32;named&#32;&apos;default&apos;.&#32;There&#32;will&#32;often&#32;be&#32;collisions&#32;with&#32;existing&#32;actions.&#32;Are&#32;you&#32;sure&#32;you&#32;want&#32;to&#32;continue&#32;creating&#32;this&#32;partial&#32;binding&#32;manifest?&quot;</emphasis>,&#32;<emphasis role="stringliteral">&quot;Create&quot;</emphasis>,&#32;<emphasis role="stringliteral">&quot;Cancel&quot;</emphasis>);
+00042 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(confirm&#32;==&#32;<emphasis role="keyword">false</emphasis>)
+00043 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>;
+00044 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00045 
+00046 
+00047 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordtype">string</emphasis>&#32;folderName&#32;=&#32;<emphasis role="stringliteral">&quot;SteamVR_&quot;</emphasis>&#32;+&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___input___action_file">SteamVR_Input_ActionFile</link>.<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___input___action_file_1a09049d3050af7c3cfe7d611fca459bc1">GetCodeFriendlyName</link>(name);
+00048 
+00049 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordtype">string</emphasis>&#32;mainFolderPath&#32;=&#32;<emphasis role="keywordtype">string</emphasis>.Format(<emphasis role="stringliteral">&quot;{0}&quot;</emphasis>,&#32;folderName);
+00050 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordtype">string</emphasis>&#32;versionFolderPath&#32;=&#32;<emphasis role="keywordtype">string</emphasis>.Format(<emphasis role="stringliteral">&quot;{0}/{1}&quot;</emphasis>,&#32;folderName,&#32;version.ToString());
+00051 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordtype">string</emphasis>&#32;manifestPath&#32;=&#32;<emphasis role="keywordtype">string</emphasis>.Format(<emphasis role="stringliteral">&quot;{0}/{1}/{2}&quot;</emphasis>,&#32;folderName,&#32;version.ToString(),&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___input___action_manifest___manager_1a88936a6c601772bc5f87cac96ae8ea64">partialManifestFilename</link>);
+00052 
+00053 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(Directory.Exists(mainFolderPath)&#32;==&#32;<emphasis role="keyword">false</emphasis>)
+00054 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00055 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;Directory.CreateDirectory(mainFolderPath);
+00056 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00057 
+00058 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(Directory.Exists(versionFolderPath)&#32;==&#32;<emphasis role="keyword">false</emphasis>)
+00059 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00060 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;Directory.CreateDirectory(versionFolderPath);
+00061 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00062 
+00063 
+00064 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___partial_input_bindings">SteamVR_PartialInputBindings</link>&#32;partial&#32;=&#32;<emphasis role="keyword">new</emphasis>&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___partial_input_bindings">SteamVR_PartialInputBindings</link>();
+00065 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;partial.<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___partial_input_bindings_1a873be6e8a716fca954320b0387456ee6">name</link>&#32;=&#32;name;
+00066 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;partial.<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___partial_input_bindings_1a2b0da5fab4770d3b7ccce299b2b204ea">version</link>&#32;=&#32;version;
+00067 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;partial.<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___partial_input_bindings_1acd18152c057c7f0683b6fa3452209813">overwriteOld</link>&#32;=&#32;overwriteOld;
+00068 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;partial.<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___partial_input_bindings_1acb28b8a4590ba2065eb2c30ff77454bf">removeUnused</link>&#32;=&#32;removeUnused;
+00069 
+00070 
+00071 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordtype">string</emphasis>&#32;jsonText&#32;=&#32;JsonConvert.SerializeObject(partial,&#32;Formatting.Indented,&#32;<emphasis role="keyword">new</emphasis>&#32;JsonSerializerSettings&#32;{&#32;NullValueHandling&#32;=&#32;NullValueHandling.Ignore&#32;});
+00072 
+00073 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(File.Exists(manifestPath))
+00074 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00075 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;FileInfo&#32;manifestFile&#32;=&#32;<emphasis role="keyword">new</emphasis>&#32;FileInfo(manifestPath);
+00076 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;manifestFile.IsReadOnly&#32;=&#32;<emphasis role="keyword">false</emphasis>;
+00077 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00078 
+00079 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;File.WriteAllText(manifestPath,&#32;jsonText);
+00080 
+00081 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___input">SteamVR_Input</link>.<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___input_1a72db21f575efb1323adffa0a93c70471">actionFile</link>.<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___input___action_file_1a9ec2e625d10d93d546c5730d9b11f571">CopyFilesToPath</link>(versionFolderPath,&#32;<emphasis role="keyword">true</emphasis>);
+00082 
+00083 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;EditorUtility.RevealInFinder(mainFolderPath);
+00084 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00085 
+<anchor xml:id="__steam_v_r___input___action_manifest___manager_8cs_source_1l00086"/><link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___input___action_manifest___manager_1ab2c7d1be12b6eb0b68f6b17464d924cb">00086</link> &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">protected</emphasis>&#32;<emphasis role="keyword">static</emphasis>&#32;<emphasis role="keywordtype">string</emphasis>&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___input___action_manifest___manager_1ab2c7d1be12b6eb0b68f6b17464d924cb">FindLanguageInDictionary</link>(Dictionary&lt;string,&#32;string&gt;&#32;dictionary)
+00087 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00088 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">foreach</emphasis>&#32;(var&#32;localizationMember&#32;<emphasis role="keywordflow">in</emphasis>&#32;dictionary)
+00089 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00090 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(localizationMember.Key&#32;==&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___input___action_file___localization_item">SteamVR_Input_ActionFile_LocalizationItem</link>.<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___input___action_file___localization_item_1af72f594ddd05655587eaa0691eeb66b0">languageTagKeyName</link>)
+00091 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;localizationMember.Value;
+00092 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00093 
+00094 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;<emphasis role="keyword">null</emphasis>;
+00095 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00096 
+<anchor xml:id="__steam_v_r___input___action_manifest___manager_8cs_source_1l00097"/><link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___input___action_manifest___manager_1a81d994e11943d34cc5447bc571f3cd4a">00097</link> &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">protected</emphasis>&#32;<emphasis role="keyword">static</emphasis>&#32;<emphasis role="keywordtype">int</emphasis>&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___input___action_manifest___manager_1a81d994e11943d34cc5447bc571f3cd4a">ImportLocalization</link>(<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___input___action_file">SteamVR_Input_ActionFile</link>&#32;currentActionsFile,&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___input___action_file">SteamVR_Input_ActionFile</link>&#32;newActionsFile,&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___partial_input_bindings">SteamVR_PartialInputBindings</link>&#32;partialBinding)
+00098 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00099 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordtype">int</emphasis>&#32;count&#32;=&#32;0;
+00100 
+00101 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">foreach</emphasis>&#32;(var&#32;newLocalDictionary&#32;<emphasis role="keywordflow">in</emphasis>&#32;newActionsFile.localization)
+00102 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00103 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordtype">string</emphasis>&#32;newLanguage&#32;=&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___input___action_manifest___manager_1ab2c7d1be12b6eb0b68f6b17464d924cb">FindLanguageInDictionary</link>(newLocalDictionary);
+00104 
+00105 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(<emphasis role="keywordtype">string</emphasis>.IsNullOrEmpty(newLanguage))
+00106 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00107 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;Debug.LogError(<emphasis role="stringliteral">&quot;&lt;b&gt;[SteamVR&#32;Input]&lt;/b&gt;&#32;Localization&#32;entry&#32;in&#32;partial&#32;actions&#32;file&#32;is&#32;missing&#32;a&#32;language&#32;tag:&#32;&quot;</emphasis>&#32;+&#32;partialBinding.path);
+00108 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">continue</emphasis>;
+00109 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00110 
+00111 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordtype">int</emphasis>&#32;currentLanguage&#32;=&#32;-1;
+00112 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">for</emphasis>&#32;(<emphasis role="keywordtype">int</emphasis>&#32;currentLanguageIndex&#32;=&#32;0;&#32;currentLanguageIndex&#32;&lt;&#32;currentActionsFile.localization.Count;&#32;currentLanguageIndex++)
+00113 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00114 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordtype">string</emphasis>&#32;language&#32;=&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___input___action_manifest___manager_1ab2c7d1be12b6eb0b68f6b17464d924cb">FindLanguageInDictionary</link>(currentActionsFile.localization[currentLanguageIndex]);
+00115 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(newLanguage&#32;==&#32;language)
+00116 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00117 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;currentLanguage&#32;=&#32;currentLanguageIndex;
+00118 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">break</emphasis>;
+00119 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00120 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00121 
+00122 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(currentLanguage&#32;==&#32;-1)
+00123 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00124 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;Dictionary&lt;string,&#32;string&gt;&#32;newDictionary&#32;=&#32;<emphasis role="keyword">new</emphasis>&#32;Dictionary&lt;string,&#32;string&gt;();
+00125 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">foreach</emphasis>&#32;(var&#32;element&#32;<emphasis role="keywordflow">in</emphasis>&#32;newLocalDictionary)
+00126 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00127 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;newDictionary.Add(element.Key,&#32;element.Value);
+00128 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;count++;
+00129 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00130 
+00131 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;currentActionsFile.localization.Add(newDictionary);
+00132 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00133 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">else</emphasis>
+00134 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00135 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">foreach</emphasis>&#32;(var&#32;element&#32;<emphasis role="keywordflow">in</emphasis>&#32;newLocalDictionary)
+00136 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00137 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;Dictionary&lt;string,&#32;string&gt;&#32;currentDictionary&#32;=&#32;currentActionsFile.localization[currentLanguage];
+00138 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordtype">bool</emphasis>&#32;exists&#32;=&#32;currentDictionary.Any(inCurrent&#32;=&gt;&#32;inCurrent.Key&#32;==&#32;element.Key);
+00139 
+00140 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(exists)
+00141 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00142 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//todo:&#32;should&#32;we&#32;overwrite?</emphasis>
+00143 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;currentDictionary[element.Key]&#32;=&#32;element.Value;
+00144 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00145 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">else</emphasis>
+00146 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00147 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;currentDictionary.Add(element.Key,&#32;element.Value);
+00148 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;count++;
+00149 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00150 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00151 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00152 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00153 
+00154 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;count;
+00155 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00156 
+<anchor xml:id="__steam_v_r___input___action_manifest___manager_8cs_source_1l00157"/><link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___input___action_manifest___manager_1ae05cd013681c8f20325b146f570d42db">00157</link> &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">protected</emphasis>&#32;<emphasis role="keyword">static</emphasis>&#32;<emphasis role="keywordtype">int</emphasis>&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___input___action_manifest___manager_1ae05cd013681c8f20325b146f570d42db">ImportActionSets</link>(<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___input___action_file">SteamVR_Input_ActionFile</link>&#32;currentActionsFile,&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___input___action_file">SteamVR_Input_ActionFile</link>&#32;newActionsFile)
+00158 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00159 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordtype">int</emphasis>&#32;count&#32;=&#32;0;
+00160 
+00161 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">foreach</emphasis>&#32;(var&#32;newSet&#32;<emphasis role="keywordflow">in</emphasis>&#32;newActionsFile.action_sets)
+00162 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00163 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(currentActionsFile.action_sets.Any(setInCurrent&#32;=&gt;&#32;newSet.name&#32;==&#32;setInCurrent.name)&#32;==&#32;<emphasis role="keyword">false</emphasis>)
+00164 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00165 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;currentActionsFile.action_sets.Add(newSet.GetCopy());
+00166 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;count++;
+00167 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00168 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00169 
+00170 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;count;
+00171 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00172 
+<anchor xml:id="__steam_v_r___input___action_manifest___manager_8cs_source_1l00173"/><link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___input___action_manifest___manager_1af0f4c904c4fb8cd0d233a30c9b1b04fc">00173</link> &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">protected</emphasis>&#32;<emphasis role="keyword">static</emphasis>&#32;<emphasis role="keywordtype">int</emphasis>&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___input___action_manifest___manager_1af0f4c904c4fb8cd0d233a30c9b1b04fc">ImportActions</link>(<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___input___action_file">SteamVR_Input_ActionFile</link>&#32;currentActionsFile,&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___input___action_file">SteamVR_Input_ActionFile</link>&#32;newActionsFile)
+00174 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00175 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordtype">int</emphasis>&#32;count&#32;=&#32;0;
+00176 
+00177 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">foreach</emphasis>&#32;(var&#32;newAction&#32;<emphasis role="keywordflow">in</emphasis>&#32;newActionsFile.actions)
+00178 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00179 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(currentActionsFile.actions.Any(actionInCurrent&#32;=&gt;&#32;newAction.name&#32;==&#32;actionInCurrent.name)&#32;==&#32;<emphasis role="keyword">false</emphasis>)
+00180 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00181 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;currentActionsFile.actions.Add(newAction.GetCopy());
+00182 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;count++;
+00183 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00184 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">else</emphasis>
+00185 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00186 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___input___action_file___action">SteamVR_Input_ActionFile_Action</link>&#32;existingAction&#32;=&#32;currentActionsFile.actions.First(actionInCurrent&#32;=&gt;&#32;newAction.name&#32;==&#32;actionInCurrent.name);
+00187 
+00188 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//todo:&#32;better&#32;merge?&#32;should&#32;we&#32;overwrite?</emphasis>
+00189 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;existingAction.<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___input___action_file___action_1ad2083f8ee7013f92a22e75f7baf51bf5">type</link>&#32;=&#32;newAction.type;
+00190 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;existingAction.<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___input___action_file___action_1adc74a98776d6edf88e31a61701d43fd8">scope</link>&#32;=&#32;newAction.scope;
+00191 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;existingAction.<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___input___action_file___action_1a170086146b7bf5285ab13c67ec877120">skeleton</link>&#32;=&#32;newAction.skeleton;
+00192 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;existingAction.<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___input___action_file___action_1a0b522a6067a3a6177c4280633e90b77a">requirement</link>&#32;=&#32;newAction.requirement;
+00193 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00194 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00195 
+00196 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;count;
+00197 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00198 
+<anchor xml:id="__steam_v_r___input___action_manifest___manager_8cs_source_1l00199"/><link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___input___action_manifest___manager_1a686bacb75cf86fba501b361d36f55e86">00199</link> &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">protected</emphasis>&#32;<emphasis role="keyword">static</emphasis>&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___input___binding_file">SteamVR_Input_BindingFile</link>&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___input___action_manifest___manager_1a686bacb75cf86fba501b361d36f55e86">GetBindingFileObject</link>(<emphasis role="keywordtype">string</emphasis>&#32;path)
+00200 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00201 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(File.Exists(path)&#32;==&#32;<emphasis role="keyword">false</emphasis>)
+00202 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00203 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;Debug.LogError(<emphasis role="stringliteral">&quot;&lt;b&gt;[SteamVR]&lt;/b&gt;&#32;Could&#32;not&#32;access&#32;file&#32;at&#32;path:&#32;&quot;</emphasis>&#32;+&#32;path);
+00204 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;<emphasis role="keyword">null</emphasis>;
+00205 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00206 
+00207 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordtype">string</emphasis>&#32;jsonText&#32;=&#32;File.ReadAllText(path);
+00208 
+00209 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___input___binding_file">SteamVR_Input_BindingFile</link>&#32;importingBindingFile&#32;=&#32;JsonConvert.DeserializeObject&lt;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___input___binding_file">SteamVR_Input_BindingFile</link>&gt;(jsonText);
+00210 
+00211 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;importingBindingFile;
+00212 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00213 
+00214 
+<anchor xml:id="__steam_v_r___input___action_manifest___manager_8cs_source_1l00215"/><link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___input___action_manifest___manager_1ab87ae830f2769600bc2073e0f9bd4ab5">00215</link> &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">protected</emphasis>&#32;<emphasis role="keyword">static</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___input___action_manifest___manager_1ab87ae830f2769600bc2073e0f9bd4ab5">WriteBindingFileObject</link>(<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___input___binding_file">SteamVR_Input_BindingFile</link>&#32;currentBindingFile,&#32;<emphasis role="keywordtype">string</emphasis>&#32;currentBindingPath)
+00216 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00217 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(File.Exists(currentBindingPath))
+00218 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00219 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;FileInfo&#32;fileInfo&#32;=&#32;<emphasis role="keyword">new</emphasis>&#32;FileInfo(currentBindingPath);
+00220 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;fileInfo.IsReadOnly&#32;=&#32;<emphasis role="keyword">false</emphasis>;
+00221 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00222 
+00223 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordtype">string</emphasis>&#32;newJSON&#32;=&#32;JsonConvert.SerializeObject(currentBindingFile,&#32;Formatting.Indented,&#32;<emphasis role="keyword">new</emphasis>&#32;JsonSerializerSettings&#32;{&#32;NullValueHandling&#32;=&#32;NullValueHandling.Ignore&#32;});
+00224 
+00225 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;File.WriteAllText(currentBindingPath,&#32;newJSON);
+00226 
+00227 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;Debug.Log(<emphasis role="stringliteral">&quot;&lt;b&gt;[SteamVR]&lt;/b&gt;&#32;Added&#32;action&#32;bindings&#32;to:&#32;&quot;</emphasis>&#32;+&#32;currentBindingPath);
+00228 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00229 
+<anchor xml:id="__steam_v_r___input___action_manifest___manager_8cs_source_1l00230"/><link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___input___action_manifest___manager_1a8391a5a51019c10a04745119ae1e16d5">00230</link> &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">protected</emphasis>&#32;<emphasis role="keyword">static</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___input___action_manifest___manager_1a8391a5a51019c10a04745119ae1e16d5">ImportBindings</link>(<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___input___action_file">SteamVR_Input_ActionFile</link>&#32;currentActionsFile,&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___input___action_file">SteamVR_Input_ActionFile</link>&#32;newActionsFile,&#32;<emphasis role="keywordtype">string</emphasis>&#32;directory)
+00231 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00232 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">foreach</emphasis>&#32;(var&#32;newDefaultPath&#32;<emphasis role="keywordflow">in</emphasis>&#32;newActionsFile.default_bindings)
+00233 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00234 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(currentActionsFile.default_bindings.Any(currentDefaultPath&#32;=&gt;&#32;newDefaultPath.controller_type&#32;==&#32;currentDefaultPath.controller_type)&#32;==&#32;<emphasis role="keyword">false</emphasis>)
+00235 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00236 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;currentActionsFile.default_bindings.Add(newDefaultPath.GetCopy());
+00237 
+00238 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordtype">string</emphasis>&#32;bindingPath&#32;=&#32;Path.Combine(directory,&#32;newDefaultPath.binding_url);
+00239 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;File.Copy(bindingPath,&#32;newDefaultPath.binding_url);
+00240 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00241 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">else</emphasis>
+00242 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00243 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordtype">string</emphasis>&#32;currentBindingPath&#32;=&#32;currentActionsFile.default_bindings.First(binding&#32;=&gt;&#32;binding.controller_type&#32;==&#32;newDefaultPath.controller_type).binding_url;
+00244 
+00245 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___input___binding_file">SteamVR_Input_BindingFile</link>&#32;currentBindingFile&#32;=&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___input___action_manifest___manager_1a686bacb75cf86fba501b361d36f55e86">GetBindingFileObject</link>(currentBindingPath);
+00246 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(currentBindingFile&#32;==&#32;<emphasis role="keyword">null</emphasis>)
+00247 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00248 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;Debug.LogError(<emphasis role="stringliteral">&quot;&lt;b&gt;[SteamVR]&lt;/b&gt;&#32;There&#32;was&#32;an&#32;error&#32;deserializing&#32;the&#32;binding&#32;at&#32;path:&#32;&quot;</emphasis>&#32;+&#32;currentBindingPath);
+00249 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">continue</emphasis>;
+00250 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00251 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;
+00252 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___input___binding_file">SteamVR_Input_BindingFile</link>&#32;importingBindingFile&#32;=&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___input___action_manifest___manager_1a686bacb75cf86fba501b361d36f55e86">GetBindingFileObject</link>(newDefaultPath.binding_url);
+00253 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(importingBindingFile&#32;==&#32;<emphasis role="keyword">null</emphasis>)
+00254 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00255 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;Debug.LogError(<emphasis role="stringliteral">&quot;&lt;b&gt;[SteamVR]&lt;/b&gt;&#32;There&#32;was&#32;an&#32;error&#32;deserializing&#32;the&#32;binding&#32;at&#32;path:&#32;&quot;</emphasis>&#32;+&#32;newDefaultPath.binding_url);
+00256 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">continue</emphasis>;
+00257 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00258 
+00259 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordtype">bool</emphasis>&#32;changed&#32;=&#32;<emphasis role="keyword">false</emphasis>;
+00260 
+00261 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">foreach</emphasis>&#32;(var&#32;importingActionList&#32;<emphasis role="keywordflow">in</emphasis>&#32;importingBindingFile.bindings)
+00262 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00263 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(currentBindingFile.bindings.Any(binding&#32;=&gt;&#32;binding.Key&#32;==&#32;importingActionList.Key))
+00264 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00265 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;var&#32;currentSetBinding&#32;=&#32;currentBindingFile.bindings.FirstOrDefault(binding&#32;=&gt;&#32;binding.Key&#32;==&#32;importingActionList.Key);
+00266 
+00267 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//todo:&#32;better&#32;merge?&#32;if&#32;we&#32;don&apos;t&#32;have&#32;an&#32;exact&#32;copy&#32;of&#32;the&#32;item&#32;then&#32;we&#32;add&#32;a&#32;new&#32;one</emphasis>
+00268 
+00269 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">foreach</emphasis>&#32;(var&#32;importingChord&#32;<emphasis role="keywordflow">in</emphasis>&#32;importingActionList.Value.chords)
+00270 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00271 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(currentSetBinding.Value.chords.Any(currentChord&#32;=&gt;&#32;importingChord.Equals(currentChord))&#32;==&#32;<emphasis role="keyword">false</emphasis>)
+00272 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00273 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;changed&#32;=&#32;<emphasis role="keyword">true</emphasis>;
+00274 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;currentSetBinding.Value.chords.Add(importingChord);
+00275 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00276 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00277 
+00278 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">foreach</emphasis>&#32;(var&#32;importingHaptic&#32;<emphasis role="keywordflow">in</emphasis>&#32;importingActionList.Value.haptics)
+00279 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00280 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(currentSetBinding.Value.haptics.Any(currentHaptic&#32;=&gt;&#32;importingHaptic.Equals(currentHaptic))&#32;==&#32;<emphasis role="keyword">false</emphasis>)
+00281 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00282 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;changed&#32;=&#32;<emphasis role="keyword">true</emphasis>;
+00283 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;currentSetBinding.Value.haptics.Add(importingHaptic);
+00284 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00285 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00286 
+00287 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">foreach</emphasis>&#32;(var&#32;importingPose&#32;<emphasis role="keywordflow">in</emphasis>&#32;importingActionList.Value.poses)
+00288 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00289 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(currentSetBinding.Value.poses.Any(currentPose&#32;=&gt;&#32;importingPose.Equals(currentPose))&#32;==&#32;<emphasis role="keyword">false</emphasis>)
+00290 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00291 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;changed&#32;=&#32;<emphasis role="keyword">true</emphasis>;
+00292 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;currentSetBinding.Value.poses.Add(importingPose);
+00293 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00294 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00295 
+00296 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">foreach</emphasis>&#32;(var&#32;importingSkeleton&#32;<emphasis role="keywordflow">in</emphasis>&#32;importingActionList.Value.skeleton)
+00297 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00298 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(currentSetBinding.Value.skeleton.Any(currentSkeleton&#32;=&gt;&#32;importingSkeleton.Equals(currentSkeleton))&#32;==&#32;<emphasis role="keyword">false</emphasis>)
+00299 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00300 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;changed&#32;=&#32;<emphasis role="keyword">true</emphasis>;
+00301 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;currentSetBinding.Value.skeleton.Add(importingSkeleton);
+00302 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00303 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00304 
+00305 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">foreach</emphasis>&#32;(var&#32;importingSource&#32;<emphasis role="keywordflow">in</emphasis>&#32;importingActionList.Value.sources)
+00306 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00307 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(currentSetBinding.Value.sources.Any(currentSource&#32;=&gt;&#32;importingSource.Equals(currentSource))&#32;==&#32;<emphasis role="keyword">false</emphasis>)
+00308 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00309 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;changed&#32;=&#32;<emphasis role="keyword">true</emphasis>;
+00310 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;currentSetBinding.Value.sources.Add(importingSource);
+00311 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00312 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00313 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00314 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">else</emphasis>
+00315 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00316 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;changed&#32;=&#32;<emphasis role="keyword">true</emphasis>;
+00317 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;currentBindingFile.bindings.Add(importingActionList.Key,&#32;importingActionList.Value);
+00318 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00319 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00320 
+00321 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(changed)
+00322 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00323 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___input___action_manifest___manager_1ab87ae830f2769600bc2073e0f9bd4ab5">WriteBindingFileObject</link>(currentBindingFile,&#32;currentBindingPath);
+00324 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00325 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00326 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00327 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00328 
+<anchor xml:id="__steam_v_r___input___action_manifest___manager_8cs_source_1l00329"/><link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___input___action_manifest___manager_1a5ddf34cbcdb0e80b9dd2dfe8c0cbf3f7">00329</link> &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keyword">static</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___input___action_manifest___manager_1a5ddf34cbcdb0e80b9dd2dfe8c0cbf3f7">CleanBindings</link>(<emphasis role="keywordtype">bool</emphasis>&#32;verbose&#32;=&#32;<emphasis role="keyword">false</emphasis>)
+00330 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00331 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___input">SteamVR_Input</link>.<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___input_1a45c0fb7aca33a1e2db7c4f5730ac8189">InitializeFile</link>(<emphasis role="keyword">true</emphasis>);
+00332 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___input___action_file">SteamVR_Input_ActionFile</link>&#32;currentActionsFile&#32;=&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___input">SteamVR_Input</link>.<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___input_1a72db21f575efb1323adffa0a93c70471">actionFile</link>;
+00333 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;
+00334 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">for</emphasis>&#32;(<emphasis role="keywordtype">int</emphasis>&#32;localizationIndex&#32;=&#32;0;&#32;localizationIndex&#32;&lt;&#32;currentActionsFile.<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___input___action_file_1af3d52acf4347b019cce1a503c994023c">localization</link>.Count;&#32;localizationIndex++)
+00335 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00336 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;Dictionary&lt;string,&#32;string&gt;&#32;dictionary&#32;=&#32;currentActionsFile.<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___input___action_file_1af3d52acf4347b019cce1a503c994023c">localization</link>[localizationIndex];
+00337 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordtype">bool</emphasis>&#32;removed;
+00338 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">do</emphasis>
+00339 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00340 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;removed&#32;=&#32;<emphasis role="keyword">false</emphasis>;
+00341 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordtype">string</emphasis>&#32;missingAction&#32;=&#32;<emphasis role="keyword">null</emphasis>;
+00342 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">foreach</emphasis>&#32;(<emphasis role="keywordtype">string</emphasis>&#32;key&#32;<emphasis role="keywordflow">in</emphasis>&#32;dictionary.Keys)
+00343 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00344 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(key&#32;==&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___input___action_file___localization_item">SteamVR_Input_ActionFile_LocalizationItem</link>.<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___input___action_file___localization_item_1af72f594ddd05655587eaa0691eeb66b0">languageTagKeyName</link>)
+00345 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">continue</emphasis>;
+00346 
+00347 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(currentActionsFile.<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___input___action_file_1ab324306dc9516ec2306947a22a2adcba">actions</link>.Any(action&#32;=&gt;&#32;<emphasis role="keywordtype">string</emphasis>.Equals(action.name,&#32;key,&#32;StringComparison.CurrentCultureIgnoreCase))&#32;==&#32;<emphasis role="keyword">false</emphasis>)
+00348 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00349 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;missingAction&#32;=&#32;key;
+00350 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00351 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00352 
+00353 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(missingAction&#32;!=&#32;<emphasis role="keyword">null</emphasis>)
+00354 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00355 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;removed&#32;=&#32;<emphasis role="keyword">true</emphasis>;
+00356 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;dictionary.Remove(missingAction);
+00357 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(verbose)
+00358 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;Debug.Log(<emphasis role="stringliteral">&quot;&lt;b&gt;[SteamVR&#32;Input]&lt;/b&gt;&#32;Removing&#32;localization&#32;entry&#32;for:&#32;&quot;</emphasis>&#32;+&#32;missingAction);
+00359 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00360 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}&#32;<emphasis role="keywordflow">while</emphasis>&#32;(removed);
+00361 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00362 
+00363 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">for</emphasis>&#32;(<emphasis role="keywordtype">int</emphasis>&#32;bindingIndex&#32;=&#32;0;&#32;bindingIndex&#32;&lt;&#32;currentActionsFile.<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___input___action_file_1ab24430cccd335b4f5e5d37b39d70cb86">default_bindings</link>.Count;&#32;bindingIndex++)
+00364 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00365 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___input___action_file___default_binding">SteamVR_Input_ActionFile_DefaultBinding</link>&#32;currentBinding&#32;=&#32;currentActionsFile.<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___input___action_file_1ab24430cccd335b4f5e5d37b39d70cb86">default_bindings</link>[bindingIndex];
+00366 
+00367 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(File.Exists(currentBinding.<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___input___action_file___default_binding_1a880dd2f0b223fd7064e03234d66a79a7">binding_url</link>)&#32;==&#32;<emphasis role="keyword">false</emphasis>)
+00368 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00369 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(verbose)
+00370 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;Debug.Log(<emphasis role="stringliteral">&quot;&lt;b&gt;[SteamVR&#32;Input]&lt;/b&gt;&#32;Removing&#32;binding&#32;entry&#32;for&#32;missing&#32;file:&#32;&apos;&quot;</emphasis>&#32;+&#32;currentBinding.<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___input___action_file___default_binding_1ac92e854a598bd2ea1cb851586c3f2d6b">controller_type</link>&#32;+&#32;<emphasis role="stringliteral">&quot;&apos;&#32;at:&#32;&quot;</emphasis>&#32;+&#32;currentBinding.<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___input___action_file___default_binding_1a880dd2f0b223fd7064e03234d66a79a7">binding_url</link>);
+00371 
+00372 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;currentActionsFile.<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___input___action_file_1ab24430cccd335b4f5e5d37b39d70cb86">default_bindings</link>.RemoveAt(bindingIndex);
+00373 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;bindingIndex--;
+00374 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">continue</emphasis>;
+00375 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00376 
+00377 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___input___binding_file">SteamVR_Input_BindingFile</link>&#32;bindingFile&#32;=&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___input___action_manifest___manager_1a686bacb75cf86fba501b361d36f55e86">GetBindingFileObject</link>(currentBinding.<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___input___action_file___default_binding_1a880dd2f0b223fd7064e03234d66a79a7">binding_url</link>);
+00378 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(bindingFile&#32;==&#32;<emphasis role="keyword">null</emphasis>)
+00379 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00380 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;Debug.LogError(<emphasis role="stringliteral">&quot;&lt;b&gt;[SteamVR&#32;Input]&lt;/b&gt;&#32;Error&#32;parsing&#32;binding&#32;file&#32;for:&#32;&apos;&quot;</emphasis>&#32;+&#32;currentBinding.<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___input___action_file___default_binding_1ac92e854a598bd2ea1cb851586c3f2d6b">controller_type</link>&#32;+&#32;<emphasis role="stringliteral">&quot;&apos;&#32;at:&#32;&quot;</emphasis>&#32;+&#32;currentBinding.<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___input___action_file___default_binding_1a880dd2f0b223fd7064e03234d66a79a7">binding_url</link>);
+00381 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">continue</emphasis>;
+00382 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00383 
+00384 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordtype">int</emphasis>&#32;changed&#32;=&#32;0;
+00385 
+00386 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">foreach</emphasis>&#32;(var&#32;actionList&#32;<emphasis role="keywordflow">in</emphasis>&#32;bindingFile.bindings)
+00387 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00388 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">for</emphasis>&#32;(<emphasis role="keywordtype">int</emphasis>&#32;itemIndex&#32;=&#32;0;&#32;itemIndex&#32;&lt;&#32;actionList.Value.chords.Count;&#32;itemIndex++)
+00389 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00390 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordtype">string</emphasis>&#32;outputActionPath&#32;=&#32;actionList.Value.chords[itemIndex].output;
+00391 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(currentActionsFile.<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___input___action_file_1ab324306dc9516ec2306947a22a2adcba">actions</link>.Any(action&#32;=&gt;&#32;<emphasis role="keywordtype">string</emphasis>.Equals(action.name,&#32;outputActionPath,&#32;StringComparison.CurrentCultureIgnoreCase))&#32;==&#32;<emphasis role="keyword">false</emphasis>)
+00392 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00393 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(verbose)
+00394 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;Debug.Log(<emphasis role="stringliteral">&quot;&lt;b&gt;[SteamVR&#32;Input]&lt;/b&gt;&#32;&quot;</emphasis>&#32;+&#32;currentBinding.controller_type&#32;+&#32;<emphasis role="stringliteral">&quot;:&#32;Removing&#32;chord&#32;binding&#32;for&#32;action:&#32;&quot;</emphasis>&#32;+&#32;outputActionPath);
+00395 
+00396 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;actionList.Value.chords.RemoveAt(itemIndex);
+00397 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;itemIndex--;
+00398 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;changed++;
+00399 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00400 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00401 
+00402 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">for</emphasis>&#32;(<emphasis role="keywordtype">int</emphasis>&#32;itemIndex&#32;=&#32;0;&#32;itemIndex&#32;&lt;&#32;actionList.Value.haptics.Count;&#32;itemIndex++)
+00403 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00404 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordtype">string</emphasis>&#32;outputActionPath&#32;=&#32;actionList.Value.haptics[itemIndex].output;
+00405 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(currentActionsFile.<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___input___action_file_1ab324306dc9516ec2306947a22a2adcba">actions</link>.Any(action&#32;=&gt;&#32;<emphasis role="keywordtype">string</emphasis>.Equals(action.name,&#32;outputActionPath,&#32;StringComparison.CurrentCultureIgnoreCase))&#32;==&#32;<emphasis role="keyword">false</emphasis>)
+00406 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00407 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(verbose)
+00408 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;Debug.Log(<emphasis role="stringliteral">&quot;&lt;b&gt;[SteamVR&#32;Input]&lt;/b&gt;&#32;&quot;</emphasis>&#32;+&#32;currentBinding.controller_type&#32;+&#32;<emphasis role="stringliteral">&quot;:&#32;Removing&#32;haptics&#32;binding&#32;for&#32;action:&#32;&quot;</emphasis>&#32;+&#32;outputActionPath);
+00409 
+00410 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;actionList.Value.haptics.RemoveAt(itemIndex);
+00411 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;itemIndex--;
+00412 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;changed++;
+00413 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00414 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00415 
+00416 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">for</emphasis>&#32;(<emphasis role="keywordtype">int</emphasis>&#32;itemIndex&#32;=&#32;0;&#32;itemIndex&#32;&lt;&#32;actionList.Value.poses.Count;&#32;itemIndex++)
+00417 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00418 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordtype">string</emphasis>&#32;outputActionPath&#32;=&#32;actionList.Value.poses[itemIndex].output;
+00419 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(currentActionsFile.<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___input___action_file_1ab324306dc9516ec2306947a22a2adcba">actions</link>.Any(action&#32;=&gt;&#32;<emphasis role="keywordtype">string</emphasis>.Equals(action.name,&#32;outputActionPath,&#32;StringComparison.CurrentCultureIgnoreCase))&#32;==&#32;<emphasis role="keyword">false</emphasis>)
+00420 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00421 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(verbose)
+00422 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;Debug.Log(<emphasis role="stringliteral">&quot;&lt;b&gt;[SteamVR&#32;Input]&lt;/b&gt;&#32;&quot;</emphasis>&#32;+&#32;currentBinding.controller_type&#32;+&#32;<emphasis role="stringliteral">&quot;:&#32;Removing&#32;pose&#32;binding&#32;for&#32;action:&#32;&quot;</emphasis>&#32;+&#32;outputActionPath);
+00423 
+00424 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;actionList.Value.poses.RemoveAt(itemIndex);
+00425 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;itemIndex--;
+00426 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;changed++;
+00427 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00428 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00429 
+00430 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">for</emphasis>&#32;(<emphasis role="keywordtype">int</emphasis>&#32;itemIndex&#32;=&#32;0;&#32;itemIndex&#32;&lt;&#32;actionList.Value.skeleton.Count;&#32;itemIndex++)
+00431 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00432 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordtype">string</emphasis>&#32;outputActionPath&#32;=&#32;actionList.Value.skeleton[itemIndex].output;
+00433 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(currentActionsFile.<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___input___action_file_1ab324306dc9516ec2306947a22a2adcba">actions</link>.Any(action&#32;=&gt;&#32;<emphasis role="keywordtype">string</emphasis>.Equals(action.name,&#32;outputActionPath,&#32;StringComparison.CurrentCultureIgnoreCase))&#32;==&#32;<emphasis role="keyword">false</emphasis>)
+00434 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00435 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(verbose)
+00436 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;Debug.Log(<emphasis role="stringliteral">&quot;&lt;b&gt;[SteamVR&#32;Input]&lt;/b&gt;&#32;&quot;</emphasis>&#32;+&#32;currentBinding.controller_type&#32;+&#32;<emphasis role="stringliteral">&quot;:&#32;Removing&#32;skeleton&#32;binding&#32;for&#32;action:&#32;&quot;</emphasis>&#32;+&#32;outputActionPath);
+00437 
+00438 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;actionList.Value.skeleton.RemoveAt(itemIndex);
+00439 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;itemIndex--;
+00440 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;changed++;
+00441 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00442 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00443 
+00444 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">for</emphasis>&#32;(<emphasis role="keywordtype">int</emphasis>&#32;itemIndex&#32;=&#32;0;&#32;itemIndex&#32;&lt;&#32;actionList.Value.sources.Count;&#32;itemIndex++)
+00445 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00446 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordtype">string</emphasis>&#32;outputActionPath&#32;=&#32;actionList.Value.sources[itemIndex].GetOutput();
+00447 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(currentActionsFile.<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___input___action_file_1ab324306dc9516ec2306947a22a2adcba">actions</link>.Any(action&#32;=&gt;&#32;<emphasis role="keywordtype">string</emphasis>.Equals(action.name,&#32;outputActionPath,&#32;StringComparison.CurrentCultureIgnoreCase))&#32;==&#32;<emphasis role="keyword">false</emphasis>)
+00448 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00449 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(verbose)
+00450 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;Debug.Log(<emphasis role="stringliteral">&quot;&lt;b&gt;[SteamVR&#32;Input]&lt;/b&gt;&#32;&quot;</emphasis>&#32;+&#32;currentBinding.controller_type&#32;+&#32;<emphasis role="stringliteral">&quot;:&#32;Removing&#32;source&#32;binding&#32;for&#32;action:&#32;&quot;</emphasis>&#32;+&#32;outputActionPath);
+00451 
+00452 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;actionList.Value.sources.RemoveAt(itemIndex);
+00453 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;itemIndex--;
+00454 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;changed++;
+00455 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00456 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00457 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00458 
+00459 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(changed&#32;&gt;&#32;0)
+00460 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00461 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___input___action_manifest___manager_1ab87ae830f2769600bc2073e0f9bd4ab5">WriteBindingFileObject</link>(bindingFile,&#32;currentBinding.binding_url);
+00462 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00463 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00464 
+00465 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___input">SteamVR_Input</link>.<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___input_1a7dcd55f6d1d832f6bff18860868d70ba">HasFileInMemoryBeenModified</link>())
+00466 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00467 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___input">SteamVR_Input</link>.<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___input_1a72db21f575efb1323adffa0a93c70471">actionFile</link>.<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___input___action_file_1a6ef31fa0d9acce2fc48e0f76d68402a5">Save</link>(<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___input">SteamVR_Input</link>.<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___input_1abe954f3809b1dc96cc8e337a1f80d35e">actionsFilePath</link>);
+00468 
+00469 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(verbose)
+00470 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;Debug.Log(<emphasis role="stringliteral">&quot;&lt;b&gt;[SteamVR&#32;Input]&lt;/b&gt;&#32;Saved&#32;new&#32;actions&#32;file:&#32;&quot;</emphasis>&#32;+&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___input">SteamVR_Input</link>.<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___input_1abe954f3809b1dc96cc8e337a1f80d35e">actionsFilePath</link>);
+00471 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00472 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00473 
+00474 
+<anchor xml:id="__steam_v_r___input___action_manifest___manager_8cs_source_1l00475"/><link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___input___action_manifest___manager_1aab7a1f939743acbe656ba6da9c7d029e">00475</link> &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">protected</emphasis>&#32;<emphasis role="keyword">static</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___input___action_manifest___manager_1aab7a1f939743acbe656ba6da9c7d029e">ImportPartialBinding</link>(<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___partial_input_bindings">SteamVR_PartialInputBindings</link>&#32;partialBinding)
+00476 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00477 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___input">SteamVR_Input</link>.<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___input_1a45c0fb7aca33a1e2db7c4f5730ac8189">InitializeFile</link>();
+00478 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___input___action_file">SteamVR_Input_ActionFile</link>&#32;currentActionsFile&#32;=&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___input">SteamVR_Input</link>.<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___input_1a72db21f575efb1323adffa0a93c70471">actionFile</link>;
+00479 
+00480 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___input___action_file">SteamVR_Input_ActionFile</link>&#32;newActionsFile&#32;=&#32;ReadJson&lt;SteamVR_Input_ActionFile&gt;(partialBinding.<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___partial_input_bindings_1ac271947867f1c393b35bec64ce44f201">GetActionsPath</link>());
+00481 
+00482 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">/*</emphasis>
+00483 <emphasis role="comment">&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;int&#32;sets&#32;=&#32;ImportActionSets(currentActionsFile,&#32;newActionsFile);</emphasis>
+00484 <emphasis role="comment">&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;int&#32;locs&#32;=&#32;ImportLocalization(currentActionsFile,&#32;newActionsFile,&#32;partialBinding);</emphasis>
+00485 <emphasis role="comment">&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;int&#32;actions&#32;=&#32;ImportActions(currentActionsFile,&#32;newActionsFile);</emphasis>
+00486 <emphasis role="comment">&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;*/</emphasis>
+00487 
+00488 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___input___action_manifest___manager_1ae05cd013681c8f20325b146f570d42db">ImportActionSets</link>(currentActionsFile,&#32;newActionsFile);
+00489 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___input___action_manifest___manager_1a81d994e11943d34cc5447bc571f3cd4a">ImportLocalization</link>(currentActionsFile,&#32;newActionsFile,&#32;partialBinding);
+00490 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___input___action_manifest___manager_1af0f4c904c4fb8cd0d233a30c9b1b04fc">ImportActions</link>(currentActionsFile,&#32;newActionsFile);
+00491 
+00492 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___input">SteamVR_Input</link>.<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___input_1a7dcd55f6d1d832f6bff18860868d70ba">HasFileInMemoryBeenModified</link>())
+00493 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00494 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___input">SteamVR_Input</link>.<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___input_1a72db21f575efb1323adffa0a93c70471">actionFile</link>.<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___input___action_file_1a6ef31fa0d9acce2fc48e0f76d68402a5">Save</link>(<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___input">SteamVR_Input</link>.<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___input_1abe954f3809b1dc96cc8e337a1f80d35e">actionsFilePath</link>);
+00495 
+00496 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;Debug.Log(<emphasis role="stringliteral">&quot;&lt;b&gt;[SteamVR]&lt;/b&gt;&#32;Saved&#32;new&#32;actions&#32;file:&#32;&quot;</emphasis>&#32;+&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___input">SteamVR_Input</link>.<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___input_1abe954f3809b1dc96cc8e337a1f80d35e">actionsFilePath</link>);
+00497 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00498 
+00499 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___input___action_manifest___manager_1a8391a5a51019c10a04745119ae1e16d5">ImportBindings</link>(currentActionsFile,&#32;newActionsFile,&#32;partialBinding.<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___partial_input_bindings_1ae41f3f0d37c80b9a66afc80f2e759038">GetDirectory</link>());
+00500 
+00501 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;partialBinding.<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___partial_input_bindings_1a2371306d154bffd13c4e2d69f023e3cd">imported</link>&#32;=&#32;<emphasis role="keyword">true</emphasis>;
+00502 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;partialBinding.<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___partial_input_bindings_1a25680da3831a2de9a97bcb0af2b351ea">Save</link>();
+00503 
+00504 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___input">SteamVR_Input</link>.<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___input_1a45c0fb7aca33a1e2db7c4f5730ac8189">InitializeFile</link>(<emphasis role="keyword">true</emphasis>);
+00505 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___input___editor_window">SteamVR_Input_EditorWindow</link>.<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___input___editor_window_1a6ce5ae54a9d801271f2a7fd335635773">ReopenWindow</link>();
+00506 
+00507 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//todo:&#32;ask&#32;first?</emphasis>
+00508 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">/*string&#32;dialogText&#32;=&#32;string.Format(&quot;{0}&#32;new&#32;action&#32;sets,&#32;{1}&#32;new&#32;actions,&#32;and&#32;{2}&#32;new&#32;localization&#32;strings&#32;have&#32;been&#32;added.&#32;Would&#32;you&#32;like&#32;to&#32;regenerate&#32;SteamVR&#32;Input&#32;code&#32;files?&quot;,&#32;sets,&#32;actions,&#32;locs);</emphasis>
+00509 <emphasis role="comment"></emphasis>
+00510 <emphasis role="comment">&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;bool&#32;confirm&#32;=&#32;EditorUtility.DisplayDialog(&quot;SteamVR&#32;Input&quot;,&#32;dialogText,&#32;&quot;Generate&quot;,&#32;&quot;Cancel&quot;);</emphasis>
+00511 <emphasis role="comment">&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;if&#32;(confirm)</emphasis>
+00512 <emphasis role="comment">&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;SteamVR_Input_Generator.BeginGeneration();</emphasis>
+00513 <emphasis role="comment">&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;*/</emphasis>
+00514 
+00515 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;SteamVR_Input_Generator.BeginGeneration();
+00516 
+00517 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;Debug.Log(<emphasis role="stringliteral">&quot;&lt;b&gt;[SteamVR]&lt;/b&gt;&#32;Reloaded&#32;actions&#32;file&#32;with&#32;additional&#32;actions&#32;from&#32;&quot;</emphasis>&#32;+&#32;partialBinding.<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___partial_input_bindings_1a873be6e8a716fca954320b0387456ee6">name</link>);
+00518 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00519 
+<anchor xml:id="__steam_v_r___input___action_manifest___manager_8cs_source_1l00520"/><link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___input___action_manifest___manager_1a5f6546aff673b524166ecf396e62a696">00520</link> &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">protected</emphasis>&#32;<emphasis role="keyword">static</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___input___action_manifest___manager_1a5f6546aff673b524166ecf396e62a696">ReplaceBinding</link>(<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___partial_input_bindings">SteamVR_PartialInputBindings</link>&#32;partialBinding)
+00521 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00522 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___input">SteamVR_Input</link>.<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___input_1a8f968e5a31e70c560ee75b6f7734ca47">DeleteManifestAndBindings</link>();
+00523 
+00524 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordtype">string</emphasis>&#32;newActionsFilePath&#32;=&#32;partialBinding.<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___partial_input_bindings_1ac271947867f1c393b35bec64ce44f201">GetActionsPath</link>();
+00525 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(File.Exists(newActionsFilePath))
+00526 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00527 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;File.Copy(newActionsFilePath,&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___input">SteamVR_Input</link>.<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___input_1abe954f3809b1dc96cc8e337a1f80d35e">actionsFilePath</link>);
+00528 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00529 
+00530 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___input___action_file">SteamVR_Input_ActionFile</link>&#32;newActionsFile&#32;=&#32;ReadJson&lt;SteamVR_Input_ActionFile&gt;(<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___input">SteamVR_Input</link>.<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___input_1abe954f3809b1dc96cc8e337a1f80d35e">actionsFilePath</link>);
+00531 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordtype">string</emphasis>&#32;partialBindingDirectory&#32;=&#32;partialBinding.<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___partial_input_bindings_1ae41f3f0d37c80b9a66afc80f2e759038">GetDirectory</link>();
+00532 
+00533 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">foreach</emphasis>&#32;(var&#32;newDefaultPath&#32;<emphasis role="keywordflow">in</emphasis>&#32;newActionsFile.default_bindings)
+00534 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00535 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordtype">string</emphasis>&#32;bindingPath&#32;=&#32;Path.Combine(partialBindingDirectory,&#32;newDefaultPath.binding_url);
+00536 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;File.Copy(bindingPath,&#32;newDefaultPath.binding_url);
+00537 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00538 
+00539 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;partialBinding.imported&#32;=&#32;<emphasis role="keyword">true</emphasis>;
+00540 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;partialBinding.Save();
+00541 
+00542 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___input">SteamVR_Input</link>.<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___input_1a45c0fb7aca33a1e2db7c4f5730ac8189">InitializeFile</link>(<emphasis role="keyword">true</emphasis>);
+00543 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___input___editor_window">SteamVR_Input_EditorWindow</link>.<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___input___editor_window_1a6ce5ae54a9d801271f2a7fd335635773">ReopenWindow</link>();
+00544 
+00545 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//todo:&#32;ask&#32;first?</emphasis>
+00546 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">/*string&#32;dialogText&#32;=&#32;string.Format(&quot;{0}&#32;new&#32;action&#32;sets,&#32;{1}&#32;new&#32;actions,&#32;and&#32;{2}&#32;new&#32;localization&#32;strings&#32;have&#32;been&#32;added.&#32;Would&#32;you&#32;like&#32;to&#32;regenerate&#32;SteamVR&#32;Input&#32;code&#32;files?&quot;,&#32;sets,&#32;actions,&#32;locs);</emphasis>
+00547 <emphasis role="comment"></emphasis>
+00548 <emphasis role="comment">&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;bool&#32;confirm&#32;=&#32;EditorUtility.DisplayDialog(&quot;SteamVR&#32;Input&quot;,&#32;dialogText,&#32;&quot;Generate&quot;,&#32;&quot;Cancel&quot;);</emphasis>
+00549 <emphasis role="comment">&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;if&#32;(confirm)</emphasis>
+00550 <emphasis role="comment">&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;SteamVR_Input_Generator.BeginGeneration();</emphasis>
+00551 <emphasis role="comment">&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;*/</emphasis>
+00552 
+00553 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;SteamVR_Input_Generator.BeginGeneration();
+00554 
+00555 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;Debug.Log(<emphasis role="stringliteral">&quot;&lt;b&gt;[SteamVR&#32;Input]&lt;/b&gt;&#32;Reloaded&#32;with&#32;new&#32;actions&#32;from&#32;&quot;</emphasis>&#32;+&#32;partialBinding.name);
+00556 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00557 
+<anchor xml:id="__steam_v_r___input___action_manifest___manager_8cs_source_1l00558"/><link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___input___action_manifest___manager_1a81b3856a73452d237088335d364adb99">00558</link> &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">protected</emphasis>&#32;<emphasis role="keyword">static</emphasis>&#32;T&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___input___action_manifest___manager_1a81b3856a73452d237088335d364adb99">ReadJson&lt;T&gt;</link>(<emphasis role="keywordtype">string</emphasis>&#32;path)
+00559 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00560 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(File.Exists(path))
+00561 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00562 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordtype">string</emphasis>&#32;jsonText&#32;=&#32;File.ReadAllText(path);
+00563 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;JsonConvert.DeserializeObject&lt;T&gt;(jsonText);
+00564 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00565 
+00566 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;<emphasis role="keywordflow">default</emphasis>(T);
+00567 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00568 
+<anchor xml:id="__steam_v_r___input___action_manifest___manager_8cs_source_1l00569"/><link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___input___action_manifest___manager_1a5aed0c7718fbf1b0f94e60bad129f3a5">00569</link> &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">protected</emphasis>&#32;<emphasis role="keyword">static</emphasis>&#32;List&lt;SteamVR_Input_ActionFile_Action&gt;&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___input___action_manifest___manager_1a5aed0c7718fbf1b0f94e60bad129f3a5">RemoveOldActions</link>(List&lt;SteamVR_PartialInputBindings&gt;&#32;partialBindingList)
+00570 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00571 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;List&lt;SteamVR_Input_ActionFile_Action&gt;&#32;toRemove&#32;=&#32;<emphasis role="keyword">new</emphasis>&#32;List&lt;SteamVR_Input_ActionFile_Action&gt;();
+00572 
+00573 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___input___action_file">SteamVR_Input_ActionFile</link>&#32;newestActionsFile&#32;=&#32;ReadJson&lt;SteamVR_Input_ActionFile&gt;(partialBindingList[0].GetActionsPath());
+00574 
+00575 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">for</emphasis>&#32;(<emphasis role="keywordtype">int</emphasis>&#32;partialBindingIndex&#32;=&#32;1;&#32;partialBindingIndex&#32;&lt;&#32;partialBindingList.Count;&#32;partialBindingIndex++)
+00576 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00577 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___input___action_file">SteamVR_Input_ActionFile</link>&#32;oldActionsFile&#32;=&#32;ReadJson&lt;SteamVR_Input_ActionFile&gt;(partialBindingList[partialBindingIndex].GetActionsPath());
+00578 
+00579 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">for</emphasis>&#32;(<emphasis role="keywordtype">int</emphasis>&#32;oldActionIndex&#32;=&#32;0;&#32;oldActionIndex&#32;&lt;&#32;oldActionsFile.<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___input___action_file_1ab324306dc9516ec2306947a22a2adcba">actions</link>.Count;&#32;oldActionIndex++)
+00580 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00581 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;var&#32;oldAction&#32;=&#32;oldActionsFile.<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___input___action_file_1ab324306dc9516ec2306947a22a2adcba">actions</link>[oldActionIndex];
+00582 
+00583 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(newestActionsFile.<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___input___action_file_1ab324306dc9516ec2306947a22a2adcba">actions</link>.Any(newAction&#32;=&gt;&#32;oldAction.Equals(newAction))&#32;==&#32;<emphasis role="keyword">false</emphasis>)
+00584 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00585 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;var&#32;existing&#32;=&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___input">SteamVR_Input</link>.<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___input_1a72db21f575efb1323adffa0a93c70471">actionFile</link>.<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___input___action_file_1ab324306dc9516ec2306947a22a2adcba">actions</link>.FirstOrDefault(action&#32;=&gt;&#32;oldAction.Equals(action));
+00586 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(existing&#32;!=&#32;<emphasis role="keyword">null</emphasis>)
+00587 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00588 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___input">SteamVR_Input</link>.<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___input_1a72db21f575efb1323adffa0a93c70471">actionFile</link>.<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___input___action_file_1ab324306dc9516ec2306947a22a2adcba">actions</link>.Remove(existing);
+00589 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;toRemove.Add(oldAction);
+00590 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00591 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00592 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00593 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00594 
+00595 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;toRemove;
+00596 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00597 
+<anchor xml:id="__steam_v_r___input___action_manifest___manager_8cs_source_1l00598"/><link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___input___action_manifest___manager_1ae88b3db8a5905d69acc87f259565e5ef">00598</link> &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">protected</emphasis>&#32;<emphasis role="keyword">static</emphasis>&#32;List&lt;SteamVR_Input_ActionFile_ActionSet&gt;&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___input___action_manifest___manager_1ae88b3db8a5905d69acc87f259565e5ef">RemoveOldActionSets</link>(List&lt;SteamVR_PartialInputBindings&gt;&#32;partialBindingList)
+00599 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00600 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;List&lt;SteamVR_Input_ActionFile_ActionSet&gt;&#32;toRemove&#32;=&#32;<emphasis role="keyword">new</emphasis>&#32;List&lt;SteamVR_Input_ActionFile_ActionSet&gt;();
+00601 
+00602 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___input___action_file">SteamVR_Input_ActionFile</link>&#32;newestActionsFile&#32;=&#32;ReadJson&lt;SteamVR_Input_ActionFile&gt;(partialBindingList[0].GetActionsPath());
+00603 
+00604 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">for</emphasis>&#32;(<emphasis role="keywordtype">int</emphasis>&#32;partialBindingIndex&#32;=&#32;1;&#32;partialBindingIndex&#32;&lt;&#32;partialBindingList.Count;&#32;partialBindingIndex++)
+00605 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00606 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___input___action_file">SteamVR_Input_ActionFile</link>&#32;oldActionsFile&#32;=&#32;ReadJson&lt;SteamVR_Input_ActionFile&gt;(partialBindingList[0].GetActionsPath());
+00607 
+00608 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">for</emphasis>&#32;(<emphasis role="keywordtype">int</emphasis>&#32;oldActionIndex&#32;=&#32;0;&#32;oldActionIndex&#32;&lt;&#32;oldActionsFile.<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___input___action_file_1a4a87ed8dd184895ed7b4117a60dd2589">action_sets</link>.Count;&#32;oldActionIndex++)
+00609 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00610 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;var&#32;oldActionSet&#32;=&#32;oldActionsFile.<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___input___action_file_1a4a87ed8dd184895ed7b4117a60dd2589">action_sets</link>[oldActionIndex];
+00611 
+00612 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(newestActionsFile.<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___input___action_file_1a4a87ed8dd184895ed7b4117a60dd2589">action_sets</link>.Any(newAction&#32;=&gt;&#32;oldActionSet.Equals(newAction))&#32;==&#32;<emphasis role="keyword">false</emphasis>)
+00613 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00614 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;var&#32;existing&#32;=&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___input">SteamVR_Input</link>.<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___input_1a72db21f575efb1323adffa0a93c70471">actionFile</link>.<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___input___action_file_1a4a87ed8dd184895ed7b4117a60dd2589">action_sets</link>.FirstOrDefault(actionSet&#32;=&gt;&#32;oldActionSet.Equals(actionSet));
+00615 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(existing&#32;!=&#32;<emphasis role="keyword">null</emphasis>)
+00616 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00617 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___input">SteamVR_Input</link>.<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___input_1a72db21f575efb1323adffa0a93c70471">actionFile</link>.<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___input___action_file_1a4a87ed8dd184895ed7b4117a60dd2589">action_sets</link>.Remove(existing);
+00618 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;toRemove.Add(oldActionSet);
+00619 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00620 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00621 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00622 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00623 
+00624 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;toRemove;
+00625 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00626 
+<anchor xml:id="__steam_v_r___input___action_manifest___manager_8cs_source_1l00627"/><link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___input___action_manifest___manager_1a7cf57180bbaf2b60179d87c2d0bc8dfb">00627</link> &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">protected</emphasis>&#32;<emphasis role="keyword">static</emphasis>&#32;<emphasis role="keywordtype">int</emphasis>&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___input___action_manifest___manager_1a7cf57180bbaf2b60179d87c2d0bc8dfb">RemoveOldLocalizations</link>(List&lt;SteamVR_Input_ActionFile_Action&gt;&#32;removedActionList)
+00628 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00629 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordtype">int</emphasis>&#32;count&#32;=&#32;0;
+00630 
+00631 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">foreach</emphasis>&#32;(var&#32;action&#32;<emphasis role="keywordflow">in</emphasis>&#32;removedActionList)
+00632 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00633 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">foreach</emphasis>&#32;(var&#32;locDictionary&#32;<emphasis role="keywordflow">in</emphasis>&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___input">SteamVR_Input</link>.<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___input_1a72db21f575efb1323adffa0a93c70471">actionFile</link>.<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___input___action_file_1af3d52acf4347b019cce1a503c994023c">localization</link>)
+00634 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00635 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordtype">bool</emphasis>&#32;removed&#32;=&#32;locDictionary.Remove(action.name);
+00636 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(removed)
+00637 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;count++;
+00638 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00639 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00640 
+00641 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;count;
+00642 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00643 
+<anchor xml:id="__steam_v_r___input___action_manifest___manager_8cs_source_1l00644"/><link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___input___action_manifest___manager_1adfd8e2c3221d8e9f790081d8f5afdadb">00644</link> &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">protected</emphasis>&#32;<emphasis role="keyword">static</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___input___action_manifest___manager_1adfd8e2c3221d8e9f790081d8f5afdadb">RemoveOldActionsAndSetsFromBindings</link>(List&lt;SteamVR_Input_ActionFile_ActionSet&gt;&#32;setsToRemove,&#32;List&lt;SteamVR_Input_ActionFile_Action&gt;&#32;actionsToRemove)
+00645 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00646 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">foreach</emphasis>&#32;(var&#32;defaultBindingItem&#32;<emphasis role="keywordflow">in</emphasis>&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___input">SteamVR_Input</link>.<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___input_1a72db21f575efb1323adffa0a93c70471">actionFile</link>.<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___input___action_file_1ab24430cccd335b4f5e5d37b39d70cb86">default_bindings</link>)
+00647 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00648 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordtype">string</emphasis>&#32;currentBindingPath&#32;=&#32;defaultBindingItem.binding_url;
+00649 
+00650 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___input___binding_file">SteamVR_Input_BindingFile</link>&#32;currentBindingFile&#32;=&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___input___action_manifest___manager_1a686bacb75cf86fba501b361d36f55e86">GetBindingFileObject</link>(currentBindingPath);
+00651 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(currentBindingFile&#32;==&#32;<emphasis role="keyword">null</emphasis>)
+00652 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00653 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;Debug.LogError(<emphasis role="stringliteral">&quot;&lt;b&gt;[SteamVR]&lt;/b&gt;&#32;There&#32;was&#32;an&#32;error&#32;deserializing&#32;the&#32;binding&#32;at&#32;path:&#32;&quot;</emphasis>&#32;+&#32;currentBindingPath);
+00654 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">continue</emphasis>;
+00655 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00656 
+00657 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordtype">bool</emphasis>&#32;changed&#32;=&#32;<emphasis role="keyword">false</emphasis>;
+00658 
+00659 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;List&lt;string&gt;&#32;bindingListsToRemove&#32;=&#32;<emphasis role="keyword">new</emphasis>&#32;List&lt;string&gt;();
+00660 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">foreach</emphasis>&#32;(var&#32;actionList&#32;<emphasis role="keywordflow">in</emphasis>&#32;currentBindingFile.bindings)
+00661 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00662 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(setsToRemove.Any(<emphasis role="keyword">set</emphasis>&#32;=&gt;&#32;<emphasis role="keyword">set</emphasis>.name&#32;==&#32;actionList.Key))
+00663 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00664 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;bindingListsToRemove.Add(actionList.Key);
+00665 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;changed&#32;=&#32;<emphasis role="keyword">true</emphasis>;
+00666 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">continue</emphasis>;
+00667 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00668 
+00669 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">for</emphasis>&#32;(<emphasis role="keywordtype">int</emphasis>&#32;chordIndex&#32;=&#32;0;&#32;chordIndex&#32;&lt;&#32;actionList.Value.chords.Count;&#32;chordIndex++)
+00670 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00671 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;var&#32;existingChord&#32;=&#32;actionList.Value.chords[chordIndex];
+00672 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(actionsToRemove.Any(action&#32;=&gt;&#32;action.name&#32;==&#32;existingChord.output))
+00673 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00674 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;actionList.Value.chords.Remove(existingChord);
+00675 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;chordIndex--;
+00676 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;changed&#32;=&#32;<emphasis role="keyword">true</emphasis>;
+00677 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00678 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00679 
+00680 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">for</emphasis>&#32;(<emphasis role="keywordtype">int</emphasis>&#32;hapticIndex&#32;=&#32;0;&#32;hapticIndex&#32;&lt;&#32;actionList.Value.haptics.Count;&#32;hapticIndex++)
+00681 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00682 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;var&#32;existingHaptic&#32;=&#32;actionList.Value.haptics[hapticIndex];
+00683 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(actionsToRemove.Any(action&#32;=&gt;&#32;action.name&#32;==&#32;existingHaptic.output))
+00684 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00685 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;actionList.Value.haptics.Remove(existingHaptic);
+00686 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;hapticIndex--;
+00687 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;changed&#32;=&#32;<emphasis role="keyword">true</emphasis>;
+00688 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00689 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00690 
+00691 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">for</emphasis>&#32;(<emphasis role="keywordtype">int</emphasis>&#32;poseIndex&#32;=&#32;0;&#32;poseIndex&#32;&lt;&#32;actionList.Value.poses.Count;&#32;poseIndex++)
+00692 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00693 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;var&#32;existingPose&#32;=&#32;actionList.Value.poses[poseIndex];
+00694 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(actionsToRemove.Any(action&#32;=&gt;&#32;action.name&#32;==&#32;existingPose.output))
+00695 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00696 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;actionList.Value.poses.Remove(existingPose);
+00697 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;poseIndex--;
+00698 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;changed&#32;=&#32;<emphasis role="keyword">true</emphasis>;
+00699 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00700 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00701 
+00702 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">for</emphasis>&#32;(<emphasis role="keywordtype">int</emphasis>&#32;skeletonIndex&#32;=&#32;0;&#32;skeletonIndex&#32;&lt;&#32;actionList.Value.skeleton.Count;&#32;skeletonIndex++)
+00703 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00704 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;var&#32;existingSkeleton&#32;=&#32;actionList.Value.skeleton[skeletonIndex];
+00705 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(actionsToRemove.Any(action&#32;=&gt;&#32;action.name&#32;==&#32;existingSkeleton.output))
+00706 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00707 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;actionList.Value.skeleton.Remove(existingSkeleton);
+00708 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;skeletonIndex--;
+00709 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;changed&#32;=&#32;<emphasis role="keyword">true</emphasis>;
+00710 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00711 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00712 
+00713 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">for</emphasis>&#32;(<emphasis role="keywordtype">int</emphasis>&#32;sourceIndex&#32;=&#32;0;&#32;sourceIndex&#32;&lt;&#32;actionList.Value.sources.Count;&#32;sourceIndex++)
+00714 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00715 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;var&#32;existingSource&#32;=&#32;actionList.Value.sources[sourceIndex];
+00716 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(actionsToRemove.Any(action&#32;=&gt;&#32;action.name&#32;==&#32;existingSource.GetOutput()))
+00717 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00718 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;actionList.Value.sources.Remove(existingSource);
+00719 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;sourceIndex--;
+00720 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;changed&#32;=&#32;<emphasis role="keyword">true</emphasis>;
+00721 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00722 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00723 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00724 
+00725 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">for</emphasis>&#32;(<emphasis role="keywordtype">int</emphasis>&#32;bindingListToRemoveIndex&#32;=&#32;0;&#32;bindingListToRemoveIndex&#32;&lt;&#32;bindingListsToRemove.Count;&#32;bindingListToRemoveIndex++)
+00726 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00727 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;currentBindingFile.bindings.Remove(bindingListsToRemove[bindingListToRemoveIndex]);
+00728 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00729 
+00730 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(changed)
+00731 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00732 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___input___action_manifest___manager_1ab87ae830f2769600bc2073e0f9bd4ab5">WriteBindingFileObject</link>(currentBindingFile,&#32;currentBindingPath);
+00733 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00734 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00735 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00736 
+<anchor xml:id="__steam_v_r___input___action_manifest___manager_8cs_source_1l00737"/><link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___input___action_manifest___manager_1ac5a5b25cfebab833ec996fc78538af5f">00737</link> &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">protected</emphasis>&#32;<emphasis role="keyword">static</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___input___action_manifest___manager_1ac5a5b25cfebab833ec996fc78538af5f">RemoveOldPartialBindings</link>(List&lt;SteamVR_PartialInputBindings&gt;&#32;partialBindingList)
+00738 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00739 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;List&lt;SteamVR_Input_ActionFile_Action&gt;&#32;actionsToRemove&#32;=&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___input___action_manifest___manager_1a5aed0c7718fbf1b0f94e60bad129f3a5">RemoveOldActions</link>(partialBindingList);
+00740 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;List&lt;SteamVR_Input_ActionFile_ActionSet&gt;&#32;setsToRemove&#32;=&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___input___action_manifest___manager_1ae88b3db8a5905d69acc87f259565e5ef">RemoveOldActionSets</link>(partialBindingList);
+00741 
+00742 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordtype">int</emphasis>&#32;sets&#32;=&#32;setsToRemove.Count;
+00743 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordtype">int</emphasis>&#32;actions&#32;=&#32;actionsToRemove.Count;
+00744 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordtype">int</emphasis>&#32;locs&#32;=&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___input___action_manifest___manager_1a7cf57180bbaf2b60179d87c2d0bc8dfb">RemoveOldLocalizations</link>(actionsToRemove);
+00745 
+00746 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordtype">string</emphasis>&#32;dialogText&#32;=&#32;<emphasis role="keywordtype">string</emphasis>.Format(<emphasis role="stringliteral">&quot;We&apos;ve&#32;found&#32;a&#32;old&#32;{0}&#32;action&#32;sets,&#32;{1}&#32;actions,&#32;and&#32;{2}&#32;localization&#32;entries&#32;from&#32;old&#32;versions&#32;of&#32;this&#32;partial&#32;binding.&#32;Would&#32;you&#32;like&#32;to&#32;remove&#32;them&#32;from&#32;the&#32;actions&#32;file&#32;and&#32;default&#32;bindings?&quot;</emphasis>,&#32;sets,&#32;actions,&#32;locs);
+00747 
+00748 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordtype">bool</emphasis>&#32;confirm&#32;=&#32;EditorUtility.DisplayDialog(<emphasis role="stringliteral">&quot;SteamVR&#32;Input&quot;</emphasis>,&#32;dialogText,&#32;<emphasis role="stringliteral">&quot;Import&quot;</emphasis>,&#32;<emphasis role="stringliteral">&quot;Cancel&quot;</emphasis>);
+00749 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(confirm)
+00750 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00751 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___input___action_manifest___manager_1adfd8e2c3221d8e9f790081d8f5afdadb">RemoveOldActionsAndSetsFromBindings</link>(setsToRemove,&#32;actionsToRemove);
+00752 
+00753 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___input">SteamVR_Input</link>.<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___input_1a72db21f575efb1323adffa0a93c70471">actionFile</link>.<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___input___action_file_1a6ef31fa0d9acce2fc48e0f76d68402a5">Save</link>(<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___input">SteamVR_Input</link>.<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___input_1abe954f3809b1dc96cc8e337a1f80d35e">actionsFilePath</link>);
+00754 
+00755 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___input">SteamVR_Input</link>.<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___input_1a45c0fb7aca33a1e2db7c4f5730ac8189">InitializeFile</link>(<emphasis role="keyword">true</emphasis>);&#32;<emphasis role="comment">//&#32;reload&#32;after&#32;the&#32;save</emphasis>
+00756 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00757 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">else</emphasis>
+00758 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00759 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___input">SteamVR_Input</link>.<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___input_1a45c0fb7aca33a1e2db7c4f5730ac8189">InitializeFile</link>(<emphasis role="keyword">true</emphasis>);&#32;<emphasis role="comment">//&#32;reload&#32;since&#32;we&#32;actually&#32;removed&#32;the&#32;actions&#32;/&#32;sets&#32;to&#32;display&#32;this&#32;message</emphasis>
+00760 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00761 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00762 
+<anchor xml:id="__steam_v_r___input___action_manifest___manager_8cs_source_1l00763"/><link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___input___action_manifest___manager_1af24bac92a337589066ab3cb2ae03de50">00763</link> &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">protected</emphasis>&#32;<emphasis role="keyword">const</emphasis>&#32;<emphasis role="keywordtype">string</emphasis>&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___input___action_manifest___manager_1af24bac92a337589066ab3cb2ae03de50">dontAskAgainTemplate</link>&#32;=&#32;<emphasis role="stringliteral">&quot;{0}_{1}_DontAskAgain&quot;</emphasis>;
+<anchor xml:id="__steam_v_r___input___action_manifest___manager_8cs_source_1l00764"/><link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___input___action_manifest___manager_1af7cc91f9ef9ac980e2895ee1e749a77b">00764</link> &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">protected</emphasis>&#32;<emphasis role="keyword">static</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___input___action_manifest___manager_1af7cc91f9ef9ac980e2895ee1e749a77b">ConfirmImport</link>(List&lt;SteamVR_PartialInputBindings&gt;&#32;partialBindingList)
+00765 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00766 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___partial_input_bindings">SteamVR_PartialInputBindings</link>&#32;partial&#32;=&#32;partialBindingList.First();
+00767 
+00768 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//bool&#32;dontAskAgain&#32;=&#32;EditorPrefs.GetBool(dontAskAgainTemplate,&#32;false);</emphasis>
+00769 
+00770 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//todo:&#32;implement&#32;&apos;do&#32;not&#32;ask&#32;again&apos;</emphasis>
+00771 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordtype">string</emphasis>&#32;dialogText&#32;=&#32;<emphasis role="keywordtype">string</emphasis>.Format(<emphasis role="stringliteral">&quot;We&apos;ve&#32;found&#32;a&#32;partial&#32;SteamVR&#32;Input&#32;binding&#32;for&#32;&apos;{0}&apos;&#32;version&#32;&apos;{1}&apos;.&#32;Would&#32;you&#32;like&#32;to&#32;import&#32;it?&quot;</emphasis>,&#32;partial.<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___partial_input_bindings_1a873be6e8a716fca954320b0387456ee6">name</link>,&#32;partial.<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___partial_input_bindings_1a2b0da5fab4770d3b7ccce299b2b204ea">version</link>);
+00772 
+00773 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordtype">bool</emphasis>&#32;confirm&#32;=&#32;EditorUtility.DisplayDialog(<emphasis role="stringliteral">&quot;SteamVR&#32;Input&quot;</emphasis>,&#32;dialogText,&#32;<emphasis role="stringliteral">&quot;Import&quot;</emphasis>,&#32;<emphasis role="stringliteral">&quot;Cancel&quot;</emphasis>);
+00774 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(confirm)
+00775 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00776 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordtype">bool</emphasis>&#32;actionsExists&#32;=&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___input">SteamVR_Input</link>.<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___input_1a8ec782e1242f6f3179c4f361f4604db6">DoesActionsFileExist</link>();
+00777 
+00778 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(actionsExists)
+00779 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00780 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordtype">string</emphasis>&#32;mergeDialogText&#32;=&#32;<emphasis role="stringliteral">&quot;You&#32;have&#32;two&#32;options&#32;for&#32;importing&#32;this&#32;binding:\n&#32;Replace&#32;your&#32;current&#32;action&#32;file&#32;(delete&#32;all&#32;your&#32;actions)\n&#32;Merge&#32;the&#32;partial&#32;action&#32;file&#32;with&#32;your&#32;existing&#32;actions&quot;</emphasis>;
+00781 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordtype">bool</emphasis>&#32;shouldMerge&#32;=&#32;EditorUtility.DisplayDialog(<emphasis role="stringliteral">&quot;SteamVR&#32;Input&quot;</emphasis>,&#32;mergeDialogText,&#32;<emphasis role="stringliteral">&quot;Merge&quot;</emphasis>,&#32;<emphasis role="stringliteral">&quot;Replace&quot;</emphasis>);
+00782 
+00783 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(shouldMerge)
+00784 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00785 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___input___action_manifest___manager_1aab7a1f939743acbe656ba6da9c7d029e">ImportPartialBinding</link>(partial);
+00786 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00787 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">else</emphasis>
+00788 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00789 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___input___action_manifest___manager_1a5f6546aff673b524166ecf396e62a696">ReplaceBinding</link>(partial);
+00790 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00791 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00792 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">else</emphasis>
+00793 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00794 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___input___action_manifest___manager_1a5f6546aff673b524166ecf396e62a696">ReplaceBinding</link>(partial);
+00795 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00796 
+00797 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(partialBindingList.Count&#32;&gt;&#32;1)
+00798 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00799 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___input___action_manifest___manager_1ac5a5b25cfebab833ec996fc78538af5f">RemoveOldPartialBindings</link>(partialBindingList);
+00800 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00801 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00802 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00803 
+<anchor xml:id="__steam_v_r___input___action_manifest___manager_8cs_source_1l00804"/><link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___input___action_manifest___manager_1a7bba008b67bd60cfb82994486c11fab0">00804</link> &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keyword">static</emphasis>&#32;Dictionary&lt;string,&#32;List&lt;SteamVR_PartialInputBindings&gt;&gt;&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___input___action_manifest___manager_1a7bba008b67bd60cfb82994486c11fab0">ScanForPartials</link>()
+00805 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00806 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordtype">string</emphasis>[]&#32;partialManifestPaths&#32;=&#32;Directory.GetFiles(<emphasis role="stringliteral">&quot;Assets/&quot;</emphasis>,&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___input___action_manifest___manager_1a88936a6c601772bc5f87cac96ae8ea64">partialManifestFilename</link>,&#32;SearchOption.AllDirectories);
+00807 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;Dictionary&lt;string,&#32;List&lt;SteamVR_PartialInputBindings&gt;&gt;&#32;partialBindings&#32;=&#32;<emphasis role="keyword">new</emphasis>&#32;Dictionary&lt;string,&#32;List&lt;SteamVR_PartialInputBindings&gt;&gt;();
+00808 
+00809 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">for</emphasis>&#32;(<emphasis role="keywordtype">int</emphasis>&#32;partialIndex&#32;=&#32;0;&#32;partialIndex&#32;&lt;&#32;partialManifestPaths.Length;&#32;partialIndex++)
+00810 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00811 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordtype">string</emphasis>&#32;path&#32;=&#32;partialManifestPaths[partialIndex];
+00812 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordtype">string</emphasis>&#32;jsonText&#32;=&#32;File.ReadAllText(path);
+00813 
+00814 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___partial_input_bindings">SteamVR_PartialInputBindings</link>&#32;partialBinding&#32;=&#32;JsonConvert.DeserializeObject&lt;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___partial_input_bindings">SteamVR_PartialInputBindings</link>&gt;(jsonText);
+00815 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;partialBinding.<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___partial_input_bindings_1a60dc5f8f20423732fe072d006cb56d16">path</link>&#32;=&#32;path;
+00816 
+00817 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(partialBindings.ContainsKey(partialBinding.<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___partial_input_bindings_1a873be6e8a716fca954320b0387456ee6">name</link>))
+00818 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00819 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">for</emphasis>&#32;(<emphasis role="keywordtype">int</emphasis>&#32;versionIndex&#32;=&#32;0;&#32;versionIndex&#32;&lt;&#32;partialBindings[partialBinding.<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___partial_input_bindings_1a873be6e8a716fca954320b0387456ee6">name</link>].Count;&#32;versionIndex++)
+00820 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00821 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(partialBinding.<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___partial_input_bindings_1a2b0da5fab4770d3b7ccce299b2b204ea">version</link>&#32;&lt;&#32;partialBindings[partialBinding.<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___partial_input_bindings_1a873be6e8a716fca954320b0387456ee6">name</link>][versionIndex].version)
+00822 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;partialBindings[partialBinding.<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___partial_input_bindings_1a873be6e8a716fca954320b0387456ee6">name</link>].Insert(versionIndex,&#32;partialBinding);
+00823 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00824 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00825 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">else</emphasis>
+00826 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00827 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;partialBindings.Add(partialBinding.<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___partial_input_bindings_1a873be6e8a716fca954320b0387456ee6">name</link>,&#32;<emphasis role="keyword">new</emphasis>&#32;List&lt;SteamVR_PartialInputBindings&gt;()&#32;{&#32;partialBinding&#32;});
+00828 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00829 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00830 
+00831 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;partialBindings;
+00832 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00833 &#32;&#32;&#32;&#32;}
+00834 
+<anchor xml:id="__steam_v_r___input___action_manifest___manager_8cs_source_1l00835"/><link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___partial_input_bindings">00835</link> &#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keyword">class&#32;</emphasis><link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___partial_input_bindings">SteamVR_PartialInputBindings</link>
+00836 &#32;&#32;&#32;&#32;{
+<anchor xml:id="__steam_v_r___input___action_manifest___manager_8cs_source_1l00837"/><link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___partial_input_bindings_1a873be6e8a716fca954320b0387456ee6">00837</link> &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keywordtype">string</emphasis>&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___partial_input_bindings_1a873be6e8a716fca954320b0387456ee6">name</link>;
+<anchor xml:id="__steam_v_r___input___action_manifest___manager_8cs_source_1l00838"/><link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___partial_input_bindings_1a2b0da5fab4770d3b7ccce299b2b204ea">00838</link> &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keywordtype">int</emphasis>&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___partial_input_bindings_1a2b0da5fab4770d3b7ccce299b2b204ea">version</link>;
+<anchor xml:id="__steam_v_r___input___action_manifest___manager_8cs_source_1l00839"/><link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___partial_input_bindings_1acd18152c057c7f0683b6fa3452209813">00839</link> &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keywordtype">bool</emphasis>&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___partial_input_bindings_1acd18152c057c7f0683b6fa3452209813">overwriteOld</link>;
+<anchor xml:id="__steam_v_r___input___action_manifest___manager_8cs_source_1l00840"/><link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___partial_input_bindings_1acb28b8a4590ba2065eb2c30ff77454bf">00840</link> &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keywordtype">bool</emphasis>&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___partial_input_bindings_1acb28b8a4590ba2065eb2c30ff77454bf">removeUnused</link>;
+<anchor xml:id="__steam_v_r___input___action_manifest___manager_8cs_source_1l00841"/><link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___partial_input_bindings_1a2371306d154bffd13c4e2d69f023e3cd">00841</link> &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keywordtype">bool</emphasis>&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___partial_input_bindings_1a2371306d154bffd13c4e2d69f023e3cd">imported</link>;
+00842 
+00843 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;[JsonIgnore]
+<anchor xml:id="__steam_v_r___input___action_manifest___manager_8cs_source_1l00844"/><link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___partial_input_bindings_1a60dc5f8f20423732fe072d006cb56d16">00844</link> &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keywordtype">string</emphasis>&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___partial_input_bindings_1a60dc5f8f20423732fe072d006cb56d16">path</link>&#32;{&#32;<emphasis role="keyword">get</emphasis>;&#32;<emphasis role="keyword">set</emphasis>;&#32;}
+00845 
+<anchor xml:id="__steam_v_r___input___action_manifest___manager_8cs_source_1l00846"/><link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___partial_input_bindings_1ac271947867f1c393b35bec64ce44f201">00846</link> &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keywordtype">string</emphasis>&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___partial_input_bindings_1ac271947867f1c393b35bec64ce44f201">GetActionsPath</link>()
+00847 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00848 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;Path.Combine(<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___partial_input_bindings_1ae41f3f0d37c80b9a66afc80f2e759038">GetDirectory</link>(),&#32;<emphasis role="stringliteral">&quot;actions.json&quot;</emphasis>);
+00849 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00850 
+<anchor xml:id="__steam_v_r___input___action_manifest___manager_8cs_source_1l00851"/><link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___partial_input_bindings_1ae41f3f0d37c80b9a66afc80f2e759038">00851</link> &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keywordtype">string</emphasis>&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___partial_input_bindings_1ae41f3f0d37c80b9a66afc80f2e759038">GetDirectory</link>()
+00852 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00853 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;<emphasis role="keyword">new</emphasis>&#32;FileInfo(<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___partial_input_bindings_1a60dc5f8f20423732fe072d006cb56d16">path</link>).Directory.FullName;
+00854 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00855 
+<anchor xml:id="__steam_v_r___input___action_manifest___manager_8cs_source_1l00856"/><link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___partial_input_bindings_1a25680da3831a2de9a97bcb0af2b351ea">00856</link> &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___partial_input_bindings_1a25680da3831a2de9a97bcb0af2b351ea">Save</link>()
+00857 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00858 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;FileInfo&#32;existingActionsFile&#32;=&#32;<emphasis role="keyword">new</emphasis>&#32;FileInfo(<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___partial_input_bindings_1a60dc5f8f20423732fe072d006cb56d16">path</link>);
+00859 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(existingActionsFile.Exists)
+00860 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00861 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;existingActionsFile.IsReadOnly&#32;=&#32;<emphasis role="keyword">false</emphasis>;
+00862 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00863 
+00864 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//SanitizeActionFile();&#32;//todo:&#32;shouldn&apos;t&#32;we&#32;be&#32;doing&#32;this?</emphasis>
+00865 
+00866 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordtype">string</emphasis>&#32;json&#32;=&#32;JsonConvert.SerializeObject(<emphasis role="keyword">this</emphasis>,&#32;Formatting.Indented,&#32;<emphasis role="keyword">new</emphasis>&#32;JsonSerializerSettings&#32;{&#32;NullValueHandling&#32;=&#32;NullValueHandling.Ignore&#32;});
+00867 
+00868 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;File.WriteAllText(<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___partial_input_bindings_1a60dc5f8f20423732fe072d006cb56d16">path</link>,&#32;json);
+00869 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00870 &#32;&#32;&#32;&#32;}
+00871 }
+</programlisting></section>

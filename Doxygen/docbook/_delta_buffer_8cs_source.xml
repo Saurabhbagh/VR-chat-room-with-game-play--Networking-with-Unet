@@ -1,0 +1,152 @@
+<?xml version='1.0' encoding='UTF-8' standalone='no'?>
+<section xmlns="http://docbook.org/ns/docbook" version="5.0" xmlns:xlink="http://www.w3.org/1999/xlink" xml:id="__delta_buffer_8cs_source">
+<title>DeltaBuffer.cs</title>
+<indexterm><primary>O:/GitHUBMINIPRoject/Assets/LeapMotion/Core/Scripts/DataStructures/DeltaBuffer.cs</primary></indexterm>
+<programlisting>00001 <emphasis role="comment">/******************************************************************************</emphasis>
+00002 <emphasis role="comment">&#32;*&#32;Copyright&#32;(C)&#32;Leap&#32;Motion,&#32;Inc.&#32;2011-2018.&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;*</emphasis>
+00003 <emphasis role="comment">&#32;*&#32;Leap&#32;Motion&#32;proprietary&#32;and&#32;confidential.&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;*</emphasis>
+00004 <emphasis role="comment">&#32;*&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;*</emphasis>
+00005 <emphasis role="comment">&#32;*&#32;Use&#32;subject&#32;to&#32;the&#32;terms&#32;of&#32;the&#32;Leap&#32;Motion&#32;SDK&#32;Agreement&#32;available&#32;at&#32;&#32;&#32;&#32;&#32;*</emphasis>
+00006 <emphasis role="comment">&#32;*&#32;https://developer.leapmotion.com/sdk_agreement,&#32;or&#32;another&#32;agreement&#32;&#32;&#32;&#32;&#32;&#32;&#32;*</emphasis>
+00007 <emphasis role="comment">&#32;*&#32;between&#32;Leap&#32;Motion&#32;and&#32;you,&#32;your&#32;company&#32;or&#32;other&#32;organization.&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;*</emphasis>
+00008 <emphasis role="comment">&#32;******************************************************************************/</emphasis>
+00009 
+00010 <emphasis role="keyword">using</emphasis>&#32;<link linkend="_namespace_leap">Leap</link>.<link linkend="_namespace_leap_1_1_unity">Unity</link>.<link linkend="_namespace_leap_1_1_unity_1_1_query">Query</link>;
+00011 <emphasis role="keyword">using</emphasis>&#32;<link linkend="__balloon_8cs_1a7d67e097df9376eb709b6a23aa3c7d23">UnityEngine</link>;
+00012 
+00013 <emphasis role="keyword">namespace&#32;</emphasis><link linkend="_namespace_leap_1_1_unity">Leap.Unity</link>&#32;{
+00014 
+<anchor xml:id="__delta_buffer_8cs_source_1l00025"/><link linkend="_class_leap_1_1_unity_1_1_delta_buffer">00025</link> &#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keyword">abstract</emphasis>&#32;<emphasis role="keyword">class&#32;</emphasis><link linkend="_class_leap_1_1_unity_1_1_delta_buffer">DeltaBuffer</link>&lt;SampleType,&#32;DerivativeType&gt;&#32;:&#32;<link linkend="_interface_leap_1_1_unity_1_1_i_indexable">IIndexable</link>&lt;SampleType&gt;&#32;{
+00026 
+<anchor xml:id="__delta_buffer_8cs_source_1l00027"/><link linkend="_struct_leap_1_1_unity_1_1_delta_buffer_1_1_value_time_pair">00027</link> &#32;&#32;&#32;&#32;<emphasis role="keyword">protected</emphasis>&#32;<emphasis role="keyword">struct&#32;</emphasis><link linkend="_struct_leap_1_1_unity_1_1_delta_buffer_1_1_value_time_pair">ValueTimePair</link>&#32;{
+<anchor xml:id="__delta_buffer_8cs_source_1l00028"/><link linkend="_struct_leap_1_1_unity_1_1_delta_buffer_1_1_value_time_pair_1a85890d19a99a8075ae2bdda548d456e5">00028</link> &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;SampleType&#32;<link linkend="_struct_leap_1_1_unity_1_1_delta_buffer_1_1_value_time_pair_1a85890d19a99a8075ae2bdda548d456e5">value</link>;
+<anchor xml:id="__delta_buffer_8cs_source_1l00029"/><link linkend="_struct_leap_1_1_unity_1_1_delta_buffer_1_1_value_time_pair_1ad2376de3a27c8a7a08935f95762851bb">00029</link> &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keywordtype">float</emphasis>&#32;<link linkend="_struct_leap_1_1_unity_1_1_delta_buffer_1_1_value_time_pair_1ad2376de3a27c8a7a08935f95762851bb">time</link>;
+00030 &#32;&#32;&#32;&#32;}
+00031 
+<anchor xml:id="__delta_buffer_8cs_source_1l00032"/><link linkend="_class_leap_1_1_unity_1_1_delta_buffer_1a0aad81ffe455c866ec1d59eb7467f392">00032</link> &#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<link linkend="_class_leap_1_1_unity_1_1_delta_buffer_1a0aad81ffe455c866ec1d59eb7467f392">DeltaBuffer</link>(<emphasis role="keywordtype">int</emphasis>&#32;bufferSize)&#32;{
+00033 &#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_leap_1_1_unity_1_1_delta_buffer_1a6ef609a3d4a68dabb789e35dcf824135">_buffer</link>&#32;=&#32;<emphasis role="keyword">new</emphasis>&#32;<link linkend="_class_leap_1_1_unity_1_1_ring_buffer">RingBuffer&lt;ValueTimePair&gt;</link>(bufferSize);
+00034 &#32;&#32;&#32;&#32;}
+00035 
+<anchor xml:id="__delta_buffer_8cs_source_1l00036"/><link linkend="_class_leap_1_1_unity_1_1_delta_buffer_1a6ef609a3d4a68dabb789e35dcf824135">00036</link> &#32;&#32;&#32;&#32;<emphasis role="keyword">protected</emphasis>&#32;<link linkend="_class_leap_1_1_unity_1_1_ring_buffer">RingBuffer&lt;ValueTimePair&gt;</link>&#32;<link linkend="_class_leap_1_1_unity_1_1_delta_buffer_1a6ef609a3d4a68dabb789e35dcf824135">_buffer</link>;
+00037 
+<anchor xml:id="__delta_buffer_8cs_source_1l00038"/><link linkend="_class_leap_1_1_unity_1_1_delta_buffer_1a0df28688269e439fe3dcf772f1e6cbec">00038</link> &#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keywordtype">int</emphasis>&#32;<link linkend="_class_leap_1_1_unity_1_1_delta_buffer_1a0df28688269e439fe3dcf772f1e6cbec">Count</link>&#32;{&#32;<emphasis role="keyword">get</emphasis>&#32;{&#32;<emphasis role="keywordflow">return</emphasis>&#32;<link linkend="_class_leap_1_1_unity_1_1_delta_buffer_1a6ef609a3d4a68dabb789e35dcf824135">_buffer</link>.Count;&#32;}&#32;}
+00039 
+<anchor xml:id="__delta_buffer_8cs_source_1l00040"/><link linkend="_class_leap_1_1_unity_1_1_delta_buffer_1a1c03628f8d8e18b96656c5dfa632ce54">00040</link> &#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keywordtype">bool</emphasis>&#32;<link linkend="_class_leap_1_1_unity_1_1_delta_buffer_1a1c03628f8d8e18b96656c5dfa632ce54">IsFull</link>&#32;{&#32;<emphasis role="keyword">get</emphasis>&#32;{&#32;<emphasis role="keywordflow">return</emphasis>&#32;<link linkend="_class_leap_1_1_unity_1_1_delta_buffer_1a6ef609a3d4a68dabb789e35dcf824135">_buffer</link>.IsFull;&#32;}&#32;}
+00041 
+<anchor xml:id="__delta_buffer_8cs_source_1l00042"/><link linkend="_class_leap_1_1_unity_1_1_delta_buffer_1ac588b2d5fefc545dbdec09b307706314">00042</link> &#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keywordtype">bool</emphasis>&#32;<link linkend="_class_leap_1_1_unity_1_1_delta_buffer_1ac588b2d5fefc545dbdec09b307706314">IsEmpty</link>&#32;{&#32;<emphasis role="keyword">get</emphasis>&#32;{&#32;<emphasis role="keywordflow">return</emphasis>&#32;<link linkend="_class_leap_1_1_unity_1_1_delta_buffer_1a6ef609a3d4a68dabb789e35dcf824135">_buffer</link>.IsEmpty;&#32;}&#32;}
+00043 
+<anchor xml:id="__delta_buffer_8cs_source_1l00044"/><link linkend="_class_leap_1_1_unity_1_1_delta_buffer_1aa7a81d7bc8dd666acbdef3d22374aed3">00044</link> &#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keywordtype">int</emphasis>&#32;<link linkend="_class_leap_1_1_unity_1_1_delta_buffer_1aa7a81d7bc8dd666acbdef3d22374aed3">Capacity</link>&#32;{&#32;<emphasis role="keyword">get</emphasis>&#32;{&#32;<emphasis role="keywordflow">return</emphasis>&#32;<link linkend="_class_leap_1_1_unity_1_1_delta_buffer_1a6ef609a3d4a68dabb789e35dcf824135">_buffer</link>.Capacity;&#32;}&#32;}
+00045 
+<anchor xml:id="__delta_buffer_8cs_source_1l00046"/><link linkend="_class_leap_1_1_unity_1_1_delta_buffer_1a2a84d086d6edb34a7f6c249cea7b4acf">00046</link> &#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;SampleType&#32;<emphasis role="keyword">this</emphasis>[<emphasis role="keywordtype">int</emphasis>&#32;idx]&#32;{
+00047 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">get</emphasis>&#32;{&#32;<emphasis role="keywordflow">return</emphasis>&#32;<link linkend="_class_leap_1_1_unity_1_1_delta_buffer_1a6ef609a3d4a68dabb789e35dcf824135">_buffer</link>[idx].value;&#32;}
+00048 &#32;&#32;&#32;&#32;}
+00049 
+<anchor xml:id="__delta_buffer_8cs_source_1l00050"/><link linkend="_class_leap_1_1_unity_1_1_delta_buffer_1a19423be980871cc58ed3bf2e7d89b05e">00050</link> &#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;<link linkend="_class_leap_1_1_unity_1_1_delta_buffer_1a19423be980871cc58ed3bf2e7d89b05e">Clear</link>()&#32;{&#32;<link linkend="_class_leap_1_1_unity_1_1_delta_buffer_1a6ef609a3d4a68dabb789e35dcf824135">_buffer</link>.Clear();&#32;}
+00051 
+<anchor xml:id="__delta_buffer_8cs_source_1l00052"/><link linkend="_class_leap_1_1_unity_1_1_delta_buffer_1a570b88b4721427fabda06907c6481f95">00052</link> &#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;<link linkend="_class_leap_1_1_unity_1_1_delta_buffer_1a570b88b4721427fabda06907c6481f95">Add</link>(SampleType&#32;sample,&#32;<emphasis role="keywordtype">float</emphasis>&#32;sampleTime)&#32;{
+00053 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(!<link linkend="_class_leap_1_1_unity_1_1_delta_buffer_1ac588b2d5fefc545dbdec09b307706314">IsEmpty</link>&#32;&amp;&amp;&#32;sampleTime&#32;==&#32;<link linkend="_class_leap_1_1_unity_1_1_delta_buffer_1a80f1987c60828de0e6c96462338fc4f8">GetLatestTime</link>())&#32;{
+00054 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_leap_1_1_unity_1_1_delta_buffer_1abbd066336bcc8b7b937df00061ded48a">SetLatest</link>(sample,&#32;sampleTime);
+00055 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>;
+00056 &#32;&#32;&#32;&#32;&#32;&#32;}
+00057 
+00058 &#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_leap_1_1_unity_1_1_delta_buffer_1a6ef609a3d4a68dabb789e35dcf824135">_buffer</link>.Add(<emphasis role="keyword">new</emphasis>&#32;ValueTimePair&#32;{&#32;value&#32;=&#32;sample,&#32;time&#32;=&#32;sampleTime&#32;});
+00059 &#32;&#32;&#32;&#32;}
+00060 
+<anchor xml:id="__delta_buffer_8cs_source_1l00061"/><link linkend="_class_leap_1_1_unity_1_1_delta_buffer_1a1c44f3ee9a602076c7c1ae001e2289e5">00061</link> &#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;SampleType&#32;<link linkend="_class_leap_1_1_unity_1_1_delta_buffer_1a1c44f3ee9a602076c7c1ae001e2289e5">Get</link>(<emphasis role="keywordtype">int</emphasis>&#32;idx)&#32;{
+00062 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;<link linkend="_class_leap_1_1_unity_1_1_delta_buffer_1a6ef609a3d4a68dabb789e35dcf824135">_buffer</link>.Get(idx).value;
+00063 &#32;&#32;&#32;&#32;}
+00064 
+<anchor xml:id="__delta_buffer_8cs_source_1l00065"/><link linkend="_class_leap_1_1_unity_1_1_delta_buffer_1a76f2f9c6580529cac9412a922558b4f7">00065</link> &#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;SampleType&#32;<link linkend="_class_leap_1_1_unity_1_1_delta_buffer_1a76f2f9c6580529cac9412a922558b4f7">GetLatest</link>()&#32;{
+00066 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;<link linkend="_class_leap_1_1_unity_1_1_delta_buffer_1a1c44f3ee9a602076c7c1ae001e2289e5">Get</link>(<link linkend="_class_leap_1_1_unity_1_1_delta_buffer_1a0df28688269e439fe3dcf772f1e6cbec">Count</link>&#32;-&#32;1);
+00067 &#32;&#32;&#32;&#32;}
+00068 
+<anchor xml:id="__delta_buffer_8cs_source_1l00069"/><link linkend="_class_leap_1_1_unity_1_1_delta_buffer_1ad3b9a4e7f743f8991b591d1ffd7db1c5">00069</link> &#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;<link linkend="_class_leap_1_1_unity_1_1_delta_buffer_1ad3b9a4e7f743f8991b591d1ffd7db1c5">Set</link>(<emphasis role="keywordtype">int</emphasis>&#32;idx,&#32;SampleType&#32;sample,&#32;<emphasis role="keywordtype">float</emphasis>&#32;sampleTime)&#32;{
+00070 &#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_leap_1_1_unity_1_1_delta_buffer_1a6ef609a3d4a68dabb789e35dcf824135">_buffer</link>.Set(idx,&#32;<emphasis role="keyword">new</emphasis>&#32;ValueTimePair&#32;{&#32;value&#32;=&#32;sample,&#32;time&#32;=&#32;sampleTime&#32;});
+00071 &#32;&#32;&#32;&#32;}
+00072 
+<anchor xml:id="__delta_buffer_8cs_source_1l00073"/><link linkend="_class_leap_1_1_unity_1_1_delta_buffer_1abbd066336bcc8b7b937df00061ded48a">00073</link> &#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;<link linkend="_class_leap_1_1_unity_1_1_delta_buffer_1abbd066336bcc8b7b937df00061ded48a">SetLatest</link>(SampleType&#32;sample,&#32;<emphasis role="keywordtype">float</emphasis>&#32;sampleTime)&#32;{
+00074 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(<link linkend="_class_leap_1_1_unity_1_1_delta_buffer_1a0df28688269e439fe3dcf772f1e6cbec">Count</link>&#32;==&#32;0)&#32;<link linkend="_class_leap_1_1_unity_1_1_delta_buffer_1ad3b9a4e7f743f8991b591d1ffd7db1c5">Set</link>(0,&#32;sample,&#32;sampleTime);
+00075 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">else</emphasis>&#32;<link linkend="_class_leap_1_1_unity_1_1_delta_buffer_1ad3b9a4e7f743f8991b591d1ffd7db1c5">Set</link>(<link linkend="_class_leap_1_1_unity_1_1_delta_buffer_1a0df28688269e439fe3dcf772f1e6cbec">Count</link>&#32;-&#32;1,&#32;sample,&#32;sampleTime);
+00076 &#32;&#32;&#32;&#32;}
+00077 
+<anchor xml:id="__delta_buffer_8cs_source_1l00078"/><link linkend="_class_leap_1_1_unity_1_1_delta_buffer_1aeed56ed083b2c15bb7b9e0b2e4973509">00078</link> &#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keywordtype">float</emphasis>&#32;<link linkend="_class_leap_1_1_unity_1_1_delta_buffer_1aeed56ed083b2c15bb7b9e0b2e4973509">GetTime</link>(<emphasis role="keywordtype">int</emphasis>&#32;idx)&#32;{
+00079 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;<link linkend="_class_leap_1_1_unity_1_1_delta_buffer_1a6ef609a3d4a68dabb789e35dcf824135">_buffer</link>.Get(idx).time;
+00080 &#32;&#32;&#32;&#32;}
+00081 
+<anchor xml:id="__delta_buffer_8cs_source_1l00082"/><link linkend="_class_leap_1_1_unity_1_1_delta_buffer_1a80f1987c60828de0e6c96462338fc4f8">00082</link> &#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keywordtype">float</emphasis>&#32;<link linkend="_class_leap_1_1_unity_1_1_delta_buffer_1a80f1987c60828de0e6c96462338fc4f8">GetLatestTime</link>()&#32;{
+00083 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;<link linkend="_class_leap_1_1_unity_1_1_delta_buffer_1a6ef609a3d4a68dabb789e35dcf824135">_buffer</link>.Get(<link linkend="_class_leap_1_1_unity_1_1_delta_buffer_1a0df28688269e439fe3dcf772f1e6cbec">Count</link>&#32;-&#32;1).time;
+00084 &#32;&#32;&#32;&#32;}
+00085 
+00091 &#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keyword">abstract</emphasis>&#32;DerivativeType&#32;<link linkend="_class_leap_1_1_unity_1_1_delta_buffer_1a8700bc7a1676ba39977f58debf74f5df">Delta</link>();
+00092 
+00093 <emphasis role="preprocessor">&#32;&#32;&#32;&#32;#region&#32;foreach&#32;Support</emphasis>
+00094 
+<anchor xml:id="__delta_buffer_8cs_source_1l00095"/><link linkend="_class_leap_1_1_unity_1_1_delta_buffer_1a12430bca3065eecc8084547cb8262f56">00095</link> &#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<link linkend="_struct_leap_1_1_unity_1_1_indexable_enumerator">IndexableEnumerator&lt;SampleType&gt;</link>&#32;<link linkend="_class_leap_1_1_unity_1_1_delta_buffer_1a12430bca3065eecc8084547cb8262f56">GetEnumerator</link>()&#32;{
+00096 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;<emphasis role="keyword">new</emphasis>&#32;<link linkend="_struct_leap_1_1_unity_1_1_indexable_enumerator">IndexableEnumerator&lt;SampleType&gt;</link>(<emphasis role="keyword">this</emphasis>);
+00097 &#32;&#32;&#32;&#32;}
+00098 
+00099 <emphasis role="preprocessor">&#32;&#32;&#32;&#32;#endregion</emphasis>
+00100 
+00101 &#32;&#32;}
+00102 
+00110 &#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keyword">class&#32;</emphasis><link linkend="_class_leap_1_1_unity_1_1_delta_buffer">DeltaBuffer</link>&#32;:&#32;<link linkend="_class_leap_1_1_unity_1_1_delta_buffer">DeltaBuffer</link>&lt;Vector3,&#32;Vector3&gt;&#32;{
+00111 
+<anchor xml:id="__delta_buffer_8cs_source_1l00112"/><link linkend="_class_leap_1_1_unity_1_1_delta_buffer_1a0aad81ffe455c866ec1d59eb7467f392">00112</link> &#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<link linkend="_class_leap_1_1_unity_1_1_delta_buffer_1a0aad81ffe455c866ec1d59eb7467f392">DeltaBuffer</link>(<emphasis role="keywordtype">int</emphasis>&#32;bufferSize)&#32;:&#32;base(bufferSize)&#32;{&#32;}
+00113 
+<anchor xml:id="__delta_buffer_8cs_source_1l00121"/><link linkend="_class_leap_1_1_unity_1_1_delta_buffer_1a69fad13be5c6bd7117ad0343f6646b8e">00121</link> &#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keyword">override</emphasis>&#32;Vector3&#32;<link linkend="_class_leap_1_1_unity_1_1_delta_buffer_1a69fad13be5c6bd7117ad0343f6646b8e">Delta</link>()&#32;{
+00122 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(<link linkend="_class_leap_1_1_unity_1_1_delta_buffer_1a0df28688269e439fe3dcf772f1e6cbec">Count</link>&#32;&lt;=&#32;1)&#32;{&#32;<emphasis role="keywordflow">return</emphasis>&#32;Vector3.zero;&#32;}
+00123 
+00124 &#32;&#32;&#32;&#32;&#32;&#32;Vector3&#32;deltaPerTimeSum&#32;=&#32;Vector3.zero;
+00125 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">for</emphasis>&#32;(<emphasis role="keywordtype">int</emphasis>&#32;i&#32;=&#32;0;&#32;i&#32;&lt;&#32;<link linkend="_class_leap_1_1_unity_1_1_delta_buffer_1a0df28688269e439fe3dcf772f1e6cbec">Count</link>&#32;-&#32;1;&#32;i++)&#32;{
+00126 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;deltaPerTimeSum&#32;+=&#32;(<link linkend="_class_leap_1_1_unity_1_1_delta_buffer_1a1c44f3ee9a602076c7c1ae001e2289e5">Get</link>(i&#32;+&#32;1)&#32;-&#32;<link linkend="_class_leap_1_1_unity_1_1_delta_buffer_1a1c44f3ee9a602076c7c1ae001e2289e5">Get</link>(i))&#32;/&#32;(<link linkend="_class_leap_1_1_unity_1_1_delta_buffer_1aeed56ed083b2c15bb7b9e0b2e4973509">GetTime</link>(i&#32;+&#32;1)&#32;-&#32;<link linkend="_class_leap_1_1_unity_1_1_delta_buffer_1aeed56ed083b2c15bb7b9e0b2e4973509">GetTime</link>(i));
+00127 &#32;&#32;&#32;&#32;&#32;&#32;}
+00128 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;deltaPerTimeSum&#32;/&#32;(<link linkend="_class_leap_1_1_unity_1_1_delta_buffer_1a0df28688269e439fe3dcf772f1e6cbec">Count</link>&#32;-&#32;1);
+00129 &#32;&#32;&#32;&#32;}
+00130 
+00131 &#32;&#32;}
+00132 
+<anchor xml:id="__delta_buffer_8cs_source_1l00141"/><link linkend="_class_leap_1_1_unity_1_1_delta_float_buffer">00141</link> &#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keyword">class&#32;</emphasis><link linkend="_class_leap_1_1_unity_1_1_delta_float_buffer">DeltaFloatBuffer</link>&#32;:&#32;<link linkend="_class_leap_1_1_unity_1_1_delta_buffer">DeltaBuffer</link>&lt;float,&#32;float&gt;&#32;{
+00142 
+<anchor xml:id="__delta_buffer_8cs_source_1l00143"/><link linkend="_class_leap_1_1_unity_1_1_delta_float_buffer_1a496dfd0f1489077ae0b34730577c7024">00143</link> &#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<link linkend="_class_leap_1_1_unity_1_1_delta_float_buffer_1a496dfd0f1489077ae0b34730577c7024">DeltaFloatBuffer</link>(<emphasis role="keywordtype">int</emphasis>&#32;bufferSize)&#32;:&#32;base(bufferSize)&#32;{&#32;}
+00144 
+<anchor xml:id="__delta_buffer_8cs_source_1l00149"/><link linkend="_class_leap_1_1_unity_1_1_delta_float_buffer_1afc1e79b97babd5397852a33e3aa425a7">00149</link> &#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keyword">override</emphasis>&#32;<emphasis role="keywordtype">float</emphasis>&#32;<link linkend="_class_leap_1_1_unity_1_1_delta_float_buffer_1afc1e79b97babd5397852a33e3aa425a7">Delta</link>()&#32;{
+00150 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(<link linkend="_class_leap_1_1_unity_1_1_delta_buffer_1a0df28688269e439fe3dcf772f1e6cbec">Count</link>&#32;&lt;=&#32;1)&#32;{&#32;<emphasis role="keywordflow">return</emphasis>&#32;0f;&#32;}
+00151 
+00152 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordtype">float</emphasis>&#32;deltaPerTimeSum&#32;=&#32;0f;
+00153 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">for</emphasis>&#32;(<emphasis role="keywordtype">int</emphasis>&#32;i&#32;=&#32;0;&#32;i&#32;&lt;&#32;<link linkend="_class_leap_1_1_unity_1_1_delta_buffer_1a0df28688269e439fe3dcf772f1e6cbec">Count</link>&#32;-&#32;1;&#32;i++)&#32;{
+00154 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;deltaPerTimeSum&#32;+=&#32;(<link linkend="_class_leap_1_1_unity_1_1_delta_buffer_1a1c44f3ee9a602076c7c1ae001e2289e5">Get</link>(i&#32;+&#32;1)&#32;-&#32;<link linkend="_class_leap_1_1_unity_1_1_delta_buffer_1a1c44f3ee9a602076c7c1ae001e2289e5">Get</link>(i))&#32;/&#32;(<link linkend="_class_leap_1_1_unity_1_1_delta_buffer_1aeed56ed083b2c15bb7b9e0b2e4973509">GetTime</link>(i&#32;+&#32;1)&#32;-&#32;<link linkend="_class_leap_1_1_unity_1_1_delta_buffer_1aeed56ed083b2c15bb7b9e0b2e4973509">GetTime</link>(i));
+00155 &#32;&#32;&#32;&#32;&#32;&#32;}
+00156 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;deltaPerTimeSum&#32;/&#32;(<link linkend="_class_leap_1_1_unity_1_1_delta_buffer_1a0df28688269e439fe3dcf772f1e6cbec">Count</link>&#32;-&#32;1);
+00157 &#32;&#32;&#32;&#32;}
+00158 
+00159 &#32;&#32;}
+00160 
+<anchor xml:id="__delta_buffer_8cs_source_1l00169"/><link linkend="_class_leap_1_1_unity_1_1_delta_quaternion_buffer">00169</link> &#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keyword">class&#32;</emphasis><link linkend="_class_leap_1_1_unity_1_1_delta_quaternion_buffer">DeltaQuaternionBuffer</link>&#32;:&#32;<link linkend="_class_leap_1_1_unity_1_1_delta_buffer">DeltaBuffer</link>&lt;Quaternion,&#32;Vector3&gt;&#32;{
+00170 
+<anchor xml:id="__delta_buffer_8cs_source_1l00171"/><link linkend="_class_leap_1_1_unity_1_1_delta_quaternion_buffer_1a8cb7e602d39297195043cc232773f7c9">00171</link> &#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<link linkend="_class_leap_1_1_unity_1_1_delta_quaternion_buffer_1a8cb7e602d39297195043cc232773f7c9">DeltaQuaternionBuffer</link>(<emphasis role="keywordtype">int</emphasis>&#32;bufferSize)&#32;:&#32;base(bufferSize)&#32;{&#32;}
+00172 
+<anchor xml:id="__delta_buffer_8cs_source_1l00177"/><link linkend="_class_leap_1_1_unity_1_1_delta_quaternion_buffer_1a4e3c9ef1beee10efb295719e81cdf766">00177</link> &#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keyword">override</emphasis>&#32;Vector3&#32;<link linkend="_class_leap_1_1_unity_1_1_delta_quaternion_buffer_1a4e3c9ef1beee10efb295719e81cdf766">Delta</link>()&#32;{
+00178 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(<link linkend="_class_leap_1_1_unity_1_1_delta_buffer_1a0df28688269e439fe3dcf772f1e6cbec">Count</link>&#32;&lt;=&#32;1)&#32;<emphasis role="keywordflow">return</emphasis>&#32;Vector3.zero;
+00179 
+00180 &#32;&#32;&#32;&#32;&#32;&#32;var&#32;deltaSum&#32;=&#32;Vector3.zero;
+00181 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">for</emphasis>&#32;(<emphasis role="keywordtype">int</emphasis>&#32;i&#32;=&#32;0;&#32;i&#32;&lt;&#32;<link linkend="_class_leap_1_1_unity_1_1_delta_buffer_1a0df28688269e439fe3dcf772f1e6cbec">Count</link>&#32;-&#32;1;&#32;i++)&#32;{
+00182 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;var&#32;sample0&#32;=&#32;<link linkend="_class_leap_1_1_unity_1_1_delta_buffer_1a6ef609a3d4a68dabb789e35dcf824135">_buffer</link>.Get(i);
+00183 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;var&#32;sample1&#32;=&#32;<link linkend="_class_leap_1_1_unity_1_1_delta_buffer_1a6ef609a3d4a68dabb789e35dcf824135">_buffer</link>.Get(i&#32;+&#32;1);
+00184 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;var&#32;r0&#32;=&#32;sample0.value;
+00185 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;var&#32;t0&#32;=&#32;sample0.time;
+00186 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;var&#32;r1&#32;=&#32;sample1.value;
+00187 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;var&#32;t1&#32;=&#32;sample1.time;
+00188 
+00189 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;var&#32;delta&#32;=&#32;(r1.From(r0)).ToAngleAxisVector();
+00190 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;var&#32;deltaTime&#32;=&#32;t1.From(t0);
+00191 
+00192 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;deltaSum&#32;+=&#32;delta&#32;/&#32;deltaTime;
+00193 &#32;&#32;&#32;&#32;&#32;&#32;}
+00194 
+00195 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;deltaSum&#32;/&#32;(<link linkend="_class_leap_1_1_unity_1_1_delta_buffer_1a0df28688269e439fe3dcf772f1e6cbec">Count</link>&#32;-&#32;1);
+00196 &#32;&#32;&#32;&#32;}
+00197 
+00198 &#32;&#32;}
+00199 
+00200 }
+</programlisting></section>

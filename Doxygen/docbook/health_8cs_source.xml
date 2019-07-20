@@ -1,0 +1,79 @@
+<?xml version='1.0' encoding='UTF-8' standalone='no'?>
+<section xmlns="http://docbook.org/ns/docbook" version="5.0" xmlns:xlink="http://www.w3.org/1999/xlink" xml:id="_health_8cs_source">
+<title>health.cs</title>
+<indexterm><primary>O:/GitHUBMINIPRoject/Assets/Script/health.cs</primary></indexterm>
+<programlisting>00001 <emphasis role="keyword">using</emphasis>&#32;System.Collections;
+00002 <emphasis role="keyword">using</emphasis>&#32;System.Collections.Generic;
+00003 <emphasis role="keyword">using</emphasis>&#32;<link linkend="__balloon_8cs_1a7d67e097df9376eb709b6a23aa3c7d23">UnityEngine</link>;
+00004 <emphasis role="keyword">using</emphasis>&#32;<link linkend="_namespace_unity_engine">UnityEngine</link>.UI;
+00005 <emphasis role="keyword">using</emphasis>&#32;<link linkend="_namespace_unity_engine">UnityEngine</link>.Networking;
+00006 <emphasis role="keyword">using</emphasis>&#32;System;
+00007 
+<anchor xml:id="_health_8cs_source_1l00012"/><link linkend="_classhealth">00012</link> <emphasis role="keyword">public</emphasis>&#32;<emphasis role="keyword">class&#32;</emphasis><link linkend="_classhealth">health</link>&#32;:&#32;NetworkBehaviour
+00013 {
+00014 &#32;
+<anchor xml:id="_health_8cs_source_1l00015"/><link linkend="_classhealth_1a53480daaacaa8f112112ab692cfb4e00">00015</link> &#32;&#32;<emphasis role="keyword">public</emphasis>&#32;NetworkInstanceId&#32;&#32;<link linkend="_classhealth_1a53480daaacaa8f112112ab692cfb4e00">PlayerId</link>;
+<anchor xml:id="_health_8cs_source_1l00016"/><link linkend="_classhealth_1a03ad8e4011a7094e3fbec6dcd7ff946c">00016</link> &#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keyword">const</emphasis>&#32;<emphasis role="keywordtype">int</emphasis>&#32;<link linkend="_classhealth_1a03ad8e4011a7094e3fbec6dcd7ff946c">maxHealth</link>&#32;=&#32;100;
+00017 &#32;&#32;<emphasis role="keywordtype">int</emphasis>&#32;count=0;
+<anchor xml:id="_health_8cs_source_1l00018"/><link linkend="_classhealth_1a50db37d3af48df3d68a1c7a415f7de53">00018</link> &#32;&#32;[SyncVar&#32;(hook&#32;=&#32;<emphasis role="stringliteral">&quot;OnChangeHealth&quot;</emphasis>)]<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keywordtype">int</emphasis>&#32;<link linkend="_classhealth_1a50db37d3af48df3d68a1c7a415f7de53">currentHealth</link>&#32;=&#32;<link linkend="_classhealth_1a03ad8e4011a7094e3fbec6dcd7ff946c">maxHealth</link>;
+<anchor xml:id="_health_8cs_source_1l00019"/><link linkend="_classhealth_1ae6062530fe2e6cf803cab4eda97db4c9">00019</link> &#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;RectTransform&#32;<link linkend="_classhealth_1ae6062530fe2e6cf803cab4eda97db4c9">healthbar</link>;
+00022 &#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;<link linkend="_classhealth_1a7356a64035ee03262ec7fca1af42eff1">TakeDamage</link>(&#32;<emphasis role="keywordtype">int</emphasis>&#32;amount&#32;)
+00027 &#32;&#32;{
+00028 &#32;&#32;&#32;&#32;<link linkend="_classhealth_1a53480daaacaa8f112112ab692cfb4e00">PlayerId</link>&#32;=&#32;GetComponent&lt;NetworkIdentity&gt;().netId;
+00029 &#32;&#32;&#32;&#32;NetworkManager&#32;nm&#32;=&#32;FindObjectOfType&lt;NetworkManager&gt;();
+00030 &#32;&#32;&#32;&#32;&#32;count&#32;=&#32;nm.numPlayers;
+00031 &#32;&#32;&#32;&#32;&#32;&#32;Debug.Log(&#32;<emphasis role="stringliteral">&quot;Number&#32;of&#32;player&#32;in&#32;the&#32;network&#32;update&#32;&quot;</emphasis>&#32;+&#32;count&#32;);
+00032 &#32;&#32;&#32;&#32;Debug.Log(&#32;<emphasis role="stringliteral">&quot;taking&#32;damage&quot;</emphasis>&#32;);
+00033 
+00034 &#32;&#32;&#32;&#32;<link linkend="_classhealth_1a50db37d3af48df3d68a1c7a415f7de53">currentHealth</link>&#32;-=&#32;amount;
+00035 
+00036 &#32;&#32;&#32;&#32;Debug.Log(&#32;<emphasis role="stringliteral">&quot;player&#32;&quot;</emphasis>+&#32;<link linkend="_classhealth_1a53480daaacaa8f112112ab692cfb4e00">PlayerId</link>&#32;+&#32;<emphasis role="stringliteral">&quot;,&#32;health:&#32;&quot;</emphasis>&#32;+&#32;<link linkend="_classhealth_1a50db37d3af48df3d68a1c7a415f7de53">currentHealth</link>);
+00037 
+00043 
+00044 &#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(&#32;<link linkend="_classhealth_1a50db37d3af48df3d68a1c7a415f7de53">currentHealth</link>&#32;&lt;=&#32;0&#32;)
+00045 &#32;&#32;&#32;&#32;{
+00046 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>(isServer)
+00047 &#32;&#32;&#32;&#32;&#32;&#32;{
+00048 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(&#32;count&#32;&gt;&#32;1&#32;)
+00049 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00050 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;
+00051 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//Destroy(&#32;GetComponent&lt;Rigidbody&gt;()&#32;);</emphasis>
+00052 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;this.gameObject.active&#32;=&#32;<emphasis role="keyword">false</emphasis>;
+00053 
+00054 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}&#32;&#32;&#32;&#32;&#32;&#32;&#32;
+00055 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">else</emphasis>
+00056 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;NetworkManager.singleton.StopClient();
+00057 
+00058 &#32;&#32;&#32;&#32;&#32;&#32;}
+00059 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">else</emphasis>&#32;<emphasis role="keywordflow">if</emphasis>(count==0)
+00060 &#32;&#32;&#32;&#32;&#32;&#32;{
+00061 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;NetworkManager.singleton.StopHost();
+00062 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;
+00063 &#32;&#32;&#32;&#32;&#32;&#32;}
+00064 
+00065 &#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">else</emphasis>
+00066 &#32;&#32;&#32;&#32;&#32;&#32;{
+00067 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;
+00068 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//NetworkManager.singleton.StopClient();</emphasis>
+00069 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;this.gameObject.active&#32;=&#32;<emphasis role="keyword">false</emphasis>;
+00070 
+00071 &#32;&#32;&#32;&#32;&#32;&#32;}
+00072 &#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_classhealth_1a50db37d3af48df3d68a1c7a415f7de53">currentHealth</link>&#32;=&#32;<link linkend="_classhealth_1a03ad8e4011a7094e3fbec6dcd7ff946c">maxHealth</link>;
+00073 &#32;&#32;&#32;&#32;}
+00074 &#32;&#32;&#32;&#32;}
+00075 &#32;&#32;
+00076 
+00077 
+00082 
+00083 
+00084 
+<anchor xml:id="_health_8cs_source_1l00085"/><link linkend="_classhealth_1a63f6a51cc26465e3a46eb81a578bcf1d">00085</link> &#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;<link linkend="_classhealth_1a63f6a51cc26465e3a46eb81a578bcf1d">OnChangeHealth</link>(&#32;<emphasis role="keywordtype">int</emphasis>&#32;<link linkend="_classhealth">health</link>&#32;)
+00086 &#32;&#32;{
+00087 &#32;&#32;&#32;&#32;<link linkend="_classhealth_1ae6062530fe2e6cf803cab4eda97db4c9">healthbar</link>.sizeDelta&#32;=&#32;<emphasis role="keyword">new</emphasis>&#32;Vector2(&#32;<link linkend="_classhealth">health</link>&#32;*&#32;2,&#32;<link linkend="_classhealth_1ae6062530fe2e6cf803cab4eda97db4c9">healthbar</link>.sizeDelta.y&#32;);
+00088 &#32;&#32;}
+00089 
+00090 &#32;&#32;
+00091 &#32;&#32;&#32;&#32;
+00092 }
+00093 
+</programlisting></section>

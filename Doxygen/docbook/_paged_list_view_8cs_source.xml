@@ -1,0 +1,197 @@
+<?xml version='1.0' encoding='UTF-8' standalone='no'?>
+<section xmlns="http://docbook.org/ns/docbook" version="5.0" xmlns:xlink="http://www.w3.org/1999/xlink" xml:id="__paged_list_view_8cs_source">
+<title>PagedListView.cs</title>
+<indexterm><primary>O:/GitHUBMINIPRoject/Library/PackageCache/com.unity.collab-proxy@1.2.15/Editor/Collab/Views/PagedListView.cs</primary></indexterm>
+<programlisting>00001 <emphasis role="keyword">using</emphasis>&#32;System;
+00002 <emphasis role="keyword">using</emphasis>&#32;System.Collections.Generic;
+00003 
+00004 <emphasis role="preprocessor">#if&#32;UNITY_2019_1_OR_NEWER</emphasis>
+00005 <emphasis role="keyword">using</emphasis>&#32;<link linkend="_namespace_unity_engine">UnityEngine</link>.UIElements;
+00006 <emphasis role="preprocessor">#else</emphasis>
+00007 <emphasis role="keyword">using</emphasis>&#32;<link linkend="_namespace_unity_engine">UnityEngine</link>.Experimental.UIElements;
+00008 <emphasis role="keyword">using</emphasis>&#32;<link linkend="_namespace_unity_engine">UnityEngine</link>.Experimental.UIElements.StyleEnums;
+00009 <emphasis role="preprocessor">#endif</emphasis>
+00010 
+00011 <emphasis role="keyword">namespace&#32;</emphasis><link linkend="_namespace_unity_editor_1_1_collaboration">UnityEditor.Collaboration</link>
+00012 {
+<anchor xml:id="__paged_list_view_8cs_source_1l00013"/><link linkend="_interface_unity_editor_1_1_collaboration_1_1_i_pager_data">00013</link> &#32;&#32;&#32;&#32;<emphasis role="keyword">internal</emphasis>&#32;<emphasis role="keyword">interface&#32;</emphasis><link linkend="_interface_unity_editor_1_1_collaboration_1_1_i_pager_data">IPagerData</link>
+00014 &#32;&#32;&#32;&#32;{
+<anchor xml:id="__paged_list_view_8cs_source_1l00015"/><link linkend="_interface_unity_editor_1_1_collaboration_1_1_i_pager_data_1a9d25f02aaec8260a36c4ced233afa4ab">00015</link> &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordtype">int</emphasis>&#32;<link linkend="_interface_unity_editor_1_1_collaboration_1_1_i_pager_data_1a9d25f02aaec8260a36c4ced233afa4ab">curPage</link>&#32;{&#32;<emphasis role="keyword">get</emphasis>;&#32;}
+<anchor xml:id="__paged_list_view_8cs_source_1l00016"/><link linkend="_interface_unity_editor_1_1_collaboration_1_1_i_pager_data_1afc60442c69cacf2b613e4ff00caaec74">00016</link> &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordtype">int</emphasis>&#32;<link linkend="_interface_unity_editor_1_1_collaboration_1_1_i_pager_data_1afc60442c69cacf2b613e4ff00caaec74">totalPages</link>&#32;{&#32;<emphasis role="keyword">get</emphasis>;&#32;}
+<anchor xml:id="__paged_list_view_8cs_source_1l00017"/><link linkend="_interface_unity_editor_1_1_collaboration_1_1_i_pager_data_1a74eb565f959227261f6fe6539e602475">00017</link> &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;PageChangeAction&#32;<link linkend="_interface_unity_editor_1_1_collaboration_1_1_i_pager_data_1a74eb565f959227261f6fe6539e602475">OnPageChanged</link>&#32;{&#32;<emphasis role="keyword">get</emphasis>;&#32;}
+00018 &#32;&#32;&#32;&#32;}
+00019 
+<anchor xml:id="__paged_list_view_8cs_source_1l00020"/><link linkend="_class_unity_editor_1_1_collaboration_1_1_pager_element">00020</link> &#32;&#32;&#32;&#32;<emphasis role="keyword">internal</emphasis>&#32;<emphasis role="keyword">class&#32;</emphasis><link linkend="_class_unity_editor_1_1_collaboration_1_1_pager_element">PagerElement</link>&#32;:&#32;VisualElement
+00021 &#32;&#32;&#32;&#32;{
+00022 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_interface_unity_editor_1_1_collaboration_1_1_i_pager_data">IPagerData</link>&#32;m_Data;
+00023 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;readonly&#32;Label&#32;m_PageText;
+00024 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;readonly&#32;Button&#32;m_DownButton;
+00025 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;readonly&#32;Button&#32;m_UpButton;
+00026 
+<anchor xml:id="__paged_list_view_8cs_source_1l00027"/><link linkend="_class_unity_editor_1_1_collaboration_1_1_pager_element_1aac8cf3ead3380c924c7c841971f00669">00027</link> &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<link linkend="_class_unity_editor_1_1_collaboration_1_1_pager_element_1aac8cf3ead3380c924c7c841971f00669">PagerElement</link>(<link linkend="_interface_unity_editor_1_1_collaboration_1_1_i_pager_data">IPagerData</link>&#32;dataSource)
+00028 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00029 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;m_Data&#32;=&#32;dataSource;
+00030 
+00031 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;this.style.flexDirection&#32;=&#32;FlexDirection.Row;
+00032 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;this.style.alignSelf&#32;=&#32;Align.Center;
+00033 
+00034 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;Add(m_DownButton&#32;=&#32;<emphasis role="keyword">new</emphasis>&#32;Button(OnPageDownClicked)&#32;{text&#32;=&#32;<emphasis role="stringliteral">&quot;\u25c5&#32;Newer&quot;</emphasis>});
+00035 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;m_DownButton.AddToClassList(<emphasis role="stringliteral">&quot;PagerDown&quot;</emphasis>);
+00036 
+00037 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;m_PageText&#32;=&#32;<emphasis role="keyword">new</emphasis>&#32;Label();
+00038 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;m_PageText.AddToClassList(<emphasis role="stringliteral">&quot;PagerLabel&quot;</emphasis>);
+00039 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;Add(m_PageText);
+00040 
+00041 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;Add(m_UpButton&#32;=&#32;<emphasis role="keyword">new</emphasis>&#32;Button(OnPageUpClicked)&#32;{text&#32;=&#32;<emphasis role="stringliteral">&quot;Older&#32;\u25bb&quot;</emphasis>});
+00042 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;m_UpButton.AddToClassList(<emphasis role="stringliteral">&quot;PagerUp&quot;</emphasis>);
+00043 
+00044 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;UpdateControls();
+00045 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00046 
+00047 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordtype">void</emphasis>&#32;OnPageDownClicked()
+00048 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00049 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;CollabAnalytics.SendUserAction(CollabAnalytics.historyCategoryString,&#32;<emphasis role="stringliteral">&quot;NewerPage&quot;</emphasis>);
+00050 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;m_Data.<link linkend="_interface_unity_editor_1_1_collaboration_1_1_i_pager_data_1a74eb565f959227261f6fe6539e602475">OnPageChanged</link>(m_Data.<link linkend="_interface_unity_editor_1_1_collaboration_1_1_i_pager_data_1a9d25f02aaec8260a36c4ced233afa4ab">curPage</link>&#32;-&#32;1);
+00051 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00052 
+00053 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordtype">void</emphasis>&#32;OnPageUpClicked()
+00054 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00055 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;CollabAnalytics.SendUserAction(CollabAnalytics.historyCategoryString,&#32;<emphasis role="stringliteral">&quot;OlderPage&quot;</emphasis>);
+00056 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;m_Data.<link linkend="_interface_unity_editor_1_1_collaboration_1_1_i_pager_data_1a74eb565f959227261f6fe6539e602475">OnPageChanged</link>(m_Data.<link linkend="_interface_unity_editor_1_1_collaboration_1_1_i_pager_data_1a9d25f02aaec8260a36c4ced233afa4ab">curPage</link>&#32;+&#32;1);
+00057 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00058 
+<anchor xml:id="__paged_list_view_8cs_source_1l00059"/><link linkend="_class_unity_editor_1_1_collaboration_1_1_pager_element_1ab4fc6ec40f8765378abab836cd4c03f9">00059</link> &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;<link linkend="_class_unity_editor_1_1_collaboration_1_1_pager_element_1ab4fc6ec40f8765378abab836cd4c03f9">Refresh</link>()
+00060 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00061 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;UpdateControls();
+00062 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00063 
+00064 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordtype">void</emphasis>&#32;UpdateControls()
+00065 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00066 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;var&#32;curPage&#32;=&#32;m_Data.<link linkend="_interface_unity_editor_1_1_collaboration_1_1_i_pager_data_1a9d25f02aaec8260a36c4ced233afa4ab">curPage</link>;
+00067 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;var&#32;totalPages&#32;=&#32;m_Data.<link linkend="_interface_unity_editor_1_1_collaboration_1_1_i_pager_data_1afc60442c69cacf2b613e4ff00caaec74">totalPages</link>;
+00068 
+00069 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;m_PageText.text&#32;=&#32;(curPage&#32;+&#32;1)&#32;+&#32;<emphasis role="stringliteral">&quot;&#32;/&#32;&quot;</emphasis>&#32;+&#32;totalPages;
+00070 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;m_DownButton.SetEnabled(curPage&#32;&gt;&#32;0);
+00071 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;m_UpButton.SetEnabled(curPage&#32;&lt;&#32;totalPages&#32;-&#32;1);
+00072 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00073 &#32;&#32;&#32;&#32;}
+00074 
+<anchor xml:id="__paged_list_view_8cs_source_1l00075"/><link linkend="_namespace_unity_editor_1_1_collaboration_1a5677c358149413818cab58b95c3d588c">00075</link> &#32;&#32;&#32;&#32;<emphasis role="keyword">internal</emphasis>&#32;<emphasis role="keyword">enum</emphasis>&#32;<link linkend="_namespace_unity_editor_1_1_collaboration_1a5677c358149413818cab58b95c3d588c">PagerLocation</link>
+00076 &#32;&#32;&#32;&#32;{
+00077 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_namespace_unity_editor_1_1_collaboration_1a5677c358149413818cab58b95c3d588caa4ffdcf0dc1f31b9acaf295d75b51d00">Top</link>,
+00078 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_namespace_unity_editor_1_1_collaboration_1a5677c358149413818cab58b95c3d588ca2ad9d63b69c4a10a5cc9cad923133bc4">Bottom</link>,
+00079 &#32;&#32;&#32;&#32;}
+00080 
+<anchor xml:id="__paged_list_view_8cs_source_1l00081"/><link linkend="_class_unity_editor_1_1_collaboration_1_1_paged_list_view">00081</link> &#32;&#32;&#32;&#32;<emphasis role="keyword">internal</emphasis>&#32;<emphasis role="keyword">class&#32;</emphasis><link linkend="_class_unity_editor_1_1_collaboration_1_1_paged_list_view">PagedListView</link>&#32;:&#32;VisualElement,&#32;<link linkend="_interface_unity_editor_1_1_collaboration_1_1_i_pager_data">IPagerData</link>
+00082 &#32;&#32;&#32;&#32;{
+<anchor xml:id="__paged_list_view_8cs_source_1l00083"/><link linkend="_class_unity_editor_1_1_collaboration_1_1_paged_list_view_1a079aa6060c864cee43e86dd1f0ebc7a3">00083</link> &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keyword">const</emphasis>&#32;<emphasis role="keywordtype">int</emphasis>&#32;<link linkend="_class_unity_editor_1_1_collaboration_1_1_paged_list_view_1a079aa6060c864cee43e86dd1f0ebc7a3">DefaultItemsPerPage</link>&#32;=&#32;10;
+00084 
+00085 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;readonly&#32;VisualElement&#32;m_ItemContainer;
+00086 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;readonly&#32;<link linkend="_class_unity_editor_1_1_collaboration_1_1_pager_element">PagerElement</link>&#32;m_PagerTop,&#32;m_PagerBottom;
+00087 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordtype">int</emphasis>&#32;m_PageSize&#32;=&#32;<link linkend="_class_unity_editor_1_1_collaboration_1_1_paged_list_view_1a079aa6060c864cee43e86dd1f0ebc7a3">DefaultItemsPerPage</link>;
+00088 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;IEnumerable&lt;VisualElement&gt;&#32;m_Items;
+00089 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordtype">int</emphasis>&#32;m_TotalItems;
+00090 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordtype">int</emphasis>&#32;m_CurPage;
+00091 
+00092 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keywordtype">int</emphasis>&#32;<link linkend="_class_unity_editor_1_1_collaboration_1_1_paged_list_view_1ac067f3e60ebc992ade20c6ea09992bc7">pageSize</link>
+<anchor xml:id="__paged_list_view_8cs_source_1l00093"/><link linkend="_class_unity_editor_1_1_collaboration_1_1_paged_list_view_1ac067f3e60ebc992ade20c6ea09992bc7">00093</link> &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00094 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">set</emphasis>&#32;{&#32;m_PageSize&#32;=&#32;value;&#32;}
+00095 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00096 
+00097 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;IEnumerable&lt;VisualElement&gt;&#32;<link linkend="_class_unity_editor_1_1_collaboration_1_1_paged_list_view_1a6b1da183409fed3c9a44e884a4ff3393">items</link>
+<anchor xml:id="__paged_list_view_8cs_source_1l00098"/><link linkend="_class_unity_editor_1_1_collaboration_1_1_paged_list_view_1a6b1da183409fed3c9a44e884a4ff3393">00098</link> &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00099 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">set</emphasis>
+00100 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00101 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;m_Items&#32;=&#32;value;
+00102 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;LayoutItems();
+00103 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00104 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00105 
+00106 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keywordtype">int</emphasis>&#32;<link linkend="_class_unity_editor_1_1_collaboration_1_1_paged_list_view_1a7d46fb1e4bb240bafed65a39b6f59182">totalItems</link>
+<anchor xml:id="__paged_list_view_8cs_source_1l00107"/><link linkend="_class_unity_editor_1_1_collaboration_1_1_paged_list_view_1a7d46fb1e4bb240bafed65a39b6f59182">00107</link> &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00108 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">set</emphasis>
+00109 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00110 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(m_TotalItems&#32;==&#32;value)
+00111 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>;
+00112 
+00113 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;m_TotalItems&#32;=&#32;value;
+00114 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;UpdatePager();
+00115 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00116 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00117 
+<anchor xml:id="__paged_list_view_8cs_source_1l00118"/><link linkend="_class_unity_editor_1_1_collaboration_1_1_paged_list_view_1a67516b5c5a8d125fa49b4aa8f3a10c1f">00118</link> &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;PageChangeAction&#32;<link linkend="_class_unity_editor_1_1_collaboration_1_1_paged_list_view_1a67516b5c5a8d125fa49b4aa8f3a10c1f">OnPageChanged</link>&#32;{&#32;<emphasis role="keyword">get</emphasis>;&#32;<emphasis role="keyword">set</emphasis>;&#32;}
+00119 
+<anchor xml:id="__paged_list_view_8cs_source_1l00120"/><link linkend="_class_unity_editor_1_1_collaboration_1_1_paged_list_view_1a2b066f74e6330559c44d26dbbb44060e">00120</link> &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<link linkend="_class_unity_editor_1_1_collaboration_1_1_paged_list_view_1a2b066f74e6330559c44d26dbbb44060e">PagedListView</link>()
+00121 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00122 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;m_PagerTop&#32;=&#32;<emphasis role="keyword">new</emphasis>&#32;<link linkend="_class_unity_editor_1_1_collaboration_1_1_pager_element">PagerElement</link>(<emphasis role="keyword">this</emphasis>);
+00123 
+00124 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;m_ItemContainer&#32;=&#32;<emphasis role="keyword">new</emphasis>&#32;VisualElement()
+00125 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00126 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;name&#32;=&#32;<emphasis role="stringliteral">&quot;PagerItems&quot;</emphasis>,
+00127 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;};
+00128 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;Add(m_ItemContainer);
+00129 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;m_Items&#32;=&#32;<emphasis role="keyword">new</emphasis>&#32;List&lt;VisualElement&gt;();
+00130 
+00131 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;m_PagerBottom&#32;=&#32;<emphasis role="keyword">new</emphasis>&#32;<link linkend="_class_unity_editor_1_1_collaboration_1_1_pager_element">PagerElement</link>(<emphasis role="keyword">this</emphasis>);
+00132 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00133 
+00134 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordtype">void</emphasis>&#32;LayoutItems()
+00135 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00136 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;m_ItemContainer.Clear();
+00137 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">foreach</emphasis>&#32;(var&#32;item&#32;<emphasis role="keywordflow">in</emphasis>&#32;m_Items)
+00138 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00139 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;m_ItemContainer.Add(item);
+00140 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00141 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00142 
+00143 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordtype">void</emphasis>&#32;UpdatePager()
+00144 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00145 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(m_PagerTop.parent&#32;!=&#32;<emphasis role="keyword">this</emphasis>&#32;&amp;&amp;&#32;<link linkend="_class_unity_editor_1_1_collaboration_1_1_paged_list_view_1abaa492b7e20d2b0ba8777c62590a2b7f">totalPages</link>&#32;&gt;&#32;1&#32;&amp;&amp;&#32;<link linkend="_class_unity_editor_1_1_collaboration_1_1_paged_list_view_1a258e713600f809cf7ef587e9f509b0fa">curPage</link>&#32;&gt;&#32;0)
+00146 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;Insert(0,&#32;m_PagerTop);
+00147 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(m_PagerTop.parent&#32;==&#32;<emphasis role="keyword">this</emphasis>&#32;&amp;&amp;&#32;(<link linkend="_class_unity_editor_1_1_collaboration_1_1_paged_list_view_1abaa492b7e20d2b0ba8777c62590a2b7f">totalPages</link>&#32;&lt;=&#32;1&#32;||&#32;<link linkend="_class_unity_editor_1_1_collaboration_1_1_paged_list_view_1a258e713600f809cf7ef587e9f509b0fa">curPage</link>&#32;==&#32;0))
+00148 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;Remove(m_PagerTop);
+00149 
+00150 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(m_PagerBottom.parent&#32;!=&#32;<emphasis role="keyword">this</emphasis>&#32;&amp;&amp;&#32;<link linkend="_class_unity_editor_1_1_collaboration_1_1_paged_list_view_1abaa492b7e20d2b0ba8777c62590a2b7f">totalPages</link>&#32;&gt;&#32;1)
+00151 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;Add(m_PagerBottom);
+00152 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(m_PagerBottom.parent&#32;==&#32;<emphasis role="keyword">this</emphasis>&#32;&amp;&amp;&#32;<link linkend="_class_unity_editor_1_1_collaboration_1_1_paged_list_view_1abaa492b7e20d2b0ba8777c62590a2b7f">totalPages</link>&#32;&lt;=&#32;1)
+00153 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;Remove(m_PagerBottom);
+00154 
+00155 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;m_PagerTop.Refresh();
+00156 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;m_PagerBottom.Refresh();
+00157 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00158 
+00159 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordtype">int</emphasis>&#32;pageCount
+00160 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00161 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">get</emphasis>
+00162 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00163 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;var&#32;pages&#32;=&#32;m_TotalItems&#32;/&#32;m_PageSize;
+00164 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(m_TotalItems&#32;%&#32;m_PageSize&#32;&gt;&#32;0)
+00165 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;pages++;
+00166 
+00167 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;pages;
+00168 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00169 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00170 
+00171 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keywordtype">int</emphasis>&#32;<link linkend="_class_unity_editor_1_1_collaboration_1_1_paged_list_view_1a258e713600f809cf7ef587e9f509b0fa">curPage</link>
+<anchor xml:id="__paged_list_view_8cs_source_1l00172"/><link linkend="_class_unity_editor_1_1_collaboration_1_1_paged_list_view_1a258e713600f809cf7ef587e9f509b0fa">00172</link> &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00173 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">get</emphasis>&#32;{&#32;<emphasis role="keywordflow">return</emphasis>&#32;m_CurPage;&#32;}
+00174 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">set</emphasis>
+00175 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00176 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;m_CurPage&#32;=&#32;value;
+00177 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;UpdatePager();
+00178 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00179 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00180 
+00181 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keywordtype">int</emphasis>&#32;<link linkend="_class_unity_editor_1_1_collaboration_1_1_paged_list_view_1abaa492b7e20d2b0ba8777c62590a2b7f">totalPages</link>
+<anchor xml:id="__paged_list_view_8cs_source_1l00182"/><link linkend="_class_unity_editor_1_1_collaboration_1_1_paged_list_view_1abaa492b7e20d2b0ba8777c62590a2b7f">00182</link> &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00183 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">get</emphasis>
+00184 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00185 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;var&#32;extraPage&#32;=&#32;0;
+00186 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(m_TotalItems&#32;%&#32;m_PageSize&#32;&gt;&#32;0)
+00187 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;extraPage&#32;=&#32;1;
+00188 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;m_TotalItems&#32;/&#32;m_PageSize&#32;+&#32;extraPage;
+00189 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00190 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00191 &#32;&#32;&#32;&#32;}
+00192 }
+</programlisting></section>

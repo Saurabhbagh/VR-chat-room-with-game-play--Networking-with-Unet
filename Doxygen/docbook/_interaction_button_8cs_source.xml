@@ -1,0 +1,451 @@
+<?xml version='1.0' encoding='UTF-8' standalone='no'?>
+<section xmlns="http://docbook.org/ns/docbook" version="5.0" xmlns:xlink="http://www.w3.org/1999/xlink" xml:id="__interaction_button_8cs_source">
+<title>InteractionButton.cs</title>
+<indexterm><primary>O:/GitHUBMINIPRoject/Assets/LeapMotion/Modules/InteractionEngine/Scripts/UI/InteractionButton.cs</primary></indexterm>
+<programlisting>00001 <emphasis role="comment">/******************************************************************************</emphasis>
+00002 <emphasis role="comment">&#32;*&#32;Copyright&#32;(C)&#32;Leap&#32;Motion,&#32;Inc.&#32;2011-2018.&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;*</emphasis>
+00003 <emphasis role="comment">&#32;*&#32;Leap&#32;Motion&#32;proprietary&#32;and&#32;confidential.&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;*</emphasis>
+00004 <emphasis role="comment">&#32;*&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;*</emphasis>
+00005 <emphasis role="comment">&#32;*&#32;Use&#32;subject&#32;to&#32;the&#32;terms&#32;of&#32;the&#32;Leap&#32;Motion&#32;SDK&#32;Agreement&#32;available&#32;at&#32;&#32;&#32;&#32;&#32;*</emphasis>
+00006 <emphasis role="comment">&#32;*&#32;https://developer.leapmotion.com/sdk_agreement,&#32;or&#32;another&#32;agreement&#32;&#32;&#32;&#32;&#32;&#32;&#32;*</emphasis>
+00007 <emphasis role="comment">&#32;*&#32;between&#32;Leap&#32;Motion&#32;and&#32;you,&#32;your&#32;company&#32;or&#32;other&#32;organization.&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;*</emphasis>
+00008 <emphasis role="comment">&#32;******************************************************************************/</emphasis>
+00009 
+00010 <emphasis role="keyword">using</emphasis>&#32;<link linkend="_namespace_leap">Leap</link>.<link linkend="_namespace_leap_1_1_unity">Unity</link>.<link linkend="_namespace_leap_1_1_unity_1_1_attributes">Attributes</link>;
+00011 <emphasis role="keyword">using</emphasis>&#32;System;
+00012 <emphasis role="keyword">using</emphasis>&#32;<link linkend="__balloon_8cs_1a7d67e097df9376eb709b6a23aa3c7d23">UnityEngine</link>;
+00013 <emphasis role="keyword">using</emphasis>&#32;<link linkend="_namespace_unity_engine">UnityEngine</link>.Events;
+00014 <emphasis role="keyword">using</emphasis>&#32;<link linkend="_namespace_unity_engine">UnityEngine</link>.Serialization;
+00015 
+00016 <emphasis role="keyword">namespace&#32;</emphasis><link linkend="_namespace_leap_1_1_unity_1_1_interaction">Leap.Unity.Interaction</link>&#32;{
+00017 
+<anchor xml:id="__interaction_button_8cs_source_1l00022"/><link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_button">00022</link> &#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keyword">class&#32;</emphasis><link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_button">InteractionButton</link>&#32;:&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_behaviour">InteractionBehaviour</link>&#32;{
+00023 
+00024 <emphasis role="preprocessor">&#32;&#32;&#32;&#32;#region&#32;Inspector</emphasis>
+00025 
+00026 &#32;&#32;&#32;&#32;[Header(<emphasis role="stringliteral">&quot;UI&#32;Control&quot;</emphasis>)]
+00027 
+00028 &#32;&#32;&#32;&#32;[Tooltip(<emphasis role="stringliteral">&quot;When&#32;set&#32;to&#32;false,&#32;this&#32;UI&#32;control&#32;will&#32;not&#32;be&#32;functional.&#32;Use&#32;this&#32;instead&#32;&quot;</emphasis>
+00029 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;+&#32;<emphasis role="stringliteral">&quot;of&#32;disabling&#32;the&#32;component&#32;itself&#32;when&#32;you&#32;want&#32;to&#32;disable&#32;the&#32;user&apos;s&#32;&quot;</emphasis>
+00030 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;+&#32;<emphasis role="stringliteral">&quot;ability&#32;to&#32;affect&#32;this&#32;UI&#32;control&#32;while&#32;keeping&#32;the&#32;GameObject&#32;active&#32;and,&#32;&quot;</emphasis>
+00031 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;+&#32;<emphasis role="stringliteral">&quot;for&#32;example,&#32;rendering,&#32;and&#32;able&#32;to&#32;receive&#32;primaryHover&#32;state.&quot;</emphasis>)]
+00032 &#32;&#32;&#32;&#32;[SerializeField,&#32;FormerlySerializedAs(<emphasis role="stringliteral">&quot;controlEnabled&quot;</emphasis>)]
+00033 &#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;<emphasis role="keywordtype">bool</emphasis>&#32;_controlEnabled&#32;=&#32;<emphasis role="keyword">true</emphasis>;
+<anchor xml:id="__interaction_button_8cs_source_1l00034"/><link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_button_1ad25616c2095b92d6abf00c501fead38f">00034</link> &#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keywordtype">bool</emphasis>&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_button_1ad25616c2095b92d6abf00c501fead38f">controlEnabled</link>&#32;{
+00035 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">get</emphasis>&#32;{&#32;<emphasis role="keywordflow">return</emphasis>&#32;_controlEnabled;&#32;}
+00036 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">set</emphasis>&#32;{&#32;_controlEnabled&#32;=&#32;value;&#32;}
+00037 &#32;&#32;&#32;&#32;}
+00038 &#32;&#32;&#32;&#32;
+00039 &#32;&#32;&#32;&#32;[Header(<emphasis role="stringliteral">&quot;Motion&#32;Configuration&quot;</emphasis>)]
+00040 
+00041 &#32;&#32;&#32;&#32;[<link linkend="_class_leap_1_1_unity_1_1_attributes_1_1_edit_time_only">EditTimeOnly</link>]
+<anchor xml:id="__interaction_button_8cs_source_1l00042"/><link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_button_1a48c30245b6b71691985f9b4423c8ce59">00042</link> &#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_button_1a29761e33189cdf8131bb519cdc114fd2">StartingPositionMode</link>&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_button_1a48c30245b6b71691985f9b4423c8ce59">startingPositionMode</link>&#32;=&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_button_1a29761e33189cdf8131bb519cdc114fd2">StartingPositionMode</link>.Depressed;
+<anchor xml:id="__interaction_button_8cs_source_1l00043"/><link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_button_1a29761e33189cdf8131bb519cdc114fd2">00043</link> &#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keyword">enum</emphasis>&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_button_1a29761e33189cdf8131bb519cdc114fd2">StartingPositionMode</link>&#32;{&#32;Depressed,&#32;Relaxed&#32;}
+00044 
+00048 &#32;&#32;&#32;&#32;[Tooltip(<emphasis role="stringliteral">&quot;The&#32;minimum&#32;and&#32;maximum&#32;heights&#32;the&#32;button&#32;can&#32;exist&#32;at.&quot;</emphasis>)]
+<anchor xml:id="__interaction_button_8cs_source_1l00049"/><link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_button_1a26f7eabb9d9880d63ab19f7dbeff186a">00049</link> &#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;Vector2&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_button_1a26f7eabb9d9880d63ab19f7dbeff186a">minMaxHeight</link>&#32;=&#32;<emphasis role="keyword">new</emphasis>&#32;Vector2(0f,&#32;0.02f);
+00050 
+00055 &#32;&#32;&#32;&#32;[Tooltip(<emphasis role="stringliteral">&quot;The&#32;height&#32;that&#32;this&#32;button&#32;rests&#32;at;&#32;this&#32;value&#32;is&#32;a&#32;lerp&#32;in&#32;between&#32;the&#32;min&#32;and&#32;max&#32;height.&quot;</emphasis>)]
+00056 &#32;&#32;&#32;&#32;[Range(0f,&#32;1f)]
+<anchor xml:id="__interaction_button_8cs_source_1l00057"/><link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_button_1ac5d100f680957b8a06989b47241d3624">00057</link> &#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keywordtype">float</emphasis>&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_button_1ac5d100f680957b8a06989b47241d3624">restingHeight</link>&#32;=&#32;0.5f;
+00058 
+00062 &#32;&#32;&#32;&#32;[Range(0,&#32;1)]
+00063 &#32;&#32;&#32;&#32;[SerializeField]
+00064 &#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;<emphasis role="keywordtype">float</emphasis>&#32;_springForce&#32;=&#32;0.1f;
+<anchor xml:id="__interaction_button_8cs_source_1l00065"/><link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_button_1a35b7556091789e87ea79f1e814049c9a">00065</link> &#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keywordtype">float</emphasis>&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_button_1a35b7556091789e87ea79f1e814049c9a">springForce</link>&#32;{
+00066 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">get</emphasis>&#32;{
+00067 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;_springForce;
+00068 &#32;&#32;&#32;&#32;&#32;&#32;}
+00069 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">set</emphasis>&#32;{
+00070 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;_springForce&#32;=&#32;value;
+00071 &#32;&#32;&#32;&#32;&#32;&#32;}
+00072 &#32;&#32;&#32;&#32;}
+00073 
+00074 <emphasis role="preprocessor">&#32;&#32;&#32;&#32;#endregion</emphasis>
+00075 
+00076 <emphasis role="preprocessor">&#32;&#32;&#32;&#32;#region&#32;Events</emphasis>
+00077 &#32;&#32;&#32;&#32;
+00078 &#32;&#32;&#32;&#32;[SerializeField]
+00079 &#32;&#32;&#32;&#32;[FormerlySerializedAs(<emphasis role="stringliteral">&quot;OnPress&quot;</emphasis>)]
+00080 &#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;UnityEvent&#32;_OnPress&#32;=&#32;<emphasis role="keyword">new</emphasis>&#32;UnityEvent();
+00081 
+00082 &#32;&#32;&#32;&#32;[SerializeField]
+00083 &#32;&#32;&#32;&#32;[FormerlySerializedAs(<emphasis role="stringliteral">&quot;OnUnpress&quot;</emphasis>)]
+00084 &#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;UnityEvent&#32;_OnUnpress&#32;=&#32;<emphasis role="keyword">new</emphasis>&#32;UnityEvent();
+00085 
+<anchor xml:id="__interaction_button_8cs_source_1l00086"/><link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_button_1a604925418c20993e8dcd62b44442f02e">00086</link> &#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;Action&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_button_1a604925418c20993e8dcd62b44442f02e">OnPress</link>&#32;=&#32;()&#32;=&gt;&#32;{&#32;};
+<anchor xml:id="__interaction_button_8cs_source_1l00087"/><link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_button_1a20976dd4b5068d794d00f49f894c7139">00087</link> &#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;Action&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_button_1a20976dd4b5068d794d00f49f894c7139">OnUnpress</link>&#32;=&#32;()&#32;=&gt;&#32;{&#32;};
+00088 
+00089 <emphasis role="preprocessor">&#32;&#32;&#32;&#32;#endregion</emphasis>
+00090 
+00091 <emphasis role="preprocessor">&#32;&#32;&#32;&#32;#region&#32;State</emphasis>
+00092 
+<anchor xml:id="__interaction_button_8cs_source_1l00093"/><link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_button_1ae2adb238902214b7d9b2dc00cad7945e">00093</link> &#32;&#32;&#32;&#32;<emphasis role="keyword">protected</emphasis>&#32;<emphasis role="keywordtype">bool</emphasis>&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_button_1ae2adb238902214b7d9b2dc00cad7945e">_isPressed</link>&#32;=&#32;<emphasis role="keyword">false</emphasis>;
+<anchor xml:id="__interaction_button_8cs_source_1l00095"/><link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_button_1a21de162442ba3672aa091ccaab86c890">00095</link> &#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keywordtype">bool</emphasis>&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_button_1a21de162442ba3672aa091ccaab86c890">isPressed</link>&#32;{&#32;<emphasis role="keyword">get</emphasis>&#32;{&#32;<emphasis role="keywordflow">return</emphasis>&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_button_1ae2adb238902214b7d9b2dc00cad7945e">_isPressed</link>;&#32;}&#32;}
+00096 &#32;&#32;&#32;&#32;[Obsolete(<emphasis role="stringliteral">&quot;Deprecated.&#32;Use&#32;isPressed&#32;instead.&quot;</emphasis>,&#32;<emphasis role="keyword">false</emphasis>)]
+<anchor xml:id="__interaction_button_8cs_source_1l00097"/><link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_button_1a7e4fe8e6be6991bd8b6547ab7766474e">00097</link> &#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keywordtype">bool</emphasis>&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_button_1a7e4fe8e6be6991bd8b6547ab7766474e">isDepressed</link>&#32;{&#32;<emphasis role="keyword">get</emphasis>&#32;{&#32;<emphasis role="keywordflow">return</emphasis>&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_button_1ae2adb238902214b7d9b2dc00cad7945e">_isPressed</link>;&#32;}&#32;}
+00098 
+<anchor xml:id="__interaction_button_8cs_source_1l00099"/><link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_button_1aba499ecdce469e3288650158dce28735">00099</link> &#32;&#32;&#32;&#32;<emphasis role="keyword">protected</emphasis>&#32;<emphasis role="keywordtype">bool</emphasis>&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_button_1aba499ecdce469e3288650158dce28735">_pressedThisFrame</link>&#32;=&#32;<emphasis role="keyword">false</emphasis>;
+<anchor xml:id="__interaction_button_8cs_source_1l00103"/><link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_button_1ad9f5e7c4373f864d20166bbc438f957a">00103</link> &#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keywordtype">bool</emphasis>&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_button_1ad9f5e7c4373f864d20166bbc438f957a">pressedThisFrame</link>&#32;{&#32;<emphasis role="keyword">get</emphasis>&#32;{&#32;<emphasis role="keywordflow">return</emphasis>&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_button_1aba499ecdce469e3288650158dce28735">_pressedThisFrame</link>;&#32;}&#32;}
+00104 &#32;&#32;&#32;&#32;[Obsolete(<emphasis role="stringliteral">&quot;Deprecated.&#32;Use&#32;pressedThisFrame&#32;instead.&quot;</emphasis>,&#32;<emphasis role="keyword">false</emphasis>)]
+<anchor xml:id="__interaction_button_8cs_source_1l00105"/><link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_button_1a19c6b223af10d8d681199bc9e5089c5a">00105</link> &#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keywordtype">bool</emphasis>&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_button_1a19c6b223af10d8d681199bc9e5089c5a">depressedThisFrame</link>&#32;{&#32;<emphasis role="keyword">get</emphasis>&#32;{&#32;<emphasis role="keywordflow">return</emphasis>&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_button_1aba499ecdce469e3288650158dce28735">_pressedThisFrame</link>;&#32;}&#32;}
+00106 
+<anchor xml:id="__interaction_button_8cs_source_1l00107"/><link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_button_1a24190962b49e9308337362aca6c3e157">00107</link> &#32;&#32;&#32;&#32;<emphasis role="keyword">protected</emphasis>&#32;<emphasis role="keywordtype">bool</emphasis>&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_button_1a24190962b49e9308337362aca6c3e157">_unpressedThisFrame</link>&#32;=&#32;<emphasis role="keyword">false</emphasis>;
+<anchor xml:id="__interaction_button_8cs_source_1l00111"/><link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_button_1a94cfc9c5194195303d76e0bbdf19d269">00111</link> &#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keywordtype">bool</emphasis>&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_button_1a94cfc9c5194195303d76e0bbdf19d269">unpressedThisFrame</link>&#32;{&#32;<emphasis role="keyword">get</emphasis>&#32;{&#32;<emphasis role="keywordflow">return</emphasis>&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_button_1a24190962b49e9308337362aca6c3e157">_unpressedThisFrame</link>;&#32;}&#32;}
+00112 &#32;&#32;&#32;&#32;[Obsolete(<emphasis role="stringliteral">&quot;Deprecated.&#32;Use&#32;unpressedThisFrame&#32;instead.&quot;</emphasis>,&#32;<emphasis role="keyword">false</emphasis>)]
+<anchor xml:id="__interaction_button_8cs_source_1l00113"/><link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_button_1a9d4ab83c7b2254a5f2be3bfa527bffbb">00113</link> &#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keywordtype">bool</emphasis>&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_button_1a9d4ab83c7b2254a5f2be3bfa527bffbb">unDepressedThisFrame</link>&#32;{&#32;<emphasis role="keyword">get</emphasis>&#32;{&#32;<emphasis role="keywordflow">return</emphasis>&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_button_1a24190962b49e9308337362aca6c3e157">_unpressedThisFrame</link>;&#32;}&#32;}
+00114 
+00115 &#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;<emphasis role="keywordtype">float</emphasis>&#32;_pressedAmount&#32;=&#32;0F;
+<anchor xml:id="__interaction_button_8cs_source_1l00122"/><link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_button_1afb700dd401edd1be364b9a0a3262a6c9">00122</link> &#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keywordtype">float</emphasis>&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_button_1afb700dd401edd1be364b9a0a3262a6c9">pressedAmount</link>&#32;{&#32;<emphasis role="keyword">get</emphasis>&#32;{&#32;<emphasis role="keywordflow">return</emphasis>&#32;_pressedAmount;&#32;}&#32;}
+00123 &#32;&#32;&#32;&#32;[Obsolete(<emphasis role="stringliteral">&quot;Deprecated.&#32;Use&#32;pressedAmount&#32;instead.&quot;</emphasis>,&#32;<emphasis role="keyword">false</emphasis>)]
+<anchor xml:id="__interaction_button_8cs_source_1l00124"/><link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_button_1a8836fb5e5744ec7c30f475fc2a4666e1">00124</link> &#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keywordtype">float</emphasis>&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_button_1a8836fb5e5744ec7c30f475fc2a4666e1">depressedAmount</link>&#32;{&#32;<emphasis role="keyword">get</emphasis>&#32;{&#32;<emphasis role="keywordflow">return</emphasis>&#32;_pressedAmount;&#32;}&#32;}
+00125 
+00126 
+<anchor xml:id="__interaction_button_8cs_source_1l00130"/><link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_button_1aaff55c4ea819215e2100b6906f970746">00130</link> &#32;&#32;&#32;&#32;<emphasis role="keyword">protected</emphasis>&#32;Vector3&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_button_1aaff55c4ea819215e2100b6906f970746">initialLocalPosition</link>;
+00131 
+<anchor xml:id="__interaction_button_8cs_source_1l00136"/><link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_button_1a33b1313c855fc4e54f7d85dfa17000f0">00136</link> &#32;&#32;&#32;&#32;<emphasis role="keyword">protected</emphasis>&#32;Vector3&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_button_1a33b1313c855fc4e54f7d85dfa17000f0">localPhysicsPosition</link>;
+00137 
+<anchor xml:id="__interaction_button_8cs_source_1l00142"/><link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_button_1a1953b5ee88c27d531b7543c16c9400a7">00142</link> &#32;&#32;&#32;&#32;<emphasis role="keyword">protected</emphasis>&#32;Vector3&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_button_1a1953b5ee88c27d531b7543c16c9400a7">physicsPosition</link>&#32;=&#32;Vector3.zero;
+00143 
+<anchor xml:id="__interaction_button_8cs_source_1l00148"/><link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_button_1a31ea002ad202e24eeedc6291f3e6fd8e">00148</link> &#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keyword">virtual</emphasis>&#32;Vector3&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_button_1a31ea002ad202e24eeedc6291f3e6fd8e">RelaxedLocalPosition</link>&#32;{
+00149 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">get</emphasis>&#32;{
+00150 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_button_1aaff55c4ea819215e2100b6906f970746">initialLocalPosition</link>
+00151 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;+&#32;Vector3.back&#32;*&#32;Mathf.Lerp(<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_button_1a26f7eabb9d9880d63ab19f7dbeff186a">minMaxHeight</link>.x,&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_button_1a26f7eabb9d9880d63ab19f7dbeff186a">minMaxHeight</link>.y,&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_button_1ac5d100f680957b8a06989b47241d3624">restingHeight</link>);
+00152 &#32;&#32;&#32;&#32;&#32;&#32;}
+00153 &#32;&#32;&#32;&#32;}
+00154 
+00155 &#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;Rigidbody&#32;_lastDepressor;
+00156 &#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;Vector3&#32;_localDepressorPosition;
+00157 &#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;Vector3&#32;_physicsVelocity&#32;=&#32;Vector3.zero;
+00158 &#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;<emphasis role="keywordtype">bool</emphasis>&#32;_physicsOccurred;
+00159 &#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;<emphasis role="keywordtype">bool</emphasis>&#32;_initialIgnoreGrasping&#32;=&#32;<emphasis role="keyword">false</emphasis>;
+00160 &#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;Quaternion&#32;_initialLocalRotation;
+00161 &#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_controller">InteractionController</link>&#32;_lockedInteractingController&#32;=&#32;<emphasis role="keyword">null</emphasis>;
+00162 
+00163 <emphasis role="preprocessor">&#32;&#32;&#32;&#32;#endregion</emphasis>
+00164 
+00165 <emphasis role="preprocessor">&#32;&#32;&#32;&#32;#region&#32;Unity&#32;Events</emphasis>
+00166 
+00167 &#32;&#32;&#32;&#32;<emphasis role="keywordtype">void</emphasis>&#32;Reset()&#32;{
+00168 &#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_behaviour_1a1a9f67ccbde4ca471e36e9a0da9a3b83">contactForceMode</link>&#32;=&#32;<link linkend="_namespace_leap_1_1_unity_1_1_interaction_1a7a6c3499f7b7d02b0d389e8ac72a315f">ContactForceMode</link>.UI;
+00169 &#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_behaviour_1a56a2792d6c9900291188d3df0c6a92e5">graspedMovementType</link>&#32;=&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_behaviour_1a800262cc3a5c425a4816b60fae89c307">GraspedMovementType</link>.Nonkinematic;
+00170 
+00171 &#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_button_1a48c30245b6b71691985f9b4423c8ce59">startingPositionMode</link>&#32;=&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_button_1a29761e33189cdf8131bb519cdc114fd2">StartingPositionMode</link>.Relaxed;
+00172 
+00173 &#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_behaviour_1a4f54f1794944882d8cf51bd641a5341c">rigidbody</link>&#32;=&#32;GetComponent&lt;Rigidbody&gt;();
+00174 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_behaviour_1a4f54f1794944882d8cf51bd641a5341c">rigidbody</link>&#32;!=&#32;<emphasis role="keyword">null</emphasis>)&#32;{
+00175 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_behaviour_1a4f54f1794944882d8cf51bd641a5341c">rigidbody</link>.useGravity&#32;=&#32;<emphasis role="keyword">false</emphasis>;
+00176 &#32;&#32;&#32;&#32;&#32;&#32;}
+00177 &#32;&#32;&#32;&#32;}
+00178 
+<anchor xml:id="__interaction_button_8cs_source_1l00179"/><link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_button_1a678babacbcc3d91d865ea76462a30aec">00179</link> &#32;&#32;&#32;&#32;<emphasis role="keyword">protected</emphasis>&#32;<emphasis role="keyword">override</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_button_1a678babacbcc3d91d865ea76462a30aec">OnDisable</link>()&#32;{
+00180 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_button_1a21de162442ba3672aa091ccaab86c890">isPressed</link>)&#32;{
+00181 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_button_1a24190962b49e9308337362aca6c3e157">_unpressedThisFrame</link>&#32;=&#32;<emphasis role="keyword">true</emphasis>;
+00182 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_button_1a20976dd4b5068d794d00f49f894c7139">OnUnpress</link>();
+00183 
+00184 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(_lockedInteractingController&#32;!=&#32;<emphasis role="keyword">null</emphasis>)&#32;{
+00185 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;_lockedInteractingController.<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_controller_1afa44de31d034ff2bceb41ee6a20d0253">primaryHoverLocked</link>&#32;=&#32;<emphasis role="keyword">false</emphasis>;
+00186 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00187 &#32;&#32;&#32;&#32;&#32;&#32;}
+00188 
+00189 &#32;&#32;&#32;&#32;&#32;&#32;base.OnDisable();
+00190 &#32;&#32;&#32;&#32;}
+00191 
+<anchor xml:id="__interaction_button_8cs_source_1l00192"/><link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_button_1a24a0efb036a0b9ac108e9bf1d5b9fb62">00192</link> &#32;&#32;&#32;&#32;<emphasis role="keyword">protected</emphasis>&#32;<emphasis role="keyword">override</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_button_1a24a0efb036a0b9ac108e9bf1d5b9fb62">Start</link>()&#32;{
+00193 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>(<link linkend="_interface_leap_1_1_unity_1_1_interaction_1_1_i_interaction_behaviour_1a2ff1423c8145ae05a1cc8506d6932136">transform</link>&#32;==&#32;<link linkend="_interface_leap_1_1_unity_1_1_interaction_1_1_i_interaction_behaviour_1a2ff1423c8145ae05a1cc8506d6932136">transform</link>.root)&#32;{
+00194 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;Debug.LogError(<emphasis role="stringliteral">&quot;This&#32;button&#32;has&#32;no&#32;parent!&#32;&#32;Please&#32;ensure&#32;that&#32;it&#32;is&#32;parented&#32;to&#32;something!&quot;</emphasis>,&#32;<emphasis role="keyword">this</emphasis>);
+00195 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;enabled&#32;=&#32;<emphasis role="keyword">false</emphasis>;
+00196 &#32;&#32;&#32;&#32;&#32;&#32;}
+00197 
+00198 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;Initialize&#32;Positions</emphasis>
+00199 &#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_button_1aaff55c4ea819215e2100b6906f970746">initialLocalPosition</link>&#32;=&#32;<link linkend="_interface_leap_1_1_unity_1_1_interaction_1_1_i_interaction_behaviour_1a2ff1423c8145ae05a1cc8506d6932136">transform</link>.localPosition;
+00200 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_button_1a48c30245b6b71691985f9b4423c8ce59">startingPositionMode</link>&#32;==&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_button_1a29761e33189cdf8131bb519cdc114fd2">StartingPositionMode</link>.Relaxed)&#32;{
+00201 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_button_1aaff55c4ea819215e2100b6906f970746">initialLocalPosition</link>&#32;=&#32;<link linkend="_interface_leap_1_1_unity_1_1_interaction_1_1_i_interaction_behaviour_1a2ff1423c8145ae05a1cc8506d6932136">transform</link>.localPosition
+00202 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;+&#32;Vector3.forward&#32;*&#32;Mathf.Lerp(<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_button_1a26f7eabb9d9880d63ab19f7dbeff186a">minMaxHeight</link>.x,&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_button_1a26f7eabb9d9880d63ab19f7dbeff186a">minMaxHeight</link>.y,&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_button_1ac5d100f680957b8a06989b47241d3624">restingHeight</link>);
+00203 &#32;&#32;&#32;&#32;&#32;&#32;}
+00204 &#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_interface_leap_1_1_unity_1_1_interaction_1_1_i_interaction_behaviour_1a2ff1423c8145ae05a1cc8506d6932136">transform</link>.localPosition&#32;=&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_button_1aaff55c4ea819215e2100b6906f970746">initialLocalPosition</link>
+00205 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;+&#32;Vector3.back&#32;*&#32;Mathf.Lerp(<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_button_1a26f7eabb9d9880d63ab19f7dbeff186a">minMaxHeight</link>.x,&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_button_1a26f7eabb9d9880d63ab19f7dbeff186a">minMaxHeight</link>.y,&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_button_1ac5d100f680957b8a06989b47241d3624">restingHeight</link>);
+00206 
+00207 &#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_button_1a33b1313c855fc4e54f7d85dfa17000f0">localPhysicsPosition</link>&#32;=&#32;<link linkend="_interface_leap_1_1_unity_1_1_interaction_1_1_i_interaction_behaviour_1a2ff1423c8145ae05a1cc8506d6932136">transform</link>.localPosition;
+00208 &#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_button_1a1953b5ee88c27d531b7543c16c9400a7">physicsPosition</link>&#32;=&#32;<link linkend="_interface_leap_1_1_unity_1_1_interaction_1_1_i_interaction_behaviour_1a2ff1423c8145ae05a1cc8506d6932136">transform</link>.position;
+00209 &#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_behaviour_1a4f54f1794944882d8cf51bd641a5341c">rigidbody</link>.position&#32;=&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_button_1a1953b5ee88c27d531b7543c16c9400a7">physicsPosition</link>;
+00210 &#32;&#32;&#32;&#32;&#32;&#32;_initialIgnoreGrasping&#32;=&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_behaviour_1a94a7c385babbf711ca62ec73b5aab02a">ignoreGrasping</link>;
+00211 &#32;&#32;&#32;&#32;&#32;&#32;_initialLocalRotation&#32;=&#32;<link linkend="_interface_leap_1_1_unity_1_1_interaction_1_1_i_interaction_behaviour_1a2ff1423c8145ae05a1cc8506d6932136">transform</link>.localRotation;
+00212 
+00213 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//Add&#32;a&#32;custom&#32;grasp&#32;controller</emphasis>
+00214 &#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_behaviour_1a2d1393f9aa91a358e24fa6919eb09265">OnGraspBegin</link>&#32;+=&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_button_1a4eaa465478ec3488601a4a8f4a1ef8dd">onGraspBegin</link>;
+00215 &#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_behaviour_1aa28fa95514cad60b292efec67f235e35">OnGraspEnd</link>&#32;+=&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_button_1ae4b4b7cc59277eee7fe17fdb6a07652d">onGraspEnd</link>;
+00216 
+00217 &#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_button_1a604925418c20993e8dcd62b44442f02e">OnPress</link>&#32;+=&#32;_OnPress.Invoke;
+00218 &#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_button_1a20976dd4b5068d794d00f49f894c7139">OnUnpress</link>&#32;+=&#32;_OnUnpress.Invoke;
+00219 
+00220 &#32;&#32;&#32;&#32;&#32;&#32;base.Start();
+00221 &#32;&#32;&#32;&#32;}
+00222 
+<anchor xml:id="__interaction_button_8cs_source_1l00223"/><link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_button_1a6a0addc3c33852bd432f177faf307e9e">00223</link> &#32;&#32;&#32;&#32;<emphasis role="keyword">protected</emphasis>&#32;<emphasis role="keyword">virtual</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_button_1a6a0addc3c33852bd432f177faf307e9e">FixedUpdate</link>()&#32;{
+00224 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(!_physicsOccurred)&#32;{
+00225 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;_physicsOccurred&#32;=&#32;<emphasis role="keyword">true</emphasis>;
+00226 
+00227 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(!<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_behaviour_1ad6176dc89403f491f7496e6781be9a8f">isGrasped</link>&#32;&amp;&amp;&#32;!<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_behaviour_1a4f54f1794944882d8cf51bd641a5341c">rigidbody</link>.IsSleeping())&#32;{
+00228 
+00229 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordtype">float</emphasis>&#32;localPhysicsDisplacementPercentage
+00230 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;=&#32;Mathf.InverseLerp(<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_button_1a26f7eabb9d9880d63ab19f7dbeff186a">minMaxHeight</link>.x,&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_button_1a26f7eabb9d9880d63ab19f7dbeff186a">minMaxHeight</link>.y,
+00231 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_button_1aaff55c4ea819215e2100b6906f970746">initialLocalPosition</link>.z&#32;-&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_button_1a33b1313c855fc4e54f7d85dfa17000f0">localPhysicsPosition</link>.z);
+00232 
+00233 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;Sleep&#32;the&#32;rigidbody&#32;if&#32;it&apos;s&#32;not&#32;really&#32;moving.</emphasis>
+00234 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_behaviour_1a4f54f1794944882d8cf51bd641a5341c">rigidbody</link>.position&#32;==&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_button_1a1953b5ee88c27d531b7543c16c9400a7">physicsPosition</link>
+00235 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&amp;&amp;&#32;_physicsVelocity&#32;==&#32;Vector3.zero
+00236 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&amp;&amp;&#32;Mathf.Abs(localPhysicsDisplacementPercentage&#32;-&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_button_1ac5d100f680957b8a06989b47241d3624">restingHeight</link>)&#32;&lt;&#32;0.01F)&#32;{
+00237 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_behaviour_1a4f54f1794944882d8cf51bd641a5341c">rigidbody</link>.Sleep();
+00238 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}&#32;<emphasis role="keywordflow">else</emphasis>&#32;{
+00239 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;Otherwise&#32;reset&#32;the&#32;body&apos;s&#32;position&#32;to&#32;where&#32;it&#32;was&#32;last&#32;time&#32;PhysX</emphasis>
+00240 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;looked&#32;at&#32;it.</emphasis>
+00241 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(_physicsVelocity.ContainsNaN())&#32;{
+00242 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;_physicsVelocity&#32;=&#32;Vector3.zero;
+00243 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00244 
+00245 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_behaviour_1a4f54f1794944882d8cf51bd641a5341c">rigidbody</link>.position&#32;=&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_button_1a1953b5ee88c27d531b7543c16c9400a7">physicsPosition</link>;
+00246 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_behaviour_1a4f54f1794944882d8cf51bd641a5341c">rigidbody</link>.velocity&#32;=&#32;_physicsVelocity;
+00247 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00248 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00249 &#32;&#32;&#32;&#32;&#32;&#32;}
+00250 &#32;&#32;&#32;&#32;}
+00251 
+00252 &#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;<emphasis role="keyword">const</emphasis>&#32;<emphasis role="keywordtype">float</emphasis>&#32;FRICTION_COEFFICIENT&#32;=&#32;30F;
+00253 &#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;<emphasis role="keyword">const</emphasis>&#32;<emphasis role="keywordtype">float</emphasis>&#32;DRAG_COEFFICIENT&#32;=&#32;60F;
+<anchor xml:id="__interaction_button_8cs_source_1l00254"/><link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_button_1a9bd38d8e028c7e13684ed763e3e2830c">00254</link> &#32;&#32;&#32;&#32;<emphasis role="keyword">protected</emphasis>&#32;<emphasis role="keyword">virtual</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_button_1a9bd38d8e028c7e13684ed763e3e2830c">Update</link>()&#32;{
+00255 
+00256 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;Reset&#32;our&#32;convenience&#32;state&#32;variables.</emphasis>
+00257 &#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_button_1aba499ecdce469e3288650158dce28735">_pressedThisFrame</link>&#32;=&#32;<emphasis role="keyword">false</emphasis>;
+00258 &#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_button_1a24190962b49e9308337362aca6c3e157">_unpressedThisFrame</link>&#32;=&#32;<emphasis role="keyword">false</emphasis>;
+00259 
+00260 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;Disable&#32;collision&#32;on&#32;this&#32;button&#32;if&#32;it&#32;is&#32;not&#32;the&#32;primary&#32;hover.</emphasis>
+00261 &#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_behaviour_1a94a7c385babbf711ca62ec73b5aab02a">ignoreGrasping</link>&#32;=&#32;_initialIgnoreGrasping&#32;?&#32;true&#32;:&#32;!<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_behaviour_1a6648c4fe010dec0193cc5ce80a8907fb">isPrimaryHovered</link>&#32;&amp;&amp;&#32;!<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_behaviour_1ad6176dc89403f491f7496e6781be9a8f">isGrasped</link>;
+00262 &#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_behaviour_1a812f158ddaabca6dd198c7133afcc486">ignoreContact</link>&#32;=&#32;(!<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_behaviour_1a6648c4fe010dec0193cc5ce80a8907fb">isPrimaryHovered</link>&#32;||&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_behaviour_1ad6176dc89403f491f7496e6781be9a8f">isGrasped</link>)&#32;||&#32;!<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_button_1ad25616c2095b92d6abf00c501fead38f">controlEnabled</link>;
+00263 
+00264 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;Enforce&#32;local&#32;rotation&#32;(if&#32;button&#32;is&#32;child&#32;of&#32;non-kinematic&#32;rigidbody,</emphasis>
+00265 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;this&#32;is&#32;necessary).</emphasis>
+00266 &#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_interface_leap_1_1_unity_1_1_interaction_1_1_i_interaction_behaviour_1a2ff1423c8145ae05a1cc8506d6932136">transform</link>.localRotation&#32;=&#32;_initialLocalRotation;
+00267 
+00268 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;Apply&#32;physical&#32;corrections&#32;only&#32;if&#32;PhysX&#32;has&#32;modified&#32;our&#32;positions.</emphasis>
+00269 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(_physicsOccurred)&#32;{
+00270 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;_physicsOccurred&#32;=&#32;<emphasis role="keyword">false</emphasis>;
+00271 
+00272 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;Record&#32;and&#32;enforce&#32;the&#32;sliding&#32;state&#32;from&#32;the&#32;previous&#32;frame.</emphasis>
+00273 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(this.<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_behaviour_1afad478858c7b7f2e5c6cc38bbbaff535">primaryHoverDistance</link>&#32;&lt;&#32;0.005f&#32;||&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_behaviour_1ad6176dc89403f491f7496e6781be9a8f">isGrasped</link>)&#32;{
+00274 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_button_1a33b1313c855fc4e54f7d85dfa17000f0">localPhysicsPosition</link>
+00275 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;=&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_button_1a8e073f9ac38439194d9b96de35362eca">constrainDepressedLocalPosition</link>(
+00276 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_interface_leap_1_1_unity_1_1_interaction_1_1_i_interaction_behaviour_1a2ff1423c8145ae05a1cc8506d6932136">transform</link>.parent.InverseTransformPoint(<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_behaviour_1a4f54f1794944882d8cf51bd641a5341c">rigidbody</link>.position)
+00277 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;-&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_button_1a33b1313c855fc4e54f7d85dfa17000f0">localPhysicsPosition</link>);
+00278 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}&#32;<emphasis role="keywordflow">else</emphasis>&#32;{
+00279 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;Vector2&#32;localSlidePosition&#32;=&#32;<emphasis role="keyword">new</emphasis>&#32;Vector2(<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_button_1a33b1313c855fc4e54f7d85dfa17000f0">localPhysicsPosition</link>.x,
+00280 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_button_1a33b1313c855fc4e54f7d85dfa17000f0">localPhysicsPosition</link>.y);
+00281 
+00282 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_button_1a33b1313c855fc4e54f7d85dfa17000f0">localPhysicsPosition</link>
+00283 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;=&#32;<link linkend="_interface_leap_1_1_unity_1_1_interaction_1_1_i_interaction_behaviour_1a2ff1423c8145ae05a1cc8506d6932136">transform</link>.parent.InverseTransformPoint(this.<link linkend="_interface_leap_1_1_unity_1_1_interaction_1_1_i_interaction_behaviour_1a2ff1423c8145ae05a1cc8506d6932136">transform</link>.position);
+00284 
+00285 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;localPhysicsPosition&#32;=&#32;<emphasis role="keyword">new</emphasis>&#32;Vector3(localSlidePosition.x,
+00286 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;localSlidePosition.y,
+00287 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_button_1a33b1313c855fc4e54f7d85dfa17000f0">localPhysicsPosition</link>.z);
+00288 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00289 
+00290 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;Calculate&#32;the&#32;physical&#32;kinematics&#32;of&#32;the&#32;button&#32;in&#32;local&#32;space</emphasis>
+00291 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;Vector3&#32;localPhysicsVelocity&#32;=&#32;<link linkend="_interface_leap_1_1_unity_1_1_interaction_1_1_i_interaction_behaviour_1a2ff1423c8145ae05a1cc8506d6932136">transform</link>.parent.InverseTransformVector(<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_behaviour_1a4f54f1794944882d8cf51bd641a5341c">rigidbody</link>.velocity);
+00292 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_button_1a21de162442ba3672aa091ccaab86c890">isPressed</link>&#32;&amp;&amp;&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_behaviour_1a6648c4fe010dec0193cc5ce80a8907fb">isPrimaryHovered</link>&#32;&amp;&amp;&#32;_lastDepressor&#32;!=&#32;<emphasis role="keyword">null</emphasis>)&#32;{
+00293 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;Vector3&#32;curLocalDepressorPos&#32;=&#32;<link linkend="_interface_leap_1_1_unity_1_1_interaction_1_1_i_interaction_behaviour_1a2ff1423c8145ae05a1cc8506d6932136">transform</link>.parent.InverseTransformPoint(_lastDepressor.position);
+00294 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;Vector3&#32;origLocalDepressorPos&#32;=&#32;<link linkend="_interface_leap_1_1_unity_1_1_interaction_1_1_i_interaction_behaviour_1a2ff1423c8145ae05a1cc8506d6932136">transform</link>.parent.InverseTransformPoint(<link linkend="_interface_leap_1_1_unity_1_1_interaction_1_1_i_interaction_behaviour_1a2ff1423c8145ae05a1cc8506d6932136">transform</link>.TransformPoint(_localDepressorPosition));
+00295 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;localPhysicsVelocity&#32;=&#32;Vector3.back&#32;*&#32;0.05f;
+00296 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_button_1a33b1313c855fc4e54f7d85dfa17000f0">localPhysicsPosition</link>&#32;=&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_button_1a8e073f9ac38439194d9b96de35362eca">constrainDepressedLocalPosition</link>(curLocalDepressorPos&#32;-&#32;origLocalDepressorPos);
+00297 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00298 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">else</emphasis>&#32;<emphasis role="keywordflow">if</emphasis>&#32;(<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_behaviour_1ad6176dc89403f491f7496e6781be9a8f">isGrasped</link>)&#32;{
+00299 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;Do&#32;nothing!</emphasis>
+00300 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00301 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">else</emphasis>&#32;{
+00302 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;Vector3&#32;originalLocalVelocity&#32;=&#32;localPhysicsVelocity;
+00303 
+00304 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;Spring&#32;force</emphasis>
+00305 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;localPhysicsVelocity&#32;+=
+00306 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;Mathf.Clamp(_springForce&#32;*&#32;10000F
+00307 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;*&#32;(<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_button_1aaff55c4ea819215e2100b6906f970746">initialLocalPosition</link>.z
+00308 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;-&#32;Mathf.Lerp(<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_button_1a26f7eabb9d9880d63ab19f7dbeff186a">minMaxHeight</link>.x,&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_button_1a26f7eabb9d9880d63ab19f7dbeff186a">minMaxHeight</link>.y,&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_button_1ac5d100f680957b8a06989b47241d3624">restingHeight</link>)
+00309 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;-&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_button_1a33b1313c855fc4e54f7d85dfa17000f0">localPhysicsPosition</link>.z),
+00310 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;-100f&#32;/&#32;<link linkend="_interface_leap_1_1_unity_1_1_interaction_1_1_i_interaction_behaviour_1a2ff1423c8145ae05a1cc8506d6932136">transform</link>.parent.lossyScale.x,
+00311 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;100f&#32;/&#32;<link linkend="_interface_leap_1_1_unity_1_1_interaction_1_1_i_interaction_behaviour_1a2ff1423c8145ae05a1cc8506d6932136">transform</link>.parent.lossyScale.x)
+00312 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;*&#32;Time.fixedDeltaTime&#32;*&#32;Vector3.forward;
+00313 
+00314 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;Friction&#32;&amp;&#32;Drag</emphasis>
+00315 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordtype">float</emphasis>&#32;velMag&#32;=&#32;originalLocalVelocity.magnitude;
+00316 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;var&#32;frictionDragVelocityChangeAmt&#32;=&#32;0f;
+00317 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(velMag&#32;&gt;&#32;0F)&#32;{
+00318 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;Friction&#32;force</emphasis>
+00319 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;var&#32;frictionForceAmt&#32;=&#32;velMag&#32;*&#32;FRICTION_COEFFICIENT;
+00320 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;frictionDragVelocityChangeAmt
+00321 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;+=&#32;Time.fixedDeltaTime&#32;*&#32;<link linkend="_interface_leap_1_1_unity_1_1_interaction_1_1_i_interaction_behaviour_1a2ff1423c8145ae05a1cc8506d6932136">transform</link>.parent.lossyScale.x&#32;*&#32;frictionForceAmt;
+00322 
+00323 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;Drag&#32;force</emphasis>
+00324 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordtype">float</emphasis>&#32;velSqrMag&#32;=&#32;velMag&#32;*&#32;velMag;
+00325 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;var&#32;dragForceAmt&#32;=&#32;velSqrMag&#32;*&#32;DRAG_COEFFICIENT;
+00326 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;frictionDragVelocityChangeAmt
+00327 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;+=&#32;Time.fixedDeltaTime&#32;*&#32;<link linkend="_interface_leap_1_1_unity_1_1_interaction_1_1_i_interaction_behaviour_1a2ff1423c8145ae05a1cc8506d6932136">transform</link>.parent.lossyScale.x&#32;*&#32;dragForceAmt;
+00328 
+00329 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;Apply&#32;velocity&#32;change,&#32;but&#32;don&apos;t&#32;let&#32;friction&#32;or&#32;drag&#32;let&#32;velocity</emphasis>
+00330 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;magnitude&#32;cross&#32;zero.</emphasis>
+00331 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;var&#32;newVelMag&#32;=&#32;Mathf.Max(0,&#32;velMag&#32;-&#32;frictionDragVelocityChangeAmt);
+00332 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;localPhysicsVelocity&#32;=&#32;localPhysicsVelocity&#32;/&#32;velMag&#32;*&#32;newVelMag;
+00333 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00334 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;
+00335 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00336 
+00337 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;Transform&#32;the&#32;local&#32;physics&#32;back&#32;into&#32;world&#32;space</emphasis>
+00338 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_button_1a1953b5ee88c27d531b7543c16c9400a7">physicsPosition</link>&#32;=&#32;<link linkend="_interface_leap_1_1_unity_1_1_interaction_1_1_i_interaction_behaviour_1a2ff1423c8145ae05a1cc8506d6932136">transform</link>.parent.TransformPoint(<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_button_1a33b1313c855fc4e54f7d85dfa17000f0">localPhysicsPosition</link>);
+00339 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;_physicsVelocity&#32;=&#32;<link linkend="_interface_leap_1_1_unity_1_1_interaction_1_1_i_interaction_behaviour_1a2ff1423c8145ae05a1cc8506d6932136">transform</link>.parent.TransformVector(localPhysicsVelocity);
+00340 
+00341 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;Calculate&#32;the&#32;Depression&#32;State&#32;of&#32;the&#32;Button&#32;from&#32;its&#32;Physical&#32;Position</emphasis>
+00342 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;Set&#32;its&#32;Graphical&#32;Position&#32;to&#32;be&#32;Constrained&#32;Physically</emphasis>
+00343 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordtype">bool</emphasis>&#32;oldDepressed&#32;=&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_button_1a21de162442ba3672aa091ccaab86c890">isPressed</link>;
+00344 
+00345 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;Normalized&#32;depression&#32;amount.</emphasis>
+00346 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;_pressedAmount&#32;=&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_button_1a33b1313c855fc4e54f7d85dfa17000f0">localPhysicsPosition</link>.z.Map(<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_button_1aaff55c4ea819215e2100b6906f970746">initialLocalPosition</link>.z&#32;-&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_button_1a26f7eabb9d9880d63ab19f7dbeff186a">minMaxHeight</link>.x,
+00347 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_button_1aaff55c4ea819215e2100b6906f970746">initialLocalPosition</link>.z&#32;-&#32;Mathf.Lerp(<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_button_1a26f7eabb9d9880d63ab19f7dbeff186a">minMaxHeight</link>.x,&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_button_1a26f7eabb9d9880d63ab19f7dbeff186a">minMaxHeight</link>.y,&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_button_1ac5d100f680957b8a06989b47241d3624">restingHeight</link>),
+00348 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;1F,&#32;0F);
+00349 
+00350 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;If&#32;the&#32;button&#32;is&#32;depressed&#32;past&#32;its&#32;limit...</emphasis>
+00351 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_button_1a33b1313c855fc4e54f7d85dfa17000f0">localPhysicsPosition</link>.z&#32;&gt;&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_button_1aaff55c4ea819215e2100b6906f970746">initialLocalPosition</link>.z&#32;-&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_button_1a26f7eabb9d9880d63ab19f7dbeff186a">minMaxHeight</link>.x)&#32;{
+00352 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_interface_leap_1_1_unity_1_1_interaction_1_1_i_interaction_behaviour_1a2ff1423c8145ae05a1cc8506d6932136">transform</link>.localPosition&#32;=&#32;<emphasis role="keyword">new</emphasis>&#32;Vector3(<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_button_1a33b1313c855fc4e54f7d85dfa17000f0">localPhysicsPosition</link>.x,&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_button_1a33b1313c855fc4e54f7d85dfa17000f0">localPhysicsPosition</link>.y,&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_button_1aaff55c4ea819215e2100b6906f970746">initialLocalPosition</link>.z&#32;-&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_button_1a26f7eabb9d9880d63ab19f7dbeff186a">minMaxHeight</link>.x);
+00353 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;((<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_behaviour_1a6648c4fe010dec0193cc5ce80a8907fb">isPrimaryHovered</link>&#32;&amp;&amp;&#32;_lastDepressor&#32;!=&#32;<emphasis role="keyword">null</emphasis>)&#32;||&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_behaviour_1ad6176dc89403f491f7496e6781be9a8f">isGrasped</link>)&#32;{
+00354 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_button_1ae2adb238902214b7d9b2dc00cad7945e">_isPressed</link>&#32;=&#32;<emphasis role="keyword">true</emphasis>;
+00355 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00356 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">else</emphasis>&#32;{
+00357 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_button_1a1953b5ee88c27d531b7543c16c9400a7">physicsPosition</link>&#32;=&#32;<link linkend="_interface_leap_1_1_unity_1_1_interaction_1_1_i_interaction_behaviour_1a2ff1423c8145ae05a1cc8506d6932136">transform</link>.parent.TransformPoint(<emphasis role="keyword">new</emphasis>&#32;Vector3(<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_button_1a33b1313c855fc4e54f7d85dfa17000f0">localPhysicsPosition</link>.x,&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_button_1a33b1313c855fc4e54f7d85dfa17000f0">localPhysicsPosition</link>.y,&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_button_1aaff55c4ea819215e2100b6906f970746">initialLocalPosition</link>.z&#32;-&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_button_1a26f7eabb9d9880d63ab19f7dbeff186a">minMaxHeight</link>.x));
+00358 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;_physicsVelocity&#32;=&#32;_physicsVelocity&#32;*&#32;0.1f;
+00359 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_button_1ae2adb238902214b7d9b2dc00cad7945e">_isPressed</link>&#32;=&#32;<emphasis role="keyword">false</emphasis>;
+00360 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;_lastDepressor&#32;=&#32;<emphasis role="keyword">null</emphasis>;
+00361 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00362 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;Else&#32;if&#32;the&#32;button&#32;is&#32;extended&#32;past&#32;its&#32;limit...</emphasis>
+00363 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00364 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">else</emphasis>&#32;<emphasis role="keywordflow">if</emphasis>&#32;(<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_button_1a33b1313c855fc4e54f7d85dfa17000f0">localPhysicsPosition</link>.z&#32;&lt;&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_button_1aaff55c4ea819215e2100b6906f970746">initialLocalPosition</link>.z&#32;-&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_button_1a26f7eabb9d9880d63ab19f7dbeff186a">minMaxHeight</link>.y)&#32;{
+00365 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_interface_leap_1_1_unity_1_1_interaction_1_1_i_interaction_behaviour_1a2ff1423c8145ae05a1cc8506d6932136">transform</link>.localPosition&#32;=&#32;<emphasis role="keyword">new</emphasis>&#32;Vector3(<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_button_1a33b1313c855fc4e54f7d85dfa17000f0">localPhysicsPosition</link>.x,&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_button_1a33b1313c855fc4e54f7d85dfa17000f0">localPhysicsPosition</link>.y,&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_button_1aaff55c4ea819215e2100b6906f970746">initialLocalPosition</link>.z&#32;-&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_button_1a26f7eabb9d9880d63ab19f7dbeff186a">minMaxHeight</link>.y);
+00366 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_button_1a1953b5ee88c27d531b7543c16c9400a7">physicsPosition</link>&#32;=&#32;<link linkend="_interface_leap_1_1_unity_1_1_interaction_1_1_i_interaction_behaviour_1a2ff1423c8145ae05a1cc8506d6932136">transform</link>.position;
+00367 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_button_1ae2adb238902214b7d9b2dc00cad7945e">_isPressed</link>&#32;=&#32;<emphasis role="keyword">false</emphasis>;
+00368 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;_lastDepressor&#32;=&#32;<emphasis role="keyword">null</emphasis>;
+00369 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00370 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">else</emphasis>&#32;{
+00371 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;Else,&#32;just&#32;make&#32;the&#32;physical&#32;and&#32;graphical&#32;motion&#32;of&#32;the&#32;button&#32;match</emphasis>
+00372 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_interface_leap_1_1_unity_1_1_interaction_1_1_i_interaction_behaviour_1a2ff1423c8145ae05a1cc8506d6932136">transform</link>.localPosition&#32;=&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_button_1a33b1313c855fc4e54f7d85dfa17000f0">localPhysicsPosition</link>;
+00373 
+00374 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;Allow&#32;some&#32;hysteresis&#32;before&#32;setting&#32;isDepressed&#32;to&#32;false.</emphasis>
+00375 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(!<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_button_1a21de162442ba3672aa091ccaab86c890">isPressed</link>
+00376 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;||&#32;!(<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_button_1a33b1313c855fc4e54f7d85dfa17000f0">localPhysicsPosition</link>.z&#32;&gt;&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_button_1aaff55c4ea819215e2100b6906f970746">initialLocalPosition</link>.z&#32;-&#32;(<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_button_1a26f7eabb9d9880d63ab19f7dbeff186a">minMaxHeight</link>.y&#32;-&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_button_1a26f7eabb9d9880d63ab19f7dbeff186a">minMaxHeight</link>.x)&#32;*&#32;0.1F))&#32;{
+00377 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_button_1ae2adb238902214b7d9b2dc00cad7945e">_isPressed</link>&#32;=&#32;<emphasis role="keyword">false</emphasis>;
+00378 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;_lastDepressor&#32;=&#32;<emphasis role="keyword">null</emphasis>;
+00379 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00380 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00381 
+00382 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;If&#32;our&#32;depression&#32;state&#32;has&#32;changed&#32;since&#32;last&#32;time...</emphasis>
+00383 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_button_1a21de162442ba3672aa091ccaab86c890">isPressed</link>&#32;&amp;&amp;&#32;!oldDepressed)&#32;{
+00384 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_behaviour_1a234b0a5dc3391758b1e423ae5006c572">primaryHoveringController</link>.<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_controller_1afa44de31d034ff2bceb41ee6a20d0253">primaryHoverLocked</link>&#32;=&#32;<emphasis role="keyword">true</emphasis>;
+00385 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;_lockedInteractingController&#32;=&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_behaviour_1a234b0a5dc3391758b1e423ae5006c572">primaryHoveringController</link>;
+00386 
+00387 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_button_1a604925418c20993e8dcd62b44442f02e">OnPress</link>();
+00388 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_button_1aba499ecdce469e3288650158dce28735">_pressedThisFrame</link>&#32;=&#32;<emphasis role="keyword">true</emphasis>;
+00389 
+00390 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}&#32;<emphasis role="keywordflow">else</emphasis>&#32;<emphasis role="keywordflow">if</emphasis>&#32;(!<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_button_1a21de162442ba3672aa091ccaab86c890">isPressed</link>&#32;&amp;&amp;&#32;oldDepressed)&#32;{
+00391 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_button_1a24190962b49e9308337362aca6c3e157">_unpressedThisFrame</link>&#32;=&#32;<emphasis role="keyword">true</emphasis>;
+00392 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_button_1a20976dd4b5068d794d00f49f894c7139">OnUnpress</link>();
+00393 
+00394 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(!(<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_behaviour_1ad6176dc89403f491f7496e6781be9a8f">isGrasped</link>&#32;&amp;&amp;&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_behaviour_1a7da6b3f9bc72ed337ccc2136035dd08f">graspingController</link>&#32;==&#32;_lockedInteractingController))&#32;{
+00395 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;_lockedInteractingController.<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_controller_1afa44de31d034ff2bceb41ee6a20d0253">primaryHoverLocked</link>&#32;=&#32;<emphasis role="keyword">false</emphasis>;
+00396 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00397 
+00398 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;_lastDepressor&#32;=&#32;<emphasis role="keyword">null</emphasis>;
+00399 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00400 &#32;&#32;&#32;&#32;&#32;&#32;}
+00401 &#32;&#32;&#32;&#32;}
+00402 
+<anchor xml:id="__interaction_button_8cs_source_1l00408"/><link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_button_1a8e073f9ac38439194d9b96de35362eca">00408</link> &#32;&#32;&#32;&#32;<emphasis role="keyword">protected</emphasis>&#32;<emphasis role="keyword">virtual</emphasis>&#32;Vector3&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_button_1a8e073f9ac38439194d9b96de35362eca">constrainDepressedLocalPosition</link>(Vector3&#32;localPosition)&#32;{
+00409 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;Buttons&#32;are&#32;only&#32;allowed&#32;to&#32;move&#32;along&#32;their&#32;Z&#32;axis.</emphasis>
+00410 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;<emphasis role="keyword">new</emphasis>&#32;Vector3(
+00411 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_button_1aaff55c4ea819215e2100b6906f970746">initialLocalPosition</link>.x,
+00412 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_button_1aaff55c4ea819215e2100b6906f970746">initialLocalPosition</link>.y,
+00413 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_button_1a33b1313c855fc4e54f7d85dfa17000f0">localPhysicsPosition</link>.z&#32;+&#32;localPosition.z);
+00414 &#32;&#32;&#32;&#32;}
+00415 
+<anchor xml:id="__interaction_button_8cs_source_1l00416"/><link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_button_1a4eaa465478ec3488601a4a8f4a1ef8dd">00416</link> &#32;&#32;&#32;&#32;<emphasis role="keyword">protected</emphasis>&#32;<emphasis role="keyword">virtual</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_button_1a4eaa465478ec3488601a4a8f4a1ef8dd">onGraspBegin</link>()&#32;{
+00417 &#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_behaviour_1a234b0a5dc3391758b1e423ae5006c572">primaryHoveringController</link>.<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_controller_1a08ba5639e6af985fa056a25ff2981278">LockPrimaryHover</link>(<emphasis role="keyword">this</emphasis>);
+00418 &#32;&#32;&#32;&#32;&#32;&#32;_lockedInteractingController&#32;=&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_behaviour_1a234b0a5dc3391758b1e423ae5006c572">primaryHoveringController</link>;
+00419 &#32;&#32;&#32;&#32;}
+00420 
+<anchor xml:id="__interaction_button_8cs_source_1l00421"/><link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_button_1ae4b4b7cc59277eee7fe17fdb6a07652d">00421</link> &#32;&#32;&#32;&#32;<emphasis role="keyword">protected</emphasis>&#32;<emphasis role="keyword">virtual</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_button_1ae4b4b7cc59277eee7fe17fdb6a07652d">onGraspEnd</link>()&#32;{
+00422 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_button_1a33b1313c855fc4e54f7d85dfa17000f0">localPhysicsPosition</link>.z&#32;&gt;&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_button_1aaff55c4ea819215e2100b6906f970746">initialLocalPosition</link>.z&#32;-&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_button_1a26f7eabb9d9880d63ab19f7dbeff186a">minMaxHeight</link>.x)&#32;{
+00423 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_interface_leap_1_1_unity_1_1_interaction_1_1_i_interaction_behaviour_1a2ff1423c8145ae05a1cc8506d6932136">transform</link>.localPosition&#32;=&#32;<emphasis role="keyword">new</emphasis>&#32;Vector3(<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_button_1a33b1313c855fc4e54f7d85dfa17000f0">localPhysicsPosition</link>.x,&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_button_1a33b1313c855fc4e54f7d85dfa17000f0">localPhysicsPosition</link>.y,&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_button_1aaff55c4ea819215e2100b6906f970746">initialLocalPosition</link>.z&#32;-&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_button_1a26f7eabb9d9880d63ab19f7dbeff186a">minMaxHeight</link>.x);
+00424 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;_physicsVelocity&#32;=&#32;_physicsVelocity&#32;*&#32;0.1f;
+00425 &#32;&#32;&#32;&#32;&#32;&#32;}
+00426 
+00427 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(_lockedInteractingController&#32;!=&#32;<emphasis role="keyword">null</emphasis>&#32;&amp;&amp;&#32;!<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_button_1a21de162442ba3672aa091ccaab86c890">isPressed</link>)&#32;{
+00428 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;_lockedInteractingController.<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_controller_1afa44de31d034ff2bceb41ee6a20d0253">primaryHoverLocked</link>&#32;=&#32;<emphasis role="keyword">false</emphasis>;
+00429 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;_lockedInteractingController&#32;=&#32;<emphasis role="keyword">null</emphasis>;
+00430 &#32;&#32;&#32;&#32;&#32;&#32;}
+00431 &#32;&#32;&#32;&#32;}
+00432 
+<anchor xml:id="__interaction_button_8cs_source_1l00433"/><link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_button_1ab6a9d171b2ed581ae70aa9844f52fa68">00433</link> &#32;&#32;&#32;&#32;<emphasis role="keyword">protected</emphasis>&#32;<emphasis role="keyword">virtual</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_button_1ab6a9d171b2ed581ae70aa9844f52fa68">OnCollisionEnter</link>(Collision&#32;collision)&#32;{&#32;trySetDepressor(collision.collider);&#32;}
+<anchor xml:id="__interaction_button_8cs_source_1l00434"/><link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_button_1ad24ae3e0c1a3a9feb60ea3046d6a01b6">00434</link> &#32;&#32;&#32;&#32;<emphasis role="keyword">protected</emphasis>&#32;<emphasis role="keyword">virtual</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_button_1ad24ae3e0c1a3a9feb60ea3046d6a01b6">OnCollisionStay</link>(Collision&#32;collision)&#32;{&#32;trySetDepressor(collision.collider);&#32;}
+00435 
+00436 &#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;during&#32;Soft&#32;Contact,&#32;controller&#32;colliders&#32;are&#32;triggers</emphasis>
+<anchor xml:id="__interaction_button_8cs_source_1l00437"/><link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_button_1a088becb31136650ee6b3a83c426d6ed7">00437</link> &#32;&#32;&#32;&#32;<emphasis role="keyword">protected</emphasis>&#32;<emphasis role="keyword">virtual</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_button_1a088becb31136650ee6b3a83c426d6ed7">OnTriggerEnter</link>(Collider&#32;collider)&#32;{&#32;trySetDepressor(collider);&#32;}
+<anchor xml:id="__interaction_button_8cs_source_1l00438"/><link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_button_1a2a9ae3b082942b0fe99fa88c75e61d0d">00438</link> &#32;&#32;&#32;&#32;<emphasis role="keyword">protected</emphasis>&#32;<emphasis role="keyword">virtual</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_button_1a2a9ae3b082942b0fe99fa88c75e61d0d">OnTriggerStay</link>(Collider&#32;collider)&#32;{&#32;trySetDepressor(collider);&#32;}
+00439 
+00440 &#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;Try&#32;grabbing&#32;the&#32;offset&#32;between&#32;the&#32;fingertip&#32;and&#32;this&#32;object...</emphasis>
+00441 &#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;trySetDepressor(Collider&#32;collider)&#32;{
+00442 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(collider.attachedRigidbody&#32;!=&#32;<emphasis role="keyword">null</emphasis>&#32;&amp;&amp;&#32;_lastDepressor&#32;==&#32;<emphasis role="keyword">null</emphasis>&#32;&amp;&amp;&#32;(<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_button_1a33b1313c855fc4e54f7d85dfa17000f0">localPhysicsPosition</link>.z&#32;&gt;&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_button_1aaff55c4ea819215e2100b6906f970746">initialLocalPosition</link>.z&#32;-&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_button_1a26f7eabb9d9880d63ab19f7dbeff186a">minMaxHeight</link>.x)
+00443 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&amp;&amp;&#32;(<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_behaviour_1af612da311eae4f7df7becea9aae8f7b7">manager</link>.<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_manager_1a025e8a1a9e433fd86245a0e836deba86">contactBoneBodies</link>.ContainsKey(collider.attachedRigidbody)
+00444 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&amp;&amp;&#32;!this.ShouldIgnoreHover(<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_behaviour_1af612da311eae4f7df7becea9aae8f7b7">manager</link>.<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_manager_1a025e8a1a9e433fd86245a0e836deba86">contactBoneBodies</link>[collider.attachedRigidbody].interactionController)))&#32;{
+00445 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;_lastDepressor&#32;=&#32;collider.attachedRigidbody;
+00446 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;_localDepressorPosition&#32;=&#32;<link linkend="_interface_leap_1_1_unity_1_1_interaction_1_1_i_interaction_behaviour_1a2ff1423c8145ae05a1cc8506d6932136">transform</link>.InverseTransformPoint(collider.attachedRigidbody.position);
+00447 &#32;&#32;&#32;&#32;&#32;&#32;}
+00448 &#32;&#32;&#32;&#32;}
+00449 
+00450 <emphasis role="preprocessor">&#32;&#32;&#32;&#32;#endregion</emphasis>
+00451 
+00452 <emphasis role="preprocessor">&#32;&#32;&#32;&#32;#region&#32;Gizmos</emphasis>
+00453 
+<anchor xml:id="__interaction_button_8cs_source_1l00454"/><link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_button_1a3cf601cd070b0d92bda43ed675d2f367">00454</link> &#32;&#32;&#32;&#32;<emphasis role="keyword">protected</emphasis>&#32;<emphasis role="keyword">virtual</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_button_1a3cf601cd070b0d92bda43ed675d2f367">OnDrawGizmosSelected</link>()&#32;{
+00455 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(<link linkend="_interface_leap_1_1_unity_1_1_interaction_1_1_i_interaction_behaviour_1a2ff1423c8145ae05a1cc8506d6932136">transform</link>.parent&#32;!=&#32;<emphasis role="keyword">null</emphasis>)&#32;{
+00456 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;Gizmos.matrix&#32;=&#32;<link linkend="_interface_leap_1_1_unity_1_1_interaction_1_1_i_interaction_behaviour_1a2ff1423c8145ae05a1cc8506d6932136">transform</link>.parent.localToWorldMatrix;
+00457 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;Vector2&#32;heights&#32;=&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_button_1a26f7eabb9d9880d63ab19f7dbeff186a">minMaxHeight</link>;
+00458 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;Vector3&#32;originPosition&#32;=&#32;Application.isPlaying&#32;?&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_button_1aaff55c4ea819215e2100b6906f970746">initialLocalPosition</link>&#32;:&#32;<link linkend="_interface_leap_1_1_unity_1_1_interaction_1_1_i_interaction_behaviour_1a2ff1423c8145ae05a1cc8506d6932136">transform</link>.localPosition;
+00459 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(!Application.isPlaying&#32;&amp;&amp;&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_button_1a48c30245b6b71691985f9b4423c8ce59">startingPositionMode</link>&#32;==&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_button_1a29761e33189cdf8131bb519cdc114fd2">StartingPositionMode</link>.Relaxed)&#32;{
+00460 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;originPosition&#32;=&#32;<link linkend="_interface_leap_1_1_unity_1_1_interaction_1_1_i_interaction_behaviour_1a2ff1423c8145ae05a1cc8506d6932136">transform</link>.localPosition&#32;+&#32;Vector3.forward&#32;*&#32;Mathf.Lerp(<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_button_1a26f7eabb9d9880d63ab19f7dbeff186a">minMaxHeight</link>.x,&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_button_1a26f7eabb9d9880d63ab19f7dbeff186a">minMaxHeight</link>.y,&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_button_1ac5d100f680957b8a06989b47241d3624">restingHeight</link>);
+00461 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00462 
+00463 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;Gizmos.color&#32;=&#32;Color.red;
+00464 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;Gizmos.DrawLine(originPosition&#32;+&#32;(Vector3.back&#32;*&#32;heights.x),&#32;originPosition&#32;+&#32;(Vector3.back&#32;*&#32;heights.y));
+00465 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;Gizmos.color&#32;=&#32;Color.green;
+00466 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;Gizmos.DrawLine(originPosition&#32;+&#32;(Vector3.back&#32;*&#32;heights.x),&#32;originPosition&#32;+&#32;(Vector3.back&#32;*&#32;Mathf.Lerp(heights.x,&#32;heights.y,&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_button_1ac5d100f680957b8a06989b47241d3624">restingHeight</link>)));
+00467 &#32;&#32;&#32;&#32;&#32;&#32;}
+00468 &#32;&#32;&#32;&#32;}
+00469 
+00470 <emphasis role="preprocessor">&#32;&#32;&#32;&#32;#endregion</emphasis>
+00471 
+00472 <emphasis role="preprocessor">&#32;&#32;&#32;&#32;#region&#32;Public&#32;Methods</emphasis>
+00473 
+<anchor xml:id="__interaction_button_8cs_source_1l00479"/><link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_button_1aedfa4f61822e03652ac6678c4367fe48">00479</link> &#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_button_1aedfa4f61822e03652ac6678c4367fe48">SetMinHeight</link>(<emphasis role="keywordtype">float</emphasis>&#32;minHeight)&#32;{
+00480 &#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_button_1a26f7eabb9d9880d63ab19f7dbeff186a">minMaxHeight</link>&#32;=&#32;<emphasis role="keyword">new</emphasis>&#32;Vector2(Mathf.Min(<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_button_1a26f7eabb9d9880d63ab19f7dbeff186a">minMaxHeight</link>.y,&#32;minHeight),&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_button_1a26f7eabb9d9880d63ab19f7dbeff186a">minMaxHeight</link>.y);
+00481 &#32;&#32;&#32;&#32;}
+00482 &#32;&#32;&#32;&#32;[Obsolete(<emphasis role="stringliteral">&quot;Deprecated.&#32;Use&#32;SetMinHeight&#32;instead.&quot;</emphasis>,&#32;<emphasis role="keyword">false</emphasis>)]
+<anchor xml:id="__interaction_button_8cs_source_1l00483"/><link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_button_1a472b1d9f22f6c8621f3b6db7d28738e1">00483</link> &#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_button_1a472b1d9f22f6c8621f3b6db7d28738e1">setMinHeight</link>(<emphasis role="keywordtype">float</emphasis>&#32;minHeight)&#32;{
+00484 &#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_button_1aedfa4f61822e03652ac6678c4367fe48">SetMinHeight</link>(minHeight);
+00485 &#32;&#32;&#32;&#32;}
+00486 
+<anchor xml:id="__interaction_button_8cs_source_1l00492"/><link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_button_1a6545b611053f312e6cf08cf0b5629fbe">00492</link> &#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_button_1a6545b611053f312e6cf08cf0b5629fbe">SetMaxHeight</link>(<emphasis role="keywordtype">float</emphasis>&#32;maxHeight)&#32;{
+00493 &#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_button_1a26f7eabb9d9880d63ab19f7dbeff186a">minMaxHeight</link>&#32;=&#32;<emphasis role="keyword">new</emphasis>&#32;Vector2(<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_button_1a26f7eabb9d9880d63ab19f7dbeff186a">minMaxHeight</link>.x,&#32;Mathf.Max(<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_button_1a26f7eabb9d9880d63ab19f7dbeff186a">minMaxHeight</link>.x,&#32;maxHeight));
+00494 &#32;&#32;&#32;&#32;}
+00495 &#32;&#32;&#32;&#32;[Obsolete(<emphasis role="stringliteral">&quot;Deprecated.&#32;Use&#32;SetMaxHeight&#32;instead.&quot;</emphasis>,&#32;<emphasis role="keyword">false</emphasis>)]
+<anchor xml:id="__interaction_button_8cs_source_1l00496"/><link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_button_1ad5b904b42f4a3a66875046120ad7edbe">00496</link> &#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_button_1ad5b904b42f4a3a66875046120ad7edbe">setMaxHeight</link>(<emphasis role="keywordtype">float</emphasis>&#32;maxHeight)&#32;{
+00497 &#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_button_1a6545b611053f312e6cf08cf0b5629fbe">SetMaxHeight</link>(maxHeight);
+00498 &#32;&#32;&#32;&#32;}
+00499 
+00500 <emphasis role="preprocessor">&#32;&#32;&#32;&#32;#endregion</emphasis>
+00501 
+00502 &#32;&#32;}
+00503 }
+</programlisting></section>

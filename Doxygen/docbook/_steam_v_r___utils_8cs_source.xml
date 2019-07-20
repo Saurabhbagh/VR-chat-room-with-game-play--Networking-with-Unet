@@ -1,0 +1,756 @@
+<?xml version='1.0' encoding='UTF-8' standalone='no'?>
+<section xmlns="http://docbook.org/ns/docbook" version="5.0" xmlns:xlink="http://www.w3.org/1999/xlink" xml:id="__steam_v_r___utils_8cs_source">
+<title>SteamVR_Utils.cs</title>
+<indexterm><primary>O:/GitHUBMINIPRoject/Assets/SteamVR/Scripts/SteamVR_Utils.cs</primary></indexterm>
+<programlisting>00001 <emphasis role="comment">//=======&#32;Copyright&#32;(c)&#32;Valve&#32;Corporation,&#32;All&#32;rights&#32;reserved.&#32;===============</emphasis>
+00002 <emphasis role="comment">//</emphasis>
+00003 <emphasis role="comment">//&#32;Purpose:&#32;Utilities&#32;for&#32;working&#32;with&#32;SteamVR</emphasis>
+00004 <emphasis role="comment">//</emphasis>
+00005 <emphasis role="comment">//=============================================================================</emphasis>
+00006 
+00007 <emphasis role="keyword">using</emphasis>&#32;<link linkend="__balloon_8cs_1a7d67e097df9376eb709b6a23aa3c7d23">UnityEngine</link>;
+00008 <emphasis role="keyword">using</emphasis>&#32;System.Collections;
+00009 <emphasis role="keyword">using</emphasis>&#32;System.Collections.Generic;
+00010 <emphasis role="keyword">using</emphasis>&#32;System.Runtime.InteropServices;
+00011 <emphasis role="keyword">using</emphasis>&#32;System.ComponentModel;
+00012 <emphasis role="keyword">using</emphasis>&#32;<link linkend="_namespace_valve">Valve</link>.<link linkend="_namespace_valve_1_1_v_r">VR</link>;
+00013 <emphasis role="keyword">using</emphasis>&#32;System.IO;
+00014 
+00015 <emphasis role="keyword">namespace&#32;</emphasis><link linkend="_namespace_valve_1_1_v_r">Valve.VR</link>
+00016 {
+00017 &#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keyword">static</emphasis>&#32;<emphasis role="keyword">class&#32;</emphasis>SteamVR_Utils
+00018 &#32;&#32;&#32;&#32;{
+00019 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;this&#32;version&#32;does&#32;not&#32;clamp&#32;[0..1]</emphasis>
+00020 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keyword">static</emphasis>&#32;Quaternion&#32;Slerp(Quaternion&#32;A,&#32;Quaternion&#32;B,&#32;<emphasis role="keywordtype">float</emphasis>&#32;time)
+00021 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00022 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordtype">float</emphasis>&#32;cosom&#32;=&#32;Mathf.Clamp(A.x&#32;*&#32;B.x&#32;+&#32;A.y&#32;*&#32;B.y&#32;+&#32;A.z&#32;*&#32;B.z&#32;+&#32;A.w&#32;*&#32;B.w,&#32;-1.0f,&#32;1.0f);
+00023 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(cosom&#32;&lt;&#32;0.0f)
+00024 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00025 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;B&#32;=&#32;<emphasis role="keyword">new</emphasis>&#32;Quaternion(-B.x,&#32;-B.y,&#32;-B.z,&#32;-B.w);
+00026 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;cosom&#32;=&#32;-cosom;
+00027 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00028 
+00029 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordtype">float</emphasis>&#32;sclp,&#32;sclq;
+00030 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;((1.0f&#32;-&#32;cosom)&#32;&gt;&#32;0.0001f)
+00031 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00032 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordtype">float</emphasis>&#32;omega&#32;=&#32;Mathf.Acos(cosom);
+00033 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordtype">float</emphasis>&#32;sinom&#32;=&#32;Mathf.Sin(omega);
+00034 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;sclp&#32;=&#32;Mathf.Sin((1.0f&#32;-&#32;time)&#32;*&#32;omega)&#32;/&#32;sinom;
+00035 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;sclq&#32;=&#32;Mathf.Sin(time&#32;*&#32;omega)&#32;/&#32;sinom;
+00036 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00037 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">else</emphasis>
+00038 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00039 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;&quot;from&quot;&#32;and&#32;&quot;to&quot;&#32;very&#32;close,&#32;so&#32;do&#32;linear&#32;interp</emphasis>
+00040 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;sclp&#32;=&#32;1.0f&#32;-&#32;time;
+00041 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;sclq&#32;=&#32;time;
+00042 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00043 
+00044 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;<emphasis role="keyword">new</emphasis>&#32;Quaternion(
+00045 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;sclp&#32;*&#32;A.x&#32;+&#32;sclq&#32;*&#32;B.x,
+00046 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;sclp&#32;*&#32;A.y&#32;+&#32;sclq&#32;*&#32;B.y,
+00047 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;sclp&#32;*&#32;A.z&#32;+&#32;sclq&#32;*&#32;B.z,
+00048 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;sclp&#32;*&#32;A.w&#32;+&#32;sclq&#32;*&#32;B.w);
+00049 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00050 
+00051 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keyword">static</emphasis>&#32;Vector3&#32;Lerp(Vector3&#32;from,&#32;Vector3&#32;to,&#32;<emphasis role="keywordtype">float</emphasis>&#32;amount)
+00052 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00053 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;<emphasis role="keyword">new</emphasis>&#32;Vector3(
+00054 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;Lerp(from.x,&#32;to.x,&#32;amount),
+00055 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;Lerp(from.y,&#32;to.y,&#32;amount),
+00056 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;Lerp(from.z,&#32;to.z,&#32;amount));
+00057 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00058 
+00059 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keyword">static</emphasis>&#32;<emphasis role="keywordtype">float</emphasis>&#32;Lerp(<emphasis role="keywordtype">float</emphasis>&#32;from,&#32;<emphasis role="keywordtype">float</emphasis>&#32;to,&#32;<emphasis role="keywordtype">float</emphasis>&#32;amount)
+00060 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00061 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;from&#32;+&#32;(to&#32;-&#32;from)&#32;*&#32;amount;
+00062 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00063 
+00064 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keyword">static</emphasis>&#32;<emphasis role="keywordtype">double</emphasis>&#32;Lerp(<emphasis role="keywordtype">double</emphasis>&#32;from,&#32;<emphasis role="keywordtype">double</emphasis>&#32;to,&#32;<emphasis role="keywordtype">double</emphasis>&#32;amount)
+00065 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00066 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;from&#32;+&#32;(to&#32;-&#32;from)&#32;*&#32;amount;
+00067 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00068 
+00069 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keyword">static</emphasis>&#32;<emphasis role="keywordtype">float</emphasis>&#32;InverseLerp(Vector3&#32;from,&#32;Vector3&#32;to,&#32;Vector3&#32;result)
+00070 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00071 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;Vector3.Dot(result&#32;-&#32;from,&#32;to&#32;-&#32;from);
+00072 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00073 
+00074 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keyword">static</emphasis>&#32;<emphasis role="keywordtype">float</emphasis>&#32;InverseLerp(<emphasis role="keywordtype">float</emphasis>&#32;from,&#32;<emphasis role="keywordtype">float</emphasis>&#32;to,&#32;<emphasis role="keywordtype">float</emphasis>&#32;result)
+00075 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00076 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;(result&#32;-&#32;from)&#32;/&#32;(to&#32;-&#32;from);
+00077 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00078 
+00079 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keyword">static</emphasis>&#32;<emphasis role="keywordtype">double</emphasis>&#32;InverseLerp(<emphasis role="keywordtype">double</emphasis>&#32;from,&#32;<emphasis role="keywordtype">double</emphasis>&#32;to,&#32;<emphasis role="keywordtype">double</emphasis>&#32;result)
+00080 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00081 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;(result&#32;-&#32;from)&#32;/&#32;(to&#32;-&#32;from);
+00082 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00083 
+00084 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keyword">static</emphasis>&#32;<emphasis role="keywordtype">float</emphasis>&#32;Saturate(<emphasis role="keywordtype">float</emphasis>&#32;A)
+00085 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00086 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;(A&#32;&lt;&#32;0)&#32;?&#32;0&#32;:&#32;(A&#32;&gt;&#32;1)&#32;?&#32;1&#32;:&#32;A;
+00087 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00088 
+00089 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keyword">static</emphasis>&#32;Vector2&#32;Saturate(Vector2&#32;A)
+00090 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00091 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;<emphasis role="keyword">new</emphasis>&#32;Vector2(Saturate(A.x),&#32;Saturate(A.y));
+00092 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00093 
+00094 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keyword">static</emphasis>&#32;Vector3&#32;Saturate(Vector3&#32;A)
+00095 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00096 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;<emphasis role="keyword">new</emphasis>&#32;Vector3(Saturate(A.x),&#32;Saturate(A.y),&#32;Saturate(A.z));
+00097 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00098 
+00099 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keyword">static</emphasis>&#32;<emphasis role="keywordtype">float</emphasis>&#32;Abs(<emphasis role="keywordtype">float</emphasis>&#32;A)
+00100 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00101 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;(A&#32;&lt;&#32;0)&#32;?&#32;-A&#32;:&#32;A;
+00102 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00103 
+00104 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keyword">static</emphasis>&#32;Vector2&#32;Abs(Vector2&#32;A)
+00105 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00106 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;<emphasis role="keyword">new</emphasis>&#32;Vector2(Abs(A.x),&#32;Abs(A.y));
+00107 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00108 
+00109 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keyword">static</emphasis>&#32;Vector3&#32;Abs(Vector3&#32;A)
+00110 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00111 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;<emphasis role="keyword">new</emphasis>&#32;Vector3(Abs(A.x),&#32;Abs(A.y),&#32;Abs(A.z));
+00112 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00113 
+00114 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;<emphasis role="keyword">static</emphasis>&#32;<emphasis role="keywordtype">float</emphasis>&#32;_copysign(<emphasis role="keywordtype">float</emphasis>&#32;sizeval,&#32;<emphasis role="keywordtype">float</emphasis>&#32;signval)
+00115 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00116 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;Mathf.Sign(signval)&#32;==&#32;1&#32;?&#32;Mathf.Abs(sizeval)&#32;:&#32;-Mathf.Abs(sizeval);
+00117 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00118 
+00119 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keyword">static</emphasis>&#32;Quaternion&#32;GetRotation(<emphasis role="keyword">this</emphasis>&#32;Matrix4x4&#32;matrix)
+00120 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00121 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;Quaternion&#32;q&#32;=&#32;<emphasis role="keyword">new</emphasis>&#32;Quaternion();
+00122 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;q.w&#32;=&#32;Mathf.Sqrt(Mathf.Max(0,&#32;1f&#32;+&#32;matrix.m00&#32;+&#32;matrix.m11&#32;+&#32;matrix.m22))&#32;/&#32;2f;
+00123 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;q.x&#32;=&#32;Mathf.Sqrt(Mathf.Max(0,&#32;1f&#32;+&#32;matrix.m00&#32;-&#32;matrix.m11&#32;-&#32;matrix.m22))&#32;/&#32;2f;
+00124 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;q.y&#32;=&#32;Mathf.Sqrt(Mathf.Max(0,&#32;1f&#32;-&#32;matrix.m00&#32;+&#32;matrix.m11&#32;-&#32;matrix.m22))&#32;/&#32;2f;
+00125 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;q.z&#32;=&#32;Mathf.Sqrt(Mathf.Max(0,&#32;1f&#32;-&#32;matrix.m00&#32;-&#32;matrix.m11&#32;+&#32;matrix.m22))&#32;/&#32;2f;
+00126 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;q.x&#32;=&#32;_copysign(q.x,&#32;matrix.m21&#32;-&#32;matrix.m12);
+00127 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;q.y&#32;=&#32;_copysign(q.y,&#32;matrix.m02&#32;-&#32;matrix.m20);
+00128 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;q.z&#32;=&#32;_copysign(q.z,&#32;matrix.m10&#32;-&#32;matrix.m01);
+00129 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;q;
+00130 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00131 
+00132 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keyword">static</emphasis>&#32;Vector3&#32;GetPosition(<emphasis role="keyword">this</emphasis>&#32;Matrix4x4&#32;matrix)
+00133 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00134 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordtype">float</emphasis>&#32;x&#32;=&#32;matrix.m03;
+00135 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordtype">float</emphasis>&#32;y&#32;=&#32;matrix.m13;
+00136 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordtype">float</emphasis>&#32;z&#32;=&#32;matrix.m23;
+00137 
+00138 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;<emphasis role="keyword">new</emphasis>&#32;Vector3(x,&#32;y,&#32;z);
+00139 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00140 
+00141 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keyword">static</emphasis>&#32;Vector3&#32;GetScale(<emphasis role="keyword">this</emphasis>&#32;Matrix4x4&#32;m)
+00142 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00143 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordtype">float</emphasis>&#32;x&#32;=&#32;Mathf.Sqrt(m.m00&#32;*&#32;m.m00&#32;+&#32;m.m01&#32;*&#32;m.m01&#32;+&#32;m.m02&#32;*&#32;m.m02);
+00144 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordtype">float</emphasis>&#32;y&#32;=&#32;Mathf.Sqrt(m.m10&#32;*&#32;m.m10&#32;+&#32;m.m11&#32;*&#32;m.m11&#32;+&#32;m.m12&#32;*&#32;m.m12);
+00145 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordtype">float</emphasis>&#32;z&#32;=&#32;Mathf.Sqrt(m.m20&#32;*&#32;m.m20&#32;+&#32;m.m21&#32;*&#32;m.m21&#32;+&#32;m.m22&#32;*&#32;m.m22);
+00146 
+00147 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;<emphasis role="keyword">new</emphasis>&#32;Vector3(x,&#32;y,&#32;z);
+00148 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00149 
+00150 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keyword">static</emphasis>&#32;Quaternion&#32;GetRotation(<link linkend="_struct_valve_1_1_v_r_1_1_hmd_matrix34__t">HmdMatrix34_t</link>&#32;matrix)
+00151 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00152 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;((matrix.<link linkend="_struct_valve_1_1_v_r_1_1_hmd_matrix34__t_1aa25b00363b6a05b9883b3d4b541c42f3">m2</link>&#32;!=&#32;0&#32;||&#32;matrix.<link linkend="_struct_valve_1_1_v_r_1_1_hmd_matrix34__t_1a6e34e038a74c8bf8a7f8c255b81e8655">m6</link>&#32;!=&#32;0&#32;||&#32;matrix.<link linkend="_struct_valve_1_1_v_r_1_1_hmd_matrix34__t_1a9dd6a3e4f4e4d9b2314e009e8e63f5f7">m10</link>&#32;!=&#32;0)&#32;&amp;&amp;&#32;(matrix.<link linkend="_struct_valve_1_1_v_r_1_1_hmd_matrix34__t_1a38aa08a6a6c6a064a9588fb3531b1ac3">m1</link>&#32;!=&#32;0&#32;||&#32;matrix.<link linkend="_struct_valve_1_1_v_r_1_1_hmd_matrix34__t_1a19d16ccfc915bd912873cca4b88d1382">m5</link>&#32;!=&#32;0&#32;||&#32;matrix.<link linkend="_struct_valve_1_1_v_r_1_1_hmd_matrix34__t_1aba4fb1da697d3479b2b7448b339f4b9f">m9</link>&#32;!=&#32;0))
+00153 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;Quaternion.LookRotation(<emphasis role="keyword">new</emphasis>&#32;Vector3(-matrix.<link linkend="_struct_valve_1_1_v_r_1_1_hmd_matrix34__t_1aa25b00363b6a05b9883b3d4b541c42f3">m2</link>,&#32;-matrix.<link linkend="_struct_valve_1_1_v_r_1_1_hmd_matrix34__t_1a6e34e038a74c8bf8a7f8c255b81e8655">m6</link>,&#32;matrix.<link linkend="_struct_valve_1_1_v_r_1_1_hmd_matrix34__t_1a9dd6a3e4f4e4d9b2314e009e8e63f5f7">m10</link>),&#32;<emphasis role="keyword">new</emphasis>&#32;Vector3(matrix.<link linkend="_struct_valve_1_1_v_r_1_1_hmd_matrix34__t_1a38aa08a6a6c6a064a9588fb3531b1ac3">m1</link>,&#32;matrix.<link linkend="_struct_valve_1_1_v_r_1_1_hmd_matrix34__t_1a19d16ccfc915bd912873cca4b88d1382">m5</link>,&#32;-matrix.<link linkend="_struct_valve_1_1_v_r_1_1_hmd_matrix34__t_1aba4fb1da697d3479b2b7448b339f4b9f">m9</link>));
+00154 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">else</emphasis>
+00155 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;Quaternion.identity;
+00156 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00157 
+00158 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keyword">static</emphasis>&#32;Vector3&#32;GetPosition(<link linkend="_struct_valve_1_1_v_r_1_1_hmd_matrix34__t">HmdMatrix34_t</link>&#32;matrix)
+00159 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00160 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;<emphasis role="keyword">new</emphasis>&#32;Vector3(matrix.<link linkend="_struct_valve_1_1_v_r_1_1_hmd_matrix34__t_1a6a12aa935ae6da5112d6ed918d8eac4a">m3</link>,&#32;matrix.<link linkend="_struct_valve_1_1_v_r_1_1_hmd_matrix34__t_1a08b45c75cf0c94816f48b6c4e0d4c897">m7</link>,&#32;-matrix.<link linkend="_struct_valve_1_1_v_r_1_1_hmd_matrix34__t_1a1bbdeba3d59213373857bbc96a1dadab">m11</link>);
+00161 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00162 
+00163 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;[System.Serializable]
+<anchor xml:id="__steam_v_r___utils_8cs_source_1l00164"/><link linkend="_struct_valve_1_1_v_r_1_1_steam_v_r___utils_1_1_rigid_transform">00164</link> &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keyword">struct&#32;</emphasis><link linkend="_struct_valve_1_1_v_r_1_1_steam_v_r___utils_1_1_rigid_transform">RigidTransform</link>
+00165 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+<anchor xml:id="__steam_v_r___utils_8cs_source_1l00166"/><link linkend="_struct_valve_1_1_v_r_1_1_steam_v_r___utils_1_1_rigid_transform_1a3cb425c3e4537084be54855b6651044e">00166</link> &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;Vector3&#32;<link linkend="_struct_valve_1_1_v_r_1_1_steam_v_r___utils_1_1_rigid_transform_1a3cb425c3e4537084be54855b6651044e">pos</link>;
+<anchor xml:id="__steam_v_r___utils_8cs_source_1l00167"/><link linkend="_struct_valve_1_1_v_r_1_1_steam_v_r___utils_1_1_rigid_transform_1aa5b8421bf162f9e958f753e08e24d584">00167</link> &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;Quaternion&#32;<link linkend="_struct_valve_1_1_v_r_1_1_steam_v_r___utils_1_1_rigid_transform_1aa5b8421bf162f9e958f753e08e24d584">rot</link>;
+00168 
+00169 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keyword">static</emphasis>&#32;<link linkend="_struct_valve_1_1_v_r_1_1_steam_v_r___utils_1_1_rigid_transform">RigidTransform</link>&#32;<link linkend="_struct_valve_1_1_v_r_1_1_steam_v_r___utils_1_1_rigid_transform_1a04aebe27625a29b885052af12c0dcf36">identity</link>
+<anchor xml:id="__steam_v_r___utils_8cs_source_1l00170"/><link linkend="_struct_valve_1_1_v_r_1_1_steam_v_r___utils_1_1_rigid_transform_1a04aebe27625a29b885052af12c0dcf36">00170</link> &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00171 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">get</emphasis>&#32;{&#32;<emphasis role="keywordflow">return</emphasis>&#32;<emphasis role="keyword">new</emphasis>&#32;<link linkend="_struct_valve_1_1_v_r_1_1_steam_v_r___utils_1_1_rigid_transform_1ac607cc418aa0f6395d0e063fe445ce6f">RigidTransform</link>(Vector3.zero,&#32;Quaternion.identity);&#32;}
+00172 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00173 
+<anchor xml:id="__steam_v_r___utils_8cs_source_1l00174"/><link linkend="_struct_valve_1_1_v_r_1_1_steam_v_r___utils_1_1_rigid_transform_1ab8c9c2c5f4c3317704b4969475099d53">00174</link> &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keyword">static</emphasis>&#32;<link linkend="_struct_valve_1_1_v_r_1_1_steam_v_r___utils_1_1_rigid_transform">RigidTransform</link>&#32;<link linkend="_struct_valve_1_1_v_r_1_1_steam_v_r___utils_1_1_rigid_transform_1ab8c9c2c5f4c3317704b4969475099d53">FromLocal</link>(Transform&#32;fromTransform)
+00175 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00176 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;<emphasis role="keyword">new</emphasis>&#32;<link linkend="_struct_valve_1_1_v_r_1_1_steam_v_r___utils_1_1_rigid_transform_1ac607cc418aa0f6395d0e063fe445ce6f">RigidTransform</link>(fromTransform.localPosition,&#32;fromTransform.localRotation);
+00177 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00178 
+<anchor xml:id="__steam_v_r___utils_8cs_source_1l00179"/><link linkend="_struct_valve_1_1_v_r_1_1_steam_v_r___utils_1_1_rigid_transform_1ac607cc418aa0f6395d0e063fe445ce6f">00179</link> &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<link linkend="_struct_valve_1_1_v_r_1_1_steam_v_r___utils_1_1_rigid_transform_1ac607cc418aa0f6395d0e063fe445ce6f">RigidTransform</link>(Vector3&#32;position,&#32;Quaternion&#32;rotation)
+00180 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00181 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;this.pos&#32;=&#32;position;
+00182 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;this.rot&#32;=&#32;rotation;
+00183 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00184 
+<anchor xml:id="__steam_v_r___utils_8cs_source_1l00185"/><link linkend="_struct_valve_1_1_v_r_1_1_steam_v_r___utils_1_1_rigid_transform_1aff474c4ea8978e70b0158d1392dafaef">00185</link> &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<link linkend="_struct_valve_1_1_v_r_1_1_steam_v_r___utils_1_1_rigid_transform_1aff474c4ea8978e70b0158d1392dafaef">RigidTransform</link>(Transform&#32;fromTransform)
+00186 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00187 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;this.pos&#32;=&#32;fromTransform.position;
+00188 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;this.rot&#32;=&#32;fromTransform.rotation;
+00189 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00190 
+<anchor xml:id="__steam_v_r___utils_8cs_source_1l00191"/><link linkend="_struct_valve_1_1_v_r_1_1_steam_v_r___utils_1_1_rigid_transform_1ae5cbef3eb23b3cc409e7cd5cae107612">00191</link> &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<link linkend="_struct_valve_1_1_v_r_1_1_steam_v_r___utils_1_1_rigid_transform_1ae5cbef3eb23b3cc409e7cd5cae107612">RigidTransform</link>(Transform&#32;from,&#32;Transform&#32;to)
+00192 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00193 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;Quaternion&#32;inverse&#32;=&#32;Quaternion.Inverse(from.rotation);
+00194 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_struct_valve_1_1_v_r_1_1_steam_v_r___utils_1_1_rigid_transform_1aa5b8421bf162f9e958f753e08e24d584">rot</link>&#32;=&#32;inverse&#32;*&#32;to.rotation;
+00195 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_struct_valve_1_1_v_r_1_1_steam_v_r___utils_1_1_rigid_transform_1a3cb425c3e4537084be54855b6651044e">pos</link>&#32;=&#32;inverse&#32;*&#32;(to.position&#32;-&#32;from.position);
+00196 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00197 
+<anchor xml:id="__steam_v_r___utils_8cs_source_1l00198"/><link linkend="_struct_valve_1_1_v_r_1_1_steam_v_r___utils_1_1_rigid_transform_1a16d19bec844269a7c8033425df723f9e">00198</link> &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<link linkend="_struct_valve_1_1_v_r_1_1_steam_v_r___utils_1_1_rigid_transform_1a16d19bec844269a7c8033425df723f9e">RigidTransform</link>(<link linkend="_struct_valve_1_1_v_r_1_1_hmd_matrix34__t">HmdMatrix34_t</link>&#32;pose)
+00199 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00200 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;Matrix4x4&#32;matrix&#32;=&#32;Matrix4x4.identity;
+00201 
+00202 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;matrix[0,&#32;0]&#32;=&#32;pose.<link linkend="_struct_valve_1_1_v_r_1_1_hmd_matrix34__t_1ae76083ee16462a47961bc62b55ec95dd">m0</link>;
+00203 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;matrix[0,&#32;1]&#32;=&#32;pose.<link linkend="_struct_valve_1_1_v_r_1_1_hmd_matrix34__t_1a38aa08a6a6c6a064a9588fb3531b1ac3">m1</link>;
+00204 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;matrix[0,&#32;2]&#32;=&#32;-pose.<link linkend="_struct_valve_1_1_v_r_1_1_hmd_matrix34__t_1aa25b00363b6a05b9883b3d4b541c42f3">m2</link>;
+00205 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;matrix[0,&#32;3]&#32;=&#32;pose.<link linkend="_struct_valve_1_1_v_r_1_1_hmd_matrix34__t_1a6a12aa935ae6da5112d6ed918d8eac4a">m3</link>;
+00206 
+00207 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;matrix[1,&#32;0]&#32;=&#32;pose.<link linkend="_struct_valve_1_1_v_r_1_1_hmd_matrix34__t_1aa1b3ad4cfe8455c6f1d303832e69cb9b">m4</link>;
+00208 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;matrix[1,&#32;1]&#32;=&#32;pose.<link linkend="_struct_valve_1_1_v_r_1_1_hmd_matrix34__t_1a19d16ccfc915bd912873cca4b88d1382">m5</link>;
+00209 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;matrix[1,&#32;2]&#32;=&#32;-pose.<link linkend="_struct_valve_1_1_v_r_1_1_hmd_matrix34__t_1a6e34e038a74c8bf8a7f8c255b81e8655">m6</link>;
+00210 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;matrix[1,&#32;3]&#32;=&#32;pose.<link linkend="_struct_valve_1_1_v_r_1_1_hmd_matrix34__t_1a08b45c75cf0c94816f48b6c4e0d4c897">m7</link>;
+00211 
+00212 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;matrix[2,&#32;0]&#32;=&#32;-pose.<link linkend="_struct_valve_1_1_v_r_1_1_hmd_matrix34__t_1ab5972fa50a970adab621719b9aaa47bf">m8</link>;
+00213 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;matrix[2,&#32;1]&#32;=&#32;-pose.<link linkend="_struct_valve_1_1_v_r_1_1_hmd_matrix34__t_1aba4fb1da697d3479b2b7448b339f4b9f">m9</link>;
+00214 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;matrix[2,&#32;2]&#32;=&#32;pose.<link linkend="_struct_valve_1_1_v_r_1_1_hmd_matrix34__t_1a9dd6a3e4f4e4d9b2314e009e8e63f5f7">m10</link>;
+00215 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;matrix[2,&#32;3]&#32;=&#32;-pose.<link linkend="_struct_valve_1_1_v_r_1_1_hmd_matrix34__t_1a1bbdeba3d59213373857bbc96a1dadab">m11</link>;
+00216 
+00217 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;this.pos&#32;=&#32;matrix.GetPosition();
+00218 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;this.rot&#32;=&#32;matrix.GetRotation();
+00219 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00220 
+<anchor xml:id="__steam_v_r___utils_8cs_source_1l00221"/><link linkend="_struct_valve_1_1_v_r_1_1_steam_v_r___utils_1_1_rigid_transform_1a319494a450bd550d813b067e5b52a118">00221</link> &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<link linkend="_struct_valve_1_1_v_r_1_1_steam_v_r___utils_1_1_rigid_transform_1a319494a450bd550d813b067e5b52a118">RigidTransform</link>(<link linkend="_struct_valve_1_1_v_r_1_1_hmd_matrix44__t">HmdMatrix44_t</link>&#32;pose)
+00222 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00223 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;Matrix4x4&#32;matrix&#32;=&#32;Matrix4x4.identity;
+00224 
+00225 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;matrix[0,&#32;0]&#32;=&#32;pose.<link linkend="_struct_valve_1_1_v_r_1_1_hmd_matrix44__t_1ac7415074ac2056e88a2bfaa8c48f572b">m0</link>;
+00226 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;matrix[0,&#32;1]&#32;=&#32;pose.<link linkend="_struct_valve_1_1_v_r_1_1_hmd_matrix44__t_1addd17bf0232e37474bd0ef94307fc5e4">m1</link>;
+00227 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;matrix[0,&#32;2]&#32;=&#32;-pose.<link linkend="_struct_valve_1_1_v_r_1_1_hmd_matrix44__t_1a623b56e2310354c7670c0c085bc08a60">m2</link>;
+00228 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;matrix[0,&#32;3]&#32;=&#32;pose.<link linkend="_struct_valve_1_1_v_r_1_1_hmd_matrix44__t_1aacd57b61c96ae9ff0c82ada912fb96db">m3</link>;
+00229 
+00230 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;matrix[1,&#32;0]&#32;=&#32;pose.<link linkend="_struct_valve_1_1_v_r_1_1_hmd_matrix44__t_1a38ddbd33c3d5466225abdda840ec1707">m4</link>;
+00231 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;matrix[1,&#32;1]&#32;=&#32;pose.<link linkend="_struct_valve_1_1_v_r_1_1_hmd_matrix44__t_1a5c7c3820f0e9ee3c79ca24c8940e4eac">m5</link>;
+00232 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;matrix[1,&#32;2]&#32;=&#32;-pose.<link linkend="_struct_valve_1_1_v_r_1_1_hmd_matrix44__t_1afcbbd6201f4a3c806eaab010e5a873d2">m6</link>;
+00233 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;matrix[1,&#32;3]&#32;=&#32;pose.<link linkend="_struct_valve_1_1_v_r_1_1_hmd_matrix44__t_1a1305972ecdd66f0bf954cb35590321cc">m7</link>;
+00234 
+00235 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;matrix[2,&#32;0]&#32;=&#32;-pose.<link linkend="_struct_valve_1_1_v_r_1_1_hmd_matrix44__t_1a511aa10c352b4ea8ef75052d9dfbb7d1">m8</link>;
+00236 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;matrix[2,&#32;1]&#32;=&#32;-pose.<link linkend="_struct_valve_1_1_v_r_1_1_hmd_matrix44__t_1a933f53f7b2c1e6db489605c6ac024e58">m9</link>;
+00237 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;matrix[2,&#32;2]&#32;=&#32;pose.<link linkend="_struct_valve_1_1_v_r_1_1_hmd_matrix44__t_1a4d8951c3477de60abc41090d7bc792d1">m10</link>;
+00238 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;matrix[2,&#32;3]&#32;=&#32;-pose.<link linkend="_struct_valve_1_1_v_r_1_1_hmd_matrix44__t_1a258861d83965fb6a82db132af122d767">m11</link>;
+00239 
+00240 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;matrix[3,&#32;0]&#32;=&#32;pose.<link linkend="_struct_valve_1_1_v_r_1_1_hmd_matrix44__t_1ac1f26f10152d062727c6f57dcae40208">m12</link>;
+00241 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;matrix[3,&#32;1]&#32;=&#32;pose.<link linkend="_struct_valve_1_1_v_r_1_1_hmd_matrix44__t_1a7cec361d99840f28dfc9cfacd3216ac0">m13</link>;
+00242 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;matrix[3,&#32;2]&#32;=&#32;-pose.<link linkend="_struct_valve_1_1_v_r_1_1_hmd_matrix44__t_1a82a7dd3a81f94aca6c74c1e0a45dc0a3">m14</link>;
+00243 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;matrix[3,&#32;3]&#32;=&#32;pose.<link linkend="_struct_valve_1_1_v_r_1_1_hmd_matrix44__t_1a14c67118676ea7c8bed5909b6c19e25d">m15</link>;
+00244 
+00245 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;this.pos&#32;=&#32;matrix.GetPosition();
+00246 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;this.rot&#32;=&#32;matrix.GetRotation();
+00247 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00248 
+<anchor xml:id="__steam_v_r___utils_8cs_source_1l00249"/><link linkend="_struct_valve_1_1_v_r_1_1_steam_v_r___utils_1_1_rigid_transform_1a61d4c42b4c657c8fbe6722ea001ada9b">00249</link> &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<link linkend="_struct_valve_1_1_v_r_1_1_hmd_matrix44__t">HmdMatrix44_t</link>&#32;<link linkend="_struct_valve_1_1_v_r_1_1_steam_v_r___utils_1_1_rigid_transform_1a61d4c42b4c657c8fbe6722ea001ada9b">ToHmdMatrix44</link>()
+00250 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00251 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;Matrix4x4&#32;matrix&#32;=&#32;Matrix4x4.TRS(<link linkend="_struct_valve_1_1_v_r_1_1_steam_v_r___utils_1_1_rigid_transform_1a3cb425c3e4537084be54855b6651044e">pos</link>,&#32;<link linkend="_struct_valve_1_1_v_r_1_1_steam_v_r___utils_1_1_rigid_transform_1aa5b8421bf162f9e958f753e08e24d584">rot</link>,&#32;Vector3.one);
+00252 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_struct_valve_1_1_v_r_1_1_hmd_matrix44__t">HmdMatrix44_t</link>&#32;pose&#32;=&#32;<emphasis role="keyword">new</emphasis>&#32;<link linkend="_struct_valve_1_1_v_r_1_1_hmd_matrix44__t">HmdMatrix44_t</link>();
+00253 
+00254 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;pose.<link linkend="_struct_valve_1_1_v_r_1_1_hmd_matrix44__t_1ac7415074ac2056e88a2bfaa8c48f572b">m0</link>&#32;=&#32;matrix[0,&#32;0];
+00255 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;pose.<link linkend="_struct_valve_1_1_v_r_1_1_hmd_matrix44__t_1addd17bf0232e37474bd0ef94307fc5e4">m1</link>&#32;=&#32;matrix[0,&#32;1];
+00256 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;pose.<link linkend="_struct_valve_1_1_v_r_1_1_hmd_matrix44__t_1a623b56e2310354c7670c0c085bc08a60">m2</link>&#32;=&#32;-matrix[0,&#32;2];
+00257 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;pose.<link linkend="_struct_valve_1_1_v_r_1_1_hmd_matrix44__t_1aacd57b61c96ae9ff0c82ada912fb96db">m3</link>&#32;=&#32;matrix[0,&#32;3];
+00258 
+00259 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;pose.<link linkend="_struct_valve_1_1_v_r_1_1_hmd_matrix44__t_1a38ddbd33c3d5466225abdda840ec1707">m4</link>&#32;=&#32;matrix[1,&#32;0];
+00260 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;pose.<link linkend="_struct_valve_1_1_v_r_1_1_hmd_matrix44__t_1a5c7c3820f0e9ee3c79ca24c8940e4eac">m5</link>&#32;=&#32;matrix[1,&#32;1];
+00261 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;pose.<link linkend="_struct_valve_1_1_v_r_1_1_hmd_matrix44__t_1afcbbd6201f4a3c806eaab010e5a873d2">m6</link>&#32;=&#32;-matrix[1,&#32;2];
+00262 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;pose.<link linkend="_struct_valve_1_1_v_r_1_1_hmd_matrix44__t_1a1305972ecdd66f0bf954cb35590321cc">m7</link>&#32;=&#32;matrix[1,&#32;3];
+00263 
+00264 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;pose.<link linkend="_struct_valve_1_1_v_r_1_1_hmd_matrix44__t_1a511aa10c352b4ea8ef75052d9dfbb7d1">m8</link>&#32;=&#32;-matrix[2,&#32;0];
+00265 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;pose.<link linkend="_struct_valve_1_1_v_r_1_1_hmd_matrix44__t_1a933f53f7b2c1e6db489605c6ac024e58">m9</link>&#32;=&#32;-matrix[2,&#32;1];
+00266 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;pose.<link linkend="_struct_valve_1_1_v_r_1_1_hmd_matrix44__t_1a4d8951c3477de60abc41090d7bc792d1">m10</link>&#32;=&#32;matrix[2,&#32;2];
+00267 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;pose.<link linkend="_struct_valve_1_1_v_r_1_1_hmd_matrix44__t_1a258861d83965fb6a82db132af122d767">m11</link>&#32;=&#32;-matrix[2,&#32;3];
+00268 
+00269 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;pose.<link linkend="_struct_valve_1_1_v_r_1_1_hmd_matrix44__t_1ac1f26f10152d062727c6f57dcae40208">m12</link>&#32;=&#32;matrix[3,&#32;0];
+00270 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;pose.<link linkend="_struct_valve_1_1_v_r_1_1_hmd_matrix44__t_1a7cec361d99840f28dfc9cfacd3216ac0">m13</link>&#32;=&#32;matrix[3,&#32;1];
+00271 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;pose.<link linkend="_struct_valve_1_1_v_r_1_1_hmd_matrix44__t_1a82a7dd3a81f94aca6c74c1e0a45dc0a3">m14</link>&#32;=&#32;-matrix[3,&#32;2];
+00272 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;pose.<link linkend="_struct_valve_1_1_v_r_1_1_hmd_matrix44__t_1a14c67118676ea7c8bed5909b6c19e25d">m15</link>&#32;=&#32;matrix[3,&#32;3];
+00273 
+00274 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;pose;
+00275 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00276 
+<anchor xml:id="__steam_v_r___utils_8cs_source_1l00277"/><link linkend="_struct_valve_1_1_v_r_1_1_steam_v_r___utils_1_1_rigid_transform_1a6f239f71cb7465d26cd782037a31f4b9">00277</link> &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<link linkend="_struct_valve_1_1_v_r_1_1_hmd_matrix34__t">HmdMatrix34_t</link>&#32;<link linkend="_struct_valve_1_1_v_r_1_1_steam_v_r___utils_1_1_rigid_transform_1a6f239f71cb7465d26cd782037a31f4b9">ToHmdMatrix34</link>()
+00278 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00279 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;Matrix4x4&#32;matrix&#32;=&#32;Matrix4x4.TRS(<link linkend="_struct_valve_1_1_v_r_1_1_steam_v_r___utils_1_1_rigid_transform_1a3cb425c3e4537084be54855b6651044e">pos</link>,&#32;<link linkend="_struct_valve_1_1_v_r_1_1_steam_v_r___utils_1_1_rigid_transform_1aa5b8421bf162f9e958f753e08e24d584">rot</link>,&#32;Vector3.one);
+00280 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_struct_valve_1_1_v_r_1_1_hmd_matrix34__t">HmdMatrix34_t</link>&#32;pose&#32;=&#32;<emphasis role="keyword">new</emphasis>&#32;<link linkend="_struct_valve_1_1_v_r_1_1_hmd_matrix34__t">HmdMatrix34_t</link>();
+00281 
+00282 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;pose.<link linkend="_struct_valve_1_1_v_r_1_1_hmd_matrix34__t_1ae76083ee16462a47961bc62b55ec95dd">m0</link>&#32;=&#32;matrix[0,&#32;0];
+00283 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;pose.<link linkend="_struct_valve_1_1_v_r_1_1_hmd_matrix34__t_1a38aa08a6a6c6a064a9588fb3531b1ac3">m1</link>&#32;=&#32;matrix[0,&#32;1];
+00284 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;pose.<link linkend="_struct_valve_1_1_v_r_1_1_hmd_matrix34__t_1aa25b00363b6a05b9883b3d4b541c42f3">m2</link>&#32;=&#32;-matrix[0,&#32;2];
+00285 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;pose.<link linkend="_struct_valve_1_1_v_r_1_1_hmd_matrix34__t_1a6a12aa935ae6da5112d6ed918d8eac4a">m3</link>&#32;=&#32;matrix[0,&#32;3];
+00286 
+00287 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;pose.<link linkend="_struct_valve_1_1_v_r_1_1_hmd_matrix34__t_1aa1b3ad4cfe8455c6f1d303832e69cb9b">m4</link>&#32;=&#32;matrix[1,&#32;0];
+00288 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;pose.<link linkend="_struct_valve_1_1_v_r_1_1_hmd_matrix34__t_1a19d16ccfc915bd912873cca4b88d1382">m5</link>&#32;=&#32;matrix[1,&#32;1];
+00289 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;pose.<link linkend="_struct_valve_1_1_v_r_1_1_hmd_matrix34__t_1a6e34e038a74c8bf8a7f8c255b81e8655">m6</link>&#32;=&#32;-matrix[1,&#32;2];
+00290 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;pose.<link linkend="_struct_valve_1_1_v_r_1_1_hmd_matrix34__t_1a08b45c75cf0c94816f48b6c4e0d4c897">m7</link>&#32;=&#32;matrix[1,&#32;3];
+00291 
+00292 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;pose.<link linkend="_struct_valve_1_1_v_r_1_1_hmd_matrix34__t_1ab5972fa50a970adab621719b9aaa47bf">m8</link>&#32;=&#32;-matrix[2,&#32;0];
+00293 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;pose.<link linkend="_struct_valve_1_1_v_r_1_1_hmd_matrix34__t_1aba4fb1da697d3479b2b7448b339f4b9f">m9</link>&#32;=&#32;-matrix[2,&#32;1];
+00294 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;pose.<link linkend="_struct_valve_1_1_v_r_1_1_hmd_matrix34__t_1a9dd6a3e4f4e4d9b2314e009e8e63f5f7">m10</link>&#32;=&#32;matrix[2,&#32;2];
+00295 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;pose.<link linkend="_struct_valve_1_1_v_r_1_1_hmd_matrix34__t_1a1bbdeba3d59213373857bbc96a1dadab">m11</link>&#32;=&#32;-matrix[2,&#32;3];
+00296 
+00297 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;pose;
+00298 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00299 
+<anchor xml:id="__steam_v_r___utils_8cs_source_1l00300"/><link linkend="_struct_valve_1_1_v_r_1_1_steam_v_r___utils_1_1_rigid_transform_1ae5da80c745e0b9f2736a0c5f5b526b2c">00300</link> &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keyword">override</emphasis>&#32;<emphasis role="keywordtype">bool</emphasis>&#32;<link linkend="_struct_valve_1_1_v_r_1_1_steam_v_r___utils_1_1_rigid_transform_1ae5da80c745e0b9f2736a0c5f5b526b2c">Equals</link>(<emphasis role="keywordtype">object</emphasis>&#32;other)
+00301 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00302 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(other&#32;is&#32;<link linkend="_struct_valve_1_1_v_r_1_1_steam_v_r___utils_1_1_rigid_transform">RigidTransform</link>)
+00303 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00304 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_struct_valve_1_1_v_r_1_1_steam_v_r___utils_1_1_rigid_transform">RigidTransform</link>&#32;t&#32;=&#32;(<link linkend="_struct_valve_1_1_v_r_1_1_steam_v_r___utils_1_1_rigid_transform_1ac607cc418aa0f6395d0e063fe445ce6f">RigidTransform</link>)other;
+00305 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;<link linkend="_struct_valve_1_1_v_r_1_1_steam_v_r___utils_1_1_rigid_transform_1a3cb425c3e4537084be54855b6651044e">pos</link>&#32;==&#32;t.<link linkend="_struct_valve_1_1_v_r_1_1_steam_v_r___utils_1_1_rigid_transform_1a3cb425c3e4537084be54855b6651044e">pos</link>&#32;&amp;&amp;&#32;<link linkend="_struct_valve_1_1_v_r_1_1_steam_v_r___utils_1_1_rigid_transform_1aa5b8421bf162f9e958f753e08e24d584">rot</link>&#32;==&#32;t.<link linkend="_struct_valve_1_1_v_r_1_1_steam_v_r___utils_1_1_rigid_transform_1aa5b8421bf162f9e958f753e08e24d584">rot</link>;
+00306 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00307 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;<emphasis role="keyword">false</emphasis>;
+00308 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00309 
+<anchor xml:id="__steam_v_r___utils_8cs_source_1l00310"/><link linkend="_struct_valve_1_1_v_r_1_1_steam_v_r___utils_1_1_rigid_transform_1a8244c59a681ae8e0d5c5c04799e465d5">00310</link> &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keyword">override</emphasis>&#32;<emphasis role="keywordtype">int</emphasis>&#32;<link linkend="_struct_valve_1_1_v_r_1_1_steam_v_r___utils_1_1_rigid_transform_1a8244c59a681ae8e0d5c5c04799e465d5">GetHashCode</link>()
+00311 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00312 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;<link linkend="_struct_valve_1_1_v_r_1_1_steam_v_r___utils_1_1_rigid_transform_1a3cb425c3e4537084be54855b6651044e">pos</link>.GetHashCode()&#32;^&#32;<link linkend="_struct_valve_1_1_v_r_1_1_steam_v_r___utils_1_1_rigid_transform_1aa5b8421bf162f9e958f753e08e24d584">rot</link>.GetHashCode();
+00313 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00314 
+<anchor xml:id="__steam_v_r___utils_8cs_source_1l00315"/><link linkend="_struct_valve_1_1_v_r_1_1_steam_v_r___utils_1_1_rigid_transform_1a80039f648bd317d1834312fcfdf05bf7">00315</link> &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keyword">static</emphasis>&#32;<emphasis role="keywordtype">bool</emphasis>&#32;<link linkend="_struct_valve_1_1_v_r_1_1_steam_v_r___utils_1_1_rigid_transform_1a80039f648bd317d1834312fcfdf05bf7">operator ==</link>(<link linkend="_struct_valve_1_1_v_r_1_1_steam_v_r___utils_1_1_rigid_transform">RigidTransform</link>&#32;a,&#32;<link linkend="_struct_valve_1_1_v_r_1_1_steam_v_r___utils_1_1_rigid_transform">RigidTransform</link>&#32;b)
+00316 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00317 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;a.<link linkend="_struct_valve_1_1_v_r_1_1_steam_v_r___utils_1_1_rigid_transform_1a3cb425c3e4537084be54855b6651044e">pos</link>&#32;==&#32;b.<link linkend="_struct_valve_1_1_v_r_1_1_steam_v_r___utils_1_1_rigid_transform_1a3cb425c3e4537084be54855b6651044e">pos</link>&#32;&amp;&amp;&#32;a.<link linkend="_struct_valve_1_1_v_r_1_1_steam_v_r___utils_1_1_rigid_transform_1aa5b8421bf162f9e958f753e08e24d584">rot</link>&#32;==&#32;b.<link linkend="_struct_valve_1_1_v_r_1_1_steam_v_r___utils_1_1_rigid_transform_1aa5b8421bf162f9e958f753e08e24d584">rot</link>;
+00318 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00319 
+<anchor xml:id="__steam_v_r___utils_8cs_source_1l00320"/><link linkend="_struct_valve_1_1_v_r_1_1_steam_v_r___utils_1_1_rigid_transform_1a44fa2a41bcc6cbcb0bb24fbe124dde02">00320</link> &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keyword">static</emphasis>&#32;<emphasis role="keywordtype">bool</emphasis>&#32;<link linkend="_struct_valve_1_1_v_r_1_1_steam_v_r___utils_1_1_rigid_transform_1a44fa2a41bcc6cbcb0bb24fbe124dde02">operator !=</link>(<link linkend="_struct_valve_1_1_v_r_1_1_steam_v_r___utils_1_1_rigid_transform">RigidTransform</link>&#32;a,&#32;<link linkend="_struct_valve_1_1_v_r_1_1_steam_v_r___utils_1_1_rigid_transform">RigidTransform</link>&#32;b)
+00321 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00322 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;a.<link linkend="_struct_valve_1_1_v_r_1_1_steam_v_r___utils_1_1_rigid_transform_1a3cb425c3e4537084be54855b6651044e">pos</link>&#32;!=&#32;b.<link linkend="_struct_valve_1_1_v_r_1_1_steam_v_r___utils_1_1_rigid_transform_1a3cb425c3e4537084be54855b6651044e">pos</link>&#32;||&#32;a.<link linkend="_struct_valve_1_1_v_r_1_1_steam_v_r___utils_1_1_rigid_transform_1aa5b8421bf162f9e958f753e08e24d584">rot</link>&#32;!=&#32;b.<link linkend="_struct_valve_1_1_v_r_1_1_steam_v_r___utils_1_1_rigid_transform_1aa5b8421bf162f9e958f753e08e24d584">rot</link>;
+00323 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00324 
+<anchor xml:id="__steam_v_r___utils_8cs_source_1l00325"/><link linkend="_struct_valve_1_1_v_r_1_1_steam_v_r___utils_1_1_rigid_transform_1af46cff34764cf27ee72c5d0c8412f321">00325</link> &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keyword">static</emphasis>&#32;<link linkend="_struct_valve_1_1_v_r_1_1_steam_v_r___utils_1_1_rigid_transform">RigidTransform</link>&#32;<link linkend="_struct_valve_1_1_v_r_1_1_steam_v_r___utils_1_1_rigid_transform_1af46cff34764cf27ee72c5d0c8412f321">operator *</link>(<link linkend="_struct_valve_1_1_v_r_1_1_steam_v_r___utils_1_1_rigid_transform">RigidTransform</link>&#32;a,&#32;<link linkend="_struct_valve_1_1_v_r_1_1_steam_v_r___utils_1_1_rigid_transform">RigidTransform</link>&#32;b)
+00326 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00327 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;<emphasis role="keyword">new</emphasis>&#32;<link linkend="_struct_valve_1_1_v_r_1_1_steam_v_r___utils_1_1_rigid_transform">RigidTransform</link>
+00328 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00329 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_struct_valve_1_1_v_r_1_1_steam_v_r___utils_1_1_rigid_transform_1aa5b8421bf162f9e958f753e08e24d584">rot</link>&#32;=&#32;a.<link linkend="_struct_valve_1_1_v_r_1_1_steam_v_r___utils_1_1_rigid_transform_1aa5b8421bf162f9e958f753e08e24d584">rot</link>&#32;*&#32;b.<link linkend="_struct_valve_1_1_v_r_1_1_steam_v_r___utils_1_1_rigid_transform_1aa5b8421bf162f9e958f753e08e24d584">rot</link>,
+00330 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_struct_valve_1_1_v_r_1_1_steam_v_r___utils_1_1_rigid_transform_1a3cb425c3e4537084be54855b6651044e">pos</link>&#32;=&#32;a.<link linkend="_struct_valve_1_1_v_r_1_1_steam_v_r___utils_1_1_rigid_transform_1a3cb425c3e4537084be54855b6651044e">pos</link>&#32;+&#32;a.<link linkend="_struct_valve_1_1_v_r_1_1_steam_v_r___utils_1_1_rigid_transform_1aa5b8421bf162f9e958f753e08e24d584">rot</link>&#32;*&#32;b.<link linkend="_struct_valve_1_1_v_r_1_1_steam_v_r___utils_1_1_rigid_transform_1a3cb425c3e4537084be54855b6651044e">pos</link>
+00331 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;};
+00332 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00333 
+<anchor xml:id="__steam_v_r___utils_8cs_source_1l00334"/><link linkend="_struct_valve_1_1_v_r_1_1_steam_v_r___utils_1_1_rigid_transform_1a106ce58b5e6dfafcad9bd06582ed58f4">00334</link> &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;<link linkend="_struct_valve_1_1_v_r_1_1_steam_v_r___utils_1_1_rigid_transform_1a106ce58b5e6dfafcad9bd06582ed58f4">Inverse</link>()
+00335 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00336 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_struct_valve_1_1_v_r_1_1_steam_v_r___utils_1_1_rigid_transform_1aa5b8421bf162f9e958f753e08e24d584">rot</link>&#32;=&#32;Quaternion.Inverse(<link linkend="_struct_valve_1_1_v_r_1_1_steam_v_r___utils_1_1_rigid_transform_1aa5b8421bf162f9e958f753e08e24d584">rot</link>);
+00337 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_struct_valve_1_1_v_r_1_1_steam_v_r___utils_1_1_rigid_transform_1a3cb425c3e4537084be54855b6651044e">pos</link>&#32;=&#32;-(<link linkend="_struct_valve_1_1_v_r_1_1_steam_v_r___utils_1_1_rigid_transform_1aa5b8421bf162f9e958f753e08e24d584">rot</link>&#32;*&#32;<link linkend="_struct_valve_1_1_v_r_1_1_steam_v_r___utils_1_1_rigid_transform_1a3cb425c3e4537084be54855b6651044e">pos</link>);
+00338 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00339 
+<anchor xml:id="__steam_v_r___utils_8cs_source_1l00340"/><link linkend="_struct_valve_1_1_v_r_1_1_steam_v_r___utils_1_1_rigid_transform_1ae198207c3c7e330ecdd0316ce8433a36">00340</link> &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<link linkend="_struct_valve_1_1_v_r_1_1_steam_v_r___utils_1_1_rigid_transform">RigidTransform</link>&#32;<link linkend="_struct_valve_1_1_v_r_1_1_steam_v_r___utils_1_1_rigid_transform_1ae198207c3c7e330ecdd0316ce8433a36">GetInverse</link>()
+00341 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00342 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_struct_valve_1_1_v_r_1_1_steam_v_r___utils_1_1_rigid_transform">RigidTransform</link>&#32;transform&#32;=&#32;<emphasis role="keyword">new</emphasis>&#32;<link linkend="_struct_valve_1_1_v_r_1_1_steam_v_r___utils_1_1_rigid_transform_1ac607cc418aa0f6395d0e063fe445ce6f">RigidTransform</link>(<link linkend="_struct_valve_1_1_v_r_1_1_steam_v_r___utils_1_1_rigid_transform_1a3cb425c3e4537084be54855b6651044e">pos</link>,&#32;<link linkend="_struct_valve_1_1_v_r_1_1_steam_v_r___utils_1_1_rigid_transform_1aa5b8421bf162f9e958f753e08e24d584">rot</link>);
+00343 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;transform.<link linkend="_struct_valve_1_1_v_r_1_1_steam_v_r___utils_1_1_rigid_transform_1a106ce58b5e6dfafcad9bd06582ed58f4">Inverse</link>();
+00344 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;transform;
+00345 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00346 
+<anchor xml:id="__steam_v_r___utils_8cs_source_1l00347"/><link linkend="_struct_valve_1_1_v_r_1_1_steam_v_r___utils_1_1_rigid_transform_1a0f88b4b4ca8321ad9c2c1d0cc5f91a4e">00347</link> &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;<link linkend="_struct_valve_1_1_v_r_1_1_steam_v_r___utils_1_1_rigid_transform_1a0f88b4b4ca8321ad9c2c1d0cc5f91a4e">Multiply</link>(<link linkend="_struct_valve_1_1_v_r_1_1_steam_v_r___utils_1_1_rigid_transform">RigidTransform</link>&#32;a,&#32;<link linkend="_struct_valve_1_1_v_r_1_1_steam_v_r___utils_1_1_rigid_transform">RigidTransform</link>&#32;b)
+00348 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00349 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_struct_valve_1_1_v_r_1_1_steam_v_r___utils_1_1_rigid_transform_1aa5b8421bf162f9e958f753e08e24d584">rot</link>&#32;=&#32;a.<link linkend="_struct_valve_1_1_v_r_1_1_steam_v_r___utils_1_1_rigid_transform_1aa5b8421bf162f9e958f753e08e24d584">rot</link>&#32;*&#32;b.<link linkend="_struct_valve_1_1_v_r_1_1_steam_v_r___utils_1_1_rigid_transform_1aa5b8421bf162f9e958f753e08e24d584">rot</link>;
+00350 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_struct_valve_1_1_v_r_1_1_steam_v_r___utils_1_1_rigid_transform_1a3cb425c3e4537084be54855b6651044e">pos</link>&#32;=&#32;a.<link linkend="_struct_valve_1_1_v_r_1_1_steam_v_r___utils_1_1_rigid_transform_1a3cb425c3e4537084be54855b6651044e">pos</link>&#32;+&#32;a.<link linkend="_struct_valve_1_1_v_r_1_1_steam_v_r___utils_1_1_rigid_transform_1aa5b8421bf162f9e958f753e08e24d584">rot</link>&#32;*&#32;b.<link linkend="_struct_valve_1_1_v_r_1_1_steam_v_r___utils_1_1_rigid_transform_1a3cb425c3e4537084be54855b6651044e">pos</link>;
+00351 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00352 
+<anchor xml:id="__steam_v_r___utils_8cs_source_1l00353"/><link linkend="_struct_valve_1_1_v_r_1_1_steam_v_r___utils_1_1_rigid_transform_1ae2edc8248d2ca9ca303e5b8157665b33">00353</link> &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;Vector3&#32;<link linkend="_struct_valve_1_1_v_r_1_1_steam_v_r___utils_1_1_rigid_transform_1ae2edc8248d2ca9ca303e5b8157665b33">InverseTransformPoint</link>(Vector3&#32;point)
+00354 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00355 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;Quaternion.Inverse(<link linkend="_struct_valve_1_1_v_r_1_1_steam_v_r___utils_1_1_rigid_transform_1aa5b8421bf162f9e958f753e08e24d584">rot</link>)&#32;*&#32;(point&#32;-&#32;<link linkend="_struct_valve_1_1_v_r_1_1_steam_v_r___utils_1_1_rigid_transform_1a3cb425c3e4537084be54855b6651044e">pos</link>);
+00356 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00357 
+<anchor xml:id="__steam_v_r___utils_8cs_source_1l00358"/><link linkend="_struct_valve_1_1_v_r_1_1_steam_v_r___utils_1_1_rigid_transform_1a557949d44b1c3996dc3b1a74fbdd49dc">00358</link> &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;Vector3&#32;<link linkend="_struct_valve_1_1_v_r_1_1_steam_v_r___utils_1_1_rigid_transform_1a557949d44b1c3996dc3b1a74fbdd49dc">TransformPoint</link>(Vector3&#32;point)
+00359 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00360 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;<link linkend="_struct_valve_1_1_v_r_1_1_steam_v_r___utils_1_1_rigid_transform_1a3cb425c3e4537084be54855b6651044e">pos</link>&#32;+&#32;(<link linkend="_struct_valve_1_1_v_r_1_1_steam_v_r___utils_1_1_rigid_transform_1aa5b8421bf162f9e958f753e08e24d584">rot</link>&#32;*&#32;point);
+00361 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00362 
+<anchor xml:id="__steam_v_r___utils_8cs_source_1l00363"/><link linkend="_struct_valve_1_1_v_r_1_1_steam_v_r___utils_1_1_rigid_transform_1ab1bec4ee6ae6e7efe88a659f82760b93">00363</link> &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keyword">static</emphasis>&#32;Vector3&#32;<link linkend="_struct_valve_1_1_v_r_1_1_steam_v_r___utils_1_1_rigid_transform_1ab1bec4ee6ae6e7efe88a659f82760b93">operator *</link>(<link linkend="_struct_valve_1_1_v_r_1_1_steam_v_r___utils_1_1_rigid_transform">RigidTransform</link>&#32;t,&#32;Vector3&#32;v)
+00364 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00365 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;t.<link linkend="_struct_valve_1_1_v_r_1_1_steam_v_r___utils_1_1_rigid_transform_1a557949d44b1c3996dc3b1a74fbdd49dc">TransformPoint</link>(v);
+00366 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00367 
+<anchor xml:id="__steam_v_r___utils_8cs_source_1l00368"/><link linkend="_struct_valve_1_1_v_r_1_1_steam_v_r___utils_1_1_rigid_transform_1a28850c000b7c770cc2a1ef635b089873">00368</link> &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keyword">static</emphasis>&#32;<link linkend="_struct_valve_1_1_v_r_1_1_steam_v_r___utils_1_1_rigid_transform">RigidTransform</link>&#32;<link linkend="_struct_valve_1_1_v_r_1_1_steam_v_r___utils_1_1_rigid_transform_1a28850c000b7c770cc2a1ef635b089873">Interpolate</link>(<link linkend="_struct_valve_1_1_v_r_1_1_steam_v_r___utils_1_1_rigid_transform">RigidTransform</link>&#32;a,&#32;<link linkend="_struct_valve_1_1_v_r_1_1_steam_v_r___utils_1_1_rigid_transform">RigidTransform</link>&#32;b,&#32;<emphasis role="keywordtype">float</emphasis>&#32;t)
+00369 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00370 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;<emphasis role="keyword">new</emphasis>&#32;<link linkend="_struct_valve_1_1_v_r_1_1_steam_v_r___utils_1_1_rigid_transform_1ac607cc418aa0f6395d0e063fe445ce6f">RigidTransform</link>(Vector3.Lerp(a.<link linkend="_struct_valve_1_1_v_r_1_1_steam_v_r___utils_1_1_rigid_transform_1a3cb425c3e4537084be54855b6651044e">pos</link>,&#32;b.<link linkend="_struct_valve_1_1_v_r_1_1_steam_v_r___utils_1_1_rigid_transform_1a3cb425c3e4537084be54855b6651044e">pos</link>,&#32;t),&#32;Quaternion.Slerp(a.<link linkend="_struct_valve_1_1_v_r_1_1_steam_v_r___utils_1_1_rigid_transform_1aa5b8421bf162f9e958f753e08e24d584">rot</link>,&#32;b.<link linkend="_struct_valve_1_1_v_r_1_1_steam_v_r___utils_1_1_rigid_transform_1aa5b8421bf162f9e958f753e08e24d584">rot</link>,&#32;t));
+00371 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00372 
+<anchor xml:id="__steam_v_r___utils_8cs_source_1l00373"/><link linkend="_struct_valve_1_1_v_r_1_1_steam_v_r___utils_1_1_rigid_transform_1ae46951071414d13e25a358d39481f2e1">00373</link> &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;<link linkend="_struct_valve_1_1_v_r_1_1_steam_v_r___utils_1_1_rigid_transform_1ae46951071414d13e25a358d39481f2e1">Interpolate</link>(<link linkend="_struct_valve_1_1_v_r_1_1_steam_v_r___utils_1_1_rigid_transform">RigidTransform</link>&#32;to,&#32;<emphasis role="keywordtype">float</emphasis>&#32;t)
+00374 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00375 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_struct_valve_1_1_v_r_1_1_steam_v_r___utils_1_1_rigid_transform_1a3cb425c3e4537084be54855b6651044e">pos</link>&#32;=&#32;SteamVR_Utils.Lerp(<link linkend="_struct_valve_1_1_v_r_1_1_steam_v_r___utils_1_1_rigid_transform_1a3cb425c3e4537084be54855b6651044e">pos</link>,&#32;to.<link linkend="_struct_valve_1_1_v_r_1_1_steam_v_r___utils_1_1_rigid_transform_1a3cb425c3e4537084be54855b6651044e">pos</link>,&#32;t);
+00376 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_struct_valve_1_1_v_r_1_1_steam_v_r___utils_1_1_rigid_transform_1aa5b8421bf162f9e958f753e08e24d584">rot</link>&#32;=&#32;SteamVR_Utils.Slerp(<link linkend="_struct_valve_1_1_v_r_1_1_steam_v_r___utils_1_1_rigid_transform_1aa5b8421bf162f9e958f753e08e24d584">rot</link>,&#32;to.<link linkend="_struct_valve_1_1_v_r_1_1_steam_v_r___utils_1_1_rigid_transform_1aa5b8421bf162f9e958f753e08e24d584">rot</link>,&#32;t);
+00377 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00378 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00379 
+00380 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;delegate&#32;<emphasis role="keywordtype">object</emphasis>&#32;SystemFn(<link linkend="_class_valve_1_1_v_r_1_1_c_v_r_system">CVRSystem</link>&#32;system,&#32;params&#32;<emphasis role="keywordtype">object</emphasis>[]&#32;args);
+00381 
+00382 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keyword">static</emphasis>&#32;<emphasis role="keywordtype">object</emphasis>&#32;CallSystemFn(SystemFn&#32;fn,&#32;params&#32;<emphasis role="keywordtype">object</emphasis>[]&#32;args)
+00383 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00384 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordtype">bool</emphasis>&#32;initOpenVR&#32;=&#32;(!<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r">SteamVR</link>.<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r_1ad98d1d8dafb84740b3a005d435da62a5">active</link>&#32;&amp;&amp;&#32;!<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r">SteamVR</link>.<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r_1ae5409008a8d99e33625353d01cb3461a">usingNativeSupport</link>);
+00385 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(initOpenVR)
+00386 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00387 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_namespace_valve_1_1_v_r_1a5d8a20b60549ae5b7668d73452c7e83e">EVRInitError</link>&#32;error&#32;=&#32;<link linkend="_namespace_valve_1_1_v_r_1a5d8a20b60549ae5b7668d73452c7e83e">EVRInitError</link>.None;
+00388 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_valve_1_1_v_r_1_1_open_v_r">OpenVR</link>.<link linkend="_class_valve_1_1_v_r_1_1_open_v_r_1a9984a6ebb99fb582a11d5ada0b8af27c">Init</link>(ref&#32;error,&#32;<link linkend="_namespace_valve_1_1_v_r_1a75c95b1b332a3c064198f2eac92ffe07">EVRApplicationType</link>.VRApplication_Utility);
+00389 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00390 
+00391 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_valve_1_1_v_r_1_1_c_v_r_system">CVRSystem</link>&#32;system&#32;=&#32;<link linkend="_class_valve_1_1_v_r_1_1_open_v_r">OpenVR</link>.<link linkend="_class_valve_1_1_v_r_1_1_open_v_r_1a6aafa4a25425620225098ded82a045c0">System</link>;
+00392 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordtype">object</emphasis>&#32;result&#32;=&#32;(system&#32;!=&#32;<emphasis role="keyword">null</emphasis>)&#32;?&#32;fn(system,&#32;args)&#32;:&#32;<emphasis role="keyword">null</emphasis>;
+00393 
+00394 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(initOpenVR)
+00395 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_valve_1_1_v_r_1_1_open_v_r">OpenVR</link>.<link linkend="_class_valve_1_1_v_r_1_1_open_v_r_1ad6faa1cc3961054643901552c4ab17ba">Shutdown</link>();
+00396 
+00397 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;result;
+00398 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00399 
+00400 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keyword">static</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;TakeStereoScreenshot(uint&#32;screenshotHandle,&#32;GameObject&#32;target,&#32;<emphasis role="keywordtype">int</emphasis>&#32;cellSize,&#32;<emphasis role="keywordtype">float</emphasis>&#32;ipd,&#32;ref&#32;<emphasis role="keywordtype">string</emphasis>&#32;previewFilename,&#32;ref&#32;<emphasis role="keywordtype">string</emphasis>&#32;VRFilename)
+00401 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00402 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">const</emphasis>&#32;<emphasis role="keywordtype">int</emphasis>&#32;width&#32;=&#32;4096;
+00403 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">const</emphasis>&#32;<emphasis role="keywordtype">int</emphasis>&#32;height&#32;=&#32;width&#32;/&#32;2;
+00404 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">const</emphasis>&#32;<emphasis role="keywordtype">int</emphasis>&#32;halfHeight&#32;=&#32;height&#32;/&#32;2;
+00405 
+00406 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;Texture2D&#32;texture&#32;=&#32;<emphasis role="keyword">new</emphasis>&#32;Texture2D(width,&#32;height&#32;*&#32;2,&#32;TextureFormat.ARGB32,&#32;<emphasis role="keyword">false</emphasis>);
+00407 
+00408 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;System.Diagnostics.Stopwatch&#32;timer&#32;=&#32;<emphasis role="keyword">new</emphasis>&#32;System.Diagnostics.Stopwatch();
+00409 
+00410 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_namespace_valve_1_1_v_r_1a82e5bf501cc3aa155444ee3f0662853fa967d35e40f3f95b1f538bd248640bf3b">Camera</link>&#32;tempCamera&#32;=&#32;<emphasis role="keyword">null</emphasis>;
+00411 
+00412 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;timer.Start();
+00413 
+00414 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_namespace_valve_1_1_v_r_1a82e5bf501cc3aa155444ee3f0662853fa967d35e40f3f95b1f538bd248640bf3b">Camera</link>&#32;camera&#32;=&#32;target.GetComponent&lt;<link linkend="_namespace_valve_1_1_v_r_1a82e5bf501cc3aa155444ee3f0662853fa967d35e40f3f95b1f538bd248640bf3b">Camera</link>&gt;();
+00415 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(camera&#32;==&#32;<emphasis role="keyword">null</emphasis>)
+00416 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00417 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(tempCamera&#32;==&#32;<emphasis role="keyword">null</emphasis>)
+00418 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;tempCamera&#32;=&#32;<emphasis role="keyword">new</emphasis>&#32;GameObject().AddComponent&lt;<link linkend="_namespace_valve_1_1_v_r_1a82e5bf501cc3aa155444ee3f0662853fa967d35e40f3f95b1f538bd248640bf3b">Camera</link>&gt;();
+00419 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;camera&#32;=&#32;tempCamera;
+00420 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00421 
+00422 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;Render&#32;preview&#32;texture</emphasis>
+00423 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">const</emphasis>&#32;<emphasis role="keywordtype">int</emphasis>&#32;previewWidth&#32;=&#32;2048;
+00424 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">const</emphasis>&#32;<emphasis role="keywordtype">int</emphasis>&#32;previewHeight&#32;=&#32;2048;
+00425 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;Texture2D&#32;previewTexture&#32;=&#32;<emphasis role="keyword">new</emphasis>&#32;Texture2D(previewWidth,&#32;previewHeight,&#32;TextureFormat.ARGB32,&#32;<emphasis role="keyword">false</emphasis>);
+00426 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;RenderTexture&#32;targetPreviewTexture&#32;=&#32;<emphasis role="keyword">new</emphasis>&#32;RenderTexture(previewWidth,&#32;previewHeight,&#32;24);
+00427 
+00428 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;RenderTexture&#32;oldTargetTexture&#32;=&#32;camera.targetTexture;
+00429 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordtype">bool</emphasis>&#32;oldOrthographic&#32;=&#32;camera.orthographic;
+00430 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordtype">float</emphasis>&#32;oldFieldOfView&#32;=&#32;camera.fieldOfView;
+00431 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordtype">float</emphasis>&#32;oldAspect&#32;=&#32;camera.aspect;
+00432 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;StereoTargetEyeMask&#32;oldstereoTargetEye&#32;=&#32;camera.stereoTargetEye;
+00433 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;camera.stereoTargetEye&#32;=&#32;StereoTargetEyeMask.None;
+00434 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;camera.fieldOfView&#32;=&#32;60.0f;
+00435 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;camera.orthographic&#32;=&#32;<emphasis role="keyword">false</emphasis>;
+00436 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;camera.targetTexture&#32;=&#32;targetPreviewTexture;
+00437 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;camera.aspect&#32;=&#32;1.0f;
+00438 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;camera.Render();
+00439 
+00440 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;copy&#32;preview&#32;texture</emphasis>
+00441 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;RenderTexture.active&#32;=&#32;targetPreviewTexture;
+00442 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;previewTexture.ReadPixels(<emphasis role="keyword">new</emphasis>&#32;Rect(0,&#32;0,&#32;targetPreviewTexture.width,&#32;targetPreviewTexture.height),&#32;0,&#32;0);
+00443 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;RenderTexture.active&#32;=&#32;<emphasis role="keyword">null</emphasis>;
+00444 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;camera.targetTexture&#32;=&#32;<emphasis role="keyword">null</emphasis>;
+00445 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="__t_m_pro___font_asset_creator_window_8cs_1aef19bab18b9814edeef255c43e4f6bbc">Object</link>.DestroyImmediate(targetPreviewTexture);
+00446 
+00447 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___spherical_projection">SteamVR_SphericalProjection</link>&#32;fx&#32;=&#32;camera.gameObject.AddComponent&lt;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___spherical_projection">SteamVR_SphericalProjection</link>&gt;();
+00448 
+00449 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;Vector3&#32;oldPosition&#32;=&#32;target.transform.localPosition;
+00450 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;Quaternion&#32;oldRotation&#32;=&#32;target.transform.localRotation;
+00451 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;Vector3&#32;basePosition&#32;=&#32;target.transform.position;
+00452 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;Quaternion&#32;baseRotation&#32;=&#32;Quaternion.Euler(0,&#32;target.transform.rotation.eulerAngles.y,&#32;0);
+00453 
+00454 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;Transform&#32;transform&#32;=&#32;camera.transform;
+00455 
+00456 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordtype">int</emphasis>&#32;vTotal&#32;=&#32;halfHeight&#32;/&#32;cellSize;
+00457 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordtype">float</emphasis>&#32;dv&#32;=&#32;90.0f&#32;/&#32;vTotal;&#32;<emphasis role="comment">//&#32;vertical&#32;degrees&#32;per&#32;segment</emphasis>
+00458 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordtype">float</emphasis>&#32;dvHalf&#32;=&#32;dv&#32;/&#32;2.0f;
+00459 
+00460 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;RenderTexture&#32;targetTexture&#32;=&#32;<emphasis role="keyword">new</emphasis>&#32;RenderTexture(cellSize,&#32;cellSize,&#32;24);
+00461 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;targetTexture.wrapMode&#32;=&#32;TextureWrapMode.Clamp;
+00462 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;targetTexture.antiAliasing&#32;=&#32;8;
+00463 
+00464 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;camera.fieldOfView&#32;=&#32;dv;
+00465 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;camera.orthographic&#32;=&#32;<emphasis role="keyword">false</emphasis>;
+00466 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;camera.targetTexture&#32;=&#32;targetTexture;
+00467 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;camera.aspect&#32;=&#32;oldAspect;
+00468 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;camera.stereoTargetEye&#32;=&#32;StereoTargetEyeMask.None;
+00469 
+00470 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;Render&#32;sections&#32;of&#32;a&#32;sphere&#32;using&#32;a&#32;rectilinear&#32;projection</emphasis>
+00471 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;and&#32;resample&#32;using&#32;a&#32;sphereical&#32;projection&#32;into&#32;a&#32;single&#32;panorama</emphasis>
+00472 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;texture&#32;per&#32;eye.&#32;&#32;We&#32;break&#32;into&#32;sections&#32;in&#32;order&#32;to&#32;keep&#32;the&#32;eye</emphasis>
+00473 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;separation&#32;similar&#32;around&#32;the&#32;sphere.&#32;&#32;Rendering&#32;alternates&#32;between</emphasis>
+00474 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;top&#32;and&#32;bottom&#32;sections,&#32;sweeping&#32;horizontally&#32;around&#32;the&#32;sphere,</emphasis>
+00475 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;alternating&#32;left&#32;and&#32;right&#32;eyes.</emphasis>
+00476 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">for</emphasis>&#32;(<emphasis role="keywordtype">int</emphasis>&#32;v&#32;=&#32;0;&#32;v&#32;&lt;&#32;vTotal;&#32;v++)
+00477 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00478 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordtype">float</emphasis>&#32;pitch&#32;=&#32;90.0f&#32;-&#32;(v&#32;*&#32;dv)&#32;-&#32;dvHalf;
+00479 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordtype">int</emphasis>&#32;uTotal&#32;=&#32;width&#32;/&#32;targetTexture.width;
+00480 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordtype">float</emphasis>&#32;du&#32;=&#32;360.0f&#32;/&#32;uTotal;&#32;<emphasis role="comment">//&#32;horizontal&#32;degrees&#32;per&#32;segment</emphasis>
+00481 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordtype">float</emphasis>&#32;duHalf&#32;=&#32;du&#32;/&#32;2.0f;
+00482 
+00483 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordtype">int</emphasis>&#32;vTarget&#32;=&#32;v&#32;*&#32;halfHeight&#32;/&#32;vTotal;
+00484 
+00485 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">for</emphasis>&#32;(<emphasis role="keywordtype">int</emphasis>&#32;i&#32;=&#32;0;&#32;i&#32;&lt;&#32;2;&#32;i++)&#32;<emphasis role="comment">//&#32;top,&#32;bottom</emphasis>
+00486 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00487 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(i&#32;==&#32;1)
+00488 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00489 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;pitch&#32;=&#32;-pitch;
+00490 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;vTarget&#32;=&#32;height&#32;-&#32;vTarget&#32;-&#32;cellSize;
+00491 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00492 
+00493 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">for</emphasis>&#32;(<emphasis role="keywordtype">int</emphasis>&#32;u&#32;=&#32;0;&#32;u&#32;&lt;&#32;uTotal;&#32;u++)
+00494 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00495 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordtype">float</emphasis>&#32;yaw&#32;=&#32;-180.0f&#32;+&#32;(u&#32;*&#32;du)&#32;+&#32;duHalf;
+00496 
+00497 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordtype">int</emphasis>&#32;uTarget&#32;=&#32;u&#32;*&#32;width&#32;/&#32;uTotal;
+00498 
+00499 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordtype">int</emphasis>&#32;vTargetOffset&#32;=&#32;0;
+00500 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordtype">float</emphasis>&#32;xOffset&#32;=&#32;-ipd&#32;/&#32;2&#32;*&#32;Mathf.Cos(pitch&#32;*&#32;Mathf.Deg2Rad);
+00501 
+00502 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">for</emphasis>&#32;(<emphasis role="keywordtype">int</emphasis>&#32;j&#32;=&#32;0;&#32;j&#32;&lt;&#32;2;&#32;j++)&#32;<emphasis role="comment">//&#32;left,&#32;right</emphasis>
+00503 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00504 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(j&#32;==&#32;1)
+00505 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00506 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;vTargetOffset&#32;=&#32;height;
+00507 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;xOffset&#32;=&#32;-xOffset;
+00508 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00509 
+00510 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;Vector3&#32;offset&#32;=&#32;baseRotation&#32;*&#32;Quaternion.Euler(0,&#32;yaw,&#32;0)&#32;*&#32;<emphasis role="keyword">new</emphasis>&#32;Vector3(xOffset,&#32;0,&#32;0);
+00511 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;transform.position&#32;=&#32;basePosition&#32;+&#32;offset;
+00512 
+00513 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;Quaternion&#32;direction&#32;=&#32;Quaternion.Euler(pitch,&#32;yaw,&#32;0.0f);
+00514 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;transform.rotation&#32;=&#32;baseRotation&#32;*&#32;direction;
+00515 
+00516 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;vector&#32;pointing&#32;to&#32;center&#32;of&#32;this&#32;section</emphasis>
+00517 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;Vector3&#32;N&#32;=&#32;direction&#32;*&#32;Vector3.forward;
+00518 
+00519 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;horizontal&#32;span&#32;of&#32;this&#32;section&#32;in&#32;degrees</emphasis>
+00520 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordtype">float</emphasis>&#32;phi0&#32;=&#32;yaw&#32;-&#32;(du&#32;/&#32;2);
+00521 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordtype">float</emphasis>&#32;phi1&#32;=&#32;phi0&#32;+&#32;du;
+00522 
+00523 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;vertical&#32;span&#32;of&#32;this&#32;section&#32;in&#32;degrees</emphasis>
+00524 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordtype">float</emphasis>&#32;theta0&#32;=&#32;pitch&#32;+&#32;(dv&#32;/&#32;2);
+00525 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordtype">float</emphasis>&#32;theta1&#32;=&#32;theta0&#32;-&#32;dv;
+00526 
+00527 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordtype">float</emphasis>&#32;midPhi&#32;=&#32;(phi0&#32;+&#32;phi1)&#32;/&#32;2;
+00528 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordtype">float</emphasis>&#32;baseTheta&#32;=&#32;Mathf.Abs(theta0)&#32;&lt;&#32;Mathf.Abs(theta1)&#32;?&#32;theta0&#32;:&#32;theta1;
+00529 
+00530 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;vectors&#32;pointing&#32;to&#32;corners&#32;of&#32;image&#32;closes&#32;to&#32;the&#32;equator</emphasis>
+00531 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;Vector3&#32;V00&#32;=&#32;Quaternion.Euler(baseTheta,&#32;phi0,&#32;0.0f)&#32;*&#32;Vector3.forward;
+00532 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;Vector3&#32;V01&#32;=&#32;Quaternion.Euler(baseTheta,&#32;phi1,&#32;0.0f)&#32;*&#32;Vector3.forward;
+00533 
+00534 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;vectors&#32;pointing&#32;to&#32;top&#32;and&#32;bottom&#32;midsection&#32;of&#32;image</emphasis>
+00535 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;Vector3&#32;V0M&#32;=&#32;Quaternion.Euler(theta0,&#32;midPhi,&#32;0.0f)&#32;*&#32;Vector3.forward;
+00536 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;Vector3&#32;V1M&#32;=&#32;Quaternion.Euler(theta1,&#32;midPhi,&#32;0.0f)&#32;*&#32;Vector3.forward;
+00537 
+00538 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;intersection&#32;points&#32;for&#32;each&#32;of&#32;the&#32;above</emphasis>
+00539 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;Vector3&#32;P00&#32;=&#32;V00&#32;/&#32;Vector3.Dot(V00,&#32;N);
+00540 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;Vector3&#32;P01&#32;=&#32;V01&#32;/&#32;Vector3.Dot(V01,&#32;N);
+00541 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;Vector3&#32;P0M&#32;=&#32;V0M&#32;/&#32;Vector3.Dot(V0M,&#32;N);
+00542 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;Vector3&#32;P1M&#32;=&#32;V1M&#32;/&#32;Vector3.Dot(V1M,&#32;N);
+00543 
+00544 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;calculate&#32;basis&#32;vectors&#32;for&#32;plane</emphasis>
+00545 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;Vector3&#32;P00_P01&#32;=&#32;P01&#32;-&#32;P00;
+00546 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;Vector3&#32;P0M_P1M&#32;=&#32;P1M&#32;-&#32;P0M;
+00547 
+00548 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordtype">float</emphasis>&#32;uMag&#32;=&#32;P00_P01.magnitude;
+00549 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordtype">float</emphasis>&#32;vMag&#32;=&#32;P0M_P1M.magnitude;
+00550 
+00551 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordtype">float</emphasis>&#32;uScale&#32;=&#32;1.0f&#32;/&#32;uMag;
+00552 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordtype">float</emphasis>&#32;vScale&#32;=&#32;1.0f&#32;/&#32;vMag;
+00553 
+00554 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;Vector3&#32;uAxis&#32;=&#32;P00_P01&#32;*&#32;uScale;
+00555 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;Vector3&#32;vAxis&#32;=&#32;P0M_P1M&#32;*&#32;vScale;
+00556 
+00557 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;update&#32;material&#32;constant&#32;buffer</emphasis>
+00558 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;fx.<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___spherical_projection_1a4e5bb05db62e8cf84e24485f0f7e489b">Set</link>(N,&#32;phi0,&#32;phi1,&#32;theta0,&#32;theta1,
+00559 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;uAxis,&#32;P00,&#32;uScale,
+00560 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;vAxis,&#32;P0M,&#32;vScale);
+00561 
+00562 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;camera.aspect&#32;=&#32;uMag&#32;/&#32;vMag;
+00563 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;camera.Render();
+00564 
+00565 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;RenderTexture.active&#32;=&#32;targetTexture;
+00566 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;texture.ReadPixels(<emphasis role="keyword">new</emphasis>&#32;Rect(0,&#32;0,&#32;targetTexture.width,&#32;targetTexture.height),&#32;uTarget,&#32;vTarget&#32;+&#32;vTargetOffset);
+00567 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;RenderTexture.active&#32;=&#32;<emphasis role="keyword">null</emphasis>;
+00568 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00569 
+00570 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;Update&#32;progress</emphasis>
+00571 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordtype">float</emphasis>&#32;progress&#32;=&#32;(float)(v&#32;*&#32;(uTotal&#32;*&#32;2.0f)&#32;+&#32;u&#32;+&#32;i&#32;*&#32;uTotal)&#32;/&#32;(<emphasis role="keywordtype">float</emphasis>)(vTotal&#32;*&#32;(uTotal&#32;*&#32;2.0f));
+00572 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_valve_1_1_v_r_1_1_open_v_r">OpenVR</link>.<link linkend="_class_valve_1_1_v_r_1_1_open_v_r_1aba4df8c153a4f1ac4b8016672df826aa">Screenshots</link>.<link linkend="_class_valve_1_1_v_r_1_1_c_v_r_screenshots_1a68d2c2b6d193819be408757bfe8cf638">UpdateScreenshotProgress</link>(screenshotHandle,&#32;progress);
+00573 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00574 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00575 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00576 
+00577 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;100%&#32;flush</emphasis>
+00578 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_valve_1_1_v_r_1_1_open_v_r">OpenVR</link>.<link linkend="_class_valve_1_1_v_r_1_1_open_v_r_1aba4df8c153a4f1ac4b8016672df826aa">Screenshots</link>.<link linkend="_class_valve_1_1_v_r_1_1_c_v_r_screenshots_1a68d2c2b6d193819be408757bfe8cf638">UpdateScreenshotProgress</link>(screenshotHandle,&#32;1.0f);
+00579 
+00580 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;Save&#32;textures&#32;to&#32;disk.</emphasis>
+00581 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;Add&#32;extensions</emphasis>
+00582 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;previewFilename&#32;+=&#32;<emphasis role="stringliteral">&quot;.png&quot;</emphasis>;
+00583 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;VRFilename&#32;+=&#32;<emphasis role="stringliteral">&quot;.png&quot;</emphasis>;
+00584 
+00585 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;Preview</emphasis>
+00586 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;previewTexture.Apply();
+00587 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;System.IO.File.WriteAllBytes(previewFilename,&#32;previewTexture.EncodeToPNG());
+00588 
+00589 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;VR</emphasis>
+00590 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;texture.Apply();
+00591 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;System.IO.File.WriteAllBytes(VRFilename,&#32;texture.EncodeToPNG());
+00592 
+00593 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;Cleanup.</emphasis>
+00594 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(camera&#32;!=&#32;tempCamera)
+00595 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00596 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;camera.targetTexture&#32;=&#32;oldTargetTexture;
+00597 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;camera.orthographic&#32;=&#32;oldOrthographic;
+00598 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;camera.fieldOfView&#32;=&#32;oldFieldOfView;
+00599 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;camera.aspect&#32;=&#32;oldAspect;
+00600 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;camera.stereoTargetEye&#32;=&#32;oldstereoTargetEye;
+00601 
+00602 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;target.transform.localPosition&#32;=&#32;oldPosition;
+00603 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;target.transform.localRotation&#32;=&#32;oldRotation;
+00604 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00605 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">else</emphasis>
+00606 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00607 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;tempCamera.targetTexture&#32;=&#32;<emphasis role="keyword">null</emphasis>;
+00608 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00609 
+00610 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="__t_m_pro___font_asset_creator_window_8cs_1aef19bab18b9814edeef255c43e4f6bbc">Object</link>.DestroyImmediate(targetTexture);
+00611 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="__t_m_pro___font_asset_creator_window_8cs_1aef19bab18b9814edeef255c43e4f6bbc">Object</link>.DestroyImmediate(fx);
+00612 
+00613 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;timer.Stop();
+00614 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;Debug.Log(<emphasis role="keywordtype">string</emphasis>.Format(<emphasis role="stringliteral">&quot;&lt;b&gt;[SteamVR]&lt;/b&gt;&#32;Screenshot&#32;took&#32;{0}&#32;seconds.&quot;</emphasis>,&#32;timer.Elapsed));
+00615 
+00616 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(tempCamera&#32;!=&#32;<emphasis role="keyword">null</emphasis>)
+00617 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00618 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="__t_m_pro___font_asset_creator_window_8cs_1aef19bab18b9814edeef255c43e4f6bbc">Object</link>.DestroyImmediate(tempCamera.gameObject);
+00619 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00620 
+00621 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="__t_m_pro___font_asset_creator_window_8cs_1aef19bab18b9814edeef255c43e4f6bbc">Object</link>.DestroyImmediate(previewTexture);
+00622 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="__t_m_pro___font_asset_creator_window_8cs_1aef19bab18b9814edeef255c43e4f6bbc">Object</link>.DestroyImmediate(texture);
+00623 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00624 
+00625 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;<emphasis role="keyword">const</emphasis>&#32;<emphasis role="keywordtype">string</emphasis>&#32;secretKey&#32;=&#32;<emphasis role="stringliteral">&quot;foobar&quot;</emphasis>;
+00627 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keyword">static</emphasis>&#32;<emphasis role="keywordtype">string</emphasis>&#32;GetBadMD5Hash(<emphasis role="keywordtype">string</emphasis>&#32;usedString)
+00628 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00629 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordtype">byte</emphasis>[]&#32;bytes&#32;=&#32;System.Text.Encoding.UTF8.GetBytes(usedString&#32;+&#32;secretKey);
+00630 
+00631 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;GetBadMD5Hash(bytes);
+00632 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00633 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keyword">static</emphasis>&#32;<emphasis role="keywordtype">string</emphasis>&#32;GetBadMD5Hash(<emphasis role="keywordtype">byte</emphasis>[]&#32;bytes)
+00634 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00635 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;System.Security.Cryptography.MD5CryptoServiceProvider&#32;md5&#32;=&#32;<emphasis role="keyword">new</emphasis>&#32;System.Security.Cryptography.MD5CryptoServiceProvider();
+00636 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordtype">byte</emphasis>[]&#32;hash&#32;=&#32;md5.ComputeHash(bytes);
+00637 
+00638 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;System.Text.StringBuilder&#32;sb&#32;=&#32;<emphasis role="keyword">new</emphasis>&#32;System.Text.StringBuilder();
+00639 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">for</emphasis>&#32;(<emphasis role="keywordtype">int</emphasis>&#32;i&#32;=&#32;0;&#32;i&#32;&lt;&#32;hash.Length;&#32;i++)
+00640 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00641 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;sb.Append(hash[i].ToString(<emphasis role="stringliteral">&quot;x2&quot;</emphasis>));
+00642 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00643 
+00644 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;sb.ToString();
+00645 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00646 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keyword">static</emphasis>&#32;<emphasis role="keywordtype">string</emphasis>&#32;GetBadMD5HashFromFile(<emphasis role="keywordtype">string</emphasis>&#32;filePath)
+00647 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00648 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(File.Exists(filePath)&#32;==&#32;<emphasis role="keyword">false</emphasis>)
+00649 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;<emphasis role="keyword">null</emphasis>;
+00650 
+00651 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordtype">string</emphasis>&#32;data&#32;=&#32;File.ReadAllText(filePath);
+00652 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;GetBadMD5Hash(data&#32;+&#32;secretKey);
+00653 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00654 
+00655 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keyword">static</emphasis>&#32;<emphasis role="keywordtype">string</emphasis>&#32;ConvertToForwardSlashes(<emphasis role="keywordtype">string</emphasis>&#32;fromString)
+00656 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00657 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordtype">string</emphasis>&#32;newString&#32;=&#32;fromString.Replace(<emphasis role="stringliteral">&quot;\\\\&quot;</emphasis>,&#32;<emphasis role="stringliteral">&quot;\\&quot;</emphasis>);
+00658 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;newString&#32;=&#32;newString.Replace(<emphasis role="stringliteral">&quot;\\&quot;</emphasis>,&#32;<emphasis role="stringliteral">&quot;/&quot;</emphasis>);
+00659 
+00660 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;newString;
+00661 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00662 
+00663 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keyword">static</emphasis>&#32;<emphasis role="keywordtype">float</emphasis>&#32;GetLossyScale(Transform&#32;forTransform)
+00664 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00665 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordtype">float</emphasis>&#32;scale&#32;=&#32;1f;
+00666 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">while</emphasis>&#32;(forTransform&#32;!=&#32;<emphasis role="keyword">null</emphasis>&#32;&amp;&amp;&#32;forTransform.parent&#32;!=&#32;<emphasis role="keyword">null</emphasis>)
+00667 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00668 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;forTransform&#32;=&#32;forTransform.parent;
+00669 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;scale&#32;*=&#32;forTransform.localScale.x;
+00670 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00671 
+00672 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;scale;
+00673 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00674 
+00675 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keyword">static</emphasis>&#32;<emphasis role="keywordtype">bool</emphasis>&#32;IsValid(Vector3&#32;vector)
+00676 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00677 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;(<emphasis role="keywordtype">float</emphasis>.IsNaN(vector.x)&#32;==&#32;<emphasis role="keyword">false</emphasis>&#32;&amp;&amp;&#32;<emphasis role="keywordtype">float</emphasis>.IsNaN(vector.y)&#32;==&#32;<emphasis role="keyword">false</emphasis>&#32;&amp;&amp;&#32;<emphasis role="keywordtype">float</emphasis>.IsNaN(vector.z)&#32;==&#32;<emphasis role="keyword">false</emphasis>);
+00678 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00679 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keyword">static</emphasis>&#32;<emphasis role="keywordtype">bool</emphasis>&#32;IsValid(Quaternion&#32;rotation)
+00680 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00681 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;(<emphasis role="keywordtype">float</emphasis>.IsNaN(rotation.x)&#32;==&#32;<emphasis role="keyword">false</emphasis>&#32;&amp;&amp;&#32;<emphasis role="keywordtype">float</emphasis>.IsNaN(rotation.y)&#32;==&#32;<emphasis role="keyword">false</emphasis>&#32;&amp;&amp;&#32;<emphasis role="keywordtype">float</emphasis>.IsNaN(rotation.z)&#32;==&#32;<emphasis role="keyword">false</emphasis>&#32;&amp;&amp;&#32;<emphasis role="keywordtype">float</emphasis>.IsNaN(rotation.w)&#32;==&#32;<emphasis role="keyword">false</emphasis>)&#32;&amp;&amp;
+00682 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;(rotation.x&#32;!=&#32;0&#32;||&#32;rotation.y&#32;!=&#32;0&#32;||&#32;rotation.z&#32;!=&#32;0&#32;||&#32;rotation.w&#32;!=&#32;0);
+00683 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00684 
+00685 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;<emphasis role="keyword">static</emphasis>&#32;Dictionary&lt;int,&#32;GameObject&gt;&#32;velocityCache&#32;=&#32;<emphasis role="keyword">new</emphasis>&#32;Dictionary&lt;int,&#32;GameObject&gt;();
+00686 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keyword">static</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;DrawVelocity(<emphasis role="keywordtype">int</emphasis>&#32;key,&#32;Vector3&#32;position,&#32;Vector3&#32;velocity,&#32;<emphasis role="keywordtype">float</emphasis>&#32;destroyAfterSeconds&#32;=&#32;5f)
+00687 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00688 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;DrawVelocity(key,&#32;position,&#32;velocity,&#32;Color.green,&#32;destroyAfterSeconds);
+00689 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00690 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keyword">static</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;DrawVelocity(<emphasis role="keywordtype">int</emphasis>&#32;key,&#32;Vector3&#32;position,&#32;Vector3&#32;velocity,&#32;Color&#32;color,&#32;<emphasis role="keywordtype">float</emphasis>&#32;destroyAfterSeconds&#32;=&#32;5f)
+00691 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00692 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(velocityCache.ContainsKey(key)&#32;==&#32;<emphasis role="keyword">false</emphasis>&#32;||&#32;velocityCache[key]&#32;==&#32;<emphasis role="keyword">null</emphasis>)
+00693 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00694 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;GameObject&#32;center&#32;=&#32;GameObject.CreatePrimitive(PrimitiveType.Cube);
+00695 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;center.transform.localScale&#32;=&#32;Vector3.one&#32;*&#32;0.025f;
+00696 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;center.transform.position&#32;=&#32;position;
+00697 
+00698 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(velocity&#32;!=&#32;Vector3.zero)
+00699 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;center.transform.forward&#32;=&#32;velocity;
+00700 
+00701 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;GameObject&#32;arrow&#32;=&#32;GameObject.CreatePrimitive(PrimitiveType.Cube);
+00702 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;arrow.transform.parent&#32;=&#32;center.transform;
+00703 
+00704 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(velocity&#32;!=&#32;Vector3.zero)
+00705 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00706 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;arrow.transform.localScale&#32;=&#32;<emphasis role="keyword">new</emphasis>&#32;Vector3(0.25f,&#32;0.25f,&#32;3&#32;+&#32;(velocity.magnitude&#32;*&#32;1.5f));
+00707 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;arrow.transform.localPosition&#32;=&#32;<emphasis role="keyword">new</emphasis>&#32;Vector3(0,&#32;0,&#32;arrow.transform.localScale.z&#32;/&#32;2f);
+00708 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00709 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">else</emphasis>
+00710 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00711 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;arrow.transform.localScale&#32;=&#32;Vector3.one;
+00712 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;arrow.transform.localPosition&#32;=&#32;Vector3.zero;
+00713 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00714 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;arrow.transform.localRotation&#32;=&#32;Quaternion.identity;
+00715 
+00716 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;GameObject.DestroyImmediate(arrow.GetComponent&lt;Collider&gt;());
+00717 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;GameObject.DestroyImmediate(center.GetComponent&lt;Collider&gt;());
+00718 
+00719 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;center.GetComponent&lt;MeshRenderer&gt;().material.color&#32;=&#32;color;
+00720 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;arrow.GetComponent&lt;MeshRenderer&gt;().material.color&#32;=&#32;color;
+00721 
+00722 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;velocityCache[key]&#32;=&#32;center;
+00723 
+00724 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;GameObject.Destroy(center,&#32;destroyAfterSeconds);
+00725 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00726 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">else</emphasis>
+00727 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00728 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;GameObject&#32;center&#32;=&#32;velocityCache[key];
+00729 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;center.transform.position&#32;=&#32;position;
+00730 
+00731 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(velocity&#32;!=&#32;Vector3.zero)
+00732 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;center.transform.forward&#32;=&#32;velocity;
+00733 
+00734 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;Transform&#32;arrow&#32;=&#32;center.transform.GetChild(0);
+00735 
+00736 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(velocity&#32;!=&#32;Vector3.zero)
+00737 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00738 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;arrow.localScale&#32;=&#32;<emphasis role="keyword">new</emphasis>&#32;Vector3(0.25f,&#32;0.25f,&#32;3&#32;+&#32;(velocity.magnitude&#32;*&#32;1.5f));
+00739 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;arrow.localPosition&#32;=&#32;<emphasis role="keyword">new</emphasis>&#32;Vector3(0,&#32;0,&#32;arrow.transform.localScale.z&#32;/&#32;2f);
+00740 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00741 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">else</emphasis>
+00742 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00743 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;arrow.localScale&#32;=&#32;Vector3.one;
+00744 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;arrow.localPosition&#32;=&#32;Vector3.zero;
+00745 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00746 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;arrow.localRotation&#32;=&#32;Quaternion.identity;
+00747 
+00748 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;GameObject.Destroy(center,&#32;destroyAfterSeconds);
+00749 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00750 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00751 &#32;&#32;&#32;&#32;}
+00752 }
+</programlisting></section>

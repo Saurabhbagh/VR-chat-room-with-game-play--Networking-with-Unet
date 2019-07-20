@@ -1,0 +1,153 @@
+<?xml version='1.0' encoding='UTF-8' standalone='no'?>
+<section xmlns="http://docbook.org/ns/docbook" version="5.0" xmlns:xlink="http://www.w3.org/1999/xlink" xml:id="__finger_direction_detector_8cs_source">
+<title>FingerDirectionDetector.cs</title>
+<indexterm><primary>O:/GitHUBMINIPRoject/Assets/LeapMotion/Core/Scripts/DetectionUtilities/FingerDirectionDetector.cs</primary></indexterm>
+<programlisting>00001 <emphasis role="comment">/******************************************************************************</emphasis>
+00002 <emphasis role="comment">&#32;*&#32;Copyright&#32;(C)&#32;Leap&#32;Motion,&#32;Inc.&#32;2011-2018.&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;*</emphasis>
+00003 <emphasis role="comment">&#32;*&#32;Leap&#32;Motion&#32;proprietary&#32;and&#32;confidential.&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;*</emphasis>
+00004 <emphasis role="comment">&#32;*&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;*</emphasis>
+00005 <emphasis role="comment">&#32;*&#32;Use&#32;subject&#32;to&#32;the&#32;terms&#32;of&#32;the&#32;Leap&#32;Motion&#32;SDK&#32;Agreement&#32;available&#32;at&#32;&#32;&#32;&#32;&#32;*</emphasis>
+00006 <emphasis role="comment">&#32;*&#32;https://developer.leapmotion.com/sdk_agreement,&#32;or&#32;another&#32;agreement&#32;&#32;&#32;&#32;&#32;&#32;&#32;*</emphasis>
+00007 <emphasis role="comment">&#32;*&#32;between&#32;Leap&#32;Motion&#32;and&#32;you,&#32;your&#32;company&#32;or&#32;other&#32;organization.&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;*</emphasis>
+00008 <emphasis role="comment">&#32;******************************************************************************/</emphasis>
+00009 
+00010 <emphasis role="keyword">using</emphasis>&#32;<link linkend="__balloon_8cs_1a7d67e097df9376eb709b6a23aa3c7d23">UnityEngine</link>;
+00011 <emphasis role="keyword">using</emphasis>&#32;System.Collections;
+00012 <emphasis role="keyword">using</emphasis>&#32;<link linkend="_namespace_leap">Leap</link>.<link linkend="_namespace_leap_1_1_unity">Unity</link>.<link linkend="_namespace_leap_1_1_unity_1_1_attributes">Attributes</link>;
+00013 
+00014 <emphasis role="keyword">namespace&#32;</emphasis><link linkend="_namespace_leap_1_1_unity">Leap.Unity</link>&#32;{
+<anchor xml:id="__finger_direction_detector_8cs_source_1l00031"/><link linkend="_class_leap_1_1_unity_1_1_finger_direction_detector">00031</link> &#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keyword">class&#32;</emphasis><link linkend="_class_leap_1_1_unity_1_1_finger_direction_detector">FingerDirectionDetector</link>&#32;:&#32;<link linkend="_class_leap_1_1_unity_1_1_detector">Detector</link>&#32;{
+00036 &#32;&#32;&#32;&#32;[Units(<emphasis role="stringliteral">&quot;seconds&quot;</emphasis>)]
+00037 &#32;&#32;&#32;&#32;[Tooltip(<emphasis role="stringliteral">&quot;The&#32;interval&#32;in&#32;seconds&#32;at&#32;which&#32;to&#32;check&#32;this&#32;detector&apos;s&#32;conditions.&quot;</emphasis>)]
+00038 &#32;&#32;&#32;&#32;[<link linkend="_class_leap_1_1_unity_1_1_attributes_1_1_min_value">MinValue</link>(0)]
+<anchor xml:id="__finger_direction_detector_8cs_source_1l00039"/><link linkend="_class_leap_1_1_unity_1_1_finger_direction_detector_1ab70cf353126c82e1f4fb4a159ad60b50">00039</link> &#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keywordtype">float</emphasis>&#32;<link linkend="_class_leap_1_1_unity_1_1_finger_direction_detector_1ab70cf353126c82e1f4fb4a159ad60b50">Period</link>&#32;=&#32;.1f;&#32;<emphasis role="comment">//seconds</emphasis>
+00040 
+00046 &#32;&#32;&#32;&#32;[Tooltip(<emphasis role="stringliteral">&quot;The&#32;hand&#32;model&#32;to&#32;watch.&#32;Set&#32;automatically&#32;if&#32;detector&#32;is&#32;on&#32;a&#32;hand.&quot;</emphasis>)]
+<anchor xml:id="__finger_direction_detector_8cs_source_1l00047"/><link linkend="_class_leap_1_1_unity_1_1_finger_direction_detector_1a77aca25282ecbc1decc67ecf44a9561a">00047</link> &#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<link linkend="_class_leap_1_1_unity_1_1_hand_model_base">HandModelBase</link>&#32;<link linkend="_class_leap_1_1_unity_1_1_hand_model">HandModel</link>&#32;=&#32;<emphasis role="keyword">null</emphasis>;&#32;&#32;
+00048 
+00053 &#32;&#32;&#32;&#32;[Tooltip(<emphasis role="stringliteral">&quot;The&#32;finger&#32;to&#32;observe.&quot;</emphasis>)]
+<anchor xml:id="__finger_direction_detector_8cs_source_1l00054"/><link linkend="_class_leap_1_1_unity_1_1_finger_direction_detector_1a73b21690811ff68505ea419bf1270d1f">00054</link> &#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<link linkend="_class_leap_1_1_finger">Finger</link>.<link linkend="_class_leap_1_1_finger_1ae75e8d46a01aff0bd5c6d6fb99e2f2ba">FingerType</link>&#32;<link linkend="_class_leap_1_1_unity_1_1_finger_direction_detector_1a73b21690811ff68505ea419bf1270d1f">FingerName</link>&#32;=&#32;<link linkend="_class_leap_1_1_finger">Finger</link>.<link linkend="_class_leap_1_1_finger_1ae75e8d46a01aff0bd5c6d6fb99e2f2ba">FingerType</link>.TYPE_INDEX;
+00055 
+00056 
+00072 &#32;&#32;&#32;&#32;[Header(<emphasis role="stringliteral">&quot;Direction&#32;Settings&quot;</emphasis>)]
+00073 &#32;&#32;&#32;&#32;[Tooltip(<emphasis role="stringliteral">&quot;How&#32;to&#32;treat&#32;the&#32;target&#32;direction.&quot;</emphasis>)]
+<anchor xml:id="__finger_direction_detector_8cs_source_1l00074"/><link linkend="_class_leap_1_1_unity_1_1_finger_direction_detector_1a2161d1a746e283cce4a95f619fb699c1">00074</link> &#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<link linkend="_namespace_leap_1_1_unity_1a34b9e7741bfe47e7a9b1c2bffbe7f4cf">PointingType</link>&#32;<link linkend="_namespace_leap_1_1_unity_1a34b9e7741bfe47e7a9b1c2bffbe7f4cf">PointingType</link>&#32;=&#32;<link linkend="_namespace_leap_1_1_unity_1a34b9e7741bfe47e7a9b1c2bffbe7f4cf">PointingType</link>.RelativeToHorizon;
+00075 
+00081 &#32;&#32;&#32;&#32;[Tooltip(<emphasis role="stringliteral">&quot;The&#32;target&#32;direction.&quot;</emphasis>)]
+00082 &#32;&#32;&#32;&#32;[<link linkend="_class_leap_1_1_unity_1_1_attributes_1_1_disable_if">DisableIf</link>(<emphasis role="stringliteral">&quot;PointingType&quot;</emphasis>,&#32;isEqualTo:&#32;<link linkend="_namespace_leap_1_1_unity_1a34b9e7741bfe47e7a9b1c2bffbe7f4cf">PointingType</link>.AtTarget)]
+<anchor xml:id="__finger_direction_detector_8cs_source_1l00083"/><link linkend="_class_leap_1_1_unity_1_1_finger_direction_detector_1aeab7a19eb59f898c7d4be2bdf35cf5e5">00083</link> &#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;Vector3&#32;<link linkend="_class_leap_1_1_unity_1_1_finger_direction_detector_1aeab7a19eb59f898c7d4be2bdf35cf5e5">PointingDirection</link>&#32;=&#32;Vector3.forward;
+00084 
+00088 &#32;&#32;&#32;&#32;[Tooltip(<emphasis role="stringliteral">&quot;A&#32;target&#32;object(optional).&#32;Use&#32;PointingType.AtTarget&quot;</emphasis>)]
+00089 &#32;&#32;&#32;&#32;[<link linkend="_class_leap_1_1_unity_1_1_attributes_1_1_disable_if">DisableIf</link>(<emphasis role="stringliteral">&quot;PointingType&quot;</emphasis>,&#32;isNotEqualTo:&#32;<link linkend="_namespace_leap_1_1_unity_1a34b9e7741bfe47e7a9b1c2bffbe7f4cf">PointingType</link>.AtTarget)]
+<anchor xml:id="__finger_direction_detector_8cs_source_1l00090"/><link linkend="_class_leap_1_1_unity_1_1_finger_direction_detector_1a2f90f8d78d0447b6129b6a43c7ecee09">00090</link> &#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;Transform&#32;<link linkend="_class_leap_1_1_unity_1_1_finger_direction_detector_1a2f90f8d78d0447b6129b6a43c7ecee09">TargetObject</link>&#32;=&#32;<emphasis role="keyword">null</emphasis>;
+00096 &#32;&#32;&#32;&#32;[Tooltip(<emphasis role="stringliteral">&quot;The&#32;angle&#32;in&#32;degrees&#32;from&#32;the&#32;target&#32;direction&#32;at&#32;which&#32;to&#32;turn&#32;on.&quot;</emphasis>)]
+00097 &#32;&#32;&#32;&#32;[Range(0,&#32;180)]
+<anchor xml:id="__finger_direction_detector_8cs_source_1l00098"/><link linkend="_class_leap_1_1_unity_1_1_finger_direction_detector_1a420e6bdcd701b20b3c6a95003c0b4c44">00098</link> &#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keywordtype">float</emphasis>&#32;<link linkend="_class_leap_1_1_unity_1_1_finger_direction_detector_1a420e6bdcd701b20b3c6a95003c0b4c44">OnAngle</link>&#32;=&#32;15f;&#32;<emphasis role="comment">//degrees</emphasis>
+00099 
+00105 &#32;&#32;&#32;&#32;[Tooltip(<emphasis role="stringliteral">&quot;The&#32;angle&#32;in&#32;degrees&#32;from&#32;the&#32;target&#32;direction&#32;at&#32;which&#32;to&#32;turn&#32;off.&quot;</emphasis>)]
+00106 &#32;&#32;&#32;&#32;[Range(0,&#32;180)]
+<anchor xml:id="__finger_direction_detector_8cs_source_1l00107"/><link linkend="_class_leap_1_1_unity_1_1_finger_direction_detector_1a234c17e715950ba6810e2f3ae86a5d15">00107</link> &#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keywordtype">float</emphasis>&#32;<link linkend="_class_leap_1_1_unity_1_1_finger_direction_detector_1a234c17e715950ba6810e2f3ae86a5d15">OffAngle</link>&#32;=&#32;25f;&#32;<emphasis role="comment">//degrees</emphasis>
+00111 <emphasis role="comment"></emphasis>&#32;&#32;&#32;&#32;[Header(<emphasis role="stringliteral">&quot;&quot;</emphasis>)]
+00112 &#32;&#32;&#32;&#32;[Tooltip(<emphasis role="stringliteral">&quot;Draw&#32;this&#32;detector&apos;s&#32;Gizmos,&#32;if&#32;any.&#32;(Gizmos&#32;must&#32;be&#32;on&#32;in&#32;Unity&#32;edtor,&#32;too.)&quot;</emphasis>)]
+<anchor xml:id="__finger_direction_detector_8cs_source_1l00113"/><link linkend="_class_leap_1_1_unity_1_1_finger_direction_detector_1a9bbe98671cb2301bb9f6b4eee2e115e7">00113</link> &#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keywordtype">bool</emphasis>&#32;<link linkend="_class_leap_1_1_unity_1_1_finger_direction_detector_1a9bbe98671cb2301bb9f6b4eee2e115e7">ShowGizmos</link>&#32;=&#32;<emphasis role="keyword">true</emphasis>;
+00114 
+00115 &#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;IEnumerator&#32;watcherCoroutine;
+00116 
+00117 &#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;OnValidate(){
+00118 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>(&#32;<link linkend="_class_leap_1_1_unity_1_1_finger_direction_detector_1a234c17e715950ba6810e2f3ae86a5d15">OffAngle</link>&#32;&lt;&#32;<link linkend="_class_leap_1_1_unity_1_1_finger_direction_detector_1a420e6bdcd701b20b3c6a95003c0b4c44">OnAngle</link>){
+00119 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_leap_1_1_unity_1_1_finger_direction_detector_1a234c17e715950ba6810e2f3ae86a5d15">OffAngle</link>&#32;=&#32;<link linkend="_class_leap_1_1_unity_1_1_finger_direction_detector_1a420e6bdcd701b20b3c6a95003c0b4c44">OnAngle</link>;
+00120 &#32;&#32;&#32;&#32;&#32;&#32;}
+00121 &#32;&#32;&#32;&#32;}
+00122 
+00123 &#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;Awake&#32;()&#32;{
+00124 &#32;&#32;&#32;&#32;&#32;&#32;watcherCoroutine&#32;=&#32;fingerPointingWatcher();
+00125 &#32;&#32;&#32;&#32;}
+00126 
+00127 &#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;OnEnable&#32;()&#32;{
+00128 &#32;&#32;&#32;&#32;&#32;&#32;StartCoroutine(watcherCoroutine);
+00129 &#32;&#32;&#32;&#32;}
+00130 &#32;&#32;
+00131 &#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;OnDisable&#32;()&#32;{
+00132 &#32;&#32;&#32;&#32;&#32;&#32;StopCoroutine(watcherCoroutine);
+00133 &#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_leap_1_1_unity_1_1_detector_1a6493874fd22793d7b59dc56098559d59">Deactivate</link>();
+00134 &#32;&#32;&#32;&#32;}
+00135 
+00136 &#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;IEnumerator&#32;fingerPointingWatcher()&#32;{
+00137 &#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_namespace_leap_1_1_unity_1_1_interaction_1a9752eb3e2905e8ebd134fff20c155e6baa78b1ac16c0cd02168097fc9a9bd7604">Hand</link>&#32;hand;
+00138 &#32;&#32;&#32;&#32;&#32;&#32;Vector3&#32;fingerDirection;
+00139 &#32;&#32;&#32;&#32;&#32;&#32;Vector3&#32;targetDirection;
+00140 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordtype">int</emphasis>&#32;selectedFinger&#32;=&#32;selectedFingerOrdinal();
+00141 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">while</emphasis>(<emphasis role="keyword">true</emphasis>){
+00142 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>(<link linkend="_class_leap_1_1_unity_1_1_finger_direction_detector_1a77aca25282ecbc1decc67ecf44a9561a">HandModel</link>&#32;!=&#32;<emphasis role="keyword">null</emphasis>&#32;&amp;&amp;&#32;<link linkend="_class_leap_1_1_unity_1_1_finger_direction_detector_1a77aca25282ecbc1decc67ecf44a9561a">HandModel</link>.<link linkend="_class_leap_1_1_unity_1_1_hand_model_base_1a31704b6829e3d442133350b34a4a5a8a">IsTracked</link>){
+00143 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;hand&#32;=&#32;<link linkend="_class_leap_1_1_unity_1_1_finger_direction_detector_1a77aca25282ecbc1decc67ecf44a9561a">HandModel</link>.<link linkend="_class_leap_1_1_unity_1_1_hand_model_base_1aa24ca02bf4a64ba33b0370ad6da8731f">GetLeapHand</link>();
+00144 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>(hand&#32;!=&#32;<emphasis role="keyword">null</emphasis>){
+00145 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;targetDirection&#32;=&#32;selectedDirection(hand.Fingers[selectedFinger].TipPosition.ToVector3());
+00146 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;fingerDirection&#32;=&#32;hand.Fingers[selectedFinger].Bone(Bone.BoneType.TYPE_DISTAL).Direction.ToVector3();
+00147 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordtype">float</emphasis>&#32;angleTo&#32;=&#32;Vector3.Angle(fingerDirection,&#32;targetDirection);
+00148 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>(<link linkend="_class_leap_1_1_unity_1_1_finger_direction_detector_1a77aca25282ecbc1decc67ecf44a9561a">HandModel</link>.<link linkend="_class_leap_1_1_unity_1_1_hand_model_base_1a31704b6829e3d442133350b34a4a5a8a">IsTracked</link>&#32;&amp;&amp;&#32;angleTo&#32;&lt;=&#32;<link linkend="_class_leap_1_1_unity_1_1_finger_direction_detector_1a420e6bdcd701b20b3c6a95003c0b4c44">OnAngle</link>){
+00149 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_leap_1_1_unity_1_1_detector_1aed8730358778949381639d53df61aac8">Activate</link>();
+00150 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}&#32;<emphasis role="keywordflow">else</emphasis>&#32;<emphasis role="keywordflow">if</emphasis>&#32;(!<link linkend="_class_leap_1_1_unity_1_1_finger_direction_detector_1a77aca25282ecbc1decc67ecf44a9561a">HandModel</link>.<link linkend="_class_leap_1_1_unity_1_1_hand_model_base_1a31704b6829e3d442133350b34a4a5a8a">IsTracked</link>&#32;||&#32;angleTo&#32;&gt;=&#32;<link linkend="_class_leap_1_1_unity_1_1_finger_direction_detector_1a234c17e715950ba6810e2f3ae86a5d15">OffAngle</link>)&#32;{
+00151 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_leap_1_1_unity_1_1_detector_1a6493874fd22793d7b59dc56098559d59">Deactivate</link>();
+00152 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00153 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00154 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00155 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;yield&#32;<emphasis role="keywordflow">return</emphasis>&#32;<emphasis role="keyword">new</emphasis>&#32;WaitForSeconds(<link linkend="_class_leap_1_1_unity_1_1_finger_direction_detector_1ab70cf353126c82e1f4fb4a159ad60b50">Period</link>);
+00156 &#32;&#32;&#32;&#32;&#32;&#32;}
+00157 &#32;&#32;&#32;&#32;}
+00158 
+00159 &#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;Vector3&#32;selectedDirection(Vector3&#32;tipPosition){
+00160 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">switch</emphasis>(<link linkend="_class_leap_1_1_unity_1_1_finger_direction_detector_1a2161d1a746e283cce4a95f619fb699c1">PointingType</link>){
+00161 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">case</emphasis>&#32;<link linkend="_class_leap_1_1_unity_1_1_finger_direction_detector_1a2161d1a746e283cce4a95f619fb699c1">PointingType</link>.RelativeToHorizon:
+00162 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;Quaternion&#32;cameraRot&#32;=&#32;<link linkend="_namespace_valve_1_1_v_r_1a82e5bf501cc3aa155444ee3f0662853fa967d35e40f3f95b1f538bd248640bf3b">Camera</link>.main.transform.rotation;
+00163 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordtype">float</emphasis>&#32;cameraYaw&#32;=&#32;cameraRot.eulerAngles.y;
+00164 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;Quaternion&#32;rotator&#32;=&#32;Quaternion.AngleAxis(cameraYaw,&#32;Vector3.up);
+00165 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;rotator&#32;*&#32;<link linkend="_class_leap_1_1_unity_1_1_finger_direction_detector_1aeab7a19eb59f898c7d4be2bdf35cf5e5">PointingDirection</link>;
+00166 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">case</emphasis>&#32;<link linkend="_class_leap_1_1_unity_1_1_finger_direction_detector_1a2161d1a746e283cce4a95f619fb699c1">PointingType</link>.RelativeToCamera:
+00167 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;<link linkend="_namespace_valve_1_1_v_r_1a82e5bf501cc3aa155444ee3f0662853fa967d35e40f3f95b1f538bd248640bf3b">Camera</link>.main.transform.TransformDirection(<link linkend="_class_leap_1_1_unity_1_1_finger_direction_detector_1aeab7a19eb59f898c7d4be2bdf35cf5e5">PointingDirection</link>);
+00168 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">case</emphasis>&#32;<link linkend="_class_leap_1_1_unity_1_1_finger_direction_detector_1a2161d1a746e283cce4a95f619fb699c1">PointingType</link>.RelativeToWorld:
+00169 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;<link linkend="_class_leap_1_1_unity_1_1_finger_direction_detector_1aeab7a19eb59f898c7d4be2bdf35cf5e5">PointingDirection</link>;
+00170 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">case</emphasis>&#32;<link linkend="_class_leap_1_1_unity_1_1_finger_direction_detector_1a2161d1a746e283cce4a95f619fb699c1">PointingType</link>.AtTarget:
+00171 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;<link linkend="_class_leap_1_1_unity_1_1_finger_direction_detector_1a2f90f8d78d0447b6129b6a43c7ecee09">TargetObject</link>.position&#32;-&#32;tipPosition;
+00172 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">default</emphasis>:
+00173 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;<link linkend="_class_leap_1_1_unity_1_1_finger_direction_detector_1aeab7a19eb59f898c7d4be2bdf35cf5e5">PointingDirection</link>;
+00174 &#32;&#32;&#32;&#32;&#32;&#32;}
+00175 &#32;&#32;&#32;&#32;}
+00176 
+00177 &#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;<emphasis role="keywordtype">int</emphasis>&#32;selectedFingerOrdinal(){
+00178 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">switch</emphasis>(<link linkend="_class_leap_1_1_unity_1_1_finger_direction_detector_1a73b21690811ff68505ea419bf1270d1f">FingerName</link>){
+00179 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">case</emphasis>&#32;Finger.FingerType.TYPE_INDEX:
+00180 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;1;
+00181 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">case</emphasis>&#32;Finger.FingerType.TYPE_MIDDLE:
+00182 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;2;
+00183 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">case</emphasis>&#32;Finger.FingerType.TYPE_PINKY:
+00184 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;4;
+00185 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">case</emphasis>&#32;Finger.FingerType.TYPE_RING:
+00186 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;3;
+00187 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">case</emphasis>&#32;Finger.FingerType.TYPE_THUMB:
+00188 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;0;
+00189 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">default</emphasis>:
+00190 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;1;
+00191 &#32;&#32;&#32;&#32;&#32;&#32;}
+00192 &#32;&#32;&#32;&#32;}
+00193 
+00194 <emphasis role="preprocessor">&#32;&#32;#if&#32;UNITY_EDITOR</emphasis>
+00195 &#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;OnDrawGizmos&#32;()&#32;{
+00196 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(<link linkend="_class_leap_1_1_unity_1_1_finger_direction_detector_1a9bbe98671cb2301bb9f6b4eee2e115e7">ShowGizmos</link>&#32;&amp;&amp;&#32;<link linkend="_class_leap_1_1_unity_1_1_finger_direction_detector_1a77aca25282ecbc1decc67ecf44a9561a">HandModel</link>&#32;!=&#32;<emphasis role="keyword">null</emphasis>&#32;&amp;&amp;&#32;<link linkend="_class_leap_1_1_unity_1_1_finger_direction_detector_1a77aca25282ecbc1decc67ecf44a9561a">HandModel</link>.<link linkend="_class_leap_1_1_unity_1_1_hand_model_base_1a31704b6829e3d442133350b34a4a5a8a">IsTracked</link>)&#32;{
+00197 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;Color&#32;innerColor;
+00198 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(<link linkend="_class_leap_1_1_unity_1_1_detector_1a89e15d17ea95587d9edf49c42473264d">IsActive</link>)&#32;{
+00199 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;innerColor&#32;=&#32;<link linkend="_class_leap_1_1_unity_1_1_detector_1ad922f873e3c07f9128d6438332e7b9c7">OnColor</link>;
+00200 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}&#32;<emphasis role="keywordflow">else</emphasis>&#32;{
+00201 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;innerColor&#32;=&#32;<link linkend="_class_leap_1_1_unity_1_1_detector_1a976fc8d66dd98aaea15196d861df429c">OffColor</link>;
+00202 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00203 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;Finger&#32;finger&#32;=&#32;<link linkend="_class_leap_1_1_unity_1_1_finger_direction_detector_1a77aca25282ecbc1decc67ecf44a9561a">HandModel</link>.<link linkend="_class_leap_1_1_unity_1_1_hand_model_base_1aa24ca02bf4a64ba33b0370ad6da8731f">GetLeapHand</link>().<link linkend="_class_leap_1_1_hand_1ac9f68349507bfa13e3ac24738382bea6">Fingers</link>[selectedFingerOrdinal()];
+00204 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;Vector3&#32;fingerDirection&#32;=&#32;finger.Bone(Bone.BoneType.TYPE_DISTAL).Direction.ToVector3();
+00205 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;Utils.DrawCone(finger.TipPosition.ToVector3(),&#32;fingerDirection,&#32;<link linkend="_class_leap_1_1_unity_1_1_finger_direction_detector_1a420e6bdcd701b20b3c6a95003c0b4c44">OnAngle</link>,&#32;finger.Length,&#32;innerColor);
+00206 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;Utils.DrawCone(finger.TipPosition.ToVector3(),&#32;fingerDirection,&#32;<link linkend="_class_leap_1_1_unity_1_1_finger_direction_detector_1a234c17e715950ba6810e2f3ae86a5d15">OffAngle</link>,&#32;finger.Length,&#32;<link linkend="_class_leap_1_1_unity_1_1_detector_1ad7f8d0e7b913b78e86b2dacaa56287aa">LimitColor</link>);
+00207 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;Gizmos.color&#32;=&#32;<link linkend="_class_leap_1_1_unity_1_1_detector_1aae0718ccceffd88a12d63ad718cda346">DirectionColor</link>;
+00208 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;Gizmos.DrawRay(finger.TipPosition.ToVector3(),&#32;selectedDirection(finger.TipPosition.ToVector3()));
+00209 &#32;&#32;&#32;&#32;&#32;&#32;}
+00210 &#32;&#32;&#32;&#32;}
+00211 <emphasis role="preprocessor">&#32;&#32;#endif</emphasis>
+00212 &#32;&#32;}
+00213 }
+</programlisting></section>

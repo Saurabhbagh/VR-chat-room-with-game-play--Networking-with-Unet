@@ -1,0 +1,56 @@
+<?xml version='1.0' encoding='UTF-8' standalone='no'?>
+<section xmlns="http://docbook.org/ns/docbook" version="5.0" xmlns:xlink="http://www.w3.org/1999/xlink" xml:id="__t_m_p___object_pool_8cs_source">
+<title>TMP_ObjectPool.cs</title>
+<indexterm><primary>O:/GitHUBMINIPRoject/Library/PackageCache/com.unity.textmeshpro@1.3.0/Scripts/Runtime/TMP_ObjectPool.cs</primary></indexterm>
+<programlisting>00001 <emphasis role="keyword">using</emphasis>&#32;System.Collections.Generic;
+00002 <emphasis role="keyword">using</emphasis>&#32;<link linkend="__balloon_8cs_1a7d67e097df9376eb709b6a23aa3c7d23">UnityEngine</link>;
+00003 <emphasis role="keyword">using</emphasis>&#32;<link linkend="_namespace_unity_engine">UnityEngine</link>.Events;
+00004 
+00005 
+00006 <emphasis role="keyword">namespace&#32;</emphasis><link linkend="_namespace_t_m_pro">TMPro</link>
+00007 {
+00008 
+<anchor xml:id="__t_m_p___object_pool_8cs_source_1l00009"/><link linkend="_class_t_m_pro_1_1_t_m_p___object_pool">00009</link> &#32;&#32;&#32;&#32;<emphasis role="keyword">internal</emphasis>&#32;<emphasis role="keyword">class&#32;</emphasis><link linkend="_class_t_m_pro_1_1_t_m_p___object_pool">TMP_ObjectPool</link>&lt;T&gt;&#32;where&#32;T&#32;:&#32;new()
+00010 &#32;&#32;&#32;&#32;{
+00011 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;readonly&#32;Stack&lt;T&gt;&#32;m_Stack&#32;=&#32;<emphasis role="keyword">new</emphasis>&#32;Stack&lt;T&gt;();
+00012 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;readonly&#32;UnityAction&lt;T&gt;&#32;m_ActionOnGet;
+00013 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;readonly&#32;UnityAction&lt;T&gt;&#32;m_ActionOnRelease;
+00014 
+<anchor xml:id="__t_m_p___object_pool_8cs_source_1l00015"/><link linkend="_class_t_m_pro_1_1_t_m_p___object_pool_1a1aa8a0fe53daff4b514c865692d35dd5">00015</link> &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keywordtype">int</emphasis>&#32;<link linkend="_class_t_m_pro_1_1_t_m_p___object_pool_1a1aa8a0fe53daff4b514c865692d35dd5">countAll</link>&#32;{&#32;<emphasis role="keyword">get</emphasis>;&#32;<emphasis role="keyword">private</emphasis>&#32;<emphasis role="keyword">set</emphasis>;&#32;}
+<anchor xml:id="__t_m_p___object_pool_8cs_source_1l00016"/><link linkend="_class_t_m_pro_1_1_t_m_p___object_pool_1a09a7afea64eb1ddf8942caf6da2853a1">00016</link> &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keywordtype">int</emphasis>&#32;<link linkend="_class_t_m_pro_1_1_t_m_p___object_pool_1a09a7afea64eb1ddf8942caf6da2853a1">countActive</link>&#32;{&#32;<emphasis role="keyword">get</emphasis>&#32;{&#32;<emphasis role="keywordflow">return</emphasis>&#32;<link linkend="_class_t_m_pro_1_1_t_m_p___object_pool_1a1aa8a0fe53daff4b514c865692d35dd5">countAll</link>&#32;-&#32;<link linkend="_class_t_m_pro_1_1_t_m_p___object_pool_1a2e5c8c7744a87bfd9723d1b92f65f929">countInactive</link>;&#32;}&#32;}
+<anchor xml:id="__t_m_p___object_pool_8cs_source_1l00017"/><link linkend="_class_t_m_pro_1_1_t_m_p___object_pool_1a2e5c8c7744a87bfd9723d1b92f65f929">00017</link> &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keywordtype">int</emphasis>&#32;<link linkend="_class_t_m_pro_1_1_t_m_p___object_pool_1a2e5c8c7744a87bfd9723d1b92f65f929">countInactive</link>&#32;{&#32;<emphasis role="keyword">get</emphasis>&#32;{&#32;<emphasis role="keywordflow">return</emphasis>&#32;m_Stack.Count;&#32;}&#32;}
+00018 
+<anchor xml:id="__t_m_p___object_pool_8cs_source_1l00019"/><link linkend="_class_t_m_pro_1_1_t_m_p___object_pool_1abac083490dabbd73d8fd069b7992c18b">00019</link> &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<link linkend="_class_t_m_pro_1_1_t_m_p___object_pool_1abac083490dabbd73d8fd069b7992c18b">TMP_ObjectPool</link>(UnityAction&lt;T&gt;&#32;actionOnGet,&#32;UnityAction&lt;T&gt;&#32;actionOnRelease)
+00020 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00021 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;m_ActionOnGet&#32;=&#32;actionOnGet;
+00022 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;m_ActionOnRelease&#32;=&#32;actionOnRelease;
+00023 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00024 
+<anchor xml:id="__t_m_p___object_pool_8cs_source_1l00025"/><link linkend="_class_t_m_pro_1_1_t_m_p___object_pool_1ac06efec7fc4061a729cfb6dfc0e66f82">00025</link> &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;T&#32;<link linkend="_class_t_m_pro_1_1_t_m_p___object_pool_1ac06efec7fc4061a729cfb6dfc0e66f82">Get</link>()
+00026 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00027 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;T&#32;element;
+00028 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(m_Stack.Count&#32;==&#32;0)
+00029 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00030 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;element&#32;=&#32;<emphasis role="keyword">new</emphasis>&#32;T();
+00031 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_t_m_pro_1_1_t_m_p___object_pool_1a1aa8a0fe53daff4b514c865692d35dd5">countAll</link>++;
+00032 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00033 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">else</emphasis>
+00034 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00035 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;element&#32;=&#32;m_Stack.Pop();
+00036 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00037 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(m_ActionOnGet&#32;!=&#32;<emphasis role="keyword">null</emphasis>)
+00038 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;m_ActionOnGet(element);
+00039 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;element;
+00040 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00041 
+<anchor xml:id="__t_m_p___object_pool_8cs_source_1l00042"/><link linkend="_class_t_m_pro_1_1_t_m_p___object_pool_1a7d1275be300c5e87b0f50dff43ff6b63">00042</link> &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;<link linkend="_class_t_m_pro_1_1_t_m_p___object_pool_1a7d1275be300c5e87b0f50dff43ff6b63">Release</link>(T&#32;element)
+00043 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00044 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(m_Stack.Count&#32;&gt;&#32;0&#32;&amp;&amp;&#32;ReferenceEquals(m_Stack.Peek(),&#32;element))
+00045 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;Debug.LogError(<emphasis role="stringliteral">&quot;Internal&#32;error.&#32;Trying&#32;to&#32;destroy&#32;object&#32;that&#32;is&#32;already&#32;released&#32;to&#32;pool.&quot;</emphasis>);
+00046 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(m_ActionOnRelease&#32;!=&#32;<emphasis role="keyword">null</emphasis>)
+00047 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;m_ActionOnRelease(element);
+00048 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;m_Stack.Push(element);
+00049 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00050 &#32;&#32;&#32;&#32;}
+00051 }
+</programlisting></section>

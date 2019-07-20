@@ -1,0 +1,217 @@
+<?xml version='1.0' encoding='UTF-8' standalone='no'?>
+<section xmlns="http://docbook.org/ns/docbook" version="5.0" xmlns:xlink="http://www.w3.org/1999/xlink" xml:id="__joe_jeff_8cs_source">
+<title>JoeJeff.cs</title>
+<indexterm><primary>O:/GitHUBMINIPRoject/Assets/SteamVR/InteractionSystem/Samples/JoeJeff/JoeJeff.cs</primary></indexterm>
+<programlisting>00001 <emphasis role="keyword">using</emphasis>&#32;<link linkend="__balloon_8cs_1a7d67e097df9376eb709b6a23aa3c7d23">UnityEngine</link>;
+00002 <emphasis role="keyword">using</emphasis>&#32;System.Collections;
+00003 <emphasis role="keyword">using</emphasis>&#32;<link linkend="_namespace_valve">Valve</link>.<link linkend="_namespace_valve_1_1_v_r">VR</link>.<link linkend="_namespace_valve_1_1_v_r_1_1_interaction_system">InteractionSystem</link>;
+00004 
+00005 <emphasis role="keyword">namespace&#32;</emphasis><link linkend="_namespace_valve_1_1_v_r_1_1_interaction_system_1_1_sample">Valve.VR.InteractionSystem.Sample</link>
+00006 {
+<anchor xml:id="__joe_jeff_8cs_source_1l00007"/><link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_sample_1_1_joe_jeff">00007</link> &#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keyword">class&#32;</emphasis><link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_sample_1_1_joe_jeff">JoeJeff</link>&#32;:&#32;MonoBehaviour
+00008 &#32;&#32;&#32;&#32;{
+<anchor xml:id="__joe_jeff_8cs_source_1l00009"/><link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_sample_1_1_joe_jeff_1a63c01ac5c2ef1901e6ef9eda1378d4a5">00009</link> &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keywordtype">float</emphasis>&#32;<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_sample_1_1_joe_jeff_1a63c01ac5c2ef1901e6ef9eda1378d4a5">animationSpeed</link>;
+00010 
+<anchor xml:id="__joe_jeff_8cs_source_1l00011"/><link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_sample_1_1_joe_jeff_1ad893033ab5e6be7e1db32c979a98b1cc">00011</link> &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keywordtype">float</emphasis>&#32;<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_sample_1_1_joe_jeff_1ad893033ab5e6be7e1db32c979a98b1cc">jumpVelocity</link>;
+00012 
+00013 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;[SerializeField]
+00014 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;<emphasis role="keywordtype">float</emphasis>&#32;m_MovingTurnSpeed&#32;=&#32;360;
+00015 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;[SerializeField]
+00016 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;<emphasis role="keywordtype">float</emphasis>&#32;m_StationaryTurnSpeed&#32;=&#32;180;
+00017 
+<anchor xml:id="__joe_jeff_8cs_source_1l00018"/><link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_sample_1_1_joe_jeff_1a20f121b435b12ab5b459a76900ca6d0b">00018</link> &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keywordtype">float</emphasis>&#32;<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_sample_1_1_joe_jeff_1a20f121b435b12ab5b459a76900ca6d0b">airControl</link>;
+00019 
+00020 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;[Tooltip(<emphasis role="stringliteral">&quot;The&#32;time&#32;it&#32;takes&#32;after&#32;landing&#32;a&#32;jump&#32;to&#32;slow&#32;down&quot;</emphasis>)]
+<anchor xml:id="__joe_jeff_8cs_source_1l00021"/><link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_sample_1_1_joe_jeff_1a9a92de4ee6bf42d269b993af94226893">00021</link> &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keywordtype">float</emphasis>&#32;<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_sample_1_1_joe_jeff_1a9a92de4ee6bf42d269b993af94226893">frictionTime</link>&#32;=&#32;0.2f;
+00022 
+00023 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;[SerializeField]
+00024 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;<emphasis role="keywordtype">float</emphasis>&#32;footHeight&#32;=&#32;0.1f;
+00025 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;[SerializeField]
+00026 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;<emphasis role="keywordtype">float</emphasis>&#32;footRadius&#32;=&#32;0.03f;
+00027 
+00028 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;RaycastHit&#32;footHit;
+00029 
+00030 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;<emphasis role="keywordtype">bool</emphasis>&#32;isGrounded;
+00031 
+00032 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;<emphasis role="keywordtype">float</emphasis>&#32;turnAmount;
+00033 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;<emphasis role="keywordtype">float</emphasis>&#32;forwardAmount;
+00034 
+00035 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;<emphasis role="keywordtype">float</emphasis>&#32;groundedTime;
+00036 
+00037 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;Animator&#32;animator;
+00038 
+00039 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;Vector3&#32;input;
+00040 
+00041 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;<emphasis role="keywordtype">bool</emphasis>&#32;held;
+00042 
+00043 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;<emphasis role="keyword">new</emphasis>&#32;Rigidbody&#32;rigidbody;
+00044 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_interactable">Interactable</link>&#32;interactable;
+00045 
+<anchor xml:id="__joe_jeff_8cs_source_1l00046"/><link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_sample_1_1_joe_jeff_1abc6273f87fc83f6a4bb8b23b587c272c">00046</link> &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_fire_source">FireSource</link>&#32;<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_sample_1_1_joe_jeff_1abc6273f87fc83f6a4bb8b23b587c272c">fire</link>;
+00047 
+00048 
+00049 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;Start()
+00050 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00051 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;animator&#32;=&#32;GetComponent&lt;Animator&gt;();
+00052 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;rigidbody&#32;=&#32;GetComponent&lt;Rigidbody&gt;();
+00053 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;interactable&#32;=&#32;GetComponent&lt;Interactable&gt;();
+00054 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;animator.speed&#32;=&#32;<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_sample_1_1_joe_jeff_1a63c01ac5c2ef1901e6ef9eda1378d4a5">animationSpeed</link>;
+00055 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00056 
+00057 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;Update()
+00058 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00059 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;held&#32;=&#32;interactable.<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_interactable_1a1980377b09ca72c574f045e7d6aac17f">attachedToHand</link>&#32;!=&#32;<emphasis role="keyword">null</emphasis>;
+00060 
+00061 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;jumpTimer&#32;-=&#32;Time.deltaTime;
+00062 
+00063 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;CheckGrounded();
+00064 
+00065 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;rigidbody.freezeRotation&#32;=&#32;!held;
+00066 
+00067 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(held&#32;==&#32;<emphasis role="keyword">false</emphasis>)
+00068 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;FixRotation();
+00069 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00070 
+00071 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;FixRotation()
+00072 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00073 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;Vector3&#32;eulers&#32;=&#32;transform.eulerAngles;
+00074 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;eulers.x&#32;=&#32;0;
+00075 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;eulers.z&#32;=&#32;0;
+00076 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;Quaternion&#32;targetRotation&#32;=&#32;Quaternion.Euler(eulers);
+00077 
+00078 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;transform.rotation&#32;=&#32;Quaternion.Slerp(transform.rotation,&#32;targetRotation,&#32;Time.deltaTime&#32;*&#32;(isGrounded&#32;?&#32;20&#32;:&#32;3));
+00079 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00080 
+00081 
+<anchor xml:id="__joe_jeff_8cs_source_1l00082"/><link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_sample_1_1_joe_jeff_1ad0406f46ad7cfffa15d9e1e95cc37ed6">00082</link> &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_sample_1_1_joe_jeff_1ad0406f46ad7cfffa15d9e1e95cc37ed6">OnAnimatorMove</link>()
+00083 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00084 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;we&#32;implement&#32;this&#32;function&#32;to&#32;override&#32;the&#32;default&#32;root&#32;motion.</emphasis>
+00085 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;this&#32;allows&#32;us&#32;to&#32;modify&#32;the&#32;positional&#32;speed&#32;before&#32;it&apos;s&#32;applied.</emphasis>
+00086 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(Time.deltaTime&#32;&gt;&#32;0)
+00087 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00088 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;Vector3&#32;animationDelta&#32;=&#32;(animator.deltaPosition)&#32;/&#32;Time.deltaTime;
+00089 
+00090 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;animationDelta&#32;=&#32;Vector3.ProjectOnPlane(animationDelta,&#32;footHit.normal);
+00091 
+00092 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(isGrounded&#32;&amp;&amp;&#32;jumpTimer&#32;&lt;&#32;0)
+00093 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00094 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(groundedTime&#32;&lt;&#32;<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_sample_1_1_joe_jeff_1a9a92de4ee6bf42d269b993af94226893">frictionTime</link>)&#32;<emphasis role="comment">//slow&#32;down&#32;when&#32;first&#32;hitting&#32;the&#32;floor&#32;after&#32;a&#32;jump</emphasis>
+00095 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00096 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordtype">float</emphasis>&#32;moveFac&#32;=&#32;Mathf.InverseLerp(0,&#32;<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_sample_1_1_joe_jeff_1a9a92de4ee6bf42d269b993af94226893">frictionTime</link>,&#32;groundedTime);
+00097 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//print(moveFac);</emphasis>
+00098 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;Vector3&#32;lerpV&#32;=&#32;Vector3.Lerp(rigidbody.velocity,&#32;animationDelta,&#32;moveFac&#32;*&#32;Time.deltaTime&#32;*&#32;30);
+00099 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;animationDelta.x&#32;=&#32;lerpV.x;
+00100 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;animationDelta.z&#32;=&#32;lerpV.z;
+00101 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00102 
+00103 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;adding&#32;a&#32;little&#32;downward&#32;force&#32;to&#32;keep&#32;him&#32;on&#32;the&#32;floor</emphasis>
+00104 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;animationDelta.y&#32;+=&#32;-0.2f;<emphasis role="comment">//&#32;rb.velocity.y;</emphasis>
+00105 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;rigidbody.velocity&#32;=&#32;animationDelta;
+00106 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00107 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">else</emphasis>
+00108 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00109 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;rigidbody.velocity&#32;+=&#32;input&#32;*&#32;Time.deltaTime&#32;*&#32;<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_sample_1_1_joe_jeff_1a20f121b435b12ab5b459a76900ca6d0b">airControl</link>;
+00110 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00111 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00112 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00113 
+<anchor xml:id="__joe_jeff_8cs_source_1l00114"/><link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_sample_1_1_joe_jeff_1aa4082021140313e24d77e4070f8fd3ad">00114</link> &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_sample_1_1_joe_jeff_1aa4082021140313e24d77e4070f8fd3ad">Move</link>(Vector3&#32;move,&#32;<emphasis role="keywordtype">bool</emphasis>&#32;jump)
+00115 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00116 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;input&#32;=&#32;move;
+00117 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(move.magnitude&#32;&gt;&#32;1f)
+00118 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;move.Normalize();
+00119 
+00120 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;move&#32;=&#32;transform.InverseTransformDirection(move);
+00121 
+00122 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;turnAmount&#32;=&#32;Mathf.Atan2(move.x,&#32;move.z);
+00123 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;forwardAmount&#32;=&#32;move.z;
+00124 
+00125 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;ApplyExtraTurnRotation();
+00126 
+00127 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;control&#32;and&#32;velocity&#32;handling&#32;is&#32;different&#32;when&#32;grounded&#32;and&#32;airborne:</emphasis>
+00128 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(isGrounded)
+00129 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00130 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;HandleGroundedMovement(jump);
+00131 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00132 
+00133 
+00134 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;send&#32;input&#32;and&#32;other&#32;state&#32;parameters&#32;to&#32;the&#32;animator</emphasis>
+00135 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;UpdateAnimator(move);
+00136 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00137 
+00138 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;UpdateAnimator(Vector3&#32;move)
+00139 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00140 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;animator.speed&#32;=&#32;<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_sample_1_1_joe_jeff_1abc6273f87fc83f6a4bb8b23b587c272c">fire</link>.<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_fire_source_1a533abd233b96d3f75164bc913e4e30b8">isBurning</link>&#32;?&#32;<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_sample_1_1_joe_jeff_1a63c01ac5c2ef1901e6ef9eda1378d4a5">animationSpeed</link>&#32;*&#32;2&#32;:&#32;<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_sample_1_1_joe_jeff_1a63c01ac5c2ef1901e6ef9eda1378d4a5">animationSpeed</link>;
+00141 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;update&#32;the&#32;animator&#32;parameters</emphasis>
+00142 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;animator.SetFloat(<emphasis role="stringliteral">&quot;Forward&quot;</emphasis>,&#32;<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_sample_1_1_joe_jeff_1abc6273f87fc83f6a4bb8b23b587c272c">fire</link>.<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_fire_source_1a533abd233b96d3f75164bc913e4e30b8">isBurning</link>&#32;?&#32;2&#32;:&#32;forwardAmount,&#32;0.1f,&#32;Time.deltaTime);
+00143 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;animator.SetFloat(<emphasis role="stringliteral">&quot;Turn&quot;</emphasis>,&#32;turnAmount,&#32;0.1f,&#32;Time.deltaTime);
+00144 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;animator.SetBool(<emphasis role="stringliteral">&quot;OnGround&quot;</emphasis>,&#32;isGrounded);
+00145 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;animator.SetBool(<emphasis role="stringliteral">&quot;Holding&quot;</emphasis>,&#32;held);
+00146 
+00147 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(!isGrounded)
+00148 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00149 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;animator.SetFloat(<emphasis role="stringliteral">&quot;FallSpeed&quot;</emphasis>,&#32;Mathf.Abs(rigidbody.velocity.y));
+00150 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;animator.SetFloat(<emphasis role="stringliteral">&quot;Jump&quot;</emphasis>,&#32;rigidbody.velocity.y);
+00151 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00152 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00153 
+00154 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;ApplyExtraTurnRotation()
+00155 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00156 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;help&#32;the&#32;character&#32;turn&#32;faster&#32;(this&#32;is&#32;in&#32;addition&#32;to&#32;root&#32;rotation&#32;in&#32;the&#32;animation)</emphasis>
+00157 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordtype">float</emphasis>&#32;turnSpeed&#32;=&#32;Mathf.Lerp(m_StationaryTurnSpeed,&#32;m_MovingTurnSpeed,&#32;forwardAmount);
+00158 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;transform.Rotate(0,&#32;turnAmount&#32;*&#32;turnSpeed&#32;*&#32;Time.deltaTime,&#32;0);
+00159 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00160 
+00161 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;CheckGrounded()
+00162 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00163 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;isGrounded&#32;=&#32;<emphasis role="keyword">false</emphasis>;
+00164 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(jumpTimer&#32;&lt;&#32;0&#32;&amp;&#32;!held)&#32;<emphasis role="comment">//&#32;make&#32;sure&#32;we&#32;didn&apos;t&#32;just&#32;jump</emphasis>
+00165 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00166 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;isGrounded&#32;=&#32;(Physics.SphereCast(<emphasis role="keyword">new</emphasis>&#32;Ray(transform.position&#32;+&#32;Vector3.up&#32;*&#32;footHeight,&#32;Vector3.down),&#32;footRadius,&#32;out&#32;footHit,&#32;footHeight&#32;-&#32;footRadius));
+00167 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(Vector2.Distance(<emphasis role="keyword">new</emphasis>&#32;Vector2(transform.position.x,&#32;transform.position.z),&#32;<emphasis role="keyword">new</emphasis>&#32;Vector2(footHit.point.x,&#32;footHit.point.z))&#32;&gt;&#32;footRadius&#32;/&#32;2)
+00168 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00169 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;isGrounded&#32;=&#32;<emphasis role="keyword">false</emphasis>;
+00170 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//on&#32;slope,&#32;hit&#32;point&#32;is&#32;on&#32;edge&#32;of&#32;sphere&#32;cast</emphasis>
+00171 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00172 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00173 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00174 
+00175 
+00176 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;FixedUpdate()
+00177 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00178 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;groundedTime&#32;+=&#32;Time.fixedDeltaTime;
+00179 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(!isGrounded)&#32;groundedTime&#32;=&#32;0;&#32;<emphasis role="comment">//&#32;reset&#32;timer</emphasis>
+00180 
+00181 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(isGrounded&#32;&amp;&#32;!held)
+00182 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00183 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;Debug.DrawLine(transform.position,&#32;footHit.point);
+00184 
+00185 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;rigidbody.position&#32;=&#32;<emphasis role="keyword">new</emphasis>&#32;Vector3(rigidbody.position.x,&#32;footHit.point.y,&#32;rigidbody.position.z);
+00186 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00187 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00188 
+00189 
+00190 
+00191 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;HandleGroundedMovement(<emphasis role="keywordtype">bool</emphasis>&#32;jump)
+00192 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00193 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;check&#32;whether&#32;conditions&#32;are&#32;right&#32;to&#32;allow&#32;a&#32;jump:</emphasis>
+00194 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(jump&#32;&amp;&amp;&#32;isGrounded)
+00195 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00196 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_sample_1_1_joe_jeff_1a1b6528311050c8005057adbf4a0d7cb7">Jump</link>();
+00197 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00198 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00199 
+00200 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;<emphasis role="keywordtype">float</emphasis>&#32;jumpTimer;
+<anchor xml:id="__joe_jeff_8cs_source_1l00201"/><link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_sample_1_1_joe_jeff_1a1b6528311050c8005057adbf4a0d7cb7">00201</link> &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_sample_1_1_joe_jeff_1a1b6528311050c8005057adbf4a0d7cb7">Jump</link>()
+00202 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00203 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;isGrounded&#32;=&#32;<emphasis role="keyword">false</emphasis>;
+00204 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;jumpTimer&#32;=&#32;0.1f;
+00205 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;animator.applyRootMotion&#32;=&#32;<emphasis role="keyword">false</emphasis>;
+00206 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;rigidbody.position&#32;+=&#32;Vector3.up&#32;*&#32;0.03f;
+00207 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;Vector3&#32;velocity&#32;=&#32;rigidbody.velocity;
+00208 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;velocity.y&#32;=&#32;<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_sample_1_1_joe_jeff_1ad893033ab5e6be7e1db32c979a98b1cc">jumpVelocity</link>;
+00209 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;rigidbody.velocity&#32;=&#32;velocity;
+00210 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00211 &#32;&#32;&#32;&#32;}
+00212 }
+</programlisting></section>

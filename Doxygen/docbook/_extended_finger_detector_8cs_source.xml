@@ -1,0 +1,158 @@
+<?xml version='1.0' encoding='UTF-8' standalone='no'?>
+<section xmlns="http://docbook.org/ns/docbook" version="5.0" xmlns:xlink="http://www.w3.org/1999/xlink" xml:id="__extended_finger_detector_8cs_source">
+<title>ExtendedFingerDetector.cs</title>
+<indexterm><primary>O:/GitHUBMINIPRoject/Assets/LeapMotion/Core/Scripts/DetectionUtilities/ExtendedFingerDetector.cs</primary></indexterm>
+<programlisting>00001 <emphasis role="comment">/******************************************************************************</emphasis>
+00002 <emphasis role="comment">&#32;*&#32;Copyright&#32;(C)&#32;Leap&#32;Motion,&#32;Inc.&#32;2011-2018.&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;*</emphasis>
+00003 <emphasis role="comment">&#32;*&#32;Leap&#32;Motion&#32;proprietary&#32;and&#32;confidential.&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;*</emphasis>
+00004 <emphasis role="comment">&#32;*&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;*</emphasis>
+00005 <emphasis role="comment">&#32;*&#32;Use&#32;subject&#32;to&#32;the&#32;terms&#32;of&#32;the&#32;Leap&#32;Motion&#32;SDK&#32;Agreement&#32;available&#32;at&#32;&#32;&#32;&#32;&#32;*</emphasis>
+00006 <emphasis role="comment">&#32;*&#32;https://developer.leapmotion.com/sdk_agreement,&#32;or&#32;another&#32;agreement&#32;&#32;&#32;&#32;&#32;&#32;&#32;*</emphasis>
+00007 <emphasis role="comment">&#32;*&#32;between&#32;Leap&#32;Motion&#32;and&#32;you,&#32;your&#32;company&#32;or&#32;other&#32;organization.&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;*</emphasis>
+00008 <emphasis role="comment">&#32;******************************************************************************/</emphasis>
+00009 
+00010 <emphasis role="keyword">using</emphasis>&#32;<link linkend="__balloon_8cs_1a7d67e097df9376eb709b6a23aa3c7d23">UnityEngine</link>;
+00011 <emphasis role="keyword">using</emphasis>&#32;System.Collections;
+00012 <emphasis role="keyword">using</emphasis>&#32;System;
+00013 <emphasis role="keyword">using</emphasis>&#32;<link linkend="_namespace_leap">Leap</link>.<link linkend="_namespace_leap_1_1_unity">Unity</link>.<link linkend="_namespace_leap_1_1_unity_1_1_attributes">Attributes</link>;
+00014 
+00015 <emphasis role="keyword">namespace&#32;</emphasis><link linkend="_namespace_leap_1_1_unity">Leap.Unity</link>&#32;{
+00016 
+<anchor xml:id="__extended_finger_detector_8cs_source_1l00030"/><link linkend="_class_leap_1_1_unity_1_1_extended_finger_detector">00030</link> &#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keyword">class&#32;</emphasis><link linkend="_class_leap_1_1_unity_1_1_extended_finger_detector">ExtendedFingerDetector</link>&#32;:&#32;<link linkend="_class_leap_1_1_unity_1_1_detector">Detector</link>&#32;{
+00035 &#32;&#32;&#32;&#32;[Tooltip(<emphasis role="stringliteral">&quot;The&#32;interval&#32;in&#32;seconds&#32;at&#32;which&#32;to&#32;check&#32;this&#32;detector&apos;s&#32;conditions.&quot;</emphasis>)]
+00036 &#32;&#32;&#32;&#32;[Units(<emphasis role="stringliteral">&quot;seconds&quot;</emphasis>)]
+00037 &#32;&#32;&#32;&#32;[<link linkend="_class_leap_1_1_unity_1_1_attributes_1_1_min_value">MinValue</link>(0)]
+<anchor xml:id="__extended_finger_detector_8cs_source_1l00038"/><link linkend="_class_leap_1_1_unity_1_1_extended_finger_detector_1a0e8262d14702fa8b2e7dc55c721d651e">00038</link> &#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keywordtype">float</emphasis>&#32;<link linkend="_class_leap_1_1_unity_1_1_extended_finger_detector_1a0e8262d14702fa8b2e7dc55c721d651e">Period</link>&#32;=&#32;.1f;&#32;<emphasis role="comment">//seconds</emphasis>
+00039 
+00045 &#32;&#32;&#32;&#32;[Tooltip(<emphasis role="stringliteral">&quot;The&#32;hand&#32;model&#32;to&#32;watch.&#32;Set&#32;automatically&#32;if&#32;detector&#32;is&#32;on&#32;a&#32;hand.&quot;</emphasis>)]
+<anchor xml:id="__extended_finger_detector_8cs_source_1l00046"/><link linkend="_class_leap_1_1_unity_1_1_extended_finger_detector_1a1ce4d883132d6a9fa84370ff12c8b0bc">00046</link> &#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<link linkend="_class_leap_1_1_unity_1_1_hand_model_base">HandModelBase</link>&#32;<link linkend="_class_leap_1_1_unity_1_1_hand_model">HandModel</link>&#32;=&#32;<emphasis role="keyword">null</emphasis>;
+00047 &#32;&#32;
+00049 &#32;&#32;&#32;&#32;[Header(<emphasis role="stringliteral">&quot;Finger&#32;States&quot;</emphasis>)]
+00050 &#32;&#32;&#32;&#32;[Tooltip(<emphasis role="stringliteral">&quot;Required&#32;state&#32;of&#32;the&#32;thumb.&quot;</emphasis>)]
+<anchor xml:id="__extended_finger_detector_8cs_source_1l00051"/><link linkend="_class_leap_1_1_unity_1_1_extended_finger_detector_1abf3b43c9d475e3241d6b1111c990d1de">00051</link> &#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<link linkend="_namespace_leap_1_1_unity_1a1d316bf483102971171646a20de176fc">PointingState</link>&#32;<link linkend="_class_leap_1_1_unity_1_1_extended_finger_detector_1abf3b43c9d475e3241d6b1111c990d1de">Thumb</link>&#32;=&#32;<link linkend="_namespace_leap_1_1_unity_1a1d316bf483102971171646a20de176fc">PointingState</link>.Either;
+00053 &#32;&#32;&#32;&#32;[Tooltip(<emphasis role="stringliteral">&quot;Required&#32;state&#32;of&#32;the&#32;index&#32;finger.&quot;</emphasis>)]
+<anchor xml:id="__extended_finger_detector_8cs_source_1l00054"/><link linkend="_class_leap_1_1_unity_1_1_extended_finger_detector_1ae24e39831917ad570db7975b8454c4ac">00054</link> &#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<link linkend="_namespace_leap_1_1_unity_1a1d316bf483102971171646a20de176fc">PointingState</link>&#32;<link linkend="_class_leap_1_1_unity_1_1_extended_finger_detector_1ae24e39831917ad570db7975b8454c4ac">Index</link>&#32;=&#32;<link linkend="_namespace_leap_1_1_unity_1a1d316bf483102971171646a20de176fc">PointingState</link>.Either;
+00056 &#32;&#32;&#32;&#32;[Tooltip(<emphasis role="stringliteral">&quot;Required&#32;state&#32;of&#32;the&#32;middle&#32;finger.&quot;</emphasis>)]
+<anchor xml:id="__extended_finger_detector_8cs_source_1l00057"/><link linkend="_class_leap_1_1_unity_1_1_extended_finger_detector_1a15d5d4abb98b316c98ef8bdeb369d97a">00057</link> &#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<link linkend="_namespace_leap_1_1_unity_1a1d316bf483102971171646a20de176fc">PointingState</link>&#32;<link linkend="_class_leap_1_1_unity_1_1_extended_finger_detector_1a15d5d4abb98b316c98ef8bdeb369d97a">Middle</link>&#32;=&#32;<link linkend="_namespace_leap_1_1_unity_1a1d316bf483102971171646a20de176fc">PointingState</link>.Either;
+00059 &#32;&#32;&#32;&#32;[Tooltip(<emphasis role="stringliteral">&quot;Required&#32;state&#32;of&#32;the&#32;ring&#32;finger.&quot;</emphasis>)]
+<anchor xml:id="__extended_finger_detector_8cs_source_1l00060"/><link linkend="_class_leap_1_1_unity_1_1_extended_finger_detector_1a08e096dca12e0dc50f7ddf831cdff192">00060</link> &#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<link linkend="_namespace_leap_1_1_unity_1a1d316bf483102971171646a20de176fc">PointingState</link>&#32;<link linkend="_class_leap_1_1_unity_1_1_extended_finger_detector_1a08e096dca12e0dc50f7ddf831cdff192">Ring</link>&#32;=&#32;<link linkend="_namespace_leap_1_1_unity_1a1d316bf483102971171646a20de176fc">PointingState</link>.Either;
+00062 &#32;&#32;&#32;&#32;[Tooltip(<emphasis role="stringliteral">&quot;Required&#32;state&#32;of&#32;the&#32;little&#32;finger.&quot;</emphasis>)]
+<anchor xml:id="__extended_finger_detector_8cs_source_1l00063"/><link linkend="_class_leap_1_1_unity_1_1_extended_finger_detector_1a8cb8f984382c8c7fae991073aa7ff232">00063</link> &#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<link linkend="_namespace_leap_1_1_unity_1a1d316bf483102971171646a20de176fc">PointingState</link>&#32;<link linkend="_class_leap_1_1_unity_1_1_extended_finger_detector_1a8cb8f984382c8c7fae991073aa7ff232">Pinky</link>&#32;=&#32;<link linkend="_namespace_leap_1_1_unity_1a1d316bf483102971171646a20de176fc">PointingState</link>.Either;
+00064 
+00066 &#32;&#32;&#32;&#32;[Header(<emphasis role="stringliteral">&quot;Min&#32;and&#32;Max&#32;Finger&#32;Counts&quot;</emphasis>)]
+00067 &#32;&#32;&#32;&#32;[Range(0,5)]
+00068 &#32;&#32;&#32;&#32;[Tooltip(<emphasis role="stringliteral">&quot;The&#32;minimum&#32;number&#32;of&#32;fingers&#32;extended.&quot;</emphasis>)]
+<anchor xml:id="__extended_finger_detector_8cs_source_1l00069"/><link linkend="_class_leap_1_1_unity_1_1_extended_finger_detector_1ab5759c120d7bcc6c3c2d779089689b3a">00069</link> &#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keywordtype">int</emphasis>&#32;<link linkend="_class_leap_1_1_unity_1_1_extended_finger_detector_1ab5759c120d7bcc6c3c2d779089689b3a">MinimumExtendedCount</link>&#32;=&#32;0;
+00071 &#32;&#32;&#32;&#32;[Range(0,&#32;5)]
+00072 &#32;&#32;&#32;&#32;[Tooltip(<emphasis role="stringliteral">&quot;The&#32;maximum&#32;number&#32;of&#32;fingers&#32;extended.&quot;</emphasis>)]
+<anchor xml:id="__extended_finger_detector_8cs_source_1l00073"/><link linkend="_class_leap_1_1_unity_1_1_extended_finger_detector_1a53da535a860f85c42cd383bbea4c3e67">00073</link> &#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keywordtype">int</emphasis>&#32;<link linkend="_class_leap_1_1_unity_1_1_extended_finger_detector_1a53da535a860f85c42cd383bbea4c3e67">MaximumExtendedCount</link>&#32;=&#32;5;
+00077 &#32;&#32;&#32;&#32;[Header(<emphasis role="stringliteral">&quot;&quot;</emphasis>)]
+00078 &#32;&#32;&#32;&#32;[Tooltip(<emphasis role="stringliteral">&quot;Draw&#32;this&#32;detector&apos;s&#32;Gizmos,&#32;if&#32;any.&#32;(Gizmos&#32;must&#32;be&#32;on&#32;in&#32;Unity&#32;edtor,&#32;too.)&quot;</emphasis>)]
+<anchor xml:id="__extended_finger_detector_8cs_source_1l00079"/><link linkend="_class_leap_1_1_unity_1_1_extended_finger_detector_1ae8f83315871432527c288cdfef9f7d4b">00079</link> &#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keywordtype">bool</emphasis>&#32;<link linkend="_class_leap_1_1_unity_1_1_extended_finger_detector_1ae8f83315871432527c288cdfef9f7d4b">ShowGizmos</link>&#32;=&#32;<emphasis role="keyword">true</emphasis>;
+00080 
+00081 &#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;IEnumerator&#32;watcherCoroutine;
+00082 
+00083 &#32;&#32;&#32;&#32;<emphasis role="keywordtype">void</emphasis>&#32;OnValidate()&#32;{
+00084 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordtype">int</emphasis>&#32;required&#32;=&#32;0,&#32;forbidden&#32;=&#32;0;
+00085 &#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_namespace_leap_1_1_unity_1a1d316bf483102971171646a20de176fc">PointingState</link>[]&#32;stateArray&#32;=&#32;{&#32;<link linkend="_class_leap_1_1_unity_1_1_extended_finger_detector_1abf3b43c9d475e3241d6b1111c990d1de">Thumb</link>,&#32;<link linkend="_class_leap_1_1_unity_1_1_extended_finger_detector_1ae24e39831917ad570db7975b8454c4ac">Index</link>,&#32;<link linkend="_class_leap_1_1_unity_1_1_extended_finger_detector_1a15d5d4abb98b316c98ef8bdeb369d97a">Middle</link>,&#32;<link linkend="_class_leap_1_1_unity_1_1_extended_finger_detector_1a08e096dca12e0dc50f7ddf831cdff192">Ring</link>,&#32;<link linkend="_class_leap_1_1_unity_1_1_extended_finger_detector_1a8cb8f984382c8c7fae991073aa7ff232">Pinky</link>&#32;};
+00086 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">for</emphasis>(<emphasis role="keywordtype">int</emphasis>&#32;i=0;&#32;i&lt;stateArray.Length;&#32;i++)&#32;{
+00087 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;var&#32;state&#32;=&#32;stateArray[i];
+00088 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">switch</emphasis>&#32;(state)&#32;{
+00089 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">case</emphasis>&#32;<link linkend="_namespace_leap_1_1_unity_1a1d316bf483102971171646a20de176fc">PointingState</link>.Extended:
+00090 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;required++;
+00091 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">break</emphasis>;
+00092 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">case</emphasis>&#32;<link linkend="_namespace_leap_1_1_unity_1a1d316bf483102971171646a20de176fc">PointingState</link>.NotExtended:
+00093 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;forbidden++;
+00094 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">break</emphasis>;
+00095 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">default</emphasis>:
+00096 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">break</emphasis>;
+00097 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00098 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_leap_1_1_unity_1_1_extended_finger_detector_1ab5759c120d7bcc6c3c2d779089689b3a">MinimumExtendedCount</link>&#32;=&#32;Math.Max(required,&#32;<link linkend="_class_leap_1_1_unity_1_1_extended_finger_detector_1ab5759c120d7bcc6c3c2d779089689b3a">MinimumExtendedCount</link>);
+00099 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_leap_1_1_unity_1_1_extended_finger_detector_1a53da535a860f85c42cd383bbea4c3e67">MaximumExtendedCount</link>&#32;=&#32;Math.Min(5&#32;-&#32;forbidden,&#32;<link linkend="_class_leap_1_1_unity_1_1_extended_finger_detector_1a53da535a860f85c42cd383bbea4c3e67">MaximumExtendedCount</link>);
+00100 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_leap_1_1_unity_1_1_extended_finger_detector_1a53da535a860f85c42cd383bbea4c3e67">MaximumExtendedCount</link>&#32;=&#32;Math.Max(required,&#32;<link linkend="_class_leap_1_1_unity_1_1_extended_finger_detector_1a53da535a860f85c42cd383bbea4c3e67">MaximumExtendedCount</link>);
+00101 &#32;&#32;&#32;&#32;&#32;&#32;}
+00102 &#32;&#32;&#32;&#32;
+00103 &#32;&#32;&#32;&#32;}
+00104 
+00105 &#32;&#32;&#32;&#32;<emphasis role="keywordtype">void</emphasis>&#32;Awake&#32;()&#32;{
+00106 &#32;&#32;&#32;&#32;&#32;&#32;watcherCoroutine&#32;=&#32;extendedFingerWatcher();
+00107 &#32;&#32;&#32;&#32;}
+00108 &#32;&#32;
+00109 &#32;&#32;&#32;&#32;<emphasis role="keywordtype">void</emphasis>&#32;OnEnable&#32;()&#32;{
+00110 &#32;&#32;&#32;&#32;&#32;&#32;StartCoroutine(watcherCoroutine);
+00111 &#32;&#32;&#32;&#32;}
+00112 &#32;&#32;
+00113 &#32;&#32;&#32;&#32;<emphasis role="keywordtype">void</emphasis>&#32;OnDisable&#32;()&#32;{
+00114 &#32;&#32;&#32;&#32;&#32;&#32;StopCoroutine(watcherCoroutine);
+00115 &#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_leap_1_1_unity_1_1_detector_1a6493874fd22793d7b59dc56098559d59">Deactivate</link>();
+00116 &#32;&#32;&#32;&#32;}
+00117 &#32;&#32;
+00118 &#32;&#32;&#32;&#32;IEnumerator&#32;extendedFingerWatcher()&#32;{
+00119 &#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_namespace_leap_1_1_unity_1_1_interaction_1a9752eb3e2905e8ebd134fff20c155e6baa78b1ac16c0cd02168097fc9a9bd7604">Hand</link>&#32;hand;
+00120 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">while</emphasis>(<emphasis role="keyword">true</emphasis>){
+00121 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordtype">bool</emphasis>&#32;fingerState&#32;=&#32;<emphasis role="keyword">false</emphasis>;
+00122 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>(<link linkend="_class_leap_1_1_unity_1_1_extended_finger_detector_1a1ce4d883132d6a9fa84370ff12c8b0bc">HandModel</link>&#32;!=&#32;<emphasis role="keyword">null</emphasis>&#32;&amp;&amp;&#32;<link linkend="_class_leap_1_1_unity_1_1_extended_finger_detector_1a1ce4d883132d6a9fa84370ff12c8b0bc">HandModel</link>.<link linkend="_class_leap_1_1_unity_1_1_hand_model_base_1a31704b6829e3d442133350b34a4a5a8a">IsTracked</link>){
+00123 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;hand&#32;=&#32;<link linkend="_class_leap_1_1_unity_1_1_extended_finger_detector_1a1ce4d883132d6a9fa84370ff12c8b0bc">HandModel</link>.<link linkend="_class_leap_1_1_unity_1_1_hand_model_base_1aa24ca02bf4a64ba33b0370ad6da8731f">GetLeapHand</link>();
+00124 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>(hand&#32;!=&#32;<emphasis role="keyword">null</emphasis>){
+00125 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;fingerState&#32;=&#32;matchFingerState(hand.Fingers[0],&#32;<link linkend="_class_leap_1_1_unity_1_1_extended_finger_detector_1abf3b43c9d475e3241d6b1111c990d1de">Thumb</link>)
+00126 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&amp;&amp;&#32;matchFingerState(hand.Fingers[1],&#32;<link linkend="_class_leap_1_1_unity_1_1_extended_finger_detector_1ae24e39831917ad570db7975b8454c4ac">Index</link>)
+00127 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&amp;&amp;&#32;matchFingerState(hand.Fingers[2],&#32;<link linkend="_class_leap_1_1_unity_1_1_extended_finger_detector_1a15d5d4abb98b316c98ef8bdeb369d97a">Middle</link>)
+00128 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&amp;&amp;&#32;matchFingerState(hand.Fingers[3],&#32;<link linkend="_class_leap_1_1_unity_1_1_extended_finger_detector_1a08e096dca12e0dc50f7ddf831cdff192">Ring</link>)
+00129 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&amp;&amp;&#32;matchFingerState(hand.Fingers[4],&#32;<link linkend="_class_leap_1_1_unity_1_1_extended_finger_detector_1a8cb8f984382c8c7fae991073aa7ff232">Pinky</link>);
+00130 
+00131 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordtype">int</emphasis>&#32;extendedCount&#32;=&#32;0;
+00132 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">for</emphasis>&#32;(<emphasis role="keywordtype">int</emphasis>&#32;f&#32;=&#32;0;&#32;f&#32;&lt;&#32;5;&#32;f++)&#32;{
+00133 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(hand.Fingers[f].IsExtended)&#32;{
+00134 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;extendedCount++;
+00135 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00136 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00137 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;fingerState&#32;=&#32;fingerState&#32;&amp;&amp;&#32;
+00138 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;(extendedCount&#32;&lt;=&#32;<link linkend="_class_leap_1_1_unity_1_1_extended_finger_detector_1a53da535a860f85c42cd383bbea4c3e67">MaximumExtendedCount</link>)&#32;&amp;&amp;&#32;
+00139 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;(extendedCount&#32;&gt;=&#32;<link linkend="_class_leap_1_1_unity_1_1_extended_finger_detector_1ab5759c120d7bcc6c3c2d779089689b3a">MinimumExtendedCount</link>);
+00140 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>(<link linkend="_class_leap_1_1_unity_1_1_extended_finger_detector_1a1ce4d883132d6a9fa84370ff12c8b0bc">HandModel</link>.<link linkend="_class_leap_1_1_unity_1_1_hand_model_base_1a31704b6829e3d442133350b34a4a5a8a">IsTracked</link>&#32;&amp;&amp;&#32;fingerState){
+00141 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_leap_1_1_unity_1_1_detector_1aed8730358778949381639d53df61aac8">Activate</link>();
+00142 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}&#32;<emphasis role="keywordflow">else</emphasis>&#32;<emphasis role="keywordflow">if</emphasis>(!<link linkend="_class_leap_1_1_unity_1_1_extended_finger_detector_1a1ce4d883132d6a9fa84370ff12c8b0bc">HandModel</link>.<link linkend="_class_leap_1_1_unity_1_1_hand_model_base_1a31704b6829e3d442133350b34a4a5a8a">IsTracked</link>&#32;||&#32;!fingerState)&#32;{
+00143 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_leap_1_1_unity_1_1_detector_1a6493874fd22793d7b59dc56098559d59">Deactivate</link>();
+00144 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00145 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00146 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}&#32;<emphasis role="keywordflow">else</emphasis>&#32;<emphasis role="keywordflow">if</emphasis>(<link linkend="_class_leap_1_1_unity_1_1_detector_1a89e15d17ea95587d9edf49c42473264d">IsActive</link>){
+00147 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_leap_1_1_unity_1_1_detector_1a6493874fd22793d7b59dc56098559d59">Deactivate</link>();
+00148 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00149 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;yield&#32;<emphasis role="keywordflow">return</emphasis>&#32;<emphasis role="keyword">new</emphasis>&#32;WaitForSeconds(<link linkend="_class_leap_1_1_unity_1_1_extended_finger_detector_1a0e8262d14702fa8b2e7dc55c721d651e">Period</link>);
+00150 &#32;&#32;&#32;&#32;&#32;&#32;}
+00151 &#32;&#32;&#32;&#32;}
+00152 
+00153 &#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;<emphasis role="keywordtype">bool</emphasis>&#32;matchFingerState&#32;(Finger&#32;finger,&#32;<link linkend="_namespace_leap_1_1_unity_1a1d316bf483102971171646a20de176fc">PointingState</link>&#32;requiredState)&#32;{
+00154 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;(requiredState&#32;==&#32;<link linkend="_namespace_leap_1_1_unity_1a1d316bf483102971171646a20de176fc">PointingState</link>.Either)&#32;||
+00155 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;(requiredState&#32;==&#32;<link linkend="_namespace_leap_1_1_unity_1a1d316bf483102971171646a20de176fc">PointingState</link>.Extended&#32;&amp;&amp;&#32;finger.IsExtended)&#32;||
+00156 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;(requiredState&#32;==&#32;<link linkend="_namespace_leap_1_1_unity_1a1d316bf483102971171646a20de176fc">PointingState</link>.NotExtended&#32;&amp;&amp;&#32;!finger.IsExtended);
+00157 &#32;&#32;&#32;&#32;}
+00158 
+00159 <emphasis role="preprocessor">&#32;&#32;&#32;&#32;#if&#32;UNITY_EDITOR</emphasis>
+00160 &#32;&#32;&#32;&#32;<emphasis role="keywordtype">void</emphasis>&#32;OnDrawGizmos&#32;()&#32;{
+00161 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(<link linkend="_class_leap_1_1_unity_1_1_extended_finger_detector_1ae8f83315871432527c288cdfef9f7d4b">ShowGizmos</link>&#32;&amp;&amp;&#32;<link linkend="_class_leap_1_1_unity_1_1_extended_finger_detector_1a1ce4d883132d6a9fa84370ff12c8b0bc">HandModel</link>&#32;!=&#32;<emphasis role="keyword">null</emphasis>&#32;&amp;&amp;&#32;<link linkend="_class_leap_1_1_unity_1_1_extended_finger_detector_1a1ce4d883132d6a9fa84370ff12c8b0bc">HandModel</link>.<link linkend="_class_leap_1_1_unity_1_1_hand_model_base_1a31704b6829e3d442133350b34a4a5a8a">IsTracked</link>)&#32;{
+00162 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_namespace_leap_1_1_unity_1a1d316bf483102971171646a20de176fc">PointingState</link>[]&#32;state&#32;=&#32;{&#32;<link linkend="_class_leap_1_1_unity_1_1_extended_finger_detector_1abf3b43c9d475e3241d6b1111c990d1de">Thumb</link>,&#32;<link linkend="_class_leap_1_1_unity_1_1_extended_finger_detector_1ae24e39831917ad570db7975b8454c4ac">Index</link>,&#32;<link linkend="_class_leap_1_1_unity_1_1_extended_finger_detector_1a15d5d4abb98b316c98ef8bdeb369d97a">Middle</link>,&#32;<link linkend="_class_leap_1_1_unity_1_1_extended_finger_detector_1a08e096dca12e0dc50f7ddf831cdff192">Ring</link>,&#32;<link linkend="_class_leap_1_1_unity_1_1_extended_finger_detector_1a8cb8f984382c8c7fae991073aa7ff232">Pinky</link>&#32;};
+00163 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_namespace_leap_1_1_unity_1_1_interaction_1a9752eb3e2905e8ebd134fff20c155e6baa78b1ac16c0cd02168097fc9a9bd7604">Hand</link>&#32;hand&#32;=&#32;<link linkend="_class_leap_1_1_unity_1_1_extended_finger_detector_1a1ce4d883132d6a9fa84370ff12c8b0bc">HandModel</link>.<link linkend="_class_leap_1_1_unity_1_1_hand_model_base_1aa24ca02bf4a64ba33b0370ad6da8731f">GetLeapHand</link>();
+00164 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordtype">int</emphasis>&#32;extendedCount&#32;=&#32;0;
+00165 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordtype">int</emphasis>&#32;notExtendedCount&#32;=&#32;0;
+00166 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">for</emphasis>&#32;(<emphasis role="keywordtype">int</emphasis>&#32;f&#32;=&#32;0;&#32;f&#32;&lt;&#32;5;&#32;f++)&#32;{
+00167 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;Finger&#32;finger&#32;=&#32;hand.<link linkend="_class_leap_1_1_hand_1ac9f68349507bfa13e3ac24738382bea6">Fingers</link>[f];
+00168 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(finger.IsExtended)&#32;extendedCount++;
+00169 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">else</emphasis>&#32;notExtendedCount++;
+00170 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(matchFingerState(finger,&#32;state[f])&#32;&amp;&amp;&#32;
+00171 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;(extendedCount&#32;&lt;=&#32;<link linkend="_class_leap_1_1_unity_1_1_extended_finger_detector_1a53da535a860f85c42cd383bbea4c3e67">MaximumExtendedCount</link>)&#32;&amp;&amp;&#32;
+00172 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;(extendedCount&#32;&gt;=&#32;<link linkend="_class_leap_1_1_unity_1_1_extended_finger_detector_1ab5759c120d7bcc6c3c2d779089689b3a">MinimumExtendedCount</link>))&#32;{
+00173 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;Gizmos.color&#32;=&#32;<link linkend="_class_leap_1_1_unity_1_1_detector_1ad922f873e3c07f9128d6438332e7b9c7">OnColor</link>;
+00174 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}&#32;<emphasis role="keywordflow">else</emphasis>&#32;{
+00175 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;Gizmos.color&#32;=&#32;<link linkend="_class_leap_1_1_unity_1_1_detector_1a976fc8d66dd98aaea15196d861df429c">OffColor</link>;
+00176 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00177 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;Gizmos.DrawWireSphere(finger.TipPosition.ToVector3(),&#32;finger.Width);
+00178 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00179 &#32;&#32;&#32;&#32;&#32;&#32;}
+00180 &#32;&#32;&#32;&#32;}
+00181 <emphasis role="preprocessor">&#32;&#32;&#32;&#32;#endif</emphasis>
+00182 &#32;&#32;}
+00183 &#32;&#32;
+<anchor xml:id="__extended_finger_detector_8cs_source_1l00185"/><link linkend="_namespace_leap_1_1_unity_1a1d316bf483102971171646a20de176fc">00185</link> &#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keyword">enum</emphasis>&#32;<link linkend="_namespace_leap_1_1_unity_1a1d316bf483102971171646a20de176fc">PointingState</link>{<link linkend="_namespace_leap_1_1_unity_1a1d316bf483102971171646a20de176fcaf23578fcd2a868168854ab714e7de537">Extended</link>,&#32;<link linkend="_namespace_leap_1_1_unity_1a1d316bf483102971171646a20de176fca8eff020959c41ba903e16d966855ce03">NotExtended</link>,&#32;<link linkend="_struct_leap_1_1_unity_1_1_either">Either</link>}
+00186 }
+</programlisting></section>

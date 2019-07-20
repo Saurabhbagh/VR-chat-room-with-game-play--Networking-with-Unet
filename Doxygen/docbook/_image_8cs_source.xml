@@ -1,0 +1,205 @@
+<?xml version='1.0' encoding='UTF-8' standalone='no'?>
+<section xmlns="http://docbook.org/ns/docbook" version="5.0" xmlns:xlink="http://www.w3.org/1999/xlink" xml:id="__image_8cs_source">
+<title>Image.cs</title>
+<indexterm><primary>O:/GitHUBMINIPRoject/Assets/LeapMotion/Core/Plugins/LeapCSharp/Image.cs</primary></indexterm>
+<programlisting>00001 <emphasis role="comment">/******************************************************************************</emphasis>
+00002 <emphasis role="comment">&#32;*&#32;Copyright&#32;(C)&#32;Leap&#32;Motion,&#32;Inc.&#32;2011-2018.&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;*</emphasis>
+00003 <emphasis role="comment">&#32;*&#32;Leap&#32;Motion&#32;proprietary&#32;and&#32;confidential.&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;*</emphasis>
+00004 <emphasis role="comment">&#32;*&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;*</emphasis>
+00005 <emphasis role="comment">&#32;*&#32;Use&#32;subject&#32;to&#32;the&#32;terms&#32;of&#32;the&#32;Leap&#32;Motion&#32;SDK&#32;Agreement&#32;available&#32;at&#32;&#32;&#32;&#32;&#32;*</emphasis>
+00006 <emphasis role="comment">&#32;*&#32;https://developer.leapmotion.com/sdk_agreement,&#32;or&#32;another&#32;agreement&#32;&#32;&#32;&#32;&#32;&#32;&#32;*</emphasis>
+00007 <emphasis role="comment">&#32;*&#32;between&#32;Leap&#32;Motion&#32;and&#32;you,&#32;your&#32;company&#32;or&#32;other&#32;organization.&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;*</emphasis>
+00008 <emphasis role="comment">&#32;******************************************************************************/</emphasis>
+00009 
+00010 <emphasis role="keyword">namespace&#32;</emphasis><link linkend="_namespace_leap">Leap</link>&#32;{
+00011 &#32;&#32;<emphasis role="keyword">using</emphasis>&#32;System;
+00012 &#32;&#32;<emphasis role="keyword">using</emphasis>&#32;<link linkend="_namespace_leap_internal">LeapInternal</link>;
+00013 
+<anchor xml:id="__image_8cs_source_1l00021"/><link linkend="_class_leap_1_1_image">00021</link> &#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keyword">class&#32;</emphasis><link linkend="_class_leap_1_1_image">Image</link>&#32;{
+00022 &#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;<link linkend="_class_leap_internal_1_1_image_data">ImageData</link>&#32;leftImage;
+00023 &#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;<link linkend="_class_leap_internal_1_1_image_data">ImageData</link>&#32;rightImage;
+00024 &#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;Int64&#32;frameId&#32;=&#32;0;
+00025 &#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;Int64&#32;timestamp&#32;=&#32;0;
+00026 
+<anchor xml:id="__image_8cs_source_1l00027"/><link linkend="_class_leap_1_1_image_1a0a4c011e7107572da7f9c736b50da4a7">00027</link> &#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<link linkend="_class_leap_1_1_image_1a0a4c011e7107572da7f9c736b50da4a7">Image</link>(Int64&#32;frameId,&#32;Int64&#32;timestamp,&#32;<link linkend="_class_leap_internal_1_1_image_data">ImageData</link>&#32;leftImage,&#32;<link linkend="_class_leap_internal_1_1_image_data">ImageData</link>&#32;rightImage)&#32;{
+00028 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(leftImage&#32;==&#32;<emphasis role="keyword">null</emphasis>&#32;||&#32;rightImage&#32;==&#32;<emphasis role="keyword">null</emphasis>)&#32;{
+00029 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">throw</emphasis>&#32;<emphasis role="keyword">new</emphasis>&#32;ArgumentNullException(<emphasis role="stringliteral">&quot;images&quot;</emphasis>);
+00030 &#32;&#32;&#32;&#32;&#32;&#32;}
+00031 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(leftImage.<link linkend="_class_leap_internal_1_1_image_data_1acba9a8c08947e1b5e8c3a3bb7403d737">type</link>&#32;!=&#32;rightImage.<link linkend="_class_leap_internal_1_1_image_data_1acba9a8c08947e1b5e8c3a3bb7403d737">type</link>&#32;||
+00032 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;leftImage.<link linkend="_class_leap_internal_1_1_image_data_1ab9edab4865edb24d95401e3495d5b591">format</link>&#32;!=&#32;rightImage.<link linkend="_class_leap_internal_1_1_image_data_1ab9edab4865edb24d95401e3495d5b591">format</link>&#32;||
+00033 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;leftImage.<link linkend="_class_leap_internal_1_1_image_data_1ad31e62a08aa17eed9c536d7f2614e06b">width</link>&#32;!=&#32;rightImage.<link linkend="_class_leap_internal_1_1_image_data_1ad31e62a08aa17eed9c536d7f2614e06b">width</link>&#32;||
+00034 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;leftImage.<link linkend="_class_leap_internal_1_1_image_data_1a60faf21caa282dea54550a837e64159b">height</link>&#32;!=&#32;rightImage.<link linkend="_class_leap_internal_1_1_image_data_1a60faf21caa282dea54550a837e64159b">height</link>&#32;||
+00035 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;leftImage.<link linkend="_class_leap_internal_1_1_image_data_1a5c60d509fcecaeefe5ba666792c312da">bpp</link>&#32;!=&#32;rightImage.<link linkend="_class_leap_internal_1_1_image_data_1a5c60d509fcecaeefe5ba666792c312da">bpp</link>&#32;||
+00036 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;leftImage.<link linkend="_class_leap_internal_1_1_image_data_1afecf213fb71842f7e847f15dfe994af9">DistortionSize</link>&#32;!=&#32;rightImage.<link linkend="_class_leap_internal_1_1_image_data_1afecf213fb71842f7e847f15dfe994af9">DistortionSize</link>)&#32;{
+00037 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">throw</emphasis>&#32;<emphasis role="keyword">new</emphasis>&#32;ArgumentException(<emphasis role="stringliteral">&quot;image&#32;mismatch&quot;</emphasis>);
+00038 &#32;&#32;&#32;&#32;&#32;&#32;}
+00039 &#32;&#32;&#32;&#32;&#32;&#32;this.frameId&#32;=&#32;frameId;
+00040 &#32;&#32;&#32;&#32;&#32;&#32;this.timestamp&#32;=&#32;timestamp;
+00041 &#32;&#32;&#32;&#32;&#32;&#32;this.leftImage&#32;=&#32;leftImage;
+00042 &#32;&#32;&#32;&#32;&#32;&#32;this.rightImage&#32;=&#32;rightImage;
+00043 &#32;&#32;&#32;&#32;}
+00044 
+00045 &#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;<link linkend="_class_leap_internal_1_1_image_data">ImageData</link>&#32;imageData(<link linkend="_class_leap_1_1_image_1a28310e43e0f2d7f7117e1b45330bdc38">CameraType</link>&#32;camera)&#32;{
+00046 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;camera&#32;==&#32;<link linkend="_class_leap_1_1_image_1a28310e43e0f2d7f7117e1b45330bdc38">CameraType</link>.LEFT&#32;?&#32;leftImage&#32;:&#32;rightImage;
+00047 &#32;&#32;&#32;&#32;}
+00048 
+<anchor xml:id="__image_8cs_source_1l00060"/><link linkend="_class_leap_1_1_image_1a13a2744f47a3bb324d08dca19d971f17">00060</link> &#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keywordtype">byte</emphasis>[]&#32;<link linkend="_class_leap_1_1_image_1a13a2744f47a3bb324d08dca19d971f17">Data</link>(<link linkend="_class_leap_1_1_image_1a28310e43e0f2d7f7117e1b45330bdc38">CameraType</link>&#32;camera)&#32;{
+00061 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(camera&#32;!=&#32;<link linkend="_class_leap_1_1_image_1a28310e43e0f2d7f7117e1b45330bdc38">CameraType</link>.LEFT&#32;&amp;&amp;&#32;camera&#32;!=&#32;<link linkend="_class_leap_1_1_image_1a28310e43e0f2d7f7117e1b45330bdc38">CameraType</link>.RIGHT)
+00062 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;<emphasis role="keyword">null</emphasis>;
+00063 
+00064 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;imageData(camera).<link linkend="_class_leap_internal_1_1_image_data_1a63f037ae55493d11d3c954a8fd5fba96">AsByteArray</link>;
+00065 &#32;&#32;&#32;&#32;}
+00066 
+<anchor xml:id="__image_8cs_source_1l00073"/><link linkend="_class_leap_1_1_image_1aaab2f799bc4f2f315c26d14401b8a7e7">00073</link> &#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;UInt32&#32;<link linkend="_class_leap_1_1_image_1aaab2f799bc4f2f315c26d14401b8a7e7">ByteOffset</link>(<link linkend="_class_leap_1_1_image_1a28310e43e0f2d7f7117e1b45330bdc38">CameraType</link>&#32;camera)&#32;{
+00074 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(camera&#32;!=&#32;<link linkend="_class_leap_1_1_image_1a28310e43e0f2d7f7117e1b45330bdc38">CameraType</link>.LEFT&#32;&amp;&amp;&#32;camera&#32;!=&#32;<link linkend="_class_leap_1_1_image_1a28310e43e0f2d7f7117e1b45330bdc38">CameraType</link>.RIGHT)
+00075 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;0;
+00076 
+00077 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;imageData(camera).<link linkend="_class_leap_internal_1_1_image_data_1a76553e860a4f525c28de15f343684dbf">byteOffset</link>;
+00078 &#32;&#32;&#32;&#32;}
+00079 
+<anchor xml:id="__image_8cs_source_1l00087"/><link linkend="_class_leap_1_1_image_1a531668f24d32026f61ef2affb12be758">00087</link> &#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;UInt32&#32;<link linkend="_class_leap_1_1_image_1a531668f24d32026f61ef2affb12be758">NumBytes</link>&#32;{
+00088 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">get</emphasis>&#32;{
+00089 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;leftImage.<link linkend="_class_leap_internal_1_1_image_data_1ad31e62a08aa17eed9c536d7f2614e06b">width</link>&#32;*&#32;leftImage.<link linkend="_class_leap_internal_1_1_image_data_1a60faf21caa282dea54550a837e64159b">height</link>&#32;*&#32;leftImage.<link linkend="_class_leap_internal_1_1_image_data_1a5c60d509fcecaeefe5ba666792c312da">bpp</link>;
+00090 &#32;&#32;&#32;&#32;&#32;&#32;}
+00091 &#32;&#32;&#32;&#32;}
+00092 
+<anchor xml:id="__image_8cs_source_1l00118"/><link linkend="_class_leap_1_1_image_1a5bf2883749b04f3e5644fc68a418add4">00118</link> &#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keywordtype">float</emphasis>[]&#32;<link linkend="_class_leap_1_1_image_1a5bf2883749b04f3e5644fc68a418add4">Distortion</link>(<link linkend="_class_leap_1_1_image_1a28310e43e0f2d7f7117e1b45330bdc38">CameraType</link>&#32;camera)&#32;{
+00119 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(camera&#32;!=&#32;<link linkend="_class_leap_1_1_image_1a28310e43e0f2d7f7117e1b45330bdc38">CameraType</link>.LEFT&#32;&amp;&amp;&#32;camera&#32;!=&#32;<link linkend="_class_leap_1_1_image_1a28310e43e0f2d7f7117e1b45330bdc38">CameraType</link>.RIGHT)
+00120 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;<emphasis role="keyword">null</emphasis>;
+00121 
+00122 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;imageData(camera).<link linkend="_class_leap_internal_1_1_image_data_1a0deb7c8a27be924edda6a059bf5b6f14">DistortionData</link>.<link linkend="_class_leap_1_1_distortion_data_1a104930e4a0b916ff12a05dd09eb88853">Data</link>;
+00123 &#32;&#32;&#32;&#32;}
+00124 
+<anchor xml:id="__image_8cs_source_1l00145"/><link linkend="_class_leap_1_1_image_1a8fd5b7f8e734a2b7232ac7b315828987">00145</link> &#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<link linkend="_struct_leap_1_1_vector">Vector</link>&#32;<link linkend="_class_leap_1_1_image_1a8fd5b7f8e734a2b7232ac7b315828987">PixelToRectilinear</link>(<link linkend="_class_leap_1_1_image_1a28310e43e0f2d7f7117e1b45330bdc38">CameraType</link>&#32;camera,&#32;<link linkend="_struct_leap_1_1_vector">Vector</link>&#32;pixel)&#32;{
+00146 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;<link linkend="_class_leap_internal_1_1_connection">Connection</link>.<link linkend="_class_leap_internal_1_1_connection_1a14b814a88c57b2dafafe72077211aa85">GetConnection</link>().<link linkend="_class_leap_internal_1_1_connection_1ac5ddffb50ba506fb3465c8a966beca95">PixelToRectilinear</link>(camera,&#32;pixel);
+00147 &#32;&#32;&#32;&#32;}
+00148 
+<anchor xml:id="__image_8cs_source_1l00174"/><link linkend="_class_leap_1_1_image_1ab2cb673a34f6fc61e504748887a8f144">00174</link> &#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<link linkend="_struct_leap_1_1_vector">Vector</link>&#32;<link linkend="_class_leap_1_1_image_1ab2cb673a34f6fc61e504748887a8f144">RectilinearToPixel</link>(<link linkend="_class_leap_1_1_image_1a28310e43e0f2d7f7117e1b45330bdc38">CameraType</link>&#32;camera,&#32;<link linkend="_struct_leap_1_1_vector">Vector</link>&#32;ray)&#32;{
+00175 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;<link linkend="_class_leap_internal_1_1_connection">Connection</link>.<link linkend="_class_leap_internal_1_1_connection_1a14b814a88c57b2dafafe72077211aa85">GetConnection</link>().<link linkend="_class_leap_internal_1_1_connection_1ac5c43c1a0c01488e8f67935e9d412117">RectilinearToPixel</link>(camera,&#32;ray);
+00176 &#32;&#32;&#32;&#32;}
+00177 
+<anchor xml:id="__image_8cs_source_1l00185"/><link linkend="_class_leap_1_1_image_1aa0f9ff65ecf4c3902ba9496fb57d2f81">00185</link> &#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keywordtype">bool</emphasis>&#32;<link linkend="_class_leap_1_1_image_1aa0f9ff65ecf4c3902ba9496fb57d2f81">Equals</link>(<link linkend="_class_leap_1_1_image">Image</link>&#32;other)&#32;{
+00186 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>
+00187 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;this.frameId&#32;==&#32;other.frameId&#32;&amp;&amp;
+00188 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;this.<link linkend="_class_leap_1_1_image_1abaa998d9eec529b2e69a0df4417502ee">Type</link>&#32;==&#32;other.<link linkend="_class_leap_1_1_image_1abaa998d9eec529b2e69a0df4417502ee">Type</link>&#32;&amp;&amp;
+00189 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;this.<link linkend="_class_leap_1_1_image_1a984396ef2f504442b8d84a54430417c8">Timestamp</link>&#32;==&#32;other.<link linkend="_class_leap_1_1_image_1a984396ef2f504442b8d84a54430417c8">Timestamp</link>;
+00190 &#32;&#32;&#32;&#32;}
+00191 
+<anchor xml:id="__image_8cs_source_1l00196"/><link linkend="_class_leap_1_1_image_1a0f052fc6d7936be1b055f5283756cc38">00196</link> &#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keyword">override</emphasis>&#32;<emphasis role="keywordtype">string</emphasis>&#32;<link linkend="_class_leap_1_1_image_1a0f052fc6d7936be1b055f5283756cc38">ToString</link>()&#32;{
+00197 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;<emphasis role="stringliteral">&quot;Image&#32;sequence&quot;</emphasis>&#32;+&#32;this.frameId&#32;+&#32;<emphasis role="stringliteral">&quot;,&#32;format:&#32;&quot;</emphasis>&#32;+&#32;this.<link linkend="_class_leap_1_1_image_1a87defbae65a250428b3b938b9ff7ae22">Format</link>&#32;+&#32;<emphasis role="stringliteral">&quot;,&#32;type:&#32;&quot;</emphasis>&#32;+&#32;this.<link linkend="_class_leap_1_1_image_1abaa998d9eec529b2e69a0df4417502ee">Type</link>;
+00198 &#32;&#32;&#32;&#32;}
+00199 
+<anchor xml:id="__image_8cs_source_1l00204"/><link linkend="_class_leap_1_1_image_1aa9411917ca37f9f0b6d2f2c0e7b37d81">00204</link> &#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;Int64&#32;<link linkend="_class_leap_1_1_image_1aa9411917ca37f9f0b6d2f2c0e7b37d81">SequenceId</link>&#32;{
+00205 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">get</emphasis>&#32;{
+00206 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;frameId;
+00207 &#32;&#32;&#32;&#32;&#32;&#32;}
+00208 &#32;&#32;&#32;&#32;}
+00209 
+<anchor xml:id="__image_8cs_source_1l00214"/><link linkend="_class_leap_1_1_image_1a66b413ab158bf69102be0a58056a34b6">00214</link> &#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keywordtype">int</emphasis>&#32;<link linkend="_class_leap_1_1_image_1a66b413ab158bf69102be0a58056a34b6">Width</link>&#32;{
+00215 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">get</emphasis>&#32;{
+00216 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;(<emphasis role="keywordtype">int</emphasis>)leftImage.<link linkend="_class_leap_internal_1_1_image_data_1ad31e62a08aa17eed9c536d7f2614e06b">width</link>;
+00217 &#32;&#32;&#32;&#32;&#32;&#32;}
+00218 &#32;&#32;&#32;&#32;}
+00219 
+<anchor xml:id="__image_8cs_source_1l00224"/><link linkend="_class_leap_1_1_image_1a00971100533a392e69ed78069340954b">00224</link> &#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keywordtype">int</emphasis>&#32;<link linkend="_class_leap_1_1_image_1a00971100533a392e69ed78069340954b">Height</link>&#32;{
+00225 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">get</emphasis>&#32;{
+00226 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;(<emphasis role="keywordtype">int</emphasis>)leftImage.<link linkend="_class_leap_internal_1_1_image_data_1a60faf21caa282dea54550a837e64159b">height</link>;
+00227 &#32;&#32;&#32;&#32;&#32;&#32;}
+00228 &#32;&#32;&#32;&#32;}
+00229 
+<anchor xml:id="__image_8cs_source_1l00238"/><link linkend="_class_leap_1_1_image_1ae1866274238f8727fddcb387a6dc0ab0">00238</link> &#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keywordtype">int</emphasis>&#32;<link linkend="_class_leap_1_1_image_1ae1866274238f8727fddcb387a6dc0ab0">BytesPerPixel</link>&#32;{
+00239 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">get</emphasis>&#32;{
+00240 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;(<emphasis role="keywordtype">int</emphasis>)leftImage.<link linkend="_class_leap_internal_1_1_image_data_1a5c60d509fcecaeefe5ba666792c312da">bpp</link>;
+00241 &#32;&#32;&#32;&#32;&#32;&#32;}
+00242 &#32;&#32;&#32;&#32;}
+00243 
+<anchor xml:id="__image_8cs_source_1l00248"/><link linkend="_class_leap_1_1_image_1a87defbae65a250428b3b938b9ff7ae22">00248</link> &#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<link linkend="_class_leap_1_1_image_1acefbe5d3803afc9f433a6e3856d242d1">FormatType</link>&#32;<link linkend="_class_leap_1_1_image_1a87defbae65a250428b3b938b9ff7ae22">Format</link>&#32;{
+00249 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">get</emphasis>&#32;{
+00250 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">switch</emphasis>&#32;(leftImage.<link linkend="_class_leap_internal_1_1_image_data_1ab9edab4865edb24d95401e3495d5b591">format</link>)&#32;{
+00251 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">case</emphasis>&#32;<link linkend="_namespace_leap_internal_1aca2c532ae62549187d1f6e33ee818035">eLeapImageFormat</link>.eLeapImageType_IR:
+00252 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;<link linkend="_class_leap_1_1_image_1acefbe5d3803afc9f433a6e3856d242d1">FormatType</link>.INFRARED;
+00253 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">case</emphasis>&#32;<link linkend="_namespace_leap_internal_1aca2c532ae62549187d1f6e33ee818035">eLeapImageFormat</link>.eLeapImageType_RGBIr_Bayer:
+00254 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;<link linkend="_class_leap_1_1_image_1acefbe5d3803afc9f433a6e3856d242d1">FormatType</link>.IBRG;
+00255 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">default</emphasis>:
+00256 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;<link linkend="_class_leap_1_1_image_1acefbe5d3803afc9f433a6e3856d242d1">FormatType</link>.INFRARED;
+00257 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00258 &#32;&#32;&#32;&#32;&#32;&#32;}
+00259 &#32;&#32;&#32;&#32;}
+00260 
+<anchor xml:id="__image_8cs_source_1l00261"/><link linkend="_class_leap_1_1_image_1abaa998d9eec529b2e69a0df4417502ee">00261</link> &#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<link linkend="_class_leap_1_1_image_1a876a507d46b2dfce38d703a05cc4377f">ImageType</link>&#32;<link linkend="_class_leap_1_1_image_1abaa998d9eec529b2e69a0df4417502ee">Type</link>&#32;{
+00262 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">get</emphasis>&#32;{
+00263 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">switch</emphasis>&#32;(leftImage.<link linkend="_class_leap_internal_1_1_image_data_1acba9a8c08947e1b5e8c3a3bb7403d737">type</link>)&#32;{
+00264 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">case</emphasis>&#32;<link linkend="_namespace_leap_internal_1aa8c735677264cfdbefdd598adb92a1f5">eLeapImageType</link>.eLeapImageType_Default:
+00265 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;<link linkend="_class_leap_1_1_image_1a876a507d46b2dfce38d703a05cc4377f">ImageType</link>.DEFAULT;
+00266 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">case</emphasis>&#32;<link linkend="_namespace_leap_internal_1aa8c735677264cfdbefdd598adb92a1f5">eLeapImageType</link>.eLeapImageType_Raw:
+00267 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;<link linkend="_class_leap_1_1_image_1a876a507d46b2dfce38d703a05cc4377f">ImageType</link>.RAW;
+00268 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">default</emphasis>:
+00269 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;<link linkend="_class_leap_1_1_image_1a876a507d46b2dfce38d703a05cc4377f">ImageType</link>.DEFAULT;
+00270 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00271 &#32;&#32;&#32;&#32;&#32;&#32;}
+00272 &#32;&#32;&#32;&#32;}
+00273 
+<anchor xml:id="__image_8cs_source_1l00283"/><link linkend="_class_leap_1_1_image_1a543d13baf55f8184ee5df4d8be7574fe">00283</link> &#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keywordtype">int</emphasis>&#32;<link linkend="_class_leap_1_1_image_1a543d13baf55f8184ee5df4d8be7574fe">DistortionWidth</link>&#32;{
+00284 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">get</emphasis>&#32;{
+00285 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;leftImage.<link linkend="_class_leap_internal_1_1_image_data_1afecf213fb71842f7e847f15dfe994af9">DistortionSize</link>&#32;*&#32;2;
+00286 &#32;&#32;&#32;&#32;&#32;&#32;}
+00287 &#32;&#32;&#32;&#32;}
+00288 
+<anchor xml:id="__image_8cs_source_1l00295"/><link linkend="_class_leap_1_1_image_1a7221f670387ea10e1047a71b251000ea">00295</link> &#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keywordtype">int</emphasis>&#32;<link linkend="_class_leap_1_1_image_1a7221f670387ea10e1047a71b251000ea">DistortionHeight</link>&#32;{
+00296 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">get</emphasis>&#32;{
+00297 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;leftImage.<link linkend="_class_leap_internal_1_1_image_data_1afecf213fb71842f7e847f15dfe994af9">DistortionSize</link>;
+00298 &#32;&#32;&#32;&#32;&#32;&#32;}
+00299 &#32;&#32;&#32;&#32;}
+00300 
+<anchor xml:id="__image_8cs_source_1l00309"/><link linkend="_class_leap_1_1_image_1aefd21949a969ba875fad9af1fa1c6158">00309</link> &#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keywordtype">float</emphasis>&#32;<link linkend="_class_leap_1_1_image_1aefd21949a969ba875fad9af1fa1c6158">RayOffsetX</link>(<link linkend="_class_leap_1_1_image_1a28310e43e0f2d7f7117e1b45330bdc38">CameraType</link>&#32;camera)&#32;{
+00310 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(camera&#32;!=&#32;<link linkend="_class_leap_1_1_image_1a28310e43e0f2d7f7117e1b45330bdc38">CameraType</link>.LEFT&#32;&amp;&amp;&#32;camera&#32;!=&#32;<link linkend="_class_leap_1_1_image_1a28310e43e0f2d7f7117e1b45330bdc38">CameraType</link>.RIGHT)
+00311 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;0;
+00312 
+00313 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;imageData(camera).<link linkend="_class_leap_internal_1_1_image_data_1a3d1eab6eade53abc3ef09b96b22b7fd6">RayOffsetX</link>;
+00314 &#32;&#32;&#32;&#32;}
+00315 
+<anchor xml:id="__image_8cs_source_1l00324"/><link linkend="_class_leap_1_1_image_1a2cca6b718a6ef06bb2da024abaec9ee9">00324</link> &#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keywordtype">float</emphasis>&#32;<link linkend="_class_leap_1_1_image_1a2cca6b718a6ef06bb2da024abaec9ee9">RayOffsetY</link>(<link linkend="_class_leap_1_1_image_1a28310e43e0f2d7f7117e1b45330bdc38">CameraType</link>&#32;camera)&#32;{
+00325 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(camera&#32;!=&#32;<link linkend="_class_leap_1_1_image_1a28310e43e0f2d7f7117e1b45330bdc38">CameraType</link>.LEFT&#32;&amp;&amp;&#32;camera&#32;!=&#32;<link linkend="_class_leap_1_1_image_1a28310e43e0f2d7f7117e1b45330bdc38">CameraType</link>.RIGHT)
+00326 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;0;
+00327 
+00328 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;imageData(camera).<link linkend="_class_leap_internal_1_1_image_data_1acc9885babfe601839ab94f511fa5e790">RayOffsetY</link>;
+00329 &#32;&#32;&#32;&#32;}
+00330 
+<anchor xml:id="__image_8cs_source_1l00339"/><link linkend="_class_leap_1_1_image_1a30e614bb33154b1f3e7536a502811278">00339</link> &#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keywordtype">float</emphasis>&#32;<link linkend="_class_leap_1_1_image_1a30e614bb33154b1f3e7536a502811278">RayScaleX</link>(<link linkend="_class_leap_1_1_image_1a28310e43e0f2d7f7117e1b45330bdc38">CameraType</link>&#32;camera)&#32;{
+00340 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(camera&#32;!=&#32;<link linkend="_class_leap_1_1_image_1a28310e43e0f2d7f7117e1b45330bdc38">CameraType</link>.LEFT&#32;&amp;&amp;&#32;camera&#32;!=&#32;<link linkend="_class_leap_1_1_image_1a28310e43e0f2d7f7117e1b45330bdc38">CameraType</link>.RIGHT)
+00341 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;0;
+00342 
+00343 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;imageData(camera).<link linkend="_class_leap_internal_1_1_image_data_1adc6300b2bfac5c6e21411936e533eb66">RayScaleX</link>;
+00344 &#32;&#32;&#32;&#32;}
+00345 
+<anchor xml:id="__image_8cs_source_1l00354"/><link linkend="_class_leap_1_1_image_1a9d5749a8512e3c14d48cf54d6e00140a">00354</link> &#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keywordtype">float</emphasis>&#32;<link linkend="_class_leap_1_1_image_1a9d5749a8512e3c14d48cf54d6e00140a">RayScaleY</link>(<link linkend="_class_leap_1_1_image_1a28310e43e0f2d7f7117e1b45330bdc38">CameraType</link>&#32;camera)&#32;{
+00355 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(camera&#32;!=&#32;<link linkend="_class_leap_1_1_image_1a28310e43e0f2d7f7117e1b45330bdc38">CameraType</link>.LEFT&#32;&amp;&amp;&#32;camera&#32;!=&#32;<link linkend="_class_leap_1_1_image_1a28310e43e0f2d7f7117e1b45330bdc38">CameraType</link>.RIGHT)
+00356 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;0;
+00357 
+00358 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;imageData(camera).<link linkend="_class_leap_internal_1_1_image_data_1ae1a73b28ca841fb8c0e1debd37ed783f">RayScaleY</link>;
+00359 &#32;&#32;&#32;&#32;}
+00360 
+<anchor xml:id="__image_8cs_source_1l00365"/><link linkend="_class_leap_1_1_image_1a984396ef2f504442b8d84a54430417c8">00365</link> &#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;Int64&#32;<link linkend="_class_leap_1_1_image_1a984396ef2f504442b8d84a54430417c8">Timestamp</link>&#32;{
+00366 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">get</emphasis>&#32;{
+00367 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;timestamp;
+00368 &#32;&#32;&#32;&#32;&#32;&#32;}
+00369 &#32;&#32;&#32;&#32;}
+00370 
+<anchor xml:id="__image_8cs_source_1l00377"/><link linkend="_class_leap_1_1_image_1acefbe5d3803afc9f433a6e3856d242d1">00377</link> &#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keyword">enum</emphasis>&#32;<link linkend="_class_leap_1_1_image_1acefbe5d3803afc9f433a6e3856d242d1">FormatType</link>&#32;{
+00378 &#32;&#32;&#32;&#32;&#32;&#32;INFRARED&#32;=&#32;0,
+00379 &#32;&#32;&#32;&#32;&#32;&#32;IBRG&#32;=&#32;1
+00380 &#32;&#32;&#32;&#32;}
+00381 
+<anchor xml:id="__image_8cs_source_1l00382"/><link linkend="_class_leap_1_1_image_1a876a507d46b2dfce38d703a05cc4377f">00382</link> &#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keyword">enum</emphasis>&#32;<link linkend="_class_leap_1_1_image_1a876a507d46b2dfce38d703a05cc4377f">ImageType</link>&#32;{
+00383 &#32;&#32;&#32;&#32;&#32;&#32;DEFAULT,
+00384 &#32;&#32;&#32;&#32;&#32;&#32;RAW
+00385 &#32;&#32;&#32;&#32;}
+00386 
+<anchor xml:id="__image_8cs_source_1l00387"/><link linkend="_class_leap_1_1_image_1a28310e43e0f2d7f7117e1b45330bdc38">00387</link> &#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keyword">enum</emphasis>&#32;<link linkend="_class_leap_1_1_image_1a28310e43e0f2d7f7117e1b45330bdc38">CameraType</link>&#32;{
+00388 &#32;&#32;&#32;&#32;&#32;&#32;LEFT&#32;=&#32;0,
+00389 &#32;&#32;&#32;&#32;&#32;&#32;RIGHT&#32;=&#32;1
+00390 &#32;&#32;&#32;&#32;};
+00391 &#32;&#32;}
+00392 
+00393 }
+</programlisting></section>

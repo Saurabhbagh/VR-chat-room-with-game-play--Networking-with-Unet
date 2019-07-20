@@ -1,0 +1,132 @@
+<?xml version='1.0' encoding='UTF-8' standalone='no'?>
+<section xmlns="http://docbook.org/ns/docbook" version="5.0" xmlns:xlink="http://www.w3.org/1999/xlink" xml:id="__steam_v_r___editor_8cs_source">
+<title>SteamVR_Editor.cs</title>
+<indexterm><primary>O:/GitHUBMINIPRoject/Assets/SteamVR/Editor/SteamVR_Editor.cs</primary></indexterm>
+<programlisting>00001 <emphasis role="comment">//=======&#32;Copyright&#32;(c)&#32;Valve&#32;Corporation,&#32;All&#32;rights&#32;reserved.&#32;===============</emphasis>
+00002 <emphasis role="comment">//</emphasis>
+00003 <emphasis role="comment">//&#32;Purpose:&#32;Custom&#32;inspector&#32;display&#32;for&#32;SteamVR_Camera</emphasis>
+00004 <emphasis role="comment">//</emphasis>
+00005 <emphasis role="comment">//=============================================================================</emphasis>
+00006 
+00007 <emphasis role="keyword">using</emphasis>&#32;<link linkend="__balloon_8cs_1a7d67e097df9376eb709b6a23aa3c7d23">UnityEngine</link>;
+00008 <emphasis role="keyword">using</emphasis>&#32;<link linkend="_namespace_unity_editor">UnityEditor</link>;
+00009 <emphasis role="keyword">using</emphasis>&#32;System.IO;
+00010 <emphasis role="keyword">using</emphasis>&#32;<link linkend="_namespace_valve">Valve</link>.<link linkend="_namespace_valve_1_1_v_r">VR</link>;
+00011 
+00012 [CustomEditor(typeof(<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___camera">SteamVR_Camera</link>)),&#32;CanEditMultipleObjects]
+<anchor xml:id="__steam_v_r___editor_8cs_source_1l00013"/><link linkend="_class_steam_v_r___editor">00013</link> <emphasis role="keyword">public</emphasis>&#32;<emphasis role="keyword">class&#32;</emphasis><link linkend="_class_steam_v_r___editor">SteamVR_Editor</link>&#32;:&#32;Editor
+00014 {
+00015 &#32;&#32;&#32;&#32;<emphasis role="keywordtype">int</emphasis>&#32;bannerHeight&#32;=&#32;150;
+00016 &#32;&#32;&#32;&#32;Texture&#32;logo;
+00017 
+00018 &#32;&#32;&#32;&#32;SerializedProperty&#32;script,&#32;wireframe;
+00019 
+00020 &#32;&#32;&#32;&#32;<emphasis role="keywordtype">string</emphasis>&#32;GetResourcePath()
+00021 &#32;&#32;&#32;&#32;{
+00022 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;var&#32;ms&#32;=&#32;MonoScript.FromScriptableObject(<emphasis role="keyword">this</emphasis>);
+00023 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;var&#32;path&#32;=&#32;AssetDatabase.GetAssetPath(ms);
+00024 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;path&#32;=&#32;Path.GetDirectoryName(path);
+00025 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;path.Substring(0,&#32;path.Length&#32;-&#32;<emphasis role="stringliteral">&quot;Editor&quot;</emphasis>.Length)&#32;+&#32;<emphasis role="stringliteral">&quot;Textures/&quot;</emphasis>;
+00026 &#32;&#32;&#32;&#32;}
+00027 
+00028 &#32;&#32;&#32;&#32;<emphasis role="keywordtype">void</emphasis>&#32;OnEnable()
+00029 &#32;&#32;&#32;&#32;{
+00030 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;var&#32;resourcePath&#32;=&#32;GetResourcePath();
+00031 
+00032 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;logo&#32;=&#32;AssetDatabase.LoadAssetAtPath&lt;Texture2D&gt;(resourcePath&#32;+&#32;<emphasis role="stringliteral">&quot;logo.png&quot;</emphasis>);
+00033 
+00034 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;script&#32;=&#32;serializedObject.FindProperty(<emphasis role="stringliteral">&quot;m_Script&quot;</emphasis>);
+00035 
+00036 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;wireframe&#32;=&#32;serializedObject.FindProperty(<emphasis role="stringliteral">&quot;wireframe&quot;</emphasis>);
+00037 
+00038 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">foreach</emphasis>&#32;(<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___camera">SteamVR_Camera</link>&#32;target&#32;<emphasis role="keywordflow">in</emphasis>&#32;targets)
+00039 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;target.<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___camera_1ae7382a4a9bdc196f3fdba43bf4801083">ForceLast</link>();
+00040 &#32;&#32;&#32;&#32;}
+00041 
+<anchor xml:id="__steam_v_r___editor_8cs_source_1l00042"/><link linkend="_class_steam_v_r___editor_1a3653a66adfbb43e4d72cb43368244be7">00042</link> &#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keyword">override</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;<link linkend="_class_steam_v_r___editor_1a3653a66adfbb43e4d72cb43368244be7">OnInspectorGUI</link>()
+00043 &#32;&#32;&#32;&#32;{
+00044 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;serializedObject.Update();
+00045 
+00046 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;var&#32;rect&#32;=&#32;GUILayoutUtility.GetRect(Screen.width&#32;-&#32;38,&#32;bannerHeight,&#32;GUI.skin.box);
+00047 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(logo)
+00048 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;GUI.DrawTexture(rect,&#32;logo,&#32;ScaleMode.ScaleToFit);
+00049 
+00050 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(!<link linkend="_namespace_valve_1_1_v_r_1aecd07a81fe79a9f96c6787513e2d98e4ae498749f3c42246d50b15c81c101d988">Application</link>.isPlaying)
+00051 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00052 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;var&#32;expand&#32;=&#32;<emphasis role="keyword">false</emphasis>;
+00053 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;var&#32;collapse&#32;=&#32;<emphasis role="keyword">false</emphasis>;
+00054 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">foreach</emphasis>&#32;(<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___camera">SteamVR_Camera</link>&#32;target&#32;<emphasis role="keywordflow">in</emphasis>&#32;targets)
+00055 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00056 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(AssetDatabase.Contains(target))
+00057 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">continue</emphasis>;
+00058 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(target.isExpanded)
+00059 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;collapse&#32;=&#32;<emphasis role="keyword">true</emphasis>;
+00060 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">else</emphasis>
+00061 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;expand&#32;=&#32;<emphasis role="keyword">true</emphasis>;
+00062 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00063 
+00064 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(expand)
+00065 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00066 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;GUILayout.BeginHorizontal();
+00067 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(GUILayout.Button(<emphasis role="stringliteral">&quot;Expand&quot;</emphasis>))
+00068 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00069 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">foreach</emphasis>&#32;(<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___camera">SteamVR_Camera</link>&#32;target&#32;<emphasis role="keywordflow">in</emphasis>&#32;targets)
+00070 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00071 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(AssetDatabase.Contains(target))
+00072 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">continue</emphasis>;
+00073 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(!target.isExpanded)
+00074 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00075 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;target.<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___camera_1a51e94885e2b2c73ec9da4716f8de0bc5">Expand</link>();
+00076 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;EditorUtility.SetDirty(target);
+00077 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00078 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00079 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00080 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;GUILayout.Space(18);
+00081 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;GUILayout.EndHorizontal();
+00082 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00083 
+00084 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(collapse)
+00085 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00086 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;GUILayout.BeginHorizontal();
+00087 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(GUILayout.Button(<emphasis role="stringliteral">&quot;Collapse&quot;</emphasis>))
+00088 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00089 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">foreach</emphasis>&#32;(<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___camera">SteamVR_Camera</link>&#32;target&#32;<emphasis role="keywordflow">in</emphasis>&#32;targets)
+00090 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00091 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(AssetDatabase.Contains(target))
+00092 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">continue</emphasis>;
+00093 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(target.isExpanded)
+00094 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00095 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;target.<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___camera_1a60ba8f4bceae007fb9f41702669346c1">Collapse</link>();
+00096 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;EditorUtility.SetDirty(target);
+00097 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00098 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00099 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00100 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;GUILayout.Space(18);
+00101 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;GUILayout.EndHorizontal();
+00102 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00103 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00104 
+00105 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;EditorGUILayout.PropertyField(script);
+00106 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;EditorGUILayout.PropertyField(wireframe);
+00107 
+00108 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;serializedObject.ApplyModifiedProperties();
+00109 &#32;&#32;&#32;&#32;}
+00110 
+<anchor xml:id="__steam_v_r___editor_8cs_source_1l00111"/><link linkend="_class_steam_v_r___editor_1a9329748a46c5779323758f500a53a866">00111</link> &#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keyword">static</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;<link linkend="_class_steam_v_r___editor_1a9329748a46c5779323758f500a53a866">ExportPackage</link>()
+00112 &#32;&#32;&#32;&#32;{
+00113 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;AssetDatabase.ExportPackage(<emphasis role="keyword">new</emphasis>&#32;<emphasis role="keywordtype">string</emphasis>[]&#32;{
+00114 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="stringliteral">&quot;Assets/SteamVR&quot;</emphasis>,
+00115 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="stringliteral">&quot;Assets/Plugins/openvr_api.cs&quot;</emphasis>,
+00116 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="stringliteral">&quot;Assets/Plugins/openvr_api.bundle&quot;</emphasis>,
+00117 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="stringliteral">&quot;Assets/Plugins/x86/openvr_api.dll&quot;</emphasis>,
+00118 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="stringliteral">&quot;Assets/Plugins/x86/steam_api.dll&quot;</emphasis>,
+00119 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="stringliteral">&quot;Assets/Plugins/x86/libsteam_api.so&quot;</emphasis>,
+00120 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="stringliteral">&quot;Assets/Plugins/x86_64/openvr_api.dll&quot;</emphasis>,
+00121 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="stringliteral">&quot;Assets/Plugins/x86_64/steam_api.dll&quot;</emphasis>,
+00122 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="stringliteral">&quot;Assets/Plugins/x86_64/libsteam_api.so&quot;</emphasis>,
+00123 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="stringliteral">&quot;Assets/Plugins/x86_64/libopenvr_api.so&quot;</emphasis>,
+00124 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;},&#32;<emphasis role="stringliteral">&quot;steamvr.unitypackage&quot;</emphasis>,&#32;ExportPackageOptions.Recurse);
+00125 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;EditorApplication.Exit(0);
+00126 &#32;&#32;&#32;&#32;}
+00127 }
+</programlisting></section>

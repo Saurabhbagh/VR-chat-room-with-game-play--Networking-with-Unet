@@ -1,0 +1,223 @@
+<?xml version='1.0' encoding='UTF-8' standalone='no'?>
+<section xmlns="http://docbook.org/ns/docbook" version="5.0" xmlns:xlink="http://www.w3.org/1999/xlink" xml:id="__t_m_p___sprite_asset_importer_8cs_source">
+<title>TMP_SpriteAssetImporter.cs</title>
+<indexterm><primary>O:/GitHUBMINIPRoject/Library/PackageCache/com.unity.textmeshpro@1.3.0/Scripts/Editor/TMP_SpriteAssetImporter.cs</primary></indexterm>
+<programlisting>00001 <emphasis role="keyword">using</emphasis>&#32;<link linkend="__balloon_8cs_1a7d67e097df9376eb709b6a23aa3c7d23">UnityEngine</link>;
+00002 <emphasis role="keyword">using</emphasis>&#32;<link linkend="_namespace_unity_editor">UnityEditor</link>;
+00003 <emphasis role="keyword">using</emphasis>&#32;System.IO;
+00004 <emphasis role="keyword">using</emphasis>&#32;System.Collections.Generic;
+00005 <emphasis role="keyword">using</emphasis>&#32;<link linkend="_namespace_t_m_pro">TMPro</link>.<link linkend="_namespace_t_m_pro_1_1_editor_utilities">EditorUtilities</link>;
+00006 <emphasis role="keyword">using</emphasis>&#32;<link linkend="_namespace_t_m_pro">TMPro</link>.<link linkend="_namespace_t_m_pro_1_1_sprite_asset_utilities">SpriteAssetUtilities</link>;
+00007 
+00008 <emphasis role="keyword">namespace&#32;</emphasis><link linkend="_namespace_t_m_pro">TMPro</link>
+00009 {
+<anchor xml:id="__t_m_p___sprite_asset_importer_8cs_source_1l00010"/><link linkend="_class_t_m_pro_1_1_t_m_p___sprite_asset_importer">00010</link> &#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keyword">class&#32;</emphasis><link linkend="_class_t_m_pro_1_1_t_m_p___sprite_asset_importer">TMP_SpriteAssetImporter</link>&#32;:&#32;EditorWindow
+00011 &#32;&#32;&#32;&#32;{
+00012 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;Create&#32;Sprite&#32;Asset&#32;Editor&#32;Window</emphasis>
+00013 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;[MenuItem(<emphasis role="stringliteral">&quot;Window/TextMeshPro/Sprite&#32;Importer&quot;</emphasis>,&#32;<emphasis role="keyword">false</emphasis>,&#32;2026)]
+<anchor xml:id="__t_m_p___sprite_asset_importer_8cs_source_1l00014"/><link linkend="_class_t_m_pro_1_1_t_m_p___sprite_asset_importer_1a3df4961b68f84eaa434f9204c4919963">00014</link> &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keyword">static</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;<link linkend="_class_t_m_pro_1_1_t_m_p___sprite_asset_importer_1a3df4961b68f84eaa434f9204c4919963">ShowFontAtlasCreatorWindow</link>()
+00015 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00016 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;var&#32;window&#32;=&#32;GetWindow&lt;TMP_SpriteAssetImporter&gt;();
+00017 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;window.titleContent&#32;=&#32;<emphasis role="keyword">new</emphasis>&#32;GUIContent(<emphasis role="stringliteral">&quot;Sprite&#32;Importer&quot;</emphasis>);
+00018 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;window.Focus();
+00019 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00020 
+00021 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;Texture2D&#32;m_SpriteAtlas;
+00022 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_namespace_t_m_pro_1_1_sprite_asset_utilities_1ae6645ac68f8728971cdb947d693945b3">SpriteAssetImportFormats</link>&#32;m_SpriteDataFormat&#32;=&#32;<link linkend="_namespace_t_m_pro_1_1_sprite_asset_utilities_1ae6645ac68f8728971cdb947d693945b3">SpriteAssetImportFormats</link>.TexturePacker;
+00023 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;TextAsset&#32;m_JsonFile;
+00024 
+00025 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordtype">string</emphasis>&#32;m_CreationFeedback;
+00026 
+00027 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_t_m_pro_1_1_t_m_p___sprite_asset">TMP_SpriteAsset</link>&#32;m_SpriteAsset;
+00028 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;List&lt;TMP_Sprite&gt;&#32;m_SpriteInfoList&#32;=&#32;<emphasis role="keyword">new</emphasis>&#32;List&lt;TMP_Sprite&gt;();
+00029 
+00030 
+00031 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordtype">void</emphasis>&#32;OnEnable()
+00032 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00033 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;Set&#32;Editor&#32;Window&#32;Size</emphasis>
+00034 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;SetEditorWindowSize();
+00035 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00036 
+<anchor xml:id="__t_m_p___sprite_asset_importer_8cs_source_1l00037"/><link linkend="_class_t_m_pro_1_1_t_m_p___sprite_asset_importer_1a5a2c0ed3a6a4fbea87bd74188fa967ef">00037</link> &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;<link linkend="_class_t_m_pro_1_1_t_m_p___sprite_asset_importer_1a5a2c0ed3a6a4fbea87bd74188fa967ef">OnGUI</link>()
+00038 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00039 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;DrawEditorPanel();
+00040 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00041 
+00042 
+00043 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordtype">void</emphasis>&#32;DrawEditorPanel()
+00044 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00045 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;label</emphasis>
+00046 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;GUILayout.Label(<emphasis role="stringliteral">&quot;Import&#32;Settings&quot;</emphasis>,&#32;EditorStyles.boldLabel);
+00047 
+00048 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;EditorGUI.BeginChangeCheck();
+00049 
+00050 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;Sprite&#32;Texture&#32;Selection</emphasis>
+00051 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;m_JsonFile&#32;=&#32;EditorGUILayout.ObjectField(<emphasis role="stringliteral">&quot;Sprite&#32;Data&#32;Source&quot;</emphasis>,&#32;m_JsonFile,&#32;typeof(TextAsset),&#32;<emphasis role="keyword">false</emphasis>)&#32;as&#32;TextAsset;
+00052 
+00053 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;m_SpriteDataFormat&#32;=&#32;(<link linkend="_namespace_t_m_pro_1_1_sprite_asset_utilities_1ae6645ac68f8728971cdb947d693945b3">SpriteAssetImportFormats</link>)EditorGUILayout.EnumPopup(<emphasis role="stringliteral">&quot;Import&#32;Format&quot;</emphasis>,&#32;m_SpriteDataFormat);
+00054 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;
+00055 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;Sprite&#32;Texture&#32;Selection</emphasis>
+00056 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;m_SpriteAtlas&#32;=&#32;EditorGUILayout.ObjectField(<emphasis role="stringliteral">&quot;Sprite&#32;Texture&#32;Atlas&quot;</emphasis>,&#32;m_SpriteAtlas,&#32;typeof(Texture2D),&#32;<emphasis role="keyword">false</emphasis>)&#32;as&#32;Texture2D;
+00057 
+00058 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(EditorGUI.EndChangeCheck())
+00059 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00060 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;m_CreationFeedback&#32;=&#32;<emphasis role="keywordtype">string</emphasis>.Empty;
+00061 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00062 
+00063 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;GUILayout.Space(10);
+00064 
+00065 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;GUI.enabled&#32;=&#32;m_JsonFile&#32;!=&#32;<emphasis role="keyword">null</emphasis>&#32;&amp;&amp;&#32;m_SpriteAtlas&#32;!=&#32;<emphasis role="keyword">null</emphasis>&#32;&amp;&amp;&#32;m_SpriteDataFormat&#32;==&#32;<link linkend="_namespace_t_m_pro_1_1_sprite_asset_utilities_1ae6645ac68f8728971cdb947d693945b3">SpriteAssetImportFormats</link>.TexturePacker;
+00066 
+00067 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;Create&#32;Sprite&#32;Asset</emphasis>
+00068 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(GUILayout.Button(<emphasis role="stringliteral">&quot;Create&#32;Sprite&#32;Asset&quot;</emphasis>))
+00069 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00070 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;m_CreationFeedback&#32;=&#32;<emphasis role="keywordtype">string</emphasis>.Empty;
+00071 
+00072 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;Read&#32;json&#32;data&#32;file</emphasis>
+00073 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(m_JsonFile&#32;!=&#32;<emphasis role="keyword">null</emphasis>&#32;&amp;&amp;&#32;m_SpriteDataFormat&#32;==&#32;<link linkend="_namespace_t_m_pro_1_1_sprite_asset_utilities_1ae6645ac68f8728971cdb947d693945b3">SpriteAssetImportFormats</link>.TexturePacker)
+00074 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00075 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_t_m_pro_1_1_sprite_asset_utilities_1_1_texture_packer">TexturePacker</link>.<link linkend="_class_t_m_pro_1_1_sprite_asset_utilities_1_1_texture_packer_1_1_sprite_data_object">SpriteDataObject</link>&#32;sprites&#32;=&#32;JsonUtility.FromJson&lt;<link linkend="_class_t_m_pro_1_1_sprite_asset_utilities_1_1_texture_packer">TexturePacker</link>.<link linkend="_class_t_m_pro_1_1_sprite_asset_utilities_1_1_texture_packer_1_1_sprite_data_object">SpriteDataObject</link>&gt;(m_JsonFile.text);
+00076 
+00077 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(sprites&#32;!=&#32;<emphasis role="keyword">null</emphasis>&#32;&amp;&amp;&#32;sprites.frames&#32;!=&#32;<emphasis role="keyword">null</emphasis>&#32;&amp;&amp;&#32;sprites.frames.Count&#32;&gt;&#32;0)
+00078 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00079 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordtype">int</emphasis>&#32;spriteCount&#32;=&#32;sprites.<link linkend="_class_t_m_pro_1_1_sprite_asset_utilities_1_1_texture_packer_1_1_sprite_data_object_1a6d29bb4e6fe078b4e4a23b98fefd6cce">frames</link>.Count;
+00080 
+00081 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;Update&#32;import&#32;results</emphasis>
+00082 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;m_CreationFeedback&#32;=&#32;<emphasis role="stringliteral">&quot;&lt;b&gt;Import&#32;Results&lt;/b&gt;\n--------------------\n&quot;</emphasis>;
+00083 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;m_CreationFeedback&#32;+=&#32;<emphasis role="stringliteral">&quot;&lt;color=#C0ffff&gt;&lt;b&gt;&quot;</emphasis>&#32;+&#32;spriteCount&#32;+&#32;<emphasis role="stringliteral">&quot;&lt;/b&gt;&lt;/color&gt;&#32;Sprites&#32;were&#32;imported&#32;from&#32;file.&quot;</emphasis>;
+00084 
+00085 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;Create&#32;sprite&#32;info&#32;list</emphasis>
+00086 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;m_SpriteInfoList&#32;=&#32;CreateSpriteInfoList(sprites);
+00087 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00088 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00089 
+00090 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00091 
+00092 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;GUI.enabled&#32;=&#32;<emphasis role="keyword">true</emphasis>;
+00093 
+00094 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;Creation&#32;Feedback</emphasis>
+00095 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;GUILayout.Space(5);
+00096 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;GUILayout.BeginVertical(EditorStyles.helpBox,&#32;GUILayout.Height(60));
+00097 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00098 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;EditorGUILayout.LabelField(m_CreationFeedback,&#32;TMP_UIStyleManager.label);
+00099 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00100 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;GUILayout.EndVertical();
+00101 
+00102 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;GUILayout.Space(5);
+00103 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;GUI.enabled&#32;=&#32;m_JsonFile&#32;!=&#32;<emphasis role="keyword">null</emphasis>&#32;&amp;&amp;&#32;m_SpriteAtlas&#32;&amp;&amp;&#32;m_SpriteInfoList&#32;!=&#32;<emphasis role="keyword">null</emphasis>&#32;&amp;&amp;&#32;m_SpriteInfoList.Count&#32;&gt;&#32;0;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;Enable&#32;Save&#32;Button&#32;if&#32;font_Atlas&#32;is&#32;not&#32;Null.</emphasis>
+00104 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(GUILayout.Button(<emphasis role="stringliteral">&quot;Save&#32;Sprite&#32;Asset&quot;</emphasis>)&#32;&amp;&amp;&#32;m_JsonFile&#32;!=&#32;<emphasis role="keyword">null</emphasis>)
+00105 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00106 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordtype">string</emphasis>&#32;filePath&#32;=&#32;EditorUtility.SaveFilePanel(<emphasis role="stringliteral">&quot;Save&#32;Sprite&#32;Asset&#32;File&quot;</emphasis>,&#32;<emphasis role="keyword">new</emphasis>&#32;FileInfo(AssetDatabase.GetAssetPath(m_JsonFile)).DirectoryName,&#32;m_JsonFile.name,&#32;<emphasis role="stringliteral">&quot;asset&quot;</emphasis>);
+00107 
+00108 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(filePath.Length&#32;==&#32;0)
+00109 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>;
+00110 
+00111 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;SaveSpriteAsset(filePath);
+00112 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00113 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;GUI.enabled&#32;=&#32;<emphasis role="keyword">true</emphasis>;
+00114 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00115 
+00116 
+00120 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;List&lt;TMP_Sprite&gt;&#32;CreateSpriteInfoList(<link linkend="_class_t_m_pro_1_1_sprite_asset_utilities_1_1_texture_packer">TexturePacker</link>.<link linkend="_class_t_m_pro_1_1_sprite_asset_utilities_1_1_texture_packer_1_1_sprite_data_object">SpriteDataObject</link>&#32;spriteDataObject)
+00121 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00122 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;List&lt;<link linkend="_class_t_m_pro_1_1_sprite_asset_utilities_1_1_texture_packer">TexturePacker</link>.<link linkend="_struct_t_m_pro_1_1_sprite_asset_utilities_1_1_texture_packer_1_1_sprite_data">SpriteData</link>&gt;&#32;importedSprites&#32;=&#32;spriteDataObject.frames;
+00123 
+00124 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;List&lt;TMP_Sprite&gt;&#32;spriteInfoList&#32;=&#32;<emphasis role="keyword">new</emphasis>&#32;List&lt;TMP_Sprite&gt;();
+00125 
+00126 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">for</emphasis>&#32;(<emphasis role="keywordtype">int</emphasis>&#32;i&#32;=&#32;0;&#32;i&#32;&lt;&#32;importedSprites.Count;&#32;i++)
+00127 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00128 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;TMP_Sprite&#32;sprite&#32;=&#32;<emphasis role="keyword">new</emphasis>&#32;TMP_Sprite();
+00129 
+00130 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;sprite.id&#32;=&#32;i;
+00131 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;sprite.name&#32;=&#32;Path.GetFileNameWithoutExtension(importedSprites[i].filename)&#32;??&#32;<emphasis role="stringliteral">&quot;&quot;</emphasis>;
+00132 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;sprite.hashCode&#32;=&#32;TMP_TextUtilities.GetSimpleHashCode(sprite.name);
+00133 
+00134 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;Attempt&#32;to&#32;extract&#32;Unicode&#32;value&#32;from&#32;name</emphasis>
+00135 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordtype">int</emphasis>&#32;unicode;
+00136 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordtype">int</emphasis>&#32;indexOfSeperator&#32;=&#32;sprite.name.IndexOf(<emphasis role="charliteral">&apos;-&apos;</emphasis>);
+00137 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(indexOfSeperator&#32;!=&#32;-1)
+00138 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;unicode&#32;=&#32;TMP_TextUtilities.StringToInt(sprite.name.Substring(indexOfSeperator&#32;+&#32;1));
+00139 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">else</emphasis>
+00140 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;unicode&#32;=&#32;TMP_TextUtilities.StringToInt(sprite.name);
+00141 
+00142 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;sprite.unicode&#32;=&#32;unicode;
+00143 
+00144 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;sprite.x&#32;=&#32;importedSprites[i].frame.x;
+00145 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;sprite.y&#32;=&#32;m_SpriteAtlas.height&#32;-&#32;(importedSprites[i].frame.y&#32;+&#32;importedSprites[i].frame.h);
+00146 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;sprite.width&#32;=&#32;importedSprites[i].frame.w;
+00147 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;sprite.height&#32;=&#32;importedSprites[i].frame.h;
+00148 
+00149 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//Calculate&#32;sprite&#32;pivot&#32;position</emphasis>
+00150 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;sprite.pivot&#32;=&#32;importedSprites[i].pivot;
+00151 
+00152 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;Properties&#32;the&#32;can&#32;be&#32;modified</emphasis>
+00153 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;sprite.xAdvance&#32;=&#32;sprite.width;
+00154 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;sprite.scale&#32;=&#32;1.0f;
+00155 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;sprite.xOffset&#32;=&#32;0&#32;-&#32;(sprite.width&#32;*&#32;sprite.pivot.x);
+00156 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;sprite.yOffset&#32;=&#32;sprite.height&#32;-&#32;(sprite.height&#32;*&#32;sprite.pivot.y);
+00157 
+00158 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;spriteInfoList.Add(sprite);
+00159 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00160 
+00161 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;spriteInfoList;
+00162 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00163 
+00164 
+00169 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordtype">void</emphasis>&#32;SaveSpriteAsset(<emphasis role="keywordtype">string</emphasis>&#32;filePath)
+00170 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00171 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;filePath&#32;=&#32;filePath.Substring(0,&#32;filePath.Length&#32;-&#32;6);&#32;<emphasis role="comment">//&#32;Trim&#32;file&#32;extension&#32;from&#32;filePath.</emphasis>
+00172 
+00173 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordtype">string</emphasis>&#32;dataPath&#32;=&#32;<link linkend="_namespace_valve_1_1_v_r_1aecd07a81fe79a9f96c6787513e2d98e4ae498749f3c42246d50b15c81c101d988">Application</link>.dataPath;
+00174 
+00175 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(filePath.IndexOf(dataPath,&#32;System.StringComparison.InvariantCultureIgnoreCase)&#32;==&#32;-1)
+00176 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00177 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;Debug.LogError(<emphasis role="stringliteral">&quot;You&apos;re&#32;saving&#32;the&#32;font&#32;asset&#32;in&#32;a&#32;directory&#32;outside&#32;of&#32;this&#32;project&#32;folder.&#32;This&#32;is&#32;not&#32;supported.&#32;Please&#32;select&#32;a&#32;directory&#32;under&#32;\&quot;&quot;</emphasis>&#32;+&#32;dataPath&#32;+&#32;<emphasis role="stringliteral">&quot;\&quot;&quot;</emphasis>);
+00178 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>;
+00179 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00180 
+00181 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordtype">string</emphasis>&#32;relativeAssetPath&#32;=&#32;filePath.Substring(dataPath.Length&#32;-&#32;6);
+00182 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordtype">string</emphasis>&#32;dirName&#32;=&#32;Path.GetDirectoryName(relativeAssetPath);
+00183 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordtype">string</emphasis>&#32;fileName&#32;=&#32;Path.GetFileNameWithoutExtension(relativeAssetPath);
+00184 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordtype">string</emphasis>&#32;pathNoExt&#32;=&#32;dirName&#32;+&#32;<emphasis role="stringliteral">&quot;/&quot;</emphasis>&#32;+&#32;fileName;
+00185 
+00186 
+00187 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;Create&#32;new&#32;Sprite&#32;Asset&#32;using&#32;this&#32;texture</emphasis>
+00188 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;m_SpriteAsset&#32;=&#32;CreateInstance&lt;TMP_SpriteAsset&gt;();
+00189 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;AssetDatabase.CreateAsset(m_SpriteAsset,&#32;pathNoExt&#32;+&#32;<emphasis role="stringliteral">&quot;.asset&quot;</emphasis>);
+00190 
+00191 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;Compute&#32;the&#32;hash&#32;code&#32;for&#32;the&#32;sprite&#32;asset.</emphasis>
+00192 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;m_SpriteAsset.<link linkend="_class_t_m_pro_1_1_t_m_p___asset_1a63f177ff7028859d2b431789737d8ccc">hashCode</link>&#32;=&#32;TMP_TextUtilities.GetSimpleHashCode(m_SpriteAsset.name);
+00193 
+00194 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;Assign&#32;new&#32;Sprite&#32;Sheet&#32;texture&#32;to&#32;the&#32;Sprite&#32;Asset.</emphasis>
+00195 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;m_SpriteAsset.<link linkend="_class_t_m_pro_1_1_t_m_p___sprite_asset_1ad58008ac004e19c361192d6159f34367">spriteSheet</link>&#32;=&#32;m_SpriteAtlas;
+00196 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;m_SpriteAsset.<link linkend="_class_t_m_pro_1_1_t_m_p___sprite_asset_1a6770844be35fbf6d455eadbc9a528372">spriteInfoList</link>&#32;=&#32;m_SpriteInfoList;
+00197 
+00198 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;Add&#32;new&#32;default&#32;material&#32;for&#32;sprite&#32;asset.</emphasis>
+00199 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;AddDefaultMaterial(m_SpriteAsset);
+00200 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00201 
+00202 
+00207 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">static</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;AddDefaultMaterial(TMP_SpriteAsset&#32;spriteAsset)
+00208 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00209 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;Shader&#32;shader&#32;=&#32;Shader.Find(<emphasis role="stringliteral">&quot;TextMeshPro/Sprite&quot;</emphasis>);
+00210 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;Material&#32;material&#32;=&#32;<emphasis role="keyword">new</emphasis>&#32;Material(shader);
+00211 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;material.SetTexture(ShaderUtilities.ID_MainTex,&#32;spriteAsset.spriteSheet);
+00212 
+00213 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;spriteAsset.material&#32;=&#32;material;
+00214 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;material.hideFlags&#32;=&#32;HideFlags.HideInHierarchy;
+00215 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;AssetDatabase.AddObjectToAsset(material,&#32;spriteAsset);
+00216 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00217 
+00218 
+00222 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordtype">void</emphasis>&#32;SetEditorWindowSize()
+00223 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00224 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;EditorWindow&#32;editorWindow&#32;=&#32;<emphasis role="keyword">this</emphasis>;
+00225 
+00226 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;Vector2&#32;currentWindowSize&#32;=&#32;editorWindow.minSize;
+00227 
+00228 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;editorWindow.minSize&#32;=&#32;<emphasis role="keyword">new</emphasis>&#32;Vector2(Mathf.Max(230,&#32;currentWindowSize.x),&#32;Mathf.Max(300,&#32;currentWindowSize.y));
+00229 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00230 
+00231 &#32;&#32;&#32;&#32;}
+00232 }
+</programlisting></section>

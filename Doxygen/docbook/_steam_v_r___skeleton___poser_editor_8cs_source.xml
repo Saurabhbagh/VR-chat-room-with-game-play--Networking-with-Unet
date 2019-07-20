@@ -1,0 +1,1114 @@
+<?xml version='1.0' encoding='UTF-8' standalone='no'?>
+<section xmlns="http://docbook.org/ns/docbook" version="5.0" xmlns:xlink="http://www.w3.org/1999/xlink" xml:id="__steam_v_r___skeleton___poser_editor_8cs_source">
+<title>SteamVR_Skeleton_PoserEditor.cs</title>
+<indexterm><primary>O:/GitHUBMINIPRoject/Assets/SteamVR/Input/Editor/SteamVR_Skeleton_PoserEditor.cs</primary></indexterm>
+<programlisting>00001 <emphasis role="keyword">using</emphasis>&#32;System;
+00002 <emphasis role="keyword">using</emphasis>&#32;System.Collections.Generic;
+00003 <emphasis role="keyword">using</emphasis>&#32;System.Linq;
+00004 <emphasis role="keyword">using</emphasis>&#32;System.Text;
+00005 
+00006 <emphasis role="keyword">using</emphasis>&#32;<link linkend="_namespace_unity_editor">UnityEditor</link>;
+00007 <emphasis role="keyword">using</emphasis>&#32;<link linkend="__balloon_8cs_1a7d67e097df9376eb709b6a23aa3c7d23">UnityEngine</link>;
+00008 
+00009 <emphasis role="keyword">namespace&#32;</emphasis><link linkend="_namespace_valve_1_1_v_r">Valve.VR</link>
+00010 {
+00011 
+00012 &#32;&#32;&#32;&#32;[CustomEditor(typeof(SteamVR_Skeleton_Poser))]
+<anchor xml:id="__steam_v_r___skeleton___poser_editor_8cs_source_1l00013"/><link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___skeleton___poser_editor">00013</link> &#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keyword">class&#32;</emphasis><link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___skeleton___poser_editor">SteamVR_Skeleton_PoserEditor</link>&#32;:&#32;Editor
+00014 &#32;&#32;&#32;&#32;{
+00015 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;<emphasis role="keyword">const</emphasis>&#32;<emphasis role="keywordtype">string</emphasis>&#32;leftDefaultAssetName&#32;=&#32;<emphasis role="stringliteral">&quot;vr_glove_left_model_slim&quot;</emphasis>;
+00016 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;<emphasis role="keyword">const</emphasis>&#32;<emphasis role="keywordtype">string</emphasis>&#32;rightDefaultAssetName&#32;=&#32;<emphasis role="stringliteral">&quot;vr_glove_right_model_slim&quot;</emphasis>;
+00017 
+00018 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;SerializedProperty&#32;skeletonMainPoseProperty;
+00019 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;SerializedProperty&#32;skeletonAdditionalPosesProperty;
+00020 
+00021 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;SerializedProperty&#32;showLeftPreviewProperty;
+00022 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;SerializedProperty&#32;showRightPreviewProperty;
+00023 
+00024 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;SerializedProperty&#32;previewLeftInstanceProperty;
+00025 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;SerializedProperty&#32;previewRightInstanceProperty;
+00026 
+00027 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;SerializedProperty&#32;previewLeftHandPrefab;
+00028 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;SerializedProperty&#32;previewRightHandPrefab;
+00029 
+00030 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;SerializedProperty&#32;previewPoseSelection;
+00031 
+00032 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;SerializedProperty&#32;poseEditorExpanded;
+00033 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;SerializedProperty&#32;blendEditorExpanded;
+00034 
+00035 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;SerializedProperty&#32;poserScale;
+00036 
+00037 
+00038 
+00039 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;SerializedProperty&#32;blendingBehaviourArray;
+00040 
+00041 
+00042 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;Texture&#32;handTexL;
+00043 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;Texture&#32;handTexR;
+00044 
+00045 
+00046 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___skeleton___poser">SteamVR_Skeleton_Poser</link>&#32;poser;
+00047 
+00048 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;<emphasis role="keywordtype">bool</emphasis>&#32;PoseChanged&#32;=&#32;<emphasis role="keyword">false</emphasis>;
+00049 
+<anchor xml:id="__steam_v_r___skeleton___poser_editor_8cs_source_1l00050"/><link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___skeleton___poser_editor_1aa9add297893896ac7e3db8b6158790f3">00050</link> &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">protected</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___skeleton___poser_editor_1aa9add297893896ac7e3db8b6158790f3">OnEnable</link>()
+00051 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00052 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;skeletonMainPoseProperty&#32;=&#32;serializedObject.FindProperty(<emphasis role="stringliteral">&quot;skeletonMainPose&quot;</emphasis>);
+00053 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;skeletonAdditionalPosesProperty&#32;=&#32;serializedObject.FindProperty(<emphasis role="stringliteral">&quot;skeletonAdditionalPoses&quot;</emphasis>);
+00054 
+00055 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;showLeftPreviewProperty&#32;=&#32;serializedObject.FindProperty(<emphasis role="stringliteral">&quot;showLeftPreview&quot;</emphasis>);
+00056 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;showRightPreviewProperty&#32;=&#32;serializedObject.FindProperty(<emphasis role="stringliteral">&quot;showRightPreview&quot;</emphasis>);
+00057 
+00058 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;previewLeftInstanceProperty&#32;=&#32;serializedObject.FindProperty(<emphasis role="stringliteral">&quot;previewLeftInstance&quot;</emphasis>);
+00059 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;previewRightInstanceProperty&#32;=&#32;serializedObject.FindProperty(<emphasis role="stringliteral">&quot;previewRightInstance&quot;</emphasis>);
+00060 
+00061 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;previewLeftHandPrefab&#32;=&#32;serializedObject.FindProperty(<emphasis role="stringliteral">&quot;previewLeftHandPrefab&quot;</emphasis>);
+00062 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;previewRightHandPrefab&#32;=&#32;serializedObject.FindProperty(<emphasis role="stringliteral">&quot;previewRightHandPrefab&quot;</emphasis>);
+00063 
+00064 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;previewPoseSelection&#32;=&#32;serializedObject.FindProperty(<emphasis role="stringliteral">&quot;previewPoseSelection&quot;</emphasis>);
+00065 
+00066 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;poseEditorExpanded&#32;=&#32;serializedObject.FindProperty(<emphasis role="stringliteral">&quot;poseEditorExpanded&quot;</emphasis>);
+00067 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;blendEditorExpanded&#32;=&#32;serializedObject.FindProperty(<emphasis role="stringliteral">&quot;blendEditorExpanded&quot;</emphasis>);
+00068 
+00069 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;poserScale&#32;=&#32;serializedObject.FindProperty(<emphasis role="stringliteral">&quot;scale&quot;</emphasis>);
+00070 
+00071 
+00072 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;blendingBehaviourArray&#32;=&#32;serializedObject.FindProperty(<emphasis role="stringliteral">&quot;blendingBehaviours&quot;</emphasis>);
+00073 
+00074 
+00075 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;poser&#32;=&#32;(<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___skeleton___poser">SteamVR_Skeleton_Poser</link>)target;
+00076 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00077 
+<anchor xml:id="__steam_v_r___skeleton___poser_editor_8cs_source_1l00078"/><link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___skeleton___poser_editor_1a2a4a82a8af4635de9f55c622235ac9b3">00078</link> &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">protected</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___skeleton___poser_editor_1a2a4a82a8af4635de9f55c622235ac9b3">LoadDefaultPreviewHands</link>()
+00079 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00080 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(previewLeftHandPrefab.objectReferenceValue&#32;==&#32;<emphasis role="keyword">null</emphasis>)
+00081 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00082 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordtype">string</emphasis>[]&#32;defaultLeftPaths&#32;=&#32;AssetDatabase.FindAssets(<emphasis role="keywordtype">string</emphasis>.Format(<emphasis role="stringliteral">&quot;t:Prefab&#32;{0}&quot;</emphasis>,&#32;leftDefaultAssetName));
+00083 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(defaultLeftPaths&#32;!=&#32;<emphasis role="keyword">null</emphasis>&#32;&amp;&amp;&#32;defaultLeftPaths.Length&#32;&gt;&#32;0)
+00084 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00085 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordtype">string</emphasis>&#32;defaultLeftGUID&#32;=&#32;defaultLeftPaths[0];
+00086 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordtype">string</emphasis>&#32;defaultLeftPath&#32;=&#32;AssetDatabase.GUIDToAssetPath(defaultLeftGUID);
+00087 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;previewLeftHandPrefab.objectReferenceValue&#32;=&#32;AssetDatabase.LoadAssetAtPath&lt;GameObject&gt;(defaultLeftPath);
+00088 
+00089 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(previewLeftHandPrefab.objectReferenceValue&#32;==&#32;<emphasis role="keyword">null</emphasis>)
+00090 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;Debug.LogError(<emphasis role="stringliteral">&quot;[SteamVR]&#32;Could&#32;not&#32;load&#32;prefab:&#32;&quot;</emphasis>&#32;+&#32;leftDefaultAssetName&#32;+&#32;<emphasis role="stringliteral">&quot;.&#32;Found&#32;path:&#32;&quot;</emphasis>&#32;+&#32;defaultLeftPath);
+00091 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00092 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">else</emphasis>
+00093 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;Debug.LogError(<emphasis role="stringliteral">&quot;[SteamVR]&#32;Could&#32;not&#32;load&#32;prefab:&#32;&quot;</emphasis>&#32;+&#32;leftDefaultAssetName);
+00094 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00095 
+00096 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(previewRightHandPrefab.objectReferenceValue&#32;==&#32;<emphasis role="keyword">null</emphasis>)
+00097 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00098 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordtype">string</emphasis>[]&#32;defaultRightPaths&#32;=&#32;AssetDatabase.FindAssets(<emphasis role="keywordtype">string</emphasis>.Format(<emphasis role="stringliteral">&quot;t:Prefab&#32;{0}&quot;</emphasis>,&#32;rightDefaultAssetName));
+00099 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(defaultRightPaths&#32;!=&#32;<emphasis role="keyword">null</emphasis>&#32;&amp;&amp;&#32;defaultRightPaths.Length&#32;&gt;&#32;0)
+00100 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00101 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordtype">string</emphasis>&#32;defaultRightGUID&#32;=&#32;defaultRightPaths[0];
+00102 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordtype">string</emphasis>&#32;defaultRightPath&#32;=&#32;AssetDatabase.GUIDToAssetPath(defaultRightGUID);
+00103 
+00104 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;previewRightHandPrefab.objectReferenceValue&#32;=&#32;AssetDatabase.LoadAssetAtPath&lt;GameObject&gt;(defaultRightPath);
+00105 
+00106 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(previewLeftHandPrefab.objectReferenceValue&#32;==&#32;<emphasis role="keyword">null</emphasis>)
+00107 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;Debug.LogError(<emphasis role="stringliteral">&quot;[SteamVR]&#32;Could&#32;not&#32;load&#32;prefab:&#32;&quot;</emphasis>&#32;+&#32;rightDefaultAssetName&#32;+&#32;<emphasis role="stringliteral">&quot;.&#32;Found&#32;path:&#32;&quot;</emphasis>&#32;+&#32;defaultRightPath);
+00108 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00109 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">else</emphasis>
+00110 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;Debug.LogError(<emphasis role="stringliteral">&quot;[SteamVR]&#32;Could&#32;not&#32;load&#32;prefab:&#32;&quot;</emphasis>&#32;+&#32;rightDefaultAssetName);
+00111 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00112 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00113 
+<anchor xml:id="__steam_v_r___skeleton___poser_editor_8cs_source_1l00114"/><link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___skeleton___poser_editor_1ad592a89bc202153f1666020de5c71b8d">00114</link> &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">protected</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___skeleton___poser_editor_1ad592a89bc202153f1666020de5c71b8d">UpdatePreviewHand</link>(SerializedProperty&#32;instanceProperty,&#32;SerializedProperty&#32;showPreviewProperty,&#32;SerializedProperty&#32;prefabProperty,&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___skeleton___pose___hand">SteamVR_Skeleton_Pose_Hand</link>&#32;handData,&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___skeleton___pose">SteamVR_Skeleton_Pose</link>&#32;sourcePose,&#32;<emphasis role="keywordtype">bool</emphasis>&#32;forceUpdate)
+00115 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00116 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;GameObject&#32;preview&#32;=&#32;instanceProperty.objectReferenceValue&#32;as&#32;GameObject;
+00117 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//EditorGUILayout.PropertyField(showPreviewProperty);</emphasis>
+00118 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(showPreviewProperty.boolValue)
+00119 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00120 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(forceUpdate&#32;&amp;&amp;&#32;preview&#32;!=&#32;<emphasis role="keyword">null</emphasis>)
+00121 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00122 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;DestroyImmediate(preview);
+00123 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00124 
+00125 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(preview&#32;==&#32;<emphasis role="keyword">null</emphasis>)
+00126 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00127 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;preview&#32;=&#32;GameObject.Instantiate&lt;GameObject&gt;((GameObject)prefabProperty.objectReferenceValue);
+00128 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;preview.transform.localScale&#32;=&#32;Vector3.one&#32;*&#32;poserScale.floatValue;
+00129 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;preview.transform.parent&#32;=&#32;poser.transform;
+00130 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;preview.transform.localPosition&#32;=&#32;Vector3.zero;
+00131 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;preview.transform.localRotation&#32;=&#32;Quaternion.identity;
+00132 
+00133 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___behaviour___skeleton">SteamVR_Behaviour_Skeleton</link>&#32;previewSkeleton&#32;=&#32;<emphasis role="keyword">null</emphasis>;
+00134 
+00135 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(preview&#32;!=&#32;<emphasis role="keyword">null</emphasis>)
+00136 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;previewSkeleton&#32;=&#32;preview.GetComponent&lt;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___behaviour___skeleton">SteamVR_Behaviour_Skeleton</link>&gt;();
+00137 
+00138 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(previewSkeleton&#32;!=&#32;<emphasis role="keyword">null</emphasis>)
+00139 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00140 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(handData.<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___skeleton___pose___hand_1abee51a185db7159e978f6e56ca2f4d06">bonePositions</link>&#32;==&#32;<emphasis role="keyword">null</emphasis>&#32;||&#32;handData.<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___skeleton___pose___hand_1abee51a185db7159e978f6e56ca2f4d06">bonePositions</link>.Length&#32;==&#32;0)
+00141 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00142 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___skeleton___pose">SteamVR_Skeleton_Pose</link>&#32;poseResource&#32;=&#32;(<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___skeleton___pose">SteamVR_Skeleton_Pose</link>)Resources.Load(<emphasis role="stringliteral">&quot;ReferencePose_OpenHand&quot;</emphasis>);
+00143 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;DeepCopyPose(poseResource,&#32;sourcePose);
+00144 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;EditorUtility.SetDirty(sourcePose);
+00145 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00146 
+00147 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;preview.transform.localPosition&#32;=&#32;Vector3.zero;
+00148 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;preview.transform.localRotation&#32;=&#32;Quaternion.identity;
+00149 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;preview.transform.parent&#32;=&#32;<emphasis role="keyword">null</emphasis>;
+00150 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;preview.transform.localScale&#32;=&#32;Vector3.one&#32;*&#32;poserScale.floatValue;
+00151 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;preview.transform.parent&#32;=&#32;poser.transform;
+00152 
+00153 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;preview.transform.localRotation&#32;=&#32;Quaternion.Inverse(handData.<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___skeleton___pose___hand_1a08578472e61f788eb40dc2c7f0e9d533">rotation</link>);
+00154 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;preview.transform.position&#32;=&#32;preview.transform.TransformPoint(-handData.<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___skeleton___pose___hand_1a1621152dc8469b2e9ba09535f2c0ad28">position</link>);
+00155 
+00156 
+00157 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">for</emphasis>&#32;(<emphasis role="keywordtype">int</emphasis>&#32;boneIndex&#32;=&#32;0;&#32;boneIndex&#32;&lt;&#32;handData.<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___skeleton___pose___hand_1abee51a185db7159e978f6e56ca2f4d06">bonePositions</link>.Length;&#32;boneIndex++)
+00158 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00159 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;Transform&#32;bone&#32;=&#32;previewSkeleton.<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___behaviour___skeleton_1a0d79a785e44f82950ea9d3cfa61d05b5">GetBone</link>(boneIndex);
+00160 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;bone.localPosition&#32;=&#32;handData.<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___skeleton___pose___hand_1abee51a185db7159e978f6e56ca2f4d06">bonePositions</link>[boneIndex];
+00161 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;bone.localRotation&#32;=&#32;handData.<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___skeleton___pose___hand_1a393bd313dfb94bf28b1619685dd384c9">boneRotations</link>[boneIndex];
+00162 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00163 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00164 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;SceneView.RepaintAll();
+00165 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;instanceProperty.objectReferenceValue&#32;=&#32;preview;
+00166 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00167 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00168 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">else</emphasis>
+00169 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00170 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(preview&#32;!=&#32;<emphasis role="keyword">null</emphasis>)
+00171 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00172 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;DestroyImmediate(preview);
+00173 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;SceneView.RepaintAll();
+00174 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00175 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00176 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00177 
+<anchor xml:id="__steam_v_r___skeleton___poser_editor_8cs_source_1l00178"/><link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___skeleton___poser_editor_1a54013643e240401b627fe5f51123bd69">00178</link> &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">protected</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___skeleton___poser_editor_1a54013643e240401b627fe5f51123bd69">ZeroTransformParents</link>(Transform&#32;toZero,&#32;Transform&#32;stopAt)
+00179 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00180 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(toZero&#32;==&#32;<emphasis role="keyword">null</emphasis>)
+00181 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>;
+00182 
+00183 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;toZero.localPosition&#32;=&#32;Vector3.zero;
+00184 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;toZero.localRotation&#32;=&#32;Quaternion.identity;
+00185 
+00186 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(toZero&#32;==&#32;stopAt)
+00187 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>;
+00188 
+00189 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___skeleton___poser_editor_1a54013643e240401b627fe5f51123bd69">ZeroTransformParents</link>(toZero.parent,&#32;stopAt);
+00190 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00191 
+<anchor xml:id="__steam_v_r___skeleton___poser_editor_8cs_source_1l00192"/><link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___skeleton___poser_editor_1ac446969b5aaaa2bd8fd4515dc7eac188">00192</link> &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">protected</emphasis>&#32;<link linkend="_namespace_valve_1_1_v_r_1a299b655881f873256f035349b59da09e">EVRSkeletalReferencePose</link>&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___skeleton___poser_editor_1ac446969b5aaaa2bd8fd4515dc7eac188">defaultReferencePose</link>&#32;=&#32;<link linkend="_namespace_valve_1_1_v_r_1a299b655881f873256f035349b59da09e">EVRSkeletalReferencePose</link>.OpenHand;
+<anchor xml:id="__steam_v_r___skeleton___poser_editor_8cs_source_1l00193"/><link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___skeleton___poser_editor_1ac9a14861334577353dddafd5f35f5b0f">00193</link> &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">protected</emphasis>&#32;<link linkend="_namespace_valve_1_1_v_r_1a299b655881f873256f035349b59da09e">EVRSkeletalReferencePose</link>&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___skeleton___poser_editor_1ac9a14861334577353dddafd5f35f5b0f">forceToReferencePose</link>&#32;=&#32;<link linkend="_namespace_valve_1_1_v_r_1a299b655881f873256f035349b59da09e">EVRSkeletalReferencePose</link>.OpenHand;
+00194 
+<anchor xml:id="__steam_v_r___skeleton___poser_editor_8cs_source_1l00195"/><link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___skeleton___poser_editor_1ad513b303bd9f95c2fecdd84c236b4b02">00195</link> &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">protected</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___skeleton___poser_editor_1ad513b303bd9f95c2fecdd84c236b4b02">SaveHandData</link>(<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___skeleton___pose___hand">SteamVR_Skeleton_Pose_Hand</link>&#32;handData,&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___behaviour___skeleton">SteamVR_Behaviour_Skeleton</link>&#32;thisSkeleton)
+00196 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00197 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;handData.<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___skeleton___pose___hand_1a1621152dc8469b2e9ba09535f2c0ad28">position</link>&#32;=&#32;thisSkeleton.transform.InverseTransformPoint(poser.transform.position);
+00198 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//handData.position&#32;=&#32;thisSkeleton.transform.localPosition;</emphasis>
+00199 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;handData.<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___skeleton___pose___hand_1a08578472e61f788eb40dc2c7f0e9d533">rotation</link>&#32;=&#32;Quaternion.Inverse(thisSkeleton.transform.localRotation);
+00200 
+00201 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;handData.<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___skeleton___pose___hand_1abee51a185db7159e978f6e56ca2f4d06">bonePositions</link>&#32;=&#32;<emphasis role="keyword">new</emphasis>&#32;Vector3[<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___action___skeleton">SteamVR_Action_Skeleton</link>.<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___action___skeleton_1ab60abde1a0e0993a1a15c03554a5671a">numBones</link>];
+00202 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;handData.<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___skeleton___pose___hand_1a393bd313dfb94bf28b1619685dd384c9">boneRotations</link>&#32;=&#32;<emphasis role="keyword">new</emphasis>&#32;Quaternion[<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___action___skeleton">SteamVR_Action_Skeleton</link>.<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___action___skeleton_1ab60abde1a0e0993a1a15c03554a5671a">numBones</link>];
+00203 
+00204 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">for</emphasis>&#32;(<emphasis role="keywordtype">int</emphasis>&#32;boneIndex&#32;=&#32;0;&#32;boneIndex&#32;&lt;&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___action___skeleton">SteamVR_Action_Skeleton</link>.<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___action___skeleton_1ab60abde1a0e0993a1a15c03554a5671a">numBones</link>;&#32;boneIndex++)
+00205 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00206 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;Transform&#32;bone&#32;=&#32;thisSkeleton.<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___behaviour___skeleton_1a0d79a785e44f82950ea9d3cfa61d05b5">GetBone</link>(boneIndex);
+00207 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;handData.<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___skeleton___pose___hand_1abee51a185db7159e978f6e56ca2f4d06">bonePositions</link>[boneIndex]&#32;=&#32;bone.localPosition;
+00208 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;handData.<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___skeleton___pose___hand_1a393bd313dfb94bf28b1619685dd384c9">boneRotations</link>[boneIndex]&#32;=&#32;bone.localRotation;
+00209 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00210 
+00211 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;EditorUtility.SetDirty(activePose);
+00212 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00213 
+<anchor xml:id="__steam_v_r___skeleton___poser_editor_8cs_source_1l00214"/><link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___skeleton___poser_editor_1a86f575b35336394ee25e91f1e14c5257">00214</link> &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">protected</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___skeleton___poser_editor_1a86f575b35336394ee25e91f1e14c5257">DrawHand</link>(<emphasis role="keywordtype">bool</emphasis>&#32;showHand,&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___skeleton___pose___hand">SteamVR_Skeleton_Pose_Hand</link>&#32;handData,&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___skeleton___pose___hand">SteamVR_Skeleton_Pose_Hand</link>&#32;otherData,&#32;<emphasis role="keywordtype">bool</emphasis>&#32;getFromOpposite)
+00215 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00216 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___behaviour___skeleton">SteamVR_Behaviour_Skeleton</link>&#32;thisSkeleton;
+00217 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___behaviour___skeleton">SteamVR_Behaviour_Skeleton</link>&#32;oppositeSkeleton;
+00218 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordtype">string</emphasis>&#32;thisSourceString;
+00219 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordtype">string</emphasis>&#32;oppositeSourceString;
+00220 
+00221 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(handData.<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___skeleton___pose___hand_1a07abf8fdb1adaeefe2ceeea537e2e067">inputSource</link>&#32;==&#32;<link linkend="_namespace_valve_1_1_v_r_1a82e5bf501cc3aa155444ee3f0662853f">SteamVR_Input_Sources</link>.LeftHand)
+00222 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00223 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;thisSkeleton&#32;=&#32;leftSkeleton;
+00224 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;thisSourceString&#32;=&#32;<emphasis role="stringliteral">&quot;Left&#32;Hand&quot;</emphasis>;
+00225 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;oppositeSourceString&#32;=&#32;<emphasis role="stringliteral">&quot;Right&#32;Hand&quot;</emphasis>;
+00226 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;oppositeSkeleton&#32;=&#32;rightSkeleton;
+00227 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00228 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">else</emphasis>
+00229 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00230 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;thisSkeleton&#32;=&#32;rightSkeleton;
+00231 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;thisSourceString&#32;=&#32;<emphasis role="stringliteral">&quot;Right&#32;Hand&quot;</emphasis>;
+00232 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;oppositeSourceString&#32;=&#32;<emphasis role="stringliteral">&quot;Left&#32;Hand&quot;</emphasis>;
+00233 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;oppositeSkeleton&#32;=&#32;leftSkeleton;
+00234 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00235 
+00236 
+00237 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(showHand)
+00238 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00239 
+00240 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(getFromOpposite)
+00241 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00242 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordtype">bool</emphasis>&#32;confirm&#32;=&#32;EditorUtility.DisplayDialog(<emphasis role="stringliteral">&quot;SteamVR&quot;</emphasis>,&#32;<emphasis role="keywordtype">string</emphasis>.Format(<emphasis role="stringliteral">&quot;This&#32;will&#32;overwrite&#32;your&#32;current&#32;{0}&#32;skeleton&#32;data.&#32;(with&#32;data&#32;from&#32;the&#32;{1}&#32;skeleton)&quot;</emphasis>,&#32;thisSourceString,&#32;oppositeSourceString),&#32;<emphasis role="stringliteral">&quot;Overwrite&quot;</emphasis>,&#32;<emphasis role="stringliteral">&quot;Cancel&quot;</emphasis>);
+00243 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(confirm)
+00244 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00245 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;Vector3&#32;reflectedPosition&#32;=&#32;<emphasis role="keyword">new</emphasis>&#32;Vector3(-oppositeSkeleton.transform.localPosition.x,&#32;oppositeSkeleton.transform.localPosition.y,&#32;oppositeSkeleton.transform.localPosition.z);
+00246 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;thisSkeleton.transform.localPosition&#32;=&#32;reflectedPosition;
+00247 
+00248 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;Quaternion&#32;oppositeRotation&#32;=&#32;oppositeSkeleton.transform.localRotation;
+00249 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;Quaternion&#32;reflectedRotation&#32;=&#32;<emphasis role="keyword">new</emphasis>&#32;Quaternion(-oppositeRotation.x,&#32;oppositeRotation.y,&#32;oppositeRotation.z,&#32;-oppositeRotation.w);
+00250 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;thisSkeleton.transform.localRotation&#32;=&#32;reflectedRotation;
+00251 
+00252 
+00253 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">for</emphasis>&#32;(<emphasis role="keywordtype">int</emphasis>&#32;boneIndex&#32;=&#32;0;&#32;boneIndex&#32;&lt;&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___action___skeleton">SteamVR_Action_Skeleton</link>.<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___action___skeleton_1ab60abde1a0e0993a1a15c03554a5671a">numBones</link>;&#32;boneIndex++)
+00254 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00255 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;Transform&#32;boneThis&#32;=&#32;thisSkeleton.<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___behaviour___skeleton_1a0d79a785e44f82950ea9d3cfa61d05b5">GetBone</link>(boneIndex);
+00256 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;Transform&#32;boneOpposite&#32;=&#32;oppositeSkeleton.<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___behaviour___skeleton_1a0d79a785e44f82950ea9d3cfa61d05b5">GetBone</link>(boneIndex);
+00257 
+00258 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;boneThis.localPosition&#32;=&#32;boneOpposite.localPosition;
+00259 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;boneThis.localRotation&#32;=&#32;boneOpposite.localRotation;
+00260 
+00261 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00262 
+00263 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;handData.<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___skeleton___pose___hand_1a4665f3a9254a6991ccf50ac84743b339">thumbFingerMovementType</link>&#32;=&#32;otherData.<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___skeleton___pose___hand_1a4665f3a9254a6991ccf50ac84743b339">thumbFingerMovementType</link>;
+00264 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;handData.<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___skeleton___pose___hand_1a3d5f7f76110f73590014db5908702d6e">indexFingerMovementType</link>&#32;=&#32;otherData.<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___skeleton___pose___hand_1a3d5f7f76110f73590014db5908702d6e">indexFingerMovementType</link>;
+00265 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;handData.<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___skeleton___pose___hand_1ab8585d689476cc3a1a6b20b11df02a31">middleFingerMovementType</link>&#32;=&#32;otherData.<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___skeleton___pose___hand_1ab8585d689476cc3a1a6b20b11df02a31">middleFingerMovementType</link>;
+00266 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;handData.<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___skeleton___pose___hand_1aba7575cade0e516ea2265066e02c1e89">ringFingerMovementType</link>&#32;=&#32;otherData.<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___skeleton___pose___hand_1aba7575cade0e516ea2265066e02c1e89">ringFingerMovementType</link>;
+00267 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;handData.<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___skeleton___pose___hand_1aa2693526977ec3902da52cd4af6f269b">pinkyFingerMovementType</link>&#32;=&#32;otherData.<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___skeleton___pose___hand_1aa2693526977ec3902da52cd4af6f269b">pinkyFingerMovementType</link>;
+00268 
+00269 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;EditorUtility.SetDirty(poser.<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___skeleton___poser_1a2b3e48f48a00bd16a66e58c124e5ec45">skeletonMainPose</link>);
+00270 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00271 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00272 
+00273 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00274 
+00275 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;EditorGUIUtility.labelWidth&#32;=&#32;120;
+00276 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_namespace_valve_1_1_v_r_1af4f7ce87893374f71b2fa2ba112642da">SteamVR_Skeleton_FingerExtensionTypes</link>&#32;newThumb&#32;=&#32;(<link linkend="_namespace_valve_1_1_v_r_1af4f7ce87893374f71b2fa2ba112642da">SteamVR_Skeleton_FingerExtensionTypes</link>)EditorGUILayout.EnumPopup(<emphasis role="stringliteral">&quot;Thumb&#32;movement&quot;</emphasis>,&#32;handData.<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___skeleton___pose___hand_1a4665f3a9254a6991ccf50ac84743b339">thumbFingerMovementType</link>);
+00277 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_namespace_valve_1_1_v_r_1af4f7ce87893374f71b2fa2ba112642da">SteamVR_Skeleton_FingerExtensionTypes</link>&#32;newIndex&#32;=&#32;(<link linkend="_namespace_valve_1_1_v_r_1af4f7ce87893374f71b2fa2ba112642da">SteamVR_Skeleton_FingerExtensionTypes</link>)EditorGUILayout.EnumPopup(<emphasis role="stringliteral">&quot;Index&#32;movement&quot;</emphasis>,&#32;handData.<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___skeleton___pose___hand_1a3d5f7f76110f73590014db5908702d6e">indexFingerMovementType</link>);
+00278 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_namespace_valve_1_1_v_r_1af4f7ce87893374f71b2fa2ba112642da">SteamVR_Skeleton_FingerExtensionTypes</link>&#32;newMiddle&#32;=&#32;(<link linkend="_namespace_valve_1_1_v_r_1af4f7ce87893374f71b2fa2ba112642da">SteamVR_Skeleton_FingerExtensionTypes</link>)EditorGUILayout.EnumPopup(<emphasis role="stringliteral">&quot;Middle&#32;movement&quot;</emphasis>,&#32;handData.<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___skeleton___pose___hand_1ab8585d689476cc3a1a6b20b11df02a31">middleFingerMovementType</link>);
+00279 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_namespace_valve_1_1_v_r_1af4f7ce87893374f71b2fa2ba112642da">SteamVR_Skeleton_FingerExtensionTypes</link>&#32;newRing&#32;=&#32;(<link linkend="_namespace_valve_1_1_v_r_1af4f7ce87893374f71b2fa2ba112642da">SteamVR_Skeleton_FingerExtensionTypes</link>)EditorGUILayout.EnumPopup(<emphasis role="stringliteral">&quot;Ring&#32;movement&quot;</emphasis>,&#32;handData.<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___skeleton___pose___hand_1aba7575cade0e516ea2265066e02c1e89">ringFingerMovementType</link>);
+00280 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_namespace_valve_1_1_v_r_1af4f7ce87893374f71b2fa2ba112642da">SteamVR_Skeleton_FingerExtensionTypes</link>&#32;newPinky&#32;=&#32;(<link linkend="_namespace_valve_1_1_v_r_1af4f7ce87893374f71b2fa2ba112642da">SteamVR_Skeleton_FingerExtensionTypes</link>)EditorGUILayout.EnumPopup(<emphasis role="stringliteral">&quot;Pinky&#32;movement&quot;</emphasis>,&#32;handData.<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___skeleton___pose___hand_1aa2693526977ec3902da52cd4af6f269b">pinkyFingerMovementType</link>);
+00281 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;EditorGUIUtility.labelWidth&#32;=&#32;0;
+00282 
+00283 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(newThumb&#32;!=&#32;handData.<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___skeleton___pose___hand_1a4665f3a9254a6991ccf50ac84743b339">thumbFingerMovementType</link>&#32;||&#32;newIndex&#32;!=&#32;handData.<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___skeleton___pose___hand_1a3d5f7f76110f73590014db5908702d6e">indexFingerMovementType</link>&#32;||
+00284 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;newMiddle&#32;!=&#32;handData.<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___skeleton___pose___hand_1ab8585d689476cc3a1a6b20b11df02a31">middleFingerMovementType</link>&#32;||&#32;newRing&#32;!=&#32;handData.<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___skeleton___pose___hand_1aba7575cade0e516ea2265066e02c1e89">ringFingerMovementType</link>&#32;||
+00285 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;newPinky&#32;!=&#32;handData.<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___skeleton___pose___hand_1aa2693526977ec3902da52cd4af6f269b">pinkyFingerMovementType</link>)
+00286 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00287 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">/*if&#32;((int)newThumb&#32;&gt;=&#32;2&#32;||&#32;(int)newIndex&#32;&gt;=&#32;2&#32;||&#32;(int)newMiddle&#32;&gt;=&#32;2&#32;||&#32;(int)newRing&#32;&gt;=&#32;2&#32;||&#32;(int)newPinky&#32;&gt;=&#32;2)</emphasis>
+00288 <emphasis role="comment">&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{</emphasis>
+00289 <emphasis role="comment">&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;Debug.LogError(&quot;&lt;b&gt;[SteamVR&#32;Input]&lt;/b&gt;&#32;Unfortunately&#32;only&#32;Static&#32;and&#32;Free&#32;modes&#32;are&#32;supported&#32;in&#32;this&#32;beta.&quot;);</emphasis>
+00290 <emphasis role="comment">&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;return;</emphasis>
+00291 <emphasis role="comment">&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}*/</emphasis>
+00292 
+00293 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;handData.<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___skeleton___pose___hand_1a4665f3a9254a6991ccf50ac84743b339">thumbFingerMovementType</link>&#32;=&#32;newThumb;
+00294 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;handData.<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___skeleton___pose___hand_1a3d5f7f76110f73590014db5908702d6e">indexFingerMovementType</link>&#32;=&#32;newIndex;
+00295 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;handData.<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___skeleton___pose___hand_1ab8585d689476cc3a1a6b20b11df02a31">middleFingerMovementType</link>&#32;=&#32;newMiddle;
+00296 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;handData.<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___skeleton___pose___hand_1aba7575cade0e516ea2265066e02c1e89">ringFingerMovementType</link>&#32;=&#32;newRing;
+00297 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;handData.<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___skeleton___pose___hand_1aa2693526977ec3902da52cd4af6f269b">pinkyFingerMovementType</link>&#32;=&#32;newPinky;
+00298 
+00299 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;EditorUtility.SetDirty(poser.<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___skeleton___poser_1a2b3e48f48a00bd16a66e58c124e5ec45">skeletonMainPose</link>);
+00300 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00301 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00302 
+<anchor xml:id="__steam_v_r___skeleton___poser_editor_8cs_source_1l00303"/><link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___skeleton___poser_editor_1ad760db10fd1db4bab002914de2dc225d">00303</link> &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">protected</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___skeleton___poser_editor_1ad760db10fd1db4bab002914de2dc225d">DrawPoseControlButtons</link>()
+00304 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00305 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;GameObject&#32;leftInstance&#32;=&#32;previewLeftInstanceProperty.objectReferenceValue&#32;as&#32;GameObject;
+00306 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;leftSkeleton&#32;=&#32;<emphasis role="keyword">null</emphasis>;
+00307 
+00308 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(leftInstance&#32;!=&#32;<emphasis role="keyword">null</emphasis>)
+00309 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;leftSkeleton&#32;=&#32;leftInstance.GetComponent&lt;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___behaviour___skeleton">SteamVR_Behaviour_Skeleton</link>&gt;();
+00310 
+00311 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;GameObject&#32;rightInstance&#32;=&#32;previewRightInstanceProperty.objectReferenceValue&#32;as&#32;GameObject;
+00312 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;rightSkeleton&#32;=&#32;<emphasis role="keyword">null</emphasis>;
+00313 
+00314 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(rightInstance&#32;!=&#32;<emphasis role="keyword">null</emphasis>)
+00315 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;rightSkeleton&#32;=&#32;rightInstance.GetComponent&lt;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___behaviour___skeleton">SteamVR_Behaviour_Skeleton</link>&gt;();
+00316 
+00317 
+00318 
+00319 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//only&#32;allow&#32;saving&#32;if&#32;a&#32;hand&#32;is&#32;opened&#32;for&#32;editing</emphasis>
+00320 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;EditorGUI.BeginDisabledGroup(showRightPreviewProperty.boolValue&#32;==&#32;<emphasis role="keyword">false</emphasis>&#32;&amp;&amp;&#32;showLeftPreviewProperty.boolValue&#32;==&#32;<emphasis role="keyword">false</emphasis>);
+00321 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;GUI.color&#32;=&#32;<emphasis role="keyword">new</emphasis>&#32;Color(0.9f,&#32;1.0f,&#32;0.9f);
+00322 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;save&#32;both&#32;hands&#32;at&#32;once,&#32;or&#32;whichever&#32;are&#32;being&#32;edited</emphasis>
+00323 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordtype">bool</emphasis>&#32;save&#32;=&#32;GUILayout.Button(<emphasis role="keywordtype">string</emphasis>.Format(<emphasis role="stringliteral">&quot;Save&#32;Pose&quot;</emphasis>));
+00324 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(save)
+00325 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00326 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(showRightPreviewProperty.boolValue)
+00327 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___skeleton___poser_editor_1ad513b303bd9f95c2fecdd84c236b4b02">SaveHandData</link>(activePose.<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___skeleton___pose_1a8363d4bc4bbc5ea72174b6e60ddec071">rightHand</link>,&#32;rightSkeleton);
+00328 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(showLeftPreviewProperty.boolValue)
+00329 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___skeleton___poser_editor_1ad513b303bd9f95c2fecdd84c236b4b02">SaveHandData</link>(activePose.<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___skeleton___pose_1a12251bc65a0ffc475284ce742b482b61">leftHand</link>,&#32;leftSkeleton);
+00330 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00331 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;GUI.color&#32;=&#32;Color.white;
+00332 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;EditorGUI.EndDisabledGroup();
+00333 
+00334 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//MIRRORING</emphasis>
+00335 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//only&#32;allow&#32;mirroring&#32;if&#32;both&#32;hands&#32;are&#32;opened&#32;for&#32;editing</emphasis>
+00336 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;EditorGUI.BeginDisabledGroup(showRightPreviewProperty.boolValue&#32;==&#32;<emphasis role="keyword">false</emphasis>&#32;||&#32;showLeftPreviewProperty.boolValue&#32;==&#32;<emphasis role="keyword">false</emphasis>);
+00337 
+00338 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;EditorGUILayout.Space();
+00339 
+00340 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(GUILayout.Button(<emphasis role="stringliteral">&quot;Import&#32;Pose&quot;</emphasis>))
+00341 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00342 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;CopyPoseSelect();
+00343 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00344 
+00345 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;EditorGUI.EndDisabledGroup();
+00346 
+00347 
+00348 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;GUILayout.Space(32);
+00349 
+00350 
+00351 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;GUILayout.Label(<emphasis role="stringliteral">&quot;Reference&#32;Pose:&quot;</emphasis>);
+00352 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;EditorGUILayout.Space();
+00353 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___skeleton___poser_editor_1ac9a14861334577353dddafd5f35f5b0f">forceToReferencePose</link>&#32;=&#32;(<link linkend="_namespace_valve_1_1_v_r_1a299b655881f873256f035349b59da09e">EVRSkeletalReferencePose</link>)EditorGUILayout.EnumPopup(<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___skeleton___poser_editor_1ac9a14861334577353dddafd5f35f5b0f">forceToReferencePose</link>);
+00354 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;GUI.color&#32;=&#32;<emphasis role="keyword">new</emphasis>&#32;Color(1.0f,&#32;0.73f,&#32;0.7f);
+00355 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordtype">bool</emphasis>&#32;forcePose&#32;=&#32;GUILayout.Button(<emphasis role="stringliteral">&quot;RESET&#32;TO&#32;REFERENCE&#32;POSE&quot;</emphasis>);
+00356 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;GUI.color&#32;=&#32;Color.white;
+00357 
+00358 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(forcePose)
+00359 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00360 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordtype">bool</emphasis>&#32;confirm&#32;=&#32;EditorUtility.DisplayDialog(<emphasis role="stringliteral">&quot;SteamVR&quot;</emphasis>,&#32;<emphasis role="keywordtype">string</emphasis>.Format(<emphasis role="stringliteral">&quot;This&#32;will&#32;overwrite&#32;your&#32;current&#32;skeleton&#32;data.&#32;(with&#32;data&#32;from&#32;the&#32;{0}&#32;reference&#32;pose)&quot;</emphasis>,&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___skeleton___poser_editor_1ac9a14861334577353dddafd5f35f5b0f">forceToReferencePose</link>.ToString()),&#32;<emphasis role="stringliteral">&quot;Overwrite&quot;</emphasis>,&#32;<emphasis role="stringliteral">&quot;Cancel&quot;</emphasis>);
+00361 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(confirm)
+00362 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00363 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___skeleton___poser_editor_1ac9a14861334577353dddafd5f35f5b0f">forceToReferencePose</link>&#32;==&#32;<link linkend="_namespace_valve_1_1_v_r_1a299b655881f873256f035349b59da09e">EVRSkeletalReferencePose</link>.GripLimit)
+00364 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00365 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;grip&#32;limit&#32;is&#32;controller-specific,&#32;the&#32;rest&#32;use&#32;a&#32;baked&#32;pose</emphasis>
+00366 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(showLeftPreviewProperty.boolValue)
+00367 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;leftSkeleton.<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___behaviour___skeleton_1adc97033308aa208c491f73c49ca62231">ForceToReferencePose</link>(<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___skeleton___poser_editor_1ac9a14861334577353dddafd5f35f5b0f">forceToReferencePose</link>);
+00368 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(showRightPreviewProperty.boolValue)
+00369 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;rightSkeleton.<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___behaviour___skeleton_1adc97033308aa208c491f73c49ca62231">ForceToReferencePose</link>(<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___skeleton___poser_editor_1ac9a14861334577353dddafd5f35f5b0f">forceToReferencePose</link>);
+00370 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00371 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">else</emphasis>
+00372 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00373 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___skeleton___pose">SteamVR_Skeleton_Pose</link>&#32;poseResource&#32;=&#32;<emphasis role="keyword">null</emphasis>;
+00374 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___skeleton___poser_editor_1ac9a14861334577353dddafd5f35f5b0f">forceToReferencePose</link>&#32;==&#32;<link linkend="_namespace_valve_1_1_v_r_1a299b655881f873256f035349b59da09e">EVRSkeletalReferencePose</link>.OpenHand)
+00375 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;poseResource&#32;=&#32;(<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___skeleton___pose">SteamVR_Skeleton_Pose</link>)Resources.Load(<emphasis role="stringliteral">&quot;ReferencePose_OpenHand&quot;</emphasis>);
+00376 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___skeleton___poser_editor_1ac9a14861334577353dddafd5f35f5b0f">forceToReferencePose</link>&#32;==&#32;<link linkend="_namespace_valve_1_1_v_r_1a299b655881f873256f035349b59da09e">EVRSkeletalReferencePose</link>.Fist)
+00377 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;poseResource&#32;=&#32;(<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___skeleton___pose">SteamVR_Skeleton_Pose</link>)Resources.Load(<emphasis role="stringliteral">&quot;ReferencePose_Fist&quot;</emphasis>);
+00378 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___skeleton___poser_editor_1ac9a14861334577353dddafd5f35f5b0f">forceToReferencePose</link>&#32;==&#32;<link linkend="_namespace_valve_1_1_v_r_1a299b655881f873256f035349b59da09e">EVRSkeletalReferencePose</link>.BindPose)
+00379 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;poseResource&#32;=&#32;(<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___skeleton___pose">SteamVR_Skeleton_Pose</link>)Resources.Load(<emphasis role="stringliteral">&quot;ReferencePose_BindPose&quot;</emphasis>);
+00380 
+00381 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;DeepCopyPose(poseResource,&#32;activePose);
+00382 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00383 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00384 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00385 
+00386 
+00387 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00388 
+00389 
+00390 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordtype">void</emphasis>&#32;CopyPoseSelect()
+00391 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00392 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordtype">string</emphasis>&#32;selected&#32;=&#32;EditorUtility.OpenFilePanel(<emphasis role="stringliteral">&quot;Open&#32;Skeleton&#32;Pose&#32;ScriptableObject&quot;</emphasis>,&#32;<link linkend="_namespace_valve_1_1_v_r_1aecd07a81fe79a9f96c6787513e2d98e4ae498749f3c42246d50b15c81c101d988">Application</link>.dataPath,&#32;<emphasis role="stringliteral">&quot;asset&quot;</emphasis>);
+00393 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;selected&#32;=&#32;selected.Replace(<link linkend="_namespace_valve_1_1_v_r_1aecd07a81fe79a9f96c6787513e2d98e4ae498749f3c42246d50b15c81c101d988">Application</link>.dataPath,&#32;<emphasis role="stringliteral">&quot;Assets&quot;</emphasis>);
+00394 
+00395 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(selected&#32;==&#32;<emphasis role="keyword">null</emphasis>)&#32;<emphasis role="keywordflow">return</emphasis>;
+00396 
+00397 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___skeleton___pose">SteamVR_Skeleton_Pose</link>&#32;newPose&#32;=&#32;(<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___skeleton___pose">SteamVR_Skeleton_Pose</link>)AssetDatabase.LoadAssetAtPath(selected,&#32;typeof(<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___skeleton___pose">SteamVR_Skeleton_Pose</link>));
+00398 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(newPose&#32;==&#32;<emphasis role="keyword">null</emphasis>)
+00399 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00400 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;EditorUtility.DisplayDialog(<emphasis role="stringliteral">&quot;WARNING&quot;</emphasis>,&#32;<emphasis role="stringliteral">&quot;Asset&#32;could&#32;not&#32;be&#32;loaded.&#32;Is&#32;it&#32;not&#32;a&#32;SteamVR_Skeleton_Pose?&quot;</emphasis>,&#32;<emphasis role="stringliteral">&quot;ok&quot;</emphasis>);
+00401 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>;
+00402 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00403 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;DeepCopyPose(newPose,&#32;activePose);
+00404 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00405 
+00406 
+00407 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordtype">void</emphasis>&#32;DeepCopyPose(SteamVR_Skeleton_Pose&#32;source,&#32;SteamVR_Skeleton_Pose&#32;dest)
+00408 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00409 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordtype">int</emphasis>&#32;boneNum&#32;=&#32;SteamVR_Action_Skeleton.numBones;
+00410 
+00411 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(dest.rightHand.bonePositions&#32;==&#32;<emphasis role="keyword">null</emphasis>)&#32;dest.rightHand.bonePositions&#32;=&#32;<emphasis role="keyword">new</emphasis>&#32;Vector3[boneNum];
+00412 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(dest.rightHand.boneRotations&#32;==&#32;<emphasis role="keyword">null</emphasis>)&#32;dest.rightHand.boneRotations&#32;=&#32;<emphasis role="keyword">new</emphasis>&#32;Quaternion[boneNum];
+00413 
+00414 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(dest.leftHand.bonePositions&#32;==&#32;<emphasis role="keyword">null</emphasis>)&#32;dest.leftHand.bonePositions&#32;=&#32;<emphasis role="keyword">new</emphasis>&#32;Vector3[boneNum];
+00415 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(dest.leftHand.boneRotations&#32;==&#32;<emphasis role="keyword">null</emphasis>)&#32;dest.leftHand.boneRotations&#32;=&#32;<emphasis role="keyword">new</emphasis>&#32;Quaternion[boneNum];
+00416 
+00417 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;EditorUtility.SetDirty(dest);
+00418 
+00419 
+00420 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;RIGHT&#32;HAND&#32;COPY</emphasis>
+00421 
+00422 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;dest.rightHand.position&#32;=&#32;source.rightHand.position;
+00423 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;dest.rightHand.rotation&#32;=&#32;source.rightHand.rotation;
+00424 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">for</emphasis>&#32;(<emphasis role="keywordtype">int</emphasis>&#32;boneIndex&#32;=&#32;0;&#32;boneIndex&#32;&lt;&#32;boneNum;&#32;boneIndex++)
+00425 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00426 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;dest.rightHand.bonePositions[boneIndex]&#32;=&#32;source.rightHand.bonePositions[boneIndex];
+00427 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;dest.rightHand.boneRotations[boneIndex]&#32;=&#32;source.rightHand.boneRotations[boneIndex];
+00428 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;EditorUtility.DisplayProgressBar(<emphasis role="stringliteral">&quot;Copying...&quot;</emphasis>,&#32;<emphasis role="stringliteral">&quot;Copying&#32;right&#32;hand&#32;pose&quot;</emphasis>,&#32;(<emphasis role="keywordtype">float</emphasis>)boneIndex&#32;/&#32;(<emphasis role="keywordtype">float</emphasis>)boneNum&#32;/&#32;2f);
+00429 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00430 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;dest.rightHand.thumbFingerMovementType&#32;=&#32;source.rightHand.thumbFingerMovementType;
+00431 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;dest.rightHand.indexFingerMovementType&#32;=&#32;source.rightHand.indexFingerMovementType;
+00432 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;dest.rightHand.middleFingerMovementType&#32;=&#32;source.rightHand.middleFingerMovementType;
+00433 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;dest.rightHand.ringFingerMovementType&#32;=&#32;source.rightHand.ringFingerMovementType;
+00434 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;dest.rightHand.pinkyFingerMovementType&#32;=&#32;source.rightHand.pinkyFingerMovementType;
+00435 
+00436 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;LEFT&#32;HAND&#32;COPY</emphasis>
+00437 
+00438 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;dest.leftHand.position&#32;=&#32;source.leftHand.position;
+00439 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;dest.leftHand.rotation&#32;=&#32;source.leftHand.rotation;
+00440 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">for</emphasis>&#32;(<emphasis role="keywordtype">int</emphasis>&#32;boneIndex&#32;=&#32;0;&#32;boneIndex&#32;&lt;&#32;boneNum;&#32;boneIndex++)
+00441 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00442 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;dest.leftHand.bonePositions[boneIndex]&#32;=&#32;source.leftHand.bonePositions[boneIndex];
+00443 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;dest.leftHand.boneRotations[boneIndex]&#32;=&#32;source.leftHand.boneRotations[boneIndex];
+00444 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;EditorUtility.DisplayProgressBar(<emphasis role="stringliteral">&quot;Copying...&quot;</emphasis>,&#32;<emphasis role="stringliteral">&quot;Copying&#32;left&#32;hand&#32;pose&quot;</emphasis>,&#32;(<emphasis role="keywordtype">float</emphasis>)boneIndex&#32;/&#32;(<emphasis role="keywordtype">float</emphasis>)boneNum&#32;/&#32;2f);
+00445 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00446 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;dest.leftHand.thumbFingerMovementType&#32;=&#32;source.leftHand.thumbFingerMovementType;
+00447 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;dest.leftHand.indexFingerMovementType&#32;=&#32;source.leftHand.indexFingerMovementType;
+00448 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;dest.leftHand.middleFingerMovementType&#32;=&#32;source.leftHand.middleFingerMovementType;
+00449 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;dest.leftHand.ringFingerMovementType&#32;=&#32;source.leftHand.ringFingerMovementType;
+00450 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;dest.leftHand.pinkyFingerMovementType&#32;=&#32;source.leftHand.pinkyFingerMovementType;
+00451 
+00452 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;EditorUtility.SetDirty(dest);
+00453 
+00454 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;forceUpdateHands&#32;=&#32;<emphasis role="keyword">true</emphasis>;
+00455 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;EditorUtility.ClearProgressBar();
+00456 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00457 
+00458 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordtype">int</emphasis>&#32;activePoseIndex&#32;=&#32;0;
+00459 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;SerializedProperty&#32;activePoseProp;
+00460 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;SteamVR_Skeleton_Pose&#32;activePose;
+00461 
+00462 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordtype">bool</emphasis>&#32;forceUpdateHands&#32;=&#32;<emphasis role="keyword">false</emphasis>;
+00463 
+<anchor xml:id="__steam_v_r___skeleton___poser_editor_8cs_source_1l00464"/><link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___skeleton___poser_editor_1a04b3335f0544e31c32be61f1ebc3a4ff">00464</link> &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keyword">override</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___skeleton___poser_editor_1a04b3335f0544e31c32be61f1ebc3a4ff">OnInspectorGUI</link>()
+00465 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00466 
+00467 
+00468 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;serializedObject.Update();
+00469 
+00470 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;DrawPoseEditorMenu();
+00471 
+00472 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;DrawBlendingBehaviourMenu();
+00473 
+00474 
+00475 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;serializedObject.ApplyModifiedProperties();
+00476 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00477 
+00478 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordtype">bool</emphasis>&#32;getRightFromOpposite&#32;=&#32;<emphasis role="keyword">false</emphasis>;
+00479 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordtype">bool</emphasis>&#32;getLeftFromOpposite&#32;=&#32;<emphasis role="keyword">false</emphasis>;
+00480 
+00481 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___behaviour___skeleton">SteamVR_Behaviour_Skeleton</link>&#32;leftSkeleton&#32;=&#32;<emphasis role="keyword">null</emphasis>;
+00482 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___behaviour___skeleton">SteamVR_Behaviour_Skeleton</link>&#32;rightSkeleton&#32;=&#32;<emphasis role="keyword">null</emphasis>;
+00483 
+00484 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordtype">void</emphasis>&#32;DrawPoseEditorMenu()
+00485 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00486 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(<link linkend="_namespace_valve_1_1_v_r_1aecd07a81fe79a9f96c6787513e2d98e4ae498749f3c42246d50b15c81c101d988">Application</link>.isPlaying)
+00487 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00488 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;EditorGUILayout.LabelField(<emphasis role="stringliteral">&quot;Cannot&#32;modify&#32;pose&#32;while&#32;in&#32;play&#32;mode.&quot;</emphasis>);
+00489 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00490 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">else</emphasis>
+00491 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00492 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordtype">bool</emphasis>&#32;createNew&#32;=&#32;<emphasis role="keyword">false</emphasis>;
+00493 
+00494 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___skeleton___poser_editor_1a2a4a82a8af4635de9f55c622235ac9b3">LoadDefaultPreviewHands</link>();
+00495 
+00496 
+00497 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;activePoseIndex&#32;=&#32;previewPoseSelection.intValue;
+00498 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(activePoseIndex&#32;==&#32;0)
+00499 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;activePoseProp&#32;=&#32;skeletonMainPoseProperty;
+00500 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">else</emphasis>
+00501 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;activePoseProp&#32;=&#32;skeletonAdditionalPosesProperty.GetArrayElementAtIndex(activePoseIndex&#32;-&#32;1);
+00502 
+00503 
+00504 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//box&#32;containing&#32;all&#32;pose&#32;editing&#32;controls</emphasis>
+00505 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;GUILayout.BeginVertical(<emphasis role="stringliteral">&quot;box&quot;</emphasis>);
+00506 
+00507 
+00508 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;poseEditorExpanded.boolValue&#32;=&#32;IndentedFoldoutHeader(poseEditorExpanded.boolValue,&#32;<emphasis role="stringliteral">&quot;Pose&#32;Editor&quot;</emphasis>);
+00509 
+00510 
+00511 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(poseEditorExpanded.boolValue)
+00512 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00513 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//show&#32;selectable&#32;menu&#32;of&#32;all&#32;poses,&#32;highlighting&#32;the&#32;one&#32;that&#32;is&#32;selected</emphasis>
+00514 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;EditorGUILayout.Space();
+00515 
+00516 
+00517 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;poser.<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___skeleton___poser_1abeafebc03bed7cc5d5623d83208a6e6d">poseNames</link>&#32;=&#32;<emphasis role="keyword">new</emphasis>&#32;<emphasis role="keywordtype">string</emphasis>[skeletonAdditionalPosesProperty.arraySize&#32;+&#32;1];
+00518 
+00519 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">for</emphasis>&#32;(<emphasis role="keywordtype">int</emphasis>&#32;i&#32;=&#32;0;&#32;i&#32;&lt;&#32;skeletonAdditionalPosesProperty.arraySize&#32;+&#32;1;&#32;i++)
+00520 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00521 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(i&#32;==&#32;0)
+00522 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;main&#32;pose&#32;special&#32;case</emphasis>
+00523 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;poser.<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___skeleton___poser_1abeafebc03bed7cc5d5623d83208a6e6d">poseNames</link>[i]&#32;=&#32;skeletonMainPoseProperty.objectReferenceValue&#32;==&#32;<emphasis role="keyword">null</emphasis>&#32;?&#32;<emphasis role="stringliteral">&quot;[not&#32;set]&quot;</emphasis>&#32;:&#32;skeletonMainPoseProperty.objectReferenceValue.name&#32;+&#32;<emphasis role="stringliteral">&quot;&#32;(MAIN)&quot;</emphasis>;
+00524 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">else</emphasis>
+00525 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;additional&#32;poses&#32;from&#32;array</emphasis>
+00526 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;poser.<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___skeleton___poser_1abeafebc03bed7cc5d5623d83208a6e6d">poseNames</link>[i]&#32;=&#32;skeletonAdditionalPosesProperty.GetArrayElementAtIndex(i&#32;-&#32;1).objectReferenceValue&#32;==&#32;<emphasis role="keyword">null</emphasis>&#32;?&#32;<emphasis role="stringliteral">&quot;[not&#32;set]&quot;</emphasis>&#32;:&#32;skeletonAdditionalPosesProperty.GetArrayElementAtIndex(i&#32;-&#32;1).objectReferenceValue.name;
+00527 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00528 
+00529 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;EditorGUILayout.BeginHorizontal();
+00530 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordtype">int</emphasis>&#32;poseSelected&#32;=&#32;GUILayout.Toolbar(activePoseIndex,&#32;poser.<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___skeleton___poser_1abeafebc03bed7cc5d5623d83208a6e6d">poseNames</link>);
+00531 
+00532 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(poseSelected&#32;!=&#32;activePoseIndex)
+00533 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00534 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;forceUpdateHands&#32;=&#32;<emphasis role="keyword">true</emphasis>;
+00535 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;activePoseIndex&#32;=&#32;poseSelected;
+00536 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;PoseChanged&#32;=&#32;<emphasis role="keyword">true</emphasis>;
+00537 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;previewPoseSelection.intValue&#32;=&#32;activePoseIndex;
+00538 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;serializedObject.ApplyModifiedProperties();
+00539 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00540 
+00541 
+00542 
+00543 
+00544 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;EditorGUILayout.BeginVertical(GUILayout.MaxWidth(32));
+00545 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(GUILayout.Button(<emphasis role="stringliteral">&quot;+&quot;</emphasis>,&#32;GUILayout.MaxWidth(32)))
+00546 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00547 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;skeletonAdditionalPosesProperty.InsertArrayElementAtIndex(skeletonAdditionalPosesProperty.arraySize);
+00548 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00549 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//only&#32;allow&#32;deletion&#32;of&#32;additional&#32;poses</emphasis>
+00550 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;EditorGUI.BeginDisabledGroup(skeletonAdditionalPosesProperty.arraySize&#32;==&#32;0&#32;||&#32;activePoseIndex&#32;==&#32;0);
+00551 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(GUILayout.Button(<emphasis role="stringliteral">&quot;-&quot;</emphasis>,&#32;GUILayout.MaxWidth(32))&#32;&amp;&amp;&#32;skeletonAdditionalPosesProperty.arraySize&#32;&gt;&#32;0)
+00552 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00553 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;skeletonAdditionalPosesProperty.DeleteArrayElementAtIndex(activePoseIndex&#32;-&#32;1);
+00554 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;skeletonAdditionalPosesProperty.DeleteArrayElementAtIndex(activePoseIndex&#32;-&#32;1);
+00555 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(activePoseIndex&#32;&gt;=&#32;skeletonAdditionalPosesProperty.arraySize&#32;+&#32;1)
+00556 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00557 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;activePoseIndex&#32;=&#32;skeletonAdditionalPosesProperty.arraySize;
+00558 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;previewPoseSelection.intValue&#32;=&#32;activePoseIndex;
+00559 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>;
+00560 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00561 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00562 
+00563 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;EditorGUI.EndDisabledGroup();
+00564 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;EditorGUILayout.EndVertical();
+00565 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;GUILayout.FlexibleSpace();
+00566 
+00567 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;EditorGUILayout.EndHorizontal();
+00568 
+00569 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;GUILayout.BeginVertical(<emphasis role="stringliteral">&quot;box&quot;</emphasis>);
+00570 
+00571 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;sides&#32;of&#32;pose&#32;editor</emphasis>
+00572 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;GUILayout.BeginHorizontal();
+00573 
+00574 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//pose&#32;controls</emphasis>
+00575 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;GUILayout.BeginVertical(GUILayout.MaxWidth(200));
+00576 
+00577 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;GUILayout.Label(<emphasis role="stringliteral">&quot;Current&#32;Pose:&quot;</emphasis>);
+00578 
+00579 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(PoseChanged)
+00580 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00581 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;PoseChanged&#32;=&#32;<emphasis role="keyword">false</emphasis>;
+00582 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;forceUpdateHands&#32;=&#32;<emphasis role="keyword">true</emphasis>;
+00583 
+00584 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(activePoseIndex&#32;==&#32;0)
+00585 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;activePoseProp&#32;=&#32;skeletonMainPoseProperty;
+00586 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">else</emphasis>
+00587 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;activePoseProp&#32;=&#32;skeletonAdditionalPosesProperty.GetArrayElementAtIndex(activePoseIndex&#32;-&#32;1);
+00588 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;activePose&#32;=&#32;(SteamVR_Skeleton_Pose)activePoseProp.objectReferenceValue;
+00589 
+00590 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00591 
+00592 
+00593 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;activePose&#32;=&#32;(SteamVR_Skeleton_Pose)activePoseProp.objectReferenceValue;
+00594 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;if&#32;(activePoseProp.objectReferenceValue&#32;==&#32;<emphasis role="keyword">null</emphasis>)
+00595 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00596 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(previewLeftInstanceProperty.objectReferenceValue&#32;!=&#32;<emphasis role="keyword">null</emphasis>)
+00597 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;DestroyImmediate(previewLeftInstanceProperty.objectReferenceValue);
+00598 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(previewRightInstanceProperty.objectReferenceValue&#32;!=&#32;<emphasis role="keyword">null</emphasis>)
+00599 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;DestroyImmediate(previewRightInstanceProperty.objectReferenceValue);
+00600 
+00601 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;EditorGUILayout.BeginHorizontal();
+00602 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;activePoseProp.objectReferenceValue&#32;=&#32;EditorGUILayout.ObjectField(activePoseProp.objectReferenceValue,&#32;typeof(SteamVR_Skeleton_Pose),&#32;<emphasis role="keyword">false</emphasis>);
+00603 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(GUILayout.Button(<emphasis role="stringliteral">&quot;Create&quot;</emphasis>))&#32;createNew&#32;=&#32;<emphasis role="keyword">true</emphasis>;
+00604 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;EditorGUILayout.EndHorizontal();
+00605 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(createNew)
+00606 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00607 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordtype">string</emphasis>&#32;fullPath&#32;=&#32;EditorUtility.SaveFilePanelInProject(<emphasis role="stringliteral">&quot;Create&#32;New&#32;Skeleton&#32;Pose&quot;</emphasis>,&#32;<emphasis role="stringliteral">&quot;newPose&quot;</emphasis>,&#32;<emphasis role="stringliteral">&quot;asset&quot;</emphasis>,&#32;<emphasis role="stringliteral">&quot;Save&#32;file&quot;</emphasis>);
+00608 
+00609 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(<emphasis role="keywordtype">string</emphasis>.IsNullOrEmpty(fullPath)&#32;==&#32;<emphasis role="keyword">false</emphasis>)
+00610 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00611 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;SteamVR_Skeleton_Pose&#32;newPose&#32;=&#32;ScriptableObject.CreateInstance&lt;SteamVR_Skeleton_Pose&gt;();
+00612 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;AssetDatabase.CreateAsset(newPose,&#32;fullPath);
+00613 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;AssetDatabase.SaveAssets();
+00614 
+00615 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;activePoseProp.objectReferenceValue&#32;=&#32;newPose;
+00616 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;serializedObject.ApplyModifiedProperties();
+00617 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00618 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00619 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00620 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">else</emphasis>
+00621 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00622 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;activePoseProp.objectReferenceValue&#32;=&#32;EditorGUILayout.ObjectField(activePoseProp.objectReferenceValue,&#32;typeof(SteamVR_Skeleton_Pose),&#32;<emphasis role="keyword">false</emphasis>);
+00623 
+00624 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___skeleton___poser_editor_1ad760db10fd1db4bab002914de2dc225d">DrawPoseControlButtons</link>();
+00625 
+00626 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___skeleton___poser_editor_1ad592a89bc202153f1666020de5c71b8d">UpdatePreviewHand</link>(previewLeftInstanceProperty,&#32;showLeftPreviewProperty,&#32;previewLeftHandPrefab,&#32;activePose.leftHand,&#32;activePose,&#32;forceUpdateHands);
+00627 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___skeleton___poser_editor_1ad592a89bc202153f1666020de5c71b8d">UpdatePreviewHand</link>(previewRightInstanceProperty,&#32;showRightPreviewProperty,&#32;previewRightHandPrefab,&#32;activePose.rightHand,&#32;activePose,&#32;forceUpdateHands);
+00628 
+00629 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;forceUpdateHands&#32;=&#32;<emphasis role="keyword">false</emphasis>;
+00630 
+00631 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;GUILayout.EndVertical();
+00632 
+00633 
+00634 
+00635 
+00636 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;GUILayout.Space(10);
+00637 
+00638 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(handTexL&#32;==&#32;<emphasis role="keyword">null</emphasis>)
+00639 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;handTexL&#32;=&#32;(Texture)EditorGUIUtility.Load(<emphasis role="stringliteral">&quot;Assets/SteamVR/Input/Editor/Resources/Icons/HandLeftIcon.png&quot;</emphasis>);
+00640 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(handTexR&#32;==&#32;<emphasis role="keyword">null</emphasis>)
+00641 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;handTexR&#32;=&#32;(Texture)EditorGUIUtility.Load(<emphasis role="stringliteral">&quot;Assets/SteamVR/Input/Editor/Resources/Icons/HandRightIcon.png&quot;</emphasis>);
+00642 
+00643 
+00644 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//Left&#32;Hand</emphasis>
+00645 
+00646 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;GUILayout.Space(32);
+00647 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;EditorGUILayout.BeginVertical();
+00648 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;EditorGUILayout.BeginVertical(<emphasis role="stringliteral">&quot;box&quot;</emphasis>);
+00649 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;EditorGUILayout.BeginHorizontal();
+00650 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;GUI.color&#32;=&#32;<emphasis role="keyword">new</emphasis>&#32;Color(1,&#32;1,&#32;1,&#32;showLeftPreviewProperty.boolValue&#32;?&#32;1&#32;:&#32;0.25f);
+00651 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(GUILayout.Button(handTexL,&#32;GUI.skin.label,&#32;GUILayout.Width(64),&#32;GUILayout.Height(64)))
+00652 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00653 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;showLeftPreviewProperty.boolValue&#32;=&#32;!showLeftPreviewProperty.boolValue;
+00654 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//forceUpdateHands&#32;=&#32;true;</emphasis>
+00655 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00656 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;GUI.color&#32;=&#32;Color.white;
+00657 
+00658 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;EditorGUIUtility.labelWidth&#32;=&#32;48;
+00659 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;EditorGUILayout.LabelField(<emphasis role="stringliteral">&quot;Left&#32;Hand&quot;</emphasis>,&#32;EditorStyles.boldLabel);
+00660 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;EditorGUIUtility.labelWidth&#32;=&#32;0;
+00661 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;GUILayout.FlexibleSpace();
+00662 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;EditorGUILayout.EndHorizontal();
+00663 
+00664 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordtype">bool</emphasis>&#32;showLeft&#32;=&#32;showLeftPreviewProperty.boolValue;
+00665 
+00666 
+00667 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___skeleton___poser_editor_1a86f575b35336394ee25e91f1e14c5257">DrawHand</link>(showLeft,&#32;activePose.leftHand,&#32;activePose.rightHand,&#32;getLeftFromOpposite);
+00668 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;EditorGUILayout.EndVertical();
+00669 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;EditorGUI.BeginDisabledGroup((showLeftPreviewProperty.boolValue&#32;&amp;&amp;&#32;showRightPreviewProperty.boolValue)&#32;==&#32;<emphasis role="keyword">false</emphasis>);
+00670 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;getRightFromOpposite&#32;=&#32;GUILayout.Button(<emphasis role="stringliteral">&quot;Copy&#32;Left&#32;pose&#32;to&#32;Right&#32;hand&quot;</emphasis>);
+00671 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;EditorGUI.EndDisabledGroup();
+00672 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;EditorGUILayout.EndVertical();
+00673 
+00674 
+00675 
+00676 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;EditorGUILayout.BeginVertical();
+00677 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;EditorGUILayout.BeginVertical(<emphasis role="stringliteral">&quot;box&quot;</emphasis>);
+00678 
+00679 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;EditorGUILayout.BeginHorizontal();
+00680 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;GUILayout.FlexibleSpace();
+00681 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;EditorGUIUtility.labelWidth&#32;=&#32;48;
+00682 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;EditorGUILayout.LabelField(<emphasis role="stringliteral">&quot;Right&#32;Hand&quot;</emphasis>,&#32;EditorStyles.boldLabel);
+00683 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;EditorGUIUtility.labelWidth&#32;=&#32;0;
+00684 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;GUI.color&#32;=&#32;<emphasis role="keyword">new</emphasis>&#32;Color(1,&#32;1,&#32;1,&#32;showRightPreviewProperty.boolValue&#32;?&#32;1&#32;:&#32;0.25f);
+00685 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(GUILayout.Button(handTexR,&#32;GUI.skin.label,&#32;GUILayout.Width(64),&#32;GUILayout.Height(64)))
+00686 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00687 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;showRightPreviewProperty.boolValue&#32;=&#32;!showRightPreviewProperty.boolValue;
+00688 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//forceUpdateHands&#32;=&#32;true;</emphasis>
+00689 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00690 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;GUI.color&#32;=&#32;Color.white;
+00691 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;EditorGUILayout.EndHorizontal();
+00692 
+00693 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordtype">bool</emphasis>&#32;showRight&#32;=&#32;showLeftPreviewProperty.boolValue;
+00694 
+00695 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___skeleton___poser_editor_1a86f575b35336394ee25e91f1e14c5257">DrawHand</link>(showRight,&#32;activePose.rightHand,&#32;activePose.leftHand,&#32;getRightFromOpposite);
+00696 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;EditorGUILayout.EndVertical();
+00697 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;EditorGUI.BeginDisabledGroup((showLeftPreviewProperty.boolValue&#32;&amp;&amp;&#32;showRightPreviewProperty.boolValue)&#32;==&#32;<emphasis role="keyword">false</emphasis>);
+00698 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;getLeftFromOpposite&#32;=&#32;GUILayout.Button(<emphasis role="stringliteral">&quot;Copy&#32;Right&#32;pose&#32;to&#32;Left&#32;hand&quot;</emphasis>);
+00699 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;EditorGUI.EndDisabledGroup();
+00700 
+00701 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00702 
+00703 
+00704 
+00705 
+00706 
+00707 
+00708 
+00709 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">/*</emphasis>
+00710 <emphasis role="comment"></emphasis>
+00711 <emphasis role="comment"></emphasis>
+00712 <emphasis role="comment"></emphasis>
+00713 <emphasis role="comment"></emphasis>
+00714 <emphasis role="comment">&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;if&#32;(activePoseProp.objectReferenceValue&#32;==&#32;null)</emphasis>
+00715 <emphasis role="comment">&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{</emphasis>
+00716 <emphasis role="comment">&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;EditorGUILayout.BeginHorizontal();</emphasis>
+00717 <emphasis role="comment">&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;EditorGUILayout.PropertyField(activePoseProp);</emphasis>
+00718 <emphasis role="comment">&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;createNew&#32;=&#32;GUILayout.Button(&quot;Create&quot;);</emphasis>
+00719 <emphasis role="comment">&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;EditorGUILayout.EndHorizontal();</emphasis>
+00720 <emphasis role="comment">&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}</emphasis>
+00721 <emphasis role="comment">&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;else</emphasis>
+00722 <emphasis role="comment">&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{</emphasis>
+00723 <emphasis role="comment">&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;EditorGUILayout.PropertyField(activePoseProp);</emphasis>
+00724 <emphasis role="comment"></emphasis>
+00725 <emphasis role="comment">&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;DrawDivider();</emphasis>
+00726 <emphasis role="comment"></emphasis>
+00727 <emphasis role="comment"></emphasis>
+00728 <emphasis role="comment">&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;DrawSaveButtons();</emphasis>
+00729 <emphasis role="comment"></emphasis>
+00730 <emphasis role="comment">&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;if&#32;(PoseChanged)</emphasis>
+00731 <emphasis role="comment">&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{</emphasis>
+00732 <emphasis role="comment">&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;PoseChanged&#32;=&#32;false;</emphasis>
+00733 <emphasis role="comment">&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;forceUpdateHands&#32;=&#32;true;</emphasis>
+00734 <emphasis role="comment">&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}</emphasis>
+00735 <emphasis role="comment"></emphasis>
+00736 <emphasis role="comment">&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;UpdatePreviewHand(previewLeftInstanceProperty,&#32;showLeftPreviewProperty,&#32;previewLeftHandPrefab,&#32;activePose.leftHand,&#32;forceUpdateHands);</emphasis>
+00737 <emphasis role="comment">&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;UpdatePreviewHand(previewRightInstanceProperty,&#32;showRightPreviewProperty,&#32;previewRightHandPrefab,&#32;activePose.rightHand,&#32;forceUpdateHands);</emphasis>
+00738 <emphasis role="comment"></emphasis>
+00739 <emphasis role="comment">&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}</emphasis>
+00740 <emphasis role="comment"></emphasis>
+00741 <emphasis role="comment">&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;activePoseProp.objectReferenceValue&#32;=&#32;newPose;</emphasis>
+00742 <emphasis role="comment">&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;serializedObject.ApplyModifiedProperties();</emphasis>
+00743 <emphasis role="comment">&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}</emphasis>
+00744 <emphasis role="comment">&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}</emphasis>
+00745 <emphasis role="comment">&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;*/</emphasis>
+00746 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;GUILayout.EndVertical();
+00747 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;EditorGUILayout.EndVertical();
+00748 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;GUILayout.EndHorizontal();
+00749 
+00750 
+00751 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;EditorGUI.BeginChangeCheck();
+00752 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;EditorGUILayout.BeginHorizontal();
+00753 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;EditorGUIUtility.labelWidth&#32;=&#32;120;
+00754 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;poserScale.floatValue&#32;=&#32;EditorGUILayout.FloatField(<emphasis role="stringliteral">&quot;Preview&#32;Pose&#32;Scale&quot;</emphasis>,&#32;poserScale.floatValue);
+00755 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(poserScale.floatValue&#32;&lt;=&#32;0)&#32;poserScale.floatValue&#32;=&#32;1;
+00756 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;EditorGUIUtility.labelWidth&#32;=&#32;0;
+00757 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;GUILayout.FlexibleSpace();
+00758 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;EditorGUILayout.EndHorizontal();
+00759 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(EditorGUI.EndChangeCheck())
+00760 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00761 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;forceUpdateHands&#32;=&#32;<emphasis role="keyword">true</emphasis>;
+00762 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00763 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00764 
+00765 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;GUILayout.EndVertical();
+00766 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00767 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00768 
+00769 
+00770 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordtype">bool</emphasis>&#32;SelectablePoseButton(<emphasis role="keywordtype">string</emphasis>&#32;name,&#32;<emphasis role="keywordtype">bool</emphasis>&#32;selected)
+00771 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00772 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(selected)
+00773 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00774 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;GUI.color&#32;=&#32;<emphasis role="keyword">new</emphasis>&#32;Color(0.7f,&#32;0.73f,&#32;0.8f);
+00775 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;GUILayout.Button(name,&#32;GUILayout.ExpandWidth(<emphasis role="keyword">false</emphasis>));
+00776 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;GUI.color&#32;=&#32;Color.white;
+00777 
+00778 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;<emphasis role="keyword">false</emphasis>;
+00779 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00780 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">else</emphasis>
+00781 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00782 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;GUILayout.Button(name,&#32;GUILayout.ExpandWidth(<emphasis role="keyword">false</emphasis>));
+00783 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00784 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00785 
+00786 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;Texture[]&#32;handMaskTextures;
+00787 
+00788 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordtype">void</emphasis>&#32;DrawBlendingBehaviourMenu()
+00789 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00790 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(handMaskTextures&#32;==&#32;<emphasis role="keyword">null</emphasis>)
+00791 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00792 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;handMaskTextures&#32;=&#32;<emphasis role="keyword">new</emphasis>&#32;Texture[]&#32;{&#32;(Texture)EditorGUIUtility.Load(<emphasis role="stringliteral">&quot;Assets/SteamVR/Input/Editor/Resources/Icons/handmask_Palm.png&quot;</emphasis>),
+00793 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;(Texture)EditorGUIUtility.Load(<emphasis role="stringliteral">&quot;Assets/SteamVR/Input/Editor/Resources/Icons/handmask_Thumb.png&quot;</emphasis>),
+00794 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;(Texture)EditorGUIUtility.Load(<emphasis role="stringliteral">&quot;Assets/SteamVR/Input/Editor/Resources/Icons/handmask_Index.png&quot;</emphasis>),
+00795 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;(Texture)EditorGUIUtility.Load(<emphasis role="stringliteral">&quot;Assets/SteamVR/Input/Editor/Resources/Icons/handmask_Middle.png&quot;</emphasis>),
+00796 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;(Texture)EditorGUIUtility.Load(<emphasis role="stringliteral">&quot;Assets/SteamVR/Input/Editor/Resources/Icons/handmask_Ring.png&quot;</emphasis>),
+00797 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;(Texture)EditorGUIUtility.Load(<emphasis role="stringliteral">&quot;Assets/SteamVR/Input/Editor/Resources/Icons/handmask_Pinky.png&quot;</emphasis>)
+00798 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;};
+00799 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00800 
+00801 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;GUILayout.Space(10);
+00802 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;GUILayout.BeginVertical(<emphasis role="stringliteral">&quot;box&quot;</emphasis>);
+00803 
+00804 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;blendEditorExpanded.boolValue&#32;=&#32;IndentedFoldoutHeader(blendEditorExpanded.boolValue,&#32;<emphasis role="stringliteral">&quot;Blending&#32;Editor&quot;</emphasis>);
+00805 
+00806 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(blendEditorExpanded.boolValue)
+00807 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00808 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//show&#32;selectable&#32;menu&#32;of&#32;all&#32;poses,&#32;highlighting&#32;the&#32;one&#32;that&#32;is&#32;selected</emphasis>
+00809 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;EditorGUILayout.Space();
+00810 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">for</emphasis>&#32;(<emphasis role="keywordtype">int</emphasis>&#32;i&#32;=&#32;0;&#32;i&#32;&lt;&#32;blendingBehaviourArray.arraySize;&#32;i++)
+00811 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00812 
+00813 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;SerializedProperty&#32;blender&#32;=&#32;blendingBehaviourArray.GetArrayElementAtIndex(i);
+00814 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;SerializedProperty&#32;blenderName&#32;=&#32;blender.FindPropertyRelative(<emphasis role="stringliteral">&quot;name&quot;</emphasis>);
+00815 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;SerializedProperty&#32;blenderEnabled&#32;=&#32;blender.FindPropertyRelative(<emphasis role="stringliteral">&quot;enabled&quot;</emphasis>);
+00816 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;SerializedProperty&#32;blenderInfluence&#32;=&#32;blender.FindPropertyRelative(<emphasis role="stringliteral">&quot;influence&quot;</emphasis>);
+00817 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;SerializedProperty&#32;blenderPose&#32;=&#32;blender.FindPropertyRelative(<emphasis role="stringliteral">&quot;pose&quot;</emphasis>);
+00818 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;SerializedProperty&#32;blenderType&#32;=&#32;blender.FindPropertyRelative(<emphasis role="stringliteral">&quot;type&quot;</emphasis>);
+00819 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;SerializedProperty&#32;blenderUseMask&#32;=&#32;blender.FindPropertyRelative(<emphasis role="stringliteral">&quot;useMask&quot;</emphasis>);
+00820 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;SerializedProperty&#32;blenderValue&#32;=&#32;blender.FindPropertyRelative(<emphasis role="stringliteral">&quot;value&quot;</emphasis>);
+00821 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;SerializedProperty&#32;blenderMask&#32;=&#32;blender.FindPropertyRelative(<emphasis role="stringliteral">&quot;mask&quot;</emphasis>).FindPropertyRelative(<emphasis role="stringliteral">&quot;values&quot;</emphasis>);
+00822 
+00823 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;SerializedProperty&#32;blenderPreview&#32;=&#32;blender.FindPropertyRelative(<emphasis role="stringliteral">&quot;previewEnabled&quot;</emphasis>);
+00824 
+00825 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;GUILayout.Space(10);
+00826 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordtype">float</emphasis>&#32;bright&#32;=&#32;blenderEnabled.boolValue&#32;?&#32;0.6f&#32;:&#32;0.9f;&#32;<emphasis role="comment">//&#32;grey&#32;out&#32;box&#32;when&#32;disabled</emphasis>
+00827 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(EditorGUIUtility.isProSkin)&#32;bright&#32;=&#32;1;
+00828 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;GUI.color&#32;=&#32;<emphasis role="keyword">new</emphasis>&#32;Color(bright,&#32;bright,&#32;bright);
+00829 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;GUILayout.BeginVertical(<emphasis role="stringliteral">&quot;box&quot;</emphasis>);
+00830 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;GUI.color&#32;=&#32;Color.white;
+00831 
+00832 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;blenderPreview.boolValue&#32;=&#32;IndentedFoldoutHeader(blenderPreview.boolValue,&#32;blenderName.stringValue,&#32;1);
+00833 
+00834 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//SerializedProperty&#32;blenderValue&#32;=&#32;blender.FindProperty(&quot;value&quot;);</emphasis>
+00835 
+00836 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;EditorGUIUtility.labelWidth&#32;=&#32;64;
+00837 
+00838 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;EditorGUILayout.BeginHorizontal();
+00839 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;DrawBlenderLogo(blenderType);
+00840 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;EditorGUILayout.PropertyField(blenderEnabled);
+00841 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;GUILayout.FlexibleSpace();
+00842 
+00843 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;EditorGUI.BeginDisabledGroup(i&#32;==&#32;0);
+00844 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(GUILayout.Button(<emphasis role="stringliteral">&quot;Move&#32;Up&quot;</emphasis>))
+00845 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00846 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;blendingBehaviourArray.MoveArrayElement(i,&#32;i&#32;-&#32;1);
+00847 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00848 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;EditorGUI.EndDisabledGroup();
+00849 
+00850 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;EditorGUI.BeginDisabledGroup(i&#32;==&#32;blendingBehaviourArray.arraySize&#32;-&#32;1);
+00851 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(GUILayout.Button(<emphasis role="stringliteral">&quot;Move&#32;Down&quot;</emphasis>))
+00852 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00853 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;blendingBehaviourArray.MoveArrayElement(i,&#32;i&#32;+&#32;1);
+00854 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00855 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;EditorGUI.EndDisabledGroup();
+00856 
+00857 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;GUILayout.Space(6);
+00858 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;GUI.color&#32;=&#32;<emphasis role="keyword">new</emphasis>&#32;Color(0.9f,&#32;0.8f,&#32;0.78f);
+00859 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(GUILayout.Button(<emphasis role="stringliteral">&quot;Delete&quot;</emphasis>))
+00860 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00861 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(EditorUtility.DisplayDialog(<emphasis role="stringliteral">&quot;&quot;</emphasis>,&#32;<emphasis role="stringliteral">&quot;Do&#32;you&#32;really&#32;want&#32;to&#32;delete&#32;this&#32;Blend&#32;Behaviour?&quot;</emphasis>,&#32;<emphasis role="stringliteral">&quot;Yes&quot;</emphasis>,&#32;<emphasis role="stringliteral">&quot;Cancel&quot;</emphasis>))
+00862 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00863 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;blendingBehaviourArray.DeleteArrayElementAtIndex(i);
+00864 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>;
+00865 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00866 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00867 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;GUI.color&#32;=&#32;Color.white;
+00868 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;EditorGUILayout.EndHorizontal();
+00869 
+00870 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(blenderPreview.boolValue)
+00871 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00872 
+00873 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;EditorGUILayout.PropertyField(blenderName);
+00874 
+00875 
+00876 
+00877 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;EditorGUILayout.BeginHorizontal();
+00878 
+00879 
+00880 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//EditorGUILayout.BeginVertical();</emphasis>
+00881 
+00882 
+00883 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;EditorGUILayout.BeginVertical();
+00884 
+00885 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;EditorGUILayout.Slider(blenderInfluence,&#32;0,&#32;1);
+00886 
+00887 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;blenderPose.intValue&#32;=&#32;EditorGUILayout.Popup(<emphasis role="stringliteral">&quot;Pose&quot;</emphasis>,&#32;blenderPose.intValue,&#32;poser.<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___skeleton___poser_1abeafebc03bed7cc5d5623d83208a6e6d">poseNames</link>);
+00888 
+00889 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;GUILayout.Space(20);
+00890 
+00891 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;EditorGUILayout.PropertyField(blenderType);
+00892 
+00893 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(<link linkend="_namespace_valve_1_1_v_r_1aecd07a81fe79a9f96c6787513e2d98e4ae498749f3c42246d50b15c81c101d988">Application</link>.isPlaying)
+00894 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00895 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;GUILayout.Space(10);
+00896 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;GUI.color&#32;=&#32;<emphasis role="keyword">new</emphasis>&#32;Color(0,&#32;0,&#32;0,&#32;0.3f);
+00897 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;EditorGUILayout.LabelField(<emphasis role="stringliteral">&quot;&quot;</emphasis>,&#32;GUI.skin.box,&#32;GUILayout.Height(20),&#32;GUILayout.ExpandWidth(<emphasis role="keyword">true</emphasis>));
+00898 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;GUI.color&#32;=&#32;Color.white;
+00899 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;Rect&#32;fillRect&#32;=&#32;GUILayoutUtility.GetLastRect();
+00900 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;EditorGUI.DrawRect(fillRectHorizontal(fillRect,&#32;blenderValue.floatValue),&#32;Color.green);
+00901 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00902 
+00903 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;EditorGUILayout.EndVertical();
+00904 
+00905 
+00906 
+00907 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;EditorGUILayout.BeginVertical(GUILayout.MaxWidth(100));
+00908 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;EditorGUILayout.PropertyField(blenderUseMask);
+00909 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(blenderUseMask.boolValue)
+00910 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00911 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;DrawMaskEnabled(blenderMask);
+00912 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00913 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">else</emphasis>
+00914 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00915 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;DrawMaskDisabled(blenderMask);
+00916 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00917 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;EditorGUILayout.EndVertical();
+00918 
+00919 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;EditorGUILayout.EndHorizontal();
+00920 
+00921 
+00922 
+00923 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;DrawDivider();
+00924 
+00925 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;EditorGUIUtility.labelWidth&#32;=&#32;0;
+00926 
+00927 
+00928 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(blenderType.intValue&#32;==&#32;(<emphasis role="keywordtype">int</emphasis>)SteamVR_Skeleton_Poser.PoseBlendingBehaviour.BlenderTypes.Manual)
+00929 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00930 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;EditorGUILayout.Slider(blenderValue,&#32;0,&#32;1);
+00931 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00932 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(blenderType.intValue&#32;==&#32;(<emphasis role="keywordtype">int</emphasis>)SteamVR_Skeleton_Poser.PoseBlendingBehaviour.BlenderTypes.AnalogAction)
+00933 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00934 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;SerializedProperty&#32;blenderAction&#32;=&#32;blender.FindPropertyRelative(<emphasis role="stringliteral">&quot;action_single&quot;</emphasis>);
+00935 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;SerializedProperty&#32;blenderSmooth&#32;=&#32;blender.FindPropertyRelative(<emphasis role="stringliteral">&quot;smoothingSpeed&quot;</emphasis>);
+00936 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;EditorGUILayout.PropertyField(blenderAction);
+00937 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;EditorGUILayout.PropertyField(blenderSmooth);
+00938 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00939 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(blenderType.intValue&#32;==&#32;(<emphasis role="keywordtype">int</emphasis>)SteamVR_Skeleton_Poser.PoseBlendingBehaviour.BlenderTypes.BooleanAction)
+00940 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00941 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;SerializedProperty&#32;blenderAction&#32;=&#32;blender.FindPropertyRelative(<emphasis role="stringliteral">&quot;action_bool&quot;</emphasis>);
+00942 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;SerializedProperty&#32;blenderSmooth&#32;=&#32;blender.FindPropertyRelative(<emphasis role="stringliteral">&quot;smoothingSpeed&quot;</emphasis>);
+00943 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;EditorGUILayout.PropertyField(blenderAction);
+00944 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;EditorGUILayout.PropertyField(blenderSmooth);
+00945 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00946 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00947 
+00948 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;GUILayout.EndVertical();
+00949 
+00950 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00951 
+00952 
+00953 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;EditorGUILayout.BeginHorizontal();
+00954 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(GUILayout.Button(<emphasis role="stringliteral">&quot;+&quot;</emphasis>,&#32;GUILayout.MaxWidth(32)))
+00955 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00956 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordtype">int</emphasis>&#32;i&#32;=&#32;blendingBehaviourArray.arraySize;
+00957 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;blendingBehaviourArray.InsertArrayElementAtIndex(i);
+00958 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;blendingBehaviourArray.GetArrayElementAtIndex(i).FindPropertyRelative(<emphasis role="stringliteral">&quot;name&quot;</emphasis>).stringValue&#32;=&#32;<emphasis role="stringliteral">&quot;New&#32;Behaviour&quot;</emphasis>;
+00959 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;blendingBehaviourArray.GetArrayElementAtIndex(i).FindPropertyRelative(<emphasis role="stringliteral">&quot;enabled&quot;</emphasis>).boolValue&#32;=&#32;<emphasis role="keyword">true</emphasis>;
+00960 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;blendingBehaviourArray.GetArrayElementAtIndex(i).FindPropertyRelative(<emphasis role="stringliteral">&quot;influence&quot;</emphasis>).floatValue&#32;=&#32;1;
+00961 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;blendingBehaviourArray.GetArrayElementAtIndex(i).FindPropertyRelative(<emphasis role="stringliteral">&quot;previewEnabled&quot;</emphasis>).boolValue&#32;=&#32;<emphasis role="keyword">true</emphasis>;
+00962 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;serializedObject.ApplyModifiedProperties();
+00963 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;poser.<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___skeleton___poser_1a3b50d4d4b057f02bfe0a6a9295c96ea7">blendingBehaviours</link>[i].mask.Reset();
+00964 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00965 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;GUILayout.FlexibleSpace();
+00966 
+00967 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;EditorGUILayout.EndHorizontal();
+00968 
+00969 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00970 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;GUILayout.EndVertical();
+00971 
+00972 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00973 
+00974 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;Rect&#32;fillRectHorizontal(Rect&#32;r,&#32;<emphasis role="keywordtype">float</emphasis>&#32;f)
+00975 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00976 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;r.xMax--;
+00977 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;r.yMax--;
+00978 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;r.xMin++;
+00979 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;r.yMin++;
+00980 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;r.width&#32;*=&#32;f;
+00981 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;r;
+00982 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00983 
+00984 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordtype">void</emphasis>&#32;DrawBlenderLogo(SerializedProperty&#32;blenderType)
+00985 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00986 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;Texture&#32;icon&#32;=&#32;<emphasis role="keyword">null</emphasis>;
+00987 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(blenderType.intValue&#32;==&#32;(<emphasis role="keywordtype">int</emphasis>)SteamVR_Skeleton_Poser.PoseBlendingBehaviour.BlenderTypes.Manual)
+00988 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00989 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;icon&#32;=&#32;(Texture)EditorGUIUtility.Load(<emphasis role="stringliteral">&quot;Assets/SteamVR/Input/Editor/Resources/Icons/BlenderBehaviour_Manual_Icon.png&quot;</emphasis>);
+00990 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00991 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(blenderType.intValue&#32;==&#32;(<emphasis role="keywordtype">int</emphasis>)SteamVR_Skeleton_Poser.PoseBlendingBehaviour.BlenderTypes.AnalogAction)
+00992 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00993 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;icon&#32;=&#32;(Texture)EditorGUIUtility.Load(<emphasis role="stringliteral">&quot;Assets/SteamVR/Input/Editor/Resources/Icons/BlenderBehaviour_Analog_Icon.png&quot;</emphasis>);
+00994 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00995 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(blenderType.intValue&#32;==&#32;(<emphasis role="keywordtype">int</emphasis>)SteamVR_Skeleton_Poser.PoseBlendingBehaviour.BlenderTypes.BooleanAction)
+00996 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00997 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;icon&#32;=&#32;(Texture)EditorGUIUtility.Load(<emphasis role="stringliteral">&quot;Assets/SteamVR/Input/Editor/Resources/Icons/BlenderBehaviour_Boolean_Icon.png&quot;</emphasis>);
+00998 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00999 
+01000 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;GUILayout.Label(icon,&#32;GUILayout.MaxHeight(32),&#32;GUILayout.MaxWidth(32));
+01001 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+01002 
+01003 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;Color&#32;maskColorEnabled&#32;=&#32;<emphasis role="keyword">new</emphasis>&#32;Color(0.3f,&#32;1.0f,&#32;0.3f,&#32;1.0f);
+01004 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;Color&#32;maskColorDisabled&#32;=&#32;<emphasis role="keyword">new</emphasis>&#32;Color(0,&#32;0,&#32;0,&#32;0.5f);
+01005 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;Color&#32;maskColorUnused&#32;=&#32;<emphasis role="keyword">new</emphasis>&#32;Color(0.3f,&#32;0.7f,&#32;0.3f,&#32;0.3f);
+01006 
+01007 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordtype">void</emphasis>&#32;DrawMaskDisabled(SerializedProperty&#32;mask)
+01008 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+01009 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;Texture&#32;m&#32;=&#32;(Texture)EditorGUIUtility.Load(<emphasis role="stringliteral">&quot;Assets/SteamVR/Input/Editor/Resources/Icons/handmask.png&quot;</emphasis>);
+01010 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;GUI.color&#32;=&#32;maskColorUnused;
+01011 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;GUILayout.Label(m,&#32;GUILayout.MaxHeight(100),&#32;GUILayout.MaxWidth(100));
+01012 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;GUI.color&#32;=&#32;Color.white;
+01013 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+01014 
+01015 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordtype">void</emphasis>&#32;DrawMaskEnabled(SerializedProperty&#32;mask)
+01016 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+01017 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;GUILayout.Label(<emphasis role="stringliteral">&quot;&quot;</emphasis>,&#32;GUILayout.Height(100),&#32;GUILayout.Width(100));
+01018 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;Rect&#32;maskRect&#32;=&#32;GUILayoutUtility.GetLastRect();
+01019 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">for</emphasis>&#32;(<emphasis role="keywordtype">int</emphasis>&#32;i&#32;=&#32;0;&#32;i&#32;&lt;&#32;6;&#32;i++)
+01020 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+01021 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;GUI.color&#32;=&#32;mask.GetArrayElementAtIndex(i).boolValue&#32;?&#32;maskColorEnabled&#32;:&#32;maskColorDisabled;
+01022 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;GUI.Label(maskRect,&#32;handMaskTextures[i]);
+01023 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;GUI.color&#32;=&#32;<emphasis role="keyword">new</emphasis>&#32;Color(0,&#32;0,&#32;0,&#32;0.0f);
+01024 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(GUI.Button(GetFingerAreaRect(maskRect,&#32;i),&#32;<emphasis role="stringliteral">&quot;&quot;</emphasis>))
+01025 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+01026 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;mask.GetArrayElementAtIndex(i).boolValue&#32;=&#32;!mask.GetArrayElementAtIndex(i).boolValue;
+01027 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+01028 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;GUI.color&#32;=&#32;Color.white;
+01029 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//maskVal</emphasis>
+01030 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+01031 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+01032 
+01036 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;Rect&#32;GetFingerAreaRect(Rect&#32;source,&#32;<emphasis role="keywordtype">int</emphasis>&#32;i)
+01037 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+01038 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;Rect&#32;outRect&#32;=&#32;source;
+01039 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(i&#32;==&#32;0)
+01040 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+01041 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;outRect.xMin&#32;=&#32;Mathf.Lerp(source.xMin,&#32;source.xMax,&#32;0.4f);&#32;<emphasis role="comment">//&#32;left&#32;edge</emphasis>
+01042 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;outRect.xMax&#32;=&#32;Mathf.Lerp(source.xMin,&#32;source.xMax,&#32;0.8f);&#32;<emphasis role="comment">//&#32;right&#32;edge</emphasis>
+01043 
+01044 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;outRect.yMin&#32;=&#32;Mathf.Lerp(source.yMin,&#32;source.yMax,&#32;0.5f);&#32;<emphasis role="comment">//&#32;top&#32;edge</emphasis>
+01045 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;outRect.yMax&#32;=&#32;Mathf.Lerp(source.yMin,&#32;source.yMax,&#32;1.0f);&#32;<emphasis role="comment">//&#32;bottom&#32;edge</emphasis>
+01046 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+01047 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(i&#32;==&#32;1)
+01048 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+01049 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;outRect.xMin&#32;=&#32;Mathf.Lerp(source.xMin,&#32;source.xMax,&#32;0.0f);&#32;<emphasis role="comment">//&#32;left&#32;edge</emphasis>
+01050 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;outRect.xMax&#32;=&#32;Mathf.Lerp(source.xMin,&#32;source.xMax,&#32;0.4f);&#32;<emphasis role="comment">//&#32;right&#32;edge</emphasis>
+01051 
+01052 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;outRect.yMin&#32;=&#32;Mathf.Lerp(source.yMin,&#32;source.yMax,&#32;0.5f);&#32;<emphasis role="comment">//&#32;top&#32;edge</emphasis>
+01053 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;outRect.yMax&#32;=&#32;Mathf.Lerp(source.yMin,&#32;source.yMax,&#32;1.0f);&#32;<emphasis role="comment">//&#32;bottom&#32;edge</emphasis>
+01054 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+01055 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(i&#32;==&#32;2)
+01056 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+01057 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;outRect.xMin&#32;=&#32;Mathf.Lerp(source.xMin,&#32;source.xMax,&#32;0.3f);&#32;<emphasis role="comment">//&#32;left&#32;edge</emphasis>
+01058 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;outRect.xMax&#32;=&#32;Mathf.Lerp(source.xMin,&#32;source.xMax,&#32;0.425f);&#32;<emphasis role="comment">//&#32;right&#32;edge</emphasis>
+01059 
+01060 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;outRect.yMin&#32;=&#32;Mathf.Lerp(source.yMin,&#32;source.yMax,&#32;0.0f);&#32;<emphasis role="comment">//&#32;top&#32;edge</emphasis>
+01061 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;outRect.yMax&#32;=&#32;Mathf.Lerp(source.yMin,&#32;source.yMax,&#32;0.5f);&#32;<emphasis role="comment">//&#32;bottom&#32;edge</emphasis>
+01062 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+01063 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(i&#32;==&#32;3)
+01064 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+01065 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;outRect.xMin&#32;=&#32;Mathf.Lerp(source.xMin,&#32;source.xMax,&#32;0.425f);&#32;<emphasis role="comment">//&#32;left&#32;edge</emphasis>
+01066 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;outRect.xMax&#32;=&#32;Mathf.Lerp(source.xMin,&#32;source.xMax,&#32;0.55f);&#32;<emphasis role="comment">//&#32;right&#32;edge</emphasis>
+01067 
+01068 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;outRect.yMin&#32;=&#32;Mathf.Lerp(source.yMin,&#32;source.yMax,&#32;0.0f);&#32;<emphasis role="comment">//&#32;top&#32;edge</emphasis>
+01069 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;outRect.yMax&#32;=&#32;Mathf.Lerp(source.yMin,&#32;source.yMax,&#32;0.5f);&#32;<emphasis role="comment">//&#32;bottom&#32;edge</emphasis>
+01070 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+01071 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(i&#32;==&#32;4)
+01072 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+01073 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;outRect.xMin&#32;=&#32;Mathf.Lerp(source.xMin,&#32;source.xMax,&#32;0.55f);&#32;<emphasis role="comment">//&#32;left&#32;edge</emphasis>
+01074 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;outRect.xMax&#32;=&#32;Mathf.Lerp(source.xMin,&#32;source.xMax,&#32;0.675f);&#32;<emphasis role="comment">//&#32;right&#32;edge</emphasis>
+01075 
+01076 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;outRect.yMin&#32;=&#32;Mathf.Lerp(source.yMin,&#32;source.yMax,&#32;0.0f);&#32;<emphasis role="comment">//&#32;top&#32;edge</emphasis>
+01077 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;outRect.yMax&#32;=&#32;Mathf.Lerp(source.yMin,&#32;source.yMax,&#32;0.5f);&#32;<emphasis role="comment">//&#32;bottom&#32;edge</emphasis>
+01078 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+01079 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(i&#32;==&#32;5)
+01080 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+01081 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;outRect.xMin&#32;=&#32;Mathf.Lerp(source.xMin,&#32;source.xMax,&#32;0.675f);&#32;<emphasis role="comment">//&#32;left&#32;edge</emphasis>
+01082 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;outRect.xMax&#32;=&#32;Mathf.Lerp(source.xMin,&#32;source.xMax,&#32;0.8f);&#32;<emphasis role="comment">//&#32;right&#32;edge</emphasis>
+01083 
+01084 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;outRect.yMin&#32;=&#32;Mathf.Lerp(source.yMin,&#32;source.yMax,&#32;0.0f);&#32;<emphasis role="comment">//&#32;top&#32;edge</emphasis>
+01085 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;outRect.yMax&#32;=&#32;Mathf.Lerp(source.yMin,&#32;source.yMax,&#32;0.5f);&#32;<emphasis role="comment">//&#32;bottom&#32;edge</emphasis>
+01086 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+01087 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;outRect;
+01088 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+01089 
+01090 
+01091 
+01092 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordtype">void</emphasis>&#32;DrawDivider()
+01093 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+01094 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;GUI.color&#32;=&#32;<emphasis role="keyword">new</emphasis>&#32;Color(0,&#32;0,&#32;0,&#32;0.6f);
+01095 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;EditorGUILayout.Space();
+01096 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;EditorGUILayout.LabelField(<emphasis role="stringliteral">&quot;&quot;</emphasis>,&#32;GUI.skin.horizontalSlider);
+01097 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;EditorGUILayout.Space();
+01098 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;GUI.color&#32;=&#32;Color.white;
+01099 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+01100 
+01101 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordtype">bool</emphasis>&#32;IndentedFoldoutHeader(<emphasis role="keywordtype">bool</emphasis>&#32;fold,&#32;<emphasis role="keywordtype">string</emphasis>&#32;text,&#32;<emphasis role="keywordtype">int</emphasis>&#32;indent&#32;=&#32;1)
+01102 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+01103 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;GUILayout.BeginHorizontal();
+01104 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;GUIStyle&#32;boldFoldoutStyle&#32;=&#32;<emphasis role="keyword">new</emphasis>&#32;GUIStyle(EditorStyles.foldout);
+01105 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;boldFoldoutStyle.fontStyle&#32;=&#32;FontStyle.Bold;
+01106 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;GUILayout.Space(14f&#32;*&#32;indent);
+01107 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;fold&#32;=&#32;EditorGUILayout.Foldout(fold,&#32;text,&#32;boldFoldoutStyle);
+01108 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;GUILayout.EndHorizontal();
+01109 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;fold;
+01110 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+01111 &#32;&#32;&#32;&#32;}
+01112 }
+</programlisting></section>

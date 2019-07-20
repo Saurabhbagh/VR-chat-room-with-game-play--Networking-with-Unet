@@ -1,0 +1,166 @@
+<?xml version='1.0' encoding='UTF-8' standalone='no'?>
+<section xmlns="http://docbook.org/ns/docbook" version="5.0" xmlns:xlink="http://www.w3.org/1999/xlink" xml:id="__attachment_hands_editor_8cs_source">
+<title>AttachmentHandsEditor.cs</title>
+<indexterm><primary>O:/GitHUBMINIPRoject/Assets/LeapMotion/Core/Scripts/Attachments/Editor/AttachmentHandsEditor.cs</primary></indexterm>
+<programlisting>00001 <emphasis role="comment">/******************************************************************************</emphasis>
+00002 <emphasis role="comment">&#32;*&#32;Copyright&#32;(C)&#32;Leap&#32;Motion,&#32;Inc.&#32;2011-2018.&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;*</emphasis>
+00003 <emphasis role="comment">&#32;*&#32;Leap&#32;Motion&#32;proprietary&#32;and&#32;confidential.&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;*</emphasis>
+00004 <emphasis role="comment">&#32;*&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;*</emphasis>
+00005 <emphasis role="comment">&#32;*&#32;Use&#32;subject&#32;to&#32;the&#32;terms&#32;of&#32;the&#32;Leap&#32;Motion&#32;SDK&#32;Agreement&#32;available&#32;at&#32;&#32;&#32;&#32;&#32;*</emphasis>
+00006 <emphasis role="comment">&#32;*&#32;https://developer.leapmotion.com/sdk_agreement,&#32;or&#32;another&#32;agreement&#32;&#32;&#32;&#32;&#32;&#32;&#32;*</emphasis>
+00007 <emphasis role="comment">&#32;*&#32;between&#32;Leap&#32;Motion&#32;and&#32;you,&#32;your&#32;company&#32;or&#32;other&#32;organization.&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;*</emphasis>
+00008 <emphasis role="comment">&#32;******************************************************************************/</emphasis>
+00009 
+00010 <emphasis role="keyword">using</emphasis>&#32;System.Collections;
+00011 <emphasis role="keyword">using</emphasis>&#32;System.Collections.Generic;
+00012 <emphasis role="keyword">using</emphasis>&#32;<link linkend="_namespace_unity_editor">UnityEditor</link>;
+00013 <emphasis role="keyword">using</emphasis>&#32;<link linkend="__balloon_8cs_1a7d67e097df9376eb709b6a23aa3c7d23">UnityEngine</link>;
+00014 
+00015 <emphasis role="keyword">namespace&#32;</emphasis><link linkend="_namespace_leap_1_1_unity_1_1_attachments">Leap.Unity.Attachments</link>&#32;{
+00016 
+00017 &#32;&#32;[CustomEditor(typeof(AttachmentHands))]
+<anchor xml:id="__attachment_hands_editor_8cs_source_1l00018"/><link linkend="_class_leap_1_1_unity_1_1_attachments_1_1_attachment_hands_editor">00018</link> &#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keyword">class&#32;</emphasis><link linkend="_class_leap_1_1_unity_1_1_attachments_1_1_attachment_hands_editor">AttachmentHandsEditor</link>&#32;:&#32;<link linkend="_class_leap_1_1_unity_1_1_custom_editor_base">CustomEditorBase</link>&lt;AttachmentHands&gt;&#32;{
+00019 
+00020 &#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;Texture&#32;_handTex;
+00021 &#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;Rect&#32;_handTexRect;
+00022 
+<anchor xml:id="__attachment_hands_editor_8cs_source_1l00023"/><link linkend="_class_leap_1_1_unity_1_1_attachments_1_1_attachment_hands_editor_1a94eeefd2eca2a58e94d70632d3d79603">00023</link> &#32;&#32;&#32;&#32;<emphasis role="keyword">protected</emphasis>&#32;<emphasis role="keyword">override</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;<link linkend="_class_leap_1_1_unity_1_1_attachments_1_1_attachment_hands_editor_1a94eeefd2eca2a58e94d70632d3d79603">OnEnable</link>()&#32;{
+00024 &#32;&#32;&#32;&#32;&#32;&#32;base.OnEnable();
+00025 
+00026 &#32;&#32;&#32;&#32;&#32;&#32;_handTex&#32;=&#32;EditorResources.Load&lt;Texture2D&gt;(<emphasis role="stringliteral">&quot;HandTex&quot;</emphasis>);
+00027 
+00028 &#32;&#32;&#32;&#32;&#32;&#32;this.<link linkend="_class_leap_1_1_unity_1_1_custom_editor_base_1aab8bbda3edcc92a5c3d5a5360988c265">specifyCustomDrawer</link>(<emphasis role="stringliteral">&quot;_attachmentPoints&quot;</emphasis>,&#32;drawAttachmentPointsEditor);
+00029 &#32;&#32;&#32;&#32;}
+00030 
+00031 &#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;drawAttachmentPointsEditor(SerializedProperty&#32;property)&#32;{
+00032 
+00033 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;Set&#32;up&#32;the&#32;draw&#32;rect&#32;space&#32;based&#32;on&#32;the&#32;image&#32;and&#32;available&#32;editor&#32;space.</emphasis>
+00034 
+00035 &#32;&#32;&#32;&#32;&#32;&#32;EditorGUILayout.Space();
+00036 &#32;&#32;&#32;&#32;&#32;&#32;EditorGUILayout.LabelField(<emphasis role="stringliteral">&quot;Attachment&#32;Transforms&quot;</emphasis>,&#32;EditorStyles.boldLabel);
+00037 
+00038 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;Determine&#32;whether&#32;the&#32;target&#32;object&#32;is&#32;a&#32;prefab.&#32;AttachmentPoints&#32;cannot&#32;be&#32;edited&#32;on&#32;prefabs.</emphasis>
+00039 &#32;&#32;&#32;&#32;&#32;&#32;PrefabType&#32;prefabType&#32;=&#32;PrefabUtility.GetPrefabType(<link linkend="_class_leap_1_1_unity_1_1_custom_editor_base_1a20eea7e492831d5b4cde7eeaf0ce749e">target</link>.gameObject);
+00040 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordtype">bool</emphasis>&#32;isTargetPrefab&#32;=&#32;prefabType&#32;==&#32;PrefabType.Prefab&#32;||&#32;prefabType&#32;==&#32;PrefabType.ModelPrefab;
+00041 
+00042 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(isTargetPrefab)&#32;{
+00043 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;EditorGUILayout.HelpBox(<emphasis role="stringliteral">&quot;Drag&#32;the&#32;prefab&#32;into&#32;the&#32;scene&#32;to&#32;make&#32;changes&#32;to&#32;attachment&#32;points.&quot;</emphasis>,&#32;MessageType.Info,&#32;<emphasis role="keyword">true</emphasis>);
+00044 &#32;&#32;&#32;&#32;&#32;&#32;}
+00045 
+00046 &#32;&#32;&#32;&#32;&#32;&#32;_handTexRect&#32;=&#32;EditorGUILayout.BeginVertical(GUILayout.MinWidth(EditorGUIUtility.currentViewWidth),
+00047 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;GUILayout.MinHeight(EditorGUIUtility.currentViewWidth&#32;*&#32;(_handTex.height&#32;/&#32;(<emphasis role="keywordtype">float</emphasis>)_handTex.width)),
+00048 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;GUILayout.MaxWidth(_handTex.width),
+00049 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;GUILayout.MaxHeight(_handTex.height));
+00050 &#32;&#32;&#32;&#32;&#32;&#32;
+00051 &#32;&#32;&#32;&#32;&#32;&#32;Rect&#32;imageContainerRect&#32;=&#32;_handTexRect;&#32;imageContainerRect.width&#32;=&#32;EditorGUIUtility.currentViewWidth&#32;-&#32;30F;
+00052 &#32;&#32;&#32;&#32;&#32;&#32;EditorGUI.DrawRect(imageContainerRect,&#32;<emphasis role="keyword">new</emphasis>&#32;Color(0.2F,&#32;0.2F,&#32;0.2F));
+00053 &#32;&#32;&#32;&#32;&#32;&#32;imageContainerRect.x&#32;+=&#32;1;&#32;imageContainerRect.y&#32;+=&#32;1;&#32;imageContainerRect.width&#32;-=&#32;2;&#32;imageContainerRect.height&#32;-=&#32;2;
+00054 &#32;&#32;&#32;&#32;&#32;&#32;EditorGUI.DrawRect(imageContainerRect,&#32;<emphasis role="keyword">new</emphasis>&#32;Color(0.6F,&#32;0.6F,&#32;0.6F));
+00055 &#32;&#32;&#32;&#32;&#32;&#32;imageContainerRect.x&#32;+=&#32;1;&#32;imageContainerRect.y&#32;+=&#32;1;&#32;imageContainerRect.width&#32;-=&#32;2;&#32;imageContainerRect.height&#32;-=&#32;2;
+00056 &#32;&#32;&#32;&#32;&#32;&#32;EditorGUI.DrawRect(imageContainerRect,&#32;<emphasis role="keyword">new</emphasis>&#32;Color(0.2F,&#32;0.2F,&#32;0.2F));
+00057 
+00058 &#32;&#32;&#32;&#32;&#32;&#32;_handTexRect&#32;=&#32;<emphasis role="keyword">new</emphasis>&#32;Rect(_handTexRect.x&#32;+&#32;(imageContainerRect.center.x&#32;-&#32;_handTexRect.center.x),
+00059 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;_handTexRect.y,
+00060 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;_handTexRect.width,
+00061 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;_handTexRect.height);
+00062 &#32;&#32;&#32;&#32;&#32;&#32;EditorGUI.DrawTextureTransparent(_handTexRect,&#32;_handTex);
+00063 &#32;&#32;&#32;&#32;&#32;&#32;EditorGUILayout.Space();
+00064 
+00065 
+00066 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;Draw&#32;the&#32;toggles&#32;for&#32;the&#32;attachment&#32;points.</emphasis>
+00067 
+00068 &#32;&#32;&#32;&#32;&#32;&#32;EditorGUI.BeginDisabledGroup(isTargetPrefab);
+00069 
+00070 &#32;&#32;&#32;&#32;&#32;&#32;makeAttachmentPointsToggle(<emphasis role="stringliteral">&quot;Palm&quot;</emphasis>,&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">new</emphasis>&#32;Vector2(&#32;0.100F,&#32;&#32;0.160F));
+00071 &#32;&#32;&#32;&#32;&#32;&#32;makeAttachmentPointsToggle(<emphasis role="stringliteral">&quot;Wrist&quot;</emphasis>,&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">new</emphasis>&#32;Vector2(&#32;0.080F,&#32;&#32;0.430F));
+00072 
+00073 &#32;&#32;&#32;&#32;&#32;&#32;makeAttachmentPointsToggle(<emphasis role="stringliteral">&quot;ThumbProximalJoint&quot;</emphasis>,&#32;&#32;<emphasis role="keyword">new</emphasis>&#32;Vector2(-0.190F,&#32;&#32;0.260F));
+00074 &#32;&#32;&#32;&#32;&#32;&#32;makeAttachmentPointsToggle(<emphasis role="stringliteral">&quot;ThumbDistalJoint&quot;</emphasis>,&#32;&#32;&#32;&#32;<emphasis role="keyword">new</emphasis>&#32;Vector2(-0.310F,&#32;&#32;0.170F));
+00075 &#32;&#32;&#32;&#32;&#32;&#32;makeAttachmentPointsToggle(<emphasis role="stringliteral">&quot;ThumbTip&quot;</emphasis>,&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">new</emphasis>&#32;Vector2(-0.390F,&#32;&#32;0.110F));
+00076 
+00077 &#32;&#32;&#32;&#32;&#32;&#32;makeAttachmentPointsToggle(<emphasis role="stringliteral">&quot;IndexKnuckle&quot;</emphasis>,&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">new</emphasis>&#32;Vector2(-0.040F,&#32;-0.040F));
+00078 &#32;&#32;&#32;&#32;&#32;&#32;makeAttachmentPointsToggle(<emphasis role="stringliteral">&quot;IndexMiddleJoint&quot;</emphasis>,&#32;&#32;&#32;&#32;<emphasis role="keyword">new</emphasis>&#32;Vector2(-0.060F,&#32;-0.170F));
+00079 &#32;&#32;&#32;&#32;&#32;&#32;makeAttachmentPointsToggle(<emphasis role="stringliteral">&quot;IndexDistalJoint&quot;</emphasis>,&#32;&#32;&#32;&#32;<emphasis role="keyword">new</emphasis>&#32;Vector2(-0.075F,&#32;-0.280F));
+00080 &#32;&#32;&#32;&#32;&#32;&#32;makeAttachmentPointsToggle(<emphasis role="stringliteral">&quot;IndexTip&quot;</emphasis>,&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">new</emphasis>&#32;Vector2(-0.080F,&#32;-0.380F));
+00081 
+00082 &#32;&#32;&#32;&#32;&#32;&#32;makeAttachmentPointsToggle(<emphasis role="stringliteral">&quot;MiddleKnuckle&quot;</emphasis>,&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">new</emphasis>&#32;Vector2(&#32;0.080F,&#32;-0.050F));
+00083 &#32;&#32;&#32;&#32;&#32;&#32;makeAttachmentPointsToggle(<emphasis role="stringliteral">&quot;MiddleMiddleJoint&quot;</emphasis>,&#32;&#32;&#32;<emphasis role="keyword">new</emphasis>&#32;Vector2(&#32;0.080F,&#32;-0.190F));
+00084 &#32;&#32;&#32;&#32;&#32;&#32;makeAttachmentPointsToggle(<emphasis role="stringliteral">&quot;MiddleDistalJoint&quot;</emphasis>,&#32;&#32;&#32;<emphasis role="keyword">new</emphasis>&#32;Vector2(&#32;0.080F,&#32;-0.310F));
+00085 &#32;&#32;&#32;&#32;&#32;&#32;makeAttachmentPointsToggle(<emphasis role="stringliteral">&quot;MiddleTip&quot;</emphasis>,&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">new</emphasis>&#32;Vector2(&#32;0.090F,&#32;-0.420F));
+00086 
+00087 &#32;&#32;&#32;&#32;&#32;&#32;makeAttachmentPointsToggle(<emphasis role="stringliteral">&quot;RingKnuckle&quot;</emphasis>,&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">new</emphasis>&#32;Vector2(&#32;0.195F,&#32;-0.020F));
+00088 &#32;&#32;&#32;&#32;&#32;&#32;makeAttachmentPointsToggle(<emphasis role="stringliteral">&quot;RingMiddleJoint&quot;</emphasis>,&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">new</emphasis>&#32;Vector2(&#32;0.220F,&#32;-0.150F));
+00089 &#32;&#32;&#32;&#32;&#32;&#32;makeAttachmentPointsToggle(<emphasis role="stringliteral">&quot;RingDistalJoint&quot;</emphasis>,&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">new</emphasis>&#32;Vector2(&#32;0.230F,&#32;-0.270F));
+00090 &#32;&#32;&#32;&#32;&#32;&#32;makeAttachmentPointsToggle(<emphasis role="stringliteral">&quot;RingTip&quot;</emphasis>,&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">new</emphasis>&#32;Vector2(&#32;0.245F,&#32;-0.380F));
+00091 
+00092 &#32;&#32;&#32;&#32;&#32;&#32;makeAttachmentPointsToggle(<emphasis role="stringliteral">&quot;PinkyKnuckle&quot;</emphasis>,&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">new</emphasis>&#32;Vector2(&#32;0.295F,&#32;&#32;0.040F));
+00093 &#32;&#32;&#32;&#32;&#32;&#32;makeAttachmentPointsToggle(<emphasis role="stringliteral">&quot;PinkyMiddleJoint&quot;</emphasis>,&#32;&#32;&#32;&#32;<emphasis role="keyword">new</emphasis>&#32;Vector2(&#32;0.340F,&#32;-0.050F));
+00094 &#32;&#32;&#32;&#32;&#32;&#32;makeAttachmentPointsToggle(<emphasis role="stringliteral">&quot;PinkyDistalJoint&quot;</emphasis>,&#32;&#32;&#32;&#32;<emphasis role="keyword">new</emphasis>&#32;Vector2(&#32;0.380F,&#32;-0.130F));
+00095 &#32;&#32;&#32;&#32;&#32;&#32;makeAttachmentPointsToggle(<emphasis role="stringliteral">&quot;PinkyTip&quot;</emphasis>,&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">new</emphasis>&#32;Vector2(&#32;0.410F,&#32;-0.210F));
+00096 
+00097 &#32;&#32;&#32;&#32;&#32;&#32;EditorGUI.EndDisabledGroup();
+00098 
+00099 &#32;&#32;&#32;&#32;&#32;&#32;EditorGUILayout.EndVertical();
+00100 &#32;&#32;&#32;&#32;}
+00101 
+00102 &#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;makeAttachmentPointsToggle(<emphasis role="keywordtype">string</emphasis>&#32;attachmentFlagName,&#32;Vector2&#32;offCenterPosImgSpace)&#32;{
+00103 &#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_namespace_leap_1_1_unity_1_1_attachments_1a4b32b38f722ad110fcd5a817256e09ab">AttachmentPointFlags</link>&#32;attachmentPoints&#32;=&#32;<link linkend="_class_leap_1_1_unity_1_1_custom_editor_base_1a20eea7e492831d5b4cde7eeaf0ce749e">target</link>.attachmentPoints;
+00104 
+00105 &#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_namespace_leap_1_1_unity_1_1_attachments_1a4b32b38f722ad110fcd5a817256e09ab">AttachmentPointFlags</link>&#32;flag&#32;=&#32;(<link linkend="_namespace_leap_1_1_unity_1_1_attachments_1a4b32b38f722ad110fcd5a817256e09ab">AttachmentPointFlags</link>)System.Enum.Parse(typeof(<link linkend="_namespace_leap_1_1_unity_1_1_attachments_1a4b32b38f722ad110fcd5a817256e09ab">AttachmentPointFlags</link>),&#32;attachmentFlagName,&#32;<emphasis role="keyword">true</emphasis>);
+00106 
+00107 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(EditorGUI.Toggle(makeToggleRect(_handTexRect.center
+00108 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;+&#32;<emphasis role="keyword">new</emphasis>&#32;Vector2(offCenterPosImgSpace.x&#32;*&#32;_handTexRect.width,
+00109 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;offCenterPosImgSpace.y&#32;*&#32;_handTexRect.height)),
+00110 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;(attachmentPoints&#32;&amp;&#32;flag)&#32;==&#32;flag))&#32;{
+00111 
+00112 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_leap_1_1_unity_1_1_custom_editor_base_1a20eea7e492831d5b4cde7eeaf0ce749e">target</link>.attachmentPoints&#32;=&#32;attachmentPoints&#32;|&#32;flag;&#32;<emphasis role="comment">//&#32;Set&#32;flag&#32;bit&#32;to&#32;1.</emphasis>
+00113 &#32;&#32;&#32;&#32;&#32;&#32;}
+00114 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">else</emphasis>&#32;{
+00115 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(!wouldFlagDeletionDestroyData(<link linkend="_class_leap_1_1_unity_1_1_custom_editor_base_1a20eea7e492831d5b4cde7eeaf0ce749e">target</link>,&#32;flag)
+00116 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;||&#32;EditorUtility.DisplayDialog(<emphasis role="stringliteral">&quot;Delete&#32;&quot;</emphasis>&#32;+&#32;flag&#32;+&#32;<emphasis role="stringliteral">&quot;&#32;Attachment&#32;Point?&quot;</emphasis>,
+00117 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="stringliteral">&quot;Deleting&#32;the&#32;&quot;</emphasis>&#32;+&#32;flag&#32;+&#32;<emphasis role="stringliteral">&quot;&#32;attachment&#32;point&#32;will&#32;destroy&#32;&quot;</emphasis>
+00118 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;+&#32;<emphasis role="stringliteral">&quot;its&#32;GameObject&#32;and&#32;any&#32;of&#32;its&#32;non-Attachment-Point&#32;children,&#32;&quot;</emphasis>
+00119 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;+&#32;<emphasis role="stringliteral">&quot;and&#32;will&#32;remove&#32;any&#32;components&#32;attached&#32;to&#32;it.&quot;</emphasis>,
+00120 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="stringliteral">&quot;Delete&#32;&quot;</emphasis>&#32;+&#32;flag&#32;+&#32;<emphasis role="stringliteral">&quot;&#32;Attachment&#32;Point&quot;</emphasis>,&#32;<emphasis role="stringliteral">&quot;Cancel&quot;</emphasis>))&#32;{
+00121 
+00122 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_leap_1_1_unity_1_1_custom_editor_base_1a20eea7e492831d5b4cde7eeaf0ce749e">target</link>.attachmentPoints&#32;=&#32;attachmentPoints&#32;&amp;&#32;(~flag);&#32;<emphasis role="comment">//&#32;Set&#32;flag&#32;bit&#32;to&#32;0.</emphasis>
+00123 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00124 &#32;&#32;&#32;&#32;&#32;&#32;}
+00125 &#32;&#32;&#32;&#32;}
+00126 
+00127 &#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;<emphasis role="keyword">const</emphasis>&#32;<emphasis role="keywordtype">float</emphasis>&#32;TOGGLE_SIZE&#32;=&#32;15.0F;
+00128 &#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;Rect&#32;makeToggleRect(Vector2&#32;centerPos)&#32;{
+00129 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;<emphasis role="keyword">new</emphasis>&#32;Rect(centerPos.x&#32;-&#32;TOGGLE_SIZE&#32;/&#32;2F,&#32;centerPos.y&#32;-&#32;TOGGLE_SIZE&#32;/&#32;2F,&#32;TOGGLE_SIZE,&#32;TOGGLE_SIZE);
+00130 &#32;&#32;&#32;&#32;}
+00131 
+00132 &#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;<emphasis role="keyword">static</emphasis>&#32;<emphasis role="keywordtype">bool</emphasis>&#32;wouldFlagDeletionDestroyData(AttachmentHands&#32;<link linkend="_class_leap_1_1_unity_1_1_custom_editor_base_1a20eea7e492831d5b4cde7eeaf0ce749e">target</link>,&#32;<link linkend="_namespace_leap_1_1_unity_1_1_attachments_1a4b32b38f722ad110fcd5a817256e09ab">AttachmentPointFlags</link>&#32;flag)&#32;{
+00133 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(<link linkend="_class_leap_1_1_unity_1_1_custom_editor_base_1a20eea7e492831d5b4cde7eeaf0ce749e">target</link>.attachmentHands&#32;==&#32;<emphasis role="keyword">null</emphasis>)&#32;<emphasis role="keywordflow">return</emphasis>&#32;<emphasis role="keyword">false</emphasis>;
+00134 
+00135 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">foreach</emphasis>&#32;(var&#32;attachmentHand&#32;<emphasis role="keywordflow">in</emphasis>&#32;<link linkend="_class_leap_1_1_unity_1_1_custom_editor_base_1a20eea7e492831d5b4cde7eeaf0ce749e">target</link>.attachmentHands)&#32;{
+00136 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;var&#32;point&#32;=&#32;attachmentHand.GetBehaviourForPoint(flag);
+00137 
+00138 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(point&#32;==&#32;<emphasis role="keyword">null</emphasis>)&#32;<emphasis role="keywordflow">return</emphasis>&#32;<emphasis role="keyword">false</emphasis>;
+00139 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">else</emphasis>&#32;{
+00140 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;Data&#32;will&#32;be&#32;destroyed&#32;if&#32;this&#32;AttachmentPointBehaviour&apos;s&#32;Transform&#32;contains&#32;any&#32;children</emphasis>
+00141 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;that&#32;are&#32;not&#32;themselves&#32;AttachmentPointBehaviours.</emphasis>
+00142 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">foreach</emphasis>&#32;(var&#32;child&#32;<emphasis role="keywordflow">in</emphasis>&#32;point.transform.GetChildren())&#32;{
+00143 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(child.GetComponent&lt;AttachmentPointBehaviour&gt;()&#32;==&#32;<emphasis role="keyword">null</emphasis>)&#32;<emphasis role="keywordflow">return</emphasis>&#32;<emphasis role="keyword">true</emphasis>;
+00144 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00145 
+00146 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;Data&#32;will&#32;be&#32;destroyed&#32;if&#32;this&#32;AttachmentPointBehaviour&#32;contains&#32;any&#32;components</emphasis>
+00147 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;that&#32;aren&apos;t&#32;constructed&#32;automatically.</emphasis>
+00148 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">foreach</emphasis>&#32;(var&#32;component&#32;<emphasis role="keywordflow">in</emphasis>&#32;point.gameObject.GetComponents&lt;Component&gt;())&#32;{
+00149 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(component&#32;is&#32;Transform)&#32;<emphasis role="keywordflow">continue</emphasis>;
+00150 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(component&#32;is&#32;AttachmentPointBehaviour)&#32;<emphasis role="keywordflow">continue</emphasis>;
+00151 
+00152 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;<emphasis role="keyword">true</emphasis>;
+00153 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00154 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00155 &#32;&#32;&#32;&#32;&#32;&#32;}
+00156 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;<emphasis role="keyword">false</emphasis>;
+00157 &#32;&#32;&#32;&#32;}
+00158 
+00159 &#32;&#32;}
+00160 
+00161 }
+</programlisting></section>

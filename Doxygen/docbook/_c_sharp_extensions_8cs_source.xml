@@ -1,0 +1,66 @@
+<?xml version='1.0' encoding='UTF-8' standalone='no'?>
+<section xmlns="http://docbook.org/ns/docbook" version="5.0" xmlns:xlink="http://www.w3.org/1999/xlink" xml:id="__c_sharp_extensions_8cs_source">
+<title>CSharpExtensions.cs</title>
+<indexterm><primary>O:/GitHUBMINIPRoject/Assets/LeapMotion/Core/Plugins/LeapCSharp/CSharpExtensions.cs</primary></indexterm>
+<programlisting>00001 <emphasis role="comment">/******************************************************************************</emphasis>
+00002 <emphasis role="comment">&#32;*&#32;Copyright&#32;(C)&#32;Leap&#32;Motion,&#32;Inc.&#32;2011-2018.&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;*</emphasis>
+00003 <emphasis role="comment">&#32;*&#32;Leap&#32;Motion&#32;proprietary&#32;and&#32;confidential.&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;*</emphasis>
+00004 <emphasis role="comment">&#32;*&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;*</emphasis>
+00005 <emphasis role="comment">&#32;*&#32;Use&#32;subject&#32;to&#32;the&#32;terms&#32;of&#32;the&#32;Leap&#32;Motion&#32;SDK&#32;Agreement&#32;available&#32;at&#32;&#32;&#32;&#32;&#32;*</emphasis>
+00006 <emphasis role="comment">&#32;*&#32;https://developer.leapmotion.com/sdk_agreement,&#32;or&#32;another&#32;agreement&#32;&#32;&#32;&#32;&#32;&#32;&#32;*</emphasis>
+00007 <emphasis role="comment">&#32;*&#32;between&#32;Leap&#32;Motion&#32;and&#32;you,&#32;your&#32;company&#32;or&#32;other&#32;organization.&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;*</emphasis>
+00008 <emphasis role="comment">&#32;******************************************************************************/</emphasis>
+00009 
+00010 <emphasis role="keyword">using</emphasis>&#32;System;
+00011 <emphasis role="keyword">namespace&#32;</emphasis><link linkend="_namespace_leap">Leap</link>&#32;{
+00017 &#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keyword">static</emphasis>&#32;<emphasis role="keyword">class&#32;</emphasis>CSharpExtensions&#32;{
+00022 &#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keyword">static</emphasis>&#32;<emphasis role="keywordtype">bool</emphasis>&#32;NearlyEquals(<emphasis role="keyword">this</emphasis>&#32;<emphasis role="keywordtype">float</emphasis>&#32;a,&#32;<emphasis role="keywordtype">float</emphasis>&#32;b,&#32;<emphasis role="keywordtype">float</emphasis>&#32;epsilon&#32;=&#32;Constants.EPSILON)&#32;{
+00023 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordtype">float</emphasis>&#32;absA&#32;=&#32;Math.Abs(a);
+00024 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordtype">float</emphasis>&#32;absB&#32;=&#32;Math.Abs(b);
+00025 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordtype">float</emphasis>&#32;diff&#32;=&#32;Math.Abs(a&#32;-&#32;b);
+00026 
+00027 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(a&#32;==&#32;b)&#32;{&#32;<emphasis role="comment">//&#32;shortcut,&#32;handles&#32;infinities</emphasis>
+00028 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;<emphasis role="keyword">true</emphasis>;
+00029 &#32;&#32;&#32;&#32;&#32;&#32;}&#32;<emphasis role="keywordflow">else</emphasis>&#32;<emphasis role="keywordflow">if</emphasis>&#32;(a&#32;==&#32;0&#32;||&#32;b&#32;==&#32;0&#32;||&#32;diff&#32;&lt;&#32;<emphasis role="keywordtype">float</emphasis>.MinValue)&#32;{
+00030 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;a&#32;or&#32;b&#32;is&#32;zero&#32;or&#32;both&#32;are&#32;extremely&#32;close&#32;to&#32;it</emphasis>
+00031 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;relative&#32;error&#32;is&#32;less&#32;meaningful&#32;here</emphasis>
+00032 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;diff&#32;&lt;&#32;(epsilon&#32;*&#32;<emphasis role="keywordtype">float</emphasis>.MinValue);
+00033 &#32;&#32;&#32;&#32;&#32;&#32;}&#32;<emphasis role="keywordflow">else</emphasis>&#32;{&#32;<emphasis role="comment">//&#32;use&#32;relative&#32;error</emphasis>
+00034 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;diff&#32;/&#32;(absA&#32;+&#32;absB)&#32;&lt;&#32;epsilon;
+00035 &#32;&#32;&#32;&#32;&#32;&#32;}
+00036 &#32;&#32;&#32;&#32;}
+00037 
+00042 &#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keyword">static</emphasis>&#32;<emphasis role="keywordtype">bool</emphasis>&#32;HasMethod(<emphasis role="keyword">this</emphasis>&#32;<emphasis role="keywordtype">object</emphasis>&#32;objectToCheck,&#32;<emphasis role="keywordtype">string</emphasis>&#32;methodName)&#32;{
+00043 &#32;&#32;&#32;&#32;&#32;&#32;var&#32;type&#32;=&#32;objectToCheck.GetType();
+00044 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;type.GetMethod(methodName)&#32;!=&#32;<emphasis role="keyword">null</emphasis>;
+00045 &#32;&#32;&#32;&#32;}
+00046 
+00051 &#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keyword">static</emphasis>&#32;<emphasis role="keywordtype">int</emphasis>&#32;indexOf(<emphasis role="keyword">this</emphasis>&#32;Enum&#32;enumItem)&#32;{
+00052 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;Array.IndexOf(Enum.GetValues(enumItem.GetType()),&#32;enumItem);
+00053 &#32;&#32;&#32;&#32;}
+00054 
+00059 &#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keyword">static</emphasis>&#32;T&#32;itemFor&lt;T&gt;(<emphasis role="keyword">this</emphasis>&#32;<emphasis role="keywordtype">int</emphasis>&#32;ordinal)&#32;{
+00060 &#32;&#32;&#32;&#32;&#32;&#32;T[]&#32;values&#32;=&#32;(T[])Enum.GetValues(typeof(T));
+00061 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;values[ordinal];
+00062 &#32;&#32;&#32;&#32;}
+00063 
+00068 &#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keyword">static</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;Dispatch&lt;T&gt;(<emphasis role="keyword">this</emphasis>&#32;EventHandler&lt;T&gt;&#32;handler,
+00069 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordtype">object</emphasis>&#32;sender,&#32;T&#32;eventArgs)&#32;where&#32;T&#32;:&#32;EventArgs&#32;{
+00070 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(handler&#32;!=&#32;<emphasis role="keyword">null</emphasis>)&#32;handler(sender,&#32;eventArgs);
+00071 &#32;&#32;&#32;&#32;}
+00072 
+00079 &#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keyword">static</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;DispatchOnContext&lt;T&gt;(<emphasis role="keyword">this</emphasis>&#32;EventHandler&lt;T&gt;&#32;handler,&#32;<emphasis role="keywordtype">object</emphasis>&#32;sender,
+00080 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;System.Threading.SynchronizationContext&#32;context,
+00081 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;T&#32;eventArgs)&#32;where&#32;T&#32;:&#32;EventArgs&#32;{
+00082 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(handler&#32;!=&#32;<emphasis role="keyword">null</emphasis>)&#32;{
+00083 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(context&#32;!=&#32;<emphasis role="keyword">null</emphasis>)&#32;{
+00084 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;System.Threading.SendOrPostCallback&#32;evt&#32;=&#32;(spc_args)&#32;=&gt;&#32;{&#32;handler(sender,&#32;spc_args&#32;as&#32;T);&#32;};
+00085 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;context.Post(evt,&#32;eventArgs);
+00086 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}&#32;<emphasis role="keywordflow">else</emphasis>
+00087 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;handler(sender,&#32;eventArgs);
+00088 &#32;&#32;&#32;&#32;&#32;&#32;}
+00089 &#32;&#32;&#32;&#32;}
+00090 &#32;&#32;}
+00091 }
+00092 
+</programlisting></section>

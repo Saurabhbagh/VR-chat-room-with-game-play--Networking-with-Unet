@@ -1,0 +1,306 @@
+<?xml version='1.0' encoding='UTF-8' standalone='no'?>
+<section xmlns="http://docbook.org/ns/docbook" version="5.0" xmlns:xlink="http://www.w3.org/1999/xlink" xml:id="__test_hand_factory_8cs_source">
+<title>TestHandFactory.cs</title>
+<indexterm><primary>O:/GitHUBMINIPRoject/Assets/LeapMotion/Core/Scripts/Hands/TestHandFactory.cs</primary></indexterm>
+<programlisting>00001 <emphasis role="comment">/******************************************************************************</emphasis>
+00002 <emphasis role="comment">&#32;*&#32;Copyright&#32;(C)&#32;Leap&#32;Motion,&#32;Inc.&#32;2011-2018.&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;*</emphasis>
+00003 <emphasis role="comment">&#32;*&#32;Leap&#32;Motion&#32;proprietary&#32;and&#32;confidential.&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;*</emphasis>
+00004 <emphasis role="comment">&#32;*&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;*</emphasis>
+00005 <emphasis role="comment">&#32;*&#32;Use&#32;subject&#32;to&#32;the&#32;terms&#32;of&#32;the&#32;Leap&#32;Motion&#32;SDK&#32;Agreement&#32;available&#32;at&#32;&#32;&#32;&#32;&#32;*</emphasis>
+00006 <emphasis role="comment">&#32;*&#32;https://developer.leapmotion.com/sdk_agreement,&#32;or&#32;another&#32;agreement&#32;&#32;&#32;&#32;&#32;&#32;&#32;*</emphasis>
+00007 <emphasis role="comment">&#32;*&#32;between&#32;Leap&#32;Motion&#32;and&#32;you,&#32;your&#32;company&#32;or&#32;other&#32;organization.&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;*</emphasis>
+00008 <emphasis role="comment">&#32;******************************************************************************/</emphasis>
+00009 
+00010 <emphasis role="keyword">namespace&#32;</emphasis><link linkend="_namespace_leap">Leap</link>&#32;{
+00011 
+00012 &#32;&#32;<emphasis role="keyword">using</emphasis>&#32;System;
+00013 &#32;&#32;<emphasis role="keyword">using</emphasis>&#32;System.Collections.<link linkend="_namespace_system_1_1_collections_1_1_generic">Generic</link>;
+00014 &#32;&#32;<emphasis role="keyword">using</emphasis>&#32;<link linkend="_namespace_leap">Leap</link>.<link linkend="_namespace_leap_1_1_unity">Unity</link>;
+00015 &#32;&#32;<emphasis role="keyword">using</emphasis>&#32;<link linkend="__balloon_8cs_1a7d67e097df9376eb709b6a23aa3c7d23">UnityEngine</link>;
+00016 
+00017 &#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keyword">static</emphasis>&#32;<emphasis role="keyword">class&#32;</emphasis>TestHandFactory&#32;{
+00018 
+00019 <emphasis role="preprocessor">&#32;&#32;&#32;&#32;#region&#32;Test&#32;Frame&#32;/&#32;Hand&#32;API</emphasis>
+00020 
+00021 &#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keyword">enum</emphasis>&#32;UnitType&#32;{
+00022 &#32;&#32;&#32;&#32;&#32;&#32;LeapUnits,
+00023 &#32;&#32;&#32;&#32;&#32;&#32;UnityUnits
+00024 &#32;&#32;&#32;&#32;}
+00025 
+00030 &#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keyword">static</emphasis>&#32;Frame&#32;MakeTestFrame(<emphasis role="keywordtype">int</emphasis>&#32;frameId,
+00031 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordtype">bool</emphasis>&#32;includeLeftHand&#32;=&#32;<emphasis role="keyword">true</emphasis>,
+00032 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordtype">bool</emphasis>&#32;includeRightHand&#32;=&#32;<emphasis role="keyword">true</emphasis>,
+00033 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_namespace_leap_1_1_unity_1acd6a6baee36c0cbe733c12b87791f963">TestHandPose</link>&#32;handPose&#32;=&#32;<link linkend="_namespace_leap_1_1_unity_1acd6a6baee36c0cbe733c12b87791f963">TestHandPose</link>.HeadMountedA,
+00034 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;UnitType&#32;unitType&#32;=&#32;UnitType.LeapUnits)&#32;{
+00035 
+00036 &#32;&#32;&#32;&#32;&#32;&#32;var&#32;testFrame&#32;=&#32;<emphasis role="keyword">new</emphasis>&#32;Frame(frameId,&#32;0,&#32;120.0f,
+00037 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">new</emphasis>&#32;List&lt;Hand&gt;());
+00038 
+00039 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(includeLeftHand)
+00040 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;testFrame.Hands.Add(MakeTestHand(<emphasis role="keyword">true</emphasis>,&#32;handPose,&#32;frameId,&#32;10,&#32;unitType));
+00041 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(includeRightHand)
+00042 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;testFrame.Hands.Add(MakeTestHand(<emphasis role="keyword">false</emphasis>,&#32;handPose,&#32;frameId,&#32;20,&#32;unitType));
+00043 
+00044 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;testFrame;
+00045 &#32;&#32;&#32;&#32;}
+00046 
+00053 &#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keyword">static</emphasis>&#32;<link linkend="_namespace_leap_1_1_unity_1_1_interaction_1a9752eb3e2905e8ebd134fff20c155e6baa78b1ac16c0cd02168097fc9a9bd7604">Hand</link>&#32;MakeTestHand(<emphasis role="keywordtype">bool</emphasis>&#32;isLeft,&#32;LeapTransform&#32;leftHandTransform,
+00054 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordtype">int</emphasis>&#32;frameId&#32;=&#32;0,&#32;<emphasis role="keywordtype">int</emphasis>&#32;handId&#32;=&#32;0,
+00055 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;UnitType&#32;unitType&#32;=&#32;UnitType.LeapUnits)&#32;{
+00056 
+00057 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;Apply&#32;the&#32;appropriate&#32;mirroring&#32;if&#32;this&#32;is&#32;a&#32;right&#32;hand.</emphasis>
+00058 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(!isLeft)&#32;{
+00059 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;leftHandTransform.translation&#32;=&#32;<emphasis role="keyword">new</emphasis>&#32;Vector(-leftHandTransform.translation.x,
+00060 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;leftHandTransform.translation.y,&#32;leftHandTransform.translation.z);
+00061 
+00062 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;leftHandTransform.rotation&#32;=&#32;<emphasis role="keyword">new</emphasis>&#32;LeapQuaternion(-leftHandTransform.rotation.x,
+00063 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;leftHandTransform.rotation.y,
+00064 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;leftHandTransform.rotation.z,
+00065 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;-leftHandTransform.rotation.w);
+00066 
+00067 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;leftHandTransform.MirrorX();
+00068 &#32;&#32;&#32;&#32;&#32;&#32;}
+00069 
+00070 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;Leap&#32;space&#32;is&#32;oriented&#32;differently&#32;than&#32;Unity&#32;space,&#32;so&#32;correct&#32;for&#32;this&#32;here.</emphasis>
+00071 &#32;&#32;&#32;&#32;&#32;&#32;var&#32;hand&#32;=&#32;makeLeapSpaceTestHand(frameId,&#32;handId,&#32;isLeft)
+00072 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;.Transform(leftHandTransform);
+00073 &#32;&#32;&#32;&#32;&#32;&#32;var&#32;correctingQuaternion&#32;=&#32;Quaternion.Euler(90f,&#32;0f,&#32;180f);
+00074 &#32;&#32;&#32;&#32;&#32;&#32;var&#32;correctingLeapQuaternion&#32;=&#32;<emphasis role="keyword">new</emphasis>&#32;LeapQuaternion(correctingQuaternion.x,
+00075 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;correctingQuaternion.y,
+00076 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;correctingQuaternion.z,
+00077 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;correctingQuaternion.w);
+00078 
+00079 &#32;&#32;&#32;&#32;&#32;&#32;var&#32;transformedHand&#32;=&#32;hand.Transform(<emphasis role="keyword">new</emphasis>&#32;LeapTransform(Vector.Zero,
+00080 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;correctingLeapQuaternion));
+00081 
+00082 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(unitType&#32;==&#32;UnitType.UnityUnits)&#32;{
+00083 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;transformedHand.TransformToUnityUnits();
+00084 &#32;&#32;&#32;&#32;&#32;&#32;}
+00085 
+00086 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;transformedHand;
+00087 &#32;&#32;&#32;&#32;}
+00088 
+00092 &#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keyword">static</emphasis>&#32;<link linkend="_namespace_leap_1_1_unity_1_1_interaction_1a9752eb3e2905e8ebd134fff20c155e6baa78b1ac16c0cd02168097fc9a9bd7604">Hand</link>&#32;MakeTestHand(<emphasis role="keywordtype">bool</emphasis>&#32;isLeft,
+00093 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordtype">int</emphasis>&#32;frameId&#32;=&#32;0,&#32;<emphasis role="keywordtype">int</emphasis>&#32;handId&#32;=&#32;0,
+00094 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;UnitType&#32;unitType&#32;=&#32;UnitType.LeapUnits)&#32;{
+00095 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;MakeTestHand(isLeft,&#32;LeapTransform.Identity,&#32;frameId,&#32;handId,&#32;unitType);
+00096 &#32;&#32;&#32;&#32;}
+00097 
+00101 &#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keyword">static</emphasis>&#32;<link linkend="_namespace_leap_1_1_unity_1_1_interaction_1a9752eb3e2905e8ebd134fff20c155e6baa78b1ac16c0cd02168097fc9a9bd7604">Hand</link>&#32;MakeTestHand(<emphasis role="keywordtype">bool</emphasis>&#32;isLeft,&#32;<link linkend="_namespace_leap_1_1_unity_1acd6a6baee36c0cbe733c12b87791f963">TestHandPose</link>&#32;pose,
+00102 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordtype">int</emphasis>&#32;frameId&#32;=&#32;0,&#32;<emphasis role="keywordtype">int</emphasis>&#32;handId&#32;=&#32;0,
+00103 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;UnitType&#32;unitType&#32;=&#32;UnitType.LeapUnits)&#32;{
+00104 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;MakeTestHand(isLeft,&#32;GetTestPoseLeftHandTransform(pose),
+00105 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;frameId,&#32;handId,
+00106 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;unitType);
+00107 &#32;&#32;&#32;&#32;}
+00108 
+00109 <emphasis role="preprocessor">&#32;&#32;&#32;&#32;#endregion</emphasis>
+00110 
+00111 <emphasis role="preprocessor">&#32;&#32;&#32;&#32;#region&#32;Test&#32;Hand&#32;Poses</emphasis>
+00112 
+00113 &#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keyword">enum</emphasis>&#32;<link linkend="_namespace_leap_1_1_unity_1acd6a6baee36c0cbe733c12b87791f963">TestHandPose</link>&#32;{
+00114 &#32;&#32;&#32;&#32;&#32;&#32;HeadMountedA,
+00115 &#32;&#32;&#32;&#32;&#32;&#32;HeadMountedB,
+00116 &#32;&#32;&#32;&#32;&#32;&#32;DesktopModeA
+00117 &#32;&#32;&#32;&#32;}
+00118 
+00119 &#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keyword">static</emphasis>&#32;LeapTransform&#32;GetTestPoseLeftHandTransform(<link linkend="_namespace_leap_1_1_unity_1acd6a6baee36c0cbe733c12b87791f963">TestHandPose</link>&#32;pose)&#32;{
+00120 &#32;&#32;&#32;&#32;&#32;&#32;LeapTransform&#32;transform&#32;=&#32;LeapTransform.Identity;
+00121 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">switch</emphasis>&#32;(pose)&#32;{
+00122 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">case</emphasis>&#32;<link linkend="_namespace_leap_1_1_unity_1acd6a6baee36c0cbe733c12b87791f963">TestHandPose</link>.HeadMountedA:
+00123 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;transform.rotation&#32;=&#32;angleAxis(180&#32;*&#32;Constants.DEG_TO_RAD,&#32;Vector.Forward);
+00124 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;transform.translation&#32;=&#32;<emphasis role="keyword">new</emphasis>&#32;Vector(80f,&#32;120f,&#32;0f);
+00125 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">break</emphasis>;
+00126 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">case</emphasis>&#32;<link linkend="_namespace_leap_1_1_unity_1acd6a6baee36c0cbe733c12b87791f963">TestHandPose</link>.HeadMountedB:
+00127 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;transform.rotation&#32;=&#32;Quaternion.Euler(30F,&#32;-10F,&#32;-20F).ToLeapQuaternion();
+00128 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;transform.translation&#32;=&#32;<emphasis role="keyword">new</emphasis>&#32;Vector(220f,&#32;270f,&#32;130f);
+00129 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">break</emphasis>;
+00130 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">case</emphasis>&#32;<link linkend="_namespace_leap_1_1_unity_1acd6a6baee36c0cbe733c12b87791f963">TestHandPose</link>.DesktopModeA:
+00131 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;transform.rotation&#32;=&#32;angleAxis(0f&#32;*&#32;Constants.DEG_TO_RAD,&#32;Vector.Forward)
+00132 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;.Multiply(angleAxis(-90f&#32;*&#32;Constants.DEG_TO_RAD,&#32;Vector.Right))
+00133 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;.Multiply(angleAxis(180f&#32;*&#32;Constants.DEG_TO_RAD,&#32;Vector.Up));
+00134 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;transform.translation&#32;=&#32;<emphasis role="keyword">new</emphasis>&#32;Vector(120f,&#32;0f,&#32;-170f);
+00135 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">break</emphasis>;
+00136 &#32;&#32;&#32;&#32;&#32;&#32;}
+00137 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;transform;
+00138 &#32;&#32;&#32;&#32;}
+00139 
+00140 <emphasis role="preprocessor">&#32;&#32;&#32;&#32;#endregion</emphasis>
+00141 
+00142 <emphasis role="preprocessor">&#32;&#32;&#32;&#32;#region&#32;Leap&#32;Space&#32;Hand&#32;Generation</emphasis>
+00143 
+00144 &#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;<emphasis role="keyword">static</emphasis>&#32;<link linkend="_namespace_leap_1_1_unity_1_1_interaction_1a9752eb3e2905e8ebd134fff20c155e6baa78b1ac16c0cd02168097fc9a9bd7604">Hand</link>&#32;makeLeapSpaceTestHand(<emphasis role="keywordtype">int</emphasis>&#32;frameId,&#32;<emphasis role="keywordtype">int</emphasis>&#32;handId,&#32;<emphasis role="keywordtype">bool</emphasis>&#32;isLeft)&#32;{
+00145 &#32;&#32;&#32;&#32;&#32;&#32;List&lt;Finger&gt;&#32;fingers&#32;=&#32;<emphasis role="keyword">new</emphasis>&#32;List&lt;Finger&gt;(5);
+00146 &#32;&#32;&#32;&#32;&#32;&#32;fingers.Add(makeThumb(frameId,&#32;handId,&#32;isLeft));
+00147 &#32;&#32;&#32;&#32;&#32;&#32;fingers.Add(makeIndexFinger(frameId,&#32;handId,&#32;isLeft));
+00148 &#32;&#32;&#32;&#32;&#32;&#32;fingers.Add(makeMiddleFinger(frameId,&#32;handId,&#32;isLeft));
+00149 &#32;&#32;&#32;&#32;&#32;&#32;fingers.Add(makeRingFinger(frameId,&#32;handId,&#32;isLeft));
+00150 &#32;&#32;&#32;&#32;&#32;&#32;fingers.Add(makePinky(frameId,&#32;handId,&#32;isLeft));
+00151 
+00152 &#32;&#32;&#32;&#32;&#32;&#32;Vector&#32;armWrist&#32;=&#32;<emphasis role="keyword">new</emphasis>&#32;Vector(-7.05809944059f,&#32;4.0f,&#32;50.0f);
+00153 &#32;&#32;&#32;&#32;&#32;&#32;Vector&#32;elbow&#32;=&#32;armWrist&#32;+&#32;250f&#32;*&#32;Vector.Backward;
+00154 
+00155 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;Adrian:&#32;The&#32;previous&#32;&quot;armBasis&quot;&#32;used&#32;&quot;elbow&quot;&#32;as&#32;a&#32;translation&#32;component.</emphasis>
+00156 &#32;&#32;&#32;&#32;&#32;&#32;Arm&#32;arm&#32;=&#32;<emphasis role="keyword">new</emphasis>&#32;Arm(elbow,&#32;armWrist,(elbow&#32;+&#32;armWrist)/2,&#32;Vector.Forward,&#32;250f,&#32;41f,&#32;LeapQuaternion.Identity);
+00157 &#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_namespace_leap_1_1_unity_1_1_interaction_1a9752eb3e2905e8ebd134fff20c155e6baa78b1ac16c0cd02168097fc9a9bd7604">Hand</link>&#32;testHand&#32;=&#32;<emphasis role="keyword">new</emphasis>&#32;<link linkend="_namespace_leap_1_1_unity_1_1_interaction_1a9752eb3e2905e8ebd134fff20c155e6baa78b1ac16c0cd02168097fc9a9bd7604">Hand</link>(frameId,
+00158 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;handId,
+00159 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;1.0f,
+00160 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;0.0f,
+00161 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;0.0f,
+00162 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;0.0f,
+00163 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;0.0f,
+00164 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;85f,
+00165 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;isLeft,
+00166 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;0.0f,
+00167 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;arm,
+00168 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;fingers,
+00169 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">new</emphasis>&#32;Vector&#32;(0,0,0),
+00170 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">new</emphasis>&#32;Vector(0,0,0),
+00171 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">new</emphasis>&#32;Vector(0,0,0),
+00172 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;Vector.Down,
+00173 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;LeapQuaternion.Identity,
+00174 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;Vector.Forward,
+00175 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">new</emphasis>&#32;Vector(-4.36385750984f,&#32;6.5f,&#32;31.0111342526f));
+00176 
+00177 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;testHand;
+00178 &#32;&#32;&#32;&#32;}
+00179 
+00180 &#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;<emphasis role="keyword">static</emphasis>&#32;LeapQuaternion&#32;angleAxis(<emphasis role="keywordtype">float</emphasis>&#32;angle,&#32;Vector&#32;axis)&#32;{
+00181 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(!axis.MagnitudeSquared.NearlyEquals(1.0f))&#32;{
+00182 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">throw</emphasis>&#32;<emphasis role="keyword">new</emphasis>&#32;ArgumentException(<emphasis role="stringliteral">&quot;Axis&#32;must&#32;be&#32;a&#32;unit&#32;vector.&quot;</emphasis>);
+00183 &#32;&#32;&#32;&#32;&#32;&#32;}
+00184 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordtype">float</emphasis>&#32;sineHalfAngle&#32;=&#32;Mathf.Sin(angle/2.0f);
+00185 &#32;&#32;&#32;&#32;&#32;&#32;LeapQuaternion&#32;q&#32;=&#32;<emphasis role="keyword">new</emphasis>&#32;LeapQuaternion(sineHalfAngle&#32;*&#32;axis.x,
+00186 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;sineHalfAngle&#32;*&#32;axis.y,
+00187 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;sineHalfAngle&#32;*&#32;axis.z,
+00188 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;Mathf.Cos(angle/2.0f));
+00189 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;q.Normalized;
+00190 &#32;&#32;&#32;&#32;}
+00191 
+00192 &#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;<emphasis role="keyword">static</emphasis>&#32;LeapQuaternion&#32;rotationBetween(Vector&#32;fromDirection,&#32;Vector&#32;toDirection)&#32;{
+00193 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordtype">float</emphasis>&#32;m&#32;=&#32;Mathf.Sqrt(2.0f&#32;+&#32;2.0f&#32;*&#32;fromDirection.Dot(toDirection));
+00194 &#32;&#32;&#32;&#32;&#32;&#32;Vector&#32;w&#32;=&#32;(1.0f&#32;/&#32;m)&#32;*&#32;fromDirection.Cross(toDirection);
+00195 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;<emphasis role="keyword">new</emphasis>&#32;LeapQuaternion(w.x,&#32;w.y,&#32;w.z,&#32;0.5f&#32;*&#32;m);
+00196 &#32;&#32;&#32;&#32;}
+00197 
+00198 &#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;<emphasis role="keyword">static</emphasis>&#32;Finger&#32;makeThumb(<emphasis role="keywordtype">int</emphasis>&#32;frameId,&#32;<emphasis role="keywordtype">int</emphasis>&#32;handId,&#32;<emphasis role="keywordtype">bool</emphasis>&#32;isLeft)&#32;{
+00199 &#32;&#32;&#32;&#32;&#32;&#32;Vector&#32;position&#32;=&#32;<emphasis role="keyword">new</emphasis>&#32;Vector(19.3382610281f,&#32;-6.0f,&#32;53.168484654f);
+00200 &#32;&#32;&#32;&#32;&#32;&#32;Vector&#32;forward&#32;=&#32;<emphasis role="keyword">new</emphasis>&#32;Vector(0.636329113772f,&#32;-0.5f,&#32;-0.899787143982f);
+00201 &#32;&#32;&#32;&#32;&#32;&#32;Vector&#32;up&#32;=&#32;<emphasis role="keyword">new</emphasis>&#32;Vector(0.804793943718f,&#32;0.447213915513f,&#32;0.390264553767f);
+00202 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordtype">float</emphasis>[]&#32;jointLengths&#32;=&#32;{0.0f,&#32;46.22f,&#32;31.57f,&#32;21.67f};
+00203 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;makeFinger(Finger.FingerType.TYPE_THUMB,&#32;position,&#32;forward,&#32;up,&#32;jointLengths,&#32;frameId,&#32;handId,&#32;handId&#32;+&#32;0,&#32;isLeft);
+00204 &#32;&#32;&#32;&#32;}
+00205 
+00206 &#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;<emphasis role="keyword">static</emphasis>&#32;Finger&#32;makeIndexFinger(<emphasis role="keywordtype">int</emphasis>&#32;frameId,&#32;<emphasis role="keywordtype">int</emphasis>&#32;handId,&#32;<emphasis role="keywordtype">bool</emphasis>&#32;isLeft)&#32;{
+00207 &#32;&#32;&#32;&#32;&#32;&#32;Vector&#32;position&#32;=&#32;<emphasis role="keyword">new</emphasis>&#32;Vector(23.1812851873f,&#32;2.0f,&#32;-23.1493459317f);
+00208 &#32;&#32;&#32;&#32;&#32;&#32;Vector&#32;forward&#32;=&#32;<emphasis role="keyword">new</emphasis>&#32;Vector(0.166044313785f,&#32;-0.14834045293f,&#32;-0.974897120667f);
+00209 &#32;&#32;&#32;&#32;&#32;&#32;Vector&#32;up&#32;=&#32;<emphasis role="keyword">new</emphasis>&#32;Vector(0.0249066470677f,&#32;0.988936352868f,&#32;-0.1462345681f);
+00210 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordtype">float</emphasis>[]&#32;&#32;jointLengths&#32;=&#32;{68.12f,&#32;39.78f,&#32;22.38f,&#32;15.82f};
+00211 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;makeFinger(Finger.FingerType.TYPE_INDEX,&#32;position,&#32;forward,&#32;up,&#32;jointLengths,&#32;frameId,&#32;handId,&#32;handId&#32;+&#32;1,&#32;isLeft);
+00212 &#32;&#32;&#32;&#32;}
+00213 
+00214 &#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;<emphasis role="keyword">static</emphasis>&#32;Finger&#32;makeMiddleFinger(<emphasis role="keywordtype">int</emphasis>&#32;frameId,&#32;<emphasis role="keywordtype">int</emphasis>&#32;handId,&#32;<emphasis role="keywordtype">bool</emphasis>&#32;isLeft)&#32;{
+00215 &#32;&#32;&#32;&#32;&#32;&#32;Vector&#32;position&#32;=&#32;<emphasis role="keyword">new</emphasis>&#32;Vector(2.78877821918f,&#32;4.0f,&#32;-23.252105626f);
+00216 &#32;&#32;&#32;&#32;&#32;&#32;Vector&#32;forward&#32;=&#32;<emphasis role="keyword">new</emphasis>&#32;Vector(0.0295207858556f,&#32;-0.148340452932f,&#32;-0.988495641481f);
+00217 &#32;&#32;&#32;&#32;&#32;&#32;Vector&#32;up&#32;=&#32;<emphasis role="keyword">new</emphasis>&#32;Vector(-0.145765270107f,&#32;0.977715980076f,&#32;-0.151075968756f);
+00218 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordtype">float</emphasis>[]&#32;&#32;jointLengths&#32;=&#32;{64.60f,&#32;44.63f,&#32;26.33f,&#32;17.40f};
+00219 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;makeFinger(Finger.FingerType.TYPE_MIDDLE,&#32;position,&#32;forward,&#32;up,&#32;jointLengths,&#32;frameId,&#32;handId,&#32;handId&#32;+&#32;2,&#32;isLeft);
+00220 &#32;&#32;&#32;&#32;}
+00221 
+00222 &#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;<emphasis role="keyword">static</emphasis>&#32;Finger&#32;makeRingFinger(<emphasis role="keywordtype">int</emphasis>&#32;frameId,&#32;<emphasis role="keywordtype">int</emphasis>&#32;handId,&#32;<emphasis role="keywordtype">bool</emphasis>&#32;isLeft)&#32;{
+00223 &#32;&#32;&#32;&#32;&#32;&#32;Vector&#32;position&#32;=&#32;<emphasis role="keyword">new</emphasis>&#32;Vector(-17.447168266f,&#32;4.0f,&#32;-17.2791440615f);
+00224 &#32;&#32;&#32;&#32;&#32;&#32;Vector&#32;forward&#32;=&#32;<emphasis role="keyword">new</emphasis>&#32;Vector(-0.121317937368f,&#32;-0.148340347175f,&#32;-0.981466810174f);
+00225 &#32;&#32;&#32;&#32;&#32;&#32;Vector&#32;up&#32;=&#32;<emphasis role="keyword">new</emphasis>&#32;Vector(-0.216910468316f,&#32;0.968834928679f,&#32;-0.119619102602f);
+00226 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordtype">float</emphasis>[]&#32;&#32;jointLengths&#32;=&#32;{58.00f,&#32;41.37f,&#32;25.65f,&#32;17.30f};
+00227 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;makeFinger(Finger.FingerType.TYPE_RING,&#32;position,&#32;forward,&#32;up,&#32;jointLengths,&#32;frameId,&#32;handId,&#32;handId&#32;+&#32;3,&#32;isLeft);
+00228 &#32;&#32;&#32;&#32;}
+00229 
+00230 &#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;<emphasis role="keyword">static</emphasis>&#32;Finger&#32;makePinky(<emphasis role="keywordtype">int</emphasis>&#32;frameId,&#32;<emphasis role="keywordtype">int</emphasis>&#32;handId,&#32;<emphasis role="keywordtype">bool</emphasis>&#32;isLeft)&#32;{
+00231 &#32;&#32;&#32;&#32;&#32;&#32;Vector&#32;position&#32;=&#32;<emphasis role="keyword">new</emphasis>&#32;Vector(-35.3374394559f,&#32;0.0f,&#32;-9.72871382551f);
+00232 &#32;&#32;&#32;&#32;&#32;&#32;Vector&#32;forward&#32;=&#32;<emphasis role="keyword">new</emphasis>&#32;Vector(-0.259328923438f,&#32;-0.105851224797f,&#32;-0.959970847306f);
+00233 &#32;&#32;&#32;&#32;&#32;&#32;Vector&#32;up&#32;=&#32;<emphasis role="keyword">new</emphasis>&#32;Vector(-0.353350220937f,&#32;0.935459475557f,&#32;-0.00769356576168f);
+00234 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordtype">float</emphasis>[]&#32;&#32;jointLengths&#32;=&#32;{53.69f,&#32;32.74f,&#32;18.11f,&#32;15.96f};
+00235 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;makeFinger(Finger.FingerType.TYPE_PINKY,&#32;position,&#32;forward,&#32;up,&#32;jointLengths,&#32;frameId,&#32;handId,&#32;handId&#32;+&#32;4,&#32;isLeft);
+00236 &#32;&#32;&#32;&#32;}
+00237 
+00238 
+00239 &#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;<emphasis role="keyword">static</emphasis>&#32;Finger&#32;makeFinger(Finger.FingerType&#32;name,&#32;Vector&#32;position,&#32;Vector&#32;forward,&#32;Vector&#32;up,&#32;<emphasis role="keywordtype">float</emphasis>[]&#32;jointLengths,
+00240 &#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordtype">int</emphasis>&#32;frameId,&#32;<emphasis role="keywordtype">int</emphasis>&#32;handId,&#32;<emphasis role="keywordtype">int</emphasis>&#32;fingerId,&#32;<emphasis role="keywordtype">bool</emphasis>&#32;isLeft)&#32;{
+00241 
+00242 &#32;&#32;&#32;&#32;&#32;&#32;forward&#32;=&#32;forward.Normalized;
+00243 &#32;&#32;&#32;&#32;&#32;&#32;up&#32;=&#32;up.Normalized;
+00244 
+00245 &#32;&#32;&#32;&#32;&#32;&#32;Bone[]&#32;bones&#32;=&#32;<emphasis role="keyword">new</emphasis>&#32;Bone[5];
+00246 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordtype">float</emphasis>&#32;proximalDistance&#32;=&#32;-jointLengths[0];
+00247 &#32;&#32;&#32;&#32;&#32;&#32;Bone&#32;metacarpal&#32;=&#32;makeBone&#32;(Bone.BoneType.TYPE_METACARPAL,&#32;position&#32;+&#32;forward&#32;*&#32;proximalDistance,&#32;jointLengths[0],&#32;8f,&#32;forward,&#32;up,&#32;isLeft);
+00248 &#32;&#32;&#32;&#32;&#32;&#32;proximalDistance&#32;+=&#32;jointLengths[0];
+00249 &#32;&#32;&#32;&#32;&#32;&#32;bones[0]&#32;=&#32;metacarpal;
+00250 
+00251 &#32;&#32;&#32;&#32;&#32;&#32;Bone&#32;proximal&#32;=&#32;makeBone&#32;(Bone.BoneType.TYPE_PROXIMAL,&#32;&#32;position&#32;+&#32;forward&#32;*&#32;proximalDistance,&#32;jointLengths[1],&#32;8f,&#32;forward,&#32;up,&#32;isLeft);
+00252 &#32;&#32;&#32;&#32;&#32;&#32;proximalDistance&#32;+=&#32;jointLengths[1];
+00253 &#32;&#32;&#32;&#32;&#32;&#32;bones[1]&#32;=&#32;proximal;
+00254 
+00255 &#32;&#32;&#32;&#32;&#32;&#32;Bone&#32;intermediate&#32;=&#32;makeBone&#32;(Bone.BoneType.TYPE_INTERMEDIATE,&#32;&#32;position&#32;+&#32;forward&#32;*&#32;proximalDistance,&#32;jointLengths[2],&#32;8f,&#32;forward,&#32;up,&#32;isLeft);
+00256 &#32;&#32;&#32;&#32;&#32;&#32;proximalDistance&#32;+=&#32;jointLengths[2];
+00257 &#32;&#32;&#32;&#32;&#32;&#32;bones[2]&#32;=&#32;intermediate;
+00258 
+00259 &#32;&#32;&#32;&#32;&#32;&#32;Bone&#32;distal&#32;=&#32;makeBone&#32;(Bone.BoneType.TYPE_DISTAL,&#32;&#32;position&#32;+&#32;forward&#32;*&#32;proximalDistance,&#32;jointLengths[3],&#32;8f,&#32;forward,&#32;up,&#32;isLeft);
+00260 &#32;&#32;&#32;&#32;&#32;&#32;bones[3]&#32;=&#32;distal;
+00261 
+00262 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;<emphasis role="keyword">new</emphasis>&#32;Finger(frameId,
+00263 &#32;&#32;&#32;&#32;&#32;&#32;handId,
+00264 &#32;&#32;&#32;&#32;&#32;&#32;fingerId,
+00265 &#32;&#32;&#32;&#32;&#32;&#32;0.0f,
+00266 &#32;&#32;&#32;&#32;&#32;&#32;distal.NextJoint,
+00267 &#32;&#32;&#32;&#32;&#32;&#32;forward,
+00268 &#32;&#32;&#32;&#32;&#32;&#32;8f,
+00269 &#32;&#32;&#32;&#32;&#32;&#32;jointLengths[1]&#32;+&#32;jointLengths[2]&#32;+&#32;jointLengths[3],
+00270 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">true</emphasis>,
+00271 &#32;&#32;&#32;&#32;&#32;&#32;name,
+00272 &#32;&#32;&#32;&#32;&#32;&#32;bones[0],
+00273 &#32;&#32;&#32;&#32;&#32;&#32;bones[1],
+00274 &#32;&#32;&#32;&#32;&#32;&#32;bones[2],
+00275 &#32;&#32;&#32;&#32;&#32;&#32;bones[3]);
+00276 &#32;&#32;&#32;&#32;}
+00277 
+00278 &#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;<emphasis role="keyword">static</emphasis>&#32;Bone&#32;makeBone(Bone.BoneType&#32;name,&#32;Vector&#32;proximalPosition,&#32;<emphasis role="keywordtype">float</emphasis>&#32;length,&#32;<emphasis role="keywordtype">float</emphasis>&#32;width,&#32;Vector&#32;direction,&#32;Vector&#32;up,&#32;<emphasis role="keywordtype">bool</emphasis>&#32;isLeft)&#32;{
+00279 
+00280 &#32;&#32;&#32;&#32;&#32;&#32;LeapQuaternion&#32;rotation&#32;=&#32;<link linkend="_namespace_unity_engine">UnityEngine</link>.Quaternion.LookRotation(-direction.ToVector3(),&#32;up.ToVector3()).ToLeapQuaternion();
+00281 
+00282 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;<emphasis role="keyword">new</emphasis>&#32;Bone(
+00283 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;proximalPosition,
+00284 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;proximalPosition&#32;+&#32;direction&#32;*&#32;length,
+00285 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;Vector.Lerp(proximalPosition,&#32;proximalPosition&#32;+&#32;direction&#32;*&#32;length,&#32;.5f),
+00286 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;direction,
+00287 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;length,
+00288 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;width,
+00289 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;name,
+00290 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;rotation);
+00291 &#32;&#32;&#32;&#32;}
+00292 
+00293 <emphasis role="preprocessor">&#32;&#32;&#32;&#32;#endregion</emphasis>
+00294 
+00295 &#32;&#32;}
+00296 
+00297 &#32;&#32;<emphasis role="comment">//&#32;Note:&#32;The&#32;fact&#32;that&#32;this&#32;class&#32;needs&#32;to&#32;exist&#32;is&#32;ridiculous</emphasis>
+00298 &#32;&#32;<emphasis role="comment">//&#32;TODO:&#32;Look&#32;into&#32;automatically&#32;returning&#32;things&#32;in&#32;Unity&#32;units?&#32;Would&#32;require&#32;changes</emphasis>
+00299 &#32;&#32;<emphasis role="comment">//&#32;for&#32;everything&#32;that&#32;uses&#32;the&#32;TestHandFactory.</emphasis>
+00300 &#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keyword">static</emphasis>&#32;<emphasis role="keyword">class&#32;</emphasis>LeapTestProviderExtensions&#32;{
+00301 
+00302 &#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keyword">static</emphasis>&#32;readonly&#32;<emphasis role="keywordtype">float</emphasis>&#32;MM_TO_M&#32;=&#32;1e-3f;
+00303 
+00304 &#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keyword">static</emphasis>&#32;LeapTransform&#32;GetLeapTransform(Vector3&#32;position,&#32;Quaternion&#32;rotation)&#32;{
+00305 &#32;&#32;&#32;&#32;&#32;&#32;Vector&#32;scale&#32;=&#32;<emphasis role="keyword">new</emphasis>&#32;Vector(MM_TO_M,&#32;MM_TO_M,&#32;MM_TO_M);&#32;<emphasis role="comment">//&#32;Leap&#32;units&#32;-&gt;&#32;Unity&#32;units.</emphasis>
+00306 &#32;&#32;&#32;&#32;&#32;&#32;LeapTransform&#32;transform&#32;=&#32;<emphasis role="keyword">new</emphasis>&#32;LeapTransform(position.ToVector(),&#32;rotation.ToLeapQuaternion(),&#32;scale);
+00307 &#32;&#32;&#32;&#32;&#32;&#32;transform.MirrorZ();&#32;<emphasis role="comment">//&#32;Unity&#32;is&#32;left&#32;handed.</emphasis>
+00308 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;transform;
+00309 &#32;&#32;&#32;&#32;}
+00310 
+00311 &#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keyword">static</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;TransformToUnityUnits(<emphasis role="keyword">this</emphasis>&#32;Hand&#32;hand)&#32;{
+00312 &#32;&#32;&#32;&#32;&#32;&#32;hand.Transform(GetLeapTransform(Vector3.zero,&#32;Quaternion.identity));
+00313 &#32;&#32;&#32;&#32;}
+00314 
+00315 &#32;&#32;}
+00316 
+00317 }
+</programlisting></section>

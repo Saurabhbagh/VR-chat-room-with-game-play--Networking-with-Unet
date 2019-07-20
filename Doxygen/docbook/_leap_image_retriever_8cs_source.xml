@@ -1,0 +1,357 @@
+<?xml version='1.0' encoding='UTF-8' standalone='no'?>
+<section xmlns="http://docbook.org/ns/docbook" version="5.0" xmlns:xlink="http://www.w3.org/1999/xlink" xml:id="__leap_image_retriever_8cs_source">
+<title>LeapImageRetriever.cs</title>
+<indexterm><primary>O:/GitHUBMINIPRoject/Assets/LeapMotion/Core/Scripts/LeapImageRetriever.cs</primary></indexterm>
+<programlisting>00001 <emphasis role="comment">/******************************************************************************</emphasis>
+00002 <emphasis role="comment">&#32;*&#32;Copyright&#32;(C)&#32;Leap&#32;Motion,&#32;Inc.&#32;2011-2018.&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;*</emphasis>
+00003 <emphasis role="comment">&#32;*&#32;Leap&#32;Motion&#32;proprietary&#32;and&#32;confidential.&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;*</emphasis>
+00004 <emphasis role="comment">&#32;*&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;*</emphasis>
+00005 <emphasis role="comment">&#32;*&#32;Use&#32;subject&#32;to&#32;the&#32;terms&#32;of&#32;the&#32;Leap&#32;Motion&#32;SDK&#32;Agreement&#32;available&#32;at&#32;&#32;&#32;&#32;&#32;*</emphasis>
+00006 <emphasis role="comment">&#32;*&#32;https://developer.leapmotion.com/sdk_agreement,&#32;or&#32;another&#32;agreement&#32;&#32;&#32;&#32;&#32;&#32;&#32;*</emphasis>
+00007 <emphasis role="comment">&#32;*&#32;between&#32;Leap&#32;Motion&#32;and&#32;you,&#32;your&#32;company&#32;or&#32;other&#32;organization.&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;*</emphasis>
+00008 <emphasis role="comment">&#32;******************************************************************************/</emphasis>
+00009 
+00010 <emphasis role="keyword">using</emphasis>&#32;<link linkend="__balloon_8cs_1a7d67e097df9376eb709b6a23aa3c7d23">UnityEngine</link>;
+00011 <emphasis role="keyword">using</emphasis>&#32;<link linkend="_namespace_unity_engine">UnityEngine</link>.Serialization;
+00012 <emphasis role="keyword">using</emphasis>&#32;System;
+00013 <emphasis role="keyword">using</emphasis>&#32;System.Collections;
+00014 <emphasis role="keyword">using</emphasis>&#32;<link linkend="_namespace_leap">Leap</link>.<link linkend="_namespace_leap_1_1_unity">Unity</link>.<link linkend="_namespace_leap_1_1_unity_1_1_query">Query</link>;
+00015 
+00016 <emphasis role="keyword">namespace&#32;</emphasis><link linkend="_namespace_leap_1_1_unity">Leap.Unity</link>&#32;{
+00017 
+00025 &#32;&#32;[RequireComponent(typeof(Camera))]
+00026 &#32;&#32;[RequireComponent(typeof(LeapServiceProvider))]
+<anchor xml:id="__leap_image_retriever_8cs_source_1l00027"/><link linkend="_class_leap_1_1_unity_1_1_leap_image_retriever">00027</link> &#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keyword">class&#32;</emphasis><link linkend="_class_leap_1_1_unity_1_1_leap_image_retriever">LeapImageRetriever</link>&#32;:&#32;MonoBehaviour&#32;{
+<anchor xml:id="__leap_image_retriever_8cs_source_1l00028"/><link linkend="_class_leap_1_1_unity_1_1_leap_image_retriever_1ac09370f0447bb55415e5751df19c86c7">00028</link> &#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keyword">const</emphasis>&#32;<emphasis role="keywordtype">string</emphasis>&#32;<link linkend="_class_leap_1_1_unity_1_1_leap_image_retriever_1ac09370f0447bb55415e5751df19c86c7">GLOBAL_COLOR_SPACE_GAMMA_NAME</link>&#32;=&#32;<emphasis role="stringliteral">&quot;_LeapGlobalColorSpaceGamma&quot;</emphasis>;
+<anchor xml:id="__leap_image_retriever_8cs_source_1l00029"/><link linkend="_class_leap_1_1_unity_1_1_leap_image_retriever_1a1f0ad619c8e20f2376e8f4e46f77a718">00029</link> &#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keyword">const</emphasis>&#32;<emphasis role="keywordtype">string</emphasis>&#32;<link linkend="_class_leap_1_1_unity_1_1_leap_image_retriever_1a1f0ad619c8e20f2376e8f4e46f77a718">GLOBAL_GAMMA_CORRECTION_EXPONENT_NAME</link>&#32;=&#32;<emphasis role="stringliteral">&quot;_LeapGlobalGammaCorrectionExponent&quot;</emphasis>;
+<anchor xml:id="__leap_image_retriever_8cs_source_1l00030"/><link linkend="_class_leap_1_1_unity_1_1_leap_image_retriever_1a85dba89c859594bd3eaf3af89bc8e66f">00030</link> &#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keyword">const</emphasis>&#32;<emphasis role="keywordtype">string</emphasis>&#32;<link linkend="_class_leap_1_1_unity_1_1_leap_image_retriever_1a85dba89c859594bd3eaf3af89bc8e66f">GLOBAL_CAMERA_PROJECTION_NAME</link>&#32;=&#32;<emphasis role="stringliteral">&quot;_LeapGlobalProjection&quot;</emphasis>;
+<anchor xml:id="__leap_image_retriever_8cs_source_1l00031"/><link linkend="_class_leap_1_1_unity_1_1_leap_image_retriever_1a7e3710c0ed8c4f9d0247a562e61cf69a">00031</link> &#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keyword">const</emphasis>&#32;<emphasis role="keywordtype">int</emphasis>&#32;<link linkend="_class_leap_1_1_unity_1_1_leap_image_retriever_1a7e3710c0ed8c4f9d0247a562e61cf69a">IMAGE_WARNING_WAIT</link>&#32;=&#32;10;
+<anchor xml:id="__leap_image_retriever_8cs_source_1l00032"/><link linkend="_class_leap_1_1_unity_1_1_leap_image_retriever_1a0731688e782d666ab36ad04bde8dd774">00032</link> &#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keyword">const</emphasis>&#32;<emphasis role="keywordtype">int</emphasis>&#32;<link linkend="_class_leap_1_1_unity_1_1_leap_image_retriever_1a0731688e782d666ab36ad04bde8dd774">LEFT_IMAGE_INDEX</link>&#32;=&#32;0;
+<anchor xml:id="__leap_image_retriever_8cs_source_1l00033"/><link linkend="_class_leap_1_1_unity_1_1_leap_image_retriever_1a112a0969ae33b316a6c9652db6de1a69">00033</link> &#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keyword">const</emphasis>&#32;<emphasis role="keywordtype">int</emphasis>&#32;<link linkend="_class_leap_1_1_unity_1_1_leap_image_retriever_1a112a0969ae33b316a6c9652db6de1a69">RIGHT_IMAGE_INDEX</link>&#32;=&#32;1;
+<anchor xml:id="__leap_image_retriever_8cs_source_1l00034"/><link linkend="_class_leap_1_1_unity_1_1_leap_image_retriever_1a4c831095b914ffd0b0d7508886a53778">00034</link> &#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keyword">const</emphasis>&#32;<emphasis role="keywordtype">float</emphasis>&#32;<link linkend="_class_leap_1_1_unity_1_1_leap_image_retriever_1a4c831095b914ffd0b0d7508886a53778">IMAGE_SETTING_POLL_RATE</link>&#32;=&#32;2.0f;
+00035 
+00036 &#32;&#32;&#32;&#32;[SerializeField]
+00037 &#32;&#32;&#32;&#32;[FormerlySerializedAs(<emphasis role="stringliteral">&quot;gammaCorrection&quot;</emphasis>)]
+00038 &#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;<emphasis role="keywordtype">float</emphasis>&#32;_gammaCorrection&#32;=&#32;1.0f;
+00039 
+00040 &#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;<link linkend="_class_leap_1_1_unity_1_1_leap_service_provider">LeapServiceProvider</link>&#32;_provider;
+00041 &#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;<link linkend="_class_leap_1_1_unity_1_1_leap_image_retriever_1_1_eye_texture_data">EyeTextureData</link>&#32;_eyeTextureData&#32;=&#32;<emphasis role="keyword">new</emphasis>&#32;<link linkend="_class_leap_1_1_unity_1_1_leap_image_retriever_1_1_eye_texture_data">EyeTextureData</link>();
+00042 
+00043 &#32;&#32;&#32;&#32;<emphasis role="comment">//Image&#32;that&#32;we&#32;have&#32;requested&#32;from&#32;the&#32;service.&#32;&#32;Are&#32;requested&#32;in&#32;Update&#32;and&#32;retrieved&#32;in&#32;OnPreRender</emphasis>
+<anchor xml:id="__leap_image_retriever_8cs_source_1l00044"/><link linkend="_class_leap_1_1_unity_1_1_leap_image_retriever_1a7001f70802cdb736676edb6696fae43b">00044</link> &#32;&#32;&#32;&#32;<emphasis role="keyword">protected</emphasis>&#32;<link linkend="_class_leap_1_1_unity_1_1_produce_consume_buffer">ProduceConsumeBuffer&lt;Image&gt;</link>&#32;<link linkend="_class_leap_1_1_unity_1_1_leap_image_retriever_1a7001f70802cdb736676edb6696fae43b">_imageQueue</link>&#32;=&#32;<emphasis role="keyword">new</emphasis>&#32;<link linkend="_class_leap_1_1_unity_1_1_produce_consume_buffer">ProduceConsumeBuffer&lt;Image&gt;</link>(32);
+<anchor xml:id="__leap_image_retriever_8cs_source_1l00045"/><link linkend="_class_leap_1_1_unity_1_1_leap_image_retriever_1a37dadc2f80f08889282e75bf2369eac9">00045</link> &#32;&#32;&#32;&#32;<emphasis role="keyword">protected</emphasis>&#32;<link linkend="_class_leap_1_1_image">Image</link>&#32;<link linkend="_class_leap_1_1_unity_1_1_leap_image_retriever_1a37dadc2f80f08889282e75bf2369eac9">_currentImage</link>&#32;=&#32;<emphasis role="keyword">null</emphasis>;
+00046 
+<anchor xml:id="__leap_image_retriever_8cs_source_1l00047"/><link linkend="_class_leap_1_1_unity_1_1_leap_image_retriever_1af6a89e17fa19a47fe009bf2b008e111a">00047</link> &#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<link linkend="_class_leap_1_1_unity_1_1_leap_image_retriever_1_1_eye_texture_data">EyeTextureData</link>&#32;<link linkend="_class_leap_1_1_unity_1_1_leap_image_retriever_1af6a89e17fa19a47fe009bf2b008e111a">TextureData</link>&#32;{
+00048 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">get</emphasis>&#32;{
+00049 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;_eyeTextureData;
+00050 &#32;&#32;&#32;&#32;&#32;&#32;}
+00051 &#32;&#32;&#32;&#32;}
+00052 
+<anchor xml:id="__leap_image_retriever_8cs_source_1l00053"/><link linkend="_class_leap_1_1_unity_1_1_leap_image_retriever_1_1_leap_texture_data">00053</link> &#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keyword">class&#32;</emphasis><link linkend="_class_leap_1_1_unity_1_1_leap_image_retriever_1_1_leap_texture_data">LeapTextureData</link>&#32;{
+00054 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;Texture2D&#32;_combinedTexture&#32;=&#32;<emphasis role="keyword">null</emphasis>;
+00055 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;<emphasis role="keywordtype">byte</emphasis>[]&#32;_intermediateArray&#32;=&#32;<emphasis role="keyword">null</emphasis>;
+00056 
+<anchor xml:id="__leap_image_retriever_8cs_source_1l00057"/><link linkend="_class_leap_1_1_unity_1_1_leap_image_retriever_1_1_leap_texture_data_1ae8cdced92ef3281e951cfa787fd40c80">00057</link> &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;Texture2D&#32;<link linkend="_class_leap_1_1_unity_1_1_leap_image_retriever_1_1_leap_texture_data_1ae8cdced92ef3281e951cfa787fd40c80">CombinedTexture</link>&#32;{
+00058 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">get</emphasis>&#32;{
+00059 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;_combinedTexture;
+00060 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00061 &#32;&#32;&#32;&#32;&#32;&#32;}
+00062 
+<anchor xml:id="__leap_image_retriever_8cs_source_1l00063"/><link linkend="_class_leap_1_1_unity_1_1_leap_image_retriever_1_1_leap_texture_data_1ae2a3b82b80076536da86b22001a1fa42">00063</link> &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keywordtype">bool</emphasis>&#32;<link linkend="_class_leap_1_1_unity_1_1_leap_image_retriever_1_1_leap_texture_data_1ae2a3b82b80076536da86b22001a1fa42">CheckStale</link>(<link linkend="_class_leap_1_1_image">Image</link>&#32;image)&#32;{
+00064 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(_combinedTexture&#32;==&#32;<emphasis role="keyword">null</emphasis>&#32;||&#32;_intermediateArray&#32;==&#32;<emphasis role="keyword">null</emphasis>)&#32;{
+00065 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;<emphasis role="keyword">true</emphasis>;
+00066 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00067 
+00068 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(image.<link linkend="_class_leap_1_1_image_1a66b413ab158bf69102be0a58056a34b6">Width</link>&#32;!=&#32;_combinedTexture.width&#32;||&#32;image.<link linkend="_class_leap_1_1_image_1a00971100533a392e69ed78069340954b">Height</link>&#32;*&#32;2&#32;!=&#32;_combinedTexture.height)&#32;{
+00069 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;<emphasis role="keyword">true</emphasis>;
+00070 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00071 
+00072 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(_combinedTexture.format&#32;!=&#32;getTextureFormat(image))&#32;{
+00073 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;<emphasis role="keyword">true</emphasis>;
+00074 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00075 
+00076 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;<emphasis role="keyword">false</emphasis>;
+00077 &#32;&#32;&#32;&#32;&#32;&#32;}
+00078 
+<anchor xml:id="__leap_image_retriever_8cs_source_1l00079"/><link linkend="_class_leap_1_1_unity_1_1_leap_image_retriever_1_1_leap_texture_data_1a35667966b1c45d70e49426c298e0e97a">00079</link> &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;<link linkend="_class_leap_1_1_unity_1_1_leap_image_retriever_1_1_leap_texture_data_1a35667966b1c45d70e49426c298e0e97a">Reconstruct</link>(<link linkend="_class_leap_1_1_image">Image</link>&#32;image,&#32;<emphasis role="keywordtype">string</emphasis>&#32;globalShaderName,&#32;<emphasis role="keywordtype">string</emphasis>&#32;pixelSizeName)&#32;{
+00080 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordtype">int</emphasis>&#32;combinedWidth&#32;=&#32;image.<link linkend="_class_leap_1_1_image_1a66b413ab158bf69102be0a58056a34b6">Width</link>;
+00081 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordtype">int</emphasis>&#32;combinedHeight&#32;=&#32;image.<link linkend="_class_leap_1_1_image_1a00971100533a392e69ed78069340954b">Height</link>&#32;*&#32;2;
+00082 
+00083 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;TextureFormat&#32;format&#32;=&#32;getTextureFormat(image);
+00084 
+00085 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(_combinedTexture&#32;!=&#32;<emphasis role="keyword">null</emphasis>)&#32;{
+00086 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;DestroyImmediate(_combinedTexture);
+00087 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00088 
+00089 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;_combinedTexture&#32;=&#32;<emphasis role="keyword">new</emphasis>&#32;Texture2D(combinedWidth,&#32;combinedHeight,&#32;format,&#32;<emphasis role="keyword">false</emphasis>,&#32;<emphasis role="keyword">true</emphasis>);
+00090 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;_combinedTexture.wrapMode&#32;=&#32;TextureWrapMode.Clamp;
+00091 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;_combinedTexture.filterMode&#32;=&#32;FilterMode.Bilinear;
+00092 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;_combinedTexture.name&#32;=&#32;globalShaderName;
+00093 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;_combinedTexture.hideFlags&#32;=&#32;HideFlags.DontSave;
+00094 
+00095 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;_intermediateArray&#32;=&#32;<emphasis role="keyword">new</emphasis>&#32;<emphasis role="keywordtype">byte</emphasis>[combinedWidth&#32;*&#32;combinedHeight&#32;*&#32;bytesPerPixel(format)];
+00096 
+00097 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;Shader.SetGlobalTexture(globalShaderName,&#32;_combinedTexture);
+00098 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;Shader.SetGlobalVector(pixelSizeName,&#32;<emphasis role="keyword">new</emphasis>&#32;Vector2(1.0f&#32;/&#32;image.<link linkend="_class_leap_1_1_image_1a66b413ab158bf69102be0a58056a34b6">Width</link>,&#32;1.0f&#32;/&#32;image.<link linkend="_class_leap_1_1_image_1a00971100533a392e69ed78069340954b">Height</link>));
+00099 &#32;&#32;&#32;&#32;&#32;&#32;}
+00100 
+<anchor xml:id="__leap_image_retriever_8cs_source_1l00101"/><link linkend="_class_leap_1_1_unity_1_1_leap_image_retriever_1_1_leap_texture_data_1a7a6260ccdc4ca472efb67a37184c6cd3">00101</link> &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;<link linkend="_class_leap_1_1_unity_1_1_leap_image_retriever_1_1_leap_texture_data_1a7a6260ccdc4ca472efb67a37184c6cd3">UpdateTexture</link>(<link linkend="_class_leap_1_1_image">Image</link>&#32;image)&#32;{
+00102 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;_combinedTexture.LoadRawTextureData(image.<link linkend="_class_leap_1_1_image_1a13a2744f47a3bb324d08dca19d971f17">Data</link>(<link linkend="_class_leap_1_1_image">Image</link>.<link linkend="_class_leap_1_1_image_1a28310e43e0f2d7f7117e1b45330bdc38">CameraType</link>.LEFT));
+00103 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;_combinedTexture.Apply();
+00104 &#32;&#32;&#32;&#32;&#32;&#32;}
+00105 
+00106 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;TextureFormat&#32;getTextureFormat(<link linkend="_class_leap_1_1_image">Image</link>&#32;image)&#32;{
+00107 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">switch</emphasis>&#32;(image.<link linkend="_class_leap_1_1_image_1a87defbae65a250428b3b938b9ff7ae22">Format</link>)&#32;{
+00108 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">case</emphasis>&#32;<link linkend="_class_leap_1_1_image">Image</link>.<link linkend="_class_leap_1_1_image_1acefbe5d3803afc9f433a6e3856d242d1">FormatType</link>.INFRARED:
+00109 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;TextureFormat.Alpha8;
+00110 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">default</emphasis>:
+00111 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">throw</emphasis>&#32;<emphasis role="keyword">new</emphasis>&#32;Exception(<emphasis role="stringliteral">&quot;Unexpected&#32;image&#32;format&#32;&quot;</emphasis>&#32;+&#32;image.<link linkend="_class_leap_1_1_image_1a87defbae65a250428b3b938b9ff7ae22">Format</link>&#32;+&#32;<emphasis role="stringliteral">&quot;!&quot;</emphasis>);
+00112 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00113 &#32;&#32;&#32;&#32;&#32;&#32;}
+00114 
+00115 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;<emphasis role="keywordtype">int</emphasis>&#32;bytesPerPixel(TextureFormat&#32;format)&#32;{
+00116 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">switch</emphasis>&#32;(format)&#32;{
+00117 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">case</emphasis>&#32;TextureFormat.Alpha8:
+00118 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;1;
+00119 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">default</emphasis>:
+00120 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">throw</emphasis>&#32;<emphasis role="keyword">new</emphasis>&#32;Exception(<emphasis role="stringliteral">&quot;Unexpected&#32;texture&#32;format&#32;&quot;</emphasis>&#32;+&#32;format);
+00121 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00122 &#32;&#32;&#32;&#32;&#32;&#32;}
+00123 &#32;&#32;&#32;&#32;}
+00124 
+<anchor xml:id="__leap_image_retriever_8cs_source_1l00125"/><link linkend="_class_leap_1_1_unity_1_1_leap_image_retriever_1_1_leap_distortion_data">00125</link> &#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keyword">class&#32;</emphasis><link linkend="_class_leap_1_1_unity_1_1_leap_image_retriever_1_1_leap_distortion_data">LeapDistortionData</link>&#32;{
+00126 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;Texture2D&#32;_combinedTexture&#32;=&#32;<emphasis role="keyword">null</emphasis>;
+00127 
+<anchor xml:id="__leap_image_retriever_8cs_source_1l00128"/><link linkend="_class_leap_1_1_unity_1_1_leap_image_retriever_1_1_leap_distortion_data_1a70f9b9095b4ea4ca2634e29d7a41b722">00128</link> &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;Texture2D&#32;<link linkend="_class_leap_1_1_unity_1_1_leap_image_retriever_1_1_leap_distortion_data_1a70f9b9095b4ea4ca2634e29d7a41b722">CombinedTexture</link>&#32;{
+00129 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">get</emphasis>&#32;{
+00130 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;_combinedTexture;
+00131 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00132 &#32;&#32;&#32;&#32;&#32;&#32;}
+00133 
+<anchor xml:id="__leap_image_retriever_8cs_source_1l00134"/><link linkend="_class_leap_1_1_unity_1_1_leap_image_retriever_1_1_leap_distortion_data_1a8774adce171f0e03d584a8e23d2a03b3">00134</link> &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keywordtype">bool</emphasis>&#32;<link linkend="_class_leap_1_1_unity_1_1_leap_image_retriever_1_1_leap_distortion_data_1a8774adce171f0e03d584a8e23d2a03b3">CheckStale</link>()&#32;{
+00135 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;_combinedTexture&#32;==&#32;<emphasis role="keyword">null</emphasis>;
+00136 &#32;&#32;&#32;&#32;&#32;&#32;}
+00137 
+<anchor xml:id="__leap_image_retriever_8cs_source_1l00138"/><link linkend="_class_leap_1_1_unity_1_1_leap_image_retriever_1_1_leap_distortion_data_1a43ed92a4bbf4858983367f3731e8cd48">00138</link> &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;<link linkend="_class_leap_1_1_unity_1_1_leap_image_retriever_1_1_leap_distortion_data_1a43ed92a4bbf4858983367f3731e8cd48">Reconstruct</link>(<link linkend="_class_leap_1_1_image">Image</link>&#32;image,&#32;<emphasis role="keywordtype">string</emphasis>&#32;shaderName)&#32;{
+00139 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordtype">int</emphasis>&#32;combinedWidth&#32;=&#32;image.<link linkend="_class_leap_1_1_image_1a543d13baf55f8184ee5df4d8be7574fe">DistortionWidth</link>&#32;/&#32;2;
+00140 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordtype">int</emphasis>&#32;combinedHeight&#32;=&#32;image.<link linkend="_class_leap_1_1_image_1a7221f670387ea10e1047a71b251000ea">DistortionHeight</link>&#32;*&#32;2;
+00141 
+00142 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(_combinedTexture&#32;!=&#32;<emphasis role="keyword">null</emphasis>)&#32;{
+00143 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;DestroyImmediate(_combinedTexture);
+00144 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00145 
+00146 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;Color32[]&#32;colorArray&#32;=&#32;<emphasis role="keyword">new</emphasis>&#32;Color32[combinedWidth&#32;*&#32;combinedHeight];
+00147 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;_combinedTexture&#32;=&#32;<emphasis role="keyword">new</emphasis>&#32;Texture2D(combinedWidth,&#32;combinedHeight,&#32;TextureFormat.RGBA32,&#32;<emphasis role="keyword">false</emphasis>,&#32;<emphasis role="keyword">true</emphasis>);
+00148 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;_combinedTexture.filterMode&#32;=&#32;FilterMode.Bilinear;
+00149 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;_combinedTexture.wrapMode&#32;=&#32;TextureWrapMode.Clamp;
+00150 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;_combinedTexture.hideFlags&#32;=&#32;HideFlags.DontSave;
+00151 
+00152 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;addDistortionData(image,&#32;colorArray,&#32;0);
+00153 
+00154 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;_combinedTexture.SetPixels32(colorArray);
+00155 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;_combinedTexture.Apply();
+00156 
+00157 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;Shader.SetGlobalTexture(shaderName,&#32;_combinedTexture);
+00158 &#32;&#32;&#32;&#32;&#32;&#32;}
+00159 
+00160 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;addDistortionData(<link linkend="_class_leap_1_1_image">Image</link>&#32;image,&#32;Color32[]&#32;colors,&#32;<emphasis role="keywordtype">int</emphasis>&#32;startIndex)&#32;{
+00161 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordtype">float</emphasis>[]&#32;distortionData&#32;=&#32;image.<link linkend="_class_leap_1_1_image_1a5bf2883749b04f3e5644fc68a418add4">Distortion</link>(<link linkend="_class_leap_1_1_image">Image</link>.<link linkend="_class_leap_1_1_image_1a28310e43e0f2d7f7117e1b45330bdc38">CameraType</link>.LEFT).
+00162 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_struct_leap_1_1_unity_1_1_query_1_1_query">Query</link>().
+00163 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;Concat(image.<link linkend="_class_leap_1_1_image_1a5bf2883749b04f3e5644fc68a418add4">Distortion</link>(<link linkend="_class_leap_1_1_image">Image</link>.<link linkend="_class_leap_1_1_image_1a28310e43e0f2d7f7117e1b45330bdc38">CameraType</link>.RIGHT)).
+00164 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;ToArray();
+00165 
+00166 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">for</emphasis>&#32;(<emphasis role="keywordtype">int</emphasis>&#32;i&#32;=&#32;0;&#32;i&#32;&lt;&#32;distortionData.Length;&#32;i&#32;+=&#32;2)&#32;{
+00167 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordtype">byte</emphasis>&#32;b0,&#32;b1,&#32;b2,&#32;b3;
+00168 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;encodeFloat(distortionData[i],&#32;out&#32;b0,&#32;out&#32;b1);
+00169 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;encodeFloat(distortionData[i&#32;+&#32;1],&#32;out&#32;b2,&#32;out&#32;b3);
+00170 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;colors[i&#32;/&#32;2&#32;+&#32;startIndex]&#32;=&#32;<emphasis role="keyword">new</emphasis>&#32;Color32(b0,&#32;b1,&#32;b2,&#32;b3);
+00171 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00172 &#32;&#32;&#32;&#32;&#32;&#32;}
+00173 
+00174 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;encodeFloat(<emphasis role="keywordtype">float</emphasis>&#32;value,&#32;out&#32;<emphasis role="keywordtype">byte</emphasis>&#32;byte0,&#32;out&#32;<emphasis role="keywordtype">byte</emphasis>&#32;byte1)&#32;{
+00175 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;The&#32;distortion&#32;range&#32;is&#32;-0.6&#32;to&#32;+1.7.&#32;Normalize&#32;to&#32;range&#32;[0..1).</emphasis>
+00176 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;value&#32;=&#32;(value&#32;+&#32;0.6f)&#32;/&#32;2.3f;
+00177 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordtype">float</emphasis>&#32;enc_0&#32;=&#32;value;
+00178 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordtype">float</emphasis>&#32;enc_1&#32;=&#32;value&#32;*&#32;255.0f;
+00179 
+00180 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;enc_0&#32;=&#32;enc_0&#32;-&#32;(int)enc_0;
+00181 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;enc_1&#32;=&#32;enc_1&#32;-&#32;(int)enc_1;
+00182 
+00183 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;enc_0&#32;-=&#32;1.0f&#32;/&#32;255.0f&#32;*&#32;enc_1;
+00184 
+00185 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;byte0&#32;=&#32;(byte)(enc_0&#32;*&#32;256.0f);
+00186 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;byte1&#32;=&#32;(byte)(enc_1&#32;*&#32;256.0f);
+00187 &#32;&#32;&#32;&#32;&#32;&#32;}
+00188 &#32;&#32;&#32;&#32;}
+00189 
+<anchor xml:id="__leap_image_retriever_8cs_source_1l00190"/><link linkend="_class_leap_1_1_unity_1_1_leap_image_retriever_1_1_eye_texture_data">00190</link> &#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keyword">class&#32;</emphasis><link linkend="_class_leap_1_1_unity_1_1_leap_image_retriever_1_1_eye_texture_data">EyeTextureData</link>&#32;{
+00191 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;<emphasis role="keyword">const</emphasis>&#32;<emphasis role="keywordtype">string</emphasis>&#32;GLOBAL_RAW_TEXTURE_NAME&#32;=&#32;<emphasis role="stringliteral">&quot;_LeapGlobalRawTexture&quot;</emphasis>;
+00192 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;<emphasis role="keyword">const</emphasis>&#32;<emphasis role="keywordtype">string</emphasis>&#32;GLOBAL_DISTORTION_TEXTURE_NAME&#32;=&#32;<emphasis role="stringliteral">&quot;_LeapGlobalDistortion&quot;</emphasis>;
+00193 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;<emphasis role="keyword">const</emphasis>&#32;<emphasis role="keywordtype">string</emphasis>&#32;GLOBAL_RAW_PIXEL_SIZE_NAME&#32;=&#32;<emphasis role="stringliteral">&quot;_LeapGlobalRawPixelSize&quot;</emphasis>;
+00194 
+<anchor xml:id="__leap_image_retriever_8cs_source_1l00195"/><link linkend="_class_leap_1_1_unity_1_1_leap_image_retriever_1_1_eye_texture_data_1af1d86d2f2714d72b92ef33feed2d4a14">00195</link> &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;readonly&#32;<link linkend="_class_leap_1_1_unity_1_1_leap_image_retriever_1_1_leap_texture_data">LeapTextureData</link>&#32;<link linkend="_class_leap_1_1_unity_1_1_leap_image_retriever_1_1_eye_texture_data_1af1d86d2f2714d72b92ef33feed2d4a14">TextureData</link>;
+<anchor xml:id="__leap_image_retriever_8cs_source_1l00196"/><link linkend="_class_leap_1_1_unity_1_1_leap_image_retriever_1_1_eye_texture_data_1af86473848f26141673ed248da09636d5">00196</link> &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;readonly&#32;<link linkend="_class_leap_1_1_unity_1_1_leap_image_retriever_1_1_leap_distortion_data">LeapDistortionData</link>&#32;<link linkend="_class_leap_1_1_unity_1_1_leap_image_retriever_1_1_eye_texture_data_1af86473848f26141673ed248da09636d5">Distortion</link>;
+00197 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;<emphasis role="keywordtype">bool</emphasis>&#32;_isStale&#32;=&#32;<emphasis role="keyword">false</emphasis>;
+00198 
+<anchor xml:id="__leap_image_retriever_8cs_source_1l00199"/><link linkend="_class_leap_1_1_unity_1_1_leap_image_retriever_1_1_eye_texture_data_1ade1d4ec6e9d6b0ebb4aa394ff415af35">00199</link> &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keyword">static</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;<link linkend="_class_leap_1_1_unity_1_1_leap_image_retriever_1_1_eye_texture_data_1ade1d4ec6e9d6b0ebb4aa394ff415af35">ResetGlobalShaderValues</link>()&#32;{
+00200 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;Texture2D&#32;empty&#32;=&#32;<emphasis role="keyword">new</emphasis>&#32;Texture2D(1,&#32;1,&#32;TextureFormat.ARGB32,&#32;<emphasis role="keyword">false</emphasis>,&#32;<emphasis role="keyword">false</emphasis>);
+00201 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;empty.name&#32;=&#32;<emphasis role="stringliteral">&quot;EmptyTexture&quot;</emphasis>;
+00202 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;empty.hideFlags&#32;=&#32;HideFlags.DontSave;
+00203 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;empty.SetPixel(0,&#32;0,&#32;<emphasis role="keyword">new</emphasis>&#32;Color(0,&#32;0,&#32;0,&#32;0));
+00204 
+00205 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;Shader.SetGlobalTexture(GLOBAL_RAW_TEXTURE_NAME,&#32;empty);
+00206 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;Shader.SetGlobalTexture(GLOBAL_DISTORTION_TEXTURE_NAME,&#32;empty);
+00207 &#32;&#32;&#32;&#32;&#32;&#32;}
+00208 
+<anchor xml:id="__leap_image_retriever_8cs_source_1l00209"/><link linkend="_class_leap_1_1_unity_1_1_leap_image_retriever_1_1_eye_texture_data_1a0e0cda447dce9a396814be0bd1903c32">00209</link> &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<link linkend="_class_leap_1_1_unity_1_1_leap_image_retriever_1_1_eye_texture_data_1a0e0cda447dce9a396814be0bd1903c32">EyeTextureData</link>()&#32;{
+00210 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_leap_1_1_unity_1_1_leap_image_retriever_1_1_eye_texture_data_1af1d86d2f2714d72b92ef33feed2d4a14">TextureData</link>&#32;=&#32;<emphasis role="keyword">new</emphasis>&#32;<link linkend="_class_leap_1_1_unity_1_1_leap_image_retriever_1_1_leap_texture_data">LeapTextureData</link>();
+00211 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_leap_1_1_unity_1_1_leap_image_retriever_1_1_eye_texture_data_1af86473848f26141673ed248da09636d5">Distortion</link>&#32;=&#32;<emphasis role="keyword">new</emphasis>&#32;<link linkend="_class_leap_1_1_unity_1_1_leap_image_retriever_1_1_leap_distortion_data">LeapDistortionData</link>();
+00212 &#32;&#32;&#32;&#32;&#32;&#32;}
+00213 
+<anchor xml:id="__leap_image_retriever_8cs_source_1l00214"/><link linkend="_class_leap_1_1_unity_1_1_leap_image_retriever_1_1_eye_texture_data_1a06df67c9881e8f29146403560a99c877">00214</link> &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keywordtype">bool</emphasis>&#32;<link linkend="_class_leap_1_1_unity_1_1_leap_image_retriever_1_1_eye_texture_data_1a06df67c9881e8f29146403560a99c877">CheckStale</link>(<link linkend="_class_leap_1_1_image">Image</link>&#32;image)&#32;{
+00215 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;<link linkend="_class_leap_1_1_unity_1_1_leap_image_retriever_1_1_eye_texture_data_1af1d86d2f2714d72b92ef33feed2d4a14">TextureData</link>.<link linkend="_class_leap_1_1_unity_1_1_leap_image_retriever_1_1_leap_texture_data_1ae2a3b82b80076536da86b22001a1fa42">CheckStale</link>(image)&#32;||
+00216 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_leap_1_1_unity_1_1_leap_image_retriever_1_1_eye_texture_data_1af86473848f26141673ed248da09636d5">Distortion</link>.<link linkend="_class_leap_1_1_unity_1_1_leap_image_retriever_1_1_leap_distortion_data_1a8774adce171f0e03d584a8e23d2a03b3">CheckStale</link>()&#32;||
+00217 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;_isStale;
+00218 &#32;&#32;&#32;&#32;&#32;&#32;}
+00219 
+<anchor xml:id="__leap_image_retriever_8cs_source_1l00220"/><link linkend="_class_leap_1_1_unity_1_1_leap_image_retriever_1_1_eye_texture_data_1a1810624815db23fb176b37c27873d7c6">00220</link> &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;<link linkend="_class_leap_1_1_unity_1_1_leap_image_retriever_1_1_eye_texture_data_1a1810624815db23fb176b37c27873d7c6">MarkStale</link>()&#32;{
+00221 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;_isStale&#32;=&#32;<emphasis role="keyword">true</emphasis>;
+00222 &#32;&#32;&#32;&#32;&#32;&#32;}
+00223 
+<anchor xml:id="__leap_image_retriever_8cs_source_1l00224"/><link linkend="_class_leap_1_1_unity_1_1_leap_image_retriever_1_1_eye_texture_data_1a3676c856cf9c84a9e88e73739d1ffeac">00224</link> &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;<link linkend="_class_leap_1_1_unity_1_1_leap_image_retriever_1_1_eye_texture_data_1a3676c856cf9c84a9e88e73739d1ffeac">Reconstruct</link>(<link linkend="_class_leap_1_1_image">Image</link>&#32;image)&#32;{
+00225 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_leap_1_1_unity_1_1_leap_image_retriever_1_1_eye_texture_data_1af1d86d2f2714d72b92ef33feed2d4a14">TextureData</link>.<link linkend="_class_leap_1_1_unity_1_1_leap_image_retriever_1_1_leap_texture_data_1a35667966b1c45d70e49426c298e0e97a">Reconstruct</link>(image,&#32;GLOBAL_RAW_TEXTURE_NAME,&#32;GLOBAL_RAW_PIXEL_SIZE_NAME);
+00226 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_leap_1_1_unity_1_1_leap_image_retriever_1_1_eye_texture_data_1af86473848f26141673ed248da09636d5">Distortion</link>.<link linkend="_class_leap_1_1_unity_1_1_leap_image_retriever_1_1_leap_distortion_data_1a43ed92a4bbf4858983367f3731e8cd48">Reconstruct</link>(image,&#32;GLOBAL_DISTORTION_TEXTURE_NAME);
+00227 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;_isStale&#32;=&#32;<emphasis role="keyword">false</emphasis>;
+00228 &#32;&#32;&#32;&#32;&#32;&#32;}
+00229 
+<anchor xml:id="__leap_image_retriever_8cs_source_1l00230"/><link linkend="_class_leap_1_1_unity_1_1_leap_image_retriever_1_1_eye_texture_data_1a00b7969341b2baf7aaff8dd8863042dd">00230</link> &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;<link linkend="_class_leap_1_1_unity_1_1_leap_image_retriever_1_1_eye_texture_data_1a00b7969341b2baf7aaff8dd8863042dd">UpdateTextures</link>(<link linkend="_class_leap_1_1_image">Image</link>&#32;image)&#32;{
+00231 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_leap_1_1_unity_1_1_leap_image_retriever_1_1_eye_texture_data_1af1d86d2f2714d72b92ef33feed2d4a14">TextureData</link>.<link linkend="_class_leap_1_1_unity_1_1_leap_image_retriever_1_1_leap_texture_data_1a7a6260ccdc4ca472efb67a37184c6cd3">UpdateTexture</link>(image);
+00232 &#32;&#32;&#32;&#32;&#32;&#32;}
+00233 &#32;&#32;&#32;&#32;}
+00234 
+00235 <emphasis role="preprocessor">#if&#32;UNITY_EDITOR</emphasis>
+00236 &#32;&#32;&#32;&#32;<emphasis role="keywordtype">void</emphasis>&#32;OnValidate()&#32;{
+00237 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(Application.isPlaying)&#32;{
+00238 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_leap_1_1_unity_1_1_leap_image_retriever_1a51a8db3bc82cbcb3f7b38831fa01763f">ApplyGammaCorrectionValues</link>();
+00239 &#32;&#32;&#32;&#32;&#32;&#32;}&#32;<emphasis role="keywordflow">else</emphasis>&#32;{
+00240 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;EyeTextureData.ResetGlobalShaderValues();
+00241 &#32;&#32;&#32;&#32;&#32;&#32;}
+00242 &#32;&#32;&#32;&#32;}
+00243 <emphasis role="preprocessor">#endif</emphasis>
+00244 
+00245 &#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;Awake()&#32;{
+00246 &#32;&#32;&#32;&#32;&#32;&#32;_provider&#32;=&#32;GetComponent&lt;LeapServiceProvider&gt;();
+00247 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(_provider&#32;==&#32;<emphasis role="keyword">null</emphasis>)&#32;{
+00248 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;_provider&#32;=&#32;GetComponentInChildren&lt;LeapServiceProvider&gt;();
+00249 &#32;&#32;&#32;&#32;&#32;&#32;}
+00250 
+00251 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//Enable&#32;pooling&#32;to&#32;reduce&#32;overhead&#32;of&#32;images</emphasis>
+00252 &#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_namespace_leap_internal">LeapInternal</link>.<link linkend="_class_leap_internal_1_1_memory_manager">MemoryManager</link>.EnablePooling&#32;=&#32;<emphasis role="keyword">true</emphasis>;
+00253 
+00254 &#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_leap_1_1_unity_1_1_leap_image_retriever_1a51a8db3bc82cbcb3f7b38831fa01763f">ApplyGammaCorrectionValues</link>();
+00255 &#32;&#32;&#32;&#32;}
+00256 
+00257 &#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;OnEnable()&#32;{
+00258 &#32;&#32;&#32;&#32;&#32;&#32;subscribeToService();
+00259 &#32;&#32;&#32;&#32;}
+00260 
+00261 &#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;OnDisable()&#32;{
+00262 &#32;&#32;&#32;&#32;&#32;&#32;unsubscribeFromService();
+00263 &#32;&#32;&#32;&#32;}
+00264 
+00265 &#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;OnDestroy()&#32;{
+00266 &#32;&#32;&#32;&#32;&#32;&#32;StopAllCoroutines();
+00267 &#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_namespace_valve_1_1_v_r_1aa1a3c2765fe53acb85372a57652c47a1a9bbf373797bf7cf7ba62c80023682e25">Controller</link>&#32;controller&#32;=&#32;_provider.<link linkend="_class_leap_1_1_unity_1_1_leap_service_provider_1aa146d4e24722ff4b68adeb23e6a1c24e">GetLeapController</link>();
+00268 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(controller&#32;!=&#32;<emphasis role="keyword">null</emphasis>)&#32;{
+00269 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;_provider.<link linkend="_class_leap_1_1_unity_1_1_leap_service_provider_1aa146d4e24722ff4b68adeb23e6a1c24e">GetLeapController</link>().<link linkend="_class_leap_1_1_controller_1a3a00d190090f618416c578d8615e4921">DistortionChange</link>&#32;-=&#32;onDistortionChange;
+00270 &#32;&#32;&#32;&#32;&#32;&#32;}
+00271 &#32;&#32;&#32;&#32;}
+00272 
+00273 &#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;LateUpdate()&#32;{
+00274 &#32;&#32;&#32;&#32;&#32;&#32;Frame&#32;imageFrame&#32;=&#32;_provider.<link linkend="_class_leap_1_1_unity_1_1_leap_service_provider_1ad651609e570c614c6d99de319ad990cd">CurrentFrame</link>;
+00275 
+00276 &#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_leap_1_1_unity_1_1_leap_image_retriever_1a37dadc2f80f08889282e75bf2369eac9">_currentImage</link>&#32;=&#32;<emphasis role="keyword">null</emphasis>;
+00277 
+00278 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">/*&#32;Use&#32;the&#32;most&#32;recent&#32;image&#32;that&#32;is&#32;not&#32;newer&#32;than&#32;the&#32;current&#32;frame</emphasis>
+00279 <emphasis role="comment">&#32;&#32;&#32;&#32;&#32;&#32;&#32;*&#32;This&#32;means&#32;that&#32;the&#32;shown&#32;image&#32;might&#32;be&#32;slightly&#32;older&#32;than&#32;the&#32;current</emphasis>
+00280 <emphasis role="comment">&#32;&#32;&#32;&#32;&#32;&#32;&#32;*&#32;frame&#32;if&#32;for&#32;some&#32;reason&#32;a&#32;frame&#32;arrived&#32;before&#32;an&#32;image&#32;did.</emphasis>
+00281 <emphasis role="comment">&#32;&#32;&#32;&#32;&#32;&#32;&#32;*&#32;</emphasis>
+00282 <emphasis role="comment">&#32;&#32;&#32;&#32;&#32;&#32;&#32;*&#32;Usually&#32;however,&#32;this&#32;is&#32;just&#32;important&#32;when&#32;robust&#32;mode&#32;is&#32;enabled.</emphasis>
+00283 <emphasis role="comment">&#32;&#32;&#32;&#32;&#32;&#32;&#32;*&#32;At&#32;that&#32;time,&#32;image&#32;ids&#32;never&#32;line&#32;up&#32;with&#32;tracking&#32;ids.</emphasis>
+00284 <emphasis role="comment">&#32;&#32;&#32;&#32;&#32;&#32;&#32;*/</emphasis>
+00285 &#32;&#32;&#32;&#32;&#32;&#32;Image&#32;potentialImage;
+00286 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">while</emphasis>&#32;(<link linkend="_class_leap_1_1_unity_1_1_leap_image_retriever_1a7001f70802cdb736676edb6696fae43b">_imageQueue</link>.TryPeek(out&#32;potentialImage))&#32;{
+00287 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(potentialImage.SequenceId&#32;&gt;&#32;imageFrame.Id)&#32;{
+00288 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">break</emphasis>;
+00289 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00290 
+00291 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_leap_1_1_unity_1_1_leap_image_retriever_1a37dadc2f80f08889282e75bf2369eac9">_currentImage</link>&#32;=&#32;potentialImage;
+00292 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_leap_1_1_unity_1_1_leap_image_retriever_1a7001f70802cdb736676edb6696fae43b">_imageQueue</link>.TryDequeue();
+00293 &#32;&#32;&#32;&#32;&#32;&#32;}
+00294 &#32;&#32;&#32;&#32;}
+00295 
+00296 &#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;OnPreRender()&#32;{
+00297 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(<link linkend="_class_leap_1_1_unity_1_1_leap_image_retriever_1a37dadc2f80f08889282e75bf2369eac9">_currentImage</link>&#32;!=&#32;<emphasis role="keyword">null</emphasis>)&#32;{
+00298 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(_eyeTextureData.<link linkend="_class_leap_1_1_unity_1_1_leap_image_retriever_1_1_eye_texture_data_1a06df67c9881e8f29146403560a99c877">CheckStale</link>(<link linkend="_class_leap_1_1_unity_1_1_leap_image_retriever_1a37dadc2f80f08889282e75bf2369eac9">_currentImage</link>))&#32;{
+00299 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;_eyeTextureData.<link linkend="_class_leap_1_1_unity_1_1_leap_image_retriever_1_1_eye_texture_data_1a3676c856cf9c84a9e88e73739d1ffeac">Reconstruct</link>(<link linkend="_class_leap_1_1_unity_1_1_leap_image_retriever_1a37dadc2f80f08889282e75bf2369eac9">_currentImage</link>);
+00300 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00301 
+00302 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;_eyeTextureData.<link linkend="_class_leap_1_1_unity_1_1_leap_image_retriever_1_1_eye_texture_data_1a00b7969341b2baf7aaff8dd8863042dd">UpdateTextures</link>(<link linkend="_class_leap_1_1_unity_1_1_leap_image_retriever_1a37dadc2f80f08889282e75bf2369eac9">_currentImage</link>);
+00303 &#32;&#32;&#32;&#32;&#32;&#32;}
+00304 &#32;&#32;&#32;&#32;}
+00305 
+00306 &#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;subscribeToService()&#32;{
+00307 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(_serviceCoroutine&#32;!=&#32;<emphasis role="keyword">null</emphasis>)&#32;{
+00308 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>;
+00309 &#32;&#32;&#32;&#32;&#32;&#32;}
+00310 
+00311 &#32;&#32;&#32;&#32;&#32;&#32;_serviceCoroutine&#32;=&#32;StartCoroutine(serviceCoroutine());
+00312 &#32;&#32;&#32;&#32;}
+00313 
+00314 &#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;unsubscribeFromService()&#32;{
+00315 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(_serviceCoroutine&#32;!=&#32;<emphasis role="keyword">null</emphasis>)&#32;{
+00316 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;StopCoroutine(_serviceCoroutine);
+00317 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;_serviceCoroutine&#32;=&#32;<emphasis role="keyword">null</emphasis>;
+00318 &#32;&#32;&#32;&#32;&#32;&#32;}
+00319 
+00320 &#32;&#32;&#32;&#32;&#32;&#32;var&#32;controller&#32;=&#32;_provider.<link linkend="_class_leap_1_1_unity_1_1_leap_service_provider_1aa146d4e24722ff4b68adeb23e6a1c24e">GetLeapController</link>();
+00321 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(controller&#32;!=&#32;<emphasis role="keyword">null</emphasis>)&#32;{
+00322 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;controller.<link linkend="_class_leap_1_1_controller_1a78edc0a692fa7200a07eee4b651012a4">ClearPolicy</link>(<link linkend="_namespace_valve_1_1_v_r_1aa1a3c2765fe53acb85372a57652c47a1a9bbf373797bf7cf7ba62c80023682e25">Controller</link>.PolicyFlag.POLICY_IMAGES);
+00323 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;controller.ImageReady&#32;-=&#32;onImageReady;
+00324 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;controller.DistortionChange&#32;-=&#32;onDistortionChange;
+00325 &#32;&#32;&#32;&#32;&#32;&#32;}
+00326 &#32;&#32;&#32;&#32;}
+00327 
+00328 &#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;Coroutine&#32;_serviceCoroutine&#32;=&#32;<emphasis role="keyword">null</emphasis>;
+00329 &#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;IEnumerator&#32;serviceCoroutine()&#32;{
+00330 &#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_namespace_valve_1_1_v_r_1aa1a3c2765fe53acb85372a57652c47a1a9bbf373797bf7cf7ba62c80023682e25">Controller</link>&#32;controller&#32;=&#32;<emphasis role="keyword">null</emphasis>;
+00331 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">do</emphasis>&#32;{
+00332 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;controller&#32;=&#32;_provider.<link linkend="_class_leap_1_1_unity_1_1_leap_service_provider_1aa146d4e24722ff4b68adeb23e6a1c24e">GetLeapController</link>();
+00333 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;yield&#32;<emphasis role="keywordflow">return</emphasis>&#32;<emphasis role="keyword">null</emphasis>;
+00334 &#32;&#32;&#32;&#32;&#32;&#32;}&#32;<emphasis role="keywordflow">while</emphasis>&#32;(controller&#32;==&#32;<emphasis role="keyword">null</emphasis>);
+00335 
+00336 &#32;&#32;&#32;&#32;&#32;&#32;controller.<link linkend="_class_leap_1_1_controller_1a7e862547a7ea735203220e43c0e04a85">SetPolicy</link>(<link linkend="_namespace_valve_1_1_v_r_1aa1a3c2765fe53acb85372a57652c47a1a9bbf373797bf7cf7ba62c80023682e25">Controller</link>.PolicyFlag.POLICY_IMAGES);
+00337 &#32;&#32;&#32;&#32;&#32;&#32;controller.ImageReady&#32;+=&#32;onImageReady;
+00338 &#32;&#32;&#32;&#32;&#32;&#32;controller.DistortionChange&#32;+=&#32;onDistortionChange;
+00339 &#32;&#32;&#32;&#32;}
+00340 
+00341 &#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;onImageReady(<emphasis role="keywordtype">object</emphasis>&#32;sender,&#32;ImageEventArgs&#32;args)&#32;{
+00342 &#32;&#32;&#32;&#32;&#32;&#32;Image&#32;image&#32;=&#32;args.image;
+00343 &#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_leap_1_1_unity_1_1_leap_image_retriever_1a7001f70802cdb736676edb6696fae43b">_imageQueue</link>.TryEnqueue(image);
+00344 &#32;&#32;&#32;&#32;}
+00345 
+<anchor xml:id="__leap_image_retriever_8cs_source_1l00346"/><link linkend="_class_leap_1_1_unity_1_1_leap_image_retriever_1a51a8db3bc82cbcb3f7b38831fa01763f">00346</link> &#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;<link linkend="_class_leap_1_1_unity_1_1_leap_image_retriever_1a51a8db3bc82cbcb3f7b38831fa01763f">ApplyGammaCorrectionValues</link>()&#32;{
+00347 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordtype">float</emphasis>&#32;gamma&#32;=&#32;1f;
+00348 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(QualitySettings.activeColorSpace&#32;!=&#32;ColorSpace.Linear)&#32;{
+00349 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;gamma&#32;=&#32;-Mathf.Log10(Mathf.GammaToLinearSpace(0.1f));
+00350 &#32;&#32;&#32;&#32;&#32;&#32;}
+00351 &#32;&#32;&#32;&#32;&#32;&#32;Shader.SetGlobalFloat(<link linkend="_class_leap_1_1_unity_1_1_leap_image_retriever_1ac09370f0447bb55415e5751df19c86c7">GLOBAL_COLOR_SPACE_GAMMA_NAME</link>,&#32;gamma);
+00352 &#32;&#32;&#32;&#32;&#32;&#32;Shader.SetGlobalFloat(<link linkend="_class_leap_1_1_unity_1_1_leap_image_retriever_1a1f0ad619c8e20f2376e8f4e46f77a718">GLOBAL_GAMMA_CORRECTION_EXPONENT_NAME</link>,&#32;1.0f&#32;/&#32;_gammaCorrection);
+00353 &#32;&#32;&#32;&#32;}
+00354 
+00355 &#32;&#32;&#32;&#32;<emphasis role="keywordtype">void</emphasis>&#32;onDistortionChange(<emphasis role="keywordtype">object</emphasis>&#32;sender,&#32;<link linkend="_class_leap_1_1_leap_event_args">LeapEventArgs</link>&#32;args)&#32;{
+00356 &#32;&#32;&#32;&#32;&#32;&#32;_eyeTextureData.<link linkend="_class_leap_1_1_unity_1_1_leap_image_retriever_1_1_eye_texture_data_1a1810624815db23fb176b37c27873d7c6">MarkStale</link>();
+00357 &#32;&#32;&#32;&#32;}
+00358 &#32;&#32;}
+00359 }
+</programlisting></section>

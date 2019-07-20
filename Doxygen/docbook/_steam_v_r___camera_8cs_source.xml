@@ -1,0 +1,299 @@
+<?xml version='1.0' encoding='UTF-8' standalone='no'?>
+<section xmlns="http://docbook.org/ns/docbook" version="5.0" xmlns:xlink="http://www.w3.org/1999/xlink" xml:id="__steam_v_r___camera_8cs_source">
+<title>SteamVR_Camera.cs</title>
+<indexterm><primary>O:/GitHUBMINIPRoject/Assets/SteamVR/Scripts/SteamVR_Camera.cs</primary></indexterm>
+<programlisting>00001 <emphasis role="comment">//=======&#32;Copyright&#32;(c)&#32;Valve&#32;Corporation,&#32;All&#32;rights&#32;reserved.&#32;===============</emphasis>
+00002 <emphasis role="comment">//</emphasis>
+00003 <emphasis role="comment">//&#32;Purpose:&#32;Adds&#32;SteamVR&#32;render&#32;support&#32;to&#32;existing&#32;camera&#32;objects</emphasis>
+00004 <emphasis role="comment">//</emphasis>
+00005 <emphasis role="comment">//=============================================================================</emphasis>
+00006 
+00007 <emphasis role="keyword">using</emphasis>&#32;<link linkend="__balloon_8cs_1a7d67e097df9376eb709b6a23aa3c7d23">UnityEngine</link>;
+00008 <emphasis role="keyword">using</emphasis>&#32;System.Collections;
+00009 <emphasis role="keyword">using</emphasis>&#32;System.Reflection;
+00010 <emphasis role="keyword">using</emphasis>&#32;<link linkend="_namespace_valve">Valve</link>.<link linkend="_namespace_valve_1_1_v_r">VR</link>;
+00011 
+00012 <emphasis role="preprocessor">#if&#32;UNITY_2017_2_OR_NEWER</emphasis>
+00013 &#32;&#32;&#32;&#32;<emphasis role="keyword">using</emphasis>&#32;<link linkend="_namespace_unity_engine">UnityEngine</link>.XR;
+00014 <emphasis role="preprocessor">#else</emphasis>
+<anchor xml:id="__steam_v_r___camera_8cs_source_1l00015"/><link linkend="__steam_v_r___camera_8cs_1ab7b558738171d1c27b78e3dd6e111c6c">00015</link> <emphasis role="keyword">using</emphasis>&#32;<link linkend="__steam_v_r_8cs_1ab7b558738171d1c27b78e3dd6e111c6c">XRSettings</link>&#32;=&#32;<link linkend="_namespace_unity_engine">UnityEngine</link>.VR.VRSettings;
+<anchor xml:id="__steam_v_r___camera_8cs_source_1l00016"/><link linkend="__steam_v_r___camera_8cs_1a3849537358333ca4818a9ca49dd66c8b">00016</link> <emphasis role="keyword">using</emphasis>&#32;<link linkend="__steam_v_r_8cs_1a3849537358333ca4818a9ca49dd66c8b">XRDevice</link>&#32;=&#32;<link linkend="_namespace_unity_engine">UnityEngine</link>.VR.VRDevice;
+00017 <emphasis role="preprocessor">#endif</emphasis>
+00018 
+00019 <emphasis role="keyword">namespace&#32;</emphasis><link linkend="_namespace_valve_1_1_v_r">Valve.VR</link>
+00020 {
+00021 &#32;&#32;&#32;&#32;[RequireComponent(typeof(<link linkend="_namespace_valve_1_1_v_r_1a82e5bf501cc3aa155444ee3f0662853fa967d35e40f3f95b1f538bd248640bf3b">Camera</link>))]
+<anchor xml:id="__steam_v_r___camera_8cs_source_1l00022"/><link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___camera">00022</link> &#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keyword">class&#32;</emphasis><link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___camera">SteamVR_Camera</link>&#32;:&#32;MonoBehaviour
+00023 &#32;&#32;&#32;&#32;{
+00024 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;[SerializeField]
+00025 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;Transform&#32;_head;
+<anchor xml:id="__steam_v_r___camera_8cs_source_1l00026"/><link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___camera_1a29bcd51ea929477bfbca732afe76f4db">00026</link> &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;Transform&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___camera_1a29bcd51ea929477bfbca732afe76f4db">head</link>&#32;{&#32;<emphasis role="keyword">get</emphasis>&#32;{&#32;<emphasis role="keywordflow">return</emphasis>&#32;_head;&#32;}&#32;}
+<anchor xml:id="__steam_v_r___camera_8cs_source_1l00027"/><link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___camera_1aa7f6289ce231db679a28107fef38b0d9">00027</link> &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;Transform&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___camera_1aa7f6289ce231db679a28107fef38b0d9">offset</link>&#32;{&#32;<emphasis role="keyword">get</emphasis>&#32;{&#32;<emphasis role="keywordflow">return</emphasis>&#32;_head;&#32;}&#32;}&#32;<emphasis role="comment">//&#32;legacy</emphasis>
+<anchor xml:id="__steam_v_r___camera_8cs_source_1l00028"/><link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___camera_1a12fe684a54d4cade55c1ba7d693e38bd">00028</link> &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;Transform&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___camera_1a12fe684a54d4cade55c1ba7d693e38bd">origin</link>&#32;{&#32;<emphasis role="keyword">get</emphasis>&#32;{&#32;<emphasis role="keywordflow">return</emphasis>&#32;_head.parent;&#32;}&#32;}
+00029 
+<anchor xml:id="__steam_v_r___camera_8cs_source_1l00030"/><link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___camera_1ae118c58f9341a3cf4e24472a19131318">00030</link> &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keyword">new</emphasis>&#32;<link linkend="_namespace_valve_1_1_v_r_1a82e5bf501cc3aa155444ee3f0662853fa967d35e40f3f95b1f538bd248640bf3b">Camera</link>&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___camera_1ae118c58f9341a3cf4e24472a19131318">camera</link>&#32;{&#32;<emphasis role="keyword">get</emphasis>;&#32;<emphasis role="keyword">private</emphasis>&#32;<emphasis role="keyword">set</emphasis>;&#32;}
+00031 
+00032 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;[SerializeField]
+00033 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;Transform&#32;_ears;
+<anchor xml:id="__steam_v_r___camera_8cs_source_1l00034"/><link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___camera_1a3127cd98719685b513db0d5debbec31b">00034</link> &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;Transform&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___camera_1a3127cd98719685b513db0d5debbec31b">ears</link>&#32;{&#32;<emphasis role="keyword">get</emphasis>&#32;{&#32;<emphasis role="keywordflow">return</emphasis>&#32;_ears;&#32;}&#32;}
+00035 
+<anchor xml:id="__steam_v_r___camera_8cs_source_1l00036"/><link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___camera_1acd583d324147b6fef955692923d387ab">00036</link> &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;Ray&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___camera_1acd583d324147b6fef955692923d387ab">GetRay</link>()
+00037 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00038 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;<emphasis role="keyword">new</emphasis>&#32;Ray(_head.position,&#32;_head.forward);
+00039 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00040 
+<anchor xml:id="__steam_v_r___camera_8cs_source_1l00041"/><link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___camera_1aa80e0ab2f8d29c70051bc23f7cef9937">00041</link> &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keywordtype">bool</emphasis>&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___camera_1aa80e0ab2f8d29c70051bc23f7cef9937">wireframe</link>&#32;=&#32;<emphasis role="keyword">false</emphasis>;
+00042 
+00043 <emphasis role="preprocessor">#if&#32;UNITY_2017_2_OR_NEWER</emphasis>
+00044 &#32;&#32;&#32;&#32;<emphasis role="keyword">static</emphasis>&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keywordtype">float</emphasis>&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___camera_1a15bffee48af1ca15135cf48e33622e56">sceneResolutionScale</link>
+00045 &#32;&#32;&#32;&#32;{
+00046 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">get</emphasis>&#32;{&#32;<emphasis role="keywordflow">return</emphasis>&#32;<link linkend="__steam_v_r_8cs_1ab7b558738171d1c27b78e3dd6e111c6c">XRSettings</link>.eyeTextureResolutionScale;&#32;}
+00047 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">set</emphasis>&#32;{&#32;<link linkend="__steam_v_r_8cs_1ab7b558738171d1c27b78e3dd6e111c6c">XRSettings</link>.eyeTextureResolutionScale&#32;=&#32;value;&#32;}
+00048 &#32;&#32;&#32;&#32;}
+00049 <emphasis role="preprocessor">#else</emphasis>
+00050 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">static</emphasis>&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keywordtype">float</emphasis>&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___camera_1a15bffee48af1ca15135cf48e33622e56">sceneResolutionScale</link>
+<anchor xml:id="__steam_v_r___camera_8cs_source_1l00051"/><link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___camera_1a15bffee48af1ca15135cf48e33622e56">00051</link> &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00052 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">get</emphasis>&#32;{&#32;<emphasis role="keywordflow">return</emphasis>&#32;<link linkend="__steam_v_r_8cs_1ab7b558738171d1c27b78e3dd6e111c6c">XRSettings</link>.renderScale;&#32;}
+00053 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">set</emphasis>&#32;{&#32;<emphasis role="keywordflow">if</emphasis>&#32;(value&#32;==&#32;0)&#32;<emphasis role="keywordflow">return</emphasis>;&#32;<link linkend="__steam_v_r_8cs_1ab7b558738171d1c27b78e3dd6e111c6c">XRSettings</link>.renderScale&#32;=&#32;value;&#32;}
+00054 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00055 <emphasis role="preprocessor">#endif</emphasis>
+00056 
+00057 <emphasis role="preprocessor">&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;#region&#32;Enable&#32;/&#32;Disable</emphasis>
+00058 
+00059 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordtype">void</emphasis>&#32;OnDisable()
+00060 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00061 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___render">SteamVR_Render</link>.<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___render_1a3c9d43d12a9793294f79f5022223e0f5">Remove</link>(<emphasis role="keyword">this</emphasis>);
+00062 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00063 
+00064 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordtype">void</emphasis>&#32;OnEnable()
+00065 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00066 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;Bail&#32;if&#32;no&#32;hmd&#32;is&#32;connected</emphasis>
+00067 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;var&#32;vr&#32;=&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r">SteamVR</link>.<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r_1af374389920329f77814037a571f6bf2f">instance</link>;
+00068 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(vr&#32;==&#32;<emphasis role="keyword">null</emphasis>)
+00069 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00070 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___camera_1a29bcd51ea929477bfbca732afe76f4db">head</link>&#32;!=&#32;<emphasis role="keyword">null</emphasis>)
+00071 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00072 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___camera_1a29bcd51ea929477bfbca732afe76f4db">head</link>.GetComponent&lt;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___tracked_object">SteamVR_TrackedObject</link>&gt;().enabled&#32;=&#32;<emphasis role="keyword">false</emphasis>;
+00073 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00074 
+00075 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;enabled&#32;=&#32;<emphasis role="keyword">false</emphasis>;
+00076 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>;
+00077 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00078 
+00079 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;Convert&#32;camera&#32;rig&#32;for&#32;native&#32;OpenVR&#32;integration.</emphasis>
+00080 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;var&#32;t&#32;=&#32;transform;
+00081 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___camera_1a29bcd51ea929477bfbca732afe76f4db">head</link>&#32;!=&#32;t)
+00082 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00083 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___camera_1a51e94885e2b2c73ec9da4716f8de0bc5">Expand</link>();
+00084 
+00085 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;t.parent&#32;=&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___camera_1a12fe684a54d4cade55c1ba7d693e38bd">origin</link>;
+00086 
+00087 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">while</emphasis>&#32;(<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___camera_1a29bcd51ea929477bfbca732afe76f4db">head</link>.childCount&#32;&gt;&#32;0)
+00088 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___camera_1a29bcd51ea929477bfbca732afe76f4db">head</link>.GetChild(0).parent&#32;=&#32;t;
+00089 
+00090 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;Keep&#32;the&#32;head&#32;around,&#32;but&#32;parent&#32;to&#32;the&#32;camera&#32;now&#32;since&#32;it&#32;moves&#32;with&#32;the&#32;hmd</emphasis>
+00091 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;but&#32;existing&#32;content&#32;may&#32;still&#32;have&#32;references&#32;to&#32;this&#32;object.</emphasis>
+00092 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___camera_1a29bcd51ea929477bfbca732afe76f4db">head</link>.parent&#32;=&#32;t;
+00093 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___camera_1a29bcd51ea929477bfbca732afe76f4db">head</link>.localPosition&#32;=&#32;Vector3.zero;
+00094 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___camera_1a29bcd51ea929477bfbca732afe76f4db">head</link>.localRotation&#32;=&#32;Quaternion.identity;
+00095 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___camera_1a29bcd51ea929477bfbca732afe76f4db">head</link>.localScale&#32;=&#32;Vector3.one;
+00096 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___camera_1a29bcd51ea929477bfbca732afe76f4db">head</link>.gameObject.SetActive(<emphasis role="keyword">false</emphasis>);
+00097 
+00098 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;_head&#32;=&#32;t;
+00099 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00100 
+00101 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___camera_1a3127cd98719685b513db0d5debbec31b">ears</link>&#32;==&#32;<emphasis role="keyword">null</emphasis>)
+00102 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00103 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;var&#32;e&#32;=&#32;transform.GetComponentInChildren&lt;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___ears">SteamVR_Ears</link>&gt;();
+00104 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(e&#32;!=&#32;<emphasis role="keyword">null</emphasis>)
+00105 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;_ears&#32;=&#32;e.transform;
+00106 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00107 
+00108 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___camera_1a3127cd98719685b513db0d5debbec31b">ears</link>&#32;!=&#32;<emphasis role="keyword">null</emphasis>)
+00109 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___camera_1a3127cd98719685b513db0d5debbec31b">ears</link>.GetComponent&lt;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___ears">SteamVR_Ears</link>&gt;().vrcam&#32;=&#32;<emphasis role="keyword">this</emphasis>;
+00110 
+00111 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___render">SteamVR_Render</link>.<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___render_1a7ea09b18f7b096dca11e1ca1d66ea869">Add</link>(<emphasis role="keyword">this</emphasis>);
+00112 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00113 
+00114 <emphasis role="preprocessor">&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;#endregion</emphasis>
+00115 
+00116 <emphasis role="preprocessor">&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;#region&#32;Functionality&#32;to&#32;ensure&#32;SteamVR_Camera&#32;component&#32;is&#32;always&#32;the&#32;last&#32;component&#32;on&#32;an&#32;object</emphasis>
+00117 
+00118 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordtype">void</emphasis>&#32;Awake()
+00119 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00120 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___camera_1ae118c58f9341a3cf4e24472a19131318">camera</link>&#32;=&#32;GetComponent&lt;Camera&gt;();&#32;<emphasis role="comment">//&#32;cached&#32;to&#32;avoid&#32;runtime&#32;lookup</emphasis>
+00121 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___camera_1ae7382a4a9bdc196f3fdba43bf4801083">ForceLast</link>();
+00122 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00123 
+00124 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">static</emphasis>&#32;Hashtable&#32;values;
+00125 
+<anchor xml:id="__steam_v_r___camera_8cs_source_1l00126"/><link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___camera_1ae7382a4a9bdc196f3fdba43bf4801083">00126</link> &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___camera_1ae7382a4a9bdc196f3fdba43bf4801083">ForceLast</link>()
+00127 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00128 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(values&#32;!=&#32;<emphasis role="keyword">null</emphasis>)
+00129 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00130 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;Restore&#32;values&#32;on&#32;new&#32;instance</emphasis>
+00131 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">foreach</emphasis>&#32;(DictionaryEntry&#32;entry&#32;<emphasis role="keywordflow">in</emphasis>&#32;values)
+00132 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00133 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;var&#32;f&#32;=&#32;entry.Key&#32;as&#32;FieldInfo;
+00134 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;f.SetValue(<emphasis role="keyword">this</emphasis>,&#32;entry.Value);
+00135 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00136 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;values&#32;=&#32;<emphasis role="keyword">null</emphasis>;
+00137 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00138 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">else</emphasis>
+00139 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00140 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;Make&#32;sure&#32;it&apos;s&#32;the&#32;last&#32;component</emphasis>
+00141 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;var&#32;components&#32;=&#32;GetComponents&lt;Component&gt;();
+00142 
+00143 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;But&#32;first&#32;make&#32;sure&#32;there&#32;aren&apos;t&#32;any&#32;other&#32;SteamVR_Cameras&#32;on&#32;this&#32;object.</emphasis>
+00144 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">for</emphasis>&#32;(<emphasis role="keywordtype">int</emphasis>&#32;i&#32;=&#32;0;&#32;i&#32;&lt;&#32;components.Length;&#32;i++)
+00145 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00146 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;var&#32;c&#32;=&#32;components[i]&#32;as&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___camera">SteamVR_Camera</link>;
+00147 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(c&#32;!=&#32;<emphasis role="keyword">null</emphasis>&#32;&amp;&amp;&#32;c&#32;!=&#32;<emphasis role="keyword">this</emphasis>)
+00148 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00149 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;DestroyImmediate(c);
+00150 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00151 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00152 
+00153 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;components&#32;=&#32;GetComponents&lt;Component&gt;();
+00154 
+00155 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(<emphasis role="keyword">this</emphasis>&#32;!=&#32;components[components.Length&#32;-&#32;1])
+00156 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00157 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;Store&#32;off&#32;values&#32;to&#32;be&#32;restored&#32;on&#32;new&#32;instance</emphasis>
+00158 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;values&#32;=&#32;<emphasis role="keyword">new</emphasis>&#32;Hashtable();
+00159 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;var&#32;fields&#32;=&#32;GetType().GetFields(BindingFlags.Instance&#32;|&#32;BindingFlags.NonPublic&#32;|&#32;BindingFlags.Public);
+00160 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">foreach</emphasis>&#32;(var&#32;f&#32;<emphasis role="keywordflow">in</emphasis>&#32;fields)
+00161 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(f.IsPublic&#32;||&#32;f.IsDefined(typeof(SerializeField),&#32;<emphasis role="keyword">true</emphasis>))
+00162 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;values[f]&#32;=&#32;f.GetValue(<emphasis role="keyword">this</emphasis>);
+00163 
+00164 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;var&#32;go&#32;=&#32;gameObject;
+00165 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;DestroyImmediate(<emphasis role="keyword">this</emphasis>);
+00166 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;go.AddComponent&lt;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___camera">SteamVR_Camera</link>&gt;().<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___camera_1ae7382a4a9bdc196f3fdba43bf4801083">ForceLast</link>();
+00167 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00168 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00169 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00170 
+00171 <emphasis role="preprocessor">&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;#endregion</emphasis>
+00172 
+00173 <emphasis role="preprocessor">&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;#region&#32;Expand&#32;/&#32;Collapse&#32;object&#32;hierarchy</emphasis>
+00174 
+00175 <emphasis role="preprocessor">#if&#32;UNITY_EDITOR</emphasis>
+00176 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keywordtype">bool</emphasis>&#32;isExpanded&#32;{&#32;<emphasis role="keyword">get</emphasis>&#32;{&#32;<emphasis role="keywordflow">return</emphasis>&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___camera_1a29bcd51ea929477bfbca732afe76f4db">head</link>&#32;!=&#32;<emphasis role="keyword">null</emphasis>&#32;&amp;&amp;&#32;transform.parent&#32;==&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___camera_1a29bcd51ea929477bfbca732afe76f4db">head</link>;&#32;}&#32;}
+00177 <emphasis role="preprocessor">#endif</emphasis>
+00178 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">const</emphasis>&#32;<emphasis role="keywordtype">string</emphasis>&#32;eyeSuffix&#32;=&#32;<emphasis role="stringliteral">&quot;&#32;(eye)&quot;</emphasis>;
+00179 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">const</emphasis>&#32;<emphasis role="keywordtype">string</emphasis>&#32;earsSuffix&#32;=&#32;<emphasis role="stringliteral">&quot;&#32;(ears)&quot;</emphasis>;
+00180 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">const</emphasis>&#32;<emphasis role="keywordtype">string</emphasis>&#32;headSuffix&#32;=&#32;<emphasis role="stringliteral">&quot;&#32;(head)&quot;</emphasis>;
+00181 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">const</emphasis>&#32;<emphasis role="keywordtype">string</emphasis>&#32;originSuffix&#32;=&#32;<emphasis role="stringliteral">&quot;&#32;(origin)&quot;</emphasis>;
+<anchor xml:id="__steam_v_r___camera_8cs_source_1l00182"/><link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___camera_1ac2f444cc76f6dedb835a4b14c9112925">00182</link> &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keywordtype">string</emphasis>&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___camera_1ac2f444cc76f6dedb835a4b14c9112925">baseName</link>&#32;{&#32;<emphasis role="keyword">get</emphasis>&#32;{&#32;<emphasis role="keywordflow">return</emphasis>&#32;name.EndsWith(eyeSuffix)&#32;?&#32;name.Substring(0,&#32;name.Length&#32;-&#32;eyeSuffix.Length)&#32;:&#32;name;&#32;}&#32;}
+00183 
+00184 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;Object&#32;hierarchy&#32;creation&#32;to&#32;make&#32;it&#32;easy&#32;to&#32;parent&#32;other&#32;objects&#32;appropriately,</emphasis>
+00185 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;otherwise&#32;this&#32;gets&#32;called&#32;on&#32;demand&#32;at&#32;runtime.&#32;Remaining&#32;initialization&#32;is</emphasis>
+00186 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;performed&#32;at&#32;startup,&#32;once&#32;the&#32;hmd&#32;has&#32;been&#32;identified.</emphasis>
+<anchor xml:id="__steam_v_r___camera_8cs_source_1l00187"/><link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___camera_1a51e94885e2b2c73ec9da4716f8de0bc5">00187</link> &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___camera_1a51e94885e2b2c73ec9da4716f8de0bc5">Expand</link>()
+00188 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00189 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;var&#32;_origin&#32;=&#32;transform.parent;
+00190 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(_origin&#32;==&#32;<emphasis role="keyword">null</emphasis>)
+00191 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00192 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;_origin&#32;=&#32;<emphasis role="keyword">new</emphasis>&#32;GameObject(name&#32;+&#32;originSuffix).transform;
+00193 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;_origin.localPosition&#32;=&#32;transform.localPosition;
+00194 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;_origin.localRotation&#32;=&#32;transform.localRotation;
+00195 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;_origin.localScale&#32;=&#32;transform.localScale;
+00196 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00197 
+00198 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___camera_1a29bcd51ea929477bfbca732afe76f4db">head</link>&#32;==&#32;<emphasis role="keyword">null</emphasis>)
+00199 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00200 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;_head&#32;=&#32;<emphasis role="keyword">new</emphasis>&#32;GameObject(name&#32;+&#32;headSuffix,&#32;typeof(<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___tracked_object">SteamVR_TrackedObject</link>)).transform;
+00201 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___camera_1a29bcd51ea929477bfbca732afe76f4db">head</link>.parent&#32;=&#32;_origin;
+00202 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___camera_1a29bcd51ea929477bfbca732afe76f4db">head</link>.position&#32;=&#32;transform.position;
+00203 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___camera_1a29bcd51ea929477bfbca732afe76f4db">head</link>.rotation&#32;=&#32;transform.rotation;
+00204 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___camera_1a29bcd51ea929477bfbca732afe76f4db">head</link>.localScale&#32;=&#32;Vector3.one;
+00205 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___camera_1a29bcd51ea929477bfbca732afe76f4db">head</link>.tag&#32;=&#32;tag;
+00206 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00207 
+00208 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(transform.parent&#32;!=&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___camera_1a29bcd51ea929477bfbca732afe76f4db">head</link>)
+00209 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00210 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;transform.parent&#32;=&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___camera_1a29bcd51ea929477bfbca732afe76f4db">head</link>;
+00211 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;transform.localPosition&#32;=&#32;Vector3.zero;
+00212 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;transform.localRotation&#32;=&#32;Quaternion.identity;
+00213 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;transform.localScale&#32;=&#32;Vector3.one;
+00214 
+00215 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">while</emphasis>&#32;(transform.childCount&#32;&gt;&#32;0)
+00216 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;transform.GetChild(0).parent&#32;=&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___camera_1a29bcd51ea929477bfbca732afe76f4db">head</link>;
+00217 <emphasis role="preprocessor">#if&#32;!UNITY_2017_2_OR_NEWER</emphasis>
+00218 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;var&#32;guiLayer&#32;=&#32;GetComponent&lt;GUILayer&gt;();
+00219 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(guiLayer&#32;!=&#32;<emphasis role="keyword">null</emphasis>)
+00220 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00221 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;DestroyImmediate(guiLayer);
+00222 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___camera_1a29bcd51ea929477bfbca732afe76f4db">head</link>.gameObject.AddComponent&lt;GUILayer&gt;();
+00223 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00224 <emphasis role="preprocessor">#endif</emphasis>
+00225 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;var&#32;audioListener&#32;=&#32;GetComponent&lt;AudioListener&gt;();
+00226 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(audioListener&#32;!=&#32;<emphasis role="keyword">null</emphasis>)
+00227 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00228 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;DestroyImmediate(audioListener);
+00229 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;_ears&#32;=&#32;<emphasis role="keyword">new</emphasis>&#32;GameObject(name&#32;+&#32;earsSuffix,&#32;typeof(<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___ears">SteamVR_Ears</link>)).transform;
+00230 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___camera_1a3127cd98719685b513db0d5debbec31b">ears</link>.parent&#32;=&#32;_head;
+00231 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___camera_1a3127cd98719685b513db0d5debbec31b">ears</link>.localPosition&#32;=&#32;Vector3.zero;
+00232 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___camera_1a3127cd98719685b513db0d5debbec31b">ears</link>.localRotation&#32;=&#32;Quaternion.identity;
+00233 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___camera_1a3127cd98719685b513db0d5debbec31b">ears</link>.localScale&#32;=&#32;Vector3.one;
+00234 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00235 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00236 
+00237 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(!name.EndsWith(eyeSuffix))
+00238 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;name&#32;+=&#32;eyeSuffix;
+00239 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00240 
+<anchor xml:id="__steam_v_r___camera_8cs_source_1l00241"/><link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___camera_1a60ba8f4bceae007fb9f41702669346c1">00241</link> &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___camera_1a60ba8f4bceae007fb9f41702669346c1">Collapse</link>()
+00242 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00243 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;transform.parent&#32;=&#32;<emphasis role="keyword">null</emphasis>;
+00244 
+00245 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;Move&#32;children&#32;and&#32;components&#32;from&#32;head&#32;back&#32;to&#32;camera.</emphasis>
+00246 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">while</emphasis>&#32;(<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___camera_1a29bcd51ea929477bfbca732afe76f4db">head</link>.childCount&#32;&gt;&#32;0)
+00247 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___camera_1a29bcd51ea929477bfbca732afe76f4db">head</link>.GetChild(0).parent&#32;=&#32;transform;
+00248 <emphasis role="preprocessor">#if&#32;!UNITY_2017_2_OR_NEWER</emphasis>
+00249 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;var&#32;guiLayer&#32;=&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___camera_1a29bcd51ea929477bfbca732afe76f4db">head</link>.GetComponent&lt;GUILayer&gt;();
+00250 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(guiLayer&#32;!=&#32;<emphasis role="keyword">null</emphasis>)
+00251 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00252 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;DestroyImmediate(guiLayer);
+00253 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;gameObject.AddComponent&lt;GUILayer&gt;();
+00254 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00255 <emphasis role="preprocessor">#endif</emphasis>
+00256 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___camera_1a3127cd98719685b513db0d5debbec31b">ears</link>&#32;!=&#32;<emphasis role="keyword">null</emphasis>)
+00257 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00258 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">while</emphasis>&#32;(<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___camera_1a3127cd98719685b513db0d5debbec31b">ears</link>.childCount&#32;&gt;&#32;0)
+00259 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___camera_1a3127cd98719685b513db0d5debbec31b">ears</link>.GetChild(0).parent&#32;=&#32;transform;
+00260 
+00261 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;DestroyImmediate(<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___camera_1a3127cd98719685b513db0d5debbec31b">ears</link>.gameObject);
+00262 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;_ears&#32;=&#32;<emphasis role="keyword">null</emphasis>;
+00263 
+00264 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;gameObject.AddComponent(typeof(AudioListener));
+00265 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00266 
+00267 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___camera_1a12fe684a54d4cade55c1ba7d693e38bd">origin</link>&#32;!=&#32;<emphasis role="keyword">null</emphasis>)
+00268 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00269 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;If&#32;we&#32;created&#32;the&#32;origin&#32;originally,&#32;destroy&#32;it&#32;now.</emphasis>
+00270 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___camera_1a12fe684a54d4cade55c1ba7d693e38bd">origin</link>.name.EndsWith(originSuffix))
+00271 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00272 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;Reparent&#32;any&#32;children&#32;so&#32;we&#32;don&apos;t&#32;accidentally&#32;delete&#32;them.</emphasis>
+00273 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;var&#32;_origin&#32;=&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___camera_1a12fe684a54d4cade55c1ba7d693e38bd">origin</link>;
+00274 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">while</emphasis>&#32;(_origin.childCount&#32;&gt;&#32;0)
+00275 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;_origin.GetChild(0).parent&#32;=&#32;_origin.parent;
+00276 
+00277 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;DestroyImmediate(_origin.gameObject);
+00278 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00279 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">else</emphasis>
+00280 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00281 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;transform.parent&#32;=&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___camera_1a12fe684a54d4cade55c1ba7d693e38bd">origin</link>;
+00282 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00283 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00284 
+00285 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;DestroyImmediate(<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___camera_1a29bcd51ea929477bfbca732afe76f4db">head</link>.gameObject);
+00286 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;_head&#32;=&#32;<emphasis role="keyword">null</emphasis>;
+00287 
+00288 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(name.EndsWith(eyeSuffix))
+00289 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;name&#32;=&#32;name.Substring(0,&#32;name.Length&#32;-&#32;eyeSuffix.Length);
+00290 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00291 
+00292 <emphasis role="preprocessor">&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;#endregion</emphasis>
+00293 &#32;&#32;&#32;&#32;}
+00294 }
+</programlisting></section>

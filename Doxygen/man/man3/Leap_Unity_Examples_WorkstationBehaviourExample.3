@@ -1,0 +1,183 @@
+.TH "Leap.Unity.Examples.WorkstationBehaviourExample" 3 "Sat Jul 20 2019" "Version https://github.com/Saurabhbagh/Multi-User-VR-Viewer--10th-July/" "Multi User Vr Viewer" \" -*- nroff -*-
+.ad l
+.nh
+.SH NAME
+Leap.Unity.Examples.WorkstationBehaviourExample \- This example script constructs behavior for a very specific kind of UI object that can animate out a 'workstation' panel when thrown or placed outside of an anchor\&.  
+
+.SH SYNOPSIS
+.br
+.PP
+.PP
+Inherits MonoBehaviour\&.
+.SS "Public Types"
+
+.in +1c
+.ti -1c
+.RI "enum \fBWorkstationState\fP { \fBWorkstationState\&.Closed\fP, \fBWorkstationState\&.Traveling\fP, \fBWorkstationState\&.Opening\fP, \fBWorkstationState\&.Open\fP, \fBWorkstationState\&.Closing\fP }"
+.br
+.in -1c
+.SS "Public Member Functions"
+
+.in +1c
+.ti -1c
+.RI "void \fBActivateWorkstation\fP ()"
+.br
+.ti -1c
+.RI "void \fBDeactivateWorkstation\fP ()"
+.br
+.ti -1c
+.RI "delegate Vector3 \fBWorkstationPositionFunc\fP (Vector3 userEyePosition, Quaternion userEyeRotation, Vector3 workstationObjInitPosition, Vector3 workstationObjInitVelocity, float workstationObjRadius, List< Vector3 > otherWorkstationPositions, List< float > otherWorkstationRadii)"
+.br
+.ti -1c
+.RI "delegate Quaternion \fBWorkstationRotationFunc\fP (Vector3 userEyePosition, Vector3 targetWorkstationPosition)"
+.br
+.in -1c
+.SS "Static Public Member Functions"
+
+.in +1c
+.ti -1c
+.RI "static Vector3 \fBDefaultDetermineWorkstationPosition\fP (Vector3 userEyePosition, Quaternion userEyeRotation, Vector3 workstationObjInitPosition, Vector3 workstationObjInitVelocity, float workstationObjRadius, List< Vector3 > otherWorkstationPositions, List< float > otherWorkstationRadii)"
+.br
+.ti -1c
+.RI "static Quaternion \fBDefaultDetermineWorkstationRotation\fP (Vector3 userEyePos, Vector3 workstationPosition)"
+.br
+.in -1c
+.SS "Public Attributes"
+
+.in +1c
+.ti -1c
+.RI "const float \fBMAX_SPEED_AS_WORKSTATION\fP = 0\&.005F"
+.br
+.RI "If the rigidbody of this object moves faster than this speed and the object is in workstation mode, it will exit workstation mode\&. "
+.ti -1c
+.RI "const float \fBMIN_SPEED_TO_ACTIVATE_TRAVELING\fP = 0\&.5F"
+.br
+.RI "If the rigidbody of this object moves slower than this speed and the object wants to enter workstation mode, it will first pick a target position and travel there\&. (Otherwise, it will open its workstation in-place\&.) "
+.ti -1c
+.RI "\fBTransformTweenBehaviour\fP \fBworkstationModeTween\fP"
+.br
+.ti -1c
+.RI "\fBWorkstationPositionFunc\fP \fBworkstationPositionFunc\fP"
+.br
+.RI "The function used to calculate this workstation's target position\&. By default, will attempt to choose a nearby position approximately in front of the user and in the direction the workstation object is currently traveling, and a position that doesn't overlap with other workstations\&. The default method is set on Awake(), so it can be overridden in OnEnable() or Start()\&. "
+.ti -1c
+.RI "\fBWorkstationRotationFunc\fP \fBworkstationRotationFunc\fP"
+.br
+.RI "The function used to calculate this workstation's target rotation\&. By default, will make the workstation's forward vector face the camera while aligning its upward vector against gravity\&. "
+.in -1c
+.SS "Properties"
+
+.in +1c
+.ti -1c
+.RI "bool \fBisTraveling\fP\fC [get]\fP"
+.br
+.RI "Gets whether the workstation is currently traveling to a target position to open in workstation mode\&. Will return false if it is not traveling due to not being in workstation mode or if it has already reached its target position\&. "
+.ti -1c
+.RI "\fBWorkstationState\fP \fBworkstationState\fP\fC [get]\fP"
+.br
+.in -1c
+.SH "Detailed Description"
+.PP 
+This example script constructs behavior for a very specific kind of UI object that can animate out a 'workstation' panel when thrown or placed outside of an anchor\&. 
+
+Workstation objects exhibit the following behaviors:
+.IP "\(bu" 2
+Play a tween forwards or backwards when entering or exiting 'workstation mode', to open or close an arbitrary transform containing other UI elements\&.
+.IP "\(bu" 2
+Smoothly fly to a 'good' target location and orientation and enter workstation mode when the user throws the anchorable object\&.
+.IP "\(bu" 2
+Set the anchorable object to kinematic when in workstation mode\&.
+.IP "\(bu" 2
+Allow the user to adjust the anchorable object's position and rotation in a constrained way while in workstation mode\&. If the user moves the anchorable object quickly, exit workstation mode\&.
+.PP
+.PP
+It is a more complicated example that demonstrates using InteractionBehaviours and AnchorableBehaviours to create novel UI behavior\&. 
+.PP
+Definition at line 38 of file WorkstationBehaviourExample\&.cs\&.
+.SH "Member Enumeration Documentation"
+.PP 
+.SS "enum \fBLeap\&.Unity\&.Examples\&.WorkstationBehaviourExample\&.WorkstationState\fP\fC [strong]\fP"
+
+.PP
+\fBEnumerator\fP
+.in +1c
+.TP
+\fB\fIClosed \fP\fP
+.TP
+\fB\fITraveling \fP\fP
+.TP
+\fB\fIOpening \fP\fP
+.TP
+\fB\fIOpen \fP\fP
+.TP
+\fB\fIClosing \fP\fP
+.PP
+Definition at line 67 of file WorkstationBehaviourExample\&.cs\&.
+.SH "Member Function Documentation"
+.PP 
+.SS "void Leap\&.Unity\&.Examples\&.WorkstationBehaviourExample\&.ActivateWorkstation ()"
+
+.PP
+Definition at line 114 of file WorkstationBehaviourExample\&.cs\&.
+.SS "void Leap\&.Unity\&.Examples\&.WorkstationBehaviourExample\&.DeactivateWorkstation ()"
+
+.PP
+Definition at line 123 of file WorkstationBehaviourExample\&.cs\&.
+.SS "static Vector3 Leap\&.Unity\&.Examples\&.WorkstationBehaviourExample\&.DefaultDetermineWorkstationPosition (Vector3 userEyePosition, Quaternion userEyeRotation, Vector3 workstationObjInitPosition, Vector3 workstationObjInitVelocity, float workstationObjRadius, List< Vector3 > otherWorkstationPositions, List< float > otherWorkstationRadii)\fC [static]\fP"
+
+.PP
+Definition at line 313 of file WorkstationBehaviourExample\&.cs\&.
+.SS "static Quaternion Leap\&.Unity\&.Examples\&.WorkstationBehaviourExample\&.DefaultDetermineWorkstationRotation (Vector3 userEyePos, Vector3 workstationPosition)\fC [static]\fP"
+
+.PP
+Definition at line 364 of file WorkstationBehaviourExample\&.cs\&.
+.SS "delegate Vector3 Leap\&.Unity\&.Examples\&.WorkstationBehaviourExample\&.WorkstationPositionFunc (Vector3 userEyePosition, Quaternion userEyeRotation, Vector3 workstationObjInitPosition, Vector3 workstationObjInitVelocity, float workstationObjRadius, List< Vector3 > otherWorkstationPositions, List< float > otherWorkstationRadii)"
+
+.SS "delegate Quaternion Leap\&.Unity\&.Examples\&.WorkstationBehaviourExample\&.WorkstationRotationFunc (Vector3 userEyePosition, Vector3 targetWorkstationPosition)"
+
+.SH "Member Data Documentation"
+.PP 
+.SS "const float Leap\&.Unity\&.Examples\&.WorkstationBehaviourExample\&.MAX_SPEED_AS_WORKSTATION = 0\&.005F"
+
+.PP
+If the rigidbody of this object moves faster than this speed and the object is in workstation mode, it will exit workstation mode\&. 
+.PP
+Definition at line 44 of file WorkstationBehaviourExample\&.cs\&.
+.SS "const float Leap\&.Unity\&.Examples\&.WorkstationBehaviourExample\&.MIN_SPEED_TO_ACTIVATE_TRAVELING = 0\&.5F"
+
+.PP
+If the rigidbody of this object moves slower than this speed and the object wants to enter workstation mode, it will first pick a target position and travel there\&. (Otherwise, it will open its workstation in-place\&.) 
+.PP
+Definition at line 51 of file WorkstationBehaviourExample\&.cs\&.
+.SS "\fBTransformTweenBehaviour\fP Leap\&.Unity\&.Examples\&.WorkstationBehaviourExample\&.workstationModeTween"
+
+.PP
+Definition at line 53 of file WorkstationBehaviourExample\&.cs\&.
+.SS "\fBWorkstationPositionFunc\fP Leap\&.Unity\&.Examples\&.WorkstationBehaviourExample\&.workstationPositionFunc"
+
+.PP
+The function used to calculate this workstation's target position\&. By default, will attempt to choose a nearby position approximately in front of the user and in the direction the workstation object is currently traveling, and a position that doesn't overlap with other workstations\&. The default method is set on Awake(), so it can be overridden in OnEnable() or Start()\&. 
+.PP
+Definition at line 286 of file WorkstationBehaviourExample\&.cs\&.
+.SS "\fBWorkstationRotationFunc\fP Leap\&.Unity\&.Examples\&.WorkstationBehaviourExample\&.workstationRotationFunc"
+
+.PP
+The function used to calculate this workstation's target rotation\&. By default, will make the workstation's forward vector face the camera while aligning its upward vector against gravity\&. 
+.PP
+Definition at line 292 of file WorkstationBehaviourExample\&.cs\&.
+.SH "Property Documentation"
+.PP 
+.SS "bool Leap\&.Unity\&.Examples\&.WorkstationBehaviourExample\&.isTraveling\fC [get]\fP"
+
+.PP
+Gets whether the workstation is currently traveling to a target position to open in workstation mode\&. Will return false if it is not traveling due to not being in workstation mode or if it has already reached its target position\&. 
+.PP
+Definition at line 65 of file WorkstationBehaviourExample\&.cs\&.
+.SS "\fBWorkstationState\fP Leap\&.Unity\&.Examples\&.WorkstationBehaviourExample\&.workstationState\fC [get]\fP"
+
+.PP
+Definition at line 68 of file WorkstationBehaviourExample\&.cs\&.
+
+.SH "Author"
+.PP 
+Generated automatically by Doxygen for Multi User Vr Viewer from the source code\&.

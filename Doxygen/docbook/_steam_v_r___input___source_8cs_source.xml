@@ -1,0 +1,91 @@
+<?xml version='1.0' encoding='UTF-8' standalone='no'?>
+<section xmlns="http://docbook.org/ns/docbook" version="5.0" xmlns:xlink="http://www.w3.org/1999/xlink" xml:id="__steam_v_r___input___source_8cs_source">
+<title>SteamVR_Input_Source.cs</title>
+<indexterm><primary>O:/GitHUBMINIPRoject/Assets/SteamVR/Input/SteamVR_Input_Source.cs</primary></indexterm>
+<programlisting>00001 <emphasis role="comment">//=======&#32;Copyright&#32;(c)&#32;Valve&#32;Corporation,&#32;All&#32;rights&#32;reserved.&#32;===============</emphasis>
+00002 
+00003 <emphasis role="keyword">using</emphasis>&#32;<link linkend="__balloon_8cs_1a7d67e097df9376eb709b6a23aa3c7d23">UnityEngine</link>;
+00004 <emphasis role="keyword">using</emphasis>&#32;System.Collections;
+00005 <emphasis role="keyword">using</emphasis>&#32;System;
+00006 <emphasis role="keyword">using</emphasis>&#32;<link linkend="_namespace_valve">Valve</link>.<link linkend="_namespace_valve_1_1_v_r">VR</link>;
+00007 <emphasis role="keyword">using</emphasis>&#32;System.Linq;
+00008 <emphasis role="keyword">using</emphasis>&#32;System.Runtime.InteropServices;
+00009 <emphasis role="keyword">using</emphasis>&#32;System.ComponentModel;
+00010 <emphasis role="keyword">using</emphasis>&#32;System.Collections.Generic;
+00011 
+00012 <emphasis role="keyword">namespace&#32;</emphasis><link linkend="_namespace_valve_1_1_v_r">Valve.VR</link>
+00013 {
+00014 &#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keyword">static</emphasis>&#32;<emphasis role="keyword">class&#32;</emphasis>SteamVR_Input_Source
+00015 &#32;&#32;&#32;&#32;{
+00016 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;<emphasis role="keyword">static</emphasis>&#32;Dictionary&lt;SteamVR_Input_Sources,&#32;ulong&gt;&#32;inputSourceHandlesBySource&#32;=&#32;<emphasis role="keyword">new</emphasis>&#32;Dictionary&lt;SteamVR_Input_Sources,&#32;ulong&gt;(<emphasis role="keyword">new</emphasis>&#32;<link linkend="_struct_valve_1_1_v_r_1_1_steam_v_r___input___sources___comparer">SteamVR_Input_Sources_Comparer</link>());
+00017 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;<emphasis role="keyword">static</emphasis>&#32;Dictionary&lt;ulong,&#32;SteamVR_Input_Sources&gt;&#32;inputSourceSourcesByHandle&#32;=&#32;<emphasis role="keyword">new</emphasis>&#32;Dictionary&lt;ulong,&#32;SteamVR_Input_Sources&gt;();
+00018 
+00019 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;<emphasis role="keyword">static</emphasis>&#32;Type&#32;enumType&#32;=&#32;typeof(<link linkend="_namespace_valve_1_1_v_r_1a82e5bf501cc3aa155444ee3f0662853f">SteamVR_Input_Sources</link>);
+00020 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;<emphasis role="keyword">static</emphasis>&#32;Type&#32;descriptionType&#32;=&#32;typeof(DescriptionAttribute);
+00021 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;
+00022 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;<emphasis role="keyword">static</emphasis>&#32;<link linkend="_namespace_valve_1_1_v_r_1a82e5bf501cc3aa155444ee3f0662853f">SteamVR_Input_Sources</link>[]&#32;allSources;
+00023 
+00024 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keyword">static</emphasis>&#32;ulong&#32;GetHandle(<link linkend="_namespace_valve_1_1_v_r_1a82e5bf501cc3aa155444ee3f0662853f">SteamVR_Input_Sources</link>&#32;inputSource)
+00025 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00026 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(inputSourceHandlesBySource.ContainsKey(inputSource))
+00027 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;inputSourceHandlesBySource[inputSource];
+00028 
+00029 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;0;
+00030 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00031 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keyword">static</emphasis>&#32;<link linkend="_namespace_valve_1_1_v_r_1a82e5bf501cc3aa155444ee3f0662853f">SteamVR_Input_Sources</link>&#32;GetSource(ulong&#32;handle)
+00032 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00033 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(inputSourceSourcesByHandle.ContainsKey(handle))
+00034 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;inputSourceSourcesByHandle[handle];
+00035 
+00036 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;<link linkend="_namespace_valve_1_1_v_r_1a82e5bf501cc3aa155444ee3f0662853f">SteamVR_Input_Sources</link>.Any;
+00037 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00038 
+00039 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keyword">static</emphasis>&#32;<link linkend="_namespace_valve_1_1_v_r_1a82e5bf501cc3aa155444ee3f0662853f">SteamVR_Input_Sources</link>[]&#32;GetAllSources()
+00040 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00041 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(allSources&#32;==&#32;<emphasis role="keyword">null</emphasis>)
+00042 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;allSources&#32;=&#32;(<link linkend="_namespace_valve_1_1_v_r_1a82e5bf501cc3aa155444ee3f0662853f">SteamVR_Input_Sources</link>[])System.Enum.GetValues(typeof(<link linkend="_namespace_valve_1_1_v_r_1a82e5bf501cc3aa155444ee3f0662853f">SteamVR_Input_Sources</link>));
+00043 
+00044 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;allSources;
+00045 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00046 
+00047 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;<emphasis role="keyword">static</emphasis>&#32;<emphasis role="keywordtype">string</emphasis>&#32;GetPath(<emphasis role="keywordtype">string</emphasis>&#32;inputSourceEnumName)
+00048 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00049 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;((DescriptionAttribute)enumType.GetMember(inputSourceEnumName)[0].GetCustomAttributes(descriptionType,&#32;<emphasis role="keyword">false</emphasis>)[0]).Description;
+00050 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00051 
+00052 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keyword">static</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;Initialize()
+00053 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00054 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;List&lt;SteamVR_Input_Sources&gt;&#32;allSourcesList&#32;=&#32;<emphasis role="keyword">new</emphasis>&#32;List&lt;SteamVR_Input_Sources&gt;();
+00055 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordtype">string</emphasis>[]&#32;enumNames&#32;=&#32;System.Enum.GetNames(enumType);
+00056 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;inputSourceHandlesBySource&#32;=&#32;<emphasis role="keyword">new</emphasis>&#32;Dictionary&lt;SteamVR_Input_Sources,&#32;ulong&gt;(<emphasis role="keyword">new</emphasis>&#32;<link linkend="_struct_valve_1_1_v_r_1_1_steam_v_r___input___sources___comparer">SteamVR_Input_Sources_Comparer</link>());
+00057 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;inputSourceSourcesByHandle&#32;=&#32;<emphasis role="keyword">new</emphasis>&#32;Dictionary&lt;ulong,&#32;SteamVR_Input_Sources&gt;();
+00058 
+00059 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">for</emphasis>&#32;(<emphasis role="keywordtype">int</emphasis>&#32;enumIndex&#32;=&#32;0;&#32;enumIndex&#32;&lt;&#32;enumNames.Length;&#32;enumIndex++)
+00060 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00061 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordtype">string</emphasis>&#32;path&#32;=&#32;GetPath(enumNames[enumIndex]);
+00062 
+00063 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;ulong&#32;handle&#32;=&#32;0;
+00064 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_namespace_valve_1_1_v_r_1a592d7f4189b8346d6c96dbdbaa35bc1b">EVRInputError</link>&#32;err&#32;=&#32;<link linkend="_class_valve_1_1_v_r_1_1_open_v_r">OpenVR</link>.<link linkend="_class_valve_1_1_v_r_1_1_open_v_r_1a7654f626318585e535bbcdca6a2b01ec">Input</link>.<link linkend="_class_valve_1_1_v_r_1_1_c_v_r_input_1a26142f29606f17823f465e181892a0ab">GetInputSourceHandle</link>(path,&#32;ref&#32;handle);
+00065 
+00066 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(err&#32;!=&#32;<link linkend="_namespace_valve_1_1_v_r_1a592d7f4189b8346d6c96dbdbaa35bc1b">EVRInputError</link>.None)
+00067 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;Debug.LogError(<emphasis role="stringliteral">&quot;&lt;b&gt;[SteamVR]&lt;/b&gt;&#32;GetInputSourceHandle&#32;(&quot;</emphasis>&#32;+&#32;path&#32;+&#32;<emphasis role="stringliteral">&quot;)&#32;error:&#32;&quot;</emphasis>&#32;+&#32;err.ToString());
+00068 
+00069 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(enumNames[enumIndex]&#32;==&#32;<link linkend="_namespace_valve_1_1_v_r_1a82e5bf501cc3aa155444ee3f0662853f">SteamVR_Input_Sources</link>.Any.ToString())&#32;<emphasis role="comment">//todo:&#32;temporary&#32;hack</emphasis>
+00070 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00071 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;inputSourceHandlesBySource.Add((<link linkend="_namespace_valve_1_1_v_r_1a82e5bf501cc3aa155444ee3f0662853f">SteamVR_Input_Sources</link>)enumIndex,&#32;0);
+00072 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;inputSourceSourcesByHandle.Add(0,&#32;(<link linkend="_namespace_valve_1_1_v_r_1a82e5bf501cc3aa155444ee3f0662853f">SteamVR_Input_Sources</link>)enumIndex);
+00073 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00074 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">else</emphasis>
+00075 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00076 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;inputSourceHandlesBySource.Add((<link linkend="_namespace_valve_1_1_v_r_1a82e5bf501cc3aa155444ee3f0662853f">SteamVR_Input_Sources</link>)enumIndex,&#32;handle);
+00077 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;inputSourceSourcesByHandle.Add(handle,&#32;(<link linkend="_namespace_valve_1_1_v_r_1a82e5bf501cc3aa155444ee3f0662853f">SteamVR_Input_Sources</link>)enumIndex);
+00078 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00079 
+00080 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;allSourcesList.Add((<link linkend="_namespace_valve_1_1_v_r_1a82e5bf501cc3aa155444ee3f0662853f">SteamVR_Input_Sources</link>)enumIndex);
+00081 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00082 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;
+00083 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;allSources&#32;=&#32;allSourcesList.ToArray();
+00084 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00085 &#32;&#32;&#32;&#32;}
+00086 }
+</programlisting></section>

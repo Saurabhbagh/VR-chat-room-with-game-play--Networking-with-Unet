@@ -1,0 +1,996 @@
+<?xml version='1.0' encoding='UTF-8' standalone='no'?>
+<section xmlns="http://docbook.org/ns/docbook" version="5.0" xmlns:xlink="http://www.w3.org/1999/xlink" xml:id="__leap_rig_upgrader_8cs_source">
+<title>LeapRigUpgrader.cs</title>
+<indexterm><primary>O:/GitHUBMINIPRoject/Assets/LeapMotion/Core/Scripts/EditorTools/Editor/LeapRigUpgrader.cs</primary></indexterm>
+<programlisting>00001 <emphasis role="comment">/******************************************************************************</emphasis>
+00002 <emphasis role="comment">&#32;*&#32;Copyright&#32;(C)&#32;Leap&#32;Motion,&#32;Inc.&#32;2011-2018.&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;*</emphasis>
+00003 <emphasis role="comment">&#32;*&#32;Leap&#32;Motion&#32;proprietary&#32;and&#32;confidential.&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;*</emphasis>
+00004 <emphasis role="comment">&#32;*&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;*</emphasis>
+00005 <emphasis role="comment">&#32;*&#32;Use&#32;subject&#32;to&#32;the&#32;terms&#32;of&#32;the&#32;Leap&#32;Motion&#32;SDK&#32;Agreement&#32;available&#32;at&#32;&#32;&#32;&#32;&#32;*</emphasis>
+00006 <emphasis role="comment">&#32;*&#32;https://developer.leapmotion.com/sdk_agreement,&#32;or&#32;another&#32;agreement&#32;&#32;&#32;&#32;&#32;&#32;&#32;*</emphasis>
+00007 <emphasis role="comment">&#32;*&#32;between&#32;Leap&#32;Motion&#32;and&#32;you,&#32;your&#32;company&#32;or&#32;other&#32;organization.&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;*</emphasis>
+00008 <emphasis role="comment">&#32;******************************************************************************/</emphasis>
+00009 
+00010 <emphasis role="keyword">using</emphasis>&#32;<link linkend="_namespace_leap">Leap</link>.<link linkend="_namespace_leap_1_1_unity">Unity</link>.<link linkend="_namespace_leap_1_1_unity_1_1_query">Query</link>;
+00011 <emphasis role="keyword">using</emphasis>&#32;System;
+00012 <emphasis role="keyword">using</emphasis>&#32;System.Collections.Generic;
+00013 <emphasis role="keyword">using</emphasis>&#32;System.Text;
+00014 <emphasis role="keyword">using</emphasis>&#32;<link linkend="_namespace_unity_editor">UnityEditor</link>;
+00015 <emphasis role="keyword">using</emphasis>&#32;<link linkend="_namespace_unity_editor">UnityEditor</link>.SceneManagement;
+00016 <emphasis role="keyword">using</emphasis>&#32;<link linkend="__balloon_8cs_1a7d67e097df9376eb709b6a23aa3c7d23">UnityEngine</link>;
+00017 <emphasis role="keyword">using</emphasis>&#32;<link linkend="_namespace_unity_engine">UnityEngine</link>.SceneManagement;
+00018 
+00019 <emphasis role="keyword">namespace&#32;</emphasis><link linkend="_namespace_leap_1_1_unity">Leap.Unity</link>&#32;{
+00020 
+<anchor xml:id="__leap_rig_upgrader_8cs_source_1l00021"/><link linkend="_namespace_leap_1_1_unity_1aa7911d55a8e7b4f29baff562ebffea48">00021</link> &#32;&#32;<emphasis role="keyword">using</emphasis>&#32;<link linkend="_namespace_leap_1_1_unity_1_1_attributes_1a71d15e38cb19d7d2ffb1aa310ce8f0f9">UnityObject</link>&#32;=&#32;<link linkend="_namespace_unity_engine">UnityEngine</link>.Object;
+00022 
+00028 &#32;&#32;[InitializeOnLoad]
+00029 &#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keyword">static</emphasis>&#32;<emphasis role="keyword">class&#32;</emphasis>LeapRigUpgrader&#32;{
+00030 
+00031 <emphasis role="preprocessor">&#32;&#32;&#32;&#32;#region&#32;Events</emphasis>
+00032 
+00033 &#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keyword">enum</emphasis>&#32;SceneScanStatus&#32;{&#32;NotScanned,&#32;ContainsOldRigs,&#32;NoOldRigsFound&#32;}
+00034 &#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;<emphasis role="keyword">static</emphasis>&#32;SceneScanStatus&#32;_currentSceneScanStatus&#32;=&#32;SceneScanStatus.NotScanned;
+00035 &#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keyword">static</emphasis>&#32;SceneScanStatus&#32;currentSceneScanStatus&#32;{
+00036 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">get</emphasis>&#32;{
+00037 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;_currentSceneScanStatus;
+00038 &#32;&#32;&#32;&#32;&#32;&#32;}
+00039 &#32;&#32;&#32;&#32;}
+00040 
+00041 &#32;&#32;&#32;&#32;[InitializeOnLoadMethod]
+00042 &#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;<emphasis role="keyword">static</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;Init()&#32;{
+00043 &#32;&#32;&#32;&#32;&#32;&#32;EditorSceneManager.sceneOpened&#32;-=&#32;onSceneOpened;
+00044 &#32;&#32;&#32;&#32;&#32;&#32;EditorSceneManager.sceneOpened&#32;+=&#32;onSceneOpened;
+00045 
+00046 <emphasis role="preprocessor">&#32;&#32;&#32;&#32;&#32;&#32;#if&#32;UNITY_2018_1_OR_NEWER</emphasis>
+00047 &#32;&#32;&#32;&#32;&#32;&#32;EditorApplication.hierarchyChanged&#32;-=&#32;onHierarchyChanged;
+00048 &#32;&#32;&#32;&#32;&#32;&#32;EditorApplication.hierarchyChanged&#32;+=&#32;onHierarchyChanged;
+00049 <emphasis role="preprocessor">&#32;&#32;&#32;&#32;&#32;&#32;#else</emphasis>
+00050 &#32;&#32;&#32;&#32;&#32;&#32;EditorApplication.hierarchyWindowChanged&#32;-=&#32;onHierarchyChanged;
+00051 &#32;&#32;&#32;&#32;&#32;&#32;EditorApplication.hierarchyWindowChanged&#32;+=&#32;onHierarchyChanged;
+00052 <emphasis role="preprocessor">&#32;&#32;&#32;&#32;&#32;&#32;#endif</emphasis>
+00053 
+00054 &#32;&#32;&#32;&#32;&#32;&#32;_currentSceneScanStatus&#32;=&#32;SceneScanStatus.NotScanned;
+00055 &#32;&#32;&#32;&#32;}
+00056 
+00057 &#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;<emphasis role="keyword">static</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;onSceneOpened(<link linkend="_namespace_leap_1_1_unity_1_1_attributes_1a4b8f0ac9a7b74b480178dc5fb4069a89a9ead0d38e06ec253ca0ecbf6ea56e59b">Scene</link>&#32;scene,&#32;OpenSceneMode&#32;openSceneMode)&#32;{
+00058 &#32;&#32;&#32;&#32;&#32;&#32;_currentSceneScanStatus&#32;=&#32;SceneScanStatus.NotScanned;
+00059 &#32;&#32;&#32;&#32;&#32;&#32;ClearScanData();
+00060 &#32;&#32;&#32;&#32;}
+00061 &#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;<emphasis role="keyword">static</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;onHierarchyChanged()&#32;{
+00062 &#32;&#32;&#32;&#32;&#32;&#32;_currentSceneScanStatus&#32;=&#32;SceneScanStatus.NotScanned;
+00063 &#32;&#32;&#32;&#32;&#32;&#32;ClearScanData();
+00064 &#32;&#32;&#32;&#32;}
+00065 
+00066 <emphasis role="preprocessor">&#32;&#32;&#32;&#32;#endregion</emphasis>
+00067 
+00068 <emphasis role="preprocessor">&#32;&#32;&#32;&#32;#region&#32;GUI&#32;Drawing</emphasis>
+00069 
+00070 <emphasis role="preprocessor">&#32;&#32;&#32;&#32;#region&#32;Convenience&#32;Properties</emphasis>
+00071 
+00072 &#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keyword">static</emphasis>&#32;GUIStyle&#32;boldLabel&#32;{
+00073 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">get</emphasis>&#32;{&#32;<emphasis role="keywordflow">return</emphasis>&#32;EditorStyles.boldLabel;&#32;}
+00074 &#32;&#32;&#32;&#32;}
+00075 
+00076 &#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;<emphasis role="keyword">static</emphasis>&#32;GUIStyle&#32;_backingWrapLabel;
+00077 &#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keyword">static</emphasis>&#32;GUIStyle&#32;wrapLabel&#32;{
+00078 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">get</emphasis>&#32;{
+00079 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(_backingWrapLabel&#32;==&#32;<emphasis role="keyword">null</emphasis>)&#32;{
+00080 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;_backingWrapLabel&#32;=&#32;<emphasis role="keyword">new</emphasis>&#32;GUIStyle(EditorStyles.label);
+00081 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;_backingWrapLabel.wordWrap&#32;=&#32;<emphasis role="keyword">true</emphasis>;
+00082 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00083 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;_backingWrapLabel;
+00084 &#32;&#32;&#32;&#32;&#32;&#32;}
+00085 &#32;&#32;&#32;&#32;}
+00086 
+00087 <emphasis role="preprocessor">&#32;&#32;&#32;&#32;#endregion</emphasis>
+00088 
+00089 <emphasis role="preprocessor">&#32;&#32;&#32;&#32;#region&#32;Project&#32;Check&#32;GUI</emphasis>
+00090 
+00095 &#32;&#32;&#32;&#32;[LeapProjectCheck(<emphasis role="stringliteral">&quot;Core&quot;</emphasis>,&#32;0)]
+00096 &#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;<emphasis role="keyword">static</emphasis>&#32;<emphasis role="keywordtype">bool</emphasis>&#32;drawRigUpgraderCheckGUI()&#32;{
+00097 &#32;&#32;&#32;&#32;&#32;&#32;EditorGUILayout.LabelField(<emphasis role="stringliteral">&quot;Leap&#32;Rig&#32;Upgrader&quot;</emphasis>,&#32;boldLabel);
+00098 &#32;&#32;&#32;&#32;&#32;&#32;
+00099 &#32;&#32;&#32;&#32;&#32;&#32;EditorGUILayout.LabelField(
+00100 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="stringliteral">&quot;If&#32;you&#32;have&#32;upgraded&#32;from&#32;Core&#32;version&#32;4.3.4&#32;or&#32;earlier&#32;to&#32;Core&#32;version&#32;4.4&#32;or&#32;&quot;</emphasis>
+00101 &#32;&#32;&#32;&#32;&#32;&#32;+&#32;<emphasis role="stringliteral">&quot;later,&#32;you&#32;can&#32;check&#32;the&#32;currently-open&#32;scene&#32;for&#32;out-of-date&#32;rigs.&#32;Instances&#32;of&#32;&quot;</emphasis>
+00102 &#32;&#32;&#32;&#32;&#32;&#32;+&#32;<emphasis role="stringliteral">&quot;older&#32;Leap&#32;Rig&#32;prefabs&#32;can&#32;be&#32;automatically&#32;upgraded&#32;to&#32;match&#32;the&#32;updated&#32;rig,&#32;&quot;</emphasis>
+00103 &#32;&#32;&#32;&#32;&#32;&#32;+&#32;<emphasis role="stringliteral">&quot;which&#32;is&#32;much&#32;simpler.&quot;</emphasis>,
+00104 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;wrapLabel);
+00105 
+00106 &#32;&#32;&#32;&#32;&#32;&#32;EditorGUILayout.Space();
+00107 
+00108 &#32;&#32;&#32;&#32;&#32;&#32;drawScanCurrentSceneButtonAndStatus();
+00109 
+00110 &#32;&#32;&#32;&#32;&#32;&#32;EditorGUILayout.Space();
+00111 
+00112 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;<emphasis role="keyword">true</emphasis>;
+00113 &#32;&#32;&#32;&#32;}
+00114 
+00115 &#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;<emphasis role="keyword">static</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;drawScanCurrentSceneButtonAndStatus()&#32;{
+00116 
+00117 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">using</emphasis>&#32;(<emphasis role="keyword">new</emphasis>&#32;EditorGUILayout.HorizontalScope())&#32;{
+00118 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(GUILayout.Button(<emphasis role="keyword">new</emphasis>&#32;GUIContent(<emphasis role="stringliteral">&quot;Scan&#32;Current&#32;Scene&quot;</emphasis>),
+00119 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;GUILayout.MaxWidth(200f)))&#32;{
+00120 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;var&#32;oldRigsDetected&#32;=&#32;ScanCurrentSceneForOldLeapRigs();
+00121 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(oldRigsDetected)&#32;{
+00122 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;_currentSceneScanStatus&#32;=&#32;SceneScanStatus.ContainsOldRigs;
+00123 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(<link linkend="_class_leap_1_1_unity_1_1_leap_unity_window">LeapUnityWindow</link>.<link linkend="_class_leap_1_1_unity_1_1_leap_unity_window_1aab787ca9a41ea00fa31ab7e478e95628">isWindowOpen</link>)&#32;{
+00124 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_leap_1_1_unity_1_1_leap_unity_window">LeapUnityWindow</link>.<link linkend="_class_leap_1_1_unity_1_1_leap_unity_window_1a98239c66f391636c27540d9ab60e99a4">ShowTab</link>(1);
+00125 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00126 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00127 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">else</emphasis>&#32;{
+00128 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;_currentSceneScanStatus&#32;=&#32;SceneScanStatus.NoOldRigsFound;
+00129 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00130 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00131 
+00132 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordtype">string</emphasis>&#32;scanText;
+00133 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">switch</emphasis>&#32;(_currentSceneScanStatus)&#32;{
+00134 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">case</emphasis>&#32;SceneScanStatus.ContainsOldRigs:
+00135 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;scanText&#32;=&#32;<emphasis role="stringliteral">&quot;Scene&#32;contained&#32;old&#32;Leap&#32;rigs&#32;as&#32;of&#32;the&#32;last&#32;scan.&quot;</emphasis>;
+00136 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">break</emphasis>;
+00137 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">case</emphasis>&#32;SceneScanStatus.NoOldRigsFound:
+00138 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;scanText&#32;=&#32;<emphasis role="stringliteral">&quot;Scene&#32;contained&#32;no&#32;old&#32;Leap&#32;rigs&#32;as&#32;of&#32;the&#32;last&#32;scan.&quot;</emphasis>;
+00139 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">break</emphasis>;
+00140 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">case</emphasis>&#32;SceneScanStatus.NotScanned:
+00141 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">default</emphasis>:
+00142 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;scanText&#32;=&#32;<emphasis role="stringliteral">&quot;Scene&#32;not&#32;yet&#32;scanned.&quot;</emphasis>;
+00143 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">break</emphasis>;
+00144 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00145 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;EditorGUILayout.LabelField(scanText);
+00146 &#32;&#32;&#32;&#32;&#32;&#32;}
+00147 &#32;&#32;&#32;&#32;}
+00148 
+00149 <emphasis role="preprocessor">&#32;&#32;&#32;&#32;#endregion</emphasis>
+00150 
+00151 <emphasis role="preprocessor">&#32;&#32;&#32;&#32;#region&#32;Upgrader&#32;GUI</emphasis>
+00152 
+00153 &#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;<emphasis role="keyword">static</emphasis>&#32;Vector2&#32;_scrollPosition&#32;=&#32;Vector2.zero;
+00154 &#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;<emphasis role="keyword">static</emphasis>&#32;Dictionary&lt;OldRigHierarchy,&#32;bool&gt;&#32;_rigFoldoutStates
+00155 &#32;&#32;&#32;&#32;&#32;&#32;=&#32;<emphasis role="keyword">new</emphasis>&#32;Dictionary&lt;OldRigHierarchy,&#32;bool&gt;();
+00156 &#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;<emphasis role="keyword">static</emphasis>&#32;<link linkend="_class_leap_1_1_unity_1_1_old_rig_hierarchy">OldRigHierarchy</link>.<link linkend="_class_leap_1_1_unity_1_1_old_rig_hierarchy_1_1_upgrade_options">UpgradeOptions</link>&#32;_upgradeOptions
+00157 &#32;&#32;&#32;&#32;&#32;&#32;=&#32;<emphasis role="keyword">new</emphasis>&#32;<link linkend="_class_leap_1_1_unity_1_1_old_rig_hierarchy">OldRigHierarchy</link>.<link linkend="_class_leap_1_1_unity_1_1_old_rig_hierarchy_1_1_upgrade_options">UpgradeOptions</link>();
+00158 
+00159 &#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keyword">static</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;DrawUpgraderGUI()&#32;{
+00160 &#32;&#32;&#32;&#32;&#32;&#32;var&#32;origIndent&#32;=&#32;EditorGUI.indentLevel;
+00161 &#32;&#32;&#32;&#32;&#32;&#32;EditorGUI.indentLevel&#32;=&#32;0;
+00162 
+00163 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">using</emphasis>&#32;(<emphasis role="keyword">new</emphasis>&#32;EditorGUILayout.VerticalScope(EditorStyles.helpBox))&#32;{
+00164 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;drawRigUpgraderCheckGUI();
+00165 &#32;&#32;&#32;&#32;&#32;&#32;}
+00166 
+00167 &#32;&#32;&#32;&#32;&#32;&#32;EditorGUILayout.Space();
+00168 &#32;&#32;&#32;&#32;&#32;&#32;EditorGUILayout.Space();
+00169 
+00170 &#32;&#32;&#32;&#32;&#32;&#32;drawRigScanResultsGUI();
+00171 
+00172 &#32;&#32;&#32;&#32;&#32;&#32;var&#32;splitterStyle&#32;=&#32;<emphasis role="keyword">new</emphasis>&#32;GUIStyle(<link linkend="_class_leap_1_1_unity_1_1_leap_unity_window">LeapUnityWindow</link>.<link linkend="_class_leap_1_1_unity_1_1_leap_unity_window_1a52ba0d06fb0957e6a5e608fb4164b5e8">windowSkin</link>.box);
+00173 &#32;&#32;&#32;&#32;&#32;&#32;splitterStyle.fixedHeight&#32;=&#32;1f;
+00174 &#32;&#32;&#32;&#32;&#32;&#32;splitterStyle.stretchWidth&#32;=&#32;<emphasis role="keyword">true</emphasis>;
+00175 &#32;&#32;&#32;&#32;&#32;&#32;splitterStyle.margin&#32;=&#32;<emphasis role="keyword">new</emphasis>&#32;RectOffset(0,&#32;0,&#32;0,&#32;0);
+00176 &#32;&#32;&#32;&#32;&#32;&#32;GUILayout.Box(<emphasis role="stringliteral">&quot;&quot;</emphasis>,&#32;splitterStyle);
+00177 
+00178 &#32;&#32;&#32;&#32;&#32;&#32;_scrollPosition&#32;=&#32;EditorGUILayout.BeginScrollView(_scrollPosition,
+00179 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;GUILayout.ExpandWidth(<emphasis role="keyword">true</emphasis>));
+00180 
+00181 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">foreach</emphasis>&#32;(var&#32;oldRig&#32;<emphasis role="keywordflow">in</emphasis>&#32;_oldRigs)&#32;{
+00182 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;EditorGUILayout.Space();
+00183 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;drawOldRigUpgradeGUI(oldRig);
+00184 &#32;&#32;&#32;&#32;&#32;&#32;}
+00185 
+00186 &#32;&#32;&#32;&#32;&#32;&#32;EditorGUILayout.EndScrollView();
+00187 
+00188 &#32;&#32;&#32;&#32;&#32;&#32;EditorGUI.indentLevel&#32;=&#32;origIndent;
+00189 &#32;&#32;&#32;&#32;}
+00190 
+00191 &#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;<emphasis role="keyword">static</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;drawRigScanResultsGUI()&#32;{
+00192 &#32;&#32;&#32;&#32;&#32;&#32;var&#32;safetyWarning&#32;=&#32;<emphasis role="stringliteral">&quot;To&#32;be&#32;safe,&#32;you&#32;should&#32;make&#32;sure&#32;you&apos;ve&#32;backed&#32;up&#32;your&#32;scene&#32;&quot;</emphasis>
+00193 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;+&#32;<emphasis role="stringliteral">&quot;before&#32;upgrading.&quot;</emphasis>;
+00194 &#32;&#32;&#32;&#32;&#32;&#32;EditorGUILayout.LabelField(safetyWarning,&#32;wrapLabel);
+00195 &#32;&#32;&#32;&#32;&#32;&#32;
+00196 &#32;&#32;&#32;&#32;&#32;&#32;var&#32;singleRig&#32;=&#32;_oldRigs.Count&#32;==&#32;1;
+00197 &#32;&#32;&#32;&#32;&#32;&#32;EditorGUILayout.LabelField(
+00198 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="stringliteral">&quot;Detected&#32;&quot;</emphasis>&#32;+&#32;_oldRigs.Count&#32;+&#32;<emphasis role="stringliteral">&quot;&#32;old&#32;rig&quot;</emphasis>
+00199 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;+&#32;(singleRig&#32;?&#32;<emphasis role="stringliteral">&quot;&quot;</emphasis>&#32;:&#32;<emphasis role="stringliteral">&quot;s&quot;</emphasis>)&#32;+&#32;<emphasis role="stringliteral">&quot;.&#32;&quot;</emphasis>
+00200 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;,&#32;wrapLabel);
+00201 &#32;&#32;&#32;&#32;}
+00202 
+00203 &#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;<emphasis role="keyword">static</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;drawOldRigUpgradeGUI(<link linkend="_class_leap_1_1_unity_1_1_old_rig_hierarchy">OldRigHierarchy</link>&#32;oldRig)&#32;{
+00204 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">using</emphasis>&#32;(<emphasis role="keyword">new</emphasis>&#32;EditorGUILayout.VerticalScope(EditorStyles.helpBox))&#32;{
+00205 
+00206 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;var&#32;rigDescFoldoutState&#32;=&#32;<emphasis role="keyword">false</emphasis>;
+00207 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(!_rigFoldoutStates.TryGetValue(oldRig,&#32;out&#32;rigDescFoldoutState))&#32;{
+00208 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;_rigFoldoutStates[oldRig]&#32;=&#32;<emphasis role="keyword">false</emphasis>;
+00209 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00210 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordtype">string</emphasis>&#32;foldoutName&#32;=&#32;getName(oldRig.<link linkend="_class_leap_1_1_unity_1_1_old_rig_hierarchy_1adef150bfa76ed5c64ad298d1b0f40d4a">rigTransform</link>);
+00211 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(!rigDescFoldoutState)&#32;{
+00212 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;foldoutName&#32;+=&#32;<emphasis role="stringliteral">&quot;&#32;(click&#32;to&#32;expand&#32;upgrade&#32;details)&quot;</emphasis>;
+00213 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00214 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">else</emphasis>&#32;{
+00215 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;foldoutName&#32;+=&#32;<emphasis role="stringliteral">&quot;&#32;(click&#32;to&#32;hide&#32;upgrade&#32;details)&quot;</emphasis>;
+00216 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00217 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">using</emphasis>&#32;(<emphasis role="keyword">new</emphasis>&#32;EditorGUILayout.HorizontalScope())&#32;{
+00218 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;_rigFoldoutStates[oldRig]&#32;=&#32;EditorGUILayout.Foldout(_rigFoldoutStates[oldRig],
+00219 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;foldoutName,&#32;toggleOnLabelClick:&#32;<emphasis role="keyword">true</emphasis>);
+00220 
+00221 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;EditorGUI.BeginDisabledGroup(<emphasis role="keyword">true</emphasis>);
+00222 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;EditorGUILayout.ObjectField(oldRig.rigTransform,&#32;typeof(Transform),&#32;<emphasis role="keyword">true</emphasis>,
+00223 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;GUILayout.ExpandWidth(<emphasis role="keyword">false</emphasis>));
+00224 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;EditorGUI.EndDisabledGroup();
+00225 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00226 
+00227 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(_rigFoldoutStates[oldRig])&#32;{
+00228 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;EditorGUILayout.Space();
+00229 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;
+00230 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;drawOldRigCameraGUI(oldRig);
+00231 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;
+00232 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;drawOldRigLeapSpaceGUI(oldRig);
+00233 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;
+00234 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;drawOldRigLHCGUI(oldRig);
+00235 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00236 
+00237 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(GUILayout.Button(<emphasis role="stringliteral">&quot;Update&#32;Rig&quot;</emphasis>))&#32;{
+00238 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;oldRig.Upgrade(_upgradeOptions);
+00239 
+00240 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;EditorApplication.delayCall&#32;+=&#32;()&#32;=&gt;&#32;{
+00241 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;ScanCurrentSceneForOldLeapRigs();
+00242 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;};
+00243 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00244 &#32;&#32;&#32;&#32;&#32;&#32;}
+00245 &#32;&#32;&#32;&#32;}
+00246 
+00247 <emphasis role="preprocessor">&#32;&#32;&#32;&#32;#region&#32;Old&#32;Rig&#32;Component&#32;Drawing</emphasis>
+00248 
+00249 &#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;<emphasis role="keyword">static</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;drawOldRigCameraGUI(<link linkend="_class_leap_1_1_unity_1_1_old_rig_hierarchy">OldRigHierarchy</link>&#32;oldRig)&#32;{
+00250 &#32;&#32;&#32;&#32;&#32;&#32;EditorGUI.indentLevel&#32;=&#32;1;
+00251 &#32;&#32;&#32;&#32;&#32;&#32;drawRigItem(<emphasis role="stringliteral">&quot;Rig&#32;Camera&quot;</emphasis>,&#32;oldRig.<link linkend="_class_leap_1_1_unity_1_1_old_rig_hierarchy_1a1273b07cacb3db69876ad8bbf0eec077">cameraData</link>.<link linkend="_class_leap_1_1_unity_1_1_old_rig_hierarchy_1_1_old_camera_data_1a064374ed9ef4561816be21780153877f">cameraComponent</link>,
+00252 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;typeof(Camera));
+00253 &#32;&#32;&#32;&#32;&#32;&#32;EditorGUI.indentLevel&#32;=&#32;2;
+00254 
+00255 &#32;&#32;&#32;&#32;&#32;&#32;var&#32;camera_enableDepthBuffer&#32;=&#32;oldRig.<link linkend="_class_leap_1_1_unity_1_1_old_rig_hierarchy_1a1273b07cacb3db69876ad8bbf0eec077">cameraData</link>.<link linkend="_class_leap_1_1_unity_1_1_old_rig_hierarchy_1_1_old_camera_data_1a01e96989d95f3fe13b5e2251676abd08">enableDepthBuffer</link>;
+00256 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(camera_enableDepthBuffer&#32;!=&#32;<emphasis role="keyword">null</emphasis>)&#32;{
+00257 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;EditorGUILayout.Space();
+00258 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;drawRigItem(<emphasis role="stringliteral">&quot;Remove&#32;Enable&#32;Depth&#32;Buffer&quot;</emphasis>,&#32;camera_enableDepthBuffer,
+00259 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;typeof(<link linkend="_class_leap_1_1_unity_1_1_enable_depth_buffer">EnableDepthBuffer</link>));
+00260 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;EditorGUILayout.LabelField(
+00261 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="stringliteral">&quot;The&#32;EnableDepthBuffer&#32;script&#32;used&#32;to&#32;be&#32;a&#32;part&#32;of&#32;Leap&#32;camera&#32;rigs&#32;by&#32;&quot;</emphasis>
+00262 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;+&#32;<emphasis role="stringliteral">&quot;default&#32;but&#32;can&#32;cause&#32;shader&#32;issues&#32;in&#32;certain&#32;situations.&#32;If&#32;you&apos;re&#32;&quot;</emphasis>
+00263 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;+&#32;<emphasis role="stringliteral">&quot;not&#32;sure&#32;you&#32;need&#32;this&#32;component,&#32;you&#32;should&#32;remove&#32;it.&quot;</emphasis>,
+00264 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;wrapLabel);
+00265 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;drawYesNoToggle(
+00266 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;yesOption:&#32;<emphasis role="stringliteral">&quot;Remove&#32;the&#32;EnableDepthBuffer&#32;script&#32;from&#32;the&#32;camera.&quot;</emphasis>,
+00267 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;noOption:&#32;<emphasis role="stringliteral">&quot;Don&apos;t&#32;remove&#32;the&#32;EnableDepthBuffer&#32;script,&#32;I&apos;m&#32;using&#32;it&#32;for&#32;&quot;</emphasis>
+00268 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;+&#32;<emphasis role="stringliteral">&quot;something.&quot;</emphasis>,
+00269 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;yesOptionFlag:&#32;ref&#32;_upgradeOptions.camera_removeEnableDepthBufferScript
+00270 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;);
+00271 &#32;&#32;&#32;&#32;&#32;&#32;}
+00272 
+00273 
+00274 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(oldRig.<link linkend="_class_leap_1_1_unity_1_1_old_rig_hierarchy_1aa6ff09cd65c3952f379e01467e97c14a">isImageRig</link>)&#32;{
+00275 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;EditorGUILayout.Space();
+00276 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;var&#32;rightEyeCamera&#32;=&#32;oldRig.<link linkend="_class_leap_1_1_unity_1_1_old_rig_hierarchy_1aa3a77f111240bc39cc8dbad463be1be4">imageRigData</link>.<link linkend="_class_leap_1_1_unity_1_1_old_rig_hierarchy_1_1_image_rig_data_1a25435730115c2e77c28a9fbed72c1446">rightEyeCamData</link>.<link linkend="_class_leap_1_1_unity_1_1_old_rig_hierarchy_1_1_old_camera_data_1a064374ed9ef4561816be21780153877f">cameraComponent</link>;
+00277 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(rightEyeCamera&#32;!=&#32;<emphasis role="keyword">null</emphasis>)&#32;{
+00278 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;drawRigItem(<emphasis role="stringliteral">&quot;Remove&#32;Right&#32;Eye&#32;Camera&quot;</emphasis>,&#32;rightEyeCamera,&#32;typeof(Camera));
+00279 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;EditorGUILayout.LabelField(
+00280 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="stringliteral">&quot;Separate&#32;cameras&#32;for&#32;the&#32;left&#32;and&#32;right&#32;eyes&#32;are&#32;no&#32;longer&#32;necessary&#32;&quot;</emphasis>
+00281 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;+&#32;<emphasis role="stringliteral">&quot;for&#32;IR&#32;viewer&#32;rigs.&quot;</emphasis>,
+00282 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;wrapLabel
+00283 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;);
+00284 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;drawYesNoToggle(
+00285 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;yesOption:&#32;<emphasis role="stringliteral">&quot;Remove&#32;this&#32;camera&#32;object.&quot;</emphasis>,
+00286 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;noOption:&#32;<emphasis role="stringliteral">&quot;Don&apos;t&#32;remove&#32;this&#32;camera,&#32;I&apos;m&#32;using&#32;it&#32;for&#32;something&#32;else.&quot;</emphasis>,
+00287 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;yesOptionFlag:&#32;ref&#32;_upgradeOptions.camera_removeRightEyeCamera
+00288 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;);
+00289 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00290 &#32;&#32;&#32;&#32;&#32;&#32;}
+00291 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">else</emphasis>&#32;{
+00292 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;EditorGUILayout.Space();
+00293 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;var&#32;primaryLeapEyeDislocator&#32;=&#32;oldRig.<link linkend="_class_leap_1_1_unity_1_1_old_rig_hierarchy_1a1273b07cacb3db69876ad8bbf0eec077">cameraData</link>.<link linkend="_class_leap_1_1_unity_1_1_old_rig_hierarchy_1_1_old_camera_data_1a4bb67ab7dfcc19a17639076bd8898612">leapEyeDislocator</link>;
+00294 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(primaryLeapEyeDislocator&#32;!=&#32;<emphasis role="keyword">null</emphasis>)&#32;{
+00295 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;drawRigItem(<emphasis role="stringliteral">&quot;Remove&#32;Leap&#32;Eye&#32;Dislocator&quot;</emphasis>,&#32;primaryLeapEyeDislocator,
+00296 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;typeof(<link linkend="_class_leap_1_1_unity_1_1_leap_eye_dislocator">LeapEyeDislocator</link>));
+00297 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;EditorGUILayout.LabelField(
+00298 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="stringliteral">&quot;LeapEyeDislocator&#32;was&#32;found&#32;on&#32;this&#32;object,&#32;but&#32;it&#32;was&#32;not&#32;detected&#32;&quot;</emphasis>
+00299 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;+&#32;<emphasis role="stringliteral">&quot;to&#32;be&#32;an&#32;IR&#32;viewer&#32;rig.&#32;LeapEyeDislocator&#32;is&#32;not&#32;necessary&#32;&quot;</emphasis>
+00300 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;+&#32;<emphasis role="stringliteral">&quot;on&#32;non-IR&#32;viewer&#32;rigs.&quot;</emphasis>,
+00301 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;wrapLabel
+00302 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;);
+00303 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;drawYesNoToggle(
+00304 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;yesOption:&#32;<emphasis role="stringliteral">&quot;Remove&#32;the&#32;LeapEyeDislocator&#32;script&#32;from&#32;the&#32;camera.&quot;</emphasis>,
+00305 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;noOption:&#32;<emphasis role="stringliteral">&quot;Don&apos;t&#32;remove&#32;LeapEyeDislocator.&quot;</emphasis>,
+00306 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;yesOptionFlag:&#32;ref&#32;_upgradeOptions.camera_removeLeapEyeDislocator
+00307 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;);
+00308 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00309 &#32;&#32;&#32;&#32;&#32;&#32;}
+00310 
+00311 &#32;&#32;&#32;&#32;&#32;&#32;EditorGUILayout.Space();
+00312 &#32;&#32;&#32;&#32;}
+00313 
+00314 &#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;<emphasis role="keyword">static</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;drawOldRigLeapSpaceGUI(<link linkend="_class_leap_1_1_unity_1_1_old_rig_hierarchy">OldRigHierarchy</link>&#32;oldRig)&#32;{
+00315 &#32;&#32;&#32;&#32;&#32;&#32;EditorGUILayout.Space();
+00316 &#32;&#32;&#32;&#32;&#32;&#32;EditorGUI.indentLevel&#32;=&#32;1;
+00317 &#32;&#32;&#32;&#32;&#32;&#32;drawRigItem(<emphasis role="stringliteral">&quot;LeapSpace&#32;Transform&#32;(to&#32;be&#32;deleted.)&quot;</emphasis>,
+00318 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;oldRig.<link linkend="_class_leap_1_1_unity_1_1_old_rig_hierarchy_1ac0517cc34c4970352fd9c8d0b8e903dd">leapSpaceData</link>.<link linkend="_class_leap_1_1_unity_1_1_old_rig_hierarchy_1_1_old_leap_space_data_1a2df72bc4798bb1cf23e6bb11c7f4546f">leapSpaceTransform</link>,&#32;typeof(Transform));
+00319 &#32;&#32;&#32;&#32;&#32;&#32;EditorGUI.indentLevel&#32;=&#32;2;
+00320 &#32;&#32;&#32;&#32;&#32;&#32;EditorGUILayout.LabelField(
+00321 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="stringliteral">&quot;The&#32;LeapSpace&#32;transform&#32;and&#32;its&#32;temporal&#32;warping&#32;functionality&#32;have&#32;been&#32;&quot;</emphasis>
+00322 &#32;&#32;&#32;&#32;&#32;&#32;+&#32;<emphasis role="stringliteral">&quot;migrated&#32;into&#32;the&#32;LeapXRServiceProvider&#32;for&#32;XR&#32;rigs.&#32;As&#32;a&#32;part&#32;of&#32;this&#32;upgrade,&#32;&quot;</emphasis>
+00323 &#32;&#32;&#32;&#32;&#32;&#32;+&#32;<emphasis role="stringliteral">&quot;this&#32;transform&#32;(including&#32;any&#32;components&#32;on&#32;it)&#32;will&#32;be&#32;deleted.&quot;</emphasis>,
+00324 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;wrapLabel);
+00325 
+00326 &#32;&#32;&#32;&#32;&#32;&#32;var&#32;leapSpace_nonLHCChildren
+00327 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;=&#32;oldRig.<link linkend="_class_leap_1_1_unity_1_1_old_rig_hierarchy_1ac0517cc34c4970352fd9c8d0b8e903dd">leapSpaceData</link>.<link linkend="_class_leap_1_1_unity_1_1_old_rig_hierarchy_1_1_old_leap_space_data_1ad44581a340d64a0e51b2cf26718b034b">nonLHCChildTransforms</link>;
+00328 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(leapSpace_nonLHCChildren.Count&#32;&gt;&#32;0)&#32;{
+00329 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;EditorGUILayout.Space();
+00330 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;drawMergeUpwardsSetting(
+00331 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;originalTransformName:&#32;<emphasis role="stringliteral">&quot;LeapSpace&quot;</emphasis>,
+00332 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;numExtraChildren:&#32;leapSpace_nonLHCChildren.Count,
+00333 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;mergeExtraChildrenUpwardFlag:
+00334 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;ref&#32;_upgradeOptions.leapSpace_mergeExtraChildrenUpward
+00335 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;);
+00336 &#32;&#32;&#32;&#32;&#32;&#32;}
+00337 
+00338 &#32;&#32;&#32;&#32;&#32;&#32;EditorGUILayout.Space();
+00339 &#32;&#32;&#32;&#32;}
+00340 
+00341 &#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;<emphasis role="keyword">static</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;drawOldRigLHCGUI(<link linkend="_class_leap_1_1_unity_1_1_old_rig_hierarchy">OldRigHierarchy</link>&#32;oldRig)&#32;{
+00342 &#32;&#32;&#32;&#32;&#32;&#32;EditorGUILayout.Space();
+00343 &#32;&#32;&#32;&#32;&#32;&#32;EditorGUI.indentLevel&#32;=&#32;1;
+00344 &#32;&#32;&#32;&#32;&#32;&#32;drawRigItem(<emphasis role="stringliteral">&quot;LeapHandController&#32;Transform&#32;(to&#32;be&#32;deleted.)&quot;</emphasis>,
+00345 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;oldRig.<link linkend="_class_leap_1_1_unity_1_1_old_rig_hierarchy_1a741aa0070b5769cf8c3c2de3173bdcd9">lhcData</link>.<link linkend="_class_leap_1_1_unity_1_1_old_rig_hierarchy_1_1_old_leap_hand_controller_data_1a06731cc5d6edecb981eff99f75a71185">leapServiceProvider</link>,&#32;typeof(Transform));
+00346 &#32;&#32;&#32;&#32;&#32;&#32;EditorGUI.indentLevel&#32;=&#32;2;
+00347 &#32;&#32;&#32;&#32;&#32;&#32;EditorGUILayout.LabelField(
+00348 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="stringliteral">&quot;The&#32;LeapHandController&#32;transform&#32;and&#32;its&#32;LeapHandController,&#32;&quot;</emphasis>
+00349 &#32;&#32;&#32;&#32;&#32;&#32;+&#32;<emphasis role="stringliteral">&quot;LeapServiceProvider,&#32;and&#32;HandPool&#32;components&#32;have&#32;been&#32;simplified.&quot;</emphasis>,
+00350 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;wrapLabel);
+00351 &#32;&#32;&#32;&#32;&#32;&#32;
+00352 &#32;&#32;&#32;&#32;&#32;&#32;EditorGUILayout.LabelField(
+00353 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="stringliteral">&quot;The&#32;LeapServiceProvider&#32;will&#32;be&#32;removed.&#32;In&#32;its&#32;place,&#32;a&#32;&quot;</emphasis>
+00354 &#32;&#32;&#32;&#32;&#32;&#32;+&#32;<emphasis role="stringliteral">&quot;LeapXRServiceProvider&#32;will&#32;be&#32;added&#32;directly&#32;to&#32;the&#32;Camera.&#32;The&#32;&quot;</emphasis>
+00355 &#32;&#32;&#32;&#32;&#32;&#32;+&#32;<emphasis role="stringliteral">&quot;LeapXRServiceProvider&#32;handles&#32;temporal&#32;warping&#32;(latency&#32;correction)&#32;&quot;</emphasis>
+00356 &#32;&#32;&#32;&#32;&#32;&#32;+&#32;<emphasis role="stringliteral">&quot;automatically&#32;for&#32;XR&#32;rigs.&#32;Applicable&#32;settings&#32;will&#32;be&#32;transferred&#32;to&#32;&quot;</emphasis>
+00357 &#32;&#32;&#32;&#32;&#32;&#32;+&#32;<emphasis role="stringliteral">&quot;the&#32;LeapXRServiceProvider.&quot;</emphasis>,&#32;wrapLabel);
+00358 &#32;&#32;&#32;&#32;&#32;&#32;
+00359 &#32;&#32;&#32;&#32;&#32;&#32;EditorGUILayout.LabelField(
+00360 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="stringliteral">&quot;The&#32;HandPool&#32;and&#32;HandController&#32;objects&#32;have&#32;been&#32;combined&#32;into&#32;a&#32;single&#32;&quot;</emphasis>
+00361 &#32;&#32;&#32;&#32;&#32;&#32;+&#32;<emphasis role="stringliteral">&quot;HandModelManager&#32;script,&#32;which&#32;should&#32;be&#32;moved&#32;to&#32;the&#32;parent&#32;transform&#32;of&#32;the&#32;&quot;</emphasis>
+00362 &#32;&#32;&#32;&#32;&#32;&#32;+&#32;<emphasis role="stringliteral">&quot;hand&#32;models.&#32;This&#32;clarifies&#32;its&#32;separation&#32;from&#32;the&#32;hand&#32;data&#32;pipeline&#32;&quot;</emphasis>
+00363 &#32;&#32;&#32;&#32;&#32;&#32;+&#32;<emphasis role="stringliteral">&quot;as&#32;one&#32;of&#32;(potentially&#32;many)&#32;consumers&#32;of&#32;hand&#32;data&#32;from&#32;a&#32;device.&quot;</emphasis>,
+00364 &#32;&#32;&#32;&#32;&#32;&#32;wrapLabel);
+00365 
+00366 &#32;&#32;&#32;&#32;&#32;&#32;var&#32;handModelParent&#32;=&#32;oldRig.<link linkend="_class_leap_1_1_unity_1_1_old_rig_hierarchy_1a23b887e672e43860cbe4417247cc57b9">handModelParentTransform</link>;
+00367 &#32;&#32;&#32;&#32;&#32;&#32;var&#32;handModelManager&#32;=&#32;oldRig.<link linkend="_class_leap_1_1_unity_1_1_old_rig_hierarchy_1a741aa0070b5769cf8c3c2de3173bdcd9">lhcData</link>.<link linkend="_class_leap_1_1_unity_1_1_old_rig_hierarchy_1_1_old_leap_hand_controller_data_1ae0983b15b4bcd2f34786b30dd2a8de81">handModelManager</link>;
+00368 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(handModelParent&#32;!=&#32;<emphasis role="keyword">null</emphasis>&#32;&amp;&amp;&#32;handModelManager&#32;!=&#32;<emphasis role="keyword">null</emphasis>)&#32;{
+00369 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;EditorGUILayout.Space();
+00370 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;drawRigItem(<emphasis role="stringliteral">&quot;Move&#32;the&#32;HandModelManager...&quot;</emphasis>,&#32;handModelManager,&#32;typeof(<link linkend="_class_leap_1_1_unity_1_1_hand_model_manager">HandModelManager</link>));
+00371 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;drawRigItem(<emphasis role="stringliteral">&quot;...to&#32;the&#32;hand&#32;model&#32;parent&#32;transform&quot;</emphasis>,&#32;handModelParent,&#32;typeof(Transform));
+00372 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;EditorGUILayout.LabelField(
+00373 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="stringliteral">&quot;The&#32;HandModelManager&#32;will&#32;be&#32;moved&#32;to&#32;the&#32;&quot;</emphasis>&#32;+&#32;handModelParent.name
+00374 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;+&#32;<emphasis role="stringliteral">&quot;&#32;transform&#32;because&#32;it&#32;is&#32;the&#32;parent&#32;transform&#32;of&#32;the&#32;hand&#32;models.&quot;</emphasis>,
+00375 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;wrapLabel);
+00376 &#32;&#32;&#32;&#32;&#32;&#32;}
+00377 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">else</emphasis>&#32;{
+00378 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;decided&#32;against&#32;adding&#32;a&#32;HandModelManager&#32;if&#32;none&#32;already&#32;exists.</emphasis>
+00379 &#32;&#32;&#32;&#32;&#32;&#32;}
+00380 
+00381 &#32;&#32;&#32;&#32;&#32;&#32;var&#32;lhc_extraComponents&#32;=&#32;oldRig.<link linkend="_class_leap_1_1_unity_1_1_old_rig_hierarchy_1a741aa0070b5769cf8c3c2de3173bdcd9">lhcData</link>.<link linkend="_class_leap_1_1_unity_1_1_old_rig_hierarchy_1_1_old_leap_hand_controller_data_1aa5a52b8e1a4ac9f1f3ac3ffd445278be">extraComponents</link>;
+00382 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(lhc_extraComponents&#32;!=&#32;<emphasis role="keyword">null</emphasis>&#32;&amp;&amp;&#32;lhc_extraComponents.Count&#32;&gt;&#32;0)&#32;{
+00383 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;EditorGUILayout.Space();
+00384 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;drawRigItem(<emphasis role="stringliteral">&quot;Extra&#32;Components&#32;Detected&quot;</emphasis>,&#32;<emphasis role="keyword">null</emphasis>,&#32;<emphasis role="keyword">null</emphasis>);
+00385 
+00386 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;var&#32;sb&#32;=&#32;<emphasis role="keyword">new</emphasis>&#32;StringBuilder();
+00387 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;sb.Append(<emphasis role="stringliteral">&quot;The&#32;&quot;</emphasis>);
+00388 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">for</emphasis>&#32;(<emphasis role="keywordtype">int</emphasis>&#32;i&#32;=&#32;0;&#32;i&#32;&lt;&#32;lhc_extraComponents.Count;&#32;i++)&#32;{
+00389 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;var&#32;component&#32;=&#32;lhc_extraComponents[i];
+00390 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;sb.Append(component.GetType().Name);
+00391 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(i&#32;!=&#32;lhc_extraComponents.Count&#32;-&#32;1)&#32;sb.Append(<emphasis role="stringliteral">&quot;,&#32;&quot;</emphasis>);
+00392 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(i&#32;==&#32;lhc_extraComponents.Count&#32;-&#32;2)&#32;sb.Append(<emphasis role="stringliteral">&quot;and&#32;&quot;</emphasis>);
+00393 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00394 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;var&#32;isPlural&#32;=&#32;lhc_extraComponents.Count&#32;!=&#32;1;
+00395 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(isPlural)&#32;{
+00396 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;sb.Append(<emphasis role="stringliteral">&quot;&#32;components&#32;(and&#32;references&#32;to&#32;them)&#32;will&#32;be&#32;migrated&#32;to&#32;the&#32;camera&#32;&quot;</emphasis>
+00397 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;+&#32;<emphasis role="stringliteral">&quot;transform.&quot;</emphasis>);
+00398 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00399 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">else</emphasis>&#32;{
+00400 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;sb.Append(<emphasis role="stringliteral">&quot;&#32;component&#32;(and&#32;references&#32;to&#32;it)&#32;will&#32;be&#32;migrated&#32;to&#32;the&#32;camera&#32;&quot;</emphasis>
+00401 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;+&#32;<emphasis role="stringliteral">&quot;transform.&quot;</emphasis>);
+00402 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00403 
+00404 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;EditorGUILayout.LabelField(
+00405 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;sb.ToString(),
+00406 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;wrapLabel);
+00407 &#32;&#32;&#32;&#32;&#32;&#32;}
+00408 
+00409 &#32;&#32;&#32;&#32;&#32;&#32;var&#32;lhc_extraChildren&#32;=&#32;oldRig.<link linkend="_class_leap_1_1_unity_1_1_old_rig_hierarchy_1a741aa0070b5769cf8c3c2de3173bdcd9">lhcData</link>.<link linkend="_class_leap_1_1_unity_1_1_old_rig_hierarchy_1_1_old_leap_hand_controller_data_1a2048e2d234553048b98e5cce12027741">extraChildTransforms</link>;
+00410 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(lhc_extraChildren.Count&#32;&gt;&#32;0)&#32;{
+00411 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;EditorGUILayout.Space();
+00412 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;drawMergeUpwardsSetting(
+00413 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;originalTransformName:&#32;<emphasis role="stringliteral">&quot;LeapHandController&quot;</emphasis>,
+00414 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;numExtraChildren:&#32;lhc_extraChildren.Count,
+00415 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;mergeExtraChildrenUpwardFlag:&#32;ref&#32;_upgradeOptions.lhc_mergeExtraChildrenUpward
+00416 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;);
+00417 &#32;&#32;&#32;&#32;&#32;&#32;}
+00418 &#32;&#32;&#32;&#32;}
+00419 
+00420 <emphasis role="preprocessor">&#32;&#32;&#32;&#32;#endregion</emphasis>
+00421 
+00422 <emphasis role="preprocessor">&#32;&#32;&#32;&#32;#region&#32;Drawing&#32;Helper&#32;Methods</emphasis>
+00423 &#32;&#32;&#32;&#32;
+00424 &#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;<emphasis role="keyword">static</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;drawRigItem(<emphasis role="keywordtype">string</emphasis>&#32;label,&#32;<link linkend="_namespace_leap_1_1_unity_1_1_attributes_1a71d15e38cb19d7d2ffb1aa310ce8f0f9">UnityObject</link>&#32;obj,&#32;Type&#32;objType)&#32;{
+00425 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">using</emphasis>&#32;(<emphasis role="keyword">new</emphasis>&#32;EditorGUILayout.HorizontalScope())&#32;{
+00426 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;EditorGUILayout.LabelField(label,&#32;GUILayout.ExpandWidth(<emphasis role="keyword">true</emphasis>));
+00427 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(obj&#32;!=&#32;<emphasis role="keyword">null</emphasis>)&#32;{
+00428 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;EditorGUI.BeginDisabledGroup(<emphasis role="keyword">true</emphasis>);
+00429 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;EditorGUILayout.ObjectField(obj,&#32;objType,&#32;<emphasis role="keyword">true</emphasis>,&#32;GUILayout.ExpandWidth(<emphasis role="keyword">false</emphasis>));
+00430 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;EditorGUI.EndDisabledGroup();
+00431 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00432 &#32;&#32;&#32;&#32;&#32;&#32;}
+00433 &#32;&#32;&#32;&#32;}
+00434 
+00435 &#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;<emphasis role="keyword">static</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;drawMergeUpwardsSetting(<emphasis role="keywordtype">string</emphasis>&#32;originalTransformName,
+00436 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordtype">int</emphasis>&#32;numExtraChildren,
+00437 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;ref&#32;<emphasis role="keywordtype">bool</emphasis>&#32;mergeExtraChildrenUpwardFlag)&#32;{
+00438 &#32;&#32;&#32;&#32;&#32;&#32;var&#32;isPlural&#32;=&#32;numExtraChildren&#32;==&#32;1;
+00439 &#32;&#32;&#32;&#32;&#32;&#32;EditorGUILayout.LabelField(
+00440 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;numExtraChildren
+00441 &#32;&#32;&#32;&#32;&#32;&#32;+&#32;(isPlural&#32;?&#32;<emphasis role="stringliteral">&quot;&#32;transforms&#32;are&#32;attached&#32;as&#32;children&#32;&quot;</emphasis>
+00442 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;:&#32;<emphasis role="stringliteral">&quot;&#32;transform&#32;is&#32;attached&#32;as&#32;a&#32;child&quot;</emphasis>)
+00443 &#32;&#32;&#32;&#32;&#32;&#32;+&#32;<emphasis role="stringliteral">&quot;&#32;to&#32;the&#32;&quot;</emphasis>&#32;+&#32;originalTransformName&#32;+&#32;<emphasis role="stringliteral">&quot;&#32;transform,&#32;which&#32;is&#32;deprecated&#32;and&#32;will&#32;be&#32;&quot;</emphasis>
+00444 &#32;&#32;&#32;&#32;&#32;&#32;+&#32;<emphasis role="stringliteral">&quot;removed.&quot;</emphasis>,
+00445 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;wrapLabel);
+00446 &#32;&#32;&#32;&#32;&#32;&#32;drawYesNoToggle(
+00447 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;yesOption:&#32;<emphasis role="stringliteral">&quot;Move&#32;these&#32;objects&#32;to&#32;be&#32;children&#32;of&#32;the&#32;camera.&quot;</emphasis>,
+00448 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;noOption:&#32;<emphasis role="stringliteral">&quot;Remove&#32;these&#32;objects.&quot;</emphasis>,
+00449 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;yesOptionFlag:&#32;ref&#32;mergeExtraChildrenUpwardFlag
+00450 &#32;&#32;&#32;&#32;&#32;&#32;);
+00451 &#32;&#32;&#32;&#32;}
+00452 
+00453 &#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;<emphasis role="keyword">static</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;drawYesNoToggle(<emphasis role="keywordtype">string</emphasis>&#32;yesOption,&#32;<emphasis role="keywordtype">string</emphasis>&#32;noOption,
+00454 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;ref&#32;<emphasis role="keywordtype">bool</emphasis>&#32;yesOptionFlag)&#32;{
+00455 &#32;&#32;&#32;&#32;&#32;&#32;yesOptionFlag&#32;=&#32;EditorGUILayout.ToggleLeft(yesOption,&#32;yesOptionFlag);
+00456 
+00457 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordtype">bool</emphasis>&#32;temp&#32;=&#32;EditorGUILayout.ToggleLeft(noOption,&#32;!yesOptionFlag);
+00458 &#32;&#32;&#32;&#32;&#32;&#32;yesOptionFlag&#32;=&#32;!temp;
+00459 &#32;&#32;&#32;&#32;}
+00460 
+00461 &#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;<emphasis role="keyword">static</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;drawObjField(<link linkend="_namespace_leap_1_1_unity_1_1_attributes_1a71d15e38cb19d7d2ffb1aa310ce8f0f9">UnityObject</link>&#32;obj,&#32;Type&#32;objType)&#32;{
+00462 &#32;&#32;&#32;&#32;&#32;&#32;EditorGUI.BeginDisabledGroup(<emphasis role="keyword">true</emphasis>);
+00463 &#32;&#32;&#32;&#32;&#32;&#32;EditorGUILayout.ObjectField(obj,&#32;objType,&#32;<emphasis role="keyword">true</emphasis>);
+00464 &#32;&#32;&#32;&#32;&#32;&#32;EditorGUI.EndDisabledGroup();
+00465 &#32;&#32;&#32;&#32;}
+00466 
+00467 &#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;<emphasis role="keyword">static</emphasis>&#32;<emphasis role="keywordtype">string</emphasis>&#32;getName(Transform&#32;t)&#32;{
+00468 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(t&#32;==&#32;<emphasis role="keyword">null</emphasis>)&#32;<emphasis role="keywordflow">return</emphasis>&#32;<emphasis role="stringliteral">&quot;&quot;</emphasis>;
+00469 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;t.name;
+00470 &#32;&#32;&#32;&#32;}
+00471 
+00472 <emphasis role="preprocessor">&#32;&#32;&#32;&#32;#endregion</emphasis>
+00473 
+00474 <emphasis role="preprocessor">&#32;&#32;&#32;&#32;#endregion</emphasis>
+00475 
+00476 <emphasis role="preprocessor">&#32;&#32;&#32;&#32;#endregion</emphasis>
+00477 
+00478 <emphasis role="preprocessor">&#32;&#32;&#32;&#32;#region&#32;Upgrader&#32;Memory</emphasis>
+00479 
+00480 &#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;<emphasis role="keyword">static</emphasis>&#32;List&lt;Transform&gt;&#32;_backingTransformsBuffer&#32;=&#32;<emphasis role="keyword">null</emphasis>;
+00481 &#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;<emphasis role="keyword">static</emphasis>&#32;List&lt;Transform&gt;&#32;_transformsBuffer&#32;{
+00482 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">get</emphasis>&#32;{
+00483 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(_backingTransformsBuffer&#32;==&#32;<emphasis role="keyword">null</emphasis>)
+00484 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;_backingTransformsBuffer&#32;=&#32;<emphasis role="keyword">new</emphasis>&#32;List&lt;Transform&gt;();
+00485 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;_backingTransformsBuffer;
+00486 &#32;&#32;&#32;&#32;&#32;&#32;}
+00487 &#32;&#32;&#32;&#32;}
+00488 
+00489 &#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;<emphasis role="keyword">static</emphasis>&#32;List&lt;OldRigHierarchy&gt;&#32;_backingOldRigs&#32;=&#32;<emphasis role="keyword">null</emphasis>;
+00490 &#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;<emphasis role="keyword">static</emphasis>&#32;List&lt;OldRigHierarchy&gt;&#32;_oldRigs&#32;{
+00491 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">get</emphasis>&#32;{
+00492 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(_backingOldRigs&#32;==&#32;<emphasis role="keyword">null</emphasis>)&#32;{
+00493 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;_backingOldRigs&#32;=&#32;<emphasis role="keyword">new</emphasis>&#32;List&lt;OldRigHierarchy&gt;();
+00494 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00495 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;_backingOldRigs;
+00496 &#32;&#32;&#32;&#32;&#32;&#32;}
+00497 &#32;&#32;&#32;&#32;}
+00498 
+00499 <emphasis role="preprocessor">&#32;&#32;&#32;&#32;#endregion</emphasis>
+00500 
+00501 <emphasis role="preprocessor">&#32;&#32;&#32;&#32;#region&#32;Scan&#32;Methods</emphasis>
+00502 
+00506 &#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keyword">static</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;ClearScanData()&#32;{
+00507 &#32;&#32;&#32;&#32;&#32;&#32;_oldRigs.Clear();
+00508 &#32;&#32;&#32;&#32;}
+00509 
+00515 &#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keyword">static</emphasis>&#32;<emphasis role="keywordtype">bool</emphasis>&#32;ScanCurrentSceneForOldLeapRigs()&#32;{
+00516 &#32;&#32;&#32;&#32;&#32;&#32;ClearScanData();
+00517 
+00518 &#32;&#32;&#32;&#32;&#32;&#32;var&#32;currentScene&#32;=&#32;SceneManager.GetActiveScene();
+00519 &#32;&#32;&#32;&#32;&#32;&#32;var&#32;rootObjs&#32;=&#32;currentScene.GetRootGameObjects();
+00520 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">foreach</emphasis>&#32;(var&#32;rootObj&#32;<emphasis role="keywordflow">in</emphasis>&#32;rootObjs)&#32;{
+00521 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;rootObj.transform.GetComponentsInChildren(_transformsBuffer);
+00522 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">foreach</emphasis>&#32;(var&#32;transform&#32;<emphasis role="keywordflow">in</emphasis>&#32;_transformsBuffer)&#32;{
+00523 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;var&#32;oldRig&#32;=&#32;<link linkend="_class_leap_1_1_unity_1_1_old_rig_hierarchy">OldRigHierarchy</link>.<link linkend="_class_leap_1_1_unity_1_1_old_rig_hierarchy_1a494d91a3cb9d07875a4c4b50c75598fd">DetectFor</link>(transform);
+00524 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(oldRig&#32;!=&#32;<emphasis role="keyword">null</emphasis>)&#32;{
+00525 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;_oldRigs.Add(oldRig);
+00526 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00527 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00528 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;_transformsBuffer.Clear();
+00529 &#32;&#32;&#32;&#32;&#32;&#32;}
+00530 
+00531 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;_oldRigs.Count&#32;&gt;&#32;0;
+00532 &#32;&#32;&#32;&#32;}
+00533 
+00534 <emphasis role="preprocessor">&#32;&#32;&#32;&#32;#endregion</emphasis>
+00535 
+00536 &#32;&#32;}
+00537 
+<anchor xml:id="__leap_rig_upgrader_8cs_source_1l00593"/><link linkend="_class_leap_1_1_unity_1_1_old_rig_hierarchy">00593</link> &#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keyword">class&#32;</emphasis><link linkend="_class_leap_1_1_unity_1_1_old_rig_hierarchy">OldRigHierarchy</link>&#32;{
+00594 
+00595 <emphasis role="preprocessor">&#32;&#32;&#32;&#32;#region&#32;Status&#32;State</emphasis>
+00596 
+<anchor xml:id="__leap_rig_upgrader_8cs_source_1l00600"/><link linkend="_class_leap_1_1_unity_1_1_old_rig_hierarchy_1a87664484cd178765c4ee65191b04fbb9">00600</link> &#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keywordtype">bool</emphasis>&#32;<link linkend="_class_leap_1_1_unity_1_1_old_rig_hierarchy_1a87664484cd178765c4ee65191b04fbb9">isUpgradeableOldRig</link>&#32;=&#32;<emphasis role="keyword">false</emphasis>;
+00601 
+<anchor xml:id="__leap_rig_upgrader_8cs_source_1l00606"/><link linkend="_class_leap_1_1_unity_1_1_old_rig_hierarchy_1afd19c98916c5f3f8f2e838499d2bd872">00606</link> &#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keywordtype">bool</emphasis>&#32;<link linkend="_class_leap_1_1_unity_1_1_old_rig_hierarchy_1afd19c98916c5f3f8f2e838499d2bd872">detectedAsPotentialRig</link>&#32;=&#32;<emphasis role="keyword">false</emphasis>;
+00607 
+00612 &#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keywordtype">string</emphasis>&#32;<link linkend="_class_leap_1_1_unity_1_1_old_rig_hierarchy_1aac4f3649429ca51cb15b614ee514147e">reasonRigCannotBeUpgraded</link>
+<anchor xml:id="__leap_rig_upgrader_8cs_source_1l00613"/><link linkend="_class_leap_1_1_unity_1_1_old_rig_hierarchy_1aac4f3649429ca51cb15b614ee514147e">00613</link> &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;=&#32;<emphasis role="stringliteral">&quot;Rig&#32;data&#32;has&#32;not&#32;been&#32;collected.&#32;Call&#32;OldRigHierarchy.DetectFor(transform)&#32;to&#32;&quot;</emphasis>
+00614 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;+&#32;<emphasis role="stringliteral">&quot;scan.&quot;</emphasis>;
+00615 
+00616 <emphasis role="preprocessor">&#32;&#32;&#32;&#32;#endregion</emphasis>
+00617 
+00618 <emphasis role="preprocessor">&#32;&#32;&#32;&#32;#region&#32;Scanned&#32;Rig&#32;Data</emphasis>
+00619 
+<anchor xml:id="__leap_rig_upgrader_8cs_source_1l00621"/><link linkend="_class_leap_1_1_unity_1_1_old_rig_hierarchy_1adef150bfa76ed5c64ad298d1b0f40d4a">00621</link> &#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;Transform&#32;<link linkend="_class_leap_1_1_unity_1_1_old_rig_hierarchy_1adef150bfa76ed5c64ad298d1b0f40d4a">rigTransform</link>;
+00622 
+<anchor xml:id="__leap_rig_upgrader_8cs_source_1l00626"/><link linkend="_class_leap_1_1_unity_1_1_old_rig_hierarchy_1a23b887e672e43860cbe4417247cc57b9">00626</link> &#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;Transform&#32;<link linkend="_class_leap_1_1_unity_1_1_old_rig_hierarchy_1a23b887e672e43860cbe4417247cc57b9">handModelParentTransform</link>;
+00627 
+00628 <emphasis role="preprocessor">&#32;&#32;&#32;&#32;#region&#32;Rig&#32;Camera&#32;Data</emphasis>
+00629 
+<anchor xml:id="__leap_rig_upgrader_8cs_source_1l00635"/><link linkend="_class_leap_1_1_unity_1_1_old_rig_hierarchy_1_1_old_camera_data">00635</link> &#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keyword">class&#32;</emphasis><link linkend="_class_leap_1_1_unity_1_1_old_rig_hierarchy_1_1_old_camera_data">OldCameraData</link>&#32;{
+<anchor xml:id="__leap_rig_upgrader_8cs_source_1l00636"/><link linkend="_class_leap_1_1_unity_1_1_old_rig_hierarchy_1_1_old_camera_data_1a14376c67e293af5af3bb537ead0db3c4">00636</link> &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;Transform&#32;<link linkend="_class_leap_1_1_unity_1_1_old_rig_hierarchy_1_1_old_camera_data_1a14376c67e293af5af3bb537ead0db3c4">cameraTransform</link>;
+<anchor xml:id="__leap_rig_upgrader_8cs_source_1l00637"/><link linkend="_class_leap_1_1_unity_1_1_old_rig_hierarchy_1_1_old_camera_data_1a4bb67ab7dfcc19a17639076bd8898612">00637</link> &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<link linkend="_class_leap_1_1_unity_1_1_leap_eye_dislocator">LeapEyeDislocator</link>&#32;<link linkend="_class_leap_1_1_unity_1_1_old_rig_hierarchy_1_1_old_camera_data_1a4bb67ab7dfcc19a17639076bd8898612">leapEyeDislocator</link>;
+<anchor xml:id="__leap_rig_upgrader_8cs_source_1l00638"/><link linkend="_class_leap_1_1_unity_1_1_old_rig_hierarchy_1_1_old_camera_data_1a01e96989d95f3fe13b5e2251676abd08">00638</link> &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<link linkend="_class_leap_1_1_unity_1_1_enable_depth_buffer">EnableDepthBuffer</link>&#32;<link linkend="_class_leap_1_1_unity_1_1_old_rig_hierarchy_1_1_old_camera_data_1a01e96989d95f3fe13b5e2251676abd08">enableDepthBuffer</link>;
+<anchor xml:id="__leap_rig_upgrader_8cs_source_1l00639"/><link linkend="_class_leap_1_1_unity_1_1_old_rig_hierarchy_1_1_old_camera_data_1a064374ed9ef4561816be21780153877f">00639</link> &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;Camera&#32;<link linkend="_class_leap_1_1_unity_1_1_old_rig_hierarchy_1_1_old_camera_data_1a064374ed9ef4561816be21780153877f">cameraComponent</link>;
+00640 
+<anchor xml:id="__leap_rig_upgrader_8cs_source_1l00641"/><link linkend="_class_leap_1_1_unity_1_1_old_rig_hierarchy_1_1_old_camera_data_1a0a3d7df4087ea5635ff1d0749d7be4ad">00641</link> &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keywordtype">bool</emphasis>&#32;<link linkend="_class_leap_1_1_unity_1_1_old_rig_hierarchy_1_1_old_camera_data_1a0a3d7df4087ea5635ff1d0749d7be4ad">containsCameraComponent</link>&#32;{&#32;<emphasis role="keyword">get</emphasis>&#32;{&#32;<emphasis role="keywordflow">return</emphasis>&#32;<link linkend="_class_leap_1_1_unity_1_1_old_rig_hierarchy_1_1_old_camera_data_1a064374ed9ef4561816be21780153877f">cameraComponent</link>&#32;!=&#32;<emphasis role="keyword">null</emphasis>;&#32;}&#32;}
+00642 &#32;&#32;&#32;&#32;}
+<anchor xml:id="__leap_rig_upgrader_8cs_source_1l00647"/><link linkend="_class_leap_1_1_unity_1_1_old_rig_hierarchy_1a1273b07cacb3db69876ad8bbf0eec077">00647</link> &#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<link linkend="_class_leap_1_1_unity_1_1_old_rig_hierarchy_1_1_old_camera_data">OldCameraData</link>&#32;<link linkend="_class_leap_1_1_unity_1_1_old_rig_hierarchy_1a1273b07cacb3db69876ad8bbf0eec077">cameraData</link>;
+00648 
+00649 <emphasis role="preprocessor">&#32;&#32;&#32;&#32;#endregion</emphasis>
+00650 
+00651 <emphasis role="preprocessor">&#32;&#32;&#32;&#32;#region&#32;Other&#32;Rig&#32;Data</emphasis>
+00652 
+<anchor xml:id="__leap_rig_upgrader_8cs_source_1l00653"/><link linkend="_class_leap_1_1_unity_1_1_old_rig_hierarchy_1_1_old_leap_space_data">00653</link> &#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keyword">class&#32;</emphasis><link linkend="_class_leap_1_1_unity_1_1_old_rig_hierarchy_1_1_old_leap_space_data">OldLeapSpaceData</link>&#32;{
+<anchor xml:id="__leap_rig_upgrader_8cs_source_1l00654"/><link linkend="_class_leap_1_1_unity_1_1_old_rig_hierarchy_1_1_old_leap_space_data_1a2df72bc4798bb1cf23e6bb11c7f4546f">00654</link> &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;Transform&#32;<link linkend="_class_leap_1_1_unity_1_1_old_rig_hierarchy_1_1_old_leap_space_data_1a2df72bc4798bb1cf23e6bb11c7f4546f">leapSpaceTransform</link>;
+00655 
+<anchor xml:id="__leap_rig_upgrader_8cs_source_1l00661"/><link linkend="_class_leap_1_1_unity_1_1_old_rig_hierarchy_1_1_old_leap_space_data_1ad44581a340d64a0e51b2cf26718b034b">00661</link> &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;List&lt;Transform&gt;&#32;<link linkend="_class_leap_1_1_unity_1_1_old_rig_hierarchy_1_1_old_leap_space_data_1ad44581a340d64a0e51b2cf26718b034b">nonLHCChildTransforms</link>;
+00662 &#32;&#32;&#32;&#32;}
+<anchor xml:id="__leap_rig_upgrader_8cs_source_1l00663"/><link linkend="_class_leap_1_1_unity_1_1_old_rig_hierarchy_1ac0517cc34c4970352fd9c8d0b8e903dd">00663</link> &#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<link linkend="_class_leap_1_1_unity_1_1_old_rig_hierarchy_1_1_old_leap_space_data">OldLeapSpaceData</link>&#32;<link linkend="_class_leap_1_1_unity_1_1_old_rig_hierarchy_1ac0517cc34c4970352fd9c8d0b8e903dd">leapSpaceData</link>;
+00664 
+<anchor xml:id="__leap_rig_upgrader_8cs_source_1l00665"/><link linkend="_class_leap_1_1_unity_1_1_old_rig_hierarchy_1_1_old_leap_hand_controller_data">00665</link> &#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keyword">class&#32;</emphasis><link linkend="_class_leap_1_1_unity_1_1_old_rig_hierarchy_1_1_old_leap_hand_controller_data">OldLeapHandControllerData</link>&#32;{
+<anchor xml:id="__leap_rig_upgrader_8cs_source_1l00666"/><link linkend="_class_leap_1_1_unity_1_1_old_rig_hierarchy_1_1_old_leap_hand_controller_data_1a30da5c72960cdc56b84358995a98cfb4">00666</link> &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;Transform&#32;<link linkend="_class_leap_1_1_unity_1_1_old_rig_hierarchy_1_1_old_leap_hand_controller_data_1a30da5c72960cdc56b84358995a98cfb4">lhcTransform</link>;
+<anchor xml:id="__leap_rig_upgrader_8cs_source_1l00667"/><link linkend="_class_leap_1_1_unity_1_1_old_rig_hierarchy_1_1_old_leap_hand_controller_data_1a06731cc5d6edecb981eff99f75a71185">00667</link> &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<link linkend="_class_leap_1_1_unity_1_1_leap_service_provider">LeapServiceProvider</link>&#32;<link linkend="_class_leap_1_1_unity_1_1_old_rig_hierarchy_1_1_old_leap_hand_controller_data_1a06731cc5d6edecb981eff99f75a71185">leapServiceProvider</link>;
+<anchor xml:id="__leap_rig_upgrader_8cs_source_1l00668"/><link linkend="_class_leap_1_1_unity_1_1_old_rig_hierarchy_1_1_old_leap_hand_controller_data_1ae0983b15b4bcd2f34786b30dd2a8de81">00668</link> &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<link linkend="_class_leap_1_1_unity_1_1_hand_model_manager">HandModelManager</link>&#32;<link linkend="_class_leap_1_1_unity_1_1_old_rig_hierarchy_1_1_old_leap_hand_controller_data_1ae0983b15b4bcd2f34786b30dd2a8de81">handModelManager</link>;
+<anchor xml:id="__leap_rig_upgrader_8cs_source_1l00669"/><link linkend="_class_leap_1_1_unity_1_1_old_rig_hierarchy_1_1_old_leap_hand_controller_data_1a2048e2d234553048b98e5cce12027741">00669</link> &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;List&lt;Transform&gt;&#32;<link linkend="_class_leap_1_1_unity_1_1_old_rig_hierarchy_1_1_old_leap_hand_controller_data_1a2048e2d234553048b98e5cce12027741">extraChildTransforms</link>;
+<anchor xml:id="__leap_rig_upgrader_8cs_source_1l00670"/><link linkend="_class_leap_1_1_unity_1_1_old_rig_hierarchy_1_1_old_leap_hand_controller_data_1aa5a52b8e1a4ac9f1f3ac3ffd445278be">00670</link> &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;List&lt;Component&gt;&#32;<link linkend="_class_leap_1_1_unity_1_1_old_rig_hierarchy_1_1_old_leap_hand_controller_data_1aa5a52b8e1a4ac9f1f3ac3ffd445278be">extraComponents</link>;
+00671 &#32;&#32;&#32;&#32;}
+<anchor xml:id="__leap_rig_upgrader_8cs_source_1l00672"/><link linkend="_class_leap_1_1_unity_1_1_old_rig_hierarchy_1a741aa0070b5769cf8c3c2de3173bdcd9">00672</link> &#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<link linkend="_class_leap_1_1_unity_1_1_old_rig_hierarchy_1_1_old_leap_hand_controller_data">OldLeapHandControllerData</link>&#32;<link linkend="_class_leap_1_1_unity_1_1_old_rig_hierarchy_1a741aa0070b5769cf8c3c2de3173bdcd9">lhcData</link>;
+00673 
+<anchor xml:id="__leap_rig_upgrader_8cs_source_1l00674"/><link linkend="_class_leap_1_1_unity_1_1_old_rig_hierarchy_1_1_image_rig_data">00674</link> &#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keyword">class&#32;</emphasis><link linkend="_class_leap_1_1_unity_1_1_old_rig_hierarchy_1_1_image_rig_data">ImageRigData</link>&#32;{
+<anchor xml:id="__leap_rig_upgrader_8cs_source_1l00675"/><link linkend="_class_leap_1_1_unity_1_1_old_rig_hierarchy_1_1_image_rig_data_1a25435730115c2e77c28a9fbed72c1446">00675</link> &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<link linkend="_class_leap_1_1_unity_1_1_old_rig_hierarchy_1_1_old_camera_data">OldCameraData</link>&#32;<link linkend="_class_leap_1_1_unity_1_1_old_rig_hierarchy_1_1_image_rig_data_1a25435730115c2e77c28a9fbed72c1446">rightEyeCamData</link>;
+00676 &#32;&#32;&#32;&#32;}
+<anchor xml:id="__leap_rig_upgrader_8cs_source_1l00677"/><link linkend="_class_leap_1_1_unity_1_1_old_rig_hierarchy_1aa3a77f111240bc39cc8dbad463be1be4">00677</link> &#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<link linkend="_class_leap_1_1_unity_1_1_old_rig_hierarchy_1_1_image_rig_data">ImageRigData</link>&#32;<link linkend="_class_leap_1_1_unity_1_1_old_rig_hierarchy_1aa3a77f111240bc39cc8dbad463be1be4">imageRigData</link>;
+<anchor xml:id="__leap_rig_upgrader_8cs_source_1l00678"/><link linkend="_class_leap_1_1_unity_1_1_old_rig_hierarchy_1aa6ff09cd65c3952f379e01467e97c14a">00678</link> &#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keywordtype">bool</emphasis>&#32;<link linkend="_class_leap_1_1_unity_1_1_old_rig_hierarchy_1aa6ff09cd65c3952f379e01467e97c14a">isImageRig</link>&#32;{&#32;<emphasis role="keyword">get</emphasis>&#32;{&#32;<emphasis role="keywordflow">return</emphasis>&#32;<link linkend="_class_leap_1_1_unity_1_1_old_rig_hierarchy_1aa3a77f111240bc39cc8dbad463be1be4">imageRigData</link>&#32;!=&#32;<emphasis role="keyword">null</emphasis>;&#32;}&#32;}
+00679 
+00680 <emphasis role="preprocessor">&#32;&#32;&#32;&#32;#endregion</emphasis>
+00681 
+00682 <emphasis role="preprocessor">&#32;&#32;&#32;&#32;#endregion</emphasis>
+00683 
+00684 <emphasis role="preprocessor">&#32;&#32;&#32;&#32;#region&#32;Scanning</emphasis>
+00685 
+<anchor xml:id="__leap_rig_upgrader_8cs_source_1l00691"/><link linkend="_class_leap_1_1_unity_1_1_old_rig_hierarchy_1a494d91a3cb9d07875a4c4b50c75598fd">00691</link> &#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keyword">static</emphasis>&#32;<emphasis role="keywordtype">bool</emphasis>&#32;<link linkend="_class_leap_1_1_unity_1_1_old_rig_hierarchy_1a494d91a3cb9d07875a4c4b50c75598fd">DetectFor</link>(Transform&#32;transform,&#32;<link linkend="_class_leap_1_1_unity_1_1_old_rig_hierarchy">OldRigHierarchy</link>&#32;toFill)&#32;{
+00692 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(transform&#32;==&#32;<emphasis role="keyword">null</emphasis>)&#32;<emphasis role="keywordflow">return</emphasis>&#32;<emphasis role="keyword">false</emphasis>;
+00693 
+00694 &#32;&#32;&#32;&#32;&#32;&#32;var&#32;didDetectOldRig&#32;=&#32;<emphasis role="keyword">false</emphasis>;
+00695 &#32;&#32;&#32;&#32;&#32;&#32;var&#32;scannedRig&#32;=&#32;toFill;
+00696 &#32;&#32;&#32;&#32;&#32;&#32;scannedRig.<link linkend="_class_leap_1_1_unity_1_1_old_rig_hierarchy_1adef150bfa76ed5c64ad298d1b0f40d4a">rigTransform</link>&#32;=&#32;transform;
+00697 
+00698 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;Scan&#32;for&#32;the&#32;camera&#32;transform&#32;in&#32;immediate&#32;children.</emphasis>
+00699 &#32;&#32;&#32;&#32;&#32;&#32;var&#32;camDataBuffer&#32;=&#32;<emphasis role="keyword">new</emphasis>&#32;List&lt;OldCameraData&gt;();
+00700 &#32;&#32;&#32;&#32;&#32;&#32;camDataBuffer.Clear();
+00701 &#32;&#32;&#32;&#32;&#32;&#32;detectPotentialOldRigCameras(transform,&#32;camDataBuffer);
+00702 
+00703 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(camDataBuffer.Count&#32;==&#32;0)&#32;{
+00704 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;No&#32;cameras&#32;found;&#32;this&#32;is&#32;not&#32;an&#32;upgradeable&#32;old&#32;rig.</emphasis>
+00705 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;<emphasis role="keyword">false</emphasis>;
+00706 &#32;&#32;&#32;&#32;&#32;&#32;}
+00707 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">else</emphasis>&#32;{
+00708 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;We&#32;have&#32;a&#32;list&#32;of&#32;children&#32;that&#32;contain&#32;Camera&#32;components&#32;and&#32;potentially</emphasis>
+00709 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;other&#32;Leap&#32;rig-related&#32;data,&#32;but&#32;the&#32;check&#32;was&#32;intentionally&#32;loose.</emphasis>
+00710 
+00711 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;Some&#32;practical&#32;cases&#32;to&#32;consider,&#32;if&#32;there&#32;was&#32;only&#32;one&#32;camera&#32;found:</emphasis>
+00712 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;(1)&#32;It&#32;could&#32;be&#32;a&#32;standard&#32;non-image&#32;rig,&#32;and&#32;so&#32;is&#32;upgradeable!</emphasis>
+00713 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;(2)&#32;It&#32;could&#32;be&#32;an&#32;image&#32;rig&#32;but&#32;with&#32;one&#32;eye&#32;removed&#32;(weird).</emphasis>
+00714 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;&#32;&#32;&#32;&#32;(2a)&#32;If&#32;the&#32;left&#32;eye&#32;was&#32;removed,&#32;the&#32;rig&#32;is&#32;non-upgradeable.</emphasis>
+00715 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;&#32;&#32;&#32;&#32;(2b)&#32;If&#32;the&#32;right&#32;eye&#32;was&#32;removed,&#32;this&#32;rig&#32;will&#32;look&#32;identical&#32;to&#32;a</emphasis>
+00716 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;non-image&#32;rig&#32;as&#32;in&#32;(1)&#32;and&#32;be&#32;upgradeable.</emphasis>
+00717 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;(3)&#32;It&#32;could&#32;just&#32;be&#32;an&#32;object&#32;with&#32;a&#32;Camera&#32;component&#32;beneath&#32;it,&#32;and&#32;be</emphasis>
+00718 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;&#32;&#32;&#32;&#32;unrelated&#32;to&#32;a&#32;Leap&#32;VR&#32;rig.&#32;(Looks&#32;similar&#32;to&#32;2a&#32;but&#32;with&#32;fewer</emphasis>
+00719 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;&#32;&#32;&#32;&#32;Leap-related&#32;or&#32;Missing&#32;components.)</emphasis>
+00720 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//</emphasis>
+00721 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;To&#32;confirm&#32;it&#32;is&#32;NOT&#32;(3)&#32;or&#32;(2a),&#32;we&#32;need&#32;to&#32;check&#32;its&#32;children&#32;to</emphasis>
+00722 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;find&#32;the&#32;LeapSpace&#32;and&#32;LeapHandController.</emphasis>
+00723 
+00724 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;Alternatively,&#32;if&#32;there&#32;were&#32;two&#32;potential&#32;cameras&#32;found:</emphasis>
+00725 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;(1)&#32;Optimistically,&#32;this&#32;could&#32;indicate&#32;it&apos;s&#32;an&#32;old&#32;image&#32;rig&#32;with&#32;a&#32;left</emphasis>
+00726 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;&#32;&#32;&#32;&#32;and&#32;right&#32;eye.</emphasis>
+00727 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;(2)&#32;It&#32;could&#32;be&#32;a&#32;stranger&#32;construction,&#32;like&#32;the&#32;rig&#32;for&#32;a&#32;custom&#32;VR</emphasis>
+00728 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;&#32;&#32;&#32;&#32;integration.</emphasis>
+00729 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;(3)&#32;It&#32;could&#32;be&#32;a&#32;standard&#32;single-camera&#32;non-image&#32;rig&#32;with&#32;another&#32;Camera</emphasis>
+00730 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;&#32;&#32;&#32;&#32;utilized&#32;for&#32;some&#32;other,&#32;distinct&#32;purpose.</emphasis>
+00731 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;(4)&#32;It&#32;could&#32;just&#32;be&#32;a&#32;transform&#32;with&#32;two&#32;cameras&#32;as&#32;children&#32;and&#32;not&#32;be</emphasis>
+00732 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;&#32;&#32;&#32;&#32;Leap-related!</emphasis>
+00733 
+00734 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;To&#32;be&#32;an&#32;upgradeable&#32;Leap&#32;Rig,&#32;image&#32;or&#32;otherwise,&#32;one&#32;of&#32;the&#32;cameras&#32;we&apos;ve</emphasis>
+00735 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;found&#32;must&#32;have&#32;a&#32;LeapServiceProvider&#32;two&#32;transforms&#32;down&#32;(we&#32;don&apos;t&#32;actually</emphasis>
+00736 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;care&#32;what&#32;transforms&#32;are&#32;named,&#32;since&#32;someone&#32;could&#32;change&#32;them&#32;without</emphasis>
+00737 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;really&#32;affecting&#32;the&#32;structure&#32;of&#32;the&#32;rig):</emphasis>
+00738 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//</emphasis>
+00739 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;(Camera)</emphasis>
+00740 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;&#32;&#32;|</emphasis>
+00741 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;&#32;&#32;`-&#32;LeapSpace&#32;-&#32;Missing&#32;Component&#32;//&#32;optional,&#32;formerly&#32;LeapVRTemporalWarping</emphasis>
+00742 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;|</emphasis>
+00743 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;`-&#32;LeapHandController&#32;-&#32;LeapServiceProvider&#32;//&#32;required</emphasis>
+00744 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;HandModelManager&#32;&#32;&#32;&#32;//&#32;optional</emphasis>
+00745 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//</emphasis>
+00746 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;If&#32;there&#32;is&#32;no&#32;LeapServiceProvider&#32;two-transforms-down,&#32;the&#32;rig&#32;has&#32;been</emphasis>
+00747 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;modified&#32;too&#32;heavily&#32;and&#32;is&#32;no&#32;longer&#32;auto-upgradeable.</emphasis>
+00748 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//</emphasis>
+00749 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;Importantly,&#32;this&#32;condition&#32;will&#32;hold&#32;true&#32;if&#32;the&#32;rig&#32;is&#32;a&#32;non-image&#32;rig&#32;OR</emphasis>
+00750 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;an&#32;image&#32;rig,&#32;and&#32;false&#32;if&#32;we&#32;are&#32;going&#32;to&#32;refuse&#32;the&#32;upgrade.&#32;What&apos;s&#32;more,</emphasis>
+00751 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;if&#32;this&#32;condition&#32;holds&#32;true,&#32;we&#32;will&#32;be&#32;able&#32;to&#32;collect&#32;all&#32;the&#32;information</emphasis>
+00752 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;we&#32;need&#32;from&#32;the&#32;rig&#32;after&#32;scanning&#32;through&#32;each&#32;camera.</emphasis>
+00753 
+00754 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;var&#32;primaryCamData&#32;&#32;&#32;&#32;&#32;=&#32;(<link linkend="_class_leap_1_1_unity_1_1_old_rig_hierarchy_1_1_old_camera_data">OldCameraData</link>)<emphasis role="keyword">null</emphasis>;
+00755 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;var&#32;firstLeapSpaceData&#32;=&#32;(<link linkend="_class_leap_1_1_unity_1_1_old_rig_hierarchy_1_1_old_leap_space_data">OldLeapSpaceData</link>)<emphasis role="keyword">null</emphasis>;
+00756 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;var&#32;firstLHCData&#32;&#32;&#32;&#32;&#32;&#32;&#32;=&#32;(<link linkend="_class_leap_1_1_unity_1_1_old_rig_hierarchy_1_1_old_leap_hand_controller_data">OldLeapHandControllerData</link>)<emphasis role="keyword">null</emphasis>;
+00757 
+00758 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;&quot;Secondary&quot;&#32;cameras&#32;in&#32;the&#32;rig&#32;are&#32;the&#32;cameras&#32;that&#32;don&apos;t&#32;have&#32;LeapSpace&#32;or</emphasis>
+00759 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;LeapHandController&#32;objects&#32;(or&#32;weren&apos;t&#32;searched&#32;for&#32;these&#32;if&#32;we&#32;already</emphasis>
+00760 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;found&#32;a&#32;primary&#32;camera).</emphasis>
+00761 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;These&#32;need&#32;to&#32;be&#32;searched&#32;after&#32;we&#32;find&#32;the&#32;primary&#32;camera&#32;to&#32;find&#32;the</emphasis>
+00762 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;right&#32;-eye&#32;camera&#32;in&#32;the&#32;image&#32;rig&#32;case.</emphasis>
+00763 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;var&#32;secondaryCamDatas&#32;=&#32;<emphasis role="keyword">new</emphasis>&#32;List&lt;OldCameraData&gt;();
+00764 
+00765 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">for</emphasis>&#32;(<emphasis role="keywordtype">int</emphasis>&#32;i&#32;=&#32;0;&#32;i&#32;&lt;&#32;camDataBuffer.Count;&#32;i++)&#32;{
+00766 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;var&#32;camData&#32;=&#32;camDataBuffer[i];
+00767 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;var&#32;expectingFirstLeapSpaceData&#32;=&#32;firstLeapSpaceData&#32;==&#32;<emphasis role="keyword">null</emphasis>;
+00768 
+00769 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;var&#32;camTransform&#32;=&#32;camData.cameraTransform;
+00770 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">foreach</emphasis>&#32;(var&#32;child&#32;<emphasis role="keywordflow">in</emphasis>&#32;camTransform.GetChildren())&#32;{
+00771 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;var&#32;expectingFirstLHCData&#32;=&#32;firstLHCData&#32;==&#32;<emphasis role="keyword">null</emphasis>;
+00772 
+00773 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;We&apos;re&#32;looking&#32;for&#32;the&#32;child&#32;that&#32;is&#32;the&#32;LeapSpace&#32;transform,&#32;only</emphasis>
+00774 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;known&#32;implicitly&#32;by&#32;looking&#32;at&#32;_its_&#32;children.</emphasis>
+00775 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">foreach</emphasis>&#32;(var&#32;grandchild&#32;<emphasis role="keywordflow">in</emphasis>&#32;child.GetChildren())&#32;{
+00776 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;var&#32;leapServiceProvider&#32;=&#32;grandchild.GetComponent&lt;<link linkend="_class_leap_1_1_unity_1_1_leap_service_provider">LeapServiceProvider</link>&gt;();
+00777 
+00778 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;We&apos;re&#32;going&#32;to&#32;assume&#32;the&#32;first&#32;LeapServiceProvider&#32;we&#32;find&#32;is</emphasis>
+00779 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;indicative&#32;of&#32;an&#32;old,&#32;upgradeable&#32;rig,&#32;and&#32;construct&#32;out&#32;the</emphasis>
+00780 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;definition&#32;from&#32;there.</emphasis>
+00781 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(leapServiceProvider&#32;!=&#32;<emphasis role="keyword">null</emphasis>)&#32;{
+00782 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;firstLHCData&#32;=&#32;<emphasis role="keyword">new</emphasis>&#32;<link linkend="_class_leap_1_1_unity_1_1_old_rig_hierarchy_1_1_old_leap_hand_controller_data">OldLeapHandControllerData</link>();
+00783 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;firstLHCData.lhcTransform&#32;=&#32;grandchild;
+00784 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;firstLHCData.leapServiceProvider&#32;=&#32;leapServiceProvider;
+00785 
+00786 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;firstLHCData.extraChildTransforms&#32;=&#32;<emphasis role="keyword">new</emphasis>&#32;List&lt;Transform&gt;();
+00787 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">foreach</emphasis>&#32;(var&#32;greatGrandchild&#32;<emphasis role="keywordflow">in</emphasis>&#32;grandchild.GetChildren())&#32;{
+00788 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;firstLHCData.extraChildTransforms.Add(greatGrandchild);
+00789 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00790 
+00791 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;firstLHCData.handModelManager
+00792 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;=&#32;grandchild.GetComponent&lt;<link linkend="_class_leap_1_1_unity_1_1_hand_model_manager">HandModelManager</link>&gt;();
+00793 
+00794 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;var&#32;components&#32;=&#32;grandchild.GetComponents&lt;Component&gt;();
+00795 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">foreach</emphasis>&#32;(var&#32;component&#32;<emphasis role="keywordflow">in</emphasis>&#32;components)&#32;{
+00796 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(component&#32;==&#32;<emphasis role="keyword">null</emphasis>)&#32;<emphasis role="keywordflow">continue</emphasis>;&#32;<emphasis role="comment">//&#32;ignore&#32;&quot;Missing&#32;Script&quot;</emphasis>
+00797 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(component&#32;==&#32;firstLHCData.lhcTransform)&#32;<emphasis role="keywordflow">continue</emphasis>;
+00798 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(component&#32;==&#32;firstLHCData.leapServiceProvider)&#32;<emphasis role="keywordflow">continue</emphasis>;
+00799 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(component&#32;==&#32;firstLHCData.handModelManager)&#32;<emphasis role="keywordflow">continue</emphasis>;
+00800 
+00801 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(firstLHCData.extraComponents&#32;==&#32;<emphasis role="keyword">null</emphasis>)&#32;{
+00802 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;firstLHCData.extraComponents&#32;=&#32;<emphasis role="keyword">new</emphasis>&#32;List&lt;Component&gt;();
+00803 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00804 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;firstLHCData.extraComponents.Add(component);
+00805 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00806 
+00807 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">break</emphasis>;
+00808 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00809 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00810 
+00811 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(firstLHCData&#32;!=&#32;<emphasis role="keyword">null</emphasis>&#32;&amp;&amp;&#32;expectingFirstLHCData)&#32;{
+00812 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;firstLeapSpaceData&#32;=&#32;<emphasis role="keyword">new</emphasis>&#32;<link linkend="_class_leap_1_1_unity_1_1_old_rig_hierarchy_1_1_old_leap_space_data">OldLeapSpaceData</link>();
+00813 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;firstLeapSpaceData.leapSpaceTransform&#32;=&#32;child;
+00814 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;firstLeapSpaceData.nonLHCChildTransforms&#32;=&#32;<emphasis role="keyword">new</emphasis>&#32;List&lt;Transform&gt;();
+00815 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">foreach</emphasis>&#32;(var&#32;leapSpaceChild&#32;<emphasis role="keywordflow">in</emphasis>&#32;child.GetChildren())&#32;{
+00816 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(leapSpaceChild&#32;==&#32;firstLHCData.lhcTransform)&#32;<emphasis role="keywordflow">continue</emphasis>;
+00817 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;firstLeapSpaceData.nonLHCChildTransforms.Add(leapSpaceChild);
+00818 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00819 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">break</emphasis>;
+00820 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00821 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00822 
+00823 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(firstLeapSpaceData&#32;!=&#32;<emphasis role="keyword">null</emphasis>&#32;&amp;&amp;&#32;expectingFirstLeapSpaceData)&#32;{
+00824 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;This&#32;is&#32;our&#32;primary&#32;camera.</emphasis>
+00825 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;primaryCamData&#32;=&#32;camData;
+00826 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00827 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">else</emphasis>&#32;{
+00828 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;Either&#32;we&#32;haven&apos;t&#32;found&#32;a&#32;LeapSpace&#32;yet&#32;or&#32;we&apos;ve&#32;already&#32;found&#32;our&#32;first.</emphasis>
+00829 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;So&#32;this&#32;is&#32;a&#32;secondary&#32;camera.</emphasis>
+00830 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;secondaryCamDatas.Add(camData);
+00831 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00832 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00833 
+00834 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;At&#32;the&#32;end&#32;of&#32;this&#32;process,&#32;we&#32;must&#32;have&#32;all&#32;three&#32;of&#32;these&#32;things&#32;in&#32;order</emphasis>
+00835 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;to&#32;be&#32;an&#32;upgradeable&#32;rig:</emphasis>
+00836 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;(1)&#32;a&#32;Primary&#32;camera,&#32;containing</emphasis>
+00837 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;(2)&#32;a&#32;LeapSpace&#32;transform,&#32;containing</emphasis>
+00838 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;(3)&#32;a&#32;LeapHandController&#32;transform</emphasis>
+00839 
+00840 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;If&#32;we&#32;don&apos;t&#32;have&#32;these&#32;things,&#32;we&#32;can&apos;t&#32;upgrade</emphasis>
+00841 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;the&#32;rig!&#32;Not&#32;having&#32;these&#32;things,&#32;in&#32;fact,&#32;indicates&#32;it&apos;s&#32;probably&#32;not&#32;an</emphasis>
+00842 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;old&#32;Leap&#32;rig&#32;at&#32;all.</emphasis>
+00843 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(primaryCamData&#32;==&#32;<emphasis role="keyword">null</emphasis>)&#32;{
+00844 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;scannedRig.isUpgradeableOldRig&#32;=&#32;<emphasis role="keyword">false</emphasis>;
+00845 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;scannedRig.cameraData&#32;=&#32;<emphasis role="keyword">null</emphasis>;
+00846 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;scannedRig.detectedAsPotentialRig&#32;=&#32;<emphasis role="keyword">false</emphasis>;
+00847 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;scannedRig.leapSpaceData&#32;=&#32;<emphasis role="keyword">null</emphasis>;
+00848 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;scannedRig.lhcData&#32;=&#32;<emphasis role="keyword">null</emphasis>;
+00849 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;scannedRig.handModelParentTransform&#32;=&#32;<emphasis role="keyword">null</emphasis>;
+00850 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;scannedRig.reasonRigCannotBeUpgraded&#32;=&#32;<emphasis role="stringliteral">&quot;Scanned&#32;transform&#32;does&#32;not&#32;look&#32;like&#32;&quot;</emphasis>
+00851 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;+&#32;<emphasis role="stringliteral">&quot;an&#32;old&#32;Leap&#32;rig.&quot;</emphasis>;
+00852 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;<emphasis role="keyword">false</emphasis>;
+00853 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00854 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">else</emphasis>&#32;{
+00855 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;OK,&#32;we&#32;can&#32;upgrade&#32;this&#32;rig.&#32;Fill&#32;it&#32;with&#32;any&#32;remaining&#32;data&#32;we&#32;need.</emphasis>
+00856 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;didDetectOldRig&#32;=&#32;<emphasis role="keyword">true</emphasis>;
+00857 
+00858 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;scannedRig.cameraData&#32;=&#32;primaryCamData;
+00859 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;scannedRig.detectedAsPotentialRig&#32;=&#32;<emphasis role="keyword">true</emphasis>;
+00860 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;scannedRig.leapSpaceData&#32;=&#32;firstLeapSpaceData;
+00861 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;scannedRig.lhcData&#32;=&#32;firstLHCData;
+00862 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;scannedRig.isUpgradeableOldRig&#32;=&#32;<emphasis role="keyword">true</emphasis>;
+00863 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;scannedRig.reasonRigCannotBeUpgraded&#32;=&#32;<emphasis role="stringliteral">&quot;&quot;</emphasis>;
+00864 
+00865 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;Since&#32;we&apos;ve&#32;come&#32;this&#32;far,&#32;we&#32;need&#32;to&#32;attempt&#32;to&#32;find&#32;the&#32;hand&#32;model</emphasis>
+00866 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;parent&#32;transform.&#32;This&#32;will&#32;be&#32;the&#32;first&#32;child&#32;transform&#32;of&#32;the&#32;rig&#32;that</emphasis>
+00867 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;contains&#32;one&#32;or&#32;more&#32;HandModelBase&#32;components.</emphasis>
+00868 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;Not&#32;having&#32;one&#32;of&#32;these&#32;doesn&apos;t&#32;preclude&#32;updating&#32;the&#32;rig,&#32;since&#32;we&#32;can</emphasis>
+00869 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;just&#32;make&#32;a&#32;new&#32;transform&#32;for&#32;this&#32;purpose.</emphasis>
+00870 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;var&#32;firstReasonableHandModelTransform&#32;=&#32;scannedRig.rigTransform.GetChildren()
+00871 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;.Query().Where(child&#32;=&gt;
+00872 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;child.GetChildren().Query()
+00873 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;.Where(gc&#32;=&gt;&#32;gc.GetComponent&lt;<link linkend="_class_leap_1_1_unity_1_1_hand_model_base">HandModelBase</link>&gt;()&#32;!=&#32;<emphasis role="keyword">null</emphasis>).Count()&#32;&gt;&#32;0)
+00874 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;.FirstOrDefault();
+00875 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;scannedRig.handModelParentTransform&#32;=&#32;firstReasonableHandModelTransform;
+00876 
+00877 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;If&#32;there&#32;is&#32;a&#32;LeapImageRetriever&#32;on&#32;the&#32;camera,&#32;this&#32;could&#32;well&#32;be&#32;an</emphasis>
+00878 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;old&#32;Leap&#32;image&#32;rig,&#32;with&#32;two&#32;eyes.</emphasis>
+00879 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;var&#32;leapImageRetriever&#32;=&#32;primaryCamData.cameraTransform
+00880 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;.GetComponent&lt;<link linkend="_class_leap_1_1_unity_1_1_leap_image_retriever">LeapImageRetriever</link>&gt;();
+00881 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;var&#32;rightEyeCamData&#32;=&#32;(<link linkend="_class_leap_1_1_unity_1_1_old_rig_hierarchy_1_1_old_camera_data">OldCameraData</link>)<emphasis role="keyword">null</emphasis>;
+00882 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(leapImageRetriever&#32;!=&#32;<emphasis role="keyword">null</emphasis>)&#32;{
+00883 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;If&#32;there&#32;is&#32;a&#32;secondary&#32;camera&#32;with&#32;a&#32;LeapEyeDislocator&#32;component,&#32;we&apos;ll</emphasis>
+00884 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;assume&#32;that&apos;s&#32;the&#32;other&#32;(right)&#32;eye.</emphasis>
+00885 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;rightEyeCamData&#32;=&#32;secondaryCamDatas.Query()
+00886 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;.Where(cd&#32;=&gt;&#32;cd.cameraTransform.GetComponent&lt;<link linkend="_class_leap_1_1_unity_1_1_leap_eye_dislocator">LeapEyeDislocator</link>&gt;()&#32;!=&#32;<emphasis role="keyword">null</emphasis>)
+00887 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;.FirstOrDefault();
+00888 
+00889 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(rightEyeCamData&#32;!=&#32;<emphasis role="keyword">null</emphasis>)&#32;{
+00890 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;scannedRig.imageRigData&#32;=&#32;<emphasis role="keyword">new</emphasis>&#32;<link linkend="_class_leap_1_1_unity_1_1_old_rig_hierarchy_1_1_image_rig_data">ImageRigData</link>();
+00891 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;scannedRig.imageRigData.rightEyeCamData&#32;=&#32;rightEyeCamData;
+00892 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00893 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00894 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00895 &#32;&#32;&#32;&#32;&#32;&#32;}
+00896 
+00897 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;didDetectOldRig;
+00898 &#32;&#32;&#32;&#32;}
+00899 
+00904 &#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;<emphasis role="keyword">static</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;detectPotentialOldRigCameras(Transform&#32;<link linkend="_class_leap_1_1_unity_1_1_old_rig_hierarchy_1adef150bfa76ed5c64ad298d1b0f40d4a">rigTransform</link>,
+00905 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;List&lt;OldCameraData&gt;&#32;detectedCameras)&#32;{
+00906 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">foreach</emphasis>&#32;(var&#32;child&#32;<emphasis role="keywordflow">in</emphasis>&#32;<link linkend="_class_leap_1_1_unity_1_1_old_rig_hierarchy_1adef150bfa76ed5c64ad298d1b0f40d4a">rigTransform</link>.GetChildren())&#32;{
+00907 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;var&#32;eyeDislocator&#32;=&#32;child.GetComponent&lt;<link linkend="_class_leap_1_1_unity_1_1_leap_eye_dislocator">LeapEyeDislocator</link>&gt;();
+00908 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;var&#32;camera&#32;=&#32;child.GetComponent&lt;Camera&gt;();
+00909 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;var&#32;leapXRProvider&#32;=&#32;child.GetComponent&lt;<link linkend="_class_leap_1_1_unity_1_1_leap_x_r_service_provider">LeapXRServiceProvider</link>&gt;();
+00910 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;var&#32;enableDepthBuffer&#32;=&#32;child.GetComponent&lt;<link linkend="_class_leap_1_1_unity_1_1_enable_depth_buffer">EnableDepthBuffer</link>&gt;();
+00911 
+00912 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(camera&#32;==&#32;<emphasis role="keyword">null</emphasis>)&#32;{
+00913 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;Definitely&#32;no&#32;camera&#32;detected&#32;for&#32;this&#32;child.</emphasis>
+00914 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">continue</emphasis>;
+00915 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00916 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">else</emphasis>&#32;<emphasis role="keywordflow">if</emphasis>&#32;(leapXRProvider&#32;!=&#32;<emphasis role="keyword">null</emphasis>)&#32;{
+00917 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;A&#32;camera&#32;with&#32;a&#32;LeapXRServiceProvider&#32;on&#32;it&#32;is&#32;definitely&#32;not&#32;an&#32;old&#32;rig!</emphasis>
+00918 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;This&#32;is&#32;probably&#32;an&#32;up-to-date&#32;rig.</emphasis>
+00919 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">continue</emphasis>;
+00920 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00921 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">else</emphasis>&#32;{
+00922 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;OK,&#32;this&#32;could&#32;be&#32;an&#32;old&#32;rig&#32;camera.&#32;Get&#32;as&#32;much&#32;data&#32;as&#32;possible&#32;about&#32;it.</emphasis>
+00923 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;var&#32;oldCamData&#32;=&#32;<emphasis role="keyword">new</emphasis>&#32;OldCameraData();
+00924 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;oldCamData.cameraTransform&#32;=&#32;child;
+00925 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;oldCamData.cameraComponent&#32;=&#32;camera;
+00926 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;oldCamData.leapEyeDislocator&#32;=&#32;eyeDislocator;
+00927 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;oldCamData.enableDepthBuffer&#32;=&#32;enableDepthBuffer;
+00928 
+00929 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;Add&#32;it&#32;to&#32;the&#32;detected&#32;cameras&#32;list.&#32;We&apos;ll&#32;process&#32;it&#32;more&#32;later.</emphasis>
+00930 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;detectedCameras.Add(oldCamData);
+00931 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00932 &#32;&#32;&#32;&#32;&#32;&#32;}
+00933 &#32;&#32;&#32;&#32;}
+00934 
+<anchor xml:id="__leap_rig_upgrader_8cs_source_1l00940"/><link linkend="_class_leap_1_1_unity_1_1_old_rig_hierarchy_1a07e5376d38915dc8ad63759188cc57e8">00940</link> &#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keyword">static</emphasis>&#32;<link linkend="_class_leap_1_1_unity_1_1_old_rig_hierarchy">OldRigHierarchy</link>&#32;<link linkend="_class_leap_1_1_unity_1_1_old_rig_hierarchy_1a07e5376d38915dc8ad63759188cc57e8">DetectFor</link>(Transform&#32;transform)&#32;{
+00941 &#32;&#32;&#32;&#32;&#32;&#32;var&#32;scannedRig&#32;=&#32;<emphasis role="keyword">new</emphasis>&#32;<link linkend="_class_leap_1_1_unity_1_1_old_rig_hierarchy">OldRigHierarchy</link>();
+00942 &#32;&#32;&#32;&#32;&#32;&#32;var&#32;didDetectOldRig&#32;=&#32;<link linkend="_class_leap_1_1_unity_1_1_old_rig_hierarchy_1a494d91a3cb9d07875a4c4b50c75598fd">DetectFor</link>(transform,&#32;scannedRig);
+00943 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(!didDetectOldRig)&#32;<emphasis role="keywordflow">return</emphasis>&#32;<emphasis role="keyword">null</emphasis>;
+00944 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;scannedRig;
+00945 &#32;&#32;&#32;&#32;}
+00946 &#32;&#32;&#32;&#32;
+00947 &#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;<emphasis role="keyword">static</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;fillMissingComponentIndices(Transform&#32;transform,&#32;List&lt;int&gt;&#32;toFill)&#32;{
+00948 &#32;&#32;&#32;&#32;&#32;&#32;toFill.Clear();
+00949 &#32;&#32;&#32;&#32;&#32;&#32;var&#32;tempList&#32;=&#32;<emphasis role="keyword">new</emphasis>&#32;List&lt;Component&gt;();
+00950 &#32;&#32;&#32;&#32;&#32;&#32;transform.GetComponents(tempList);
+00951 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">for</emphasis>&#32;(<emphasis role="keywordtype">int</emphasis>&#32;i&#32;=&#32;0;&#32;i&#32;&lt;&#32;tempList.Count;&#32;i++)&#32;{
+00952 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;var&#32;component&#32;=&#32;tempList[i];
+00953 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(component&#32;==&#32;<emphasis role="keyword">null</emphasis>)&#32;{
+00954 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;toFill.Add(i);
+00955 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00956 &#32;&#32;&#32;&#32;&#32;&#32;}
+00957 &#32;&#32;&#32;&#32;}
+00958 
+00959 <emphasis role="preprocessor">&#32;&#32;&#32;&#32;#endregion</emphasis>
+00960 
+00961 <emphasis role="preprocessor">&#32;&#32;&#32;&#32;#region&#32;Upgrading</emphasis>
+00962 
+<anchor xml:id="__leap_rig_upgrader_8cs_source_1l00963"/><link linkend="_class_leap_1_1_unity_1_1_old_rig_hierarchy_1_1_upgrade_options">00963</link> &#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keyword">class&#32;</emphasis><link linkend="_class_leap_1_1_unity_1_1_old_rig_hierarchy_1_1_upgrade_options">UpgradeOptions</link>&#32;{
+<anchor xml:id="__leap_rig_upgrader_8cs_source_1l00964"/><link linkend="_class_leap_1_1_unity_1_1_old_rig_hierarchy_1_1_upgrade_options_1a04fcb64256d2693fe1649f491e59a7d1">00964</link> &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keywordtype">bool</emphasis>&#32;<link linkend="_class_leap_1_1_unity_1_1_old_rig_hierarchy_1_1_upgrade_options_1a04fcb64256d2693fe1649f491e59a7d1">camera_removeEnableDepthBufferScript</link>&#32;=&#32;<emphasis role="keyword">true</emphasis>;
+<anchor xml:id="__leap_rig_upgrader_8cs_source_1l00965"/><link linkend="_class_leap_1_1_unity_1_1_old_rig_hierarchy_1_1_upgrade_options_1a57ef49dcd002094bce369b437ed7c3b9">00965</link> &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keywordtype">bool</emphasis>&#32;<link linkend="_class_leap_1_1_unity_1_1_old_rig_hierarchy_1_1_upgrade_options_1a57ef49dcd002094bce369b437ed7c3b9">camera_removeRightEyeCamera</link>&#32;=&#32;<emphasis role="keyword">true</emphasis>;
+<anchor xml:id="__leap_rig_upgrader_8cs_source_1l00966"/><link linkend="_class_leap_1_1_unity_1_1_old_rig_hierarchy_1_1_upgrade_options_1a574c3a8a23a1a7edaacf09bfd3317299">00966</link> &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keywordtype">bool</emphasis>&#32;<link linkend="_class_leap_1_1_unity_1_1_old_rig_hierarchy_1_1_upgrade_options_1a574c3a8a23a1a7edaacf09bfd3317299">camera_removeLeapEyeDislocator</link>&#32;=&#32;<emphasis role="keyword">true</emphasis>;
+<anchor xml:id="__leap_rig_upgrader_8cs_source_1l00967"/><link linkend="_class_leap_1_1_unity_1_1_old_rig_hierarchy_1_1_upgrade_options_1a797fb4b846240cb8785866005694167b">00967</link> &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keywordtype">bool</emphasis>&#32;<link linkend="_class_leap_1_1_unity_1_1_old_rig_hierarchy_1_1_upgrade_options_1a797fb4b846240cb8785866005694167b">leapSpace_removeMissingScripts</link>&#32;=&#32;<emphasis role="keyword">true</emphasis>;
+<anchor xml:id="__leap_rig_upgrader_8cs_source_1l00968"/><link linkend="_class_leap_1_1_unity_1_1_old_rig_hierarchy_1_1_upgrade_options_1aeab3e8a33b5a0e9d72bce7098d6a8081">00968</link> &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keywordtype">bool</emphasis>&#32;<link linkend="_class_leap_1_1_unity_1_1_old_rig_hierarchy_1_1_upgrade_options_1aeab3e8a33b5a0e9d72bce7098d6a8081">leapSpace_mergeExtraChildrenUpward</link>&#32;=&#32;<emphasis role="keyword">true</emphasis>;
+<anchor xml:id="__leap_rig_upgrader_8cs_source_1l00969"/><link linkend="_class_leap_1_1_unity_1_1_old_rig_hierarchy_1_1_upgrade_options_1a7b1ad80bb624f91b59f47946a436c082">00969</link> &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keywordtype">bool</emphasis>&#32;<link linkend="_class_leap_1_1_unity_1_1_old_rig_hierarchy_1_1_upgrade_options_1a7b1ad80bb624f91b59f47946a436c082">lhc_removeMissingScripts</link>&#32;=&#32;<emphasis role="keyword">true</emphasis>;
+<anchor xml:id="__leap_rig_upgrader_8cs_source_1l00970"/><link linkend="_class_leap_1_1_unity_1_1_old_rig_hierarchy_1_1_upgrade_options_1a77b2f694059bde9437ec4df2dae8e743">00970</link> &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keywordtype">bool</emphasis>&#32;<link linkend="_class_leap_1_1_unity_1_1_old_rig_hierarchy_1_1_upgrade_options_1a77b2f694059bde9437ec4df2dae8e743">lhc_mergeExtraChildrenUpward</link>&#32;=&#32;<emphasis role="keyword">true</emphasis>;
+00971 &#32;&#32;&#32;&#32;}
+00972 
+<anchor xml:id="__leap_rig_upgrader_8cs_source_1l00973"/><link linkend="_class_leap_1_1_unity_1_1_old_rig_hierarchy_1a3b5f9882e0f1fe11166886bdbf0f4029">00973</link> &#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;<link linkend="_class_leap_1_1_unity_1_1_old_rig_hierarchy_1a3b5f9882e0f1fe11166886bdbf0f4029">Upgrade</link>(<link linkend="_class_leap_1_1_unity_1_1_old_rig_hierarchy_1_1_upgrade_options">UpgradeOptions</link>&#32;options)&#32;{
+00974 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(options&#32;==&#32;<emphasis role="keyword">null</emphasis>)&#32;{&#32;options&#32;=&#32;<emphasis role="keyword">new</emphasis>&#32;<link linkend="_class_leap_1_1_unity_1_1_old_rig_hierarchy_1_1_upgrade_options">UpgradeOptions</link>();&#32;}
+00975 
+00976 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(!this.isUpgradeableOldRig)&#32;{
+00977 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">throw</emphasis>&#32;<emphasis role="keyword">new</emphasis>&#32;InvalidOperationException(
+00978 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="stringliteral">&quot;Aborting&#32;upgrade&#32;attempt:&#32;This&#32;rig&#32;is&#32;not&#32;upgradeable.&quot;</emphasis>);
+00979 &#32;&#32;&#32;&#32;&#32;&#32;}
+00980 
+00981 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;Rig&#32;transform:&#32;unmodified.</emphasis>
+00982 
+00983 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;Camera&#32;transform,&#32;then&#32;LeapSpace&#32;transform,&#32;then&#32;LHC&#32;transform.</emphasis>
+00984 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(<link linkend="_class_leap_1_1_unity_1_1_old_rig_hierarchy_1a1273b07cacb3db69876ad8bbf0eec077">cameraData</link>&#32;==&#32;<emphasis role="keyword">null</emphasis>)&#32;{
+00985 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;Debug.LogError(<emphasis role="stringliteral">&quot;No&#32;camera&#32;data&#32;available&#32;for&#32;this&#32;rig&#32;during&#32;upgrade&#32;attempt.&quot;</emphasis>);
+00986 &#32;&#32;&#32;&#32;&#32;&#32;}
+00987 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">else</emphasis>&#32;{
+00988 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;var&#32;enableDepthBufferScript&#32;=&#32;this.cameraData.<link linkend="_class_leap_1_1_unity_1_1_old_rig_hierarchy_1_1_old_camera_data_1a01e96989d95f3fe13b5e2251676abd08">enableDepthBuffer</link>;
+00989 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(options.<link linkend="_class_leap_1_1_unity_1_1_old_rig_hierarchy_1_1_upgrade_options_1a04fcb64256d2693fe1649f491e59a7d1">camera_removeEnableDepthBufferScript</link>
+00990 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&amp;&amp;&#32;enableDepthBufferScript&#32;!=&#32;<emphasis role="keyword">null</emphasis>)&#32;{
+00991 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;Undo.DestroyObjectImmediate(enableDepthBufferScript);
+00992 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00993 
+00994 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;var&#32;eyeDislocator&#32;=&#32;this.cameraData.<link linkend="_class_leap_1_1_unity_1_1_old_rig_hierarchy_1_1_old_camera_data_1a4bb67ab7dfcc19a17639076bd8898612">leapEyeDislocator</link>;
+00995 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(options.<link linkend="_class_leap_1_1_unity_1_1_old_rig_hierarchy_1_1_upgrade_options_1a574c3a8a23a1a7edaacf09bfd3317299">camera_removeLeapEyeDislocator</link>
+00996 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&amp;&amp;&#32;eyeDislocator&#32;!=&#32;<emphasis role="keyword">null</emphasis>)&#32;{
+00997 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;Undo.DestroyObjectImmediate(eyeDislocator);
+00998 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00999 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;
+01000 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(this.<link linkend="_class_leap_1_1_unity_1_1_old_rig_hierarchy_1aa6ff09cd65c3952f379e01467e97c14a">isImageRig</link>)&#32;{
+01001 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;var&#32;rightEyeCamData&#32;=&#32;this.imageRigData.<link linkend="_class_leap_1_1_unity_1_1_old_rig_hierarchy_1_1_image_rig_data_1a25435730115c2e77c28a9fbed72c1446">rightEyeCamData</link>;
+01002 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(rightEyeCamData&#32;!=&#32;<emphasis role="keyword">null</emphasis>)&#32;{
+01003 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;var&#32;rightEyeTransform&#32;=&#32;rightEyeCamData.<link linkend="_class_leap_1_1_unity_1_1_old_rig_hierarchy_1_1_old_camera_data_1a14376c67e293af5af3bb537ead0db3c4">cameraTransform</link>;
+01004 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(options.<link linkend="_class_leap_1_1_unity_1_1_old_rig_hierarchy_1_1_upgrade_options_1a57ef49dcd002094bce369b437ed7c3b9">camera_removeRightEyeCamera</link>
+01005 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&amp;&amp;&#32;rightEyeTransform&#32;!=&#32;<emphasis role="keyword">null</emphasis>)&#32;{
+01006 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;Undo.DestroyObjectImmediate(rightEyeTransform.gameObject);
+01007 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+01008 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+01009 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(<link linkend="_class_leap_1_1_unity_1_1_old_rig_hierarchy_1a1273b07cacb3db69876ad8bbf0eec077">cameraData</link>.<link linkend="_class_leap_1_1_unity_1_1_old_rig_hierarchy_1_1_old_camera_data_1a064374ed9ef4561816be21780153877f">cameraComponent</link>&#32;!=&#32;<emphasis role="keyword">null</emphasis>
+01010 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&amp;&amp;&#32;<link linkend="_class_leap_1_1_unity_1_1_old_rig_hierarchy_1a1273b07cacb3db69876ad8bbf0eec077">cameraData</link>.<link linkend="_class_leap_1_1_unity_1_1_old_rig_hierarchy_1_1_old_camera_data_1a064374ed9ef4561816be21780153877f">cameraComponent</link>.stereoTargetEye&#32;==&#32;StereoTargetEyeMask.Left)&#32;{
+01011 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_leap_1_1_unity_1_1_old_rig_hierarchy_1a1273b07cacb3db69876ad8bbf0eec077">cameraData</link>.<link linkend="_class_leap_1_1_unity_1_1_old_rig_hierarchy_1_1_old_camera_data_1a064374ed9ef4561816be21780153877f">cameraComponent</link>.stereoTargetEye&#32;=&#32;StereoTargetEyeMask.Both;
+01012 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+01013 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+01014 
+01015 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;var&#32;cameraTransform&#32;=&#32;<link linkend="_class_leap_1_1_unity_1_1_old_rig_hierarchy_1a1273b07cacb3db69876ad8bbf0eec077">cameraData</link>.<link linkend="_class_leap_1_1_unity_1_1_old_rig_hierarchy_1_1_old_camera_data_1a14376c67e293af5af3bb537ead0db3c4">cameraTransform</link>;
+01016 
+01017 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(<link linkend="_class_leap_1_1_unity_1_1_old_rig_hierarchy_1ac0517cc34c4970352fd9c8d0b8e903dd">leapSpaceData</link>&#32;==&#32;<emphasis role="keyword">null</emphasis>)&#32;{
+01018 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;Debug.LogError(<emphasis role="stringliteral">&quot;No&#32;LeapSpace&#32;data&#32;available&#32;for&#32;this&#32;rig&#32;during&#32;upgrade&#32;&quot;</emphasis>
+01019 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;+&#32;<emphasis role="stringliteral">&quot;attempt.&quot;</emphasis>);
+01020 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+01021 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">else</emphasis>&#32;{
+01022 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;var&#32;leapSpaceExtraChildren&#32;=&#32;<link linkend="_class_leap_1_1_unity_1_1_old_rig_hierarchy_1ac0517cc34c4970352fd9c8d0b8e903dd">leapSpaceData</link>.<link linkend="_class_leap_1_1_unity_1_1_old_rig_hierarchy_1_1_old_leap_space_data_1ad44581a340d64a0e51b2cf26718b034b">nonLHCChildTransforms</link>;
+01023 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(options.<link linkend="_class_leap_1_1_unity_1_1_old_rig_hierarchy_1_1_upgrade_options_1aeab3e8a33b5a0e9d72bce7098d6a8081">leapSpace_mergeExtraChildrenUpward</link>
+01024 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&amp;&amp;&#32;leapSpaceExtraChildren&#32;!=&#32;<emphasis role="keyword">null</emphasis>)&#32;{
+01025 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">foreach</emphasis>&#32;(var&#32;extraChild&#32;<emphasis role="keywordflow">in</emphasis>&#32;leapSpaceExtraChildren.Query().Where(t&#32;=&gt;&#32;t&#32;!=&#32;<emphasis role="keyword">null</emphasis>))&#32;{
+01026 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;Undo.SetTransformParent(extraChild,&#32;cameraTransform,
+01027 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="stringliteral">&quot;Move&#32;LeapSpace&#32;child&#32;to&#32;Camera&quot;</emphasis>);
+01028 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+01029 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+01030 
+01031 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;var&#32;leapSpaceTransform&#32;=&#32;<link linkend="_class_leap_1_1_unity_1_1_old_rig_hierarchy_1ac0517cc34c4970352fd9c8d0b8e903dd">leapSpaceData</link>.<link linkend="_class_leap_1_1_unity_1_1_old_rig_hierarchy_1_1_old_leap_space_data_1a2df72bc4798bb1cf23e6bb11c7f4546f">leapSpaceTransform</link>;
+01032 
+01033 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(<link linkend="_class_leap_1_1_unity_1_1_old_rig_hierarchy_1a741aa0070b5769cf8c3c2de3173bdcd9">lhcData</link>&#32;==&#32;<emphasis role="keyword">null</emphasis>)&#32;{
+01034 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;Debug.LogError(<emphasis role="stringliteral">&quot;No&#32;LeapHandController&#32;data&#32;available&#32;for&#32;this&#32;rig&#32;during&#32;&quot;</emphasis>
+01035 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;+&#32;<emphasis role="stringliteral">&quot;upgrade&#32;attempt.&quot;</emphasis>);
+01036 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+01037 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">else</emphasis>&#32;{
+01038 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;var&#32;lhcExtraChildren&#32;=&#32;<link linkend="_class_leap_1_1_unity_1_1_old_rig_hierarchy_1a741aa0070b5769cf8c3c2de3173bdcd9">lhcData</link>.<link linkend="_class_leap_1_1_unity_1_1_old_rig_hierarchy_1_1_old_leap_hand_controller_data_1a2048e2d234553048b98e5cce12027741">extraChildTransforms</link>;
+01039 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(options.<link linkend="_class_leap_1_1_unity_1_1_old_rig_hierarchy_1_1_upgrade_options_1a77b2f694059bde9437ec4df2dae8e743">lhc_mergeExtraChildrenUpward</link>
+01040 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&amp;&amp;&#32;lhcExtraChildren&#32;!=&#32;<emphasis role="keyword">null</emphasis>)&#32;{
+01041 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">foreach</emphasis>&#32;(var&#32;extraChild&#32;<emphasis role="keywordflow">in</emphasis>&#32;lhcExtraChildren.Query().Where(t&#32;=&gt;&#32;t&#32;!=&#32;<emphasis role="keyword">null</emphasis>))&#32;{
+01042 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;Undo.SetTransformParent(extraChild,&#32;cameraTransform,
+01043 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="stringliteral">&quot;Move&#32;LHC&#32;child&#32;to&#32;Camera&quot;</emphasis>);
+01044 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+01045 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+01046 
+01047 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;Migrate&#32;the&#32;HandPool&#32;(now&#32;HandModelManager)&#32;to&#32;the&#32;hand&#32;model&#32;parent&#32;</emphasis>
+01048 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;transform&#32;if&#32;we&#32;could&#32;find&#32;one.</emphasis>
+01049 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;var&#32;handModelManager&#32;=&#32;<link linkend="_class_leap_1_1_unity_1_1_old_rig_hierarchy_1a741aa0070b5769cf8c3c2de3173bdcd9">lhcData</link>.<link linkend="_class_leap_1_1_unity_1_1_old_rig_hierarchy_1_1_old_leap_hand_controller_data_1ae0983b15b4bcd2f34786b30dd2a8de81">handModelManager</link>;
+01050 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;var&#32;newHandModelManager&#32;=&#32;(<link linkend="_class_leap_1_1_unity_1_1_hand_model_manager">HandModelManager</link>)<emphasis role="keyword">null</emphasis>;
+01051 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(handModelManager&#32;!=&#32;<emphasis role="keyword">null</emphasis>&#32;&amp;&amp;&#32;this.handModelParentTransform&#32;!=&#32;<emphasis role="keyword">null</emphasis>)&#32;{
+01052 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;newHandModelManager
+01053 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;=&#32;Undo.AddComponent&lt;<link linkend="_class_leap_1_1_unity_1_1_hand_model_manager">HandModelManager</link>&gt;(<link linkend="_class_leap_1_1_unity_1_1_old_rig_hierarchy_1a23b887e672e43860cbe4417247cc57b9">handModelParentTransform</link>.gameObject);
+01054 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;EditorUtility.CopySerialized(handModelManager,&#32;newHandModelManager);
+01055 
+01056 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;EditorUtils.ReplaceSceneReferences(handModelManager,&#32;newHandModelManager);
+01057 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+01058 
+01059 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;Migrate&#32;the&#32;LeapServiceProvider&#32;on&#32;the&#32;LHC&#32;to&#32;a&#32;LeapXRServiceProvider&#32;on</emphasis>
+01060 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;the&#32;primary&#32;camera,&#32;and&#32;swap&#32;references&#32;over&#32;to&#32;it.</emphasis>
+01061 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;var&#32;leapServiceProvider&#32;=&#32;<link linkend="_class_leap_1_1_unity_1_1_old_rig_hierarchy_1a741aa0070b5769cf8c3c2de3173bdcd9">lhcData</link>.<link linkend="_class_leap_1_1_unity_1_1_old_rig_hierarchy_1_1_old_leap_hand_controller_data_1a06731cc5d6edecb981eff99f75a71185">leapServiceProvider</link>;
+01062 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;var&#32;leapXRServiceProvider&#32;=&#32;(<link linkend="_class_leap_1_1_unity_1_1_leap_x_r_service_provider">LeapXRServiceProvider</link>)<emphasis role="keyword">null</emphasis>;
+01063 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(leapServiceProvider&#32;!=&#32;<emphasis role="keyword">null</emphasis>)&#32;{
+01064 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;leapXRServiceProvider&#32;=&#32;Undo.AddComponent&lt;<link linkend="_class_leap_1_1_unity_1_1_leap_x_r_service_provider">LeapXRServiceProvider</link>&gt;(
+01065 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_leap_1_1_unity_1_1_old_rig_hierarchy_1a1273b07cacb3db69876ad8bbf0eec077">cameraData</link>.<link linkend="_class_leap_1_1_unity_1_1_old_rig_hierarchy_1_1_old_camera_data_1a14376c67e293af5af3bb537ead0db3c4">cameraTransform</link>.gameObject);
+01066 
+01067 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;leapServiceProvider
+01068 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;.<link linkend="_class_leap_1_1_unity_1_1_leap_service_provider_1ada1aaf6421decbb20a418c412193033c">CopySettingsToLeapXRServiceProvider</link>(leapXRServiceProvider);
+01069 
+01070 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;EditorUtils.ReplaceSceneReferences(leapServiceProvider,
+01071 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;leapXRServiceProvider);
+01072 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+01073 
+01074 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(newHandModelManager&#32;!=&#32;<emphasis role="keyword">null</emphasis>&#32;&amp;&amp;&#32;leapXRServiceProvider&#32;!=&#32;<emphasis role="keyword">null</emphasis>)&#32;{
+01075 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;newHandModelManager.leapProvider&#32;=&#32;leapXRServiceProvider;
+01076 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+01077 
+01078 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;Migrate&#32;any&#32;extra&#32;components&#32;on&#32;the&#32;LHC&#32;to&#32;the&#32;camera.</emphasis>
+01079 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;var&#32;extraComponents&#32;=&#32;<link linkend="_class_leap_1_1_unity_1_1_old_rig_hierarchy_1a741aa0070b5769cf8c3c2de3173bdcd9">lhcData</link>.<link linkend="_class_leap_1_1_unity_1_1_old_rig_hierarchy_1_1_old_leap_hand_controller_data_1aa5a52b8e1a4ac9f1f3ac3ffd445278be">extraComponents</link>;
+01080 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(extraComponents&#32;!=&#32;<emphasis role="keyword">null</emphasis>&#32;&amp;&amp;&#32;extraComponents.Count&#32;&gt;&#32;0)&#32;{
+01081 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">foreach</emphasis>&#32;(var&#32;component&#32;<emphasis role="keywordflow">in</emphasis>&#32;extraComponents.Query().Where(c&#32;=&gt;&#32;c&#32;!=&#32;<emphasis role="keyword">null</emphasis>))&#32;{
+01082 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;var&#32;newComponent
+01083 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;=&#32;cameraTransform.gameObject.AddComponent(component.GetType());
+01084 
+01085 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;EditorUtility.CopySerialized(component,&#32;newComponent);
+01086 
+01087 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;EditorUtils.ReplaceSceneReferences(component,&#32;newComponent);
+01088 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+01089 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+01090 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+01091 
+01092 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;Remove&#32;the&#32;LeapSpace&#32;transform,&#32;also&#32;destroying&#32;the&#32;LeapHandController</emphasis>
+01093 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;object.</emphasis>
+01094 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(leapSpaceTransform&#32;!=&#32;<emphasis role="keyword">null</emphasis>)&#32;{
+01095 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;Undo.DestroyObjectImmediate(leapSpaceTransform.gameObject);
+01096 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+01097 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+01098 &#32;&#32;&#32;&#32;&#32;&#32;}
+01099 &#32;&#32;&#32;&#32;}
+01100 
+01101 <emphasis role="preprocessor">&#32;&#32;&#32;&#32;#endregion</emphasis>
+01102 
+01103 &#32;&#32;}
+01104 
+01105 }
+01106 &#32;
+</programlisting></section>

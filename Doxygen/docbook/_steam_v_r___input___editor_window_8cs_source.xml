@@ -1,0 +1,1048 @@
+<?xml version='1.0' encoding='UTF-8' standalone='no'?>
+<section xmlns="http://docbook.org/ns/docbook" version="5.0" xmlns:xlink="http://www.w3.org/1999/xlink" xml:id="__steam_v_r___input___editor_window_8cs_source">
+<title>SteamVR_Input_EditorWindow.cs</title>
+<indexterm><primary>O:/GitHUBMINIPRoject/Assets/SteamVR/Input/Editor/SteamVR_Input_EditorWindow.cs</primary></indexterm>
+<programlisting>00001 <emphasis role="keyword">using</emphasis>&#32;<link linkend="_namespace_unity_editor">UnityEditor</link>;
+00002 <emphasis role="keyword">using</emphasis>&#32;<link linkend="__balloon_8cs_1a7d67e097df9376eb709b6a23aa3c7d23">UnityEngine</link>;
+00003 
+00004 <emphasis role="keyword">using</emphasis>&#32;System.CodeDom;
+00005 <emphasis role="keyword">using</emphasis>&#32;Microsoft.CSharp;
+00006 <emphasis role="keyword">using</emphasis>&#32;System.IO;
+00007 <emphasis role="keyword">using</emphasis>&#32;System.CodeDom.Compiler;
+00008 
+00009 <emphasis role="keyword">using</emphasis>&#32;System.Linq;
+00010 <emphasis role="keyword">using</emphasis>&#32;System.Collections.Generic;
+00011 <emphasis role="keyword">using</emphasis>&#32;System.Reflection;
+00012 <emphasis role="keyword">using</emphasis>&#32;System.Linq.Expressions;
+00013 <emphasis role="keyword">using</emphasis>&#32;System;
+00014 <emphasis role="keyword">using</emphasis>&#32;UnityEditorInternal;
+00015 <emphasis role="keyword">using</emphasis>&#32;<link linkend="_namespace_valve">Valve</link>.Newtonsoft.Json;
+00016 
+00017 <emphasis role="keyword">namespace&#32;</emphasis><link linkend="_namespace_valve_1_1_v_r">Valve.VR</link>
+00018 {
+00019 <emphasis role="preprocessor">#pragma&#32;warning&#32;disable&#32;0219&#32;//&#32;variable&#32;assigned&#32;but&#32;not&#32;used.</emphasis>
+<anchor xml:id="__steam_v_r___input___editor_window_8cs_source_1l00020"/><link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___input___editor_window">00020</link> &#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keyword">class&#32;</emphasis><link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___input___editor_window">SteamVR_Input_EditorWindow</link>&#32;:&#32;EditorWindow
+00021 &#32;&#32;&#32;&#32;{
+00022 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;<emphasis role="keyword">static</emphasis>&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___input___editor_window">SteamVR_Input_EditorWindow</link>&#32;instance;
+00023 
+00024 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;[MenuItem(<emphasis role="stringliteral">&quot;Window/SteamVR&#32;Input&quot;</emphasis>)]
+<anchor xml:id="__steam_v_r___input___editor_window_8cs_source_1l00025"/><link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___input___editor_window_1a6c00ad119684854607a322588bc46c0b">00025</link> &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keyword">static</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___input___editor_window_1a6c00ad119684854607a322588bc46c0b">ShowWindow</link>()
+00026 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00027 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;instance&#32;=&#32;GetWindow&lt;SteamVR_Input_EditorWindow&gt;(<emphasis role="keyword">false</emphasis>,&#32;<emphasis role="stringliteral">&quot;SteamVR&#32;Input&quot;</emphasis>,&#32;<emphasis role="keyword">true</emphasis>);
+00028 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00029 
+<anchor xml:id="__steam_v_r___input___editor_window_8cs_source_1l00030"/><link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___input___editor_window_1a6ce5ae54a9d801271f2a7fd335635773">00030</link> &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keyword">static</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___input___editor_window_1a6ce5ae54a9d801271f2a7fd335635773">ReopenWindow</link>()
+00031 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00032 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;instance&#32;=&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___input___editor_window_1af0349180cfb189626f90a5f8c8205d17">GetOpenWindow</link>();
+00033 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(instance&#32;!=&#32;<emphasis role="keyword">null</emphasis>)
+00034 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00035 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;instance.<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___input___editor_window_1a4bf70d50040dc00586252c9ccb53a98e">ForceClose</link>();
+00036 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;System.Threading.Thread.Sleep(100);
+00037 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00038 
+00039 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___input___editor_window_1a6c00ad119684854607a322588bc46c0b">ShowWindow</link>();
+00040 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00041 
+<anchor xml:id="__steam_v_r___input___editor_window_8cs_source_1l00042"/><link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___input___editor_window_1a9d642f474ed2b993e18f92f728d7f166">00042</link> &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keyword">static</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___input___editor_window_1a9d642f474ed2b993e18f92f728d7f166">Refresh</link>()
+00043 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00044 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;instance&#32;=&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___input___editor_window_1af0349180cfb189626f90a5f8c8205d17">GetOpenWindow</link>();
+00045 
+00046 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(instance&#32;!=&#32;<emphasis role="keyword">null</emphasis>)
+00047 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00048 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;instance.selectedActionIndex&#32;=&#32;-1;
+00049 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;instance.selectedAction&#32;=&#32;<emphasis role="keyword">null</emphasis>;
+00050 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;instance.selectedActionSet&#32;=&#32;-1;
+00051 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;instance.selectedLocalizationIndex&#32;=&#32;-1;
+00052 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;instance.scrollPosition&#32;=&#32;Vector2.zero;
+00053 
+00054 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___input">SteamVR_Input</link>.<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___input_1a45c0fb7aca33a1e2db7c4f5730ac8189">InitializeFile</link>(<emphasis role="keyword">true</emphasis>);
+00055 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;instance.InitializeLists();
+00056 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00057 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00058 
+00059 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;<emphasis role="keywordtype">bool</emphasis>&#32;forcingClose&#32;=&#32;<emphasis role="keyword">false</emphasis>;
+<anchor xml:id="__steam_v_r___input___editor_window_8cs_source_1l00060"/><link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___input___editor_window_1a4bf70d50040dc00586252c9ccb53a98e">00060</link> &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___input___editor_window_1a4bf70d50040dc00586252c9ccb53a98e">ForceClose</link>()
+00061 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00062 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;forcingClose&#32;=&#32;<emphasis role="keyword">true</emphasis>;
+00063 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;this.Close();
+00064 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00065 
+00066 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;<emphasis role="keyword">const</emphasis>&#32;<emphasis role="keywordtype">bool</emphasis>&#32;defaultOverwriteBuildOption&#32;=&#32;<emphasis role="keyword">true</emphasis>;
+00067 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;<emphasis role="keyword">const</emphasis>&#32;<emphasis role="keywordtype">bool</emphasis>&#32;defaultDeleteUnusedOption&#32;=&#32;<emphasis role="keyword">true</emphasis>;
+00068 
+00069 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;<emphasis role="keyword">static</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;InitializeEditorValues()
+00070 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00071 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(EditorPrefs.HasKey(SteamVR_Input_Generator.steamVRInputOverwriteBuildKey)&#32;==&#32;<emphasis role="keyword">false</emphasis>)
+00072 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;EditorPrefs.SetBool(SteamVR_Input_Generator.steamVRInputOverwriteBuildKey,&#32;defaultOverwriteBuildOption);
+00073 
+00074 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(EditorPrefs.HasKey(SteamVR_Input_Generator.steamVRInputDeleteUnusedKey)&#32;==&#32;<emphasis role="keyword">false</emphasis>)
+00075 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;EditorPrefs.SetBool(SteamVR_Input_Generator.steamVRInputDeleteUnusedKey,&#32;defaultDeleteUnusedOption);
+00076 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00077 
+00078 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;ReorderableList&#32;inList;
+00079 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;ReorderableList&#32;outList;
+00080 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;ReorderableList&#32;localizationList;
+00081 
+00082 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;<emphasis role="keywordtype">int</emphasis>&#32;selectedActionIndex&#32;=&#32;-1;
+00083 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;SteamVR_Input_ActionFile_Action&#32;selectedAction;
+00084 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;<emphasis role="keywordtype">int</emphasis>&#32;selectedActionSet&#32;=&#32;-1;
+00085 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;<emphasis role="keywordtype">int</emphasis>&#32;selectedLocalizationIndex&#32;=&#32;-1;
+00086 
+00087 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;InitializeLists()
+00088 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00089 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(selectedActionSet&#32;==&#32;-1)
+00090 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00091 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;inList&#32;=&#32;<emphasis role="keyword">null</emphasis>;
+00092 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;outList&#32;=&#32;<emphasis role="keyword">null</emphasis>;
+00093 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>;
+00094 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00095 
+00096 
+00097 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;inList&#32;=&#32;<emphasis role="keyword">new</emphasis>&#32;ReorderableList(SteamVR_Input.actionFile.action_sets[selectedActionSet].actionsInList,&#32;typeof(<emphasis role="keywordtype">string</emphasis>),&#32;<emphasis role="keyword">false</emphasis>,&#32;<emphasis role="keyword">true</emphasis>,&#32;<emphasis role="keyword">true</emphasis>,&#32;<emphasis role="keyword">true</emphasis>);
+00098 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;inList.onAddCallback&#32;+=&#32;OnAddCallback;
+00099 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;inList.onRemoveCallback&#32;+=&#32;OnRemoveCallback;
+00100 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;inList.onSelectCallback&#32;+=&#32;OnSelectCallback;
+00101 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;inList.drawHeaderCallback&#32;+=&#32;DrawHeaderCallbackIn;
+00102 
+00103 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;outList&#32;=&#32;<emphasis role="keyword">new</emphasis>&#32;ReorderableList(SteamVR_Input.actionFile.action_sets[selectedActionSet].actionsOutList,&#32;typeof(<emphasis role="keywordtype">string</emphasis>),&#32;<emphasis role="keyword">false</emphasis>,&#32;<emphasis role="keyword">true</emphasis>,&#32;<emphasis role="keyword">true</emphasis>,&#32;<emphasis role="keyword">true</emphasis>);
+00104 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;outList.onAddCallback&#32;+=&#32;OnAddCallback;
+00105 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;outList.onRemoveCallback&#32;+=&#32;OnRemoveCallback;
+00106 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;outList.onSelectCallback&#32;+=&#32;OnSelectCallback;
+00107 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;outList.drawHeaderCallback&#32;+=&#32;DrawHeaderCallbackOut;
+00108 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00109 
+00110 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;DrawHeaderCallbackIn(Rect&#32;rect)
+00111 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00112 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;DrawHeaderCallback(rect,&#32;<emphasis role="stringliteral">&quot;In&quot;</emphasis>);
+00113 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00114 
+00115 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;DrawHeaderCallbackOut(Rect&#32;rect)
+00116 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00117 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;DrawHeaderCallback(rect,&#32;<emphasis role="stringliteral">&quot;Out&quot;</emphasis>);
+00118 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00119 
+00120 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;DrawHeaderCallback(Rect&#32;rect,&#32;<emphasis role="keywordtype">string</emphasis>&#32;name)
+00121 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00122 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;EditorGUI.LabelField(rect,&#32;name);
+00123 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00124 
+00125 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;OnSelectCallback(ReorderableList&#32;list)
+00126 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00127 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;selectedActionIndex&#32;=&#32;list.index;
+00128 
+00129 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(selectedActionIndex&#32;!=&#32;-1)
+00130 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00131 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;selectedAction&#32;=&#32;(SteamVR_Input_ActionFile_Action)list.list[selectedActionIndex];
+00132 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00133 
+00134 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(inList&#32;==&#32;list)
+00135 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00136 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;outList.index&#32;=&#32;-1;
+00137 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00138 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">else</emphasis>&#32;<emphasis role="keywordflow">if</emphasis>&#32;(outList&#32;==&#32;list)
+00139 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00140 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;inList.index&#32;=&#32;-1;
+00141 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00142 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00143 
+00144 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;OnRemoveCallback(ReorderableList&#32;list)
+00145 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00146 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(list.index&#32;==&#32;-1)
+00147 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>;
+00148 
+00149 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;list.list.RemoveAt(list.index);
+00150 
+00151 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;list.index&#32;=&#32;-1;
+00152 
+00153 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;OnSelectCallback(list);
+00154 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00155 
+00156 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;OnAddCallback(ReorderableList&#32;list)
+00157 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00158 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(selectedActionSet&#32;==&#32;-1)
+00159 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00160 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>;
+00161 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00162 
+00163 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;SteamVR_Input_ActionFile_Action&#32;newAction&#32;=&#32;<emphasis role="keyword">new</emphasis>&#32;SteamVR_Input_ActionFile_Action();
+00164 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;list.list.Add(newAction);
+00165 
+00166 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordtype">string</emphasis>&#32;direction&#32;=&#32;<emphasis role="stringliteral">&quot;&quot;</emphasis>;
+00167 
+00168 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(inList&#32;==&#32;list)
+00169 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00170 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;direction&#32;=&#32;<emphasis role="stringliteral">&quot;in&quot;</emphasis>;
+00171 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;outList.index&#32;=&#32;-1;
+00172 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;inList.index&#32;=&#32;inList.list.Count&#32;-&#32;1;
+00173 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00174 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">else</emphasis>&#32;<emphasis role="keywordflow">if</emphasis>&#32;(outList&#32;==&#32;list)
+00175 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00176 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;direction&#32;=&#32;<emphasis role="stringliteral">&quot;out&quot;</emphasis>;
+00177 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;inList.index&#32;=&#32;-1;
+00178 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;outList.index&#32;=&#32;outList.list.Count&#32;-&#32;1;
+00179 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00180 
+00181 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;newAction.name&#32;=&#32;SteamVR_Input_ActionFile_Action.CreateNewName(SteamVR_Input.actionFile.action_sets[selectedActionSet].shortName,&#32;direction);
+00182 
+00183 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;OnSelectCallback(list);
+00184 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00185 
+00186 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;InitializeLocalizationArray()
+00187 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00188 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;localizationList&#32;=&#32;<emphasis role="keyword">new</emphasis>&#32;ReorderableList(SteamVR_Input.actionFile.localizationHelperList,&#32;typeof(<emphasis role="keywordtype">string</emphasis>),&#32;<emphasis role="keyword">false</emphasis>,&#32;<emphasis role="keyword">true</emphasis>,&#32;<emphasis role="keyword">true</emphasis>,&#32;<emphasis role="keyword">true</emphasis>);
+00189 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;localizationList.onAddCallback&#32;+=&#32;LocalizationOnAddCallback;
+00190 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;localizationList.onRemoveCallback&#32;+=&#32;LocalizationOnRemoveCallback;
+00191 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;localizationList.onSelectCallback&#32;+=&#32;LocalizationOnSelectCallback;
+00192 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;localizationList.drawHeaderCallback&#32;+=&#32;LocalizationDrawHeaderCallback;
+00193 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;localizationList.drawElementCallback&#32;+=&#32;LocalizationDrawElementCallback;
+00194 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00195 
+00196 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;LocalizationDrawElementCallback(Rect&#32;rect,&#32;<emphasis role="keywordtype">int</emphasis>&#32;<link linkend="_namespace_valve_1_1_v_r_1ac40c4bdf0a3dcd6e69cad2d85f287c67a6a992d5529f459a44fee58c733255e86">index</link>,&#32;<emphasis role="keywordtype">bool</emphasis>&#32;isActive,&#32;<emphasis role="keywordtype">bool</emphasis>&#32;isFocused)
+00197 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00198 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;SteamVR_Input_ActionFile_LocalizationItem&#32;item&#32;=&#32;((List&lt;SteamVR_Input_ActionFile_LocalizationItem&gt;)localizationList.list)[<link linkend="_namespace_valve_1_1_v_r_1ac40c4bdf0a3dcd6e69cad2d85f287c67a6a992d5529f459a44fee58c733255e86">index</link>];
+00199 
+00200 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(localizationList.index&#32;==&#32;<link linkend="_namespace_valve_1_1_v_r_1ac40c4bdf0a3dcd6e69cad2d85f287c67a6a992d5529f459a44fee58c733255e86">index</link>)
+00201 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00202 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;item.language&#32;=&#32;EditorGUI.TextField(rect,&#32;item.language);
+00203 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00204 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">else</emphasis>
+00205 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00206 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;EditorGUI.LabelField(rect,&#32;item.language);
+00207 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00208 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00209 
+00210 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;LocalizationDrawHeaderCallback(Rect&#32;rect)
+00211 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00212 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;EditorGUI.LabelField(rect,&#32;<emphasis role="stringliteral">&quot;Languages&quot;</emphasis>);
+00213 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00214 
+00215 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;LocalizationOnSelectCallback(ReorderableList&#32;list)
+00216 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00217 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;selectedLocalizationIndex&#32;=&#32;list.index;
+00218 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00219 
+00220 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;LocalizationOnRemoveCallback(ReorderableList&#32;list)
+00221 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00222 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;List&lt;SteamVR_Input_ActionFile_LocalizationItem&gt;&#32;itemList&#32;=&#32;((List&lt;SteamVR_Input_ActionFile_LocalizationItem&gt;)localizationList.list);
+00223 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;itemList.RemoveAt(list.index);
+00224 
+00225 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;selectedLocalizationIndex&#32;=&#32;-1;
+00226 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00227 
+00228 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;LocalizationOnAddCallback(ReorderableList&#32;list)
+00229 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00230 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;List&lt;SteamVR_Input_ActionFile_LocalizationItem&gt;&#32;itemList&#32;=&#32;((List&lt;SteamVR_Input_ActionFile_LocalizationItem&gt;)localizationList.list);
+00231 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;SteamVR_Input_ActionFile_LocalizationItem&#32;newLanguage&#32;=&#32;<emphasis role="keyword">new</emphasis>&#32;SteamVR_Input_ActionFile_LocalizationItem(<emphasis role="stringliteral">&quot;new-language&quot;</emphasis>);
+00232 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;newLanguage.items.Add(selectedAction.name,&#32;selectedAction.name);
+00233 
+00234 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;itemList.Add(newLanguage);
+00235 
+00236 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;selectedLocalizationIndex&#32;=&#32;list.list.Count&#32;-&#32;1;
+00237 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00238 
+00239 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;<emphasis role="keyword">const</emphasis>&#32;<emphasis role="keywordtype">string</emphasis>&#32;progressBarTitle&#32;=&#32;<emphasis role="stringliteral">&quot;SteamVR&#32;Input&#32;Generation&quot;</emphasis>;
+00240 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;<emphasis role="keyword">const</emphasis>&#32;<emphasis role="keywordtype">string</emphasis>&#32;progressBarTextKey&#32;=&#32;<emphasis role="stringliteral">&quot;SteamVR_Input_ProgressBarText&quot;</emphasis>;
+00241 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;<emphasis role="keyword">const</emphasis>&#32;<emphasis role="keywordtype">string</emphasis>&#32;progressBarAmountKey&#32;=&#32;<emphasis role="stringliteral">&quot;SteamVR_Input_ProgressBarAmount&quot;</emphasis>;
+00242 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;<emphasis role="keyword">static</emphasis>&#32;<emphasis role="keywordtype">string</emphasis>&#32;progressBarText&#32;=&#32;<emphasis role="keyword">null</emphasis>;
+00243 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;<emphasis role="keyword">static</emphasis>&#32;<emphasis role="keywordtype">float</emphasis>&#32;progressBarAmount&#32;=&#32;0;
+<anchor xml:id="__steam_v_r___input___editor_window_8cs_source_1l00244"/><link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___input___editor_window_1a2636f1bb7d713478c9660b1f0a183380">00244</link> &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keyword">static</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___input___editor_window_1a2636f1bb7d713478c9660b1f0a183380">SetProgressBarText</link>(<emphasis role="keywordtype">string</emphasis>&#32;newText,&#32;<emphasis role="keywordtype">float</emphasis>&#32;newAmount)
+00245 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00246 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;EditorPrefs.SetString(progressBarTextKey,&#32;newText);
+00247 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;EditorPrefs.SetFloat(progressBarAmountKey,&#32;newAmount);
+00248 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;progressBarText&#32;=&#32;newText;
+00249 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;progressBarAmount&#32;=&#32;newAmount;
+00250 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+<anchor xml:id="__steam_v_r___input___editor_window_8cs_source_1l00251"/><link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___input___editor_window_1aec0d44ea05fb8b8141706ffebfe3ab74">00251</link> &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keyword">static</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___input___editor_window_1aec0d44ea05fb8b8141706ffebfe3ab74">ClearProgressBar</link>()
+00252 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00253 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;EditorPrefs.SetString(progressBarTextKey,&#32;<emphasis role="stringliteral">&quot;&quot;</emphasis>);
+00254 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;EditorPrefs.SetFloat(progressBarAmountKey,&#32;0);
+00255 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;progressBarText&#32;=&#32;<emphasis role="stringliteral">&quot;&quot;</emphasis>;
+00256 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;progressBarAmount&#32;=&#32;0;
+00257 
+00258 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;EditorUtility.ClearProgressBar();
+00259 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00260 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;<emphasis role="keyword">static</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;UpdateProgressBarTextFromPrefs()
+00261 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00262 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(progressBarText&#32;==&#32;<emphasis role="keyword">null</emphasis>)
+00263 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00264 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(EditorPrefs.HasKey(progressBarTextKey))
+00265 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00266 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;progressBarText&#32;=&#32;EditorPrefs.GetString(progressBarTextKey);
+00267 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;progressBarAmount&#32;=&#32;EditorPrefs.GetFloat(progressBarAmountKey);
+00268 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00269 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">else</emphasis>
+00270 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00271 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;progressBarText&#32;=&#32;<emphasis role="stringliteral">&quot;&quot;</emphasis>;
+00272 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;EditorPrefs.SetString(progressBarTextKey,&#32;progressBarText);
+00273 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00274 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00275 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00276 
+00277 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;Vector2&#32;scrollPosition;
+00278 
+00279 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;<emphasis role="keywordtype">bool</emphasis>&#32;initialized&#32;=&#32;<emphasis role="keyword">false</emphasis>;
+00280 
+00281 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;Initialize()
+00282 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00283 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;SteamVR_Input.InitializeFile(<emphasis role="keyword">false</emphasis>,&#32;<emphasis role="keyword">false</emphasis>);
+00284 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;InitializeEditorValues();
+00285 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;initialized&#32;=&#32;<emphasis role="keyword">true</emphasis>;
+00286 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00287 
+00288 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;<emphasis role="keywordtype">bool</emphasis>&#32;CopyOrClose()
+00289 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00290 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordtype">bool</emphasis>&#32;copyExamples&#32;=&#32;<link linkend="_namespace_unity_editor">UnityEditor</link>.EditorUtility.DisplayDialog(<emphasis role="stringliteral">&quot;Copy&#32;Examples&quot;</emphasis>,&#32;<emphasis role="stringliteral">&quot;It&#32;looks&#32;like&#32;your&#32;project&#32;is&#32;missing&#32;an&#32;actions.json.&#32;Would&#32;you&#32;like&#32;to&#32;use&#32;the&#32;example&#32;files?&quot;</emphasis>,&#32;<emphasis role="stringliteral">&quot;Yes&quot;</emphasis>,&#32;<emphasis role="stringliteral">&quot;No&quot;</emphasis>);
+00291 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(copyExamples)
+00292 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00293 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;SteamVR_CopyExampleInputFiles.CopyFiles(<emphasis role="keyword">true</emphasis>);
+00294 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;System.Threading.Thread.Sleep(1000);
+00295 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordtype">bool</emphasis>&#32;initializeSuccess&#32;=&#32;SteamVR_Input.InitializeFile();
+00296 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;initializeSuccess;
+00297 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00298 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">else</emphasis>
+00299 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00300 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;SteamVR_Input.CreateEmptyActionsFile();
+00301 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;System.Threading.Thread.Sleep(1000);
+00302 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordtype">bool</emphasis>&#32;initializeSuccess&#32;=&#32;SteamVR_Input.InitializeFile();
+00303 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;initializeSuccess;
+00304 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00305 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//Debug.LogErrorFormat(&quot;&lt;b&gt;[SteamVR]&lt;/b&gt;&#32;Actions&#32;file&#32;does&#32;not&#32;exist&#32;in&#32;project&#32;root:&#32;{0}.&#32;You&apos;ll&#32;need&#32;to&#32;create&#32;one&#32;for&#32;SteamVR&#32;to&#32;work.&quot;,&#32;SteamVR_Input.actionsFilePath);</emphasis>
+00306 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00307 
+00308 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;CheckFileInitialized()
+00309 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00310 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(initialized&#32;==&#32;<emphasis role="keyword">false</emphasis>)
+00311 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00312 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;Initialize();
+00313 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00314 
+00315 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(SteamVR_Input.actionFile&#32;==&#32;<emphasis role="keyword">null</emphasis>)
+00316 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00317 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordtype">bool</emphasis>&#32;initializeSuccess&#32;=&#32;SteamVR_Input.InitializeFile(<emphasis role="keyword">false</emphasis>,&#32;<emphasis role="keyword">false</emphasis>);
+00318 
+00319 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(initializeSuccess&#32;==&#32;<emphasis role="keyword">false</emphasis>)
+00320 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00321 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordtype">bool</emphasis>&#32;copySuccess&#32;=&#32;CopyOrClose();
+00322 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(copySuccess&#32;==&#32;<emphasis role="keyword">false</emphasis>)
+00323 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00324 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;Close();&#32;<emphasis role="comment">//&#32;close&#32;the&#32;window&#32;since&#32;they&#32;didn&apos;t&#32;initialize&#32;the&#32;file</emphasis>
+00325 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00326 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00327 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00328 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00329 
+00330 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;UpdateProgressBar()
+00331 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00332 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;UpdateProgressBarTextFromPrefs();
+00333 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(<emphasis role="keywordtype">string</emphasis>.IsNullOrEmpty(progressBarText)&#32;==&#32;<emphasis role="keyword">false</emphasis>)
+00334 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00335 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;EditorUtility.DisplayProgressBar(progressBarTitle,&#32;progressBarText,&#32;progressBarAmount);
+00336 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00337 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00338 
+00339 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;CheckInitialized()
+00340 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00341 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(localizationList&#32;==&#32;<emphasis role="keyword">null</emphasis>)
+00342 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;InitializeLocalizationArray();
+00343 
+00344 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(selectedLocalizationIndex&#32;==&#32;-1&#32;&amp;&amp;&#32;localizationList.count&#32;&gt;&#32;0)
+00345 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;selectedLocalizationIndex&#32;=&#32;0;
+00346 
+00347 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(selectedActionSet&#32;==&#32;-1&#32;&amp;&amp;&#32;SteamVR_Input.actionFile.action_sets.Count()&#32;&gt;&#32;0)
+00348 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00349 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;selectedActionSet&#32;=&#32;0;
+00350 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;InitializeLists();
+00351 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00352 
+00353 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(selectedActionSet&#32;!=&#32;-1&#32;&amp;&amp;&#32;inList&#32;==&#32;<emphasis role="keyword">null</emphasis>)
+00354 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;InitializeLists();
+00355 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00356 
+<anchor xml:id="__steam_v_r___input___editor_window_8cs_source_1l00357"/><link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___input___editor_window_1a36197010225a2eb134a03d9ea099a907">00357</link> &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keyword">static</emphasis>&#32;<emphasis role="keywordtype">bool</emphasis>&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___input___editor_window_1a36197010225a2eb134a03d9ea099a907">IsOpen</link>()
+00358 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00359 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___input___editor_window">SteamVR_Input_EditorWindow</link>[]&#32;windows&#32;=&#32;Resources.FindObjectsOfTypeAll&lt;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___input___editor_window">SteamVR_Input_EditorWindow</link>&gt;();
+00360 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(windows&#32;!=&#32;<emphasis role="keyword">null</emphasis>&#32;&amp;&amp;&#32;windows.Length&#32;&gt;&#32;0)
+00361 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00362 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;<emphasis role="keyword">true</emphasis>;
+00363 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00364 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;<emphasis role="keyword">false</emphasis>;
+00365 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00366 
+<anchor xml:id="__steam_v_r___input___editor_window_8cs_source_1l00367"/><link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___input___editor_window_1af0349180cfb189626f90a5f8c8205d17">00367</link> &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keyword">static</emphasis>&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___input___editor_window">SteamVR_Input_EditorWindow</link>&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___input___editor_window_1af0349180cfb189626f90a5f8c8205d17">GetOpenWindow</link>()
+00368 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00369 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___input___editor_window">SteamVR_Input_EditorWindow</link>[]&#32;windows&#32;=&#32;Resources.FindObjectsOfTypeAll&lt;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___input___editor_window">SteamVR_Input_EditorWindow</link>&gt;();
+00370 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(windows&#32;!=&#32;<emphasis role="keyword">null</emphasis>&#32;&amp;&amp;&#32;windows.Length&#32;&gt;&#32;0)
+00371 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00372 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;windows[0];
+00373 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00374 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;<emphasis role="keyword">null</emphasis>;
+00375 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00376 
+00377 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;GUIStyle&#32;headerLabelStyle&#32;=&#32;<emphasis role="keyword">null</emphasis>;
+00378 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;OnGUI()
+00379 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00380 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(headerLabelStyle&#32;==&#32;<emphasis role="keyword">null</emphasis>)
+00381 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;headerLabelStyle&#32;=&#32;<emphasis role="keyword">new</emphasis>&#32;GUIStyle(EditorStyles.boldLabel);
+00382 
+00383 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;CheckFileInitialized();
+00384 
+00385 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;UpdateProgressBar();
+00386 
+00387 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(<link linkend="_namespace_valve_1_1_v_r_1aecd07a81fe79a9f96c6787513e2d98e4ae498749f3c42246d50b15c81c101d988">Application</link>.isPlaying&#32;==&#32;<emphasis role="keyword">false</emphasis>&#32;&amp;&amp;&#32;(SteamVR_Input_Generator.IsGenerating()&#32;==&#32;<emphasis role="keyword">true</emphasis>&#32;||&#32;<emphasis role="keywordtype">string</emphasis>.IsNullOrEmpty(progressBarText)&#32;==&#32;<emphasis role="keyword">false</emphasis>))
+00388 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00389 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;EditorGUI.LabelField(<emphasis role="keyword">new</emphasis>&#32;Rect(0,&#32;0,&#32;200,&#32;20),&#32;<emphasis role="stringliteral">&quot;Generating&#32;SteamVR&#32;Input...&quot;</emphasis>);
+00390 
+00391 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordtype">bool</emphasis>&#32;cancel&#32;=&#32;GUI.Button(<emphasis role="keyword">new</emphasis>&#32;Rect(50,&#32;20,&#32;100,&#32;20),&#32;<emphasis role="stringliteral">&quot;Cancel&quot;</emphasis>);
+00392 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(cancel)
+00393 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00394 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;SteamVR_Input_Generator.CancelGeneration();
+00395 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___input___editor_window_1aec0d44ea05fb8b8141706ffebfe3ab74">ClearProgressBar</link>();
+00396 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00397 
+00398 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>;
+00399 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00400 
+00401 <emphasis role="preprocessor">#if&#32;UNITY_2017_1_OR_NEWER</emphasis>
+00402 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(EditorApplication.isCompiling)
+00403 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00404 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;EditorGUI.LabelField(<emphasis role="keyword">new</emphasis>&#32;Rect(0,&#32;0,&#32;100,&#32;20),&#32;<emphasis role="stringliteral">&quot;Compiling...&quot;</emphasis>);
+00405 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>;&#32;<emphasis role="comment">//ongui&#32;gets&#32;more&#32;fussy&#32;after&#32;2017</emphasis>
+00406 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00407 <emphasis role="preprocessor">#endif</emphasis>
+00408 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;CheckInitialized();
+00409 
+00410 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;scrollPosition&#32;=&#32;EditorGUILayout.BeginScrollView(scrollPosition);
+00411 
+00412 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;EditorGUILayout.Space();
+00413 
+00414 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;DrawTop();
+00415 
+00416 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;EditorGUILayout.Space();
+00417 
+00418 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;DrawSets();
+00419 
+00420 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;EditorGUILayout.Space();
+00421 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;EditorGUILayout.Space();
+00422 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;EditorGUILayout.Space();
+00423 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;EditorGUILayout.Space();
+00424 
+00425 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(selectedActionSet&#32;==&#32;-1)
+00426 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00427 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;DrawNoSetSelected();
+00428 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00429 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">else</emphasis>
+00430 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00431 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;EditorGUILayout.BeginHorizontal();
+00432 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;EditorGUILayout.BeginVertical();
+00433 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;DrawActions();
+00434 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;EditorGUILayout.EndVertical();
+00435 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;EditorGUILayout.Space();
+00436 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;EditorGUILayout.Space();
+00437 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;EditorGUILayout.BeginVertical();
+00438 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(selectedActionIndex&#32;==&#32;-1)
+00439 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00440 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;DrawNoActionSelected();
+00441 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00442 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">else</emphasis>
+00443 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00444 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;DrawDetails();
+00445 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00446 
+00447 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;EditorGUILayout.EndVertical();
+00448 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;EditorGUILayout.EndHorizontal();
+00449 
+00450 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;EditorGUILayout.Space();
+00451 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;EditorGUILayout.Space();
+00452 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;EditorGUILayout.Space();
+00453 
+00454 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;DrawSave();
+00455 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00456 
+00457 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;EditorGUILayout.EndScrollView();
+00458 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00459 
+00460 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;DrawTop()
+00461 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00462 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;EditorGUILayout.BeginHorizontal();
+00463 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;GUILayout.FlexibleSpace();
+00464 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;DrawSettingsButton();
+00465 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;EditorGUILayout.EndHorizontal();
+00466 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00467 
+00468 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;DrawSettingsButton()
+00469 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00470 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordtype">bool</emphasis>&#32;openSettings&#32;=&#32;GUILayout.Button(<emphasis role="stringliteral">&quot;Advanced&#32;Settings&quot;</emphasis>);
+00471 
+00472 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(openSettings)
+00473 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00474 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;SteamVR_Input_SettingsEditor.ShowWindow();
+00475 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00476 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00477 
+00478 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;DrawNoSetSelected()
+00479 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00480 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//EditorGUILayout.LabelField(&quot;No&#32;action&#32;set&#32;selected.&quot;);</emphasis>
+00481 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;EditorGUILayout.LabelField(<emphasis role="stringliteral">&quot;&quot;</emphasis>);
+00482 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00483 
+00484 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;DrawNoActionSelected()
+00485 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00486 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//EditorGUILayout.LabelField(&quot;No&#32;action&#32;selected.&quot;);</emphasis>
+00487 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;EditorGUILayout.LabelField(<emphasis role="stringliteral">&quot;&quot;</emphasis>);
+00488 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00489 
+00490 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;DrawSave()
+00491 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00492 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;EditorGUILayout.BeginHorizontal();
+00493 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;GUILayout.FlexibleSpace();
+00494 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordtype">bool</emphasis>&#32;save&#32;=&#32;GUILayout.Button(<emphasis role="stringliteral">&quot;Save&#32;and&#32;generate&quot;</emphasis>);
+00495 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;GUILayout.FlexibleSpace();
+00496 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordtype">bool</emphasis>&#32;open&#32;=&#32;GUILayout.Button(<emphasis role="stringliteral">&quot;Open&#32;binding&#32;UI&quot;</emphasis>);
+00497 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;GUILayout.FlexibleSpace();
+00498 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;EditorGUILayout.EndHorizontal();
+00499 
+00500 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(save)
+00501 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00502 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;EditorApplication.delayCall&#32;+=&#32;SaveFile;
+00503 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00504 
+00505 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(open)
+00506 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00507 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;OpenControllerBindings();
+00508 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00509 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00510 
+00511 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;OpenControllerBindings()
+00512 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00513 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(HasBeenModified())
+00514 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00515 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordtype">bool</emphasis>&#32;saveFirst&#32;=&#32;EditorUtility.DisplayDialog(<emphasis role="stringliteral">&quot;Save?&quot;</emphasis>,&#32;<emphasis role="stringliteral">&quot;It&#32;looks&#32;like&#32;you&apos;ve&#32;made&#32;changes&#32;without&#32;saving.&#32;Would&#32;you&#32;like&#32;to&#32;save&#32;before&#32;editing&#32;the&#32;bindings?.&quot;</emphasis>,&#32;<emphasis role="stringliteral">&quot;Save&quot;</emphasis>,&#32;<emphasis role="stringliteral">&quot;Open&#32;without&#32;saving&quot;</emphasis>);
+00516 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(saveFirst)
+00517 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00518 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;SaveFile();
+00519 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00520 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00521 
+00522 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;SteamVR.ShowBindingsForEditor();
+00523 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00524 
+00525 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;<emphasis role="keywordtype">bool</emphasis>&#32;HasBeenModified()
+00526 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00527 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;SteamVR_Input.actionFile.SaveHelperLists();
+00528 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;SteamVR_Input.HasFileInMemoryBeenModified();
+00529 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00530 
+00531 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;OnDestroy()
+00532 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00533 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(forcingClose&#32;==&#32;<emphasis role="keyword">false</emphasis>&#32;&amp;&amp;&#32;HasBeenModified())
+00534 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00535 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordtype">bool</emphasis>&#32;saveFirst&#32;=&#32;EditorUtility.DisplayDialog(<emphasis role="stringliteral">&quot;Save?&quot;</emphasis>,&#32;<emphasis role="stringliteral">&quot;It&#32;looks&#32;like&#32;you&apos;ve&#32;closed&#32;the&#32;input&#32;actions&#32;window&#32;without&#32;saving&#32;changes.&#32;Would&#32;you&#32;like&#32;to&#32;save&#32;first?&quot;</emphasis>,&#32;<emphasis role="stringliteral">&quot;Save&quot;</emphasis>,&#32;<emphasis role="stringliteral">&quot;Close&quot;</emphasis>);
+00536 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(saveFirst)
+00537 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00538 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;SaveFile();
+00539 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00540 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00541 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00542 
+00543 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;DrawActions()
+00544 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00545 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;EditorGUILayout.BeginFadeGroup(1);
+00546 
+00547 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;EditorGUILayout.LabelField(<emphasis role="stringliteral">&quot;Actions&quot;</emphasis>,&#32;headerLabelStyle);
+00548 
+00549 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;EditorGUILayout.Space();
+00550 
+00551 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(inList&#32;!=&#32;<emphasis role="keyword">null</emphasis>)
+00552 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;inList.DoLayoutList();
+00553 
+00554 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;EditorGUILayout.Space();
+00555 
+00556 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(inList&#32;!=&#32;<emphasis role="keyword">null</emphasis>)
+00557 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;outList.DoLayoutList();
+00558 
+00559 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;EditorGUILayout.EndFadeGroup();
+00560 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00561 
+00562 
+00563 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;DrawDetails()
+00564 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00565 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;EditorGUILayout.BeginFadeGroup(1);
+00566 
+00567 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;EditorGUILayout.LabelField(<emphasis role="stringliteral">&quot;Action&#32;Details&quot;</emphasis>,&#32;headerLabelStyle);
+00568 
+00569 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;EditorGUILayout.Space();
+00570 
+00571 
+00572 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;EditorGUILayout.LabelField(<emphasis role="stringliteral">&quot;Full&#32;Action&#32;Path:&quot;</emphasis>);
+00573 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(selectedActionIndex&#32;!=&#32;-1)
+00574 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00575 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;EditorGUILayout.LabelField(selectedAction.name);
+00576 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00577 
+00578 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;EditorGUILayout.Space();
+00579 
+00580 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;EditorGUILayout.LabelField(<emphasis role="stringliteral">&quot;Name:&quot;</emphasis>);
+00581 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(selectedActionIndex&#32;!=&#32;-1)
+00582 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00583 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordtype">string</emphasis>&#32;newName&#32;=&#32;EditorGUILayout.TextField(selectedAction.shortName);
+00584 
+00585 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(newName&#32;!=&#32;selectedAction.shortName)
+00586 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00587 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;selectedAction.name&#32;=&#32;selectedAction.path&#32;+&#32;newName;
+00588 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00589 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00590 
+00591 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;EditorGUILayout.Space();
+00592 
+00593 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;EditorGUILayout.LabelField(<emphasis role="stringliteral">&quot;Type:&quot;</emphasis>);
+00594 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(selectedActionIndex&#32;!=&#32;-1)
+00595 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00596 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordtype">bool</emphasis>&#32;directionIn&#32;=&#32;selectedAction.path.IndexOf(<emphasis role="stringliteral">&quot;/in/&quot;</emphasis>,&#32;StringComparison.CurrentCultureIgnoreCase)&#32;!=&#32;-1;
+00597 
+00598 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordtype">string</emphasis>[]&#32;list;
+00599 
+00600 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(directionIn)
+00601 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;list&#32;=&#32;SteamVR_Input_ActionFile_ActionTypes.listIn;
+00602 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">else</emphasis>
+00603 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;list&#32;=&#32;SteamVR_Input_ActionFile_ActionTypes.listOut;
+00604 
+00605 
+00606 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordtype">int</emphasis>&#32;selectedType&#32;=&#32;Array.IndexOf(list,&#32;selectedAction.type);
+00607 
+00608 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordtype">int</emphasis>&#32;newSelectedType&#32;=&#32;EditorGUILayout.Popup(selectedType,&#32;list);
+00609 
+00610 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(selectedType&#32;==&#32;-1&#32;&amp;&amp;&#32;newSelectedType&#32;==&#32;-1)
+00611 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;newSelectedType&#32;=&#32;0;
+00612 
+00613 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(selectedType&#32;!=&#32;newSelectedType&#32;&amp;&amp;&#32;newSelectedType&#32;!=&#32;-1)
+00614 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00615 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;selectedAction.type&#32;=&#32;list[newSelectedType];
+00616 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00617 
+00618 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(selectedAction.type&#32;==&#32;SteamVR_Input_ActionFile_ActionTypes.skeleton)
+00619 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00620 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordtype">string</emphasis>&#32;currentSkeletonPath&#32;=&#32;selectedAction.skeleton;
+00621 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(<emphasis role="keywordtype">string</emphasis>.IsNullOrEmpty(currentSkeletonPath)&#32;==&#32;<emphasis role="keyword">false</emphasis>)
+00622 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;currentSkeletonPath&#32;=&#32;currentSkeletonPath.Replace(<emphasis role="stringliteral">&quot;/&quot;</emphasis>,&#32;<emphasis role="stringliteral">&quot;\\&quot;</emphasis>);
+00623 
+00624 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordtype">int</emphasis>&#32;selectedSkeletonType&#32;=&#32;Array.IndexOf(SteamVR_Input_ActionFile_ActionTypes.listSkeletons,&#32;currentSkeletonPath);
+00625 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordtype">int</emphasis>&#32;newSelectedSkeletonType&#32;=&#32;EditorGUILayout.Popup(selectedSkeletonType,&#32;SteamVR_Input_ActionFile_ActionTypes.listSkeletons);
+00626 
+00627 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(selectedSkeletonType&#32;==&#32;-1)
+00628 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;selectedSkeletonType&#32;=&#32;0;
+00629 
+00630 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(selectedSkeletonType&#32;!=&#32;newSelectedSkeletonType&#32;&amp;&amp;&#32;newSelectedSkeletonType&#32;!=&#32;-1)
+00631 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00632 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;selectedAction.skeleton&#32;=&#32;SteamVR_Input_ActionFile_ActionTypes.listSkeletons[newSelectedSkeletonType].Replace(<emphasis role="stringliteral">&quot;\\&quot;</emphasis>,&#32;<emphasis role="stringliteral">&quot;/&quot;</emphasis>);
+00633 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00634 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00635 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00636 
+00637 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;EditorGUILayout.Space();
+00638 
+00639 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;EditorGUILayout.LabelField(<emphasis role="stringliteral">&quot;Required:&quot;</emphasis>);
+00640 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(selectedActionIndex&#32;!=&#32;-1)
+00641 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00642 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordtype">int</emphasis>&#32;oldRequirement&#32;=&#32;(int)selectedAction.requirementEnum;
+00643 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordtype">int</emphasis>&#32;newRequirement&#32;=&#32;GUILayout.SelectionGrid(oldRequirement,&#32;SteamVR_Input_ActionFile_Action.requirementValues,&#32;1,&#32;EditorStyles.radioButton);
+00644 
+00645 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(oldRequirement&#32;!=&#32;newRequirement)
+00646 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00647 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;selectedAction.requirementEnum&#32;=&#32;(<link linkend="_namespace_valve_1_1_v_r_1aad5d315b08bb9488c260d7228a1337e6">SteamVR_Input_ActionFile_Action_Requirements</link>)newRequirement;
+00648 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00649 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00650 
+00651 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;EditorGUILayout.Space();
+00652 
+00653 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;EditorGUILayout.LabelField(<emphasis role="stringliteral">&quot;Localization:&quot;</emphasis>);
+00654 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;localizationList.DoLayoutList();
+00655 
+00656 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;EditorGUILayout.Space();
+00657 
+00658 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;EditorGUILayout.LabelField(<emphasis role="stringliteral">&quot;Localized&#32;String:&quot;</emphasis>);
+00659 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(selectedLocalizationIndex&#32;!=&#32;-1)
+00660 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00661 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;Dictionary&lt;string,&#32;string&gt;&#32;localizationItems&#32;=&#32;SteamVR_Input.actionFile.localizationHelperList[selectedLocalizationIndex].items;
+00662 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordtype">string</emphasis>&#32;oldValue&#32;=&#32;<emphasis role="stringliteral">&quot;&quot;</emphasis>;
+00663 
+00664 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(localizationItems.ContainsKey(selectedAction.name))
+00665 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;oldValue&#32;=&#32;localizationItems[selectedAction.name];
+00666 
+00667 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordtype">string</emphasis>&#32;newValue&#32;=&#32;EditorGUILayout.TextField(oldValue);
+00668 
+00669 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(<emphasis role="keywordtype">string</emphasis>.IsNullOrEmpty(newValue))
+00670 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00671 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;localizationItems.Remove(selectedAction.name);
+00672 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00673 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">else</emphasis>&#32;<emphasis role="keywordflow">if</emphasis>&#32;(oldValue&#32;!=&#32;newValue)
+00674 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00675 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(localizationItems.ContainsKey(selectedAction.name)&#32;==&#32;<emphasis role="keyword">false</emphasis>)
+00676 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;localizationItems.Add(selectedAction.name,&#32;newValue);
+00677 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">else</emphasis>
+00678 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;localizationItems[selectedAction.name]&#32;=&#32;newValue;
+00679 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00680 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00681 
+00682 
+00683 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;EditorGUILayout.EndFadeGroup();
+00684 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00685 
+00686 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;DrawSets()
+00687 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00688 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;EditorGUILayout.LabelField(<emphasis role="stringliteral">&quot;Action&#32;Sets&quot;</emphasis>,&#32;headerLabelStyle);
+00689 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;EditorGUILayout.BeginHorizontal();
+00690 
+00691 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;GUILayout.FlexibleSpace();
+00692 
+00693 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">for</emphasis>&#32;(<emphasis role="keywordtype">int</emphasis>&#32;actionSetIndex&#32;=&#32;0;&#32;actionSetIndex&#32;&lt;&#32;SteamVR_Input.actionFile.action_sets.Count;&#32;actionSetIndex++)
+00694 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00695 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(selectedActionSet&#32;==&#32;actionSetIndex)
+00696 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00697 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;EditorGUILayout.BeginVertical();
+00698 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordtype">string</emphasis>&#32;newName&#32;=&#32;GUILayout.TextField(SteamVR_Input.actionFile.action_sets[actionSetIndex].shortName);
+00699 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(newName&#32;!=&#32;SteamVR_Input.actionFile.action_sets[actionSetIndex].shortName)
+00700 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00701 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordtype">string</emphasis>&#32;oldName&#32;=&#32;SteamVR_Input.actionFile.action_sets[actionSetIndex].name;
+00702 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">foreach</emphasis>&#32;(var&#32;action&#32;<emphasis role="keywordflow">in</emphasis>&#32;SteamVR_Input.actionFile.actions)
+00703 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00704 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(action.actionSet&#32;==&#32;oldName)
+00705 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;action.SetNewActionSet(newName);
+00706 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00707 
+00708 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;SteamVR_Input.actionFile.action_sets[actionSetIndex].SetNewShortName(newName);
+00709 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00710 
+00711 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;EditorGUILayout.BeginHorizontal();
+00712 
+00713 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordtype">int</emphasis>&#32;selectedUsage&#32;=&#32;-1;
+00714 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">for</emphasis>&#32;(<emphasis role="keywordtype">int</emphasis>&#32;valueIndex&#32;=&#32;0;&#32;valueIndex&#32;&lt;&#32;SteamVR_Input_ActionFile_ActionSet_Usages.listValues.Length;&#32;valueIndex++)
+00715 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00716 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(SteamVR_Input_ActionFile_ActionSet_Usages.listValues[valueIndex]&#32;==&#32;SteamVR_Input.actionFile.action_sets[actionSetIndex].usage)
+00717 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00718 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;selectedUsage&#32;=&#32;valueIndex;
+00719 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">break</emphasis>;
+00720 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00721 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00722 
+00723 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordtype">int</emphasis>&#32;wasUsage&#32;=&#32;selectedUsage;
+00724 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(selectedUsage&#32;==&#32;-1)
+00725 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;selectedUsage&#32;=&#32;1;
+00726 
+00727 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;selectedUsage&#32;=&#32;EditorGUILayout.Popup(selectedUsage,&#32;SteamVR_Input_ActionFile_ActionSet_Usages.listDescriptions);
+00728 
+00729 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(wasUsage&#32;!=&#32;selectedUsage)
+00730 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00731 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;SteamVR_Input.actionFile.action_sets[actionSetIndex].usage&#32;=&#32;SteamVR_Input_ActionFile_ActionSet_Usages.listValues[selectedUsage];
+00732 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00733 
+00734 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;EditorGUILayout.Space();
+00735 
+00736 
+00737 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordtype">bool</emphasis>&#32;removeSet&#32;=&#32;GUILayout.Button(<emphasis role="stringliteral">&quot;-&quot;</emphasis>);
+00738 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(removeSet)
+00739 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00740 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordtype">bool</emphasis>&#32;confirm&#32;=&#32;EditorUtility.DisplayDialog(<emphasis role="stringliteral">&quot;Confirmation&quot;</emphasis>,&#32;<emphasis role="stringliteral">&quot;Are&#32;you&#32;sure&#32;you&#32;want&#32;to&#32;delete&#32;this&#32;action&#32;set&#32;and&#32;all&#32;of&#32;its&#32;actions?.&quot;</emphasis>,&#32;<emphasis role="stringliteral">&quot;Delete&quot;</emphasis>,&#32;<emphasis role="stringliteral">&quot;Cancel&quot;</emphasis>);
+00741 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(confirm)
+00742 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00743 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//todo:&#32;this&#32;doesn&apos;t&#32;work</emphasis>
+00744 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;SteamVR_Input.actionFile.action_sets.RemoveAt(selectedActionSet);
+00745 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;selectedActionSet&#32;=&#32;-1;
+00746 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;selectedAction&#32;=&#32;<emphasis role="keyword">null</emphasis>;
+00747 
+00748 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;InitializeLists();
+00749 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">break</emphasis>;
+00750 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00751 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00752 
+00753 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;EditorGUILayout.Space();
+00754 
+00755 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;EditorGUILayout.EndHorizontal();
+00756 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;EditorGUILayout.EndVertical();
+00757 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00758 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">else</emphasis>
+00759 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00760 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordtype">bool</emphasis>&#32;pressedSet&#32;=&#32;GUILayout.Button(SteamVR_Input.actionFile.action_sets[actionSetIndex].shortName);
+00761 
+00762 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(pressedSet)
+00763 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00764 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;selectedActionSet&#32;=&#32;actionSetIndex;
+00765 
+00766 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;selectedActionIndex&#32;=&#32;-1;
+00767 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;selectedAction&#32;=&#32;<emphasis role="keyword">null</emphasis>;
+00768 
+00769 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;InitializeLists();
+00770 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00771 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00772 
+00773 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(actionSetIndex&#32;&lt;&#32;SteamVR_Input.actionFile.action_sets.Count&#32;-&#32;1)
+00774 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;GUILayout.FlexibleSpace();
+00775 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00776 
+00777 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;EditorGUILayout.Space();
+00778 
+00779 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordtype">bool</emphasis>&#32;addSet&#32;=&#32;GUILayout.Button(<emphasis role="stringliteral">&quot;+&quot;</emphasis>);
+00780 
+00781 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(addSet)
+00782 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00783 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;SteamVR_Input_ActionFile_ActionSet&#32;newActionSet&#32;=&#32;<emphasis role="keyword">new</emphasis>&#32;SteamVR_Input_ActionFile_ActionSet();
+00784 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;newActionSet.name&#32;=&#32;SteamVR_Input_ActionFile_ActionSet.CreateNewName();
+00785 
+00786 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;SteamVR_Input.actionFile.action_sets.Add(newActionSet);
+00787 
+00788 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;selectedActionSet&#32;=&#32;SteamVR_Input.actionFile.action_sets.Count&#32;-&#32;1;
+00789 
+00790 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;selectedActionIndex&#32;=&#32;-1;
+00791 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;selectedAction&#32;=&#32;<emphasis role="keyword">null</emphasis>;
+00792 
+00793 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;InitializeLists();
+00794 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00795 
+00796 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;GUILayout.FlexibleSpace();
+00797 
+00798 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;EditorGUILayout.EndHorizontal();
+00799 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00800 
+00801 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;<emphasis role="keyword">static</emphasis>&#32;MemberInfo&#32;GetMemberInfo&lt;TModel,&#32;TItem&gt;(TModel&#32;model,&#32;Expression&lt;Func&lt;TModel,&#32;TItem&gt;&gt;&#32;expr)
+00802 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00803 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;((MemberExpression)expr.Body).Member;
+00804 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00805 
+00806 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;SaveFile()
+00807 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00808 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;SteamVR_Input.actionFile.SaveHelperLists();
+00809 
+00810 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;SteamVR_Input.actionFile.Save(SteamVR_Input.actionsFilePath);
+00811 
+00812 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;SteamVR_Input_ActionManifest_Manager.CleanBindings(<emphasis role="keyword">true</emphasis>);
+00813 
+00814 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;Debug.Log(<emphasis role="stringliteral">&quot;&lt;b&gt;[SteamVR&#32;Input]&lt;/b&gt;&#32;Saved&#32;actions&#32;manifest&#32;successfully.&quot;</emphasis>);
+00815 
+00816 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;SteamVR_Input_Generator.BeginGeneration();
+00817 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00818 
+00819 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;SanitizeActionFile()
+00820 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00821 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">foreach</emphasis>&#32;(var&#32;action&#32;<emphasis role="keywordflow">in</emphasis>&#32;SteamVR_Input.actionFile.actions)
+00822 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00823 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(action.type&#32;!=&#32;SteamVR_Input_ActionFile_ActionTypes.skeleton)
+00824 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00825 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(<emphasis role="keywordtype">string</emphasis>.IsNullOrEmpty(action.skeleton)&#32;==&#32;<emphasis role="keyword">false</emphasis>)
+00826 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00827 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;action.skeleton&#32;=&#32;<emphasis role="keyword">null</emphasis>;&#32;<emphasis role="comment">//todo:&#32;shouldn&apos;t&#32;have&#32;skeleton&#32;data&#32;for&#32;non&#32;skeleton&#32;types&#32;I&#32;think</emphasis>
+00828 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00829 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00830 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00831 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00832 &#32;&#32;&#32;&#32;}
+00833 
+<anchor xml:id="__steam_v_r___input___editor_window_8cs_source_1l00834"/><link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___input___settings_editor">00834</link> &#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keyword">class&#32;</emphasis><link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___input___settings_editor">SteamVR_Input_SettingsEditor</link>&#32;:&#32;EditorWindow
+00835 &#32;&#32;&#32;&#32;{
+<anchor xml:id="__steam_v_r___input___editor_window_8cs_source_1l00836"/><link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___input___settings_editor_1a59ffd9b581a8fd54028f7118127a0592">00836</link> &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keyword">static</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___input___settings_editor_1a59ffd9b581a8fd54028f7118127a0592">ShowWindow</link>()
+00837 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00838 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;GetWindow&lt;SteamVR_Input_SettingsEditor&gt;(<emphasis role="keyword">true</emphasis>,&#32;<emphasis role="stringliteral">&quot;SteamVR&#32;Input&#32;Settings&quot;</emphasis>,&#32;<emphasis role="keyword">true</emphasis>);
+00839 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00840 
+00841 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;GUIStyle&#32;headerLabelStyle&#32;=&#32;<emphasis role="keyword">null</emphasis>;
+00842 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;GUIStyle&#32;multiLineStyle&#32;=&#32;<emphasis role="keyword">null</emphasis>;
+00843 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;GUIStyle&#32;smallMultiLineStyle&#32;=&#32;<emphasis role="keyword">null</emphasis>;
+00844 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;OnGUI()
+00845 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00846 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(headerLabelStyle&#32;==&#32;<emphasis role="keyword">null</emphasis>)
+00847 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;headerLabelStyle&#32;=&#32;<emphasis role="keyword">new</emphasis>&#32;GUIStyle(EditorStyles.boldLabel);
+00848 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(multiLineStyle&#32;==&#32;<emphasis role="keyword">null</emphasis>)
+00849 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;multiLineStyle&#32;=&#32;<emphasis role="keyword">new</emphasis>&#32;GUIStyle(EditorStyles.wordWrappedLabel);
+00850 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(smallMultiLineStyle&#32;==&#32;<emphasis role="keyword">null</emphasis>)
+00851 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00852 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;smallMultiLineStyle&#32;=&#32;<emphasis role="keyword">new</emphasis>&#32;GUIStyle(EditorStyles.wordWrappedLabel);
+00853 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;smallMultiLineStyle.fontSize&#32;=&#32;EditorStyles.miniLabel.fontSize;
+00854 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;smallMultiLineStyle.fontStyle&#32;=&#32;FontStyle.Italic;
+00855 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00856 
+00857 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;SteamVR_Input.InitializeFile();
+00858 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;EditorGUILayout.Space();
+00859 
+00860 
+00861 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;EditorGUILayout.LabelField(<emphasis role="stringliteral">&quot;Actions&#32;manifest&quot;</emphasis>,&#32;headerLabelStyle);
+00862 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;EditorGUILayout.LabelField(<emphasis role="keywordtype">string</emphasis>.Format(<emphasis role="stringliteral">&quot;Path:&#32;{0}&quot;</emphasis>,&#32;SteamVR_Input.actionsFilePath));
+00863 
+00864 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;DrawRefreshButton();
+00865 
+00866 
+00867 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;EditorGUILayout.Space();
+00868 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;EditorGUILayout.Space();
+00869 
+00870 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;EditorGUILayout.Space();
+00871 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;EditorGUILayout.Space();
+00872 
+00873 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;DrawPartial();
+00874 
+00875 
+00876 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;EditorGUILayout.Space();
+00877 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;EditorGUILayout.Space();
+00878 
+00879 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;EditorGUILayout.Space();
+00880 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;EditorGUILayout.Space();
+00881 
+00882 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;DrawOverwriteOption();
+00883 
+00884 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;DrawDeleteUnusedActions();
+00885 
+00886 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;EditorGUILayout.Space();
+00887 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;EditorGUILayout.Space();
+00888 
+00889 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;EditorGUILayout.BeginHorizontal();
+00890 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;GUILayout.FlexibleSpace();
+00891 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordtype">bool</emphasis>&#32;<emphasis role="keyword">delete</emphasis>&#32;=&#32;GUILayout.Button(<emphasis role="stringliteral">&quot;Delete&#32;generated&#32;input&#32;folder&quot;</emphasis>);
+00892 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;GUILayout.FlexibleSpace();
+00893 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordtype">bool</emphasis>&#32;showSettings&#32;=&#32;GUILayout.Button(<emphasis role="stringliteral">&quot;SteamVR&#32;Settings&quot;</emphasis>);
+00894 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;GUILayout.FlexibleSpace();
+00895 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;EditorGUILayout.EndHorizontal();
+00896 
+00897 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(<emphasis role="keyword">delete</emphasis>)
+00898 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00899 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordtype">bool</emphasis>&#32;confirm&#32;=&#32;EditorUtility.DisplayDialog(<emphasis role="stringliteral">&quot;Confirmation&quot;</emphasis>,&#32;<emphasis role="stringliteral">&quot;Are&#32;you&#32;sure&#32;you&#32;want&#32;to&#32;delete&#32;the&#32;input&#32;code&#32;files?&#32;This&#32;may&#32;make&#32;your&#32;project&#32;unable&#32;to&#32;compile.&quot;</emphasis>,&#32;<emphasis role="stringliteral">&quot;Delete&quot;</emphasis>,&#32;<emphasis role="stringliteral">&quot;Cancel&quot;</emphasis>);
+00900 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(confirm)
+00901 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;SteamVR_Input_Generator.DeleteGeneratedFolder();
+00902 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00903 
+00904 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(showSettings)
+00905 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00906 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;Selection.activeObject&#32;=&#32;SteamVR_Settings.instance;
+00907 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00908 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00909 
+00910 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;DrawRefreshButton()
+00911 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00912 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;EditorGUILayout.BeginHorizontal();
+00913 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordtype">bool</emphasis>&#32;refresh&#32;=&#32;GUILayout.Button(<emphasis role="stringliteral">&quot;Refresh&quot;</emphasis>);
+00914 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;GUILayout.FlexibleSpace();
+00915 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;EditorGUILayout.EndHorizontal();
+00916 
+00917 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(refresh)
+00918 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00919 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;SteamVR_Input_EditorWindow.ReopenWindow();
+00920 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00921 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00922 
+00923 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;DrawPartial()
+00924 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00925 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;EditorGUILayout.LabelField(<emphasis role="stringliteral">&quot;Partial&#32;bindings&quot;</emphasis>,&#32;headerLabelStyle);
+00926 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;EditorGUILayout.LabelField(<emphasis role="stringliteral">&quot;This&#32;is&#32;for&#32;SteamVR&#32;related&#32;asset&#32;packages.&#32;Here&#32;you&#32;can&#32;create&#32;a&#32;folder&#32;containing&#32;your&#32;current&#32;action&#32;manifest&#32;and&#32;associated&#32;bindings&#32;that&#32;will&#32;automatically&#32;query&#32;users&#32;to&#32;import&#32;into&#32;their&#32;project&#32;and&#32;add&#32;to&#32;their&#32;actions&#32;when&#32;loaded&#32;(as&#32;long&#32;as&#32;they&#32;have&#32;the&#32;SteamVR&#32;asset).&quot;</emphasis>,&#32;multiLineStyle);
+00927 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;EditorGUILayout.LabelField(<emphasis role="stringliteral">&quot;note:&#32;Please&#32;create&#32;action&#32;sets&#32;specific&#32;to&#32;your&#32;asset&#32;to&#32;avoid&#32;collisions.&quot;</emphasis>,&#32;smallMultiLineStyle);
+00928 
+00929 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordtype">bool</emphasis>&#32;create&#32;=&#32;GUILayout.Button(<emphasis role="stringliteral">&quot;Create&quot;</emphasis>);
+00930 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(create)
+00931 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00932 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;SteamVR_Input_CreatePartial.ShowWindow();
+00933 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00934 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00935 
+00936 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;DrawOverwriteOption()
+00937 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00938 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;EditorGUILayout.BeginHorizontal();
+00939 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;EditorGUILayout.LabelField(<emphasis role="stringliteral">&quot;Overwrite&#32;actions&#32;and&#32;bindings&#32;json&#32;files&#32;during&#32;build&quot;</emphasis>);
+00940 
+00941 
+00942 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordtype">bool</emphasis>&#32;overwrite&#32;=&#32;EditorPrefs.GetBool(SteamVR_Input_Generator.steamVRInputOverwriteBuildKey);
+00943 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordtype">bool</emphasis>&#32;newOverwrite&#32;=&#32;EditorGUILayout.Toggle(overwrite);
+00944 
+00945 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(overwrite&#32;!=&#32;newOverwrite)
+00946 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00947 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;EditorPrefs.SetBool(SteamVR_Input_Generator.steamVRInputOverwriteBuildKey,&#32;newOverwrite);
+00948 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00949 
+00950 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;EditorGUILayout.EndHorizontal();
+00951 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00952 
+00953 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;DrawDeleteUnusedActions()
+00954 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00955 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;EditorGUILayout.BeginHorizontal();
+00956 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;EditorGUILayout.LabelField(<emphasis role="stringliteral">&quot;Delete&#32;actions&#32;that&#32;are&#32;no&#32;longer&#32;in&#32;the&#32;action&#32;list&#32;during&#32;generation&quot;</emphasis>);
+00957 
+00958 
+00959 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordtype">bool</emphasis>&#32;deleteUnused&#32;=&#32;EditorPrefs.GetBool(SteamVR_Input_Generator.steamVRInputDeleteUnusedKey);
+00960 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordtype">bool</emphasis>&#32;newDeleteUnused&#32;=&#32;EditorGUILayout.Toggle(deleteUnused);
+00961 
+00962 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(deleteUnused&#32;!=&#32;newDeleteUnused)
+00963 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00964 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;EditorPrefs.SetBool(SteamVR_Input_Generator.steamVRInputDeleteUnusedKey,&#32;newDeleteUnused);
+00965 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00966 
+00967 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;EditorGUILayout.EndHorizontal();
+00968 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00969 &#32;&#32;&#32;&#32;}
+00970 
+<anchor xml:id="__steam_v_r___input___editor_window_8cs_source_1l00971"/><link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___input___create_partial">00971</link> &#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keyword">class&#32;</emphasis><link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___input___create_partial">SteamVR_Input_CreatePartial</link>&#32;:&#32;EditorWindow
+00972 &#32;&#32;&#32;&#32;{
+<anchor xml:id="__steam_v_r___input___editor_window_8cs_source_1l00973"/><link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___input___create_partial_1a95d11c4dfb940099132d91da8d9b48f9">00973</link> &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keyword">static</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___input___create_partial_1a95d11c4dfb940099132d91da8d9b48f9">ShowWindow</link>()
+00974 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00975 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;GetWindow&lt;SteamVR_Input_CreatePartial&gt;(<emphasis role="keyword">true</emphasis>,&#32;<emphasis role="stringliteral">&quot;SteamVR&#32;Input&#32;Partial&#32;Bindings&#32;Creator&quot;</emphasis>,&#32;<emphasis role="keyword">true</emphasis>);
+00976 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00977 
+00978 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;GUIStyle&#32;headerLabelStyle&#32;=&#32;<emphasis role="keyword">null</emphasis>;
+00979 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;GUIStyle&#32;multiLineStyle&#32;=&#32;<emphasis role="keyword">null</emphasis>;
+00980 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;GUIStyle&#32;smallMultiLineStyle&#32;=&#32;<emphasis role="keyword">null</emphasis>;
+00981 
+00982 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;<emphasis role="keywordtype">string</emphasis>&#32;folderName&#32;=&#32;<emphasis role="keyword">null</emphasis>;
+00983 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;<emphasis role="keywordtype">int</emphasis>&#32;version&#32;=&#32;1;
+00984 
+00985 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;<emphasis role="keywordtype">bool</emphasis>&#32;overwriteOldActions&#32;=&#32;<emphasis role="keyword">true</emphasis>;
+00986 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;<emphasis role="keywordtype">bool</emphasis>&#32;removeOldVersionActions&#32;=&#32;<emphasis role="keyword">true</emphasis>;
+00987 
+00988 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;OnGUI()
+00989 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00990 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(headerLabelStyle&#32;==&#32;<emphasis role="keyword">null</emphasis>)
+00991 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;headerLabelStyle&#32;=&#32;<emphasis role="keyword">new</emphasis>&#32;GUIStyle(EditorStyles.boldLabel);
+00992 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(multiLineStyle&#32;==&#32;<emphasis role="keyword">null</emphasis>)
+00993 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;multiLineStyle&#32;=&#32;<emphasis role="keyword">new</emphasis>&#32;GUIStyle(EditorStyles.wordWrappedLabel);
+00994 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(smallMultiLineStyle&#32;==&#32;<emphasis role="keyword">null</emphasis>)
+00995 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00996 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;smallMultiLineStyle&#32;=&#32;<emphasis role="keyword">new</emphasis>&#32;GUIStyle(EditorStyles.wordWrappedLabel);
+00997 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;smallMultiLineStyle.fontSize&#32;=&#32;EditorStyles.miniLabel.fontSize;
+00998 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;smallMultiLineStyle.fontStyle&#32;=&#32;FontStyle.Italic;
+00999 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+01000 
+01001 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(folderName&#32;==&#32;<emphasis role="keyword">null</emphasis>)
+01002 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;folderName&#32;=&#32;<emphasis role="stringliteral">&quot;SteamVR_&quot;</emphasis>&#32;+&#32;SteamVR.GenerateCleanProductName();
+01003 
+01004 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;SteamVR_Input.InitializeFile();
+01005 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;EditorGUILayout.Space();
+01006 
+01007 
+01008 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;EditorGUILayout.LabelField(<emphasis role="stringliteral">&quot;Partial&#32;input&#32;bindings&quot;</emphasis>,&#32;headerLabelStyle);
+01009 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;EditorGUILayout.LabelField(<emphasis role="stringliteral">&quot;When&#32;you&#32;create&#32;a&#32;partial&#32;bindings&#32;folder&#32;you&#32;can&#32;include&#32;that&#32;anywhere&#32;inside&#32;your&#32;asset&#32;package&#32;folder&#32;and&#32;it&#32;will&#32;automatically&#32;be&#32;found&#32;and&#32;imported&#32;to&#32;the&#32;user&apos;s&#32;project&#32;on&#32;load.&quot;</emphasis>,&#32;multiLineStyle);
+01010 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;EditorGUILayout.LabelField(<emphasis role="stringliteral">&quot;note:&#32;You&#32;can&#32;rename&#32;the&#32;folder&#32;but&#32;do&#32;not&#32;rename&#32;any&#32;files&#32;inside.&quot;</emphasis>,&#32;smallMultiLineStyle);
+01011 
+01012 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;EditorGUILayout.Space();
+01013 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;EditorGUILayout.Space();
+01014 
+01015 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;folderName&#32;=&#32;EditorGUILayout.TextField(<emphasis role="stringliteral">&quot;Name&quot;</emphasis>,&#32;folderName);
+01016 
+01017 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;EditorGUILayout.Space();
+01018 
+01019 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;version&#32;=&#32;EditorGUILayout.IntField(<emphasis role="stringliteral">&quot;Version&quot;</emphasis>,&#32;version);
+01020 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;EditorGUILayout.LabelField(<emphasis role="stringliteral">&quot;note:&#32;only&#32;whole&#32;numbers&quot;</emphasis>,&#32;smallMultiLineStyle);
+01021 
+01022 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;EditorGUILayout.Space();
+01023 
+01024 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;overwriteOldActions&#32;=&#32;EditorGUILayout.Toggle(<emphasis role="stringliteral">&quot;Overwrite&#32;old&#32;actions&quot;</emphasis>,&#32;overwriteOldActions);
+01025 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;EditorGUILayout.LabelField(<emphasis role="stringliteral">&quot;If&#32;the&#32;person&#32;importing&#32;your&#32;asset&#32;package&#32;has&#32;a&#32;previous&#32;version&#32;of&#32;your&#32;package&#32;this&#32;determines&#32;whether&#32;or&#32;not&#32;to&#32;overwrite&#32;actions&#32;and&#32;bindings&#32;that&#32;have&#32;the&#32;same&#32;name.&quot;</emphasis>,&#32;smallMultiLineStyle);
+01026 
+01027 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;EditorGUILayout.Space();
+01028 
+01029 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;removeOldVersionActions&#32;=&#32;EditorGUILayout.Toggle(<emphasis role="stringliteral">&quot;Remove&#32;unused&#32;actions&#32;from&#32;old&#32;versions&quot;</emphasis>,&#32;overwriteOldActions);
+01030 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;EditorGUILayout.LabelField(<emphasis role="stringliteral">&quot;If&#32;the&#32;person&#32;importing&#32;your&#32;asset&#32;package&#32;has&#32;a&#32;previous&#32;version&#32;of&#32;your&#32;package&#32;that&#32;has&#32;actions&#32;that&#32;are&#32;not&#32;used&#32;in&#32;the&#32;new&#32;version&#32;of&#32;your&#32;package&#32;this&#32;determines&#32;whether&#32;or&#32;not&#32;to&#32;delete&#32;those&#32;actions.&quot;</emphasis>,&#32;smallMultiLineStyle);
+01031 
+01032 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;EditorGUILayout.Space();
+01033 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;EditorGUILayout.Space();
+01034 
+01035 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordtype">bool</emphasis>&#32;create&#32;=&#32;GUILayout.Button(<emphasis role="stringliteral">&quot;Create&quot;</emphasis>);
+01036 
+01037 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(create)
+01038 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+01039 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;SteamVR_Input_ActionManifest_Manager.CreatePartial(folderName,&#32;version,&#32;overwriteOldActions,&#32;removeOldVersionActions);
+01040 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+01041 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+01042 &#32;&#32;&#32;&#32;}
+01043 }
+</programlisting></section>

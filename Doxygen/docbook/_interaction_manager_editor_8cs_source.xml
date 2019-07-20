@@ -1,0 +1,394 @@
+<?xml version='1.0' encoding='UTF-8' standalone='no'?>
+<section xmlns="http://docbook.org/ns/docbook" version="5.0" xmlns:xlink="http://www.w3.org/1999/xlink" xml:id="__interaction_manager_editor_8cs_source">
+<title>InteractionManagerEditor.cs</title>
+<indexterm><primary>O:/GitHUBMINIPRoject/Assets/LeapMotion/Modules/InteractionEngine/Scripts/Editor/InteractionManagerEditor.cs</primary></indexterm>
+<programlisting>00001 <emphasis role="comment">/******************************************************************************</emphasis>
+00002 <emphasis role="comment">&#32;*&#32;Copyright&#32;(C)&#32;Leap&#32;Motion,&#32;Inc.&#32;2011-2018.&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;*</emphasis>
+00003 <emphasis role="comment">&#32;*&#32;Leap&#32;Motion&#32;proprietary&#32;and&#32;confidential.&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;*</emphasis>
+00004 <emphasis role="comment">&#32;*&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;*</emphasis>
+00005 <emphasis role="comment">&#32;*&#32;Use&#32;subject&#32;to&#32;the&#32;terms&#32;of&#32;the&#32;Leap&#32;Motion&#32;SDK&#32;Agreement&#32;available&#32;at&#32;&#32;&#32;&#32;&#32;*</emphasis>
+00006 <emphasis role="comment">&#32;*&#32;https://developer.leapmotion.com/sdk_agreement,&#32;or&#32;another&#32;agreement&#32;&#32;&#32;&#32;&#32;&#32;&#32;*</emphasis>
+00007 <emphasis role="comment">&#32;*&#32;between&#32;Leap&#32;Motion&#32;and&#32;you,&#32;your&#32;company&#32;or&#32;other&#32;organization.&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;*</emphasis>
+00008 <emphasis role="comment">&#32;******************************************************************************/</emphasis>
+00009 
+00010 <emphasis role="keyword">using</emphasis>&#32;System.Collections;
+00011 <emphasis role="keyword">using</emphasis>&#32;System.Collections.Generic;
+00012 <emphasis role="keyword">using</emphasis>&#32;<link linkend="__balloon_8cs_1a7d67e097df9376eb709b6a23aa3c7d23">UnityEngine</link>;
+00013 <emphasis role="keyword">using</emphasis>&#32;<link linkend="_namespace_unity_editor">UnityEditor</link>;
+00014 <emphasis role="keyword">using</emphasis>&#32;<link linkend="_namespace_leap">Leap</link>.<link linkend="_namespace_leap_1_1_unity">Unity</link>.<link linkend="_namespace_leap_1_1_unity_1_1_query">Query</link>;
+00015 <emphasis role="keyword">using</emphasis>&#32;<link linkend="_namespace_leap">Leap</link>.<link linkend="_namespace_leap_1_1_unity">Unity</link>.<link linkend="_namespace_leap_1_1_unity_1_1_runtime_gizmos">RuntimeGizmos</link>;
+00016 <emphasis role="keyword">using</emphasis>&#32;<link linkend="_namespace_leap">Leap</link>.<link linkend="_namespace_leap_1_1_unity">Unity</link>.<link linkend="_namespace_leap_1_1_unity_1_1_interaction">Interaction</link>.<link linkend="_namespace_leap_1_1_unity_1_1_interaction_1_1_internal">Internal</link>;
+00017 
+00018 <emphasis role="keyword">namespace&#32;</emphasis><link linkend="_namespace_leap_1_1_unity_1_1_interaction">Leap.Unity.Interaction</link>&#32;{
+00019 
+00020 &#32;&#32;[CustomEditor(typeof(InteractionManager))]
+<anchor xml:id="__interaction_manager_editor_8cs_source_1l00021"/><link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_manager_editor">00021</link> &#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keyword">class&#32;</emphasis><link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_manager_editor">InteractionManagerEditor</link>&#32;:&#32;<link linkend="_class_leap_1_1_unity_1_1_custom_editor_base">CustomEditorBase</link>&lt;InteractionManager&gt;&#32;{
+00022 
+<anchor xml:id="__interaction_manager_editor_8cs_source_1l00023"/><link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_manager_editor_1a98a39c4b467e4b97d93f012753141fc1">00023</link> &#32;&#32;&#32;&#32;<emphasis role="keyword">protected</emphasis>&#32;<emphasis role="keyword">override</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_manager_editor_1a98a39c4b467e4b97d93f012753141fc1">OnEnable</link>()&#32;{
+00024 &#32;&#32;&#32;&#32;&#32;&#32;base.OnEnable();
+00025 
+00026 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;Interaction&#32;Controllers</emphasis>
+00027 &#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_leap_1_1_unity_1_1_custom_editor_base_1aab8bbda3edcc92a5c3d5a5360988c265">specifyCustomDrawer</link>(<emphasis role="stringliteral">&quot;_interactionControllers&quot;</emphasis>,&#32;drawControllersStatusEditor);
+00028 
+00029 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;Layers</emphasis>
+00030 &#32;&#32;&#32;&#32;&#32;&#32;SerializedProperty&#32;autoGenerateLayerProperty&#32;=&#32;serializedObject.FindProperty(<emphasis role="stringliteral">&quot;_autoGenerateLayers&quot;</emphasis>);
+00031 &#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_leap_1_1_unity_1_1_custom_editor_base_1a050b2c7054d16bc8e497877eed360664">specifyConditionalDrawing</link>(()&#32;=&gt;&#32;autoGenerateLayerProperty.boolValue,
+00032 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="stringliteral">&quot;_templateLayer&quot;</emphasis>);
+00033 &#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_leap_1_1_unity_1_1_custom_editor_base_1a050b2c7054d16bc8e497877eed360664">specifyConditionalDrawing</link>(()&#32;=&gt;&#32;!autoGenerateLayerProperty.boolValue,
+00034 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="stringliteral">&quot;_interactionLayer&quot;</emphasis>,
+00035 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="stringliteral">&quot;_interactionNoContactLayer&quot;</emphasis>,
+00036 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="stringliteral">&quot;_contactBoneLayer&quot;</emphasis>);
+00037 &#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_leap_1_1_unity_1_1_custom_editor_base_1ac4af66143c23aa0601e20d58bb3f532e">specifyCustomDecorator</link>(<emphasis role="stringliteral">&quot;_interactionLayer&quot;</emphasis>,&#32;drawInteractionLayerDecorator);
+00038 
+00039 &#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_leap_1_1_unity_1_1_custom_editor_base_1ac4af66143c23aa0601e20d58bb3f532e">specifyCustomDecorator</link>(<emphasis role="stringliteral">&quot;_drawControllerRuntimeGizmos&quot;</emphasis>,&#32;drawControllerRuntimeGizmoDecorator);
+00040 &#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_leap_1_1_unity_1_1_custom_editor_base_1a9b40a6fa85eec234563632935f08e7e1">specifyCustomPostDecorator</link>(<emphasis role="stringliteral">&quot;_drawControllerRuntimeGizmos&quot;</emphasis>,&#32;drawPostControllerRuntimeGizmoDecorator);
+00041 &#32;&#32;&#32;&#32;}
+00042 
+<anchor xml:id="__interaction_manager_editor_8cs_source_1l00043"/><link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_manager_editor_1aa72499eea4104ced9f3697918162f100">00043</link> &#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keyword">override</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_manager_editor_1aa72499eea4104ced9f3697918162f100">OnInspectorGUI</link>()&#32;{
+00044 &#32;&#32;&#32;&#32;&#32;&#32;base.OnInspectorGUI();
+00045 &#32;&#32;&#32;&#32;}
+00046 
+<anchor xml:id="__interaction_manager_editor_8cs_source_1l00047"/><link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_manager_editor_1a874c2b8aa6579b0ecaf9670da4b36c3e">00047</link> &#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keyword">override</emphasis>&#32;<emphasis role="keywordtype">bool</emphasis>&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_manager_editor_1a874c2b8aa6579b0ecaf9670da4b36c3e">RequiresConstantRepaint</link>()&#32;{
+00048 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;Application.isPlaying;
+00049 &#32;&#32;&#32;&#32;}
+00050 
+00051 &#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;drawInteractionLayerDecorator(SerializedProperty&#32;property)&#32;{
+00052 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(!<link linkend="_namespace_leap_1_1_unity_1a186e5eb0a2b743f1f6b79346f0ab8ad0a50ae99e9c35446c2580e4b540b0fd104">Physics</link>.GetIgnoreLayerCollision(<link linkend="_class_leap_1_1_unity_1_1_custom_editor_base_1a20eea7e492831d5b4cde7eeaf0ce749e">target</link>.interactionNoContactLayer.layerIndex,
+00053 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_leap_1_1_unity_1_1_custom_editor_base_1a20eea7e492831d5b4cde7eeaf0ce749e">target</link>.contactBoneLayer.layerIndex))&#32;{
+00054 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;EditorGUILayout.HelpBox(<emphasis role="stringliteral">&quot;The&#32;No&#32;Contact&#32;layer&#32;should&#32;NOT&#32;collide&#32;with&#32;the&#32;Contact&#32;&quot;</emphasis>
+00055 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;+&#32;<emphasis role="stringliteral">&quot;Bone&#32;layer.&#32;(Check&#32;your&#32;layer&#32;collision&#32;settings&#32;in&#32;Edit&#32;&quot;</emphasis>
+00056 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;+&#32;<emphasis role="stringliteral">&quot;/Project&#32;Settings/Physics.)&quot;</emphasis>,&#32;MessageType.Error);
+00057 &#32;&#32;&#32;&#32;&#32;&#32;}
+00058 
+00059 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(<link linkend="_namespace_leap_1_1_unity_1a186e5eb0a2b743f1f6b79346f0ab8ad0a50ae99e9c35446c2580e4b540b0fd104">Physics</link>.GetIgnoreLayerCollision(<link linkend="_class_leap_1_1_unity_1_1_custom_editor_base_1a20eea7e492831d5b4cde7eeaf0ce749e">target</link>.interactionLayer.layerIndex,
+00060 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_leap_1_1_unity_1_1_custom_editor_base_1a20eea7e492831d5b4cde7eeaf0ce749e">target</link>.contactBoneLayer.layerIndex))&#32;{
+00061 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;EditorGUILayout.HelpBox(<emphasis role="stringliteral">&quot;The&#32;Interaction&#32;layer&#32;should&#32;collide&#32;with&#32;the&#32;Contact&#32;&quot;</emphasis>
+00062 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;+&#32;<emphasis role="stringliteral">&quot;Bone&#32;layer.&#32;(Check&#32;your&#32;layer&#32;collision&#32;settings&#32;in&#32;Edit&#32;&quot;</emphasis>
+00063 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;+&#32;<emphasis role="stringliteral">&quot;/Project&#32;Settings/Physics.)&quot;</emphasis>,&#32;MessageType.Error);
+00064 &#32;&#32;&#32;&#32;&#32;&#32;}
+00065 &#32;&#32;&#32;&#32;}
+00066 
+00067 &#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;<link linkend="_class_leap_1_1_unity_1_1_runtime_gizmos_1_1_runtime_gizmo_manager">RuntimeGizmoManager</link>&#32;_runtimeGizmoManager;
+00068 
+00069 &#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;drawControllerRuntimeGizmoDecorator(SerializedProperty&#32;property)&#32;{
+00070 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(property.boolValue&#32;&amp;&amp;&#32;_runtimeGizmoManager&#32;==&#32;<emphasis role="keyword">null</emphasis>)&#32;{
+00071 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;_runtimeGizmoManager&#32;=&#32;FindObjectOfType&lt;RuntimeGizmoManager&gt;();
+00072 
+00073 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(_runtimeGizmoManager&#32;==&#32;<emphasis role="keyword">null</emphasis>)&#32;{
+00074 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;EditorGUILayout.Space();
+00075 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;EditorGUILayout.Space();
+00076 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;EditorGUILayout.HelpBox(<emphasis role="stringliteral">&quot;Draw&#32;Controller&#32;Runtime&#32;Gizmos&#32;is&#32;checked,&#32;but&#32;there&#32;&quot;</emphasis>
+00077 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;+&#32;<emphasis role="stringliteral">&quot;is&#32;no&#32;RuntimeGizmoManager&#32;in&#32;your&#32;scene,&#32;or&#32;it&#32;is&#32;&quot;</emphasis>
+00078 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;+&#32;<emphasis role="stringliteral">&quot;disabled.&quot;</emphasis>,&#32;MessageType.Warning);
+00079 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00080 &#32;&#32;&#32;&#32;&#32;&#32;}
+00081 &#32;&#32;&#32;&#32;}
+00082 
+00083 &#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;drawPostControllerRuntimeGizmoDecorator(SerializedProperty&#32;property)&#32;{
+00084 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(property.boolValue&#32;&amp;&amp;&#32;_runtimeGizmoManager&#32;!=&#32;<emphasis role="keyword">null</emphasis>)&#32;{
+00085 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_manager_editor_1a58578d667041a887d24fd2581df9d335">drawControllerRuntimeGizmosColorLegend</link>();
+00086 &#32;&#32;&#32;&#32;&#32;&#32;}
+00087 &#32;&#32;&#32;&#32;}
+00088 
+<anchor xml:id="__interaction_manager_editor_8cs_source_1l00089"/><link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_manager_editor_1a58578d667041a887d24fd2581df9d335">00089</link> &#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_manager_editor_1a58578d667041a887d24fd2581df9d335">drawControllerRuntimeGizmosColorLegend</link>()&#32;{
+00090 &#32;&#32;&#32;&#32;&#32;&#32;EditorGUILayout.Space();
+00091 &#32;&#32;&#32;&#32;&#32;&#32;EditorGUILayout.LabelField(<emphasis role="stringliteral">&quot;Controller&#32;Gizmos&#32;Legend&quot;</emphasis>,&#32;EditorStyles.boldLabel);
+00092 
+00093 &#32;&#32;&#32;&#32;&#32;&#32;EditorGUI.BeginDisabledGroup(<emphasis role="keyword">true</emphasis>);
+00094 
+00095 &#32;&#32;&#32;&#32;&#32;&#32;EditorGUILayout.ColorField(<emphasis role="keyword">new</emphasis>&#32;GUIContent(<emphasis role="stringliteral">&quot;Contact&#32;Bone&#32;Colliders&quot;</emphasis>,
+00096 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="stringliteral">&quot;The&#32;gizmo&#32;color&#32;for&#32;contact&#32;bone&#32;colliders&#32;&quot;</emphasis>
+00097 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;+&#32;<emphasis role="stringliteral">&quot;when&#32;soft&#32;contact&#32;is&#32;disabled.&quot;</emphasis>),
+00098 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_controller">InteractionController</link>.<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_controller_1_1_gizmo_colors">GizmoColors</link>.ContactBone);
+00099 &#32;&#32;&#32;&#32;&#32;&#32;EditorGUILayout.ColorField(<emphasis role="keyword">new</emphasis>&#32;GUIContent(<emphasis role="stringliteral">&quot;Soft&#32;Contact&#32;Bone&#32;Colliders&quot;</emphasis>,
+00100 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="stringliteral">&quot;The&#32;gizmo&#32;color&#32;for&#32;contact&#32;bones&#32;colliders&#32;&quot;</emphasis>
+00101 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;+&#32;<emphasis role="stringliteral">&quot;when&#32;soft&#32;contact&#32;is&#32;enabled.&quot;</emphasis>),
+00102 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_controller">InteractionController</link>.<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_controller_1_1_gizmo_colors">GizmoColors</link>.SoftContactBone);
+00103 
+00104 &#32;&#32;&#32;&#32;&#32;&#32;EditorGUILayout.Space();
+00105 &#32;&#32;&#32;&#32;&#32;&#32;EditorGUILayout.ColorField(<emphasis role="keyword">new</emphasis>&#32;GUIContent(<emphasis role="stringliteral">&quot;Hover&#32;Points&quot;</emphasis>,
+00106 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="stringliteral">&quot;The&#32;gizmo&#32;color&#32;for&#32;hover&#32;points.&#32;Gizmo&#32;&quot;</emphasis>
+00107 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;+&#32;<emphasis role="stringliteral">&quot;does&#32;not&#32;reflect&#32;the&#32;actual&#32;hover&#32;radius.&quot;</emphasis>),
+00108 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_controller">InteractionController</link>.<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_controller_1_1_gizmo_colors">GizmoColors</link>.HoverPoint);
+00109 &#32;&#32;&#32;&#32;&#32;&#32;EditorGUILayout.ColorField(<emphasis role="keyword">new</emphasis>&#32;GUIContent(<emphasis role="stringliteral">&quot;Primary&#32;Hover&#32;Points&quot;</emphasis>,
+00110 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="stringliteral">&quot;The&#32;gizmo&#32;color&#32;for&#32;primary&#32;hover&#32;points.&quot;</emphasis>),
+00111 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_controller">InteractionController</link>.<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_controller_1_1_gizmo_colors">GizmoColors</link>.PrimaryHoverPoint);
+00112 
+00113 &#32;&#32;&#32;&#32;&#32;&#32;EditorGUILayout.Space();
+00114 &#32;&#32;&#32;&#32;&#32;&#32;EditorGUILayout.ColorField(<emphasis role="keyword">new</emphasis>&#32;GUIContent(<emphasis role="stringliteral">&quot;Grasp&#32;Points&quot;</emphasis>,
+00115 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="stringliteral">&quot;The&#32;gizmo&#32;color&#32;for&#32;grasp&#32;points.&#32;&quot;</emphasis>
+00116 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;+&#32;<emphasis role="stringliteral">&quot;InteractionHands&#32;do&#32;not&#32;use&#32;grasp&#32;points,&#32;&quot;</emphasis>
+00117 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;+&#32;<emphasis role="stringliteral">&quot;so&#32;no&#32;gizmo&#32;is&#32;drawn&#32;for&#32;them.&quot;</emphasis>),
+00118 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_controller">InteractionController</link>.<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_controller_1_1_gizmo_colors">GizmoColors</link>.GraspPoint);
+00119 &#32;&#32;&#32;&#32;&#32;&#32;EditorGUILayout.ColorField(<emphasis role="keyword">new</emphasis>&#32;GUIContent(<emphasis role="stringliteral">&quot;Graspable&#32;Objects&quot;</emphasis>,
+00120 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="stringliteral">&quot;The&#32;gizmo&#32;color&#32;for&#32;the&#32;wire&#32;sphere&#32;&quot;</emphasis>
+00121 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;+&#32;<emphasis role="stringliteral">&quot;that&#32;appears&#32;at&#32;objects&#32;when&#32;they&#32;are&#32;&quot;</emphasis>
+00122 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;+&#32;<emphasis role="stringliteral">&quot;graspable&#32;by&#32;an&#32;interaction&#32;controller.&#32;&quot;</emphasis>),
+00123 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_controller">InteractionController</link>.<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_controller_1_1_gizmo_colors">GizmoColors</link>.Graspable);
+00124 
+00125 &#32;&#32;&#32;&#32;&#32;&#32;EditorGUI.EndDisabledGroup();
+00126 &#32;&#32;&#32;&#32;}
+00127 
+00128 &#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;drawControllersStatusEditor(SerializedProperty&#32;property)&#32;{
+00129 &#32;&#32;&#32;&#32;&#32;&#32;EditorGUILayout.Space();
+00130 &#32;&#32;&#32;&#32;&#32;&#32;EditorGUILayout.LabelField(<emphasis role="stringliteral">&quot;Interaction&#32;Controller&#32;Status&quot;</emphasis>,&#32;EditorStyles.boldLabel);
+00131 
+00132 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(<link linkend="_class_leap_1_1_unity_1_1_custom_editor_base_1a20eea7e492831d5b4cde7eeaf0ce749e">target</link>.interactionControllers.Count&#32;==&#32;0)&#32;{
+00133 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;EditorGUILayout.HelpBox(<emphasis role="stringliteral">&quot;This&#32;Interaction&#32;Manager&#32;has&#32;no&#32;interaction&#32;controllers&#32;&quot;</emphasis>
+00134 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;+&#32;<emphasis role="stringliteral">&quot;assigned&#32;to&#32;it.&#32;Please&#32;add&#32;at&#32;least&#32;one&#32;InteractionHand&#32;&quot;</emphasis>
+00135 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;+&#32;<emphasis role="stringliteral">&quot;or&#32;an&#32;InteractionVRController&#32;as&#32;a&#32;child&#32;of&#32;this&#32;object.&quot;</emphasis>,
+00136 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;MessageType.Warning);
+00137 
+00138 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>;
+00139 &#32;&#32;&#32;&#32;&#32;&#32;}
+00140 
+00141 &#32;&#32;&#32;&#32;&#32;&#32;EditorGUILayout.BeginVertical();
+00142 
+00143 &#32;&#32;&#32;&#32;&#32;&#32;_leftVRNodeController&#32;=&#32;<emphasis role="keyword">null</emphasis>;
+00144 &#32;&#32;&#32;&#32;&#32;&#32;_rightVRNodeController&#32;=&#32;<emphasis role="keyword">null</emphasis>;
+00145 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">foreach</emphasis>&#32;(var&#32;controller&#32;<emphasis role="keywordflow">in</emphasis>&#32;<link linkend="_class_leap_1_1_unity_1_1_custom_editor_base_1a20eea7e492831d5b4cde7eeaf0ce749e">target</link>.interactionControllers)&#32;{
+00146 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;EditorGUILayout.BeginHorizontal();
+00147 
+00148 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;drawControllerStatusEditor(controller);
+00149 
+00150 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;EditorGUILayout.EndHorizontal();
+00151 &#32;&#32;&#32;&#32;&#32;&#32;}
+00152 
+00153 &#32;&#32;&#32;&#32;&#32;&#32;EditorGUILayout.EndVertical();
+00154 &#32;&#32;&#32;&#32;}
+00155 
+00156 &#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keyword">static</emphasis>&#32;<emphasis role="keyword">class&#32;</emphasis>Colors&#32;{
+00157 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keyword">static</emphasis>&#32;Color&#32;DarkGray&#32;&#32;{&#32;<emphasis role="keyword">get</emphasis>&#32;{&#32;<emphasis role="keywordflow">return</emphasis>&#32;<emphasis role="keyword">new</emphasis>&#32;Color(0.4F,&#32;0.4F,&#32;0.4F);&#32;}&#32;}
+00158 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keyword">static</emphasis>&#32;Color&#32;LightGray&#32;{&#32;<emphasis role="keyword">get</emphasis>&#32;{&#32;<emphasis role="keywordflow">return</emphasis>&#32;<emphasis role="keyword">new</emphasis>&#32;Color(0.7F,&#32;0.7F,&#32;0.7F);&#32;}&#32;}
+00159 
+00160 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keyword">static</emphasis>&#32;Color&#32;Good&#32;&#32;&#32;&#32;&#32;&#32;{&#32;<emphasis role="keyword">get</emphasis>&#32;{&#32;<emphasis role="keywordflow">return</emphasis>&#32;Color.Lerp(Color.green,&#32;LightGray,&#32;0.2F);&#32;}&#32;}
+00161 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keyword">static</emphasis>&#32;Color&#32;Caution&#32;&#32;&#32;{&#32;<emphasis role="keyword">get</emphasis>&#32;{&#32;<emphasis role="keywordflow">return</emphasis>&#32;Color.Lerp(Good,&#32;Color.yellow,&#32;0.8F);&#32;}&#32;}
+00162 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keyword">static</emphasis>&#32;Color&#32;<link linkend="_namespace_valve_1_1_v_r_1ab893e8e2bf198a8cb4d2a2cd9c545c32a0eaadb4fcb48a0a0ed7bc9868be9fbaa">Warning</link>&#32;&#32;&#32;{&#32;<emphasis role="keyword">get</emphasis>&#32;{&#32;<emphasis role="keywordflow">return</emphasis>&#32;Color.Lerp(Color.yellow,&#32;Problem,&#32;0.5F);&#32;}&#32;}
+00163 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keyword">static</emphasis>&#32;Color&#32;Problem&#32;&#32;&#32;{&#32;<emphasis role="keyword">get</emphasis>&#32;{&#32;<emphasis role="keywordflow">return</emphasis>&#32;Color.Lerp(Color.red,&#32;Color.yellow,&#32;0.3F);&#32;}&#32;}
+00164 &#32;&#32;&#32;&#32;}
+00165 
+00166 &#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;<emphasis role="keyword">struct&#32;</emphasis>ControllerStatusMessage&#32;{
+00167 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keywordtype">string</emphasis>&#32;message;
+00168 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keywordtype">string</emphasis>&#32;tooltip;
+00169 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;Color&#32;color;
+00170 &#32;&#32;&#32;&#32;}
+00171 &#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;List&lt;ControllerStatusMessage&gt;&#32;statusMessagesBuffer&#32;=&#32;<emphasis role="keyword">new</emphasis>&#32;List&lt;ControllerStatusMessage&gt;();
+00172 
+00173 &#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;drawControllerStatusEditor(InteractionController&#32;controller)&#32;{
+00174 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;Controller&#32;object</emphasis>
+00175 &#32;&#32;&#32;&#32;&#32;&#32;EditorGUI.BeginDisabledGroup(<emphasis role="keyword">true</emphasis>);
+00176 &#32;&#32;&#32;&#32;&#32;&#32;EditorGUILayout.ObjectField(controller,&#32;typeof(InteractionController),&#32;<emphasis role="keyword">true</emphasis>);
+00177 &#32;&#32;&#32;&#32;&#32;&#32;EditorGUI.EndDisabledGroup();
+00178 
+00179 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;Status</emphasis>
+00180 &#32;&#32;&#32;&#32;&#32;&#32;var&#32;messages&#32;=&#32;statusMessagesBuffer;
+00181 &#32;&#32;&#32;&#32;&#32;&#32;messages.Clear();
+00182 
+00183 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;Check&#32;various&#32;states&#32;and&#32;add&#32;messages&#32;to&#32;the&#32;messages&#32;buffer.</emphasis>
+00184 &#32;&#32;&#32;&#32;&#32;&#32;checkTrackingStatus(controller,&#32;messages);
+00185 
+00186 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(controller.intHand&#32;!=&#32;<emphasis role="keyword">null</emphasis>)&#32;{
+00187 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;checkInteractionHandStatus(controller.intHand,&#32;messages);
+00188 &#32;&#32;&#32;&#32;&#32;&#32;}
+00189 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">else</emphasis>&#32;<emphasis role="keywordflow">if</emphasis>&#32;(controller&#32;is&#32;InteractionXRController)&#32;{
+00190 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;checkInteractionVRControllerStatus(controller&#32;as&#32;InteractionXRController,&#32;messages);
+00191 &#32;&#32;&#32;&#32;&#32;&#32;}
+00192 
+00193 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;Render&#32;the&#32;status&#32;messages.</emphasis>
+00194 &#32;&#32;&#32;&#32;&#32;&#32;Rect&#32;statusMessagesRect&#32;=&#32;EditorGUILayout.BeginVertical(GUILayout.MinHeight(20));
+00195 
+00196 &#32;&#32;&#32;&#32;&#32;&#32;EditorGUI.DrawRect(statusMessagesRect,&#32;Colors.DarkGray);
+00197 &#32;&#32;&#32;&#32;&#32;&#32;statusMessagesRect&#32;=&#32;statusMessagesRect.ShrinkOne();
+00198 &#32;&#32;&#32;&#32;&#32;&#32;EditorGUI.DrawRect(statusMessagesRect,&#32;Colors.LightGray);
+00199 &#32;&#32;&#32;&#32;&#32;&#32;statusMessagesRect&#32;=&#32;statusMessagesRect.ShrinkOne();
+00200 &#32;&#32;&#32;&#32;&#32;&#32;EditorGUI.DrawRect(statusMessagesRect,&#32;Colors.DarkGray);
+00201 
+00202 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(messages.Count&#32;==&#32;0)&#32;{
+00203 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;messages.Add(<emphasis role="keyword">new</emphasis>&#32;ControllerStatusMessage()&#32;{
+00204 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;message&#32;=&#32;<emphasis role="stringliteral">&quot;No&#32;Status&#32;Messages&quot;</emphasis>,
+00205 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;tooltip&#32;=&#32;<emphasis role="stringliteral">&quot;&quot;</emphasis>,
+00206 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;color&#32;=&#32;Colors.Good
+00207 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;});
+00208 &#32;&#32;&#32;&#32;&#32;&#32;}
+00209 
+00210 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">foreach</emphasis>&#32;(var&#32;statusMessage&#32;<emphasis role="keywordflow">in</emphasis>&#32;messages)&#32;{
+00211 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;var&#32;messageColorStyle&#32;=&#32;<emphasis role="keyword">new</emphasis>&#32;GUIStyle(EditorStyles.label);
+00212 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;messageColorStyle.normal.textColor&#32;=&#32;statusMessage.color;
+00213 
+00214 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;EditorGUILayout.LabelField(<emphasis role="keyword">new</emphasis>&#32;GUIContent(<emphasis role="stringliteral">&quot;[&quot;</emphasis>&#32;+&#32;statusMessage.message&#32;+&#32;<emphasis role="stringliteral">&quot;]&quot;</emphasis>,
+00215 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;statusMessage.tooltip),
+00216 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;messageColorStyle);
+00217 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;GUILayout.Space(1);
+00218 &#32;&#32;&#32;&#32;&#32;&#32;}
+00219 &#32;&#32;&#32;&#32;&#32;&#32;GUILayout.Space(1);
+00220 
+00221 &#32;&#32;&#32;&#32;&#32;&#32;EditorGUILayout.EndVertical();
+00222 &#32;&#32;&#32;&#32;}
+00223 
+00224 &#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;checkTrackingStatus(InteractionController&#32;controller,
+00225 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;List&lt;ControllerStatusMessage&gt;&#32;messages)&#32;{
+00226 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(<link linkend="_namespace_valve_1_1_v_r_1aecd07a81fe79a9f96c6787513e2d98e4ae498749f3c42246d50b15c81c101d988">Application</link>.isPlaying)&#32;{
+00227 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(controller.isTracked)&#32;{
+00228 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(controller.isBeingMoved)&#32;{
+00229 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;messages.Add(<emphasis role="keyword">new</emphasis>&#32;ControllerStatusMessage()&#32;{
+00230 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;message&#32;=&#32;<emphasis role="stringliteral">&quot;Tracked&quot;</emphasis>,
+00231 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;tooltip&#32;=&#32;<emphasis role="stringliteral">&quot;This&#32;interaction&#32;controller&#32;is&#32;currently&#32;being&#32;tracked.&quot;</emphasis>,
+00232 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;color&#32;=&#32;Colors.Good
+00233 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;});
+00234 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}&#32;<emphasis role="keywordflow">else</emphasis>&#32;{
+00235 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;messages.Add(<emphasis role="keyword">new</emphasis>&#32;ControllerStatusMessage()&#32;{
+00236 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;message&#32;=&#32;<emphasis role="stringliteral">&quot;Not&#32;Moving&quot;</emphasis>,
+00237 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;tooltip&#32;=&#32;<emphasis role="stringliteral">&quot;This&#32;interaction&#32;controller&#32;is&#32;currently&#32;not&#32;being&#32;moved.&quot;</emphasis>,
+00238 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;color&#32;=&#32;Colors.Caution
+00239 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;});
+00240 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00241 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}&#32;<emphasis role="keywordflow">else</emphasis>&#32;{
+00242 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;messages.Add(<emphasis role="keyword">new</emphasis>&#32;ControllerStatusMessage()&#32;{
+00243 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;message&#32;=&#32;<emphasis role="stringliteral">&quot;Untracked&quot;</emphasis>,
+00244 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;tooltip&#32;=&#32;<emphasis role="stringliteral">&quot;This&#32;interaction&#32;controller&#32;is&#32;not&#32;currently&#32;being&#32;tracked.&quot;</emphasis>,
+00245 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;color&#32;=&#32;Colors.Warning
+00246 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;});
+00247 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00248 &#32;&#32;&#32;&#32;&#32;&#32;}
+00249 &#32;&#32;&#32;&#32;}
+00250 
+00251 &#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;LeapProvider&#32;_provider&#32;=&#32;<emphasis role="keyword">null</emphasis>;
+00252 
+00253 &#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;checkInteractionHandStatus(InteractionHand&#32;intHand,
+00254 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;List&lt;ControllerStatusMessage&gt;&#32;messages)&#32;{
+00255 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(!<link linkend="_namespace_valve_1_1_v_r_1aecd07a81fe79a9f96c6787513e2d98e4ae498749f3c42246d50b15c81c101d988">Application</link>.isPlaying)&#32;{
+00256 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;Check&#32;for&#32;valid&#32;InteractionHand&#32;data&#32;state.</emphasis>
+00257 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(intHand.handDataMode&#32;==&#32;<link linkend="_namespace_leap_1_1_unity_1_1_interaction_1ab4a739b7f8a6748903e2ccc029df7a50">HandDataMode</link>.Custom)&#32;{
+00258 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;messages.Add(<emphasis role="keyword">new</emphasis>&#32;ControllerStatusMessage()&#32;{
+00259 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;message&#32;=&#32;<emphasis role="stringliteral">&quot;HandDataMode:&#32;Custom&quot;</emphasis>,
+00260 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;tooltip&#32;=&#32;<emphasis role="stringliteral">&quot;This&#32;interaction&#32;hand&#32;has&#32;its&#32;data&#32;mode&#32;set&#32;to&#32;Custom.&#32;&quot;</emphasis>
+00261 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;+&#32;<emphasis role="stringliteral">&quot;A&#32;custom&#32;script&#32;will&#32;be&#32;required&#32;to&#32;ensure&#32;hand&#32;data&#32;gets&#32;to&#32;&quot;</emphasis>
+00262 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;+&#32;<emphasis role="stringliteral">&quot;the&#32;interaction&#32;hand&#32;properly.&#32;Upon&#32;pressing&#32;play,&#32;an&#32;error&#32;will&#32;&quot;</emphasis>
+00263 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;+&#32;<emphasis role="stringliteral">&quot;be&#32;raised&#32;by&#32;the&#32;hand&#32;itself&#32;if&#32;it&#32;is&#32;misconfigured.&quot;</emphasis>,
+00264 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;color&#32;=&#32;Colors.Caution
+00265 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;});
+00266 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00267 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">else</emphasis>&#32;{
+00268 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;Check&#32;for&#32;a&#32;LeapProvider&#32;in&#32;the&#32;scene&#32;somewhere.</emphasis>
+00269 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(_provider&#32;==&#32;<emphasis role="keyword">null</emphasis>)&#32;{
+00270 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;_provider&#32;=&#32;FindObjectOfType&lt;LeapProvider&gt;();
+00271 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00272 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(_provider&#32;==&#32;<emphasis role="keyword">null</emphasis>)&#32;{
+00273 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;messages.Add(<emphasis role="keyword">new</emphasis>&#32;ControllerStatusMessage()&#32;{
+00274 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;message&#32;=&#32;<emphasis role="stringliteral">&quot;No&#32;LeapProvider&quot;</emphasis>,
+00275 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;tooltip&#32;=&#32;<emphasis role="stringliteral">&quot;No&#32;LeapProvider&#32;object&#32;was&#32;found&#32;in&#32;your&#32;scene.&#32;&quot;</emphasis>
+00276 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;+&#32;<emphasis role="stringliteral">&quot;InteractionHands&#32;require&#32;a&#32;LeapProvider&#32;to&#32;function;&#32;consider&#32;&quot;</emphasis>
+00277 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;+&#32;<emphasis role="stringliteral">&quot;dragging&#32;in&#32;the&#32;LeapHeadMountedRig&#32;prefab&#32;or&#32;creating&#32;and&#32;&quot;</emphasis>
+00278 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;+&#32;<emphasis role="stringliteral">&quot;configuring&#32;a&#32;LeapServiceProvider.&quot;</emphasis>,
+00279 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;color&#32;=&#32;Colors.Warning
+00280 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;});
+00281 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00282 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00283 &#32;&#32;&#32;&#32;&#32;&#32;}
+00284 
+00285 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;Check&#32;if&#32;the&#32;player&#32;has&#32;multiple&#32;left&#32;hands&#32;or&#32;multiple&#32;right&#32;hands.</emphasis>
+00286 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(intHand.handDataMode&#32;!=&#32;<link linkend="_namespace_leap_1_1_unity_1_1_interaction_1ab4a739b7f8a6748903e2ccc029df7a50">HandDataMode</link>.Custom)&#32;{
+00287 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordtype">int</emphasis>&#32;<link linkend="_namespace_valve_1_1_v_r_1ac40c4bdf0a3dcd6e69cad2d85f287c67a6a992d5529f459a44fee58c733255e86">index</link>&#32;=&#32;<link linkend="_class_leap_1_1_unity_1_1_custom_editor_base_1a20eea7e492831d5b4cde7eeaf0ce749e">target</link>.interactionControllers.Query().IndexOf(intHand);
+00288 
+00289 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(<link linkend="_class_leap_1_1_unity_1_1_custom_editor_base_1a20eea7e492831d5b4cde7eeaf0ce749e">target</link>.interactionControllers.Query().
+00290 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;Take(index).
+00291 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;OfType&lt;InteractionHand&gt;().
+00292 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;Where(h&#32;=&gt;&#32;h.handDataMode&#32;==&#32;intHand.handDataMode).
+00293 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;Where(h&#32;=&gt;&#32;h.leapProvider&#32;==&#32;intHand.leapProvider).
+00294 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_namespace_valve_1_1_v_r_1a82e5bf501cc3aa155444ee3f0662853faed36a1ef76a59ee3f15180e0441188ad">Any</link>())&#32;{
+00295 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;messages.Add(<emphasis role="keyword">new</emphasis>&#32;ControllerStatusMessage()&#32;{
+00296 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;message&#32;=&#32;<emphasis role="stringliteral">&quot;Duplicate&#32;Hand&quot;</emphasis>,
+00297 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;tooltip&#32;=&#32;<emphasis role="stringliteral">&quot;You&#32;already&#32;have&#32;a&#32;hand&#32;with&#32;this&#32;data&#32;mode&#32;in&#32;your&#32;scene.&#32;&quot;</emphasis>
+00298 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;+&#32;<emphasis role="stringliteral">&quot;You&#32;should&#32;remove&#32;one&#32;of&#32;the&#32;duplicates.&quot;</emphasis>,
+00299 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;color&#32;=&#32;Colors.Problem
+00300 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;});
+00301 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00302 &#32;&#32;&#32;&#32;&#32;&#32;}
+00303 &#32;&#32;&#32;&#32;}
+00304 
+00305 &#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;InteractionXRController&#32;_leftVRNodeController;
+00306 &#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;InteractionXRController&#32;_rightVRNodeController;
+00307 
+00308 &#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;checkInteractionVRControllerStatus(InteractionXRController&#32;controller,
+00309 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;List&lt;ControllerStatusMessage&gt;&#32;messages)&#32;{
+00310 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;Check&#32;if&#32;the&#32;controller&#32;is&#32;configured&#32;correctly&#32;if&#32;it&#32;is&#32;set&#32;up&#32;with&#32;a&#32;custom</emphasis>
+00311 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;tracking&#32;provider.</emphasis>
+00312 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(controller.isUsingCustomTracking)&#32;{
+00313 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;messages.Add(<emphasis role="keyword">new</emphasis>&#32;ControllerStatusMessage()&#32;{
+00314 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;message&#32;=&#32;<emphasis role="stringliteral">&quot;Custom&#32;Tracking&#32;Provider&quot;</emphasis>,
+00315 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;tooltip&#32;=&#32;<emphasis role="stringliteral">&quot;You&#32;are&#32;using&#32;a&#32;custom&#32;tracking&#32;provider&#32;for&#32;this&#32;VR&#32;controller.&quot;</emphasis>,
+00316 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;color&#32;=&#32;Colors.Caution
+00317 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;});
+00318 &#32;&#32;&#32;&#32;&#32;&#32;}
+00319 
+00320 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;Check&#32;if&#32;the&#32;player&#32;has&#32;duplicate&#32;VRNode&#32;left&#32;controllers&#32;or&#32;right&#32;controllers.</emphasis>
+00321 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordtype">bool</emphasis>&#32;isLeftVRNodeController&#32;&#32;=&#32;controller.trackingProvider&#32;is&#32;DefaultXRNodeTrackingProvider
+00322 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&amp;&amp;&#32;controller.chirality&#32;==&#32;<link linkend="_namespace_leap_1_1_unity_1a4d15adcf20ba121b2cd9c07f503b606f">Chirality</link>.Left;
+00323 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordtype">bool</emphasis>&#32;isRightVRNodeController&#32;=&#32;controller.trackingProvider&#32;is&#32;DefaultXRNodeTrackingProvider
+00324 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&amp;&amp;&#32;controller.chirality&#32;==&#32;<link linkend="_namespace_leap_1_1_unity_1a4d15adcf20ba121b2cd9c07f503b606f">Chirality</link>.Right;
+00325 
+00326 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(isLeftVRNodeController&#32;&amp;&amp;&#32;_leftVRNodeController&#32;!=&#32;<emphasis role="keyword">null</emphasis>
+00327 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;||&#32;isRightVRNodeController&#32;&amp;&amp;&#32;_rightVRNodeController&#32;!=&#32;<emphasis role="keyword">null</emphasis>)&#32;{
+00328 
+00329 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;var&#32;alreadyExistsController&#32;=&#32;isLeftVRNodeController&#32;?&#32;_leftVRNodeController&#32;:&#32;_rightVRNodeController;
+00330 
+00331 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordtype">string</emphasis>&#32;message;
+00332 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordtype">string</emphasis>&#32;tooltip;
+00333 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;Color&#32;color;
+00334 
+00335 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(controller.deviceJoystickTokens.Equals(alreadyExistsController.deviceJoystickTokens))&#32;{
+00336 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;message&#32;=&#32;<emphasis role="stringliteral">&quot;Duplicate&#32;VR&#32;Controller&quot;</emphasis>;
+00337 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;tooltip&#32;=&#32;<emphasis role="stringliteral">&quot;You&#32;already&#32;have&#32;a&#32;VRNode&#32;controller&#32;with&#32;this&#32;chirality&#32;and&#32;device&#32;&quot;</emphasis>
+00338 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;+&#32;<emphasis role="stringliteral">&quot;string&#32;in&#32;your&#32;scene.&#32;You&#32;should&#32;remove&#32;one&#32;of&#32;the&#32;duplicates.&quot;</emphasis>;
+00339 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;color&#32;=&#32;Colors.Problem;
+00340 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}&#32;<emphasis role="keywordflow">else</emphasis>&#32;{
+00341 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;message&#32;=&#32;<emphasis role="stringliteral">&quot;Multiple&#32;VR&#32;Controllers&quot;</emphasis>;
+00342 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;tooltip&#32;=&#32;<emphasis role="stringliteral">&quot;You&#32;have&#32;multiple&#32;VR&#32;controllers&#32;of&#32;the&#32;same&#32;chirality&#32;enabled&#32;with&#32;&quot;</emphasis>
+00343 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;+&#32;<emphasis role="stringliteral">&quot;different&#32;device&#32;strings.&#32;If&#32;both&#32;device&#32;strings&#32;match&#32;attached&#32;&quot;</emphasis>
+00344 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;+&#32;<emphasis role="stringliteral">&quot;Unity&#32;joysticks,&#32;you&#32;may&#32;get&#32;duplicate&#32;controllers.&quot;</emphasis>;
+00345 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;color&#32;=&#32;Colors.Caution;
+00346 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00347 
+00348 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;messages.Add(<emphasis role="keyword">new</emphasis>&#32;ControllerStatusMessage()&#32;{
+00349 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;message&#32;=&#32;message,
+00350 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;tooltip&#32;=&#32;tooltip,
+00351 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;color&#32;=&#32;color
+00352 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;});
+00353 &#32;&#32;&#32;&#32;&#32;&#32;}
+00354 
+00355 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(isLeftVRNodeController)&#32;{
+00356 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;_leftVRNodeController&#32;=&#32;controller;
+00357 &#32;&#32;&#32;&#32;&#32;&#32;}
+00358 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(isRightVRNodeController)&#32;{
+00359 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;_rightVRNodeController&#32;=&#32;controller;
+00360 &#32;&#32;&#32;&#32;&#32;&#32;}
+00361 
+00362 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordtype">string</emphasis>&#32;wrongChiralityToken&#32;=&#32;controller.isLeft&#32;?&#32;<emphasis role="stringliteral">&quot;right&quot;</emphasis>&#32;:&#32;<emphasis role="stringliteral">&quot;left&quot;</emphasis>;
+00363 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(controller.deviceJoystickTokens.Contains(wrongChiralityToken))&#32;{
+00364 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;messages.Add(<emphasis role="keyword">new</emphasis>&#32;ControllerStatusMessage()&#32;{
+00365 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;message&#32;=&#32;<emphasis role="stringliteral">&quot;Wrong&#32;Chirality?&quot;</emphasis>,
+00366 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;tooltip&#32;=&#32;<emphasis role="stringliteral">&quot;This&#32;VR&#32;controller&apos;s&#32;device&#32;joystick&#32;string&#32;specifies&#32;a&#32;chirality&#32;&quot;</emphasis>
+00367 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;+&#32;<emphasis role="stringliteral">&quot;that&#32;is&#32;different&#32;from&#32;the&#32;chirality&#32;of&#32;the&#32;controller&#32;itself.&#32;You&#32;&quot;</emphasis>
+00368 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;+&#32;<emphasis role="stringliteral">&quot;should&#32;confirm&#32;this&#32;controller&apos;s&#32;device&#32;string&#32;or&#32;chirality&#32;setting.&quot;</emphasis>,
+00369 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;color&#32;=&#32;Colors.Warning
+00370 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;});
+00371 &#32;&#32;&#32;&#32;&#32;&#32;}
+00372 
+00373 &#32;&#32;&#32;&#32;}
+00374 
+00375 &#32;&#32;}
+00376 
+00377 &#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keyword">static</emphasis>&#32;<emphasis role="keyword">class&#32;</emphasis>Extensions&#32;{
+00378 
+00379 &#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keyword">static</emphasis>&#32;Rect&#32;ShrinkOne(<emphasis role="keyword">this</emphasis>&#32;Rect&#32;rect)&#32;{
+00380 &#32;&#32;&#32;&#32;&#32;&#32;rect.x&#32;+=&#32;1;
+00381 &#32;&#32;&#32;&#32;&#32;&#32;rect.y&#32;+=&#32;1;
+00382 &#32;&#32;&#32;&#32;&#32;&#32;rect.width&#32;-=&#32;2;
+00383 &#32;&#32;&#32;&#32;&#32;&#32;rect.height&#32;-=&#32;2;
+00384 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;rect;
+00385 &#32;&#32;&#32;&#32;}
+00386 
+00387 &#32;&#32;}
+00388 
+00389 }
+</programlisting></section>

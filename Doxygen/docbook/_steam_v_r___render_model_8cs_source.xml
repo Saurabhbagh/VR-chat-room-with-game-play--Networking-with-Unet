@@ -1,0 +1,863 @@
+<?xml version='1.0' encoding='UTF-8' standalone='no'?>
+<section xmlns="http://docbook.org/ns/docbook" version="5.0" xmlns:xlink="http://www.w3.org/1999/xlink" xml:id="__steam_v_r___render_model_8cs_source">
+<title>SteamVR_RenderModel.cs</title>
+<indexterm><primary>O:/GitHUBMINIPRoject/Assets/SteamVR/Scripts/SteamVR_RenderModel.cs</primary></indexterm>
+<programlisting>00001 <emphasis role="comment">//=======&#32;Copyright&#32;(c)&#32;Valve&#32;Corporation,&#32;All&#32;rights&#32;reserved.&#32;===============</emphasis>
+00002 <emphasis role="comment">//</emphasis>
+00003 <emphasis role="comment">//&#32;Purpose:&#32;Render&#32;model&#32;of&#32;associated&#32;tracked&#32;object</emphasis>
+00004 <emphasis role="comment">//</emphasis>
+00005 <emphasis role="comment">//=============================================================================</emphasis>
+00006 
+00007 <emphasis role="keyword">using</emphasis>&#32;<link linkend="__balloon_8cs_1a7d67e097df9376eb709b6a23aa3c7d23">UnityEngine</link>;
+00008 <emphasis role="keyword">using</emphasis>&#32;System.Collections;
+00009 <emphasis role="keyword">using</emphasis>&#32;System.Collections.Generic;
+00010 <emphasis role="keyword">using</emphasis>&#32;System.Runtime.InteropServices;
+00011 <emphasis role="keyword">using</emphasis>&#32;<link linkend="_namespace_valve">Valve</link>.<link linkend="_namespace_valve_1_1_v_r">VR</link>;
+00012 
+00013 <emphasis role="keyword">namespace&#32;</emphasis><link linkend="_namespace_valve_1_1_v_r">Valve.VR</link>
+00014 {
+00015 &#32;&#32;&#32;&#32;[ExecuteInEditMode]
+<anchor xml:id="__steam_v_r___render_model_8cs_source_1l00016"/><link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___render_model">00016</link> &#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keyword">class&#32;</emphasis><link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___render_model">SteamVR_RenderModel</link>&#32;:&#32;MonoBehaviour
+00017 &#32;&#32;&#32;&#32;{
+<anchor xml:id="__steam_v_r___render_model_8cs_source_1l00018"/><link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___render_model_1af732541e751210a72fd7ea793566d940">00018</link> &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___tracked_object">SteamVR_TrackedObject</link>.<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___tracked_object_1a3d437894eff0bfc81eeb21a8c478413e">EIndex</link>&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___render_model_1af732541e751210a72fd7ea793566d940">index</link>&#32;=&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___tracked_object">SteamVR_TrackedObject</link>.<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___tracked_object_1a3d437894eff0bfc81eeb21a8c478413e">EIndex</link>.None;
+<anchor xml:id="__steam_v_r___render_model_8cs_source_1l00019"/><link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___render_model_1a97f12235b76af906c2d2cd83dce06785">00019</link> &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">protected</emphasis>&#32;<link linkend="_namespace_valve_1_1_v_r_1a82e5bf501cc3aa155444ee3f0662853f">SteamVR_Input_Sources</link>&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___render_model_1a97f12235b76af906c2d2cd83dce06785">inputSource</link>;
+00020 
+<anchor xml:id="__steam_v_r___render_model_8cs_source_1l00021"/><link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___render_model_1ab459a749b89d3f4f12339ef618177344">00021</link> &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keyword">const</emphasis>&#32;<emphasis role="keywordtype">string</emphasis>&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___render_model_1ab459a749b89d3f4f12339ef618177344">modelOverrideWarning</link>&#32;=&#32;<emphasis role="stringliteral">&quot;Model&#32;override&#32;is&#32;really&#32;only&#32;meant&#32;to&#32;be&#32;used&#32;in&#32;&quot;</emphasis>&#32;+
+00022 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="stringliteral">&quot;the&#32;scene&#32;view&#32;for&#32;lining&#32;things&#32;up;&#32;using&#32;it&#32;at&#32;runtime&#32;is&#32;discouraged.&#32;&#32;Use&#32;tracked&#32;device&#32;&quot;</emphasis>&#32;+
+00023 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="stringliteral">&quot;index&#32;instead&#32;to&#32;ensure&#32;the&#32;correct&#32;model&#32;is&#32;displayed&#32;for&#32;all&#32;users.&quot;</emphasis>;
+00024 
+00025 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;[Tooltip(<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___render_model_1ab459a749b89d3f4f12339ef618177344">modelOverrideWarning</link>)]
+<anchor xml:id="__steam_v_r___render_model_8cs_source_1l00026"/><link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___render_model_1a2980ac7d5745563e149a6622daac0578">00026</link> &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keywordtype">string</emphasis>&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___render_model_1a2980ac7d5745563e149a6622daac0578">modelOverride</link>;
+00027 
+00028 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;[Tooltip(<emphasis role="stringliteral">&quot;Shader&#32;to&#32;apply&#32;to&#32;model.&quot;</emphasis>)]
+<anchor xml:id="__steam_v_r___render_model_8cs_source_1l00029"/><link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___render_model_1a295413d096843e816feec34051948d5d">00029</link> &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;Shader&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___render_model_1a295413d096843e816feec34051948d5d">shader</link>;
+00030 
+00031 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;[Tooltip(<emphasis role="stringliteral">&quot;Enable&#32;to&#32;print&#32;out&#32;when&#32;render&#32;models&#32;are&#32;loaded.&quot;</emphasis>)]
+<anchor xml:id="__steam_v_r___render_model_8cs_source_1l00032"/><link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___render_model_1a6e1361eb79e5e7d2907239b69d8c2747">00032</link> &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keywordtype">bool</emphasis>&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___render_model_1a6e1361eb79e5e7d2907239b69d8c2747">verbose</link>&#32;=&#32;<emphasis role="keyword">false</emphasis>;
+00033 
+00034 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;[Tooltip(<emphasis role="stringliteral">&quot;If&#32;available,&#32;break&#32;down&#32;into&#32;separate&#32;components&#32;instead&#32;of&#32;loading&#32;as&#32;a&#32;single&#32;mesh.&quot;</emphasis>)]
+<anchor xml:id="__steam_v_r___render_model_8cs_source_1l00035"/><link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___render_model_1ad8097606e4229b87628de3bd9c1b1740">00035</link> &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keywordtype">bool</emphasis>&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___render_model_1ad8097606e4229b87628de3bd9c1b1740">createComponents</link>&#32;=&#32;<emphasis role="keyword">true</emphasis>;
+00036 
+00037 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;[Tooltip(<emphasis role="stringliteral">&quot;Update&#32;transforms&#32;of&#32;components&#32;at&#32;runtime&#32;to&#32;reflect&#32;user&#32;action.&quot;</emphasis>)]
+<anchor xml:id="__steam_v_r___render_model_8cs_source_1l00038"/><link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___render_model_1a31f89a1d33b360df1c448395f42fd0ad">00038</link> &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keywordtype">bool</emphasis>&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___render_model_1a31f89a1d33b360df1c448395f42fd0ad">updateDynamically</link>&#32;=&#32;<emphasis role="keyword">true</emphasis>;
+00039 
+00040 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;Additional&#32;controller&#32;settings&#32;for&#32;showing&#32;scrollwheel,&#32;etc.</emphasis>
+<anchor xml:id="__steam_v_r___render_model_8cs_source_1l00041"/><link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___render_model_1ac6b2a701413243d24c2dd40bfbe8b845">00041</link> &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<link linkend="_struct_valve_1_1_v_r_1_1_render_model___controller_mode___state__t">RenderModel_ControllerMode_State_t</link>&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___render_model_1ac6b2a701413243d24c2dd40bfbe8b845">controllerModeState</link>;
+00042 
+00043 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;Name&#32;of&#32;the&#32;sub-object&#32;which&#32;represents&#32;the&#32;&quot;local&quot;&#32;coordinate&#32;space&#32;for&#32;each&#32;component.</emphasis>
+<anchor xml:id="__steam_v_r___render_model_8cs_source_1l00044"/><link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___render_model_1a1dc259cc2c45275417739bf0f9fd75f9">00044</link> &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keyword">const</emphasis>&#32;<emphasis role="keywordtype">string</emphasis>&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___render_model_1a1dc259cc2c45275417739bf0f9fd75f9">k_localTransformName</link>&#32;=&#32;<emphasis role="stringliteral">&quot;attach&quot;</emphasis>;
+00045 
+00046 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;Cached&#32;name&#32;of&#32;this&#32;render&#32;model&#32;for&#32;updating&#32;component&#32;transforms&#32;at&#32;runtime.</emphasis>
+<anchor xml:id="__steam_v_r___render_model_8cs_source_1l00047"/><link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___render_model_1a0655bfb7f8ed5cfb849c2156737dab6a">00047</link> &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keywordtype">string</emphasis>&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___render_model_1a0655bfb7f8ed5cfb849c2156737dab6a">renderModelName</link>&#32;{&#32;<emphasis role="keyword">get</emphasis>;&#32;<emphasis role="keyword">private</emphasis>&#32;<emphasis role="keyword">set</emphasis>;&#32;}
+00048 
+<anchor xml:id="__steam_v_r___render_model_8cs_source_1l00049"/><link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___render_model_1a5950c36ccece814211ef458311b3f71f">00049</link> &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keywordtype">bool</emphasis>&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___render_model_1a5950c36ccece814211ef458311b3f71f">initializedAttachPoints</link>&#32;{&#32;<emphasis role="keyword">get</emphasis>;&#32;<emphasis role="keyword">set</emphasis>;&#32;}
+00050 
+00051 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;Dictionary&lt;string,&#32;Transform&gt;&#32;componentAttachPoints&#32;=&#32;<emphasis role="keyword">new</emphasis>&#32;Dictionary&lt;string,&#32;Transform&gt;();
+00052 
+00053 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;List&lt;MeshRenderer&gt;&#32;meshRenderers&#32;=&#32;<emphasis role="keyword">new</emphasis>&#32;List&lt;MeshRenderer&gt;();
+00054 
+00055 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;If&#32;someone&#32;knows&#32;how&#32;to&#32;keep&#32;these&#32;from&#32;getting&#32;cleaned&#32;up&#32;every&#32;time</emphasis>
+00056 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;you&#32;exit&#32;play&#32;mode,&#32;let&#32;me&#32;know.&#32;&#32;I&apos;ve&#32;tried&#32;marking&#32;the&#32;RenderModel</emphasis>
+00057 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;class&#32;below&#32;as&#32;[System.Serializable]&#32;and&#32;switching&#32;to&#32;normal&#32;public</emphasis>
+00058 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;variables&#32;for&#32;mesh&#32;and&#32;material&#32;to&#32;get&#32;them&#32;to&#32;serialize&#32;properly,</emphasis>
+00059 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;as&#32;well&#32;as&#32;tried&#32;marking&#32;the&#32;mesh&#32;and&#32;material&#32;objects&#32;as</emphasis>
+00060 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;DontUnloadUnusedAsset,&#32;but&#32;Unity&#32;was&#32;still&#32;unloading&#32;them.</emphasis>
+00061 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;The&#32;hashtable&#32;is&#32;preserving&#32;its&#32;entries,&#32;but&#32;the&#32;mesh&#32;and&#32;material</emphasis>
+00062 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;variables&#32;are&#32;going&#32;null.</emphasis>
+00063 
+<anchor xml:id="__steam_v_r___render_model_8cs_source_1l00064"/><link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___render_model_1_1_render_model">00064</link> &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keyword">class&#32;</emphasis><link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___render_model_1_1_render_model">RenderModel</link>
+00065 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+<anchor xml:id="__steam_v_r___render_model_8cs_source_1l00066"/><link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___render_model_1_1_render_model_1a381f0a0a9d2b8ce30be042c6a2b29ac8">00066</link> &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___render_model_1_1_render_model_1a381f0a0a9d2b8ce30be042c6a2b29ac8">RenderModel</link>(Mesh&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___render_model_1_1_render_model_1aded51c30fc3950960db2b3df166f5e18">mesh</link>,&#32;Material&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___render_model_1_1_render_model_1a9001f7a0fc96e519b20d785bb45f7eb3">material</link>)
+00067 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00068 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;this.mesh&#32;=&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___render_model_1_1_render_model_1aded51c30fc3950960db2b3df166f5e18">mesh</link>;
+00069 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;this.material&#32;=&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___render_model_1_1_render_model_1a9001f7a0fc96e519b20d785bb45f7eb3">material</link>;
+00070 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+<anchor xml:id="__steam_v_r___render_model_8cs_source_1l00071"/><link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___render_model_1_1_render_model_1aded51c30fc3950960db2b3df166f5e18">00071</link> &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;Mesh&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___render_model_1_1_render_model_1aded51c30fc3950960db2b3df166f5e18">mesh</link>&#32;{&#32;<emphasis role="keyword">get</emphasis>;&#32;<emphasis role="keyword">private</emphasis>&#32;<emphasis role="keyword">set</emphasis>;&#32;}
+<anchor xml:id="__steam_v_r___render_model_8cs_source_1l00072"/><link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___render_model_1_1_render_model_1a9001f7a0fc96e519b20d785bb45f7eb3">00072</link> &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;Material&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___render_model_1_1_render_model_1a9001f7a0fc96e519b20d785bb45f7eb3">material</link>&#32;{&#32;<emphasis role="keyword">get</emphasis>;&#32;<emphasis role="keyword">private</emphasis>&#32;<emphasis role="keyword">set</emphasis>;&#32;}
+00073 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00074 
+<anchor xml:id="__steam_v_r___render_model_8cs_source_1l00075"/><link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___render_model_1a637b914e124022351bbb1976775d9afb">00075</link> &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keyword">static</emphasis>&#32;Hashtable&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___render_model_1a637b914e124022351bbb1976775d9afb">models</link>&#32;=&#32;<emphasis role="keyword">new</emphasis>&#32;Hashtable();
+<anchor xml:id="__steam_v_r___render_model_8cs_source_1l00076"/><link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___render_model_1a96489732de88e8abb28dbb430a729a87">00076</link> &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keyword">static</emphasis>&#32;Hashtable&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___render_model_1a96489732de88e8abb28dbb430a729a87">materials</link>&#32;=&#32;<emphasis role="keyword">new</emphasis>&#32;Hashtable();
+00077 
+00078 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;Helper&#32;class&#32;to&#32;load&#32;render&#32;models&#32;interface&#32;on&#32;demand&#32;and&#32;clean&#32;up&#32;when&#32;done.</emphasis>
+<anchor xml:id="__steam_v_r___render_model_8cs_source_1l00079"/><link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___render_model_1_1_render_model_interface_holder">00079</link> &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;sealed&#32;<emphasis role="keyword">class&#32;</emphasis><link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___render_model_1_1_render_model_interface_holder">RenderModelInterfaceHolder</link>&#32;:&#32;System.IDisposable
+00080 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00081 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;<emphasis role="keywordtype">bool</emphasis>&#32;needsShutdown,&#32;failedLoadInterface;
+00082 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;<link linkend="_class_valve_1_1_v_r_1_1_c_v_r_render_models">CVRRenderModels</link>&#32;_instance;
+00083 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<link linkend="_class_valve_1_1_v_r_1_1_c_v_r_render_models">CVRRenderModels</link>&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___render_model_1_1_render_model_interface_holder_1a7c72010e9399bb1d83d1cf8105fe49c8">instance</link>
+<anchor xml:id="__steam_v_r___render_model_8cs_source_1l00084"/><link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___render_model_1_1_render_model_interface_holder_1a7c72010e9399bb1d83d1cf8105fe49c8">00084</link> &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00085 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">get</emphasis>
+00086 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00087 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(_instance&#32;==&#32;<emphasis role="keyword">null</emphasis>&#32;&amp;&amp;&#32;!failedLoadInterface)
+00088 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00089 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(<link linkend="_namespace_valve_1_1_v_r_1aecd07a81fe79a9f96c6787513e2d98e4ae498749f3c42246d50b15c81c101d988">Application</link>.isEditor&#32;&amp;&amp;&#32;<link linkend="_namespace_valve_1_1_v_r_1aecd07a81fe79a9f96c6787513e2d98e4ae498749f3c42246d50b15c81c101d988">Application</link>.isPlaying&#32;==&#32;<emphasis role="keyword">false</emphasis>)
+00090 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;needsShutdown&#32;=&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r">SteamVR</link>.<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r_1af84660d96abb07e1e6d776a27568f058">InitializeTemporarySession</link>();
+00091 
+00092 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;_instance&#32;=&#32;<link linkend="_class_valve_1_1_v_r_1_1_open_v_r">OpenVR</link>.<link linkend="_class_valve_1_1_v_r_1_1_open_v_r_1a8edbc1c20720ae5911e5e6c29221b9b5">RenderModels</link>;
+00093 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(_instance&#32;==&#32;<emphasis role="keyword">null</emphasis>)
+00094 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00095 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;Debug.LogError(<emphasis role="stringliteral">&quot;&lt;b&gt;[SteamVR]&lt;/b&gt;&#32;Failed&#32;to&#32;load&#32;IVRRenderModels&#32;interface&#32;version&#32;&quot;</emphasis>&#32;+&#32;<link linkend="_class_valve_1_1_v_r_1_1_open_v_r">OpenVR</link>.<link linkend="_class_valve_1_1_v_r_1_1_open_v_r_1a1b23f2c66b887bd6b768949290a89bd5">IVRRenderModels_Version</link>);
+00096 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;failedLoadInterface&#32;=&#32;<emphasis role="keyword">true</emphasis>;
+00097 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00098 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00099 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;_instance;
+00100 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00101 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+<anchor xml:id="__steam_v_r___render_model_8cs_source_1l00102"/><link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___render_model_1_1_render_model_interface_holder_1a083e37229825793a4e479c58f2f4dc47">00102</link> &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___render_model_1_1_render_model_interface_holder_1a083e37229825793a4e479c58f2f4dc47">Dispose</link>()
+00103 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00104 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(needsShutdown)
+00105 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r">SteamVR</link>.<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r_1afb99eabf5440c7e76beefad597182ee1">ExitTemporarySession</link>();
+00106 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00107 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00108 
+00109 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;OnModelSkinSettingsHaveChanged(<link linkend="_struct_valve_1_1_v_r_1_1_v_r_event__t">VREvent_t</link>&#32;vrEvent)
+00110 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00111 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(!<emphasis role="keywordtype">string</emphasis>.IsNullOrEmpty(<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___render_model_1a0655bfb7f8ed5cfb849c2156737dab6a">renderModelName</link>))
+00112 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00113 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___render_model_1a0655bfb7f8ed5cfb849c2156737dab6a">renderModelName</link>&#32;=&#32;<emphasis role="stringliteral">&quot;&quot;</emphasis>;
+00114 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___render_model_1a59d9e165c3b79e6d820cd08c4c33a6c3">UpdateModel</link>();
+00115 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00116 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00117 
+<anchor xml:id="__steam_v_r___render_model_8cs_source_1l00118"/><link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___render_model_1a251a4e0e082f7e54e6976ac0f2beb16c">00118</link> &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___render_model_1a251a4e0e082f7e54e6976ac0f2beb16c">SetMeshRendererState</link>(<emphasis role="keywordtype">bool</emphasis>&#32;state)
+00119 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00120 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">for</emphasis>&#32;(<emphasis role="keywordtype">int</emphasis>&#32;rendererIndex&#32;=&#32;0;&#32;rendererIndex&#32;&lt;&#32;meshRenderers.Count;&#32;rendererIndex++)
+00121 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00122 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;MeshRenderer&#32;renderer&#32;=&#32;meshRenderers[rendererIndex];
+00123 
+00124 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(renderer&#32;!=&#32;<emphasis role="keyword">null</emphasis>)
+00125 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;renderer.enabled&#32;=&#32;state;
+00126 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00127 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00128 
+00129 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;OnHideRenderModels(<emphasis role="keywordtype">bool</emphasis>&#32;hidden)
+00130 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00131 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___render_model_1a251a4e0e082f7e54e6976ac0f2beb16c">SetMeshRendererState</link>(!hidden);
+00132 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00133 
+00134 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;OnDeviceConnected(<emphasis role="keywordtype">int</emphasis>&#32;i,&#32;<emphasis role="keywordtype">bool</emphasis>&#32;connected)
+00135 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00136 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(i&#32;!=&#32;(<emphasis role="keywordtype">int</emphasis>)<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___render_model_1af732541e751210a72fd7ea793566d940">index</link>)
+00137 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>;
+00138 
+00139 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(connected)
+00140 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00141 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___render_model_1a59d9e165c3b79e6d820cd08c4c33a6c3">UpdateModel</link>();
+00142 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00143 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00144 
+<anchor xml:id="__steam_v_r___render_model_8cs_source_1l00145"/><link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___render_model_1a59d9e165c3b79e6d820cd08c4c33a6c3">00145</link> &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___render_model_1a59d9e165c3b79e6d820cd08c4c33a6c3">UpdateModel</link>()
+00146 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00147 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;var&#32;system&#32;=&#32;<link linkend="_class_valve_1_1_v_r_1_1_open_v_r">OpenVR</link>.<link linkend="_class_valve_1_1_v_r_1_1_open_v_r_1a6aafa4a25425620225098ded82a045c0">System</link>;
+00148 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(system&#32;==&#32;<emphasis role="keyword">null</emphasis>&#32;||&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___render_model_1af732541e751210a72fd7ea793566d940">index</link>&#32;==&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___tracked_object">SteamVR_TrackedObject</link>.<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___tracked_object_1a3d437894eff0bfc81eeb21a8c478413e">EIndex</link>.None)
+00149 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>;
+00150 
+00151 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;var&#32;error&#32;=&#32;<link linkend="_namespace_valve_1_1_v_r_1aab6684f03930a2d2cf22ed66b437e47b">ETrackedPropertyError</link>.TrackedProp_Success;
+00152 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;var&#32;capacity&#32;=&#32;system.<link linkend="_class_valve_1_1_v_r_1_1_c_v_r_system_1a7832bc9cd34345dacb66731bc39d8f2a">GetStringTrackedDeviceProperty</link>((uint)<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___render_model_1af732541e751210a72fd7ea793566d940">index</link>,&#32;<link linkend="_namespace_valve_1_1_v_r_1ab060521ead7273986988fc4897e52482">ETrackedDeviceProperty</link>.Prop_RenderModelName_String,&#32;<emphasis role="keyword">null</emphasis>,&#32;0,&#32;ref&#32;error);
+00153 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(capacity&#32;&lt;=&#32;1)
+00154 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00155 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;Debug.LogError(<emphasis role="stringliteral">&quot;&lt;b&gt;[SteamVR]&lt;/b&gt;&#32;Failed&#32;to&#32;get&#32;render&#32;model&#32;name&#32;for&#32;tracked&#32;object&#32;&quot;</emphasis>&#32;+&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___render_model_1af732541e751210a72fd7ea793566d940">index</link>);
+00156 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>;
+00157 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00158 
+00159 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;var&#32;buffer&#32;=&#32;<emphasis role="keyword">new</emphasis>&#32;System.Text.StringBuilder((<emphasis role="keywordtype">int</emphasis>)capacity);
+00160 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;system.GetStringTrackedDeviceProperty((uint)<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___render_model_1af732541e751210a72fd7ea793566d940">index</link>,&#32;<link linkend="_namespace_valve_1_1_v_r_1ab060521ead7273986988fc4897e52482">ETrackedDeviceProperty</link>.Prop_RenderModelName_String,&#32;buffer,&#32;capacity,&#32;ref&#32;error);
+00161 
+00162 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;var&#32;s&#32;=&#32;buffer.ToString();
+00163 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___render_model_1a0655bfb7f8ed5cfb849c2156737dab6a">renderModelName</link>&#32;!=&#32;s)
+00164 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00165 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;StartCoroutine(SetModelAsync(s));
+00166 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00167 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00168 
+00169 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;IEnumerator&#32;SetModelAsync(<emphasis role="keywordtype">string</emphasis>&#32;newRenderModelName)
+00170 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00171 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;meshRenderers.Clear();
+00172 
+00173 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(<emphasis role="keywordtype">string</emphasis>.IsNullOrEmpty(newRenderModelName))
+00174 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;yield&#32;<emphasis role="keywordflow">break</emphasis>;
+00175 
+00176 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;Preload&#32;all&#32;render&#32;models&#32;before&#32;asking&#32;for&#32;the&#32;data&#32;to&#32;create&#32;meshes.</emphasis>
+00177 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">using</emphasis>&#32;(RenderModelInterfaceHolder&#32;holder&#32;=&#32;<emphasis role="keyword">new</emphasis>&#32;RenderModelInterfaceHolder())
+00178 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00179 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_valve_1_1_v_r_1_1_c_v_r_render_models">CVRRenderModels</link>&#32;renderModels&#32;=&#32;holder.instance;
+00180 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(renderModels&#32;==&#32;<emphasis role="keyword">null</emphasis>)
+00181 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;yield&#32;<emphasis role="keywordflow">break</emphasis>;
+00182 
+00183 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;Gather&#32;names&#32;of&#32;render&#32;models&#32;to&#32;preload.</emphasis>
+00184 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordtype">string</emphasis>[]&#32;renderModelNames;
+00185 
+00186 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;uint&#32;count&#32;=&#32;renderModels.<link linkend="_class_valve_1_1_v_r_1_1_c_v_r_render_models_1a568ad8302d430ae46af582059489a5dd">GetComponentCount</link>(newRenderModelName);
+00187 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(count&#32;&gt;&#32;0)
+00188 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00189 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;renderModelNames&#32;=&#32;<emphasis role="keyword">new</emphasis>&#32;<emphasis role="keywordtype">string</emphasis>[count];
+00190 
+00191 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">for</emphasis>&#32;(<emphasis role="keywordtype">int</emphasis>&#32;componentIndex&#32;=&#32;0;&#32;componentIndex&#32;&lt;&#32;count;&#32;componentIndex++)
+00192 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00193 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;uint&#32;capacity&#32;=&#32;renderModels.<link linkend="_class_valve_1_1_v_r_1_1_c_v_r_render_models_1aff8d40ef614d7ecfaadac708a7d4f04d">GetComponentName</link>(newRenderModelName,&#32;(uint)componentIndex,&#32;<emphasis role="keyword">null</emphasis>,&#32;0);
+00194 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(capacity&#32;==&#32;0)
+00195 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">continue</emphasis>;
+00196 
+00197 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;var&#32;componentNameStringBuilder&#32;=&#32;<emphasis role="keyword">new</emphasis>&#32;System.Text.StringBuilder((<emphasis role="keywordtype">int</emphasis>)capacity);
+00198 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(renderModels.<link linkend="_class_valve_1_1_v_r_1_1_c_v_r_render_models_1aff8d40ef614d7ecfaadac708a7d4f04d">GetComponentName</link>(newRenderModelName,&#32;(uint)componentIndex,&#32;componentNameStringBuilder,&#32;capacity)&#32;==&#32;0)
+00199 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">continue</emphasis>;
+00200 
+00201 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordtype">string</emphasis>&#32;componentName&#32;=&#32;componentNameStringBuilder.ToString();
+00202 
+00203 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;capacity&#32;=&#32;renderModels.<link linkend="_class_valve_1_1_v_r_1_1_c_v_r_render_models_1a1fb89266de3f332bc3c51b623943eb2d">GetComponentRenderModelName</link>(newRenderModelName,&#32;componentName,&#32;<emphasis role="keyword">null</emphasis>,&#32;0);
+00204 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(capacity&#32;==&#32;0)
+00205 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">continue</emphasis>;
+00206 
+00207 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;var&#32;nameStringBuilder&#32;=&#32;<emphasis role="keyword">new</emphasis>&#32;System.Text.StringBuilder((<emphasis role="keywordtype">int</emphasis>)capacity);
+00208 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(renderModels.<link linkend="_class_valve_1_1_v_r_1_1_c_v_r_render_models_1a1fb89266de3f332bc3c51b623943eb2d">GetComponentRenderModelName</link>(newRenderModelName,&#32;componentName,&#32;nameStringBuilder,&#32;capacity)&#32;==&#32;0)
+00209 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">continue</emphasis>;
+00210 
+00211 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;var&#32;s&#32;=&#32;nameStringBuilder.ToString();
+00212 
+00213 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;Only&#32;need&#32;to&#32;preload&#32;if&#32;not&#32;already&#32;cached.</emphasis>
+00214 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;RenderModel&#32;model&#32;=&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___render_model_1a637b914e124022351bbb1976775d9afb">models</link>[s]&#32;as&#32;RenderModel;
+00215 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(model&#32;==&#32;<emphasis role="keyword">null</emphasis>&#32;||&#32;model.mesh&#32;==&#32;<emphasis role="keyword">null</emphasis>)
+00216 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00217 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;renderModelNames[componentIndex]&#32;=&#32;s;
+00218 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00219 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00220 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00221 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">else</emphasis>
+00222 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00223 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;Only&#32;need&#32;to&#32;preload&#32;if&#32;not&#32;already&#32;cached.</emphasis>
+00224 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;RenderModel&#32;model&#32;=&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___render_model_1a637b914e124022351bbb1976775d9afb">models</link>[newRenderModelName]&#32;as&#32;RenderModel;
+00225 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(model&#32;==&#32;<emphasis role="keyword">null</emphasis>&#32;||&#32;model.mesh&#32;==&#32;<emphasis role="keyword">null</emphasis>)
+00226 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00227 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;renderModelNames&#32;=&#32;<emphasis role="keyword">new</emphasis>&#32;<emphasis role="keywordtype">string</emphasis>[]&#32;{&#32;newRenderModelName&#32;};
+00228 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00229 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">else</emphasis>
+00230 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00231 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;renderModelNames&#32;=&#32;<emphasis role="keyword">new</emphasis>&#32;<emphasis role="keywordtype">string</emphasis>[0];
+00232 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00233 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00234 
+00235 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;Keep&#32;trying&#32;every&#32;100ms&#32;until&#32;all&#32;components&#32;finish&#32;loading.</emphasis>
+00236 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">while</emphasis>&#32;(<emphasis role="keyword">true</emphasis>)
+00237 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00238 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;var&#32;loading&#32;=&#32;<emphasis role="keyword">false</emphasis>;
+00239 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">for</emphasis>&#32;(<emphasis role="keywordtype">int</emphasis>&#32;renderModelNameIndex&#32;=&#32;0;&#32;renderModelNameIndex&#32;&lt;&#32;renderModelNames.Length;&#32;renderModelNameIndex++)
+00240 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00241 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(<emphasis role="keywordtype">string</emphasis>.IsNullOrEmpty(renderModelNames[renderModelNameIndex]))
+00242 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">continue</emphasis>;
+00243 
+00244 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;var&#32;pRenderModel&#32;=&#32;System.IntPtr.Zero;
+00245 
+00246 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;var&#32;error&#32;=&#32;renderModels.<link linkend="_class_valve_1_1_v_r_1_1_c_v_r_render_models_1a6be099382011169eae6acb8d374ceae9">LoadRenderModel_Async</link>(renderModelNames[renderModelNameIndex],&#32;ref&#32;pRenderModel);
+00247 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//Debug.Log(&quot;&lt;b&gt;[SteamVR]&lt;/b&gt;&#32;renderModels.LoadRenderModel_Async(&quot;&#32;+&#32;renderModelNames[renderModelNameIndex]&#32;+&#32;&quot;:&#32;&quot;&#32;+&#32;error.ToString());</emphasis>
+00248 
+00249 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(error&#32;==&#32;<link linkend="_namespace_valve_1_1_v_r_1ac95dda09bbb588fd83a8ac0ba3c82266">EVRRenderModelError</link>.Loading)
+00250 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00251 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;loading&#32;=&#32;<emphasis role="keyword">true</emphasis>;
+00252 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00253 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">else</emphasis>&#32;<emphasis role="keywordflow">if</emphasis>&#32;(error&#32;==&#32;<link linkend="_namespace_valve_1_1_v_r_1ac95dda09bbb588fd83a8ac0ba3c82266">EVRRenderModelError</link>.None)
+00254 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00255 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;Preload&#32;textures&#32;as&#32;well.</emphasis>
+00256 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;var&#32;renderModel&#32;=&#32;MarshalRenderModel(pRenderModel);
+00257 
+00258 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;Check&#32;the&#32;cache&#32;first.</emphasis>
+00259 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;var&#32;material&#32;=&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___render_model_1a96489732de88e8abb28dbb430a729a87">materials</link>[renderModel.diffuseTextureId]&#32;as&#32;Material;
+00260 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(material&#32;==&#32;<emphasis role="keyword">null</emphasis>&#32;||&#32;material.mainTexture&#32;==&#32;<emphasis role="keyword">null</emphasis>)
+00261 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00262 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;var&#32;pDiffuseTexture&#32;=&#32;System.IntPtr.Zero;
+00263 
+00264 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;error&#32;=&#32;renderModels.<link linkend="_class_valve_1_1_v_r_1_1_c_v_r_render_models_1af399586b6d1e2baffab9c62e3f5e0a6f">LoadTexture_Async</link>(renderModel.diffuseTextureId,&#32;ref&#32;pDiffuseTexture);
+00265 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//Debug.Log(&quot;&lt;b&gt;[SteamVR]&lt;/b&gt;&#32;renderModels.LoadRenderModel_Async(&quot;&#32;+&#32;renderModelNames[renderModelNameIndex]&#32;+&#32;&quot;:&#32;&quot;&#32;+&#32;error.ToString());</emphasis>
+00266 
+00267 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(error&#32;==&#32;<link linkend="_namespace_valve_1_1_v_r_1ac95dda09bbb588fd83a8ac0ba3c82266">EVRRenderModelError</link>.Loading)
+00268 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00269 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;loading&#32;=&#32;<emphasis role="keyword">true</emphasis>;
+00270 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00271 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00272 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00273 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00274 
+00275 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(loading)
+00276 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00277 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;yield&#32;<emphasis role="keywordflow">return</emphasis>&#32;<emphasis role="keyword">new</emphasis>&#32;WaitForSecondsRealtime(0.1f);
+00278 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00279 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">else</emphasis>
+00280 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00281 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">break</emphasis>;
+00282 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00283 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00284 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00285 
+00286 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordtype">bool</emphasis>&#32;success&#32;=&#32;SetModel(newRenderModelName);
+00287 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;this.<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___render_model_1a0655bfb7f8ed5cfb849c2156737dab6a">renderModelName</link>&#32;=&#32;newRenderModelName;
+00288 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;SteamVR_Events.RenderModelLoaded.Send(<emphasis role="keyword">this</emphasis>,&#32;success);
+00289 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00290 
+00291 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;<emphasis role="keywordtype">bool</emphasis>&#32;SetModel(<emphasis role="keywordtype">string</emphasis>&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___render_model_1a0655bfb7f8ed5cfb849c2156737dab6a">renderModelName</link>)
+00292 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00293 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;StripMesh(gameObject);
+00294 
+00295 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">using</emphasis>&#32;(var&#32;holder&#32;=&#32;<emphasis role="keyword">new</emphasis>&#32;RenderModelInterfaceHolder())
+00296 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00297 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___render_model_1ad8097606e4229b87628de3bd9c1b1740">createComponents</link>)
+00298 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00299 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;componentAttachPoints.Clear();
+00300 
+00301 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(LoadComponents(holder,&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___render_model_1a0655bfb7f8ed5cfb849c2156737dab6a">renderModelName</link>))
+00302 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00303 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___render_model_1a4fec96fa73075ae8c809bfeaa6c95aab">UpdateComponents</link>(holder.instance);
+00304 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;<emphasis role="keyword">true</emphasis>;
+00305 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00306 
+00307 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;Debug.Log(<emphasis role="stringliteral">&quot;&lt;b&gt;[SteamVR]&lt;/b&gt;&#32;[&quot;</emphasis>&#32;+&#32;gameObject.name&#32;+&#32;<emphasis role="stringliteral">&quot;]&#32;Render&#32;model&#32;does&#32;not&#32;support&#32;components,&#32;falling&#32;back&#32;to&#32;single&#32;mesh.&quot;</emphasis>);
+00308 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00309 
+00310 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(!<emphasis role="keywordtype">string</emphasis>.IsNullOrEmpty(<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___render_model_1a0655bfb7f8ed5cfb849c2156737dab6a">renderModelName</link>))
+00311 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00312 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;var&#32;model&#32;=&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___render_model_1a637b914e124022351bbb1976775d9afb">models</link>[<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___render_model_1a0655bfb7f8ed5cfb849c2156737dab6a">renderModelName</link>]&#32;as&#32;RenderModel;
+00313 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(model&#32;==&#32;<emphasis role="keyword">null</emphasis>&#32;||&#32;model.mesh&#32;==&#32;<emphasis role="keyword">null</emphasis>)
+00314 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00315 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;var&#32;renderModels&#32;=&#32;holder.instance;
+00316 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(renderModels&#32;==&#32;<emphasis role="keyword">null</emphasis>)
+00317 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;<emphasis role="keyword">false</emphasis>;
+00318 
+00319 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___render_model_1a6e1361eb79e5e7d2907239b69d8c2747">verbose</link>)
+00320 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;Debug.Log(<emphasis role="stringliteral">&quot;&lt;b&gt;[SteamVR]&lt;/b&gt;&#32;Loading&#32;render&#32;model&#32;&quot;</emphasis>&#32;+&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___render_model_1a0655bfb7f8ed5cfb849c2156737dab6a">renderModelName</link>);
+00321 
+00322 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;model&#32;=&#32;LoadRenderModel(renderModels,&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___render_model_1a0655bfb7f8ed5cfb849c2156737dab6a">renderModelName</link>,&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___render_model_1a0655bfb7f8ed5cfb849c2156737dab6a">renderModelName</link>);
+00323 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(model&#32;==&#32;<emphasis role="keyword">null</emphasis>)
+00324 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;<emphasis role="keyword">false</emphasis>;
+00325 
+00326 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___render_model_1a637b914e124022351bbb1976775d9afb">models</link>[<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___render_model_1a0655bfb7f8ed5cfb849c2156737dab6a">renderModelName</link>]&#32;=&#32;model;
+00327 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00328 
+00329 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;gameObject.AddComponent&lt;MeshFilter&gt;().mesh&#32;=&#32;model.mesh;
+00330 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;MeshRenderer&#32;newRenderer&#32;=&#32;gameObject.AddComponent&lt;MeshRenderer&gt;();
+00331 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;newRenderer.sharedMaterial&#32;=&#32;model.material;
+00332 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;meshRenderers.Add(newRenderer);
+00333 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;<emphasis role="keyword">true</emphasis>;
+00334 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00335 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00336 
+00337 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;<emphasis role="keyword">false</emphasis>;
+00338 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00339 
+00340 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;RenderModel&#32;LoadRenderModel(<link linkend="_class_valve_1_1_v_r_1_1_c_v_r_render_models">CVRRenderModels</link>&#32;renderModels,&#32;<emphasis role="keywordtype">string</emphasis>&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___render_model_1a0655bfb7f8ed5cfb849c2156737dab6a">renderModelName</link>,&#32;<emphasis role="keywordtype">string</emphasis>&#32;baseName)
+00341 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00342 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;var&#32;pRenderModel&#32;=&#32;System.IntPtr.Zero;
+00343 
+00344 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_namespace_valve_1_1_v_r_1ac95dda09bbb588fd83a8ac0ba3c82266">EVRRenderModelError</link>&#32;error;
+00345 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">while</emphasis>&#32;(<emphasis role="keyword">true</emphasis>)
+00346 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00347 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;error&#32;=&#32;renderModels.<link linkend="_class_valve_1_1_v_r_1_1_c_v_r_render_models_1a6be099382011169eae6acb8d374ceae9">LoadRenderModel_Async</link>(<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___render_model_1a0655bfb7f8ed5cfb849c2156737dab6a">renderModelName</link>,&#32;ref&#32;pRenderModel);
+00348 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(error&#32;!=&#32;<link linkend="_namespace_valve_1_1_v_r_1ac95dda09bbb588fd83a8ac0ba3c82266">EVRRenderModelError</link>.Loading)
+00349 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">break</emphasis>;
+00350 
+00351 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;Sleep();
+00352 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00353 
+00354 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(error&#32;!=&#32;<link linkend="_namespace_valve_1_1_v_r_1ac95dda09bbb588fd83a8ac0ba3c82266">EVRRenderModelError</link>.None)
+00355 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00356 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;Debug.LogError(<emphasis role="keywordtype">string</emphasis>.Format(<emphasis role="stringliteral">&quot;&lt;b&gt;[SteamVR]&lt;/b&gt;&#32;Failed&#32;to&#32;load&#32;render&#32;model&#32;{0}&#32;-&#32;{1}&quot;</emphasis>,&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___render_model_1a0655bfb7f8ed5cfb849c2156737dab6a">renderModelName</link>,&#32;error.ToString()));
+00357 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;<emphasis role="keyword">null</emphasis>;
+00358 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00359 
+00360 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;var&#32;renderModel&#32;=&#32;MarshalRenderModel(pRenderModel);
+00361 
+00362 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;var&#32;vertices&#32;=&#32;<emphasis role="keyword">new</emphasis>&#32;Vector3[renderModel.unVertexCount];
+00363 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;var&#32;normals&#32;=&#32;<emphasis role="keyword">new</emphasis>&#32;Vector3[renderModel.unVertexCount];
+00364 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;var&#32;uv&#32;=&#32;<emphasis role="keyword">new</emphasis>&#32;Vector2[renderModel.unVertexCount];
+00365 
+00366 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;var&#32;type&#32;=&#32;typeof(<link linkend="_struct_valve_1_1_v_r_1_1_render_model___vertex__t">RenderModel_Vertex_t</link>);
+00367 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">for</emphasis>&#32;(<emphasis role="keywordtype">int</emphasis>&#32;iVert&#32;=&#32;0;&#32;iVert&#32;&lt;&#32;renderModel.unVertexCount;&#32;iVert++)
+00368 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00369 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;var&#32;ptr&#32;=&#32;<emphasis role="keyword">new</emphasis>&#32;System.IntPtr(renderModel.rVertexData.ToInt64()&#32;+&#32;iVert&#32;*&#32;Marshal.SizeOf(type));
+00370 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;var&#32;vert&#32;=&#32;(<link linkend="_struct_valve_1_1_v_r_1_1_render_model___vertex__t">RenderModel_Vertex_t</link>)Marshal.PtrToStructure(ptr,&#32;type);
+00371 
+00372 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;vertices[iVert]&#32;=&#32;<emphasis role="keyword">new</emphasis>&#32;Vector3(vert.vPosition.v0,&#32;vert.vPosition.v1,&#32;-vert.vPosition.v2);
+00373 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;normals[iVert]&#32;=&#32;<emphasis role="keyword">new</emphasis>&#32;Vector3(vert.vNormal.v0,&#32;vert.vNormal.v1,&#32;-vert.vNormal.v2);
+00374 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;uv[iVert]&#32;=&#32;<emphasis role="keyword">new</emphasis>&#32;Vector2(vert.rfTextureCoord0,&#32;vert.rfTextureCoord1);
+00375 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00376 
+00377 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordtype">int</emphasis>&#32;indexCount&#32;=&#32;(int)renderModel.unTriangleCount&#32;*&#32;3;
+00378 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;var&#32;indices&#32;=&#32;<emphasis role="keyword">new</emphasis>&#32;<emphasis role="keywordtype">short</emphasis>[indexCount];
+00379 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;Marshal.Copy(renderModel.rIndexData,&#32;indices,&#32;0,&#32;indices.Length);
+00380 
+00381 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;var&#32;triangles&#32;=&#32;<emphasis role="keyword">new</emphasis>&#32;<emphasis role="keywordtype">int</emphasis>[indexCount];
+00382 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">for</emphasis>&#32;(<emphasis role="keywordtype">int</emphasis>&#32;iTri&#32;=&#32;0;&#32;iTri&#32;&lt;&#32;renderModel.unTriangleCount;&#32;iTri++)
+00383 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00384 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;triangles[iTri&#32;*&#32;3&#32;+&#32;0]&#32;=&#32;(int)indices[iTri&#32;*&#32;3&#32;+&#32;2];
+00385 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;triangles[iTri&#32;*&#32;3&#32;+&#32;1]&#32;=&#32;(int)indices[iTri&#32;*&#32;3&#32;+&#32;1];
+00386 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;triangles[iTri&#32;*&#32;3&#32;+&#32;2]&#32;=&#32;(int)indices[iTri&#32;*&#32;3&#32;+&#32;0];
+00387 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00388 
+00389 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;var&#32;mesh&#32;=&#32;<emphasis role="keyword">new</emphasis>&#32;Mesh();
+00390 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;mesh.vertices&#32;=&#32;vertices;
+00391 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;mesh.normals&#32;=&#32;normals;
+00392 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;mesh.uv&#32;=&#32;uv;
+00393 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;mesh.triangles&#32;=&#32;triangles;
+00394 
+00395 <emphasis role="preprocessor">#if&#32;(UNITY_5_4&#32;||&#32;UNITY_5_3&#32;||&#32;UNITY_5_2&#32;||&#32;UNITY_5_1&#32;||&#32;UNITY_5_0)</emphasis>
+00396 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;mesh.Optimize();
+00397 <emphasis role="preprocessor">#endif</emphasis>
+00398 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//mesh.hideFlags&#32;=&#32;HideFlags.DontUnloadUnusedAsset;</emphasis>
+00399 
+00400 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;Check&#32;cache&#32;before&#32;loading&#32;texture.</emphasis>
+00401 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;var&#32;material&#32;=&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___render_model_1a96489732de88e8abb28dbb430a729a87">materials</link>[renderModel.diffuseTextureId]&#32;as&#32;Material;
+00402 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(material&#32;==&#32;<emphasis role="keyword">null</emphasis>&#32;||&#32;material.mainTexture&#32;==&#32;<emphasis role="keyword">null</emphasis>)
+00403 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00404 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;var&#32;pDiffuseTexture&#32;=&#32;System.IntPtr.Zero;
+00405 
+00406 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">while</emphasis>&#32;(<emphasis role="keyword">true</emphasis>)
+00407 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00408 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;error&#32;=&#32;renderModels.<link linkend="_class_valve_1_1_v_r_1_1_c_v_r_render_models_1af399586b6d1e2baffab9c62e3f5e0a6f">LoadTexture_Async</link>(renderModel.diffuseTextureId,&#32;ref&#32;pDiffuseTexture);
+00409 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(error&#32;!=&#32;<link linkend="_namespace_valve_1_1_v_r_1ac95dda09bbb588fd83a8ac0ba3c82266">EVRRenderModelError</link>.Loading)
+00410 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">break</emphasis>;
+00411 
+00412 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;Sleep();
+00413 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00414 
+00415 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(error&#32;==&#32;<link linkend="_namespace_valve_1_1_v_r_1ac95dda09bbb588fd83a8ac0ba3c82266">EVRRenderModelError</link>.None)
+00416 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00417 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;var&#32;diffuseTexture&#32;=&#32;MarshalRenderModel_TextureMap(pDiffuseTexture);
+00418 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;var&#32;texture&#32;=&#32;<emphasis role="keyword">new</emphasis>&#32;Texture2D(diffuseTexture.unWidth,&#32;diffuseTexture.unHeight,&#32;TextureFormat.RGBA32,&#32;<emphasis role="keyword">false</emphasis>);
+00419 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(SystemInfo.graphicsDeviceType&#32;==&#32;<link linkend="_namespace_unity_engine">UnityEngine</link>.Rendering.GraphicsDeviceType.Direct3D11)
+00420 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00421 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;texture.Apply();
+00422 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;System.IntPtr&#32;texturePointer&#32;=&#32;texture.GetNativeTexturePtr();
+00423 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">while</emphasis>&#32;(<emphasis role="keyword">true</emphasis>)
+00424 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00425 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;error&#32;=&#32;renderModels.<link linkend="_class_valve_1_1_v_r_1_1_c_v_r_render_models_1ac30a0d95adaa26064a9e52ca97241bdc">LoadIntoTextureD3D11_Async</link>(renderModel.diffuseTextureId,&#32;texturePointer);
+00426 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(error&#32;!=&#32;<link linkend="_namespace_valve_1_1_v_r_1ac95dda09bbb588fd83a8ac0ba3c82266">EVRRenderModelError</link>.Loading)
+00427 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">break</emphasis>;
+00428 
+00429 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;Sleep();
+00430 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00431 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00432 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">else</emphasis>
+00433 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00434 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;var&#32;textureMapData&#32;=&#32;<emphasis role="keyword">new</emphasis>&#32;<emphasis role="keywordtype">byte</emphasis>[diffuseTexture.unWidth&#32;*&#32;diffuseTexture.unHeight&#32;*&#32;4];&#32;<emphasis role="comment">//&#32;RGBA</emphasis>
+00435 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;Marshal.Copy(diffuseTexture.rubTextureMapData,&#32;textureMapData,&#32;0,&#32;textureMapData.Length);
+00436 
+00437 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;var&#32;colors&#32;=&#32;<emphasis role="keyword">new</emphasis>&#32;Color32[diffuseTexture.unWidth&#32;*&#32;diffuseTexture.unHeight];
+00438 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordtype">int</emphasis>&#32;iColor&#32;=&#32;0;
+00439 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">for</emphasis>&#32;(<emphasis role="keywordtype">int</emphasis>&#32;iHeight&#32;=&#32;0;&#32;iHeight&#32;&lt;&#32;diffuseTexture.unHeight;&#32;iHeight++)
+00440 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00441 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">for</emphasis>&#32;(<emphasis role="keywordtype">int</emphasis>&#32;iWidth&#32;=&#32;0;&#32;iWidth&#32;&lt;&#32;diffuseTexture.unWidth;&#32;iWidth++)
+00442 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00443 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;var&#32;r&#32;=&#32;textureMapData[iColor++];
+00444 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;var&#32;g&#32;=&#32;textureMapData[iColor++];
+00445 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;var&#32;b&#32;=&#32;textureMapData[iColor++];
+00446 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;var&#32;a&#32;=&#32;textureMapData[iColor++];
+00447 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;colors[iHeight&#32;*&#32;diffuseTexture.unWidth&#32;+&#32;iWidth]&#32;=&#32;<emphasis role="keyword">new</emphasis>&#32;Color32(r,&#32;g,&#32;b,&#32;a);
+00448 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00449 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00450 
+00451 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;texture.SetPixels32(colors);
+00452 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;texture.Apply();
+00453 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00454 
+00455 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;material&#32;=&#32;<emphasis role="keyword">new</emphasis>&#32;Material(<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___render_model_1a295413d096843e816feec34051948d5d">shader</link>&#32;!=&#32;<emphasis role="keyword">null</emphasis>&#32;?&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___render_model_1a295413d096843e816feec34051948d5d">shader</link>&#32;:&#32;Shader.Find(<emphasis role="stringliteral">&quot;Standard&quot;</emphasis>));
+00456 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;material.mainTexture&#32;=&#32;texture;
+00457 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//material.hideFlags&#32;=&#32;HideFlags.DontUnloadUnusedAsset;</emphasis>
+00458 
+00459 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___render_model_1a96489732de88e8abb28dbb430a729a87">materials</link>[renderModel.diffuseTextureId]&#32;=&#32;material;
+00460 
+00461 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;renderModels.<link linkend="_class_valve_1_1_v_r_1_1_c_v_r_render_models_1ae2431db2c9cb3de9c208315c71b974e0">FreeTexture</link>(pDiffuseTexture);
+00462 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00463 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">else</emphasis>
+00464 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00465 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;Debug.Log(<emphasis role="stringliteral">&quot;&lt;b&gt;[SteamVR]&lt;/b&gt;&#32;Failed&#32;to&#32;load&#32;render&#32;model&#32;texture&#32;for&#32;render&#32;model&#32;&quot;</emphasis>&#32;+&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___render_model_1a0655bfb7f8ed5cfb849c2156737dab6a">renderModelName</link>&#32;+&#32;<emphasis role="stringliteral">&quot;.&#32;Error:&#32;&quot;</emphasis>&#32;+&#32;error.ToString());
+00466 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00467 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00468 
+00469 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;Delay&#32;freeing&#32;when&#32;we&#32;can&#32;since&#32;we&apos;ll&#32;often&#32;get&#32;multiple&#32;requests&#32;for&#32;the&#32;same&#32;model&#32;right</emphasis>
+00470 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;after&#32;another&#32;(e.g.&#32;two&#32;controllers&#32;or&#32;two&#32;basestations).</emphasis>
+00471 <emphasis role="preprocessor">#if&#32;UNITY_EDITOR</emphasis>
+00472 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(!<link linkend="_namespace_valve_1_1_v_r_1aecd07a81fe79a9f96c6787513e2d98e4ae498749f3c42246d50b15c81c101d988">Application</link>.isPlaying)
+00473 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;renderModels.<link linkend="_class_valve_1_1_v_r_1_1_c_v_r_render_models_1ad36fe11f2fe3aeac575a5e48daaa12e1">FreeRenderModel</link>(pRenderModel);
+00474 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">else</emphasis>
+00475 <emphasis role="preprocessor">#endif</emphasis>
+00476 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;StartCoroutine(FreeRenderModel(pRenderModel));
+00477 
+00478 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;<emphasis role="keyword">new</emphasis>&#32;RenderModel(mesh,&#32;material);
+00479 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00480 
+00481 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;IEnumerator&#32;FreeRenderModel(System.IntPtr&#32;pRenderModel)
+00482 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00483 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;yield&#32;<emphasis role="keywordflow">return</emphasis>&#32;<emphasis role="keyword">new</emphasis>&#32;WaitForSeconds(1.0f);
+00484 
+00485 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">using</emphasis>&#32;(var&#32;holder&#32;=&#32;<emphasis role="keyword">new</emphasis>&#32;RenderModelInterfaceHolder())
+00486 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00487 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;var&#32;renderModels&#32;=&#32;holder.instance;
+00488 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;renderModels.<link linkend="_class_valve_1_1_v_r_1_1_c_v_r_render_models_1ad36fe11f2fe3aeac575a5e48daaa12e1">FreeRenderModel</link>(pRenderModel);
+00489 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00490 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00491 
+<anchor xml:id="__steam_v_r___render_model_8cs_source_1l00492"/><link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___render_model_1a5d384d5496846ec32181563e7d5ff7ce">00492</link> &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;Transform&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___render_model_1a5d384d5496846ec32181563e7d5ff7ce">FindTransformByName</link>(<emphasis role="keywordtype">string</emphasis>&#32;componentName,&#32;Transform&#32;inTransform&#32;=&#32;<emphasis role="keyword">null</emphasis>)
+00493 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00494 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(inTransform&#32;==&#32;<emphasis role="keyword">null</emphasis>)
+00495 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;inTransform&#32;=&#32;this.transform;
+00496 
+00497 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">for</emphasis>&#32;(<emphasis role="keywordtype">int</emphasis>&#32;childIndex&#32;=&#32;0;&#32;childIndex&#32;&lt;&#32;inTransform.childCount;&#32;childIndex++)
+00498 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00499 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;Transform&#32;child&#32;=&#32;inTransform.GetChild(childIndex);
+00500 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(child.name&#32;==&#32;componentName)
+00501 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;child;
+00502 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00503 
+00504 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;<emphasis role="keyword">null</emphasis>;
+00505 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00506 
+<anchor xml:id="__steam_v_r___render_model_8cs_source_1l00507"/><link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___render_model_1ae233582d690bd1989ecdc19a064d5ff5">00507</link> &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;Transform&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___render_model_1ae233582d690bd1989ecdc19a064d5ff5">GetComponentTransform</link>(<emphasis role="keywordtype">string</emphasis>&#32;componentName)
+00508 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00509 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(componentName&#32;==&#32;<emphasis role="keyword">null</emphasis>)
+00510 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;this.transform;
+00511 
+00512 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(componentAttachPoints.ContainsKey(componentName))
+00513 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;componentAttachPoints[componentName];
+00514 
+00515 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;<emphasis role="keyword">null</emphasis>;
+00516 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00517 
+00518 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;StripMesh(GameObject&#32;go)
+00519 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00520 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;var&#32;meshRenderer&#32;=&#32;go.GetComponent&lt;MeshRenderer&gt;();
+00521 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(meshRenderer&#32;!=&#32;<emphasis role="keyword">null</emphasis>)
+00522 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;DestroyImmediate(meshRenderer);
+00523 
+00524 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;var&#32;meshFilter&#32;=&#32;go.GetComponent&lt;MeshFilter&gt;();
+00525 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(meshFilter&#32;!=&#32;<emphasis role="keyword">null</emphasis>)
+00526 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;DestroyImmediate(meshFilter);
+00527 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00528 
+00529 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;<emphasis role="keywordtype">bool</emphasis>&#32;LoadComponents(RenderModelInterfaceHolder&#32;holder,&#32;<emphasis role="keywordtype">string</emphasis>&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___render_model_1a0655bfb7f8ed5cfb849c2156737dab6a">renderModelName</link>)
+00530 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00531 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;Disable&#32;existing&#32;components&#32;(we&#32;will&#32;re-enable&#32;them&#32;if&#32;referenced&#32;by&#32;this&#32;new&#32;model).</emphasis>
+00532 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;Also&#32;strip&#32;mesh&#32;filter&#32;and&#32;renderer&#32;since&#32;these&#32;will&#32;get&#32;re-added&#32;if&#32;the&#32;new&#32;component&#32;needs&#32;them.</emphasis>
+00533 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;var&#32;t&#32;=&#32;transform;
+00534 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">for</emphasis>&#32;(<emphasis role="keywordtype">int</emphasis>&#32;childIndex&#32;=&#32;0;&#32;childIndex&#32;&lt;&#32;t.childCount;&#32;childIndex++)
+00535 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00536 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;var&#32;child&#32;=&#32;t.GetChild(childIndex);
+00537 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;child.gameObject.SetActive(<emphasis role="keyword">false</emphasis>);
+00538 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;StripMesh(child.gameObject);
+00539 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00540 
+00541 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;If&#32;no&#32;model&#32;specified,&#32;we&apos;re&#32;done;&#32;return&#32;success.</emphasis>
+00542 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(<emphasis role="keywordtype">string</emphasis>.IsNullOrEmpty(<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___render_model_1a0655bfb7f8ed5cfb849c2156737dab6a">renderModelName</link>))
+00543 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;<emphasis role="keyword">true</emphasis>;
+00544 
+00545 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;var&#32;renderModels&#32;=&#32;holder.instance;
+00546 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(renderModels&#32;==&#32;<emphasis role="keyword">null</emphasis>)
+00547 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;<emphasis role="keyword">false</emphasis>;
+00548 
+00549 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;var&#32;count&#32;=&#32;renderModels.<link linkend="_class_valve_1_1_v_r_1_1_c_v_r_render_models_1a568ad8302d430ae46af582059489a5dd">GetComponentCount</link>(<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___render_model_1a0655bfb7f8ed5cfb849c2156737dab6a">renderModelName</link>);
+00550 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(count&#32;==&#32;0)
+00551 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;<emphasis role="keyword">false</emphasis>;
+00552 
+00553 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">for</emphasis>&#32;(<emphasis role="keywordtype">int</emphasis>&#32;i&#32;=&#32;0;&#32;i&#32;&lt;&#32;count;&#32;i++)
+00554 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00555 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;var&#32;capacity&#32;=&#32;renderModels.GetComponentName(<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___render_model_1a0655bfb7f8ed5cfb849c2156737dab6a">renderModelName</link>,&#32;(uint)i,&#32;<emphasis role="keyword">null</emphasis>,&#32;0);
+00556 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(capacity&#32;==&#32;0)
+00557 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">continue</emphasis>;
+00558 
+00559 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;System.Text.StringBuilder&#32;componentNameStringBuilder&#32;=&#32;<emphasis role="keyword">new</emphasis>&#32;System.Text.StringBuilder((<emphasis role="keywordtype">int</emphasis>)capacity);
+00560 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(renderModels.GetComponentName(<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___render_model_1a0655bfb7f8ed5cfb849c2156737dab6a">renderModelName</link>,&#32;(uint)i,&#32;componentNameStringBuilder,&#32;capacity)&#32;==&#32;0)
+00561 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">continue</emphasis>;
+00562 
+00563 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordtype">string</emphasis>&#32;componentName&#32;=&#32;componentNameStringBuilder.ToString();
+00564 
+00565 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;Create&#32;(or&#32;reuse)&#32;a&#32;child&#32;object&#32;for&#32;this&#32;component&#32;(some&#32;components&#32;are&#32;dynamic&#32;and&#32;don&apos;t&#32;have&#32;meshes).</emphasis>
+00566 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;t&#32;=&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___render_model_1a5d384d5496846ec32181563e7d5ff7ce">FindTransformByName</link>(componentName);
+00567 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(t&#32;!=&#32;<emphasis role="keyword">null</emphasis>)
+00568 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00569 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;t.gameObject.SetActive(<emphasis role="keyword">true</emphasis>);
+00570 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;componentAttachPoints[componentName]&#32;=&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___render_model_1a5d384d5496846ec32181563e7d5ff7ce">FindTransformByName</link>(<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___render_model_1a1dc259cc2c45275417739bf0f9fd75f9">k_localTransformName</link>,&#32;t);
+00571 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00572 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">else</emphasis>
+00573 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00574 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;t&#32;=&#32;<emphasis role="keyword">new</emphasis>&#32;GameObject(componentName).transform;
+00575 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;t.parent&#32;=&#32;transform;
+00576 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;t.gameObject.layer&#32;=&#32;gameObject.layer;
+00577 
+00578 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;Also&#32;create&#32;a&#32;child&#32;&apos;attach&apos;&#32;object&#32;for&#32;attaching&#32;things.</emphasis>
+00579 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;var&#32;attach&#32;=&#32;<emphasis role="keyword">new</emphasis>&#32;GameObject(<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___render_model_1a1dc259cc2c45275417739bf0f9fd75f9">k_localTransformName</link>).transform;
+00580 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;attach.parent&#32;=&#32;t;
+00581 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;attach.localPosition&#32;=&#32;Vector3.zero;
+00582 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;attach.localRotation&#32;=&#32;Quaternion.identity;
+00583 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;attach.localScale&#32;=&#32;Vector3.one;
+00584 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;attach.gameObject.layer&#32;=&#32;gameObject.layer;
+00585 
+00586 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;componentAttachPoints[componentName]&#32;=&#32;attach;
+00587 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00588 
+00589 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;Reset&#32;transform.</emphasis>
+00590 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;t.localPosition&#32;=&#32;Vector3.zero;
+00591 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;t.localRotation&#32;=&#32;Quaternion.identity;
+00592 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;t.localScale&#32;=&#32;Vector3.one;
+00593 
+00594 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;capacity&#32;=&#32;renderModels.GetComponentRenderModelName(<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___render_model_1a0655bfb7f8ed5cfb849c2156737dab6a">renderModelName</link>,&#32;componentName,&#32;<emphasis role="keyword">null</emphasis>,&#32;0);
+00595 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(capacity&#32;==&#32;0)
+00596 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">continue</emphasis>;
+00597 
+00598 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;var&#32;componentRenderModelNameStringBuilder&#32;=&#32;<emphasis role="keyword">new</emphasis>&#32;System.Text.StringBuilder((<emphasis role="keywordtype">int</emphasis>)capacity);
+00599 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(renderModels.GetComponentRenderModelName(<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___render_model_1a0655bfb7f8ed5cfb849c2156737dab6a">renderModelName</link>,&#32;componentName,&#32;componentRenderModelNameStringBuilder,&#32;capacity)&#32;==&#32;0)
+00600 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">continue</emphasis>;
+00601 
+00602 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordtype">string</emphasis>&#32;componentRenderModelName&#32;=&#32;componentRenderModelNameStringBuilder.ToString();
+00603 
+00604 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;Check&#32;the&#32;cache&#32;or&#32;load&#32;into&#32;memory.</emphasis>
+00605 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;var&#32;model&#32;=&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___render_model_1a637b914e124022351bbb1976775d9afb">models</link>[componentRenderModelName]&#32;as&#32;RenderModel;
+00606 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(model&#32;==&#32;<emphasis role="keyword">null</emphasis>&#32;||&#32;model.mesh&#32;==&#32;<emphasis role="keyword">null</emphasis>)
+00607 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00608 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___render_model_1a6e1361eb79e5e7d2907239b69d8c2747">verbose</link>)
+00609 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;Debug.Log(<emphasis role="stringliteral">&quot;&lt;b&gt;[SteamVR]&lt;/b&gt;&#32;Loading&#32;render&#32;model&#32;&quot;</emphasis>&#32;+&#32;componentRenderModelName);
+00610 
+00611 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;model&#32;=&#32;LoadRenderModel(renderModels,&#32;componentRenderModelName,&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___render_model_1a0655bfb7f8ed5cfb849c2156737dab6a">renderModelName</link>);
+00612 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(model&#32;==&#32;<emphasis role="keyword">null</emphasis>)
+00613 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">continue</emphasis>;
+00614 
+00615 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___render_model_1a637b914e124022351bbb1976775d9afb">models</link>[componentRenderModelName]&#32;=&#32;model;
+00616 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00617 
+00618 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;t.gameObject.AddComponent&lt;MeshFilter&gt;().mesh&#32;=&#32;model.mesh;
+00619 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;MeshRenderer&#32;newRenderer&#32;=&#32;t.gameObject.AddComponent&lt;MeshRenderer&gt;();
+00620 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;newRenderer.sharedMaterial&#32;=&#32;model.material;
+00621 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;meshRenderers.Add(newRenderer);
+00622 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00623 
+00624 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;<emphasis role="keyword">true</emphasis>;
+00625 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00626 
+00627 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;SteamVR_Events.Action&#32;deviceConnectedAction,&#32;hideRenderModelsAction,&#32;modelSkinSettingsHaveChangedAction;
+00628 
+00629 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___render_model">SteamVR_RenderModel</link>()
+00630 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00631 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;deviceConnectedAction&#32;=&#32;SteamVR_Events.DeviceConnectedAction(OnDeviceConnected);
+00632 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;hideRenderModelsAction&#32;=&#32;SteamVR_Events.HideRenderModelsAction(OnHideRenderModels);
+00633 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;modelSkinSettingsHaveChangedAction&#32;=&#32;SteamVR_Events.SystemAction(<link linkend="_namespace_valve_1_1_v_r_1afe3398b9e5cb1ea06335142d1b9289f3">EVREventType</link>.VREvent_ModelSkinSettingsHaveChanged,&#32;OnModelSkinSettingsHaveChanged);
+00634 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00635 
+00636 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordtype">void</emphasis>&#32;OnEnable()
+00637 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00638 <emphasis role="preprocessor">#if&#32;UNITY_EDITOR</emphasis>
+00639 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(!<link linkend="_namespace_valve_1_1_v_r_1aecd07a81fe79a9f96c6787513e2d98e4ae498749f3c42246d50b15c81c101d988">Application</link>.isPlaying)
+00640 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>;
+00641 <emphasis role="preprocessor">#endif</emphasis>
+00642 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(!<emphasis role="keywordtype">string</emphasis>.IsNullOrEmpty(<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___render_model_1a2980ac7d5745563e149a6622daac0578">modelOverride</link>))
+00643 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00644 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;Debug.Log(<emphasis role="stringliteral">&quot;&lt;b&gt;[SteamVR]&lt;/b&gt;&#32;&quot;</emphasis>&#32;+&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___render_model_1ab459a749b89d3f4f12339ef618177344">modelOverrideWarning</link>);
+00645 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;enabled&#32;=&#32;<emphasis role="keyword">false</emphasis>;
+00646 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>;
+00647 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00648 
+00649 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;var&#32;system&#32;=&#32;<link linkend="_class_valve_1_1_v_r_1_1_open_v_r">OpenVR</link>.<link linkend="_class_valve_1_1_v_r_1_1_open_v_r_1a6aafa4a25425620225098ded82a045c0">System</link>;
+00650 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(system&#32;!=&#32;<emphasis role="keyword">null</emphasis>&#32;&amp;&amp;&#32;system.IsTrackedDeviceConnected((uint)<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___render_model_1af732541e751210a72fd7ea793566d940">index</link>))
+00651 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00652 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___render_model_1a59d9e165c3b79e6d820cd08c4c33a6c3">UpdateModel</link>();
+00653 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00654 
+00655 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;deviceConnectedAction.enabled&#32;=&#32;<emphasis role="keyword">true</emphasis>;
+00656 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;hideRenderModelsAction.enabled&#32;=&#32;<emphasis role="keyword">true</emphasis>;
+00657 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;modelSkinSettingsHaveChangedAction.enabled&#32;=&#32;<emphasis role="keyword">true</emphasis>;
+00658 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00659 
+00660 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordtype">void</emphasis>&#32;OnDisable()
+00661 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00662 <emphasis role="preprocessor">#if&#32;UNITY_EDITOR</emphasis>
+00663 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(!<link linkend="_namespace_valve_1_1_v_r_1aecd07a81fe79a9f96c6787513e2d98e4ae498749f3c42246d50b15c81c101d988">Application</link>.isPlaying)
+00664 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>;
+00665 <emphasis role="preprocessor">#endif</emphasis>
+00666 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;deviceConnectedAction.enabled&#32;=&#32;<emphasis role="keyword">false</emphasis>;
+00667 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;hideRenderModelsAction.enabled&#32;=&#32;<emphasis role="keyword">false</emphasis>;
+00668 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;modelSkinSettingsHaveChangedAction.enabled&#32;=&#32;<emphasis role="keyword">false</emphasis>;
+00669 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00670 
+00671 <emphasis role="preprocessor">#if&#32;UNITY_EDITOR</emphasis>
+00672 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;Hashtable&#32;values;
+00673 <emphasis role="preprocessor">#endif</emphasis>
+00674 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordtype">void</emphasis>&#32;Update()
+00675 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00676 <emphasis role="preprocessor">#if&#32;UNITY_EDITOR</emphasis>
+00677 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(!<link linkend="_namespace_valve_1_1_v_r_1aecd07a81fe79a9f96c6787513e2d98e4ae498749f3c42246d50b15c81c101d988">Application</link>.isPlaying)
+00678 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00679 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;See&#32;if&#32;anything&#32;has&#32;changed&#32;since&#32;this&#32;gets&#32;called&#32;whenever&#32;anything&#32;gets&#32;touched.</emphasis>
+00680 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;var&#32;fields&#32;=&#32;GetType().GetFields(System.Reflection.BindingFlags.Instance&#32;|&#32;System.Reflection.BindingFlags.Public);
+00681 
+00682 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordtype">bool</emphasis>&#32;modified&#32;=&#32;<emphasis role="keyword">false</emphasis>;
+00683 
+00684 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(values&#32;==&#32;<emphasis role="keyword">null</emphasis>)
+00685 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00686 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;modified&#32;=&#32;<emphasis role="keyword">true</emphasis>;
+00687 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00688 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">else</emphasis>
+00689 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00690 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">foreach</emphasis>&#32;(var&#32;f&#32;<emphasis role="keywordflow">in</emphasis>&#32;fields)
+00691 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00692 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(!values.Contains(f))
+00693 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00694 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;modified&#32;=&#32;<emphasis role="keyword">true</emphasis>;
+00695 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">break</emphasis>;
+00696 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00697 
+00698 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;var&#32;v0&#32;=&#32;values[f];
+00699 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;var&#32;v1&#32;=&#32;f.GetValue(<emphasis role="keyword">this</emphasis>);
+00700 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(v1&#32;!=&#32;<emphasis role="keyword">null</emphasis>)
+00701 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00702 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(!v1.Equals(v0))
+00703 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00704 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;modified&#32;=&#32;<emphasis role="keyword">true</emphasis>;
+00705 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">break</emphasis>;
+00706 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00707 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00708 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">else</emphasis>&#32;<emphasis role="keywordflow">if</emphasis>&#32;(v0&#32;!=&#32;<emphasis role="keyword">null</emphasis>)
+00709 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00710 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;modified&#32;=&#32;<emphasis role="keyword">true</emphasis>;
+00711 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">break</emphasis>;
+00712 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00713 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00714 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00715 
+00716 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(modified)
+00717 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00718 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___render_model_1a0655bfb7f8ed5cfb849c2156737dab6a">renderModelName</link>&#32;!=&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___render_model_1a2980ac7d5745563e149a6622daac0578">modelOverride</link>)
+00719 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00720 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___render_model_1a0655bfb7f8ed5cfb849c2156737dab6a">renderModelName</link>&#32;=&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___render_model_1a2980ac7d5745563e149a6622daac0578">modelOverride</link>;
+00721 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;SetModel(<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___render_model_1a2980ac7d5745563e149a6622daac0578">modelOverride</link>);
+00722 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00723 
+00724 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;values&#32;=&#32;<emphasis role="keyword">new</emphasis>&#32;Hashtable();
+00725 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">foreach</emphasis>&#32;(var&#32;f&#32;<emphasis role="keywordflow">in</emphasis>&#32;fields)
+00726 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;values[f]&#32;=&#32;f.GetValue(<emphasis role="keyword">this</emphasis>);
+00727 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00728 
+00729 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>;&#32;<emphasis role="comment">//&#32;Do&#32;not&#32;update&#32;transforms&#32;(below)&#32;when&#32;not&#32;playing&#32;in&#32;Editor&#32;(to&#32;avoid&#32;keeping&#32;OpenVR&#32;running&#32;all&#32;the&#32;time).</emphasis>
+00730 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00731 <emphasis role="preprocessor">#endif</emphasis>
+00732 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;Update&#32;component&#32;transforms&#32;dynamically.</emphasis>
+00733 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___render_model_1a31f89a1d33b360df1c448395f42fd0ad">updateDynamically</link>)
+00734 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___render_model_1a4fec96fa73075ae8c809bfeaa6c95aab">UpdateComponents</link>(<link linkend="_class_valve_1_1_v_r_1_1_open_v_r">OpenVR</link>.<link linkend="_class_valve_1_1_v_r_1_1_open_v_r_1a8edbc1c20720ae5911e5e6c29221b9b5">RenderModels</link>);
+00735 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00736 
+00737 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;Dictionary&lt;int,&#32;string&gt;&#32;nameCache;
+00738 
+<anchor xml:id="__steam_v_r___render_model_8cs_source_1l00739"/><link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___render_model_1a4fec96fa73075ae8c809bfeaa6c95aab">00739</link> &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___render_model_1a4fec96fa73075ae8c809bfeaa6c95aab">UpdateComponents</link>(<link linkend="_class_valve_1_1_v_r_1_1_c_v_r_render_models">CVRRenderModels</link>&#32;renderModels)
+00740 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00741 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(renderModels&#32;==&#32;<emphasis role="keyword">null</emphasis>)
+00742 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>;
+00743 
+00744 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(transform.childCount&#32;==&#32;0)
+00745 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>;
+00746 
+00747 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(nameCache&#32;==&#32;<emphasis role="keyword">null</emphasis>)
+00748 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;nameCache&#32;=&#32;<emphasis role="keyword">new</emphasis>&#32;Dictionary&lt;int,&#32;string&gt;();
+00749 
+00750 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">for</emphasis>&#32;(<emphasis role="keywordtype">int</emphasis>&#32;childIndex&#32;=&#32;0;&#32;childIndex&#32;&lt;&#32;transform.childCount;&#32;childIndex++)
+00751 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00752 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;Transform&#32;child&#32;=&#32;transform.GetChild(childIndex);
+00753 
+00754 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;Cache&#32;names&#32;since&#32;accessing&#32;an&#32;object&apos;s&#32;name&#32;allocate&#32;memory.</emphasis>
+00755 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordtype">string</emphasis>&#32;componentName;
+00756 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(!nameCache.TryGetValue(child.GetInstanceID(),&#32;out&#32;componentName))
+00757 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00758 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;componentName&#32;=&#32;child.name;
+00759 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;nameCache.Add(child.GetInstanceID(),&#32;componentName);
+00760 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00761 
+00762 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;var&#32;componentState&#32;=&#32;<emphasis role="keyword">new</emphasis>&#32;<link linkend="_struct_valve_1_1_v_r_1_1_render_model___component_state__t">RenderModel_ComponentState_t</link>();
+00763 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(!renderModels.<link linkend="_class_valve_1_1_v_r_1_1_c_v_r_render_models_1ad8b4389985fb3dad9cfb1c4525f25ad5">GetComponentStateForDevicePath</link>(<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___render_model_1a0655bfb7f8ed5cfb849c2156737dab6a">renderModelName</link>,&#32;componentName,&#32;SteamVR_Input_Source.GetHandle(<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___render_model_1a97f12235b76af906c2d2cd83dce06785">inputSource</link>),&#32;ref&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___render_model_1ac6b2a701413243d24c2dd40bfbe8b845">controllerModeState</link>,&#32;ref&#32;componentState))
+00764 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">continue</emphasis>;
+00765 
+00766 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;child.localPosition&#32;=&#32;SteamVR_Utils.GetPosition(componentState.mTrackingToComponentRenderModel);
+00767 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;child.localRotation&#32;=&#32;SteamVR_Utils.GetRotation(componentState.mTrackingToComponentRenderModel);
+00768 
+00769 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;Transform&#32;attach&#32;=&#32;<emphasis role="keyword">null</emphasis>;
+00770 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">for</emphasis>&#32;(<emphasis role="keywordtype">int</emphasis>&#32;childChildIndex&#32;=&#32;0;&#32;childChildIndex&#32;&lt;&#32;child.childCount;&#32;childChildIndex++)
+00771 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00772 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;Transform&#32;childChild&#32;=&#32;child.GetChild(childChildIndex);
+00773 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordtype">int</emphasis>&#32;childInstanceID&#32;=&#32;childChild.GetInstanceID();
+00774 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordtype">string</emphasis>&#32;childName;
+00775 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(!nameCache.TryGetValue(childInstanceID,&#32;out&#32;childName))
+00776 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00777 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;childName&#32;=&#32;childChild.name;
+00778 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;nameCache.Add(childInstanceID,&#32;componentName);
+00779 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00780 
+00781 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(childName&#32;==&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___render_model">SteamVR_RenderModel</link>.<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___render_model_1a1dc259cc2c45275417739bf0f9fd75f9">k_localTransformName</link>)
+00782 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;attach&#32;=&#32;childChild;
+00783 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00784 
+00785 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(attach&#32;!=&#32;<emphasis role="keyword">null</emphasis>)
+00786 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00787 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;attach.position&#32;=&#32;transform.TransformPoint(SteamVR_Utils.GetPosition(componentState.mTrackingToComponentLocal));
+00788 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;attach.rotation&#32;=&#32;transform.rotation&#32;*&#32;SteamVR_Utils.GetRotation(componentState.mTrackingToComponentLocal);
+00789 
+00790 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___render_model_1a5950c36ccece814211ef458311b3f71f">initializedAttachPoints</link>&#32;=&#32;<emphasis role="keyword">true</emphasis>;
+00791 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00792 
+00793 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordtype">bool</emphasis>&#32;visible&#32;=&#32;(componentState.uProperties&#32;&amp;&#32;(uint)<link linkend="_namespace_valve_1_1_v_r_1ae28918e49268c8409341f214f4ea5639">EVRComponentProperty</link>.IsVisible)&#32;!=&#32;0;
+00794 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(visible&#32;!=&#32;child.gameObject.activeSelf)
+00795 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00796 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;child.gameObject.SetActive(visible);
+00797 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00798 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00799 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00800 
+<anchor xml:id="__steam_v_r___render_model_8cs_source_1l00801"/><link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___render_model_1a0d60fefa83b15ba80676f55753f89274">00801</link> &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___render_model_1a0d60fefa83b15ba80676f55753f89274">SetDeviceIndex</link>(<emphasis role="keywordtype">int</emphasis>&#32;newIndex)
+00802 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00803 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;this.index&#32;=&#32;(<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___tracked_object">SteamVR_TrackedObject</link>.<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___tracked_object_1a3d437894eff0bfc81eeb21a8c478413e">EIndex</link>)newIndex;
+00804 
+00805 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___render_model_1a2980ac7d5745563e149a6622daac0578">modelOverride</link>&#32;=&#32;<emphasis role="stringliteral">&quot;&quot;</emphasis>;
+00806 
+00807 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(enabled)
+00808 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00809 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___render_model_1a59d9e165c3b79e6d820cd08c4c33a6c3">UpdateModel</link>();
+00810 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00811 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00812 
+<anchor xml:id="__steam_v_r___render_model_8cs_source_1l00813"/><link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___render_model_1a56179c580285575841d60ae39e5685d3">00813</link> &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___render_model_1a56179c580285575841d60ae39e5685d3">SetInputSource</link>(<link linkend="_namespace_valve_1_1_v_r_1a82e5bf501cc3aa155444ee3f0662853f">SteamVR_Input_Sources</link>&#32;newInputSource)
+00814 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00815 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_valve_1_1_v_r_1_1_steam_v_r___render_model_1a97f12235b76af906c2d2cd83dce06785">inputSource</link>&#32;=&#32;newInputSource;
+00816 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00817 
+00818 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;<emphasis role="keyword">static</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;Sleep()
+00819 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00820 <emphasis role="preprocessor">#if&#32;!UNITY_METRO</emphasis>
+00821 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//System.Threading.Thread.SpinWait(1);&#32;//faster&#32;napping</emphasis>
+00822 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;System.Threading.Thread.Sleep(1);
+00823 <emphasis role="preprocessor">#endif</emphasis>
+00824 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00825 
+00832 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;<link linkend="_struct_valve_1_1_v_r_1_1_render_model__t">RenderModel_t</link>&#32;MarshalRenderModel(System.IntPtr&#32;pRenderModel)
+00833 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00834 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;((System.Environment.OSVersion.Platform&#32;==&#32;System.PlatformID.MacOSX)&#32;||
+00835 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;(System.Environment.OSVersion.Platform&#32;==&#32;System.PlatformID.Unix))
+00836 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00837 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;var&#32;packedModel&#32;=&#32;(<link linkend="_struct_valve_1_1_v_r_1_1_render_model__t___packed">RenderModel_t_Packed</link>)Marshal.PtrToStructure(pRenderModel,&#32;typeof(<link linkend="_struct_valve_1_1_v_r_1_1_render_model__t___packed">RenderModel_t_Packed</link>));
+00838 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_struct_valve_1_1_v_r_1_1_render_model__t">RenderModel_t</link>&#32;model&#32;=&#32;<emphasis role="keyword">new</emphasis>&#32;<link linkend="_struct_valve_1_1_v_r_1_1_render_model__t">RenderModel_t</link>();
+00839 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;packedModel.Unpack(ref&#32;model);
+00840 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;model;
+00841 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00842 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">else</emphasis>
+00843 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00844 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;(<link linkend="_struct_valve_1_1_v_r_1_1_render_model__t">RenderModel_t</link>)Marshal.PtrToStructure(pRenderModel,&#32;typeof(<link linkend="_struct_valve_1_1_v_r_1_1_render_model__t">RenderModel_t</link>));
+00845 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00846 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00847 
+00854 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;<link linkend="_struct_valve_1_1_v_r_1_1_render_model___texture_map__t">RenderModel_TextureMap_t</link>&#32;MarshalRenderModel_TextureMap(System.IntPtr&#32;pRenderModel)
+00855 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00856 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;((System.Environment.OSVersion.Platform&#32;==&#32;System.PlatformID.MacOSX)&#32;||
+00857 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;(System.Environment.OSVersion.Platform&#32;==&#32;System.PlatformID.Unix))
+00858 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00859 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;var&#32;packedModel&#32;=&#32;(<link linkend="_struct_valve_1_1_v_r_1_1_render_model___texture_map__t___packed">RenderModel_TextureMap_t_Packed</link>)Marshal.PtrToStructure(pRenderModel,&#32;typeof(<link linkend="_struct_valve_1_1_v_r_1_1_render_model___texture_map__t___packed">RenderModel_TextureMap_t_Packed</link>));
+00860 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_struct_valve_1_1_v_r_1_1_render_model___texture_map__t">RenderModel_TextureMap_t</link>&#32;model&#32;=&#32;<emphasis role="keyword">new</emphasis>&#32;<link linkend="_struct_valve_1_1_v_r_1_1_render_model___texture_map__t">RenderModel_TextureMap_t</link>();
+00861 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;packedModel.Unpack(ref&#32;model);
+00862 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;model;
+00863 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00864 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">else</emphasis>
+00865 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00866 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;(<link linkend="_struct_valve_1_1_v_r_1_1_render_model___texture_map__t">RenderModel_TextureMap_t</link>)Marshal.PtrToStructure(pRenderModel,&#32;typeof(<link linkend="_struct_valve_1_1_v_r_1_1_render_model___texture_map__t">RenderModel_TextureMap_t</link>));
+00867 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00868 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00869 &#32;&#32;&#32;&#32;}
+00870 }
+</programlisting></section>

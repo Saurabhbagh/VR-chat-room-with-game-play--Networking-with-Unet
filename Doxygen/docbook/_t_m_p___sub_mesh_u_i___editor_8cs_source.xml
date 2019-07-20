@@ -1,0 +1,103 @@
+<?xml version='1.0' encoding='UTF-8' standalone='no'?>
+<section xmlns="http://docbook.org/ns/docbook" version="5.0" xmlns:xlink="http://www.w3.org/1999/xlink" xml:id="__t_m_p___sub_mesh_u_i___editor_8cs_source">
+<title>TMP_SubMeshUI_Editor.cs</title>
+<indexterm><primary>O:/GitHUBMINIPRoject/Library/PackageCache/com.unity.textmeshpro@1.3.0/Scripts/Editor/TMP_SubMeshUI_Editor.cs</primary></indexterm>
+<programlisting>00001 <emphasis role="keyword">using</emphasis>&#32;<link linkend="__balloon_8cs_1a7d67e097df9376eb709b6a23aa3c7d23">UnityEngine</link>;
+00002 <emphasis role="keyword">using</emphasis>&#32;<link linkend="_namespace_unity_editor">UnityEditor</link>;
+00003 <emphasis role="keyword">using</emphasis>&#32;System.Collections;
+00004 
+00005 <emphasis role="keyword">namespace&#32;</emphasis><link linkend="_namespace_t_m_pro_1_1_editor_utilities">TMPro.EditorUtilities</link>
+00006 {
+00007 &#32;&#32;&#32;&#32;[CustomEditor(typeof(TMP_SubMeshUI)),&#32;CanEditMultipleObjects]
+<anchor xml:id="__t_m_p___sub_mesh_u_i___editor_8cs_source_1l00008"/><link linkend="_class_t_m_pro_1_1_editor_utilities_1_1_t_m_p___sub_mesh_u_i___editor">00008</link> &#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keyword">class&#32;</emphasis><link linkend="_class_t_m_pro_1_1_editor_utilities_1_1_t_m_p___sub_mesh_u_i___editor">TMP_SubMeshUI_Editor</link>&#32;:&#32;Editor
+00009 &#32;&#32;&#32;&#32;{
+00010 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;<emphasis role="keyword">struct&#32;</emphasis>m_foldout
+00011 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{&#32;<emphasis role="comment">//&#32;Track&#32;Inspector&#32;foldout&#32;panel&#32;states,&#32;globally.</emphasis>
+00012 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//public&#32;static&#32;bool&#32;textInput&#32;=&#32;true;</emphasis>
+00013 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keyword">static</emphasis>&#32;<emphasis role="keywordtype">bool</emphasis>&#32;fontSettings&#32;=&#32;<emphasis role="keyword">true</emphasis>;
+00014 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//public&#32;static&#32;bool&#32;extraSettings&#32;=&#32;false;</emphasis>
+00015 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//public&#32;static&#32;bool&#32;shadowSetting&#32;=&#32;false;</emphasis>
+00016 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//public&#32;static&#32;bool&#32;materialEditor&#32;=&#32;true;</emphasis>
+00017 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00018 
+00019 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;SerializedProperty&#32;fontAsset_prop;
+00020 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;SerializedProperty&#32;spriteAsset_prop;
+00021 
+00022 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;<link linkend="_class_t_m_pro_1_1_t_m_p___sub_mesh_u_i">TMP_SubMeshUI</link>&#32;m_SubMeshComponent;
+00023 
+00024 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;CanvasRenderer&#32;m_canvasRenderer;
+00025 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;Editor&#32;m_materialEditor;
+00026 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;Material&#32;m_targetMaterial;
+00027 
+00028 
+<anchor xml:id="__t_m_p___sub_mesh_u_i___editor_8cs_source_1l00029"/><link linkend="_class_t_m_pro_1_1_editor_utilities_1_1_t_m_p___sub_mesh_u_i___editor_1ac7be378cdc471d5b7b2a455fce25f358">00029</link> &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;<link linkend="_class_t_m_pro_1_1_editor_utilities_1_1_t_m_p___sub_mesh_u_i___editor_1ac7be378cdc471d5b7b2a455fce25f358">OnEnable</link>()
+00030 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00031 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;fontAsset_prop&#32;=&#32;serializedObject.FindProperty(<emphasis role="stringliteral">&quot;m_fontAsset&quot;</emphasis>);
+00032 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;spriteAsset_prop&#32;=&#32;serializedObject.FindProperty(<emphasis role="stringliteral">&quot;m_spriteAsset&quot;</emphasis>);
+00033 
+00034 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;m_SubMeshComponent&#32;=&#32;target&#32;as&#32;<link linkend="_class_t_m_pro_1_1_t_m_p___sub_mesh_u_i">TMP_SubMeshUI</link>;
+00035 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//m_rectTransform&#32;=&#32;m_SubMeshComponent.rectTransform;</emphasis>
+00036 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;m_canvasRenderer&#32;=&#32;m_SubMeshComponent.<link linkend="_class_t_m_pro_1_1_t_m_p___sub_mesh_u_i_1a4888f8c9e99911b05312c1ed5a578a33">canvasRenderer</link>;
+00037 
+00038 
+00039 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;Create&#32;new&#32;Material&#32;Editor&#32;if&#32;one&#32;does&#32;not&#32;exists</emphasis>
+00040 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(m_canvasRenderer&#32;!=&#32;<emphasis role="keyword">null</emphasis>&#32;&amp;&amp;&#32;m_canvasRenderer.GetMaterial()&#32;!=&#32;<emphasis role="keyword">null</emphasis>)
+00041 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00042 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;m_materialEditor&#32;=&#32;Editor.CreateEditor(m_canvasRenderer.GetMaterial());
+00043 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;m_targetMaterial&#32;=&#32;m_canvasRenderer.GetMaterial();
+00044 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00045 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00046 
+00047 
+<anchor xml:id="__t_m_p___sub_mesh_u_i___editor_8cs_source_1l00048"/><link linkend="_class_t_m_pro_1_1_editor_utilities_1_1_t_m_p___sub_mesh_u_i___editor_1a50d02affa7fbd9ff08426629786615ce">00048</link> &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;<link linkend="_class_t_m_pro_1_1_editor_utilities_1_1_t_m_p___sub_mesh_u_i___editor_1a50d02affa7fbd9ff08426629786615ce">OnDisable</link>()
+00049 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00050 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;Destroy&#32;material&#32;editor&#32;if&#32;one&#32;exists</emphasis>
+00051 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(m_materialEditor&#32;!=&#32;<emphasis role="keyword">null</emphasis>)
+00052 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00053 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//Debug.Log(&quot;Destroying&#32;Inline&#32;Material&#32;Editor.&quot;);</emphasis>
+00054 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;DestroyImmediate(m_materialEditor);
+00055 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00056 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00057 
+00058 
+00059 
+<anchor xml:id="__t_m_p___sub_mesh_u_i___editor_8cs_source_1l00060"/><link linkend="_class_t_m_pro_1_1_editor_utilities_1_1_t_m_p___sub_mesh_u_i___editor_1af9405c765094607ca214e34a83718e1f">00060</link> &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keyword">override</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;<link linkend="_class_t_m_pro_1_1_editor_utilities_1_1_t_m_p___sub_mesh_u_i___editor_1af9405c765094607ca214e34a83718e1f">OnInspectorGUI</link>()
+00061 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00062 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;GUI.enabled&#32;=&#32;<emphasis role="keyword">false</emphasis>;
+00063 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;EditorGUILayout.PropertyField(fontAsset_prop);
+00064 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;EditorGUILayout.PropertyField(spriteAsset_prop);
+00065 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;GUI.enabled&#32;=&#32;<emphasis role="keyword">true</emphasis>;
+00066 
+00067 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;EditorGUILayout.Space();
+00068 
+00069 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;If&#32;a&#32;Custom&#32;Material&#32;Editor&#32;exists,&#32;we&#32;use&#32;it.</emphasis>
+00070 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(m_canvasRenderer&#32;!=&#32;<emphasis role="keyword">null</emphasis>&#32;&amp;&amp;&#32;m_canvasRenderer.GetMaterial()&#32;!=&#32;<emphasis role="keyword">null</emphasis>)
+00071 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00072 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;Material&#32;mat&#32;=&#32;m_canvasRenderer.GetMaterial();
+00073 
+00074 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//Debug.Log(mat&#32;+&#32;&quot;&#32;&#32;&quot;&#32;+&#32;m_targetMaterial);</emphasis>
+00075 
+00076 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(mat&#32;!=&#32;m_targetMaterial)
+00077 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00078 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;Destroy&#32;previous&#32;Material&#32;Instance</emphasis>
+00079 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//Debug.Log(&quot;New&#32;Material&#32;has&#32;been&#32;assigned.&quot;);</emphasis>
+00080 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;m_targetMaterial&#32;=&#32;mat;
+00081 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;DestroyImmediate(m_materialEditor);
+00082 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00083 
+00084 
+00085 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(m_materialEditor&#32;==&#32;<emphasis role="keyword">null</emphasis>)
+00086 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00087 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;m_materialEditor&#32;=&#32;Editor.CreateEditor(mat);
+00088 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00089 
+00090 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;m_materialEditor.DrawHeader();
+00091 
+00092 
+00093 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;m_materialEditor.OnInspectorGUI();
+00094 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00095 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00096 
+00097 &#32;&#32;&#32;&#32;}
+00098 }
+</programlisting></section>

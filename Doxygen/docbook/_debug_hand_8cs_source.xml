@@ -1,0 +1,94 @@
+<?xml version='1.0' encoding='UTF-8' standalone='no'?>
+<section xmlns="http://docbook.org/ns/docbook" version="5.0" xmlns:xlink="http://www.w3.org/1999/xlink" xml:id="__debug_hand_8cs_source">
+<title>DebugHand.cs</title>
+<indexterm><primary>O:/GitHUBMINIPRoject/Assets/LeapMotion/Core/Scripts/Hands/DebugHand.cs</primary></indexterm>
+<programlisting>00001 <emphasis role="comment">/******************************************************************************</emphasis>
+00002 <emphasis role="comment">&#32;*&#32;Copyright&#32;(C)&#32;Leap&#32;Motion,&#32;Inc.&#32;2011-2018.&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;*</emphasis>
+00003 <emphasis role="comment">&#32;*&#32;Leap&#32;Motion&#32;proprietary&#32;and&#32;confidential.&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;*</emphasis>
+00004 <emphasis role="comment">&#32;*&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;*</emphasis>
+00005 <emphasis role="comment">&#32;*&#32;Use&#32;subject&#32;to&#32;the&#32;terms&#32;of&#32;the&#32;Leap&#32;Motion&#32;SDK&#32;Agreement&#32;available&#32;at&#32;&#32;&#32;&#32;&#32;*</emphasis>
+00006 <emphasis role="comment">&#32;*&#32;https://developer.leapmotion.com/sdk_agreement,&#32;or&#32;another&#32;agreement&#32;&#32;&#32;&#32;&#32;&#32;&#32;*</emphasis>
+00007 <emphasis role="comment">&#32;*&#32;between&#32;Leap&#32;Motion&#32;and&#32;you,&#32;your&#32;company&#32;or&#32;other&#32;organization.&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;*</emphasis>
+00008 <emphasis role="comment">&#32;******************************************************************************/</emphasis>
+00009 
+00010 <emphasis role="keyword">using</emphasis>&#32;<link linkend="__balloon_8cs_1a7d67e097df9376eb709b6a23aa3c7d23">UnityEngine</link>;
+00011 <emphasis role="keyword">using</emphasis>&#32;System.Collections;
+00012 <emphasis role="keyword">using</emphasis>&#32;<link linkend="_namespace_leap">Leap</link>;
+00013 
+00014 <emphasis role="keyword">namespace&#32;</emphasis><link linkend="_namespace_leap_1_1_unity">Leap.Unity</link>&#32;{
+<anchor xml:id="__debug_hand_8cs_source_1l00022"/><link linkend="_class_leap_1_1_unity_1_1_debug_hand">00022</link> &#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keyword">class&#32;</emphasis><link linkend="_class_leap_1_1_unity_1_1_debug_hand">DebugHand</link>&#32;:&#32;<link linkend="_class_leap_1_1_unity_1_1_hand_model_base">HandModelBase</link>&#32;{
+00023 &#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;<link linkend="_class_leap_1_1_hand">Hand</link>&#32;hand_;
+00024 
+00025 &#32;&#32;&#32;&#32;[SerializeField]
+00026 &#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;<emphasis role="keywordtype">bool</emphasis>&#32;visualizeBasis&#32;=&#32;<emphasis role="keyword">true</emphasis>;
+<anchor xml:id="__debug_hand_8cs_source_1l00027"/><link linkend="_class_leap_1_1_unity_1_1_debug_hand_1ae5f9ba1586c260729c18963e5ce2bd92">00027</link> &#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keywordtype">bool</emphasis>&#32;<link linkend="_class_leap_1_1_unity_1_1_debug_hand_1ae5f9ba1586c260729c18963e5ce2bd92">VisualizeBasis</link>&#32;{&#32;<emphasis role="keyword">get</emphasis>&#32;{&#32;<emphasis role="keywordflow">return</emphasis>&#32;visualizeBasis;&#32;}&#32;<emphasis role="keyword">set</emphasis>&#32;{&#32;visualizeBasis&#32;=&#32;value;&#32;}&#32;}
+00028 
+<anchor xml:id="__debug_hand_8cs_source_1l00030"/><link linkend="_class_leap_1_1_unity_1_1_debug_hand_1abe57d750cd5877dc24cc93f593fb0d3b">00030</link> &#32;&#32;&#32;&#32;<emphasis role="keyword">protected</emphasis>&#32;Color[]&#32;<link linkend="_class_leap_1_1_unity_1_1_debug_hand_1abe57d750cd5877dc24cc93f593fb0d3b">colors</link>&#32;=&#32;{&#32;Color.gray,&#32;Color.yellow,&#32;Color.cyan,&#32;Color.magenta&#32;};
+00031 
+<anchor xml:id="__debug_hand_8cs_source_1l00032"/><link linkend="_class_leap_1_1_unity_1_1_debug_hand_1aa83762c9f8d2288619683ea6c423dda3">00032</link> &#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keyword">override</emphasis>&#32;<link linkend="_namespace_leap_1_1_unity_1a186e5eb0a2b743f1f6b79346f0ab8ad0">ModelType</link>&#32;<link linkend="_class_leap_1_1_unity_1_1_debug_hand_1aa83762c9f8d2288619683ea6c423dda3">HandModelType</link>&#32;{
+00033 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">get</emphasis>&#32;{
+00034 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;<link linkend="_namespace_leap_1_1_unity_1a186e5eb0a2b743f1f6b79346f0ab8ad0">ModelType</link>.Graphics;
+00035 &#32;&#32;&#32;&#32;&#32;&#32;}
+00036 &#32;&#32;&#32;&#32;}
+00037 
+00038 &#32;&#32;&#32;&#32;[SerializeField]
+00039 &#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;<link linkend="_namespace_leap_1_1_unity_1a4d15adcf20ba121b2cd9c07f503b606f">Chirality</link>&#32;handedness;
+<anchor xml:id="__debug_hand_8cs_source_1l00040"/><link linkend="_class_leap_1_1_unity_1_1_debug_hand_1a28c11b6ea4043f473e856168d5af15fa">00040</link> &#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keyword">override</emphasis>&#32;<link linkend="_namespace_leap_1_1_unity_1a4d15adcf20ba121b2cd9c07f503b606f">Chirality</link>&#32;<link linkend="_class_leap_1_1_unity_1_1_debug_hand_1a28c11b6ea4043f473e856168d5af15fa">Handedness</link>&#32;{
+00041 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">get</emphasis>&#32;{
+00042 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;handedness;
+00043 &#32;&#32;&#32;&#32;&#32;&#32;}
+00044 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">set</emphasis>&#32;{&#32;}
+00045 &#32;&#32;&#32;&#32;}
+00046 
+<anchor xml:id="__debug_hand_8cs_source_1l00047"/><link linkend="_class_leap_1_1_unity_1_1_debug_hand_1a406218fbf7d947d156064ccc5ac84d06">00047</link> &#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keyword">override</emphasis>&#32;<link linkend="_class_leap_1_1_hand">Hand</link>&#32;<link linkend="_class_leap_1_1_unity_1_1_debug_hand_1a406218fbf7d947d156064ccc5ac84d06">GetLeapHand</link>()&#32;{
+00048 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;hand_;
+00049 &#32;&#32;&#32;&#32;}
+00050 
+<anchor xml:id="__debug_hand_8cs_source_1l00051"/><link linkend="_class_leap_1_1_unity_1_1_debug_hand_1a22cf0421f70d6ab4129c169116d0d83c">00051</link> &#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keyword">override</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;<link linkend="_class_leap_1_1_unity_1_1_debug_hand_1a22cf0421f70d6ab4129c169116d0d83c">SetLeapHand</link>(<link linkend="_class_leap_1_1_hand">Hand</link>&#32;hand)&#32;{
+00052 &#32;&#32;&#32;&#32;&#32;&#32;hand_&#32;=&#32;hand;
+00053 &#32;&#32;&#32;&#32;}
+00054 
+<anchor xml:id="__debug_hand_8cs_source_1l00055"/><link linkend="_class_leap_1_1_unity_1_1_debug_hand_1ab2f2c81a42220b3b96cbdabadbfefd17">00055</link> &#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keyword">override</emphasis>&#32;<emphasis role="keywordtype">bool</emphasis>&#32;<link linkend="_class_leap_1_1_unity_1_1_debug_hand_1ab2f2c81a42220b3b96cbdabadbfefd17">SupportsEditorPersistence</link>()&#32;{
+00056 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;<emphasis role="keyword">true</emphasis>;
+00057 &#32;&#32;&#32;&#32;}
+00058 
+<anchor xml:id="__debug_hand_8cs_source_1l00062"/><link linkend="_class_leap_1_1_unity_1_1_debug_hand_1a504064bb8442d990fbd080bda3c1c02c">00062</link> &#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keyword">override</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;<link linkend="_class_leap_1_1_unity_1_1_debug_hand_1a504064bb8442d990fbd080bda3c1c02c">InitHand</link>()&#32;{
+00063 &#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_leap_1_1_unity_1_1_debug_hand_1a013b3eb2cdabba0ddcc7e38aa3ee3044">DrawDebugLines</link>();
+00064 &#32;&#32;&#32;&#32;}
+00065 
+<anchor xml:id="__debug_hand_8cs_source_1l00069"/><link linkend="_class_leap_1_1_unity_1_1_debug_hand_1a72947d57d9e6eaabade4aa289d5052bd">00069</link> &#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keyword">override</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;<link linkend="_class_leap_1_1_unity_1_1_debug_hand_1a72947d57d9e6eaabade4aa289d5052bd">UpdateHand</link>()&#32;{
+00070 &#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_leap_1_1_unity_1_1_debug_hand_1a013b3eb2cdabba0ddcc7e38aa3ee3044">DrawDebugLines</link>();
+00071 &#32;&#32;&#32;&#32;}
+00072 
+<anchor xml:id="__debug_hand_8cs_source_1l00076"/><link linkend="_class_leap_1_1_unity_1_1_debug_hand_1a013b3eb2cdabba0ddcc7e38aa3ee3044">00076</link> &#32;&#32;&#32;&#32;<emphasis role="keyword">protected</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;<link linkend="_class_leap_1_1_unity_1_1_debug_hand_1a013b3eb2cdabba0ddcc7e38aa3ee3044">DrawDebugLines</link>()&#32;{
+00077 &#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_leap_1_1_hand">Hand</link>&#32;hand&#32;=&#32;<link linkend="_class_leap_1_1_unity_1_1_debug_hand_1a406218fbf7d947d156064ccc5ac84d06">GetLeapHand</link>();
+00078 &#32;&#32;&#32;&#32;&#32;&#32;Debug.DrawLine(hand.<link linkend="_class_leap_1_1_hand_1a929a9aae640b9e8de5b544d7faacd04a">Arm</link>.<link linkend="_class_leap_1_1_arm_1a4249c0d34efeac222e96ba444bec5876">ElbowPosition</link>.ToVector3(),&#32;hand.<link linkend="_class_leap_1_1_hand_1a929a9aae640b9e8de5b544d7faacd04a">Arm</link>.<link linkend="_class_leap_1_1_arm_1a2ab323132d053651016290600610483b">WristPosition</link>.ToVector3(),&#32;Color.red);&#32;<emphasis role="comment">//Arm</emphasis>
+00079 &#32;&#32;&#32;&#32;&#32;&#32;Debug.DrawLine(hand.<link linkend="_class_leap_1_1_hand_1a18030f2fe8236bfcfc9be404eb3c9a57">WristPosition</link>.ToVector3(),&#32;hand.<link linkend="_class_leap_1_1_hand_1aaf0940b9108e92c22e33b9c6cd32921a">PalmPosition</link>.ToVector3(),&#32;Color.white);&#32;<emphasis role="comment">//Wrist&#32;to&#32;palm&#32;line</emphasis>
+00080 &#32;&#32;&#32;&#32;&#32;&#32;Debug.DrawLine(hand.<link linkend="_class_leap_1_1_hand_1aaf0940b9108e92c22e33b9c6cd32921a">PalmPosition</link>.ToVector3(),&#32;(hand.<link linkend="_class_leap_1_1_hand_1aaf0940b9108e92c22e33b9c6cd32921a">PalmPosition</link>&#32;+&#32;hand.<link linkend="_class_leap_1_1_hand_1a32586524eb04a8d5b9ed6559285fb1d1">PalmNormal</link>&#32;*&#32;hand.<link linkend="_class_leap_1_1_hand_1a1a8e00fae9b278de950b48ece3a2097e">PalmWidth</link>&#32;/&#32;2).ToVector3(),&#32;Color.black);&#32;<emphasis role="comment">//Hand&#32;Normal</emphasis>
+00081 
+00082 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(<link linkend="_class_leap_1_1_unity_1_1_debug_hand_1ae5f9ba1586c260729c18963e5ce2bd92">VisualizeBasis</link>)&#32;{
+00083 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_leap_1_1_unity_1_1_debug_hand_1abb49cc3a3a3716e71a59c193fe7e58b1">DrawBasis</link>(hand.<link linkend="_class_leap_1_1_hand_1aaf0940b9108e92c22e33b9c6cd32921a">PalmPosition</link>,&#32;hand.<link linkend="_class_leap_1_1_hand_1a31cd466c474963af5727269c7c9d6b5a">Basis</link>,&#32;hand.<link linkend="_class_leap_1_1_hand_1a1a8e00fae9b278de950b48ece3a2097e">PalmWidth</link>&#32;/&#32;4);&#32;<emphasis role="comment">//Hand&#32;basis</emphasis>
+00084 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_leap_1_1_unity_1_1_debug_hand_1abb49cc3a3a3716e71a59c193fe7e58b1">DrawBasis</link>(hand.<link linkend="_class_leap_1_1_hand_1a929a9aae640b9e8de5b544d7faacd04a">Arm</link>.<link linkend="_class_leap_1_1_arm_1a4249c0d34efeac222e96ba444bec5876">ElbowPosition</link>,&#32;hand.<link linkend="_class_leap_1_1_hand_1a929a9aae640b9e8de5b544d7faacd04a">Arm</link>.<link linkend="_class_leap_1_1_bone_1a3918f3a7fe8406e54c4715aed7504ab9">Basis</link>,&#32;.01f);&#32;<emphasis role="comment">//Arm&#32;basis</emphasis>
+00085 &#32;&#32;&#32;&#32;&#32;&#32;}
+00086 
+00087 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">for</emphasis>&#32;(<emphasis role="keywordtype">int</emphasis>&#32;f&#32;=&#32;0;&#32;f&#32;&lt;&#32;5;&#32;f++)&#32;{&#32;<emphasis role="comment">//Fingers</emphasis>
+00088 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_leap_1_1_finger">Finger</link>&#32;finger&#32;=&#32;hand.<link linkend="_class_leap_1_1_hand_1ac9f68349507bfa13e3ac24738382bea6">Fingers</link>[f];
+00089 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">for</emphasis>&#32;(<emphasis role="keywordtype">int</emphasis>&#32;i&#32;=&#32;0;&#32;i&#32;&lt;&#32;4;&#32;++i)&#32;{
+00090 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_leap_1_1_bone">Bone</link>&#32;bone&#32;=&#32;finger.<link linkend="_class_leap_1_1_finger_1a5ae2d74471ca480d76820478067bda64">Bone</link>((<link linkend="_class_leap_1_1_bone">Bone</link>.<link linkend="_class_leap_1_1_bone_1a21054e31cefa7b75f25a026006fdbb1b">BoneType</link>)i);
+00091 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;Debug.DrawLine(bone.<link linkend="_class_leap_1_1_bone_1a9bf9d79aa10edd70baa3d27e8bac0730">PrevJoint</link>.ToVector3(),&#32;bone.<link linkend="_class_leap_1_1_bone_1a9bf9d79aa10edd70baa3d27e8bac0730">PrevJoint</link>.ToVector3()&#32;+&#32;bone.<link linkend="_class_leap_1_1_bone_1a15e47cfdff3b474b9da055ae15aec82e">Direction</link>.ToVector3()&#32;*&#32;bone.<link linkend="_class_leap_1_1_bone_1ab10b9823a94b21069ded7fe9cbf92dc8">Length</link>,&#32;<link linkend="_class_leap_1_1_unity_1_1_debug_hand_1abe57d750cd5877dc24cc93f593fb0d3b">colors</link>[i]);
+00092 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(<link linkend="_class_leap_1_1_unity_1_1_debug_hand_1ae5f9ba1586c260729c18963e5ce2bd92">VisualizeBasis</link>)
+00093 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_leap_1_1_unity_1_1_debug_hand_1abb49cc3a3a3716e71a59c193fe7e58b1">DrawBasis</link>(bone.<link linkend="_class_leap_1_1_bone_1a9bf9d79aa10edd70baa3d27e8bac0730">PrevJoint</link>,&#32;bone.<link linkend="_class_leap_1_1_bone_1a3918f3a7fe8406e54c4715aed7504ab9">Basis</link>,&#32;.01f);
+00094 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00095 &#32;&#32;&#32;&#32;&#32;&#32;}
+00096 &#32;&#32;&#32;&#32;}
+00097 
+<anchor xml:id="__debug_hand_8cs_source_1l00098"/><link linkend="_class_leap_1_1_unity_1_1_debug_hand_1abb49cc3a3a3716e71a59c193fe7e58b1">00098</link> &#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;<link linkend="_class_leap_1_1_unity_1_1_debug_hand_1abb49cc3a3a3716e71a59c193fe7e58b1">DrawBasis</link>(<link linkend="_struct_leap_1_1_vector">Vector</link>&#32;position,&#32;<link linkend="_struct_leap_1_1_leap_transform">LeapTransform</link>&#32;basis,&#32;<emphasis role="keywordtype">float</emphasis>&#32;scale)&#32;{
+00099 &#32;&#32;&#32;&#32;&#32;&#32;Vector3&#32;origin&#32;=&#32;position.ToVector3();
+00100 &#32;&#32;&#32;&#32;&#32;&#32;Debug.DrawLine(origin,&#32;origin&#32;+&#32;basis.<link linkend="_struct_leap_1_1_leap_transform_1a8a67b81b7344f05e136048e2159ab663">xBasis</link>.ToVector3()&#32;*&#32;scale,&#32;Color.red);
+00101 &#32;&#32;&#32;&#32;&#32;&#32;Debug.DrawLine(origin,&#32;origin&#32;+&#32;basis.<link linkend="_struct_leap_1_1_leap_transform_1ac46874ef78036f1bc2d2bf76dd9a62a2">yBasis</link>.ToVector3()&#32;*&#32;scale,&#32;Color.green);
+00102 &#32;&#32;&#32;&#32;&#32;&#32;Debug.DrawLine(origin,&#32;origin&#32;+&#32;basis.<link linkend="_struct_leap_1_1_leap_transform_1a59e5ecf307c5938bf9e04902b8395f8a">zBasis</link>.ToVector3()&#32;*&#32;scale,&#32;Color.blue);
+00103 &#32;&#32;&#32;&#32;}
+00104 
+00105 &#32;&#32;}
+00106 }
+</programlisting></section>

@@ -1,0 +1,123 @@
+<?xml version='1.0' encoding='UTF-8' standalone='no'?>
+<doxygen xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="compound.xsd" version="1.8.15">
+  <compounddef id="_leap_profiling_8cs" kind="file" language="C#">
+    <compoundname>LeapProfiling.cs</compoundname>
+    <innerclass refid="class_leap_1_1_unity_1_1_leap_profiling" prot="public">Leap::Unity::LeapProfiling</innerclass>
+    <innernamespace refid="namespace_leap">Leap</innernamespace>
+    <innernamespace refid="namespace_leap_1_1_unity">Leap::Unity</innernamespace>
+    <innernamespace refid="namespace_unity_engine_1_1_profiling">UnityEngine::Profiling</innernamespace>
+    <briefdescription>
+    </briefdescription>
+    <detaileddescription>
+    </detaileddescription>
+    <programlisting>
+<codeline lineno="1"><highlight class="comment">/******************************************************************************</highlight></codeline>
+<codeline lineno="2"><highlight class="comment"><sp/>*<sp/>Copyright<sp/>(C)<sp/>Leap<sp/>Motion,<sp/>Inc.<sp/>2011-2018.<sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/>*</highlight></codeline>
+<codeline lineno="3"><highlight class="comment"><sp/>*<sp/>Leap<sp/>Motion<sp/>proprietary<sp/>and<sp/>confidential.<sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/>*</highlight></codeline>
+<codeline lineno="4"><highlight class="comment"><sp/>*<sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/>*</highlight></codeline>
+<codeline lineno="5"><highlight class="comment"><sp/>*<sp/>Use<sp/>subject<sp/>to<sp/>the<sp/>terms<sp/>of<sp/>the<sp/>Leap<sp/>Motion<sp/>SDK<sp/>Agreement<sp/>available<sp/>at<sp/><sp/><sp/><sp/><sp/>*</highlight></codeline>
+<codeline lineno="6"><highlight class="comment"><sp/>*<sp/>https://developer.leapmotion.com/sdk_agreement,<sp/>or<sp/>another<sp/>agreement<sp/><sp/><sp/><sp/><sp/><sp/><sp/>*</highlight></codeline>
+<codeline lineno="7"><highlight class="comment"><sp/>*<sp/>between<sp/>Leap<sp/>Motion<sp/>and<sp/>you,<sp/>your<sp/>company<sp/>or<sp/>other<sp/>organization.<sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/>*</highlight></codeline>
+<codeline lineno="8"><highlight class="comment"><sp/>******************************************************************************/</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="9"><highlight class="normal"></highlight></codeline>
+<codeline lineno="10"><highlight class="normal"></highlight><highlight class="keyword">using</highlight><highlight class="normal"><sp/>System.Threading;</highlight></codeline>
+<codeline lineno="11"><highlight class="normal"></highlight><highlight class="keyword">using</highlight><highlight class="normal"><sp/>System.Collections.Generic;</highlight></codeline>
+<codeline lineno="12"><highlight class="normal"></highlight><highlight class="keyword">using</highlight><highlight class="normal"><sp/><ref refid="_balloon_8cs_1a7d67e097df9376eb709b6a23aa3c7d23" kindref="member">UnityEngine</ref>;</highlight></codeline>
+<codeline lineno="13"><highlight class="normal"></highlight><highlight class="keyword">using</highlight><highlight class="normal"><sp/><ref refid="namespace_unity_engine" kindref="compound">UnityEngine</ref>.Profiling;</highlight></codeline>
+<codeline lineno="14"><highlight class="normal"></highlight></codeline>
+<codeline lineno="15"><highlight class="normal"></highlight><highlight class="keyword">namespace<sp/></highlight><highlight class="normal"><ref refid="namespace_leap_1_1_unity" kindref="compound">Leap.Unity</ref><sp/>{</highlight></codeline>
+<codeline lineno="16"><highlight class="normal"></highlight></codeline>
+<codeline lineno="20"><highlight class="normal"><sp/><sp/></highlight><highlight class="keyword">public</highlight><highlight class="normal"><sp/></highlight><highlight class="keyword">static</highlight><highlight class="normal"><sp/></highlight><highlight class="keyword">class<sp/></highlight><highlight class="normal">LeapProfiling<sp/>{</highlight></codeline>
+<codeline lineno="21"><highlight class="normal"></highlight></codeline>
+<codeline lineno="22"><highlight class="normal"><sp/><sp/><sp/><sp/></highlight><highlight class="comment">//Maps<sp/>a<sp/>block<sp/>name<sp/>to<sp/>the<sp/>sampler<sp/>for<sp/>it</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="23"><highlight class="normal"><sp/><sp/><sp/><sp/></highlight><highlight class="keyword">private</highlight><highlight class="normal"><sp/></highlight><highlight class="keyword">static</highlight><highlight class="normal"><sp/>Dictionary&lt;string,<sp/>CustomSampler&gt;<sp/>_samplers<sp/>=<sp/></highlight><highlight class="keyword">new</highlight><highlight class="normal"><sp/>Dictionary&lt;string,<sp/>CustomSampler&gt;();</highlight></codeline>
+<codeline lineno="24"><highlight class="normal"></highlight></codeline>
+<codeline lineno="25"><highlight class="normal"><sp/><sp/><sp/><sp/></highlight><highlight class="comment">//Represents<sp/>a<sp/>queue<sp/>of<sp/>samplers<sp/>that<sp/>need<sp/>to<sp/>be<sp/>created.</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="26"><highlight class="normal"><sp/><sp/><sp/><sp/></highlight><highlight class="comment">//Samplers<sp/>can<sp/>only<sp/>be<sp/>created<sp/>on<sp/>the<sp/>main<sp/>thread,<sp/>so<sp/>we<sp/>need<sp/>some<sp/>way<sp/>for<sp/>the<sp/>info<sp/>given</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="27"><highlight class="normal"><sp/><sp/><sp/><sp/></highlight><highlight class="comment">//on<sp/>alternate<sp/>threads<sp/>to<sp/>be<sp/>passed<sp/>to<sp/>the<sp/>main<sp/>thread.</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="28"><highlight class="normal"><sp/><sp/><sp/><sp/></highlight><highlight class="keyword">private</highlight><highlight class="normal"><sp/></highlight><highlight class="keyword">static</highlight><highlight class="normal"><sp/>Queue&lt;string&gt;<sp/>_samplersToCreate<sp/>=<sp/></highlight><highlight class="keyword">new</highlight><highlight class="normal"><sp/>Queue&lt;string&gt;();</highlight></codeline>
+<codeline lineno="29"><highlight class="normal"></highlight></codeline>
+<codeline lineno="30"><highlight class="normal"><sp/><sp/><sp/><sp/></highlight><highlight class="comment">//We<sp/>keep<sp/>track<sp/>of<sp/>the<sp/>size<sp/>of<sp/>the<sp/>queue<sp/>in<sp/>a<sp/>member<sp/>variable</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="31"><highlight class="normal"><sp/><sp/><sp/><sp/></highlight><highlight class="keyword">private</highlight><highlight class="normal"><sp/></highlight><highlight class="keyword">static</highlight><highlight class="normal"><sp/></highlight><highlight class="keywordtype">int</highlight><highlight class="normal"><sp/>_samplersToCreateCount<sp/>=<sp/>0;</highlight></codeline>
+<codeline lineno="32"><highlight class="normal"></highlight></codeline>
+<codeline lineno="33"><highlight class="normal"><sp/><sp/><sp/><sp/></highlight><highlight class="keyword">public</highlight><highlight class="normal"><sp/></highlight><highlight class="keyword">static</highlight><highlight class="normal"><sp/></highlight><highlight class="keywordtype">void</highlight><highlight class="normal"><sp/>Update()<sp/>{</highlight></codeline>
+<codeline lineno="34"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/></highlight><highlight class="comment">//Read<sp/>of<sp/>_samplersToCreateCount<sp/>is<sp/>atomic</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="35"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/></highlight><highlight class="keywordflow">if</highlight><highlight class="normal"><sp/>(_samplersToCreateCount<sp/>&gt;<sp/>0)<sp/>{</highlight></codeline>
+<codeline lineno="36"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/></highlight><highlight class="comment">//Only<sp/>if<sp/>the<sp/>count<sp/>is<sp/>nonzero<sp/>do<sp/>we<sp/>do<sp/>an<sp/>expensive<sp/>lock<sp/></highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="37"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/>lock<sp/>(_samplersToCreate)<sp/>{</highlight></codeline>
+<codeline lineno="38"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/></highlight><highlight class="comment">//First<sp/>duplicate<sp/>the<sp/>existing<sp/>dictionary</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="39"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/>var<sp/>newDictionary<sp/>=<sp/></highlight><highlight class="keyword">new</highlight><highlight class="normal"><sp/>Dictionary&lt;string,<sp/>CustomSampler&gt;(_samplers);</highlight></codeline>
+<codeline lineno="40"><highlight class="normal"></highlight></codeline>
+<codeline lineno="41"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/></highlight><highlight class="comment">//Then<sp/>construct<sp/>all<sp/>of<sp/>the<sp/>new<sp/>samplers<sp/>and<sp/>add<sp/>them<sp/>to<sp/>the<sp/>new<sp/>dictionary</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="42"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/></highlight><highlight class="keywordflow">while</highlight><highlight class="normal"><sp/>(_samplersToCreate.Count<sp/>&gt;<sp/>0)<sp/>{</highlight></codeline>
+<codeline lineno="43"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/></highlight><highlight class="keywordtype">string</highlight><highlight class="normal"><sp/>blockName<sp/>=<sp/>_samplersToCreate.Dequeue();</highlight></codeline>
+<codeline lineno="44"><highlight class="normal"></highlight></codeline>
+<codeline lineno="45"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/>newDictionary[blockName]<sp/>=<sp/>CustomSampler.Create(blockName);</highlight></codeline>
+<codeline lineno="46"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/>}</highlight></codeline>
+<codeline lineno="47"><highlight class="normal"></highlight></codeline>
+<codeline lineno="48"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/></highlight><highlight class="comment">//Reset<sp/>samplers<sp/>to<sp/>create<sp/>to<sp/>zero</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="49"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/>_samplersToCreateCount<sp/>=<sp/>0;</highlight></codeline>
+<codeline lineno="50"><highlight class="normal"></highlight></codeline>
+<codeline lineno="51"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/></highlight><highlight class="comment">//Reference<sp/>assignments<sp/>are<sp/>atomic<sp/>in<sp/>C#</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="52"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/></highlight><highlight class="comment">//All<sp/>new<sp/>callbacks<sp/>will<sp/>now<sp/>reference<sp/>the<sp/>updated<sp/>dictionary</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="53"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/></highlight><highlight class="comment">//Old<sp/>dictionary<sp/>will<sp/>be<sp/>collected<sp/>by<sp/>GC</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="54"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/>_samplers<sp/>=<sp/>newDictionary;</highlight></codeline>
+<codeline lineno="55"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/>}</highlight></codeline>
+<codeline lineno="56"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/>}</highlight></codeline>
+<codeline lineno="57"><highlight class="normal"><sp/><sp/><sp/><sp/>}</highlight></codeline>
+<codeline lineno="58"><highlight class="normal"></highlight></codeline>
+<codeline lineno="59"><highlight class="normal"><sp/><sp/><sp/><sp/></highlight><highlight class="keyword">public</highlight><highlight class="normal"><sp/></highlight><highlight class="keyword">static</highlight><highlight class="normal"><sp/></highlight><highlight class="keywordtype">void</highlight><highlight class="normal"><sp/>BeginProfilingForThread(BeginProfilingForThreadArgs<sp/>eventData)<sp/>{</highlight></codeline>
+<codeline lineno="60"><highlight class="normal"></highlight><highlight class="preprocessor">#if<sp/>UNITY_2017_3_OR_NEWER</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="61"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/></highlight><highlight class="comment">//Enable<sp/>unity<sp/>profiling<sp/>for<sp/>this<sp/>thread</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="62"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/>Profiler.BeginThreadProfiling(</highlight><highlight class="stringliteral">&quot;LeapCSharp&quot;</highlight><highlight class="normal">,<sp/>eventData.threadName);</highlight></codeline>
+<codeline lineno="63"><highlight class="normal"></highlight></codeline>
+<codeline lineno="64"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/></highlight><highlight class="comment">//Assume<sp/>that<sp/>threads<sp/>are<sp/>not<sp/>stopping<sp/>and<sp/>starting<sp/>frequently</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="65"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/></highlight><highlight class="comment">//so<sp/>we<sp/>can<sp/>get<sp/>away<sp/>with<sp/>less-than-optimal<sp/>strategies<sp/>when<sp/>starting<sp/>a<sp/>thread.</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="66"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/></highlight><highlight class="comment">//in<sp/>this<sp/>case<sp/>we<sp/>use<sp/>a<sp/>naive<sp/>queue<sp/>with<sp/>a<sp/>lock.</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="67"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/>lock<sp/>(_samplersToCreate)<sp/>{</highlight></codeline>
+<codeline lineno="68"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/></highlight><highlight class="keywordflow">foreach</highlight><highlight class="normal"><sp/>(var<sp/>blockName<sp/></highlight><highlight class="keywordflow">in</highlight><highlight class="normal"><sp/>eventData.blockNames)<sp/>{</highlight></codeline>
+<codeline lineno="69"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/>_samplersToCreate.Enqueue(blockName);</highlight></codeline>
+<codeline lineno="70"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/>}</highlight></codeline>
+<codeline lineno="71"><highlight class="normal"></highlight></codeline>
+<codeline lineno="72"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/>Interlocked.Add(ref<sp/>_samplersToCreateCount,<sp/>eventData.blockNames.Length);</highlight></codeline>
+<codeline lineno="73"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/>}</highlight></codeline>
+<codeline lineno="74"><highlight class="normal"></highlight><highlight class="preprocessor">#else</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="75"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/>Debug.LogWarning(</highlight><highlight class="stringliteral">&quot;Thread<sp/>Profiling<sp/>is<sp/>unavailable<sp/>in<sp/>versions<sp/>of<sp/>Unity<sp/>below<sp/>2017.3&quot;</highlight><highlight class="normal">);</highlight></codeline>
+<codeline lineno="76"><highlight class="normal"></highlight><highlight class="preprocessor">#endif</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="77"><highlight class="normal"><sp/><sp/><sp/><sp/>}</highlight></codeline>
+<codeline lineno="78"><highlight class="normal"></highlight></codeline>
+<codeline lineno="79"><highlight class="normal"><sp/><sp/><sp/><sp/></highlight><highlight class="keyword">public</highlight><highlight class="normal"><sp/></highlight><highlight class="keyword">static</highlight><highlight class="normal"><sp/></highlight><highlight class="keywordtype">void</highlight><highlight class="normal"><sp/>EndProfilingForThread(EndProfilingForThreadArgs<sp/>eventData)<sp/>{</highlight></codeline>
+<codeline lineno="80"><highlight class="normal"></highlight><highlight class="preprocessor">#if<sp/>UNITY_2017_3_OR_NEWER</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="81"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/>Profiler.EndThreadProfiling();</highlight></codeline>
+<codeline lineno="82"><highlight class="normal"></highlight><highlight class="preprocessor">#else</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="83"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/>Debug.LogWarning(</highlight><highlight class="stringliteral">&quot;Thread<sp/>Profiling<sp/>is<sp/>unavailable<sp/>in<sp/>versions<sp/>of<sp/>Unity<sp/>below<sp/>2017.3&quot;</highlight><highlight class="normal">);</highlight></codeline>
+<codeline lineno="84"><highlight class="normal"></highlight><highlight class="preprocessor">#endif</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="85"><highlight class="normal"><sp/><sp/><sp/><sp/>}</highlight></codeline>
+<codeline lineno="86"><highlight class="normal"></highlight></codeline>
+<codeline lineno="87"><highlight class="normal"><sp/><sp/><sp/><sp/></highlight><highlight class="keyword">public</highlight><highlight class="normal"><sp/></highlight><highlight class="keyword">static</highlight><highlight class="normal"><sp/></highlight><highlight class="keywordtype">void</highlight><highlight class="normal"><sp/>BeginProfilingBlock(BeginProfilingBlockArgs<sp/>eventData)<sp/>{</highlight></codeline>
+<codeline lineno="88"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/></highlight><highlight class="comment">//Sampler<sp/>might<sp/>not<sp/>have<sp/>been<sp/>created<sp/>yet<sp/>because<sp/>samplers<sp/>can<sp/>only<sp/>be<sp/>created</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="89"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/></highlight><highlight class="comment">//on<sp/>the<sp/>main<sp/>thread.<sp/><sp/>We<sp/>will<sp/>simply<sp/>not<sp/>be<sp/>able<sp/>to<sp/>report<sp/>all<sp/>blocks<sp/>until</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="90"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/></highlight><highlight class="comment">//a<sp/>sampler<sp/>is<sp/>available.</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="91"><highlight class="normal"></highlight></codeline>
+<codeline lineno="92"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/></highlight><highlight class="comment">//Note<sp/>that<sp/>the<sp/>Dictionary<sp/>type<sp/>is<sp/>thread<sp/>safe<sp/>for<sp/>read<sp/>operations</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="93"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/></highlight><highlight class="comment">//Dictionary<sp/>is<sp/>only<sp/>used<sp/>once<sp/>and<sp/>so<sp/>there<sp/>is<sp/>no<sp/>risk<sp/>of<sp/>the<sp/>dictionary<sp/></highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="94"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/></highlight><highlight class="comment">//being<sp/>swapped<sp/>out<sp/>from<sp/>underneath<sp/>us</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="95"><highlight class="normal"></highlight></codeline>
+<codeline lineno="96"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/>CustomSampler<sp/>sampler;</highlight></codeline>
+<codeline lineno="97"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/></highlight><highlight class="keywordflow">if</highlight><highlight class="normal"><sp/>(_samplers.TryGetValue(eventData.blockName,<sp/>out<sp/>sampler))<sp/>{</highlight></codeline>
+<codeline lineno="98"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/>sampler.Begin();</highlight></codeline>
+<codeline lineno="99"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/>}</highlight></codeline>
+<codeline lineno="100"><highlight class="normal"><sp/><sp/><sp/><sp/>}</highlight></codeline>
+<codeline lineno="101"><highlight class="normal"></highlight></codeline>
+<codeline lineno="102"><highlight class="normal"><sp/><sp/><sp/><sp/></highlight><highlight class="keyword">public</highlight><highlight class="normal"><sp/></highlight><highlight class="keyword">static</highlight><highlight class="normal"><sp/></highlight><highlight class="keywordtype">void</highlight><highlight class="normal"><sp/>EndProfilingBlock(EndProfilingBlockArgs<sp/>eventData)<sp/>{</highlight></codeline>
+<codeline lineno="103"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/>CustomSampler<sp/>sampler;</highlight></codeline>
+<codeline lineno="104"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/></highlight><highlight class="keywordflow">if</highlight><highlight class="normal"><sp/>(_samplers.TryGetValue(eventData.blockName,<sp/>out<sp/>sampler))<sp/>{</highlight></codeline>
+<codeline lineno="105"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/>sampler.End();</highlight></codeline>
+<codeline lineno="106"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/>}</highlight></codeline>
+<codeline lineno="107"><highlight class="normal"><sp/><sp/><sp/><sp/>}</highlight></codeline>
+<codeline lineno="108"><highlight class="normal"><sp/><sp/>}</highlight></codeline>
+<codeline lineno="109"><highlight class="normal">}</highlight></codeline>
+    </programlisting>
+    <location file="O:/GitHUBMINIPRoject/Assets/LeapMotion/Core/Scripts/LeapProfiling.cs"/>
+  </compounddef>
+</doxygen>

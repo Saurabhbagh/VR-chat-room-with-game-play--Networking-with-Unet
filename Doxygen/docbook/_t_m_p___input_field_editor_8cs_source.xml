@@ -1,0 +1,275 @@
+<?xml version='1.0' encoding='UTF-8' standalone='no'?>
+<section xmlns="http://docbook.org/ns/docbook" version="5.0" xmlns:xlink="http://www.w3.org/1999/xlink" xml:id="__t_m_p___input_field_editor_8cs_source">
+<title>TMP_InputFieldEditor.cs</title>
+<indexterm><primary>O:/GitHUBMINIPRoject/Library/PackageCache/com.unity.textmeshpro@1.3.0/Scripts/Editor/TMP_InputFieldEditor.cs</primary></indexterm>
+<programlisting>00001 <emphasis role="keyword">using</emphasis>&#32;<link linkend="__balloon_8cs_1a7d67e097df9376eb709b6a23aa3c7d23">UnityEngine</link>;
+00002 <emphasis role="keyword">using</emphasis>&#32;<link linkend="_namespace_unity_engine">UnityEngine</link>.UI;
+00003 <emphasis role="keyword">using</emphasis>&#32;<link linkend="_namespace_unity_editor">UnityEditor</link>;
+00004 <emphasis role="keyword">using</emphasis>&#32;<link linkend="_namespace_unity_editor">UnityEditor</link>.UI;
+00005 <emphasis role="keyword">using</emphasis>&#32;<link linkend="_namespace_unity_editor">UnityEditor</link>.AnimatedValues;
+00006 
+00007 
+00008 <emphasis role="keyword">namespace&#32;</emphasis><link linkend="_namespace_t_m_pro_1_1_editor_utilities">TMPro.EditorUtilities</link>
+00009 {
+00010 &#32;&#32;&#32;&#32;[CanEditMultipleObjects]
+00011 &#32;&#32;&#32;&#32;[CustomEditor(typeof(TMP_InputField),&#32;<emphasis role="keyword">true</emphasis>)]
+<anchor xml:id="__t_m_p___input_field_editor_8cs_source_1l00012"/><link linkend="_class_t_m_pro_1_1_editor_utilities_1_1_t_m_p___input_field_editor">00012</link> &#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keyword">class&#32;</emphasis><link linkend="_class_t_m_pro_1_1_editor_utilities_1_1_t_m_p___input_field_editor">TMP_InputFieldEditor</link>&#32;:&#32;SelectableEditor
+00013 &#32;&#32;&#32;&#32;{
+00014 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;<emphasis role="keyword">struct&#32;</emphasis>m_foldout
+00015 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{&#32;<emphasis role="comment">//&#32;Track&#32;Inspector&#32;foldout&#32;panel&#32;states,&#32;globally.</emphasis>
+00016 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keyword">static</emphasis>&#32;<emphasis role="keywordtype">bool</emphasis>&#32;textInput&#32;=&#32;<emphasis role="keyword">true</emphasis>;
+00017 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keyword">static</emphasis>&#32;<emphasis role="keywordtype">bool</emphasis>&#32;fontSettings&#32;=&#32;<emphasis role="keyword">true</emphasis>;
+00018 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keyword">static</emphasis>&#32;<emphasis role="keywordtype">bool</emphasis>&#32;extraSettings&#32;=&#32;<emphasis role="keyword">true</emphasis>;
+00019 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//public&#32;static&#32;bool&#32;shadowSetting&#32;=&#32;false;</emphasis>
+00020 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//public&#32;static&#32;bool&#32;materialEditor&#32;=&#32;true;</emphasis>
+00021 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00022 
+00023 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;SerializedProperty&#32;m_TextViewport;
+00024 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;SerializedProperty&#32;m_TextComponent;
+00025 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;SerializedProperty&#32;m_Text;
+00026 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;SerializedProperty&#32;m_ContentType;
+00027 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;SerializedProperty&#32;m_LineType;
+00028 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;SerializedProperty&#32;m_InputType;
+00029 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;SerializedProperty&#32;m_CharacterValidation;
+00030 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;SerializedProperty&#32;m_InputValidator;
+00031 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;SerializedProperty&#32;m_RegexValue;
+00032 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;SerializedProperty&#32;m_KeyboardType;
+00033 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;SerializedProperty&#32;m_CharacterLimit;
+00034 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;SerializedProperty&#32;m_CaretBlinkRate;
+00035 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;SerializedProperty&#32;m_CaretWidth;
+00036 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;SerializedProperty&#32;m_CaretColor;
+00037 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;SerializedProperty&#32;m_CustomCaretColor;
+00038 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;SerializedProperty&#32;m_SelectionColor;
+00039 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;SerializedProperty&#32;m_HideMobileInput;
+00040 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;SerializedProperty&#32;m_Placeholder;
+00041 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;SerializedProperty&#32;m_VerticalScrollbar;
+00042 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;SerializedProperty&#32;m_ScrollbarScrollSensitivity;
+00043 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;SerializedProperty&#32;m_OnValueChanged;
+00044 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;SerializedProperty&#32;m_OnEndEdit;
+00045 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;SerializedProperty&#32;m_OnSelect;
+00046 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;SerializedProperty&#32;m_OnDeselect;
+00047 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;SerializedProperty&#32;m_ReadOnly;
+00048 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;SerializedProperty&#32;m_RichText;
+00049 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;SerializedProperty&#32;m_RichTextEditingAllowed;
+00050 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;SerializedProperty&#32;m_ResetOnDeActivation;
+00051 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;SerializedProperty&#32;m_RestoreOriginalTextOnEscape;
+00052 
+00053 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;SerializedProperty&#32;m_OnFocusSelectAll;
+00054 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;SerializedProperty&#32;m_GlobalPointSize;
+00055 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;SerializedProperty&#32;m_GlobalFontAsset;
+00056 
+00057 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;AnimBool&#32;m_CustomColor;
+00058 
+00059 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//TMP_InputValidator&#32;m_ValidationScript;</emphasis>
+00060 
+<anchor xml:id="__t_m_p___input_field_editor_8cs_source_1l00061"/><link linkend="_class_t_m_pro_1_1_editor_utilities_1_1_t_m_p___input_field_editor_1a13a786fd7318702adc91f2d3a4e5f240">00061</link> &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">protected</emphasis>&#32;<emphasis role="keyword">override</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;<link linkend="_class_t_m_pro_1_1_editor_utilities_1_1_t_m_p___input_field_editor_1a13a786fd7318702adc91f2d3a4e5f240">OnEnable</link>()
+00062 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00063 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;base.OnEnable();
+00064 
+00065 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;m_TextViewport&#32;=&#32;serializedObject.FindProperty(<emphasis role="stringliteral">&quot;m_TextViewport&quot;</emphasis>);
+00066 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;m_TextComponent&#32;=&#32;serializedObject.FindProperty(<emphasis role="stringliteral">&quot;m_TextComponent&quot;</emphasis>);
+00067 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;m_Text&#32;=&#32;serializedObject.FindProperty(<emphasis role="stringliteral">&quot;m_Text&quot;</emphasis>);
+00068 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;m_ContentType&#32;=&#32;serializedObject.FindProperty(<emphasis role="stringliteral">&quot;m_ContentType&quot;</emphasis>);
+00069 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;m_LineType&#32;=&#32;serializedObject.FindProperty(<emphasis role="stringliteral">&quot;m_LineType&quot;</emphasis>);
+00070 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;m_InputType&#32;=&#32;serializedObject.FindProperty(<emphasis role="stringliteral">&quot;m_InputType&quot;</emphasis>);
+00071 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;m_CharacterValidation&#32;=&#32;serializedObject.FindProperty(<emphasis role="stringliteral">&quot;m_CharacterValidation&quot;</emphasis>);
+00072 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;m_InputValidator&#32;=&#32;serializedObject.FindProperty(<emphasis role="stringliteral">&quot;m_InputValidator&quot;</emphasis>);
+00073 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;m_RegexValue&#32;=&#32;serializedObject.FindProperty(<emphasis role="stringliteral">&quot;m_RegexValue&quot;</emphasis>);
+00074 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;m_KeyboardType&#32;=&#32;serializedObject.FindProperty(<emphasis role="stringliteral">&quot;m_KeyboardType&quot;</emphasis>);
+00075 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;m_CharacterLimit&#32;=&#32;serializedObject.FindProperty(<emphasis role="stringliteral">&quot;m_CharacterLimit&quot;</emphasis>);
+00076 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;m_CaretBlinkRate&#32;=&#32;serializedObject.FindProperty(<emphasis role="stringliteral">&quot;m_CaretBlinkRate&quot;</emphasis>);
+00077 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;m_CaretWidth&#32;=&#32;serializedObject.FindProperty(<emphasis role="stringliteral">&quot;m_CaretWidth&quot;</emphasis>);
+00078 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;m_CaretColor&#32;=&#32;serializedObject.FindProperty(<emphasis role="stringliteral">&quot;m_CaretColor&quot;</emphasis>);
+00079 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;m_CustomCaretColor&#32;=&#32;serializedObject.FindProperty(<emphasis role="stringliteral">&quot;m_CustomCaretColor&quot;</emphasis>);
+00080 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;m_SelectionColor&#32;=&#32;serializedObject.FindProperty(<emphasis role="stringliteral">&quot;m_SelectionColor&quot;</emphasis>);
+00081 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;m_HideMobileInput&#32;=&#32;serializedObject.FindProperty(<emphasis role="stringliteral">&quot;m_HideMobileInput&quot;</emphasis>);
+00082 
+00083 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;m_Placeholder&#32;=&#32;serializedObject.FindProperty(<emphasis role="stringliteral">&quot;m_Placeholder&quot;</emphasis>);
+00084 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;m_VerticalScrollbar&#32;=&#32;serializedObject.FindProperty(<emphasis role="stringliteral">&quot;m_VerticalScrollbar&quot;</emphasis>);
+00085 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;m_ScrollbarScrollSensitivity&#32;=&#32;serializedObject.FindProperty(<emphasis role="stringliteral">&quot;m_ScrollSensitivity&quot;</emphasis>);
+00086 
+00087 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;m_OnValueChanged&#32;=&#32;serializedObject.FindProperty(<emphasis role="stringliteral">&quot;m_OnValueChanged&quot;</emphasis>);
+00088 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;m_OnEndEdit&#32;=&#32;serializedObject.FindProperty(<emphasis role="stringliteral">&quot;m_OnEndEdit&quot;</emphasis>);
+00089 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;m_OnSelect&#32;=&#32;serializedObject.FindProperty(<emphasis role="stringliteral">&quot;m_OnSelect&quot;</emphasis>);
+00090 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;m_OnDeselect&#32;=&#32;serializedObject.FindProperty(<emphasis role="stringliteral">&quot;m_OnDeselect&quot;</emphasis>);
+00091 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;m_ReadOnly&#32;=&#32;serializedObject.FindProperty(<emphasis role="stringliteral">&quot;m_ReadOnly&quot;</emphasis>);
+00092 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;m_RichText&#32;=&#32;serializedObject.FindProperty(<emphasis role="stringliteral">&quot;m_RichText&quot;</emphasis>);
+00093 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;m_RichTextEditingAllowed&#32;=&#32;serializedObject.FindProperty(<emphasis role="stringliteral">&quot;m_isRichTextEditingAllowed&quot;</emphasis>);
+00094 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;m_ResetOnDeActivation&#32;=&#32;serializedObject.FindProperty(<emphasis role="stringliteral">&quot;m_ResetOnDeActivation&quot;</emphasis>);
+00095 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;m_RestoreOriginalTextOnEscape&#32;=&#32;serializedObject.FindProperty(<emphasis role="stringliteral">&quot;m_RestoreOriginalTextOnEscape&quot;</emphasis>);
+00096 
+00097 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;m_OnFocusSelectAll&#32;=&#32;serializedObject.FindProperty(<emphasis role="stringliteral">&quot;m_OnFocusSelectAll&quot;</emphasis>);
+00098 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;m_GlobalPointSize&#32;=&#32;serializedObject.FindProperty(<emphasis role="stringliteral">&quot;m_GlobalPointSize&quot;</emphasis>);
+00099 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;m_GlobalFontAsset&#32;=&#32;serializedObject.FindProperty(<emphasis role="stringliteral">&quot;m_GlobalFontAsset&quot;</emphasis>);
+00100 
+00101 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;m_CustomColor&#32;=&#32;<emphasis role="keyword">new</emphasis>&#32;AnimBool(m_CustomCaretColor.boolValue);
+00102 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;m_CustomColor.valueChanged.AddListener(Repaint);
+00103 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00104 
+<anchor xml:id="__t_m_p___input_field_editor_8cs_source_1l00105"/><link linkend="_class_t_m_pro_1_1_editor_utilities_1_1_t_m_p___input_field_editor_1a3a6a4623990bf29d8bd5c3016b6b8509">00105</link> &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">protected</emphasis>&#32;<emphasis role="keyword">override</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;<link linkend="_class_t_m_pro_1_1_editor_utilities_1_1_t_m_p___input_field_editor_1a3a6a4623990bf29d8bd5c3016b6b8509">OnDisable</link>()
+00106 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00107 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;base.OnDisable();
+00108 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;m_CustomColor.valueChanged.RemoveListener(Repaint);
+00109 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00110 
+<anchor xml:id="__t_m_p___input_field_editor_8cs_source_1l00111"/><link linkend="_class_t_m_pro_1_1_editor_utilities_1_1_t_m_p___input_field_editor_1a59b111f8284526795f6dcc32a3db65f6">00111</link> &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keyword">override</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;<link linkend="_class_t_m_pro_1_1_editor_utilities_1_1_t_m_p___input_field_editor_1a59b111f8284526795f6dcc32a3db65f6">OnInspectorGUI</link>()
+00112 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00113 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;serializedObject.Update();
+00114 
+00115 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;base.OnInspectorGUI();
+00116 
+00117 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;EditorGUILayout.Space();
+00118 
+00119 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;EditorGUILayout.PropertyField(m_TextViewport);
+00120 
+00121 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;EditorGUILayout.PropertyField(m_TextComponent);
+00122 
+00123 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_t_m_pro_1_1_text_mesh_pro_u_g_u_i">TextMeshProUGUI</link>&#32;text&#32;=&#32;<emphasis role="keyword">null</emphasis>;
+00124 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(m_TextComponent&#32;!=&#32;<emphasis role="keyword">null</emphasis>&#32;&amp;&amp;&#32;m_TextComponent.objectReferenceValue&#32;!=&#32;<emphasis role="keyword">null</emphasis>)
+00125 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00126 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;text&#32;=&#32;m_TextComponent.objectReferenceValue&#32;as&#32;<link linkend="_class_t_m_pro_1_1_text_mesh_pro_u_g_u_i">TextMeshProUGUI</link>;
+00127 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//if&#32;(text.supportRichText)</emphasis>
+00128 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//{</emphasis>
+00129 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;&#32;&#32;&#32;EditorGUILayout.HelpBox(&quot;Using&#32;Rich&#32;Text&#32;with&#32;input&#32;is&#32;unsupported.&quot;,&#32;MessageType.Warning);</emphasis>
+00130 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//}</emphasis>
+00131 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00132 
+00133 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;EditorGUI.BeginDisabledGroup(m_TextComponent&#32;==&#32;<emphasis role="keyword">null</emphasis>&#32;||&#32;m_TextComponent.objectReferenceValue&#32;==&#32;<emphasis role="keyword">null</emphasis>);
+00134 
+00135 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;TEXT&#32;INPUT&#32;BOX</emphasis>
+00136 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;EditorGUILayout.PropertyField(m_Text);
+00137 
+00138 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;INPUT&#32;FIELD&#32;SETTINGS</emphasis>
+00139 <emphasis role="preprocessor">&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;#region&#32;INPUT&#32;FIELD&#32;SETTINGS</emphasis>
+00140 
+00141 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;m_foldout.fontSettings&#32;=&#32;EditorGUILayout.Foldout(m_foldout.fontSettings,&#32;<emphasis role="stringliteral">&quot;Input&#32;Field&#32;Settings&quot;</emphasis>,&#32;<emphasis role="keyword">true</emphasis>,&#32;TMP_UIStyleManager.boldFoldout);
+00142 
+00143 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(m_foldout.fontSettings)
+00144 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00145 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;EditorGUI.indentLevel++;
+00146 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;EditorGUI.BeginChangeCheck();
+00147 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;EditorGUILayout.PropertyField(m_GlobalFontAsset,&#32;<emphasis role="keyword">new</emphasis>&#32;GUIContent(<emphasis role="stringliteral">&quot;Font&#32;Asset&quot;</emphasis>,&#32;<emphasis role="stringliteral">&quot;Set&#32;the&#32;Font&#32;Asset&#32;for&#32;both&#32;Placeholder&#32;and&#32;Input&#32;Field&#32;text&#32;object.&quot;</emphasis>));
+00148 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(EditorGUI.EndChangeCheck())
+00149 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00150 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_t_m_pro_1_1_t_m_p___input_field">TMP_InputField</link>&#32;inputField&#32;=&#32;target&#32;as&#32;<link linkend="_class_t_m_pro_1_1_t_m_p___input_field">TMP_InputField</link>;
+00151 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;inputField.<link linkend="_class_t_m_pro_1_1_t_m_p___input_field_1a2ed20e5b12507b1ff2e108dd99d4091f">SetGlobalFontAsset</link>(m_GlobalFontAsset.objectReferenceValue&#32;as&#32;<link linkend="_class_t_m_pro_1_1_t_m_p___font_asset">TMP_FontAsset</link>);
+00152 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00153 
+00154 
+00155 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;EditorGUI.BeginChangeCheck();
+00156 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;EditorGUILayout.PropertyField(m_GlobalPointSize,&#32;<emphasis role="keyword">new</emphasis>&#32;GUIContent(<emphasis role="stringliteral">&quot;Point&#32;Size&quot;</emphasis>,&#32;<emphasis role="stringliteral">&quot;Set&#32;the&#32;point&#32;size&#32;of&#32;both&#32;Placeholder&#32;and&#32;Input&#32;Field&#32;text&#32;object.&quot;</emphasis>));
+00157 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(EditorGUI.EndChangeCheck())
+00158 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00159 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_t_m_pro_1_1_t_m_p___input_field">TMP_InputField</link>&#32;inputField&#32;=&#32;target&#32;as&#32;<link linkend="_class_t_m_pro_1_1_t_m_p___input_field">TMP_InputField</link>;
+00160 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;inputField.<link linkend="_class_t_m_pro_1_1_t_m_p___input_field_1aba2ab9700cbd18d64736530a34d91068">SetGlobalPointSize</link>(m_GlobalPointSize.floatValue);
+00161 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00162 
+00163 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;EditorGUI.BeginChangeCheck();
+00164 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;EditorGUILayout.PropertyField(m_CharacterLimit);
+00165 
+00166 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;EditorGUILayout.Space();
+00167 
+00168 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;EditorGUILayout.PropertyField(m_ContentType);
+00169 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(!m_ContentType.hasMultipleDifferentValues)
+00170 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00171 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;EditorGUI.indentLevel++;
+00172 
+00173 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(m_ContentType.enumValueIndex&#32;==&#32;(<emphasis role="keywordtype">int</emphasis>)<link linkend="_class_t_m_pro_1_1_t_m_p___input_field">TMP_InputField</link>.<link linkend="_class_t_m_pro_1_1_t_m_p___input_field_1a30e2af425a58881d8b71361e70ddbe27">ContentType</link>.Standard&#32;||
+00174 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;m_ContentType.enumValueIndex&#32;==&#32;(<emphasis role="keywordtype">int</emphasis>)<link linkend="_class_t_m_pro_1_1_t_m_p___input_field">TMP_InputField</link>.<link linkend="_class_t_m_pro_1_1_t_m_p___input_field_1a30e2af425a58881d8b71361e70ddbe27">ContentType</link>.Autocorrected&#32;||
+00175 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;m_ContentType.enumValueIndex&#32;==&#32;(<emphasis role="keywordtype">int</emphasis>)<link linkend="_class_t_m_pro_1_1_t_m_p___input_field">TMP_InputField</link>.<link linkend="_class_t_m_pro_1_1_t_m_p___input_field_1a30e2af425a58881d8b71361e70ddbe27">ContentType</link>.Custom)
+00176 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00177 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;EditorGUI.BeginChangeCheck();
+00178 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;EditorGUILayout.PropertyField(m_LineType);
+00179 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(EditorGUI.EndChangeCheck())
+00180 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00181 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(text&#32;!=&#32;<emphasis role="keyword">null</emphasis>)
+00182 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00183 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(m_LineType.enumValueIndex&#32;==&#32;(<emphasis role="keywordtype">int</emphasis>)<link linkend="_class_t_m_pro_1_1_t_m_p___input_field">TMP_InputField</link>.<link linkend="_class_t_m_pro_1_1_t_m_p___input_field_1a0da8af0aef5faef7c405ac72d28bd214">LineType</link>.SingleLine)
+00184 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;text.<link linkend="_class_t_m_pro_1_1_t_m_p___text_1a9add0d44e7faabf1070b2ace2ac89378">enableWordWrapping</link>&#32;=&#32;<emphasis role="keyword">false</emphasis>;
+00185 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">else</emphasis>
+00186 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;text.<link linkend="_class_t_m_pro_1_1_t_m_p___text_1a9add0d44e7faabf1070b2ace2ac89378">enableWordWrapping</link>&#32;=&#32;<emphasis role="keyword">true</emphasis>;
+00187 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00188 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00189 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00190 
+00191 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(m_ContentType.enumValueIndex&#32;==&#32;(<emphasis role="keywordtype">int</emphasis>)<link linkend="_class_t_m_pro_1_1_t_m_p___input_field">TMP_InputField</link>.<link linkend="_class_t_m_pro_1_1_t_m_p___input_field_1a30e2af425a58881d8b71361e70ddbe27">ContentType</link>.Custom)
+00192 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00193 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;EditorGUILayout.PropertyField(m_InputType);
+00194 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;EditorGUILayout.PropertyField(m_KeyboardType);
+00195 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;EditorGUILayout.PropertyField(m_CharacterValidation);
+00196 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(m_CharacterValidation.enumValueIndex&#32;==&#32;(<emphasis role="keywordtype">int</emphasis>)<link linkend="_class_t_m_pro_1_1_t_m_p___input_field">TMP_InputField</link>.<link linkend="_class_t_m_pro_1_1_t_m_p___input_field_1a96ac8b8cc04492aadbf24839b8d6376e">CharacterValidation</link>.Regex)
+00197 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00198 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;EditorGUILayout.PropertyField(m_RegexValue);
+00199 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00200 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">else</emphasis>&#32;<emphasis role="keywordflow">if</emphasis>&#32;(m_CharacterValidation.enumValueIndex&#32;==&#32;(<emphasis role="keywordtype">int</emphasis>)<link linkend="_class_t_m_pro_1_1_t_m_p___input_field">TMP_InputField</link>.<link linkend="_class_t_m_pro_1_1_t_m_p___input_field_1a96ac8b8cc04492aadbf24839b8d6376e">CharacterValidation</link>.CustomValidator)
+00201 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00202 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;EditorGUILayout.PropertyField(m_InputValidator);
+00203 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00204 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00205 
+00206 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;EditorGUI.indentLevel--;
+00207 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00208 
+00209 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;EditorGUILayout.Space();
+00210 
+00211 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;EditorGUILayout.PropertyField(m_Placeholder);
+00212 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;EditorGUILayout.PropertyField(m_VerticalScrollbar);
+00213 
+00214 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(m_VerticalScrollbar.objectReferenceValue&#32;!=&#32;<emphasis role="keyword">null</emphasis>)
+00215 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;EditorGUILayout.PropertyField(m_ScrollbarScrollSensitivity);
+00216 
+00217 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;EditorGUILayout.PropertyField(m_CaretBlinkRate);
+00218 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;EditorGUILayout.PropertyField(m_CaretWidth);
+00219 
+00220 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;EditorGUILayout.PropertyField(m_CustomCaretColor);
+00221 
+00222 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;m_CustomColor.target&#32;=&#32;m_CustomCaretColor.boolValue;
+00223 
+00224 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(EditorGUILayout.BeginFadeGroup(m_CustomColor.faded))
+00225 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00226 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;EditorGUILayout.PropertyField(m_CaretColor);
+00227 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00228 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;EditorGUILayout.EndFadeGroup();
+00229 
+00230 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;EditorGUILayout.PropertyField(m_SelectionColor);
+00231 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;
+00232 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;EditorGUI.indentLevel--;
+00233 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00234 <emphasis role="preprocessor">&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;#endregion</emphasis>
+00235 
+00236 
+00237 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;CONTROL&#32;SETTINGS</emphasis>
+00238 <emphasis role="preprocessor">&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;#region&#32;CONTROL&#32;SETTINGS</emphasis>
+00239 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;m_foldout.extraSettings&#32;=&#32;EditorGUILayout.Foldout(m_foldout.extraSettings,&#32;<emphasis role="stringliteral">&quot;Control&#32;Settings&quot;</emphasis>,&#32;<emphasis role="keyword">true</emphasis>,&#32;TMP_UIStyleManager.boldFoldout);
+00240 
+00241 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(m_foldout.extraSettings)
+00242 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00243 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;EditorGUI.indentLevel++;
+00244 
+00245 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;EditorGUILayout.PropertyField(m_OnFocusSelectAll,&#32;<emphasis role="keyword">new</emphasis>&#32;GUIContent(<emphasis role="stringliteral">&quot;OnFocus&#32;-&#32;Select&#32;All&quot;</emphasis>,&#32;<emphasis role="stringliteral">&quot;Should&#32;all&#32;the&#32;text&#32;be&#32;selected&#32;when&#32;the&#32;Input&#32;Field&#32;is&#32;selected.&quot;</emphasis>));
+00246 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;EditorGUILayout.PropertyField(m_ResetOnDeActivation,&#32;<emphasis role="keyword">new</emphasis>&#32;GUIContent(<emphasis role="stringliteral">&quot;Reset&#32;On&#32;DeActivation&quot;</emphasis>,&#32;<emphasis role="stringliteral">&quot;Should&#32;the&#32;Text&#32;and&#32;Caret&#32;position&#32;be&#32;reset&#32;when&#32;Input&#32;Field&#32;is&#32;DeActivated.&quot;</emphasis>));
+00247 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;EditorGUILayout.PropertyField(m_RestoreOriginalTextOnEscape,&#32;<emphasis role="keyword">new</emphasis>&#32;GUIContent(<emphasis role="stringliteral">&quot;Restore&#32;On&#32;ESC&#32;Key&quot;</emphasis>,&#32;<emphasis role="stringliteral">&quot;Should&#32;the&#32;original&#32;text&#32;be&#32;restored&#32;when&#32;pressing&#32;ESC.&quot;</emphasis>));
+00248 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;EditorGUILayout.PropertyField(m_HideMobileInput);
+00249 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;EditorGUILayout.PropertyField(m_ReadOnly);
+00250 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;EditorGUILayout.PropertyField(m_RichText);
+00251 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;EditorGUILayout.PropertyField(m_RichTextEditingAllowed,&#32;<emphasis role="keyword">new</emphasis>&#32;GUIContent(<emphasis role="stringliteral">&quot;Allow&#32;Rich&#32;Text&#32;Editing&quot;</emphasis>));
+00252 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;
+00253 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;EditorGUI.indentLevel--;
+00254 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00255 <emphasis role="preprocessor">&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;#endregion</emphasis>
+00256 
+00257 
+00258 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;EditorGUILayout.Space();
+00259 
+00260 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;EditorGUILayout.PropertyField(m_OnValueChanged);
+00261 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;EditorGUILayout.PropertyField(m_OnEndEdit);
+00262 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;EditorGUILayout.PropertyField(m_OnSelect);
+00263 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;EditorGUILayout.PropertyField(m_OnDeselect);
+00264 
+00265 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;EditorGUI.EndDisabledGroup();
+00266 
+00267 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;serializedObject.ApplyModifiedProperties();
+00268 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00269 &#32;&#32;&#32;&#32;}
+00270 }
+</programlisting></section>

@@ -1,0 +1,251 @@
+<?xml version='1.0' encoding='UTF-8' standalone='no'?>
+<section xmlns="http://docbook.org/ns/docbook" version="5.0" xmlns:xlink="http://www.w3.org/1999/xlink" xml:id="__t_m_p___coroutine_tween_8cs_source">
+<title>TMP_CoroutineTween.cs</title>
+<indexterm><primary>O:/GitHUBMINIPRoject/Library/PackageCache/com.unity.textmeshpro@1.3.0/Scripts/Runtime/TMP_CoroutineTween.cs</primary></indexterm>
+<programlisting>00001 <emphasis role="keyword">using</emphasis>&#32;<link linkend="__balloon_8cs_1a7d67e097df9376eb709b6a23aa3c7d23">UnityEngine</link>;
+00002 <emphasis role="keyword">using</emphasis>&#32;<link linkend="_namespace_unity_engine">UnityEngine</link>.Events;
+00003 <emphasis role="keyword">using</emphasis>&#32;System.Collections;
+00004 
+00005 
+00006 <emphasis role="keyword">namespace&#32;</emphasis><link linkend="_namespace_t_m_pro">TMPro</link>
+00007 {
+00008 &#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;Base&#32;interface&#32;for&#32;tweeners,</emphasis>
+00009 &#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;using&#32;an&#32;interface&#32;instead&#32;of</emphasis>
+00010 &#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;an&#32;abstract&#32;class&#32;as&#32;we&#32;want&#32;the</emphasis>
+00011 &#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;tweens&#32;to&#32;be&#32;structs.</emphasis>
+<anchor xml:id="__t_m_p___coroutine_tween_8cs_source_1l00012"/><link linkend="_interface_t_m_pro_1_1_i_tween_value">00012</link> &#32;&#32;&#32;&#32;<emphasis role="keyword">internal</emphasis>&#32;<emphasis role="keyword">interface&#32;</emphasis><link linkend="_interface_t_m_pro_1_1_i_tween_value">ITweenValue</link>
+00013 &#32;&#32;&#32;&#32;{
+00014 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordtype">void</emphasis>&#32;<link linkend="_interface_t_m_pro_1_1_i_tween_value_1aed9322f3d92691a29267b72c104b40bf">TweenValue</link>(<emphasis role="keywordtype">float</emphasis>&#32;floatPercentage);
+<anchor xml:id="__t_m_p___coroutine_tween_8cs_source_1l00015"/><link linkend="_interface_t_m_pro_1_1_i_tween_value_1a4b32d163a38f053e9e7a830c44174fb4">00015</link> &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordtype">bool</emphasis>&#32;<link linkend="_interface_t_m_pro_1_1_i_tween_value_1a4b32d163a38f053e9e7a830c44174fb4">ignoreTimeScale</link>&#32;{&#32;<emphasis role="keyword">get</emphasis>;&#32;}
+<anchor xml:id="__t_m_p___coroutine_tween_8cs_source_1l00016"/><link linkend="_interface_t_m_pro_1_1_i_tween_value_1a1b13b53073d463536d1c1c8165bc2a24">00016</link> &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordtype">float</emphasis>&#32;<link linkend="_interface_t_m_pro_1_1_i_tween_value_1a1b13b53073d463536d1c1c8165bc2a24">duration</link>&#32;{&#32;<emphasis role="keyword">get</emphasis>;&#32;}
+00017 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordtype">bool</emphasis>&#32;<link linkend="_interface_t_m_pro_1_1_i_tween_value_1ae0e763108b1d0fe8f9e34661a16fa994">ValidTarget</link>();
+00018 &#32;&#32;&#32;&#32;}
+00019 
+00020 &#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;Color&#32;tween&#32;class,&#32;receives&#32;the</emphasis>
+00021 &#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;TweenValue&#32;callback&#32;and&#32;then&#32;sets</emphasis>
+00022 &#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;the&#32;value&#32;on&#32;the&#32;target.</emphasis>
+<anchor xml:id="__t_m_p___coroutine_tween_8cs_source_1l00023"/><link linkend="_struct_t_m_pro_1_1_color_tween">00023</link> &#32;&#32;&#32;&#32;<emphasis role="keyword">internal</emphasis>&#32;<emphasis role="keyword">struct&#32;</emphasis><link linkend="_struct_t_m_pro_1_1_color_tween">ColorTween</link>&#32;:&#32;<link linkend="_interface_t_m_pro_1_1_i_tween_value">ITweenValue</link>
+00024 &#32;&#32;&#32;&#32;{
+<anchor xml:id="__t_m_p___coroutine_tween_8cs_source_1l00025"/><link linkend="_struct_t_m_pro_1_1_color_tween_1a22465a1cc95d87abd9ca22c2dd021fbd">00025</link> &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keyword">enum</emphasis>&#32;<link linkend="_struct_t_m_pro_1_1_color_tween_1a22465a1cc95d87abd9ca22c2dd021fbd">ColorTweenMode</link>
+00026 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00027 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;All,
+00028 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;RGB,
+00029 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;Alpha
+00030 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00031 
+<anchor xml:id="__t_m_p___coroutine_tween_8cs_source_1l00032"/><link linkend="_class_t_m_pro_1_1_color_tween_1_1_color_tween_callback">00032</link> &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keyword">class&#32;</emphasis><link linkend="_class_t_m_pro_1_1_color_tween_1_1_color_tween_callback">ColorTweenCallback</link>&#32;:&#32;UnityEvent&lt;Color&gt;&#32;{&#32;}
+00033 
+00034 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;<link linkend="_class_t_m_pro_1_1_color_tween_1_1_color_tween_callback">ColorTweenCallback</link>&#32;m_Target;
+00035 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;Color&#32;m_StartColor;
+00036 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;Color&#32;m_TargetColor;
+00037 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;<link linkend="_struct_t_m_pro_1_1_color_tween_1a22465a1cc95d87abd9ca22c2dd021fbd">ColorTweenMode</link>&#32;m_TweenMode;
+00038 
+00039 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;<emphasis role="keywordtype">float</emphasis>&#32;m_Duration;
+00040 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;<emphasis role="keywordtype">bool</emphasis>&#32;m_IgnoreTimeScale;
+00041 
+00042 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;Color&#32;<link linkend="_struct_t_m_pro_1_1_color_tween_1a22d5f15683397db24c9fa7ba47e32a11">startColor</link>
+<anchor xml:id="__t_m_p___coroutine_tween_8cs_source_1l00043"/><link linkend="_struct_t_m_pro_1_1_color_tween_1a22d5f15683397db24c9fa7ba47e32a11">00043</link> &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00044 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">get</emphasis>&#32;{&#32;<emphasis role="keywordflow">return</emphasis>&#32;m_StartColor;&#32;}
+00045 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">set</emphasis>&#32;{&#32;m_StartColor&#32;=&#32;value;&#32;}
+00046 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00047 
+00048 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;Color&#32;<link linkend="_struct_t_m_pro_1_1_color_tween_1af6f6e8d0db57003afbaa35865364f342">targetColor</link>
+<anchor xml:id="__t_m_p___coroutine_tween_8cs_source_1l00049"/><link linkend="_struct_t_m_pro_1_1_color_tween_1af6f6e8d0db57003afbaa35865364f342">00049</link> &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00050 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">get</emphasis>&#32;{&#32;<emphasis role="keywordflow">return</emphasis>&#32;m_TargetColor;&#32;}
+00051 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">set</emphasis>&#32;{&#32;m_TargetColor&#32;=&#32;value;&#32;}
+00052 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00053 
+00054 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<link linkend="_struct_t_m_pro_1_1_color_tween_1a22465a1cc95d87abd9ca22c2dd021fbd">ColorTweenMode</link>&#32;<link linkend="_struct_t_m_pro_1_1_color_tween_1aef6eb969db69ffdcef35e0f13f2e0dc2">tweenMode</link>
+<anchor xml:id="__t_m_p___coroutine_tween_8cs_source_1l00055"/><link linkend="_struct_t_m_pro_1_1_color_tween_1aef6eb969db69ffdcef35e0f13f2e0dc2">00055</link> &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00056 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">get</emphasis>&#32;{&#32;<emphasis role="keywordflow">return</emphasis>&#32;m_TweenMode;&#32;}
+00057 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">set</emphasis>&#32;{&#32;m_TweenMode&#32;=&#32;value;&#32;}
+00058 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00059 
+00060 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keywordtype">float</emphasis>&#32;<link linkend="_struct_t_m_pro_1_1_color_tween_1aa20e0c9773e9a8e50d0feae7c4e599a0">duration</link>
+<anchor xml:id="__t_m_p___coroutine_tween_8cs_source_1l00061"/><link linkend="_struct_t_m_pro_1_1_color_tween_1aa20e0c9773e9a8e50d0feae7c4e599a0">00061</link> &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00062 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">get</emphasis>&#32;{&#32;<emphasis role="keywordflow">return</emphasis>&#32;m_Duration;&#32;}
+00063 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">set</emphasis>&#32;{&#32;m_Duration&#32;=&#32;value;&#32;}
+00064 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00065 
+00066 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keywordtype">bool</emphasis>&#32;<link linkend="_struct_t_m_pro_1_1_color_tween_1ad8ec0ae32214f07d8e7538636bdbdb08">ignoreTimeScale</link>
+<anchor xml:id="__t_m_p___coroutine_tween_8cs_source_1l00067"/><link linkend="_struct_t_m_pro_1_1_color_tween_1ad8ec0ae32214f07d8e7538636bdbdb08">00067</link> &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00068 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">get</emphasis>&#32;{&#32;<emphasis role="keywordflow">return</emphasis>&#32;m_IgnoreTimeScale;&#32;}
+00069 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">set</emphasis>&#32;{&#32;m_IgnoreTimeScale&#32;=&#32;value;&#32;}
+00070 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00071 
+<anchor xml:id="__t_m_p___coroutine_tween_8cs_source_1l00072"/><link linkend="_struct_t_m_pro_1_1_color_tween_1aa2ab2acdd602a7f7c73c179d4b0b92f5">00072</link> &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;<link linkend="_struct_t_m_pro_1_1_color_tween_1aa2ab2acdd602a7f7c73c179d4b0b92f5">TweenValue</link>(<emphasis role="keywordtype">float</emphasis>&#32;floatPercentage)
+00073 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00074 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(!<link linkend="_struct_t_m_pro_1_1_color_tween_1adab4fef0982d1c37120c45baa1bf1111">ValidTarget</link>())
+00075 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>;
+00076 
+00077 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;var&#32;newColor&#32;=&#32;Color.Lerp(m_StartColor,&#32;m_TargetColor,&#32;floatPercentage);
+00078 
+00079 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(m_TweenMode&#32;==&#32;<link linkend="_struct_t_m_pro_1_1_color_tween_1a22465a1cc95d87abd9ca22c2dd021fbd">ColorTweenMode</link>.Alpha)
+00080 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00081 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;newColor.r&#32;=&#32;m_StartColor.r;
+00082 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;newColor.g&#32;=&#32;m_StartColor.g;
+00083 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;newColor.b&#32;=&#32;m_StartColor.b;
+00084 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00085 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">else</emphasis>&#32;<emphasis role="keywordflow">if</emphasis>&#32;(m_TweenMode&#32;==&#32;<link linkend="_struct_t_m_pro_1_1_color_tween_1a22465a1cc95d87abd9ca22c2dd021fbd">ColorTweenMode</link>.RGB)
+00086 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00087 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;newColor.a&#32;=&#32;m_StartColor.a;
+00088 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00089 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;m_Target.Invoke(newColor);
+00090 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00091 
+<anchor xml:id="__t_m_p___coroutine_tween_8cs_source_1l00092"/><link linkend="_struct_t_m_pro_1_1_color_tween_1a5a3af510dc44b3ad3c8973bb93197961">00092</link> &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;<link linkend="_struct_t_m_pro_1_1_color_tween_1a5a3af510dc44b3ad3c8973bb93197961">AddOnChangedCallback</link>(UnityAction&lt;Color&gt;&#32;callback)
+00093 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00094 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(m_Target&#32;==&#32;<emphasis role="keyword">null</emphasis>)
+00095 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;m_Target&#32;=&#32;<emphasis role="keyword">new</emphasis>&#32;<link linkend="_class_t_m_pro_1_1_color_tween_1_1_color_tween_callback">ColorTweenCallback</link>();
+00096 
+00097 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;m_Target.AddListener(callback);
+00098 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00099 
+<anchor xml:id="__t_m_p___coroutine_tween_8cs_source_1l00100"/><link linkend="_struct_t_m_pro_1_1_color_tween_1a836616b26c0730957c7a2e1d340356fb">00100</link> &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keywordtype">bool</emphasis>&#32;<link linkend="_struct_t_m_pro_1_1_color_tween_1a836616b26c0730957c7a2e1d340356fb">GetIgnoreTimescale</link>()
+00101 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00102 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;m_IgnoreTimeScale;
+00103 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00104 
+<anchor xml:id="__t_m_p___coroutine_tween_8cs_source_1l00105"/><link linkend="_struct_t_m_pro_1_1_color_tween_1ad68d38055abd7079732e93a83746f30b">00105</link> &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keywordtype">float</emphasis>&#32;<link linkend="_struct_t_m_pro_1_1_color_tween_1ad68d38055abd7079732e93a83746f30b">GetDuration</link>()
+00106 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00107 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;m_Duration;
+00108 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00109 
+<anchor xml:id="__t_m_p___coroutine_tween_8cs_source_1l00110"/><link linkend="_struct_t_m_pro_1_1_color_tween_1adab4fef0982d1c37120c45baa1bf1111">00110</link> &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keywordtype">bool</emphasis>&#32;<link linkend="_struct_t_m_pro_1_1_color_tween_1adab4fef0982d1c37120c45baa1bf1111">ValidTarget</link>()
+00111 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00112 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;m_Target&#32;!=&#32;<emphasis role="keyword">null</emphasis>;
+00113 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00114 &#32;&#32;&#32;&#32;}
+00115 
+00116 &#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;Float&#32;tween&#32;class,&#32;receives&#32;the</emphasis>
+00117 &#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;TweenValue&#32;callback&#32;and&#32;then&#32;sets</emphasis>
+00118 &#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;the&#32;value&#32;on&#32;the&#32;target.</emphasis>
+<anchor xml:id="__t_m_p___coroutine_tween_8cs_source_1l00119"/><link linkend="_struct_t_m_pro_1_1_float_tween">00119</link> &#32;&#32;&#32;&#32;<emphasis role="keyword">internal</emphasis>&#32;<emphasis role="keyword">struct&#32;</emphasis><link linkend="_struct_t_m_pro_1_1_float_tween">FloatTween</link>&#32;:&#32;<link linkend="_interface_t_m_pro_1_1_i_tween_value">ITweenValue</link>
+00120 &#32;&#32;&#32;&#32;{
+<anchor xml:id="__t_m_p___coroutine_tween_8cs_source_1l00121"/><link linkend="_class_t_m_pro_1_1_float_tween_1_1_float_tween_callback">00121</link> &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keyword">class&#32;</emphasis><link linkend="_class_t_m_pro_1_1_float_tween_1_1_float_tween_callback">FloatTweenCallback</link>&#32;:&#32;UnityEvent&lt;float&gt;&#32;{&#32;}
+00122 
+00123 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;<link linkend="_class_t_m_pro_1_1_float_tween_1_1_float_tween_callback">FloatTweenCallback</link>&#32;m_Target;
+00124 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;<emphasis role="keywordtype">float</emphasis>&#32;m_StartValue;
+00125 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;<emphasis role="keywordtype">float</emphasis>&#32;m_TargetValue;
+00126 
+00127 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;<emphasis role="keywordtype">float</emphasis>&#32;m_Duration;
+00128 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;<emphasis role="keywordtype">bool</emphasis>&#32;m_IgnoreTimeScale;
+00129 
+00130 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keywordtype">float</emphasis>&#32;<link linkend="_struct_t_m_pro_1_1_float_tween_1a5a567005f8103ed38c69863060034a9c">startValue</link>
+<anchor xml:id="__t_m_p___coroutine_tween_8cs_source_1l00131"/><link linkend="_struct_t_m_pro_1_1_float_tween_1a5a567005f8103ed38c69863060034a9c">00131</link> &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00132 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">get</emphasis>&#32;{&#32;<emphasis role="keywordflow">return</emphasis>&#32;m_StartValue;&#32;}
+00133 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">set</emphasis>&#32;{&#32;m_StartValue&#32;=&#32;value;&#32;}
+00134 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00135 
+00136 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keywordtype">float</emphasis>&#32;<link linkend="_struct_t_m_pro_1_1_float_tween_1a6f00d7dd7b7d7478c17b424fb779f3e4">targetValue</link>
+<anchor xml:id="__t_m_p___coroutine_tween_8cs_source_1l00137"/><link linkend="_struct_t_m_pro_1_1_float_tween_1a6f00d7dd7b7d7478c17b424fb779f3e4">00137</link> &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00138 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">get</emphasis>&#32;{&#32;<emphasis role="keywordflow">return</emphasis>&#32;m_TargetValue;&#32;}
+00139 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">set</emphasis>&#32;{&#32;m_TargetValue&#32;=&#32;value;&#32;}
+00140 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00141 
+00142 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keywordtype">float</emphasis>&#32;<link linkend="_struct_t_m_pro_1_1_float_tween_1a1732506042e018ce35fda4cc017ebb73">duration</link>
+<anchor xml:id="__t_m_p___coroutine_tween_8cs_source_1l00143"/><link linkend="_struct_t_m_pro_1_1_float_tween_1a1732506042e018ce35fda4cc017ebb73">00143</link> &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00144 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">get</emphasis>&#32;{&#32;<emphasis role="keywordflow">return</emphasis>&#32;m_Duration;&#32;}
+00145 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">set</emphasis>&#32;{&#32;m_Duration&#32;=&#32;value;&#32;}
+00146 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00147 
+00148 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keywordtype">bool</emphasis>&#32;<link linkend="_struct_t_m_pro_1_1_float_tween_1afb7dd396669aef918acda86f74ee2d33">ignoreTimeScale</link>
+<anchor xml:id="__t_m_p___coroutine_tween_8cs_source_1l00149"/><link linkend="_struct_t_m_pro_1_1_float_tween_1afb7dd396669aef918acda86f74ee2d33">00149</link> &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00150 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">get</emphasis>&#32;{&#32;<emphasis role="keywordflow">return</emphasis>&#32;m_IgnoreTimeScale;&#32;}
+00151 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">set</emphasis>&#32;{&#32;m_IgnoreTimeScale&#32;=&#32;value;&#32;}
+00152 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00153 
+<anchor xml:id="__t_m_p___coroutine_tween_8cs_source_1l00154"/><link linkend="_struct_t_m_pro_1_1_float_tween_1ae58254bf8799dddc55990ec1f0082c6d">00154</link> &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;<link linkend="_struct_t_m_pro_1_1_float_tween_1ae58254bf8799dddc55990ec1f0082c6d">TweenValue</link>(<emphasis role="keywordtype">float</emphasis>&#32;floatPercentage)
+00155 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00156 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(!<link linkend="_struct_t_m_pro_1_1_float_tween_1a3d09fd870431b55a0632db8da6356ee1">ValidTarget</link>())
+00157 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>;
+00158 
+00159 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;var&#32;newValue&#32;=&#32;Mathf.Lerp(m_StartValue,&#32;m_TargetValue,&#32;floatPercentage);
+00160 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;m_Target.Invoke(newValue);
+00161 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00162 
+<anchor xml:id="__t_m_p___coroutine_tween_8cs_source_1l00163"/><link linkend="_struct_t_m_pro_1_1_float_tween_1ab85f7b9e878c92af531dbb2a84b2fee6">00163</link> &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;<link linkend="_struct_t_m_pro_1_1_float_tween_1ab85f7b9e878c92af531dbb2a84b2fee6">AddOnChangedCallback</link>(UnityAction&lt;float&gt;&#32;callback)
+00164 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00165 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(m_Target&#32;==&#32;<emphasis role="keyword">null</emphasis>)
+00166 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;m_Target&#32;=&#32;<emphasis role="keyword">new</emphasis>&#32;<link linkend="_class_t_m_pro_1_1_float_tween_1_1_float_tween_callback">FloatTweenCallback</link>();
+00167 
+00168 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;m_Target.AddListener(callback);
+00169 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00170 
+<anchor xml:id="__t_m_p___coroutine_tween_8cs_source_1l00171"/><link linkend="_struct_t_m_pro_1_1_float_tween_1a01d7fe80680ceafebda7a94c0f59f8bf">00171</link> &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keywordtype">bool</emphasis>&#32;<link linkend="_struct_t_m_pro_1_1_float_tween_1a01d7fe80680ceafebda7a94c0f59f8bf">GetIgnoreTimescale</link>()
+00172 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00173 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;m_IgnoreTimeScale;
+00174 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00175 
+<anchor xml:id="__t_m_p___coroutine_tween_8cs_source_1l00176"/><link linkend="_struct_t_m_pro_1_1_float_tween_1a4a7ba395bbd92d2dbfb57b305a71944d">00176</link> &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keywordtype">float</emphasis>&#32;<link linkend="_struct_t_m_pro_1_1_float_tween_1a4a7ba395bbd92d2dbfb57b305a71944d">GetDuration</link>()
+00177 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00178 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;m_Duration;
+00179 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00180 
+<anchor xml:id="__t_m_p___coroutine_tween_8cs_source_1l00181"/><link linkend="_struct_t_m_pro_1_1_float_tween_1a3d09fd870431b55a0632db8da6356ee1">00181</link> &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keywordtype">bool</emphasis>&#32;<link linkend="_struct_t_m_pro_1_1_float_tween_1a3d09fd870431b55a0632db8da6356ee1">ValidTarget</link>()
+00182 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00183 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;m_Target&#32;!=&#32;<emphasis role="keyword">null</emphasis>;
+00184 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00185 &#32;&#32;&#32;&#32;}
+00186 
+00187 &#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;Tween&#32;runner,&#32;executes&#32;the&#32;given&#32;tween.</emphasis>
+00188 &#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;The&#32;coroutine&#32;will&#32;live&#32;within&#32;the&#32;given</emphasis>
+00189 &#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;behaviour&#32;container.</emphasis>
+<anchor xml:id="__t_m_p___coroutine_tween_8cs_source_1l00190"/><link linkend="_class_t_m_pro_1_1_tween_runner">00190</link> &#32;&#32;&#32;&#32;<emphasis role="keyword">internal</emphasis>&#32;<emphasis role="keyword">class&#32;</emphasis><link linkend="_class_t_m_pro_1_1_tween_runner">TweenRunner</link>&lt;T&gt;&#32;where&#32;T&#32;:&#32;struct,&#32;<link linkend="_interface_t_m_pro_1_1_i_tween_value">ITweenValue</link>
+00191 &#32;&#32;&#32;&#32;{
+<anchor xml:id="__t_m_p___coroutine_tween_8cs_source_1l00192"/><link linkend="_class_t_m_pro_1_1_tween_runner_1a7dc1ce8abefe863ae28aa4f99568c4ab">00192</link> &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">protected</emphasis>&#32;MonoBehaviour&#32;<link linkend="_class_t_m_pro_1_1_tween_runner_1a7dc1ce8abefe863ae28aa4f99568c4ab">m_CoroutineContainer</link>;
+<anchor xml:id="__t_m_p___coroutine_tween_8cs_source_1l00193"/><link linkend="_class_t_m_pro_1_1_tween_runner_1a74047a063eeebdbf3c571976dfb944e0">00193</link> &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">protected</emphasis>&#32;IEnumerator&#32;<link linkend="_class_t_m_pro_1_1_tween_runner_1a74047a063eeebdbf3c571976dfb944e0">m_Tween</link>;
+00194 
+00195 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;utility&#32;function&#32;for&#32;starting&#32;the&#32;tween</emphasis>
+00196 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;<emphasis role="keyword">static</emphasis>&#32;IEnumerator&#32;Start(T&#32;tweenInfo)
+00197 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00198 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(!tweenInfo.ValidTarget())
+00199 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;yield&#32;<emphasis role="keywordflow">break</emphasis>;
+00200 
+00201 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;var&#32;elapsedTime&#32;=&#32;0.0f;
+00202 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">while</emphasis>&#32;(elapsedTime&#32;&lt;&#32;tweenInfo.duration)
+00203 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00204 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;elapsedTime&#32;+=&#32;tweenInfo.ignoreTimeScale&#32;?&#32;Time.unscaledDeltaTime&#32;:&#32;Time.deltaTime;
+00205 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;var&#32;percentage&#32;=&#32;Mathf.Clamp01(elapsedTime&#32;/&#32;tweenInfo.duration);
+00206 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;tweenInfo.TweenValue(percentage);
+00207 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;yield&#32;<emphasis role="keywordflow">return</emphasis>&#32;<emphasis role="keyword">null</emphasis>;
+00208 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00209 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;tweenInfo.TweenValue(1.0f);
+00210 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00211 
+<anchor xml:id="__t_m_p___coroutine_tween_8cs_source_1l00212"/><link linkend="_class_t_m_pro_1_1_tween_runner_1a7af4db815f3367dbab643a84e6680916">00212</link> &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;<link linkend="_class_t_m_pro_1_1_tween_runner_1a7af4db815f3367dbab643a84e6680916">Init</link>(MonoBehaviour&#32;coroutineContainer)
+00213 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00214 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_t_m_pro_1_1_tween_runner_1a7dc1ce8abefe863ae28aa4f99568c4ab">m_CoroutineContainer</link>&#32;=&#32;coroutineContainer;
+00215 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00216 
+<anchor xml:id="__t_m_p___coroutine_tween_8cs_source_1l00217"/><link linkend="_class_t_m_pro_1_1_tween_runner_1ac433f6e5ac92706935adf751b482231d">00217</link> &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;<link linkend="_class_t_m_pro_1_1_tween_runner_1ac433f6e5ac92706935adf751b482231d">StartTween</link>(T&#32;info)
+00218 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00219 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(<link linkend="_class_t_m_pro_1_1_tween_runner_1a7dc1ce8abefe863ae28aa4f99568c4ab">m_CoroutineContainer</link>&#32;==&#32;<emphasis role="keyword">null</emphasis>)
+00220 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00221 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;Debug.LogWarning(<emphasis role="stringliteral">&quot;Coroutine&#32;container&#32;not&#32;configured...&#32;did&#32;you&#32;forget&#32;to&#32;call&#32;Init?&quot;</emphasis>);
+00222 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>;
+00223 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00224 
+00225 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_t_m_pro_1_1_tween_runner_1a9f415377a8d07a95d65c68ea400b1c72">StopTween</link>();
+00226 
+00227 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(!<link linkend="_class_t_m_pro_1_1_tween_runner_1a7dc1ce8abefe863ae28aa4f99568c4ab">m_CoroutineContainer</link>.gameObject.activeInHierarchy)
+00228 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00229 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;info.TweenValue(1.0f);
+00230 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>;
+00231 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00232 
+00233 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_t_m_pro_1_1_tween_runner_1a74047a063eeebdbf3c571976dfb944e0">m_Tween</link>&#32;=&#32;Start(info);
+00234 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_t_m_pro_1_1_tween_runner_1a7dc1ce8abefe863ae28aa4f99568c4ab">m_CoroutineContainer</link>.StartCoroutine(<link linkend="_class_t_m_pro_1_1_tween_runner_1a74047a063eeebdbf3c571976dfb944e0">m_Tween</link>);
+00235 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00236 
+<anchor xml:id="__t_m_p___coroutine_tween_8cs_source_1l00237"/><link linkend="_class_t_m_pro_1_1_tween_runner_1a9f415377a8d07a95d65c68ea400b1c72">00237</link> &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;<link linkend="_class_t_m_pro_1_1_tween_runner_1a9f415377a8d07a95d65c68ea400b1c72">StopTween</link>()
+00238 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00239 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(<link linkend="_class_t_m_pro_1_1_tween_runner_1a74047a063eeebdbf3c571976dfb944e0">m_Tween</link>&#32;!=&#32;<emphasis role="keyword">null</emphasis>)
+00240 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00241 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_t_m_pro_1_1_tween_runner_1a7dc1ce8abefe863ae28aa4f99568c4ab">m_CoroutineContainer</link>.StopCoroutine(<link linkend="_class_t_m_pro_1_1_tween_runner_1a74047a063eeebdbf3c571976dfb944e0">m_Tween</link>);
+00242 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_t_m_pro_1_1_tween_runner_1a74047a063eeebdbf3c571976dfb944e0">m_Tween</link>&#32;=&#32;<emphasis role="keyword">null</emphasis>;
+00243 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00244 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00245 &#32;&#32;&#32;&#32;}
+00246 }
+</programlisting></section>

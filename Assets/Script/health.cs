@@ -82,7 +82,7 @@ public class health : NetworkBehaviour
 
 
 
-  void OnChangeHealth( int health )
+  public void OnChangeHealth( int health )
   {
     healthbar.sizeDelta = new Vector2( health * 2, healthbar.sizeDelta.y );
   }

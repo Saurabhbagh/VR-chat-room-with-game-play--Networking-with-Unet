@@ -1,0 +1,249 @@
+<?xml version='1.0' encoding='UTF-8' standalone='no'?>
+<section xmlns="http://docbook.org/ns/docbook" version="5.0" xmlns:xlink="http://www.w3.org/1999/xlink" xml:id="__heuristic_grab_classifier_8cs_source">
+<title>HeuristicGrabClassifier.cs</title>
+<indexterm><primary>O:/GitHUBMINIPRoject/Assets/LeapMotion/Modules/InteractionEngine/Scripts/Internal/HeuristicGrabClassifier.cs</primary></indexterm>
+<programlisting>00001 <emphasis role="comment">/******************************************************************************</emphasis>
+00002 <emphasis role="comment">&#32;*&#32;Copyright&#32;(C)&#32;Leap&#32;Motion,&#32;Inc.&#32;2011-2018.&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;*</emphasis>
+00003 <emphasis role="comment">&#32;*&#32;Leap&#32;Motion&#32;proprietary&#32;and&#32;confidential.&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;*</emphasis>
+00004 <emphasis role="comment">&#32;*&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;*</emphasis>
+00005 <emphasis role="comment">&#32;*&#32;Use&#32;subject&#32;to&#32;the&#32;terms&#32;of&#32;the&#32;Leap&#32;Motion&#32;SDK&#32;Agreement&#32;available&#32;at&#32;&#32;&#32;&#32;&#32;*</emphasis>
+00006 <emphasis role="comment">&#32;*&#32;https://developer.leapmotion.com/sdk_agreement,&#32;or&#32;another&#32;agreement&#32;&#32;&#32;&#32;&#32;&#32;&#32;*</emphasis>
+00007 <emphasis role="comment">&#32;*&#32;between&#32;Leap&#32;Motion&#32;and&#32;you,&#32;your&#32;company&#32;or&#32;other&#32;organization.&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;*</emphasis>
+00008 <emphasis role="comment">&#32;******************************************************************************/</emphasis>
+00009 
+00010 <emphasis role="keyword">using</emphasis>&#32;InteractionEngineUtility;
+00011 <emphasis role="keyword">using</emphasis>&#32;<link linkend="_namespace_leap">Leap</link>.<link linkend="_namespace_leap_1_1_unity">Unity</link>.<link linkend="_namespace_leap_1_1_unity_1_1_runtime_gizmos">RuntimeGizmos</link>;
+00012 <emphasis role="keyword">using</emphasis>&#32;System;
+00013 <emphasis role="keyword">using</emphasis>&#32;System.Collections.Generic;
+00014 <emphasis role="preprocessor">#if&#32;UNITY_EDITOR</emphasis>
+00015 <emphasis role="keyword">using</emphasis>&#32;<link linkend="_namespace_unity_editor">UnityEditor</link>;
+00016 <emphasis role="preprocessor">#endif</emphasis>
+00017 <emphasis role="keyword">using</emphasis>&#32;<link linkend="__balloon_8cs_1a7d67e097df9376eb709b6a23aa3c7d23">UnityEngine</link>;
+00018 
+00019 <emphasis role="keyword">namespace&#32;</emphasis><link linkend="_namespace_leap_1_1_unity_1_1_interaction_1_1_internal">Leap.Unity.Interaction.Internal</link>&#32;{
+00020 
+<anchor xml:id="__heuristic_grab_classifier_8cs_source_1l00021"/><link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_internal_1_1_heuristic_grab_classifier">00021</link> &#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keyword">class&#32;</emphasis><link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_internal_1_1_heuristic_grab_classifier">HeuristicGrabClassifier</link>&#32;{
+00022 
+<anchor xml:id="__heuristic_grab_classifier_8cs_source_1l00023"/><link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_internal_1_1_heuristic_grab_classifier_1a5448b1cba99694cc212019b370ba38ef">00023</link> &#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_hand">InteractionHand</link>&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_internal_1_1_heuristic_grab_classifier_1a5448b1cba99694cc212019b370ba38ef">interactionHand</link>;
+00024 
+00025 &#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;Dictionary&lt;<link linkend="_interface_leap_1_1_unity_1_1_interaction_1_1_i_interaction_behaviour">IInteractionBehaviour</link>,&#32;GrabClassifierHeuristics.GrabClassifier&gt;&#32;_classifiers
+00026 &#32;&#32;&#32;&#32;&#32;&#32;=&#32;<emphasis role="keyword">new</emphasis>&#32;Dictionary&lt;<link linkend="_interface_leap_1_1_unity_1_1_interaction_1_1_i_interaction_behaviour">IInteractionBehaviour</link>,&#32;GrabClassifierHeuristics.GrabClassifier&gt;();
+00027 &#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;GrabClassifierHeuristics.ClassifierParameters&#32;_defaultGrabParams,&#32;_scaledGrabParams;
+00028 &#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;Collider[][]&#32;_collidingCandidates&#32;=&#32;<emphasis role="keyword">new</emphasis>&#32;Collider[6][];
+00029 &#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;<emphasis role="keywordtype">int</emphasis>[]&#32;_numberOfColliders&#32;=&#32;<emphasis role="keyword">new</emphasis>&#32;<emphasis role="keywordtype">int</emphasis>[6];
+00030 &#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;Vector3[]&#32;_fingerTipPositions&#32;=&#32;<emphasis role="keyword">new</emphasis>&#32;Vector3[5];
+00031 &#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;Vector3[]&#32;_fingerKnucklePositions&#32;=&#32;<emphasis role="keyword">new</emphasis>&#32;Vector3[5];
+00032 
+<anchor xml:id="__heuristic_grab_classifier_8cs_source_1l00033"/><link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_internal_1_1_heuristic_grab_classifier_1a6ec6f734b62f6ef4b18af44906aeebdd">00033</link> &#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_internal_1_1_heuristic_grab_classifier_1a6ec6f734b62f6ef4b18af44906aeebdd">HeuristicGrabClassifier</link>(<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_hand">InteractionHand</link>&#32;intHand,
+00034 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordtype">float</emphasis>&#32;fingerStickiness&#32;=&#32;0F,
+00035 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordtype">float</emphasis>&#32;thumbStickiness&#32;=&#32;0.04F,
+00036 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordtype">float</emphasis>&#32;maxCurl&#32;=&#32;0.65F,
+00037 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordtype">float</emphasis>&#32;minCurl&#32;=&#32;-0.1F,
+00038 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordtype">float</emphasis>&#32;fingerRadius&#32;=&#32;0.012F,
+00039 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordtype">float</emphasis>&#32;thumbRadius&#32;=&#32;0.017F,
+00040 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordtype">float</emphasis>&#32;grabCooldown&#32;=&#32;0.2F,
+00041 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordtype">float</emphasis>&#32;maxCurlVel&#32;=&#32;0.0F,
+00042 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordtype">float</emphasis>&#32;grabbedMaxCurlVel&#32;=&#32;-0.025F,
+00043 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordtype">float</emphasis>&#32;maxGrabDistance&#32;=&#32;0.05F,
+00044 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordtype">int</emphasis>&#32;layerMask&#32;=&#32;0,
+00045 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;QueryTriggerInteraction&#32;queryTriggers&#32;=&#32;QueryTriggerInteraction.UseGlobal)&#32;{
+00046 
+00047 &#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_internal_1_1_heuristic_grab_classifier_1a5448b1cba99694cc212019b370ba38ef">interactionHand</link>&#32;=&#32;intHand;
+00048 &#32;&#32;&#32;&#32;&#32;&#32;_defaultGrabParams&#32;=&#32;<emphasis role="keyword">new</emphasis>&#32;GrabClassifierHeuristics.ClassifierParameters(
+00049 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;fingerStickiness,&#32;thumbStickiness,&#32;maxCurl,&#32;minCurl,&#32;fingerRadius,
+00050 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;thumbRadius,&#32;grabCooldown,&#32;maxCurlVel,&#32;grabbedMaxCurlVel,&#32;maxGrabDistance,
+00051 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;layerMask&#32;==&#32;0&#32;?&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_internal_1_1_heuristic_grab_classifier_1a5448b1cba99694cc212019b370ba38ef">interactionHand</link>.<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_controller_1a9e906a87460175737227bd0f42bebdce">manager</link>.<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_manager_1ac8f4cc8c3f11fb6f67640072100b7e8a">GetInteractionLayerMask</link>()&#32;:&#32;layerMask,
+00052 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;queryTriggers);
+00053 &#32;&#32;&#32;&#32;&#32;&#32;_scaledGrabParams&#32;=&#32;<emphasis role="keyword">new</emphasis>&#32;GrabClassifierHeuristics.ClassifierParameters(
+00054 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;fingerStickiness,&#32;thumbStickiness,&#32;maxCurl,&#32;minCurl,&#32;fingerRadius,
+00055 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;thumbRadius,&#32;grabCooldown,&#32;maxCurlVel,&#32;grabbedMaxCurlVel,&#32;maxGrabDistance,
+00056 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;layerMask&#32;==&#32;0&#32;?&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_internal_1_1_heuristic_grab_classifier_1a5448b1cba99694cc212019b370ba38ef">interactionHand</link>.<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_controller_1a9e906a87460175737227bd0f42bebdce">manager</link>.<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_manager_1ac8f4cc8c3f11fb6f67640072100b7e8a">GetInteractionLayerMask</link>()&#32;:&#32;layerMask,
+00057 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;queryTriggers);
+00058 
+00059 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">for</emphasis>&#32;(<emphasis role="keywordtype">int</emphasis>&#32;i&#32;=&#32;0;&#32;i&#32;&lt;&#32;_collidingCandidates.Length;&#32;i++)&#32;{
+00060 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;_collidingCandidates[i]&#32;=&#32;<emphasis role="keyword">new</emphasis>&#32;Collider[5];
+00061 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00062 &#32;&#32;&#32;&#32;}
+00063 
+<anchor xml:id="__heuristic_grab_classifier_8cs_source_1l00064"/><link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_internal_1_1_heuristic_grab_classifier_1ae3d0c844b6f3a40df35e6a2c71efbefd">00064</link> &#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_internal_1_1_heuristic_grab_classifier_1ae3d0c844b6f3a40df35e6a2c71efbefd">FixedUpdateClassifierHandState</link>()&#32;{
+00065 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">using</emphasis>&#32;(<emphasis role="keyword">new</emphasis>&#32;<link linkend="_struct_leap_1_1_unity_1_1_profiler_sample">ProfilerSample</link>(<emphasis role="stringliteral">&quot;Update&#32;Classifier&#32;Hand&#32;State&quot;</emphasis>))&#32;{
+00066 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;var&#32;hand&#32;=&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_internal_1_1_heuristic_grab_classifier_1a5448b1cba99694cc212019b370ba38ef">interactionHand</link>.<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_hand_1a49dba50672251b00081f95e8de3c2993">leapHand</link>;
+00067 
+00068 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_internal_1_1_heuristic_grab_classifier_1a5448b1cba99694cc212019b370ba38ef">interactionHand</link>.<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_hand_1a3e4c5576bf023cf5e944e8ec2dd4d18f">isTracked</link>)&#32;{
+00069 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;Ensure&#32;that&#32;all&#32;scale&#32;dependent&#32;variables&#32;are&#32;properly&#32;set.</emphasis>
+00070 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;_scaledGrabParams.FINGERTIP_RADIUS&#32;=&#32;_defaultGrabParams.FINGERTIP_RADIUS
+00071 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;*&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_internal_1_1_heuristic_grab_classifier_1a5448b1cba99694cc212019b370ba38ef">interactionHand</link>.<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_controller_1a9e906a87460175737227bd0f42bebdce">manager</link>.<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_manager_1a129650833ce143b39615e9f2906a3669">SimulationScale</link>;
+00072 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;_scaledGrabParams.THUMBTIP_RADIUS&#32;=&#32;_defaultGrabParams.THUMBTIP_RADIUS
+00073 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;*&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_internal_1_1_heuristic_grab_classifier_1a5448b1cba99694cc212019b370ba38ef">interactionHand</link>.<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_controller_1a9e906a87460175737227bd0f42bebdce">manager</link>.<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_manager_1a129650833ce143b39615e9f2906a3669">SimulationScale</link>;
+00074 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;_scaledGrabParams.MAXIMUM_DISTANCE_FROM_HAND&#32;=&#32;_defaultGrabParams.MAXIMUM_DISTANCE_FROM_HAND
+00075 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;*&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_internal_1_1_heuristic_grab_classifier_1a5448b1cba99694cc212019b370ba38ef">interactionHand</link>.<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_controller_1a9e906a87460175737227bd0f42bebdce">manager</link>.<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_manager_1a129650833ce143b39615e9f2906a3669">SimulationScale</link>;
+00076 
+00077 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;Ensure&#32;layer&#32;mask&#32;is&#32;up-to-date.</emphasis>
+00078 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;_scaledGrabParams.LAYER_MASK&#32;=&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_internal_1_1_heuristic_grab_classifier_1a5448b1cba99694cc212019b370ba38ef">interactionHand</link>.<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_controller_1a9e906a87460175737227bd0f42bebdce">manager</link>.<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_manager_1ac8f4cc8c3f11fb6f67640072100b7e8a">GetInteractionLayerMask</link>();
+00079 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;
+00080 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">for</emphasis>&#32;(<emphasis role="keywordtype">int</emphasis>&#32;i&#32;=&#32;0;&#32;i&#32;&lt;&#32;hand.Fingers.Count;&#32;i++)&#32;{
+00081 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;_fingerTipPositions[i]&#32;=&#32;hand.Fingers[i].TipPosition.ToVector3();
+00082 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;_fingerKnucklePositions[i]&#32;=&#32;hand.Fingers[i].Bone(<link linkend="_class_leap_1_1_bone">Bone</link>.<link linkend="_class_leap_1_1_bone_1a21054e31cefa7b75f25a026006fdbb1b">BoneType</link>.TYPE_METACARPAL).NextJoint.ToVector3();
+00083 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00084 
+00085 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;GrabClassifierHeuristics.UpdateAllProbeColliders(_fingerTipPositions,&#32;_fingerKnucklePositions,&#32;ref&#32;_collidingCandidates,&#32;ref&#32;_numberOfColliders,&#32;_scaledGrabParams);
+00086 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00087 &#32;&#32;&#32;&#32;&#32;&#32;}
+00088 &#32;&#32;&#32;&#32;}
+00089 
+<anchor xml:id="__heuristic_grab_classifier_8cs_source_1l00090"/><link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_internal_1_1_heuristic_grab_classifier_1ad958ef46c9aacf8fa7646fb52329f266">00090</link> &#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keywordtype">bool</emphasis>&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_internal_1_1_heuristic_grab_classifier_1ad958ef46c9aacf8fa7646fb52329f266">FixedUpdateClassifierGrasp</link>(out&#32;<link linkend="_interface_leap_1_1_unity_1_1_interaction_1_1_i_interaction_behaviour">IInteractionBehaviour</link>&#32;graspedObject)&#32;{
+00091 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">using</emphasis>&#32;(<emphasis role="keyword">new</emphasis>&#32;<link linkend="_struct_leap_1_1_unity_1_1_profiler_sample">ProfilerSample</link>(<emphasis role="stringliteral">&quot;Update&#32;Grab&#32;Classifier&#32;-&#32;Grasp&quot;</emphasis>,&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_internal_1_1_heuristic_grab_classifier_1a5448b1cba99694cc212019b370ba38ef">interactionHand</link>.<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_controller_1a9e906a87460175737227bd0f42bebdce">manager</link>))&#32;{
+00092 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;graspedObject&#32;=&#32;<emphasis role="keyword">null</emphasis>;
+00093 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_internal_1_1_heuristic_grab_classifier_1a5448b1cba99694cc212019b370ba38ef">interactionHand</link>.<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_controller_1afd400c908dffa22a7fb025f067df34e5">isGraspingObject</link>&#32;||&#32;!<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_internal_1_1_heuristic_grab_classifier_1a5448b1cba99694cc212019b370ba38ef">interactionHand</link>.<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_hand_1a3e4c5576bf023cf5e944e8ec2dd4d18f">isTracked</link>)&#32;{
+00094 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;Cannot&#32;grasp&#32;another&#32;object&#32;with&#32;an&#32;untracked&#32;hand&#32;or&#32;while&#32;the&#32;hand&#32;is</emphasis>
+00095 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;already&#32;grasping&#32;an&#32;object&#32;or&#32;if&#32;the&#32;hand&#32;is&#32;not&#32;tracked.</emphasis>
+00096 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;<emphasis role="keyword">false</emphasis>;
+00097 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00098 
+00099 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">foreach</emphasis>&#32;(var&#32;interactionObj&#32;<emphasis role="keywordflow">in</emphasis>&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_internal_1_1_heuristic_grab_classifier_1a5448b1cba99694cc212019b370ba38ef">interactionHand</link>.<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_controller_1a7b07298222ede0d272988129488ef445">graspCandidates</link>)&#32;{
+00100 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(updateBehaviour(interactionObj,&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_internal_1_1_heuristic_grab_classifier_1a5448b1cba99694cc212019b370ba38ef">interactionHand</link>.<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_hand_1a49dba50672251b00081f95e8de3c2993">leapHand</link>,&#32;graspMode:&#32;GraspUpdateMode.BeginGrasp))&#32;{
+00101 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;graspedObject&#32;=&#32;interactionObj;
+00102 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;<emphasis role="keyword">true</emphasis>;
+00103 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00104 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00105 
+00106 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;<emphasis role="keyword">false</emphasis>;
+00107 &#32;&#32;&#32;&#32;&#32;&#32;}
+00108 &#32;&#32;&#32;&#32;}
+00109 
+<anchor xml:id="__heuristic_grab_classifier_8cs_source_1l00110"/><link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_internal_1_1_heuristic_grab_classifier_1a188485d78695a6f187e7c28532548033">00110</link> &#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keywordtype">bool</emphasis>&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_internal_1_1_heuristic_grab_classifier_1a188485d78695a6f187e7c28532548033">FixedUpdateClassifierRelease</link>(out&#32;<link linkend="_interface_leap_1_1_unity_1_1_interaction_1_1_i_interaction_behaviour">IInteractionBehaviour</link>&#32;releasedObject)&#32;{
+00111 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">using</emphasis>&#32;(<emphasis role="keyword">new</emphasis>&#32;<link linkend="_struct_leap_1_1_unity_1_1_profiler_sample">ProfilerSample</link>(<emphasis role="stringliteral">&quot;Update&#32;Grab&#32;Classifier&#32;-&#32;Release&quot;</emphasis>,&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_internal_1_1_heuristic_grab_classifier_1a5448b1cba99694cc212019b370ba38ef">interactionHand</link>.<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_controller_1a9e906a87460175737227bd0f42bebdce">manager</link>))&#32;{
+00112 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;releasedObject&#32;=&#32;<emphasis role="keyword">null</emphasis>;
+00113 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(!<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_internal_1_1_heuristic_grab_classifier_1a5448b1cba99694cc212019b370ba38ef">interactionHand</link>.<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_controller_1afd400c908dffa22a7fb025f067df34e5">isGraspingObject</link>)&#32;{
+00114 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;Can&apos;t&#32;release&#32;an&#32;object&#32;if&#32;the&#32;hand&#32;is&#32;already&#32;not&#32;grasping&#32;one.</emphasis>
+00115 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;<emphasis role="keyword">false</emphasis>;
+00116 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00117 
+00118 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(updateBehaviour(<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_internal_1_1_heuristic_grab_classifier_1a5448b1cba99694cc212019b370ba38ef">interactionHand</link>.<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_controller_1aecfb55af7f506df76774eac811ad25fc">graspedObject</link>,&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_internal_1_1_heuristic_grab_classifier_1a5448b1cba99694cc212019b370ba38ef">interactionHand</link>.<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_hand_1a49dba50672251b00081f95e8de3c2993">leapHand</link>,&#32;graspMode:&#32;GraspUpdateMode.ReleaseGrasp))&#32;{
+00119 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;releasedObject&#32;=&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_internal_1_1_heuristic_grab_classifier_1a5448b1cba99694cc212019b370ba38ef">interactionHand</link>.<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_controller_1aecfb55af7f506df76774eac811ad25fc">graspedObject</link>;
+00120 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;<emphasis role="keyword">true</emphasis>;
+00121 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00122 
+00123 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;<emphasis role="keyword">false</emphasis>;
+00124 &#32;&#32;&#32;&#32;&#32;&#32;}
+00125 &#32;&#32;&#32;&#32;}
+00126 
+00127 &#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;<emphasis role="keyword">enum</emphasis>&#32;GraspUpdateMode&#32;{
+00128 &#32;&#32;&#32;&#32;&#32;&#32;BeginGrasp,
+00129 &#32;&#32;&#32;&#32;&#32;&#32;ReleaseGrasp
+00130 &#32;&#32;&#32;&#32;}
+00131 
+00136 &#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;<emphasis role="keywordtype">bool</emphasis>&#32;updateBehaviour(<link linkend="_interface_leap_1_1_unity_1_1_interaction_1_1_i_interaction_behaviour">IInteractionBehaviour</link>&#32;behaviour,&#32;<link linkend="_class_leap_1_1_hand">Hand</link>&#32;hand,&#32;GraspUpdateMode&#32;graspMode,&#32;<emphasis role="keywordtype">bool</emphasis>&#32;ignoreTemporal&#32;=&#32;<emphasis role="keyword">false</emphasis>)&#32;{
+00137 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">using</emphasis>&#32;(<emphasis role="keyword">new</emphasis>&#32;<link linkend="_struct_leap_1_1_unity_1_1_profiler_sample">ProfilerSample</link>(<emphasis role="stringliteral">&quot;Update&#32;Individual&#32;Grab&#32;Classifier&quot;</emphasis>,&#32;behaviour.<link linkend="_interface_leap_1_1_unity_1_1_interaction_1_1_i_interaction_behaviour_1a5bf48f2a9cc26189140cff87dd3caffb">gameObject</link>))&#32;{
+00138 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;Ensure&#32;a&#32;classifier&#32;exists&#32;for&#32;this&#32;Interaction&#32;Behaviour.</emphasis>
+00139 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;GrabClassifierHeuristics.GrabClassifier&#32;classifier;
+00140 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(!_classifiers.TryGetValue(behaviour,&#32;out&#32;classifier))&#32;{
+00141 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;classifier&#32;=&#32;<emphasis role="keyword">new</emphasis>&#32;GrabClassifierHeuristics.GrabClassifier(behaviour.<link linkend="_interface_leap_1_1_unity_1_1_interaction_1_1_i_interaction_behaviour_1a5bf48f2a9cc26189140cff87dd3caffb">gameObject</link>);
+00142 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;_classifiers.Add(behaviour,&#32;classifier);
+00143 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00144 
+00145 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;Do&#32;the&#32;actual&#32;grab&#32;classification&#32;logic.</emphasis>
+00146 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_internal_1_1_heuristic_grab_classifier_1a6a4380fb41761dd696eb549984b07e60">FillClassifier</link>(behaviour,&#32;hand,&#32;ref&#32;classifier);
+00147 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;GrabClassifierHeuristics.UpdateClassifier(classifier,&#32;_scaledGrabParams,
+00148 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;ref&#32;_collidingCandidates,
+00149 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;ref&#32;_numberOfColliders,
+00150 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;ignoreTemporal);
+00151 
+00152 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;Determine&#32;whether&#32;there&#32;was&#32;a&#32;state&#32;change.</emphasis>
+00153 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordtype">bool</emphasis>&#32;didStateChange&#32;=&#32;<emphasis role="keyword">false</emphasis>;
+00154 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(!classifier.prevThisControllerGrabbing&#32;&amp;&amp;&#32;classifier.isThisControllerGrabbing
+00155 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&amp;&amp;&#32;graspMode&#32;==&#32;GraspUpdateMode.BeginGrasp)&#32;{
+00156 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;didStateChange&#32;=&#32;<emphasis role="keyword">true</emphasis>;
+00157 
+00158 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;classifier.prevThisControllerGrabbing&#32;=&#32;classifier.isThisControllerGrabbing;
+00159 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00160 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">else</emphasis>&#32;<emphasis role="keywordflow">if</emphasis>&#32;(classifier.prevThisControllerGrabbing&#32;&amp;&amp;&#32;!classifier.isThisControllerGrabbing
+00161 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&amp;&amp;&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_internal_1_1_heuristic_grab_classifier_1a5448b1cba99694cc212019b370ba38ef">interactionHand</link>.<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_controller_1aecfb55af7f506df76774eac811ad25fc">graspedObject</link>&#32;==&#32;behaviour&#32;&amp;&amp;&#32;graspMode&#32;==&#32;GraspUpdateMode.ReleaseGrasp)&#32;{
+00162 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;didStateChange&#32;=&#32;<emphasis role="keyword">true</emphasis>;
+00163 
+00164 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;classifier.coolDownProgress&#32;=&#32;0f;
+00165 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;classifier.prevThisControllerGrabbing&#32;=&#32;classifier.isThisControllerGrabbing;
+00166 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00167 
+00168 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;didStateChange;
+00169 &#32;&#32;&#32;&#32;&#32;&#32;}
+00170 &#32;&#32;&#32;&#32;}
+00171 
+<anchor xml:id="__heuristic_grab_classifier_8cs_source_1l00172"/><link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_internal_1_1_heuristic_grab_classifier_1a40a2327dbe8e9ec05bf97fbb32ed9324">00172</link> &#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_internal_1_1_heuristic_grab_classifier_1a40a2327dbe8e9ec05bf97fbb32ed9324">UnregisterInteractionBehaviour</link>(<link linkend="_interface_leap_1_1_unity_1_1_interaction_1_1_i_interaction_behaviour">IInteractionBehaviour</link>&#32;behaviour)&#32;{
+00173 &#32;&#32;&#32;&#32;&#32;&#32;_classifiers.Remove(behaviour);
+00174 &#32;&#32;&#32;&#32;}
+00175 
+<anchor xml:id="__heuristic_grab_classifier_8cs_source_1l00176"/><link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_internal_1_1_heuristic_grab_classifier_1a9c2b9020038d2087dd78e9c4ccdbfcdb">00176</link> &#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_internal_1_1_heuristic_grab_classifier_1a9c2b9020038d2087dd78e9c4ccdbfcdb">NotifyGraspForciblyReleased</link>(<link linkend="_interface_leap_1_1_unity_1_1_interaction_1_1_i_interaction_behaviour">IInteractionBehaviour</link>&#32;behaviour)&#32;{
+00177 &#32;&#32;&#32;&#32;&#32;&#32;GrabClassifierHeuristics.GrabClassifier&#32;classifier;
+00178 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(_classifiers.TryGetValue(behaviour,&#32;out&#32;classifier))&#32;{
+00179 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;classifier.prevThisControllerGrabbing&#32;=&#32;<emphasis role="keyword">false</emphasis>;
+00180 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;classifier.isThisControllerGrabbing&#32;=&#32;<emphasis role="keyword">false</emphasis>;
+00181 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;classifier.coolDownProgress&#32;=&#32;0F;
+00182 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">for</emphasis>&#32;(<emphasis role="keywordtype">int</emphasis>&#32;i&#32;=&#32;0;&#32;i&#32;&lt;&#32;classifier.probes.Length;&#32;i++)&#32;{
+00183 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;classifier.probes[i].isInside&#32;=&#32;<emphasis role="keyword">false</emphasis>;
+00184 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00185 &#32;&#32;&#32;&#32;&#32;&#32;}
+00186 &#32;&#32;&#32;&#32;}
+00187 
+<anchor xml:id="__heuristic_grab_classifier_8cs_source_1l00188"/><link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_internal_1_1_heuristic_grab_classifier_1a54611fe455fec49241a629b7d9eea6c6">00188</link> &#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_internal_1_1_heuristic_grab_classifier_1a54611fe455fec49241a629b7d9eea6c6">GetGraspingFingertipPositions</link>(<link linkend="_interface_leap_1_1_unity_1_1_interaction_1_1_i_interaction_behaviour">IInteractionBehaviour</link>&#32;behaviour,&#32;Vector3[]&#32;fingertipPositionsBuffer,&#32;out&#32;<emphasis role="keywordtype">int</emphasis>&#32;numGraspingFingertips)&#32;{
+00189 &#32;&#32;&#32;&#32;&#32;&#32;GrabClassifierHeuristics.GrabClassifier&#32;classifier;
+00190 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(_classifiers.TryGetValue(behaviour,&#32;out&#32;classifier))&#32;{
+00191 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordtype">int</emphasis>&#32;writeIdx&#32;=&#32;0;
+00192 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">for</emphasis>&#32;(<emphasis role="keywordtype">int</emphasis>&#32;probeIdx&#32;=&#32;0;&#32;probeIdx&#32;&lt;&#32;classifier.probes.Length;&#32;probeIdx++)&#32;{
+00193 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(classifier.probes[probeIdx].isInside)&#32;{
+00194 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;fingertipPositionsBuffer[writeIdx++]&#32;=&#32;_fingerTipPositions[probeIdx];
+00195 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00196 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00197 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;numGraspingFingertips&#32;=&#32;writeIdx;
+00198 &#32;&#32;&#32;&#32;&#32;&#32;}
+00199 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">else</emphasis>&#32;{
+00200 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;numGraspingFingertips&#32;=&#32;0;
+00201 &#32;&#32;&#32;&#32;&#32;&#32;}
+00202 &#32;&#32;&#32;&#32;}
+00203 
+<anchor xml:id="__heuristic_grab_classifier_8cs_source_1l00204"/><link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_internal_1_1_heuristic_grab_classifier_1a162bb92ee41f1376f650d3dd351aa2f0">00204</link> &#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keywordtype">bool</emphasis>&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_internal_1_1_heuristic_grab_classifier_1a162bb92ee41f1376f650d3dd351aa2f0">TryGrasp</link>(<link linkend="_interface_leap_1_1_unity_1_1_interaction_1_1_i_interaction_behaviour">IInteractionBehaviour</link>&#32;intObj,&#32;<link linkend="_class_leap_1_1_hand">Hand</link>&#32;hand)&#32;{
+00205 &#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_internal_1_1_heuristic_grab_classifier_1ae3d0c844b6f3a40df35e6a2c71efbefd">FixedUpdateClassifierHandState</link>();
+00206 
+00207 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;updateBehaviour(intObj,&#32;hand,&#32;GraspUpdateMode.BeginGrasp,
+00208 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;ignoreTemporal:&#32;<emphasis role="keyword">true</emphasis>);
+00209 &#32;&#32;&#32;&#32;}
+00210 
+<anchor xml:id="__heuristic_grab_classifier_8cs_source_1l00211"/><link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_internal_1_1_heuristic_grab_classifier_1a475f3bc02d1c3649d24ee266e2221c3b">00211</link> &#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_internal_1_1_heuristic_grab_classifier_1a475f3bc02d1c3649d24ee266e2221c3b">SwapClassifierState</link>(<link linkend="_interface_leap_1_1_unity_1_1_interaction_1_1_i_interaction_behaviour">IInteractionBehaviour</link>&#32;original,&#32;<link linkend="_interface_leap_1_1_unity_1_1_interaction_1_1_i_interaction_behaviour">IInteractionBehaviour</link>&#32;replacement)&#32;{
+00212 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(original&#32;==&#32;<emphasis role="keyword">null</emphasis>)&#32;{
+00213 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">throw</emphasis>&#32;<emphasis role="keyword">new</emphasis>&#32;ArgumentNullException(<emphasis role="stringliteral">&quot;original&quot;</emphasis>);
+00214 &#32;&#32;&#32;&#32;&#32;&#32;}
+00215 
+00216 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(replacement&#32;==&#32;<emphasis role="keyword">null</emphasis>)&#32;{
+00217 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">throw</emphasis>&#32;<emphasis role="keyword">new</emphasis>&#32;ArgumentNullException(<emphasis role="stringliteral">&quot;replacement&quot;</emphasis>);
+00218 &#32;&#32;&#32;&#32;&#32;&#32;}
+00219 
+00220 &#32;&#32;&#32;&#32;&#32;&#32;GrabClassifierHeuristics.GrabClassifier&#32;classifier;
+00221 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(!_classifiers.TryGetValue(original,&#32;out&#32;classifier))&#32;{
+00222 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">throw</emphasis>&#32;<emphasis role="keyword">new</emphasis>&#32;InvalidOperationException(<emphasis role="stringliteral">&quot;Cannot&#32;swap&#32;from&#32;something&#32;that&#32;is&#32;not&#32;currently&#32;grasped!&quot;</emphasis>);
+00223 &#32;&#32;&#32;&#32;&#32;&#32;}
+00224 
+00225 &#32;&#32;&#32;&#32;&#32;&#32;classifier.body&#32;=&#32;replacement.<link linkend="_interface_leap_1_1_unity_1_1_interaction_1_1_i_interaction_behaviour_1a9e83e4dac0c2d1117738b55b34dbde2d">rigidbody</link>;
+00226 &#32;&#32;&#32;&#32;&#32;&#32;classifier.transform&#32;=&#32;replacement.<link linkend="_interface_leap_1_1_unity_1_1_interaction_1_1_i_interaction_behaviour_1a2ff1423c8145ae05a1cc8506d6932136">transform</link>;
+00227 
+00228 &#32;&#32;&#32;&#32;&#32;&#32;_classifiers.Remove(original);
+00229 &#32;&#32;&#32;&#32;&#32;&#32;_classifiers[replacement]&#32;=&#32;classifier;
+00230 &#32;&#32;&#32;&#32;}
+00231 
+<anchor xml:id="__heuristic_grab_classifier_8cs_source_1l00232"/><link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_internal_1_1_heuristic_grab_classifier_1a6a4380fb41761dd696eb549984b07e60">00232</link> &#32;&#32;&#32;&#32;<emphasis role="keyword">protected</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_internal_1_1_heuristic_grab_classifier_1a6a4380fb41761dd696eb549984b07e60">FillClassifier</link>(<link linkend="_interface_leap_1_1_unity_1_1_interaction_1_1_i_interaction_behaviour">IInteractionBehaviour</link>&#32;behaviour,&#32;<link linkend="_class_leap_1_1_hand">Hand</link>&#32;hand,&#32;ref&#32;GrabClassifierHeuristics.GrabClassifier&#32;classifier)&#32;{
+00233 &#32;&#32;&#32;&#32;&#32;&#32;classifier.handChirality&#32;=&#32;hand.<link linkend="_class_leap_1_1_hand_1a783d6adaec7c3f3422e70bba4480b39d">IsLeft</link>;
+00234 &#32;&#32;&#32;&#32;&#32;&#32;classifier.handDirection&#32;=&#32;hand.<link linkend="_class_leap_1_1_hand_1a1b743a48862aac8d04be2bb54588f3bf">Direction</link>.ToVector3();
+00235 &#32;&#32;&#32;&#32;&#32;&#32;classifier.handXBasis&#32;=&#32;hand.<link linkend="_class_leap_1_1_hand_1a31cd466c474963af5727269c7c9d6b5a">Basis</link>.<link linkend="_struct_leap_1_1_leap_transform_1a8a67b81b7344f05e136048e2159ab663">xBasis</link>.ToVector3();
+00236 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordtype">float</emphasis>&#32;simScale&#32;=&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_internal_1_1_heuristic_grab_classifier_1a5448b1cba99694cc212019b370ba38ef">interactionHand</link>.<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_controller_1a9e906a87460175737227bd0f42bebdce">manager</link>.<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_manager_1a129650833ce143b39615e9f2906a3669">SimulationScale</link>;
+00237 &#32;&#32;&#32;&#32;&#32;&#32;classifier.handGrabCenter&#32;=&#32;(hand.<link linkend="_class_leap_1_1_hand_1aaf0940b9108e92c22e33b9c6cd32921a">PalmPosition</link>
+00238 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;+&#32;(hand.<link linkend="_class_leap_1_1_hand_1a1b743a48862aac8d04be2bb54588f3bf">Direction</link>&#32;*&#32;0.05f&#32;*&#32;simScale)
+00239 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;+&#32;(hand.<link linkend="_class_leap_1_1_hand_1a32586524eb04a8d5b9ed6559285fb1d1">PalmNormal</link>&#32;*&#32;0.01f&#32;*&#32;simScale)).ToVector3();
+00240 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">for</emphasis>&#32;(<emphasis role="keywordtype">int</emphasis>&#32;i&#32;=&#32;0;&#32;i&#32;&lt;&#32;hand.<link linkend="_class_leap_1_1_hand_1ac9f68349507bfa13e3ac24738382bea6">Fingers</link>.Count;&#32;i++)&#32;{
+00241 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;classifier.probes[i].direction&#32;=&#32;hand.<link linkend="_class_leap_1_1_hand_1ac9f68349507bfa13e3ac24738382bea6">Fingers</link>[i].Direction.ToVector3();
+00242 &#32;&#32;&#32;&#32;&#32;&#32;}
+00243 &#32;&#32;&#32;&#32;&#32;&#32;classifier.isGrabbed&#32;=&#32;behaviour.<link linkend="_interface_leap_1_1_unity_1_1_interaction_1_1_i_interaction_behaviour_1a2f4a6d4d2cddd4d05332b29e6647b6a1">isGrasped</link>;
+00244 &#32;&#32;&#32;&#32;}
+00245 
+00246 &#32;&#32;}
+00247 
+00248 }
+</programlisting></section>

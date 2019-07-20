@@ -1,0 +1,468 @@
+<?xml version='1.0' encoding='UTF-8' standalone='no'?>
+<section xmlns="http://docbook.org/ns/docbook" version="5.0" xmlns:xlink="http://www.w3.org/1999/xlink" xml:id="__interaction_slider_8cs_source">
+<title>InteractionSlider.cs</title>
+<indexterm><primary>O:/GitHUBMINIPRoject/Assets/LeapMotion/Modules/InteractionEngine/Scripts/UI/InteractionSlider.cs</primary></indexterm>
+<programlisting>00001 <emphasis role="comment">/******************************************************************************</emphasis>
+00002 <emphasis role="comment">&#32;*&#32;Copyright&#32;(C)&#32;Leap&#32;Motion,&#32;Inc.&#32;2011-2018.&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;*</emphasis>
+00003 <emphasis role="comment">&#32;*&#32;Leap&#32;Motion&#32;proprietary&#32;and&#32;confidential.&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;*</emphasis>
+00004 <emphasis role="comment">&#32;*&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;*</emphasis>
+00005 <emphasis role="comment">&#32;*&#32;Use&#32;subject&#32;to&#32;the&#32;terms&#32;of&#32;the&#32;Leap&#32;Motion&#32;SDK&#32;Agreement&#32;available&#32;at&#32;&#32;&#32;&#32;&#32;*</emphasis>
+00006 <emphasis role="comment">&#32;*&#32;https://developer.leapmotion.com/sdk_agreement,&#32;or&#32;another&#32;agreement&#32;&#32;&#32;&#32;&#32;&#32;&#32;*</emphasis>
+00007 <emphasis role="comment">&#32;*&#32;between&#32;Leap&#32;Motion&#32;and&#32;you,&#32;your&#32;company&#32;or&#32;other&#32;organization.&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;*</emphasis>
+00008 <emphasis role="comment">&#32;******************************************************************************/</emphasis>
+00009 
+00010 <emphasis role="keyword">using</emphasis>&#32;<link linkend="__balloon_8cs_1a7d67e097df9376eb709b6a23aa3c7d23">UnityEngine</link>;
+00011 <emphasis role="keyword">using</emphasis>&#32;<link linkend="_namespace_unity_engine">UnityEngine</link>.Events;
+00012 <emphasis role="keyword">using</emphasis>&#32;<link linkend="_namespace_unity_engine">UnityEngine</link>.Serialization;
+00013 <emphasis role="keyword">using</emphasis>&#32;<link linkend="_namespace_leap">Leap</link>.<link linkend="_namespace_leap_1_1_unity">Unity</link>.<link linkend="_namespace_leap_1_1_unity_1_1_attributes">Attributes</link>;
+00014 <emphasis role="keyword">using</emphasis>&#32;System;
+00015 
+00016 <emphasis role="keyword">namespace&#32;</emphasis><link linkend="_namespace_leap_1_1_unity_1_1_interaction">Leap.Unity.Interaction</link>&#32;{
+00017 
+<anchor xml:id="__interaction_slider_8cs_source_1l00022"/><link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_slider">00022</link> &#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keyword">class&#32;</emphasis><link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_slider">InteractionSlider</link>&#32;:&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_button">InteractionButton</link>&#32;{
+00023 
+00024 <emphasis role="preprocessor">&#32;&#32;&#32;&#32;#region&#32;Inspector&#32;&amp;&#32;Properties</emphasis>
+00025 
+<anchor xml:id="__interaction_slider_8cs_source_1l00026"/><link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_slider_1ae3fefc578d521cc71c2ea5d222e01748">00026</link> &#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keyword">enum</emphasis>&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_slider_1ae3fefc578d521cc71c2ea5d222e01748">SliderType</link>&#32;{
+00027 &#32;&#32;&#32;&#32;&#32;&#32;Vertical,
+00028 &#32;&#32;&#32;&#32;&#32;&#32;Horizontal,
+00029 &#32;&#32;&#32;&#32;&#32;&#32;TwoDimensional
+00030 &#32;&#32;&#32;&#32;}
+00031 
+00032 &#32;&#32;&#32;&#32;[Header(<emphasis role="stringliteral">&quot;Slider&#32;Settings&quot;</emphasis>)]
+<anchor xml:id="__interaction_slider_8cs_source_1l00033"/><link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_slider_1a7d25fc4d3c00bacc32c01b4c55cac68b">00033</link> &#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_slider_1ae3fefc578d521cc71c2ea5d222e01748">SliderType</link>&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_slider_1a7d25fc4d3c00bacc32c01b4c55cac68b">sliderType</link>&#32;=&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_slider_1ae3fefc578d521cc71c2ea5d222e01748">SliderType</link>.Horizontal;
+00034 
+<anchor xml:id="__interaction_slider_8cs_source_1l00035"/><link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_slider_1ad03391d78ef10020b7e6242fa211f58b">00035</link> &#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keywordtype">bool</emphasis>&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_slider_1ad03391d78ef10020b7e6242fa211f58b">dispatchSlideValueOnStart</link>&#32;=&#32;<emphasis role="keyword">true</emphasis>;
+00036 
+00037 &#32;&#32;&#32;&#32;[Tooltip(<emphasis role="stringliteral">&quot;Manually&#32;specify&#32;slider&#32;limits&#32;even&#32;if&#32;the&#32;slider&apos;s&#32;parent&#32;has&#32;a&#32;RectTransform.&quot;</emphasis>)]
+00038 &#32;&#32;&#32;&#32;[<link linkend="_class_leap_1_1_unity_1_1_attributes_1_1_disable_if">DisableIf</link>(<emphasis role="stringliteral">&quot;_parentHasRectTransform&quot;</emphasis>,&#32;isEqualTo:&#32;<emphasis role="keyword">false</emphasis>)]
+<anchor xml:id="__interaction_slider_8cs_source_1l00039"/><link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_slider_1aba23eaca1c57c11c38d116d424ac5ff4">00039</link> &#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keywordtype">bool</emphasis>&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_slider_1aba23eaca1c57c11c38d116d424ac5ff4">overrideRectLimits</link>&#32;=&#32;<emphasis role="keyword">false</emphasis>;
+00040 &#32;&#32;&#32;&#32;[SerializeField,&#32;HideInInspector]
+00041 <emphasis role="preprocessor">&#32;&#32;&#32;&#32;#pragma&#32;warning&#32;disable&#32;0414</emphasis>
+00042 &#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;<emphasis role="keywordtype">bool</emphasis>&#32;_parentHasRectTransform&#32;=&#32;<emphasis role="keyword">false</emphasis>;
+00043 <emphasis role="preprocessor">&#32;&#32;&#32;&#32;#pragma&#32;warning&#32;restore&#32;0414</emphasis>
+00044 
+00045 &#32;&#32;&#32;&#32;[Header(<emphasis role="stringliteral">&quot;Horizontal&#32;Axis&quot;</emphasis>)]
+<anchor xml:id="__interaction_slider_8cs_source_1l00046"/><link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_slider_1abd18238605930c81a01de1cfa85b7928">00046</link> &#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keywordtype">float</emphasis>&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_slider_1abd18238605930c81a01de1cfa85b7928">defaultHorizontalValue</link>;
+00047 
+00048 &#32;&#32;&#32;&#32;[Tooltip(<emphasis role="stringliteral">&quot;The&#32;minimum&#32;and&#32;maximum&#32;values&#32;that&#32;the&#32;slider&#32;reports&#32;on&#32;the&#32;horizontal&#32;axis.&quot;</emphasis>)]
+00049 &#32;&#32;&#32;&#32;[FormerlySerializedAs(<emphasis role="stringliteral">&quot;horizontalValueRange&quot;</emphasis>)]
+00050 &#32;&#32;&#32;&#32;[SerializeField]
+00051 &#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;Vector2&#32;_horizontalValueRange&#32;=&#32;<emphasis role="keyword">new</emphasis>&#32;Vector2(0f,&#32;1f);
+<anchor xml:id="__interaction_slider_8cs_source_1l00052"/><link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_slider_1ade7f328906f7f69b399cd4484fff243b">00052</link> &#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keywordtype">float</emphasis>&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_slider_1ade7f328906f7f69b399cd4484fff243b">minHorizontalValue</link>&#32;{
+00053 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">get</emphasis>&#32;{
+00054 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;_horizontalValueRange.x;
+00055 &#32;&#32;&#32;&#32;&#32;&#32;}
+00056 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">set</emphasis>&#32;{
+00057 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(value&#32;!=&#32;_horizontalValueRange.x)&#32;{
+00058 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;_horizontalValueRange.x&#32;=&#32;value;
+00059 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_slider_1a243b45406c68896909172f5293d03cc8">HorizontalSlideEvent</link>(<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_slider_1ac9ef0803e7785ff6ef45efe362c8d2cb">HorizontalSliderValue</link>);
+00060 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00061 &#32;&#32;&#32;&#32;&#32;&#32;}
+00062 &#32;&#32;&#32;&#32;}
+00063 
+<anchor xml:id="__interaction_slider_8cs_source_1l00064"/><link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_slider_1a1ff30cd526fda7b40abe4f0272516b26">00064</link> &#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keywordtype">float</emphasis>&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_slider_1a1ff30cd526fda7b40abe4f0272516b26">maxHorizontalValue</link>&#32;{
+00065 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">get</emphasis>&#32;{
+00066 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;_horizontalValueRange.y;
+00067 &#32;&#32;&#32;&#32;&#32;&#32;}
+00068 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">set</emphasis>&#32;{
+00069 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(value&#32;!=&#32;_horizontalValueRange.y)&#32;{
+00070 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;_horizontalValueRange.y&#32;=&#32;value;
+00071 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_slider_1a243b45406c68896909172f5293d03cc8">HorizontalSlideEvent</link>(<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_slider_1ac9ef0803e7785ff6ef45efe362c8d2cb">HorizontalSliderValue</link>);
+00072 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00073 &#32;&#32;&#32;&#32;&#32;&#32;}
+00074 &#32;&#32;&#32;&#32;}
+00075 
+00076 &#32;&#32;&#32;&#32;[Tooltip(<emphasis role="stringliteral">&quot;The&#32;minimum&#32;and&#32;maximum&#32;horizontal&#32;extents&#32;that&#32;the&#32;slider&#32;can&#32;slide&#32;to&#32;in&#32;world&#32;space.&quot;</emphasis>)]
+00077 &#32;&#32;&#32;&#32;[<link linkend="_class_leap_1_1_unity_1_1_attributes_1_1_min_max">MinMax</link>(-0.5f,&#32;0.5f)]
+<anchor xml:id="__interaction_slider_8cs_source_1l00078"/><link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_slider_1aac876ee4286370ad7a186d10d0c75848">00078</link> &#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;Vector2&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_slider_1aac876ee4286370ad7a186d10d0c75848">horizontalSlideLimits</link>&#32;=&#32;<emphasis role="keyword">new</emphasis>&#32;Vector2(-0.05f,&#32;0.05f);
+00079 
+00080 &#32;&#32;&#32;&#32;[Tooltip(<emphasis role="stringliteral">&quot;The&#32;number&#32;of&#32;discrete&#32;quantized&#32;notches&#32;**beyond&#32;the&#32;first**&#32;that&#32;this&#32;&quot;</emphasis>
+00081 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;+&#32;<emphasis role="stringliteral">&quot;slider&#32;can&#32;occupy&#32;on&#32;the&#32;horizontal&#32;axis.&#32;A&#32;value&#32;of&#32;zero&#32;indicates&#32;a&#32;&quot;</emphasis>
+00082 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;+&#32;<emphasis role="stringliteral">&quot;continuous&#32;(non-quantized)&#32;slider&#32;for&#32;this&#32;axis.&quot;</emphasis>)]
+00083 &#32;&#32;&#32;&#32;[<link linkend="_class_leap_1_1_unity_1_1_attributes_1_1_min_value">MinValue</link>(0)]
+<anchor xml:id="__interaction_slider_8cs_source_1l00084"/><link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_slider_1a3d961fb69c6c913958da01b8aa9c4e04">00084</link> &#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keywordtype">int</emphasis>&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_slider_1a3d961fb69c6c913958da01b8aa9c4e04">horizontalSteps</link>&#32;=&#32;0;
+00085 
+00086 &#32;&#32;&#32;&#32;[System.Serializable]
+<anchor xml:id="__interaction_slider_8cs_source_1l00087"/><link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_slider_1_1_float_event">00087</link> &#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keyword">class&#32;</emphasis><link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_slider_1_1_float_event">FloatEvent</link>&#32;:&#32;UnityEvent&lt;float&gt;&#32;{&#32;}
+00089 &#32;&#32;&#32;&#32;[SerializeField]
+00090 &#32;&#32;&#32;&#32;[FormerlySerializedAs(<emphasis role="stringliteral">&quot;horizontalSlideEvent&quot;</emphasis>)]
+00091 &#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_slider_1_1_float_event">FloatEvent</link>&#32;_horizontalSlideEvent&#32;=&#32;<emphasis role="keyword">new</emphasis>&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_slider_1_1_float_event">FloatEvent</link>();
+00092 
+00093 &#32;&#32;&#32;&#32;[Header(<emphasis role="stringliteral">&quot;Vertical&#32;Axis&quot;</emphasis>)]
+<anchor xml:id="__interaction_slider_8cs_source_1l00094"/><link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_slider_1a3ad496e9fb9d322fd79363bb6056c123">00094</link> &#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keywordtype">float</emphasis>&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_slider_1a3ad496e9fb9d322fd79363bb6056c123">defaultVerticalValue</link>;
+00095 
+00096 &#32;&#32;&#32;&#32;[Tooltip(<emphasis role="stringliteral">&quot;The&#32;minimum&#32;and&#32;maximum&#32;values&#32;that&#32;the&#32;slider&#32;reports&#32;on&#32;the&#32;horizontal&#32;axis.&quot;</emphasis>)]
+00097 &#32;&#32;&#32;&#32;[FormerlySerializedAs(<emphasis role="stringliteral">&quot;verticalValueRange&quot;</emphasis>)]
+00098 &#32;&#32;&#32;&#32;[SerializeField]
+00099 &#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;Vector2&#32;_verticalValueRange&#32;=&#32;<emphasis role="keyword">new</emphasis>&#32;Vector2(0f,&#32;1f);
+<anchor xml:id="__interaction_slider_8cs_source_1l00100"/><link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_slider_1a4896afd67be05e27600197d4ce85be50">00100</link> &#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keywordtype">float</emphasis>&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_slider_1a4896afd67be05e27600197d4ce85be50">minVerticalValue</link>&#32;{
+00101 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">get</emphasis>&#32;{
+00102 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;_verticalValueRange.x;
+00103 &#32;&#32;&#32;&#32;&#32;&#32;}
+00104 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">set</emphasis>&#32;{
+00105 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(value&#32;!=&#32;_verticalValueRange.x)&#32;{
+00106 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;_verticalValueRange.x&#32;=&#32;value;
+00107 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_slider_1a49c795fc36d6852b16589cfceda0f53c">VerticalSlideEvent</link>(<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_slider_1ae89da2e5a3a6a9c9182ea5169614bf79">VerticalSliderValue</link>);
+00108 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00109 &#32;&#32;&#32;&#32;&#32;&#32;}
+00110 &#32;&#32;&#32;&#32;}
+00111 
+<anchor xml:id="__interaction_slider_8cs_source_1l00112"/><link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_slider_1a4fb7772dfe4873192bcdcf35bb736dfe">00112</link> &#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keywordtype">float</emphasis>&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_slider_1a4fb7772dfe4873192bcdcf35bb736dfe">maxVerticalValue</link>&#32;{
+00113 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">get</emphasis>&#32;{
+00114 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;_verticalValueRange.y;
+00115 &#32;&#32;&#32;&#32;&#32;&#32;}
+00116 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">set</emphasis>&#32;{
+00117 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(value&#32;!=&#32;_verticalValueRange.y)&#32;{
+00118 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;_verticalValueRange.y&#32;=&#32;value;
+00119 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_slider_1a49c795fc36d6852b16589cfceda0f53c">VerticalSlideEvent</link>(<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_slider_1ae89da2e5a3a6a9c9182ea5169614bf79">VerticalSliderValue</link>);
+00120 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00121 &#32;&#32;&#32;&#32;&#32;&#32;}
+00122 &#32;&#32;&#32;&#32;}
+00123 
+00124 &#32;&#32;&#32;&#32;[<link linkend="_class_leap_1_1_unity_1_1_attributes_1_1_min_max">MinMax</link>(-0.5f,&#32;0.5f)]
+00125 &#32;&#32;&#32;&#32;[Tooltip(<emphasis role="stringliteral">&quot;The&#32;minimum&#32;and&#32;maximum&#32;vertical&#32;extents&#32;that&#32;the&#32;slider&#32;can&#32;slide&#32;to&#32;in&#32;world&#32;space.&quot;</emphasis>)]
+<anchor xml:id="__interaction_slider_8cs_source_1l00126"/><link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_slider_1a6f401163a50594104f9e9e54c473d5a0">00126</link> &#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;Vector2&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_slider_1a6f401163a50594104f9e9e54c473d5a0">verticalSlideLimits</link>&#32;=&#32;<emphasis role="keyword">new</emphasis>&#32;Vector2(0f,&#32;0f);
+00127 
+00128 &#32;&#32;&#32;&#32;[Tooltip(<emphasis role="stringliteral">&quot;The&#32;number&#32;of&#32;discrete&#32;quantized&#32;notches&#32;**beyond&#32;the&#32;first**&#32;that&#32;this&#32;&quot;</emphasis>
+00129 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;+&#32;<emphasis role="stringliteral">&quot;slider&#32;can&#32;occupy&#32;on&#32;the&#32;vertical&#32;axis.&#32;A&#32;value&#32;of&#32;zero&#32;indicates&#32;a&#32;&quot;</emphasis>
+00130 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;+&#32;<emphasis role="stringliteral">&quot;continuous&#32;(non-quantized)&#32;slider&#32;for&#32;this&#32;axis.&quot;</emphasis>)]
+00131 &#32;&#32;&#32;&#32;[<link linkend="_class_leap_1_1_unity_1_1_attributes_1_1_min_value">MinValue</link>(0)]
+<anchor xml:id="__interaction_slider_8cs_source_1l00132"/><link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_slider_1a1c480cd9ec1089bfe6084fe6e5b3f52c">00132</link> &#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keywordtype">int</emphasis>&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_slider_1a1c480cd9ec1089bfe6084fe6e5b3f52c">verticalSteps</link>&#32;=&#32;0;
+00133 
+00135 &#32;&#32;&#32;&#32;[SerializeField]
+00136 &#32;&#32;&#32;&#32;[FormerlySerializedAs(<emphasis role="stringliteral">&quot;verticalSlideEvent&quot;</emphasis>)]
+00137 &#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_slider_1_1_float_event">FloatEvent</link>&#32;_verticalSlideEvent&#32;=&#32;<emphasis role="keyword">new</emphasis>&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_slider_1_1_float_event">FloatEvent</link>();
+00138 
+<anchor xml:id="__interaction_slider_8cs_source_1l00139"/><link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_slider_1a243b45406c68896909172f5293d03cc8">00139</link> &#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;Action&lt;float&gt;&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_slider_1a243b45406c68896909172f5293d03cc8">HorizontalSlideEvent</link>&#32;=&#32;(f)&#32;=&gt;&#32;{&#32;};
+<anchor xml:id="__interaction_slider_8cs_source_1l00140"/><link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_slider_1a49c795fc36d6852b16589cfceda0f53c">00140</link> &#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;Action&lt;float&gt;&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_slider_1a49c795fc36d6852b16589cfceda0f53c">VerticalSlideEvent</link>&#32;=&#32;(f)&#32;=&gt;&#32;{&#32;};
+00141 
+<anchor xml:id="__interaction_slider_8cs_source_1l00142"/><link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_slider_1a0839fc6a18dac7cf052443c90735ae83">00142</link> &#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keywordtype">float</emphasis>&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_slider_1a0839fc6a18dac7cf052443c90735ae83">HorizontalSliderPercent</link>&#32;{
+00143 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">get</emphasis>&#32;{
+00144 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_slider_1a5e5fa6567015733a70839c85521dab61">_horizontalSliderPercent</link>;
+00145 &#32;&#32;&#32;&#32;&#32;&#32;}
+00146 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">set</emphasis>&#32;{
+00147 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(!_started)&#32;{
+00148 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;Debug.LogWarning(<emphasis role="stringliteral">&quot;An&#32;object&#32;is&#32;attempting&#32;to&#32;access&#32;this&#32;slider&apos;s&#32;value&#32;before&#32;it&#32;has&#32;been&#32;initialized!&#32;&#32;Initializing&#32;now;&#32;this&#32;could&#32;yield&#32;unexpected&#32;behaviour...&quot;</emphasis>,&#32;<emphasis role="keyword">this</emphasis>);
+00149 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_slider_1a7a15aed4a6f46dcf1b37ced85386b33b">Start</link>();
+00150 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00151 
+00152 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_slider_1a5e5fa6567015733a70839c85521dab61">_horizontalSliderPercent</link>&#32;=&#32;value;
+00153 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_button_1a33b1313c855fc4e54f7d85dfa17000f0">localPhysicsPosition</link>.x&#32;=&#32;Mathf.Lerp(<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_button_1aaff55c4ea819215e2100b6906f970746">initialLocalPosition</link>.x&#32;+&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_slider_1aac876ee4286370ad7a186d10d0c75848">horizontalSlideLimits</link>.x,&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_button_1aaff55c4ea819215e2100b6906f970746">initialLocalPosition</link>.x&#32;+&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_slider_1aac876ee4286370ad7a186d10d0c75848">horizontalSlideLimits</link>.y,&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_slider_1a5e5fa6567015733a70839c85521dab61">_horizontalSliderPercent</link>);
+00154 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_button_1a1953b5ee88c27d531b7543c16c9400a7">physicsPosition</link>&#32;=&#32;<link linkend="_interface_leap_1_1_unity_1_1_interaction_1_1_i_interaction_behaviour_1a2ff1423c8145ae05a1cc8506d6932136">transform</link>.parent.TransformPoint(<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_button_1a33b1313c855fc4e54f7d85dfa17000f0">localPhysicsPosition</link>);
+00155 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_behaviour_1a4f54f1794944882d8cf51bd641a5341c">rigidbody</link>.position&#32;=&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_button_1a1953b5ee88c27d531b7543c16c9400a7">physicsPosition</link>;
+00156 &#32;&#32;&#32;&#32;&#32;&#32;}
+00157 &#32;&#32;&#32;&#32;}
+00158 
+<anchor xml:id="__interaction_slider_8cs_source_1l00159"/><link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_slider_1a15270101be432ad4caad1ef425626989">00159</link> &#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keywordtype">float</emphasis>&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_slider_1a15270101be432ad4caad1ef425626989">VerticalSliderPercent</link>&#32;{
+00160 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">get</emphasis>&#32;{
+00161 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_slider_1af9e4615728cba8989b60d8aecf6436e5">_verticalSliderPercent</link>;
+00162 &#32;&#32;&#32;&#32;&#32;&#32;}
+00163 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">set</emphasis>&#32;{
+00164 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(!_started)&#32;{
+00165 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;Debug.LogWarning(<emphasis role="stringliteral">&quot;An&#32;object&#32;is&#32;attempting&#32;to&#32;access&#32;this&#32;slider&apos;s&#32;value&#32;before&#32;it&#32;has&#32;been&#32;initialized!&#32;&#32;Initializing&#32;now;&#32;this&#32;could&#32;yield&#32;unpected&#32;behaviour...&quot;</emphasis>,&#32;<emphasis role="keyword">this</emphasis>);
+00166 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_slider_1a7a15aed4a6f46dcf1b37ced85386b33b">Start</link>();
+00167 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00168 
+00169 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_slider_1af9e4615728cba8989b60d8aecf6436e5">_verticalSliderPercent</link>&#32;=&#32;value;
+00170 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_button_1a33b1313c855fc4e54f7d85dfa17000f0">localPhysicsPosition</link>.y&#32;=&#32;Mathf.Lerp(<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_button_1aaff55c4ea819215e2100b6906f970746">initialLocalPosition</link>.y&#32;+&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_slider_1a6f401163a50594104f9e9e54c473d5a0">verticalSlideLimits</link>.x,&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_button_1aaff55c4ea819215e2100b6906f970746">initialLocalPosition</link>.y&#32;+&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_slider_1a6f401163a50594104f9e9e54c473d5a0">verticalSlideLimits</link>.y,&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_slider_1af9e4615728cba8989b60d8aecf6436e5">_verticalSliderPercent</link>);
+00171 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_button_1a1953b5ee88c27d531b7543c16c9400a7">physicsPosition</link>&#32;=&#32;<link linkend="_interface_leap_1_1_unity_1_1_interaction_1_1_i_interaction_behaviour_1a2ff1423c8145ae05a1cc8506d6932136">transform</link>.parent.TransformPoint(<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_button_1a33b1313c855fc4e54f7d85dfa17000f0">localPhysicsPosition</link>);
+00172 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_behaviour_1a4f54f1794944882d8cf51bd641a5341c">rigidbody</link>.position&#32;=&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_button_1a1953b5ee88c27d531b7543c16c9400a7">physicsPosition</link>;
+00173 &#32;&#32;&#32;&#32;&#32;&#32;}
+00174 &#32;&#32;&#32;&#32;}
+00175 
+<anchor xml:id="__interaction_slider_8cs_source_1l00177"/><link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_slider_1ac9ef0803e7785ff6ef45efe362c8d2cb">00177</link> &#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keywordtype">float</emphasis>&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_slider_1ac9ef0803e7785ff6ef45efe362c8d2cb">HorizontalSliderValue</link>&#32;{
+00178 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">get</emphasis>&#32;{
+00179 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;Mathf.Lerp(_horizontalValueRange.x,&#32;_horizontalValueRange.y,&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_slider_1a5e5fa6567015733a70839c85521dab61">_horizontalSliderPercent</link>);
+00180 &#32;&#32;&#32;&#32;&#32;&#32;}
+00181 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">set</emphasis>&#32;{
+00182 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_slider_1a0839fc6a18dac7cf052443c90735ae83">HorizontalSliderPercent</link>&#32;=&#32;Mathf.InverseLerp(_horizontalValueRange.x,&#32;_horizontalValueRange.y,&#32;value);
+00183 &#32;&#32;&#32;&#32;&#32;&#32;}
+00184 &#32;&#32;&#32;&#32;}
+00185 
+<anchor xml:id="__interaction_slider_8cs_source_1l00187"/><link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_slider_1ae89da2e5a3a6a9c9182ea5169614bf79">00187</link> &#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keywordtype">float</emphasis>&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_slider_1ae89da2e5a3a6a9c9182ea5169614bf79">VerticalSliderValue</link>&#32;{
+00188 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">get</emphasis>&#32;{
+00189 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;Mathf.Lerp(_verticalValueRange.x,&#32;_verticalValueRange.y,&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_slider_1af9e4615728cba8989b60d8aecf6436e5">_verticalSliderPercent</link>);
+00190 &#32;&#32;&#32;&#32;&#32;&#32;}
+00191 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">set</emphasis>&#32;{
+00192 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_slider_1a15270101be432ad4caad1ef425626989">VerticalSliderPercent</link>&#32;=&#32;Mathf.InverseLerp(_verticalValueRange.x,&#32;_verticalValueRange.y,&#32;value);
+00193 &#32;&#32;&#32;&#32;&#32;&#32;}
+00194 &#32;&#32;&#32;&#32;}
+00195 
+00196 &#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;calculateSliderValues()&#32;{
+00197 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;Calculate&#32;renormalized&#32;slider&#32;values.</emphasis>
+00198 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_slider_1aac876ee4286370ad7a186d10d0c75848">horizontalSlideLimits</link>.x&#32;!=&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_slider_1aac876ee4286370ad7a186d10d0c75848">horizontalSlideLimits</link>.y)&#32;{
+00199 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_slider_1a5e5fa6567015733a70839c85521dab61">_horizontalSliderPercent</link>&#32;=&#32;Mathf.InverseLerp(<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_button_1aaff55c4ea819215e2100b6906f970746">initialLocalPosition</link>.x&#32;+&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_slider_1aac876ee4286370ad7a186d10d0c75848">horizontalSlideLimits</link>.x,&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_button_1aaff55c4ea819215e2100b6906f970746">initialLocalPosition</link>.x&#32;+&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_slider_1aac876ee4286370ad7a186d10d0c75848">horizontalSlideLimits</link>.y,&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_button_1a33b1313c855fc4e54f7d85dfa17000f0">localPhysicsPosition</link>.x);
+00200 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_slider_1a243b45406c68896909172f5293d03cc8">HorizontalSlideEvent</link>(<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_slider_1ac9ef0803e7785ff6ef45efe362c8d2cb">HorizontalSliderValue</link>);
+00201 &#32;&#32;&#32;&#32;&#32;&#32;}
+00202 
+00203 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_slider_1a6f401163a50594104f9e9e54c473d5a0">verticalSlideLimits</link>.x&#32;!=&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_slider_1a6f401163a50594104f9e9e54c473d5a0">verticalSlideLimits</link>.y)&#32;{
+00204 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_slider_1af9e4615728cba8989b60d8aecf6436e5">_verticalSliderPercent</link>&#32;=&#32;Mathf.InverseLerp(<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_button_1aaff55c4ea819215e2100b6906f970746">initialLocalPosition</link>.y&#32;+&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_slider_1a6f401163a50594104f9e9e54c473d5a0">verticalSlideLimits</link>.x,&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_button_1aaff55c4ea819215e2100b6906f970746">initialLocalPosition</link>.y&#32;+&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_slider_1a6f401163a50594104f9e9e54c473d5a0">verticalSlideLimits</link>.y,&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_button_1a33b1313c855fc4e54f7d85dfa17000f0">localPhysicsPosition</link>.y);
+00205 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_slider_1a49c795fc36d6852b16589cfceda0f53c">VerticalSlideEvent</link>(<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_slider_1ae89da2e5a3a6a9c9182ea5169614bf79">VerticalSliderValue</link>);
+00206 &#32;&#32;&#32;&#32;&#32;&#32;}
+00207 &#32;&#32;&#32;&#32;}
+00208 
+<anchor xml:id="__interaction_slider_8cs_source_1l00209"/><link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_slider_1a99d0b70094955c67a7b1a21cf154a30d">00209</link> &#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keywordtype">float</emphasis>&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_slider_1a99d0b70094955c67a7b1a21cf154a30d">normalizedHorizontalValue</link>&#32;{
+00210 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">get</emphasis>&#32;{
+00211 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_slider_1a5e5fa6567015733a70839c85521dab61">_horizontalSliderPercent</link>;
+00212 &#32;&#32;&#32;&#32;&#32;&#32;}
+00213 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">set</emphasis>&#32;{
+00214 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;var&#32;newValue&#32;=&#32;Mathf.Clamp01(value);
+00215 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(newValue&#32;!=&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_slider_1a5e5fa6567015733a70839c85521dab61">_horizontalSliderPercent</link>)&#32;{
+00216 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_slider_1a5e5fa6567015733a70839c85521dab61">_horizontalSliderPercent</link>&#32;=&#32;newValue;
+00217 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_slider_1a243b45406c68896909172f5293d03cc8">HorizontalSlideEvent</link>(<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_slider_1ac9ef0803e7785ff6ef45efe362c8d2cb">HorizontalSliderValue</link>);
+00218 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00219 &#32;&#32;&#32;&#32;&#32;&#32;}
+00220 &#32;&#32;&#32;&#32;}
+00221 
+<anchor xml:id="__interaction_slider_8cs_source_1l00222"/><link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_slider_1ad1e522381654bdcdb1e04876a0cc385b">00222</link> &#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keywordtype">float</emphasis>&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_slider_1ad1e522381654bdcdb1e04876a0cc385b">normalizedVerticalValue</link>&#32;{
+00223 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">get</emphasis>&#32;{
+00224 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_slider_1af9e4615728cba8989b60d8aecf6436e5">_verticalSliderPercent</link>;
+00225 &#32;&#32;&#32;&#32;&#32;&#32;}
+00226 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">set</emphasis>&#32;{
+00227 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;var&#32;newValue&#32;=&#32;Mathf.Clamp01(value);
+00228 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(newValue&#32;!=&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_slider_1af9e4615728cba8989b60d8aecf6436e5">_verticalSliderPercent</link>)&#32;{
+00229 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_slider_1af9e4615728cba8989b60d8aecf6436e5">_verticalSliderPercent</link>&#32;=&#32;newValue;
+00230 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_slider_1a49c795fc36d6852b16589cfceda0f53c">VerticalSlideEvent</link>(<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_slider_1ae89da2e5a3a6a9c9182ea5169614bf79">VerticalSliderValue</link>);
+00231 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00232 &#32;&#32;&#32;&#32;&#32;&#32;}
+00233 &#32;&#32;&#32;&#32;}
+00234 
+<anchor xml:id="__interaction_slider_8cs_source_1l00241"/><link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_slider_1ad187d79e89f3bd2784d9021c2de30238">00241</link> &#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keywordtype">int</emphasis>&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_slider_1ad187d79e89f3bd2784d9021c2de30238">horizontalStepValue</link>&#32;{
+00242 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">get</emphasis>&#32;{
+00243 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordtype">float</emphasis>&#32;range&#32;=&#32;_horizontalValueRange.y&#32;-&#32;_horizontalValueRange.x;
+00244 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(range&#32;==&#32;0F)&#32;<emphasis role="keywordflow">return</emphasis>&#32;0;
+00245 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">else</emphasis>&#32;{
+00246 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;(<emphasis role="keywordtype">int</emphasis>)(<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_slider_1a5e5fa6567015733a70839c85521dab61">_horizontalSliderPercent</link>&#32;*&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_slider_1a3d961fb69c6c913958da01b8aa9c4e04">horizontalSteps</link>&#32;*&#32;1.001F);
+00247 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00248 &#32;&#32;&#32;&#32;&#32;&#32;}
+00249 &#32;&#32;&#32;&#32;}
+00250 
+<anchor xml:id="__interaction_slider_8cs_source_1l00254"/><link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_slider_1a0fe4068b54cb45ed1bc4132fd3d0c9af">00254</link> &#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keywordtype">bool</emphasis>&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_slider_1a0fe4068b54cb45ed1bc4132fd3d0c9af">wasSlid</link>&#32;{
+00255 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">get</emphasis>&#32;{&#32;<emphasis role="keywordflow">return</emphasis>&#32;_wasSlid&#32;&amp;&amp;&#32;_sawWasSlid;&#32;}
+00256 &#32;&#32;&#32;&#32;}
+00257 
+00258 <emphasis role="preprocessor">&#32;&#32;&#32;&#32;#endregion</emphasis>
+00259 
+00260 <emphasis role="preprocessor">&#32;&#32;&#32;&#32;#region&#32;Internal&#32;State</emphasis>
+00261 
+<anchor xml:id="__interaction_slider_8cs_source_1l00262"/><link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_slider_1a5e5fa6567015733a70839c85521dab61">00262</link> &#32;&#32;&#32;&#32;<emphasis role="keyword">protected</emphasis>&#32;<emphasis role="keywordtype">float</emphasis>&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_slider_1a5e5fa6567015733a70839c85521dab61">_horizontalSliderPercent</link>;
+<anchor xml:id="__interaction_slider_8cs_source_1l00263"/><link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_slider_1af9e4615728cba8989b60d8aecf6436e5">00263</link> &#32;&#32;&#32;&#32;<emphasis role="keyword">protected</emphasis>&#32;<emphasis role="keywordtype">float</emphasis>&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_slider_1af9e4615728cba8989b60d8aecf6436e5">_verticalSliderPercent</link>;
+<anchor xml:id="__interaction_slider_8cs_source_1l00264"/><link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_slider_1a8db525944d09fcb639d3808153307691">00264</link> &#32;&#32;&#32;&#32;<emphasis role="keyword">protected</emphasis>&#32;RectTransform&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_slider_1a8db525944d09fcb639d3808153307691">parent</link>;
+00265 
+00266 &#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;<emphasis role="keywordtype">bool</emphasis>&#32;_started&#32;=&#32;<emphasis role="keyword">false</emphasis>;
+00267 
+00268 &#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;<emphasis role="keywordtype">bool</emphasis>&#32;_sawWasSlid&#32;=&#32;<emphasis role="keyword">false</emphasis>;
+00269 &#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;<emphasis role="keywordtype">bool</emphasis>&#32;_wasSlid&#32;=&#32;<emphasis role="keyword">false</emphasis>;
+00270 
+00271 <emphasis role="preprocessor">&#32;&#32;&#32;&#32;#endregion</emphasis>
+00272 
+00273 <emphasis role="preprocessor">&#32;&#32;&#32;&#32;#region&#32;Unity&#32;Events</emphasis>
+00274 
+<anchor xml:id="__interaction_slider_8cs_source_1l00275"/><link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_slider_1a6e91615fa8a4ab9ea1d211b3dcaa0e2b">00275</link> &#32;&#32;&#32;&#32;<emphasis role="keyword">protected</emphasis>&#32;<emphasis role="keyword">override</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_slider_1a6e91615fa8a4ab9ea1d211b3dcaa0e2b">OnValidate</link>()&#32;{
+00276 &#32;&#32;&#32;&#32;&#32;&#32;base.OnValidate();
+00277 
+00278 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(this.<link linkend="_interface_leap_1_1_unity_1_1_interaction_1_1_i_interaction_behaviour_1a2ff1423c8145ae05a1cc8506d6932136">transform</link>.parent&#32;!=&#32;<emphasis role="keyword">null</emphasis>&#32;&amp;&amp;&#32;<emphasis role="keyword">this</emphasis>.transform.parent.GetComponent&lt;RectTransform&gt;()&#32;!=&#32;<emphasis role="keyword">null</emphasis>)&#32;{
+00279 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;_parentHasRectTransform&#32;=&#32;<emphasis role="keyword">true</emphasis>;
+00280 &#32;&#32;&#32;&#32;&#32;&#32;}
+00281 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">else</emphasis>&#32;{
+00282 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;_parentHasRectTransform&#32;=&#32;<emphasis role="keyword">false</emphasis>;
+00283 &#32;&#32;&#32;&#32;&#32;&#32;}
+00284 &#32;&#32;&#32;&#32;}
+00285 
+<anchor xml:id="__interaction_slider_8cs_source_1l00286"/><link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_slider_1a0477f252b1bc1fe7a736b87624a0d951">00286</link> &#32;&#32;&#32;&#32;<emphasis role="keyword">protected</emphasis>&#32;<emphasis role="keyword">override</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_slider_1a0477f252b1bc1fe7a736b87624a0d951">OnEnable</link>()&#32;{
+00287 &#32;&#32;&#32;&#32;&#32;&#32;base.OnEnable();
+00288 
+00289 &#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_behaviour_1a3c7b7197c53f70e06444f114d4cf7a1e">OnContactStay</link>&#32;+=&#32;calculateSliderValues;
+00290 &#32;&#32;&#32;&#32;}
+00291 
+<anchor xml:id="__interaction_slider_8cs_source_1l00292"/><link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_slider_1ab466b7324c426f9a77797130729ca9a6">00292</link> &#32;&#32;&#32;&#32;<emphasis role="keyword">protected</emphasis>&#32;<emphasis role="keyword">override</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_slider_1ab466b7324c426f9a77797130729ca9a6">OnDisable</link>()&#32;{
+00293 &#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_behaviour_1a3c7b7197c53f70e06444f114d4cf7a1e">OnContactStay</link>&#32;-=&#32;calculateSliderValues;
+00294 
+00295 &#32;&#32;&#32;&#32;&#32;&#32;base.OnDisable();
+00296 &#32;&#32;&#32;&#32;}
+00297 
+<anchor xml:id="__interaction_slider_8cs_source_1l00298"/><link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_slider_1a7a15aed4a6f46dcf1b37ced85386b33b">00298</link> &#32;&#32;&#32;&#32;<emphasis role="keyword">protected</emphasis>&#32;<emphasis role="keyword">override</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_slider_1a7a15aed4a6f46dcf1b37ced85386b33b">Start</link>()&#32;{
+00299 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(_started)&#32;<emphasis role="keywordflow">return</emphasis>;
+00300 
+00301 &#32;&#32;&#32;&#32;&#32;&#32;_started&#32;=&#32;<emphasis role="keyword">true</emphasis>;
+00302 
+00303 &#32;&#32;&#32;&#32;&#32;&#32;calculateSliderLimits();
+00304 
+00305 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">switch</emphasis>&#32;(<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_slider_1a7d25fc4d3c00bacc32c01b4c55cac68b">sliderType</link>)&#32;{
+00306 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">case</emphasis>&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_slider_1ae3fefc578d521cc71c2ea5d222e01748">SliderType</link>.Horizontal:
+00307 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_slider_1a6f401163a50594104f9e9e54c473d5a0">verticalSlideLimits</link>&#32;=&#32;<emphasis role="keyword">new</emphasis>&#32;Vector2(0,&#32;0);
+00308 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">break</emphasis>;
+00309 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">case</emphasis>&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_slider_1ae3fefc578d521cc71c2ea5d222e01748">SliderType</link>.Vertical:
+00310 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_slider_1aac876ee4286370ad7a186d10d0c75848">horizontalSlideLimits</link>&#32;=&#32;<emphasis role="keyword">new</emphasis>&#32;Vector2(0,&#32;0);
+00311 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">break</emphasis>;
+00312 &#32;&#32;&#32;&#32;&#32;&#32;}
+00313 
+00314 &#32;&#32;&#32;&#32;&#32;&#32;base.Start();
+00315 
+00316 &#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_slider_1a243b45406c68896909172f5293d03cc8">HorizontalSlideEvent</link>&#32;+=&#32;_horizontalSlideEvent.Invoke;
+00317 &#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_slider_1a49c795fc36d6852b16589cfceda0f53c">VerticalSlideEvent</link>&#32;&#32;&#32;+=&#32;_verticalSlideEvent.Invoke;
+00318 
+00319 &#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_slider_1a243b45406c68896909172f5293d03cc8">HorizontalSlideEvent</link>&#32;+=&#32;(f)&#32;=&gt;&#32;{&#32;_wasSlid&#32;=&#32;<emphasis role="keyword">true</emphasis>;&#32;};
+00320 &#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_slider_1a49c795fc36d6852b16589cfceda0f53c">VerticalSlideEvent</link>&#32;&#32;&#32;+=&#32;(f)&#32;=&gt;&#32;{&#32;_wasSlid&#32;=&#32;<emphasis role="keyword">true</emphasis>;&#32;};
+00321 
+00322 &#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_slider_1ac9ef0803e7785ff6ef45efe362c8d2cb">HorizontalSliderValue</link>&#32;=&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_slider_1abd18238605930c81a01de1cfa85b7928">defaultHorizontalValue</link>;
+00323 &#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_slider_1ae89da2e5a3a6a9c9182ea5169614bf79">VerticalSliderValue</link>&#32;=&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_slider_1a3ad496e9fb9d322fd79363bb6056c123">defaultVerticalValue</link>;
+00324 
+00325 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_slider_1ad03391d78ef10020b7e6242fa211f58b">dispatchSlideValueOnStart</link>)&#32;{
+00326 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_slider_1a243b45406c68896909172f5293d03cc8">HorizontalSlideEvent</link>(<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_slider_1ac9ef0803e7785ff6ef45efe362c8d2cb">HorizontalSliderValue</link>);
+00327 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_slider_1a49c795fc36d6852b16589cfceda0f53c">VerticalSlideEvent</link>(<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_slider_1ae89da2e5a3a6a9c9182ea5169614bf79">VerticalSliderValue</link>);
+00328 &#32;&#32;&#32;&#32;&#32;&#32;}
+00329 &#32;&#32;&#32;&#32;}
+00330 
+<anchor xml:id="__interaction_slider_8cs_source_1l00331"/><link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_slider_1af07f856388385d64cdd47e6c917308a8">00331</link> &#32;&#32;&#32;&#32;<emphasis role="keyword">protected</emphasis>&#32;<emphasis role="keyword">override</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_slider_1af07f856388385d64cdd47e6c917308a8">Update</link>()&#32;{
+00332 &#32;&#32;&#32;&#32;&#32;&#32;base.Update();
+00333 
+00334 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(!Application.isPlaying)&#32;{&#32;<emphasis role="keywordflow">return</emphasis>;&#32;}
+00335 
+00336 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_button_1a21de162442ba3672aa091ccaab86c890">isPressed</link>&#32;||&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_behaviour_1ad6176dc89403f491f7496e6781be9a8f">isGrasped</link>)&#32;{
+00337 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;calculateSliderValues();
+00338 &#32;&#32;&#32;&#32;&#32;&#32;}
+00339 
+00340 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;Whenever&#32;&quot;_wasSlid&quot;&#32;is&#32;set&#32;to&#32;true&#32;(however&#32;many&#32;times&#32;between&#32;Update()&#32;cycles),</emphasis>
+00341 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;this&#32;logic&#32;produces&#32;a&#32;single&#32;Update()&#32;cycle&#32;through&#32;which&#32;slider.wasSlid</emphasis>
+00342 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;will&#32;return&#32;true.&#32;(This&#32;allows&#32;observing&#32;MonoBehaviours&#32;to&#32;simply&#32;check</emphasis>
+00343 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;&quot;wasSlid&quot;&#32;during&#32;their&#32;Update()&#32;cycle&#32;to&#32;perform&#32;updating&#32;logic.)</emphasis>
+00344 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(_wasSlid&#32;&amp;&amp;&#32;!_sawWasSlid)&#32;{
+00345 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;_sawWasSlid&#32;=&#32;<emphasis role="keyword">true</emphasis>;
+00346 &#32;&#32;&#32;&#32;&#32;&#32;}
+00347 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">else</emphasis>&#32;<emphasis role="keywordflow">if</emphasis>&#32;(_sawWasSlid)&#32;{
+00348 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;_wasSlid&#32;=&#32;<emphasis role="keyword">false</emphasis>;
+00349 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;_sawWasSlid&#32;=&#32;<emphasis role="keyword">false</emphasis>;
+00350 &#32;&#32;&#32;&#32;&#32;&#32;}
+00351 &#32;&#32;&#32;&#32;}
+00352 
+00353 <emphasis role="preprocessor">&#32;&#32;&#32;&#32;#endregion</emphasis>
+00354 
+00355 <emphasis role="preprocessor">&#32;&#32;&#32;&#32;#region&#32;Public&#32;API</emphasis>
+00356 
+<anchor xml:id="__interaction_slider_8cs_source_1l00357"/><link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_slider_1af984b10c1e7d956a61505d1294ab28e4">00357</link> &#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_slider_1af984b10c1e7d956a61505d1294ab28e4">RecalculateSliderLimits</link>()&#32;{
+00358 &#32;&#32;&#32;&#32;&#32;&#32;calculateSliderLimits();
+00359 &#32;&#32;&#32;&#32;}
+00360 
+00361 <emphasis role="preprocessor">&#32;&#32;&#32;&#32;#endregion</emphasis>
+00362 
+00363 <emphasis role="preprocessor">&#32;&#32;&#32;&#32;#region&#32;Internal&#32;Methods</emphasis>
+00364 
+00365 &#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;calculateSliderLimits()&#32;{
+00366 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(<link linkend="_interface_leap_1_1_unity_1_1_interaction_1_1_i_interaction_behaviour_1a2ff1423c8145ae05a1cc8506d6932136">transform</link>.parent&#32;!=&#32;<emphasis role="keyword">null</emphasis>)&#32;{
+00367 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_slider_1a8db525944d09fcb639d3808153307691">parent</link>&#32;=&#32;<link linkend="_interface_leap_1_1_unity_1_1_interaction_1_1_i_interaction_behaviour_1a2ff1423c8145ae05a1cc8506d6932136">transform</link>.parent.GetComponent&lt;RectTransform&gt;();
+00368 
+00369 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_slider_1aba23eaca1c57c11c38d116d424ac5ff4">overrideRectLimits</link>)&#32;<emphasis role="keywordflow">return</emphasis>;
+00370 
+00371 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_slider_1a8db525944d09fcb639d3808153307691">parent</link>&#32;!=&#32;<emphasis role="keyword">null</emphasis>)&#32;{
+00372 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_slider_1a8db525944d09fcb639d3808153307691">parent</link>.rect.width&#32;&lt;&#32;0f&#32;||&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_slider_1a8db525944d09fcb639d3808153307691">parent</link>.rect.height&#32;&lt;&#32;0f)&#32;{
+00373 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;Debug.LogError(<emphasis role="stringliteral">&quot;Parent&#32;Rectangle&#32;dimensions&#32;negative;&#32;can&apos;t&#32;set&#32;slider&#32;boundaries!&quot;</emphasis>,&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_slider_1a8db525944d09fcb639d3808153307691">parent</link>.gameObject);
+00374 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;enabled&#32;=&#32;<emphasis role="keyword">false</emphasis>;
+00375 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}&#32;<emphasis role="keywordflow">else</emphasis>&#32;{
+00376 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;var&#32;<emphasis role="keyword">self</emphasis>&#32;=&#32;<link linkend="_interface_leap_1_1_unity_1_1_interaction_1_1_i_interaction_behaviour_1a2ff1423c8145ae05a1cc8506d6932136">transform</link>.GetComponent&lt;RectTransform&gt;();
+00377 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(<emphasis role="keyword">self</emphasis>&#32;!=&#32;<emphasis role="keyword">null</emphasis>)&#32;{
+00378 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_slider_1aac876ee4286370ad7a186d10d0c75848">horizontalSlideLimits</link>&#32;=&#32;<emphasis role="keyword">new</emphasis>&#32;Vector2(<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_slider_1a8db525944d09fcb639d3808153307691">parent</link>.rect.xMin&#32;-&#32;<link linkend="_interface_leap_1_1_unity_1_1_interaction_1_1_i_interaction_behaviour_1a2ff1423c8145ae05a1cc8506d6932136">transform</link>.localPosition.x&#32;+&#32;<emphasis role="keyword">self</emphasis>.rect.width&#32;/&#32;2F,&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_slider_1a8db525944d09fcb639d3808153307691">parent</link>.rect.xMax&#32;-&#32;<link linkend="_interface_leap_1_1_unity_1_1_interaction_1_1_i_interaction_behaviour_1a2ff1423c8145ae05a1cc8506d6932136">transform</link>.localPosition.x&#32;-&#32;<emphasis role="keyword">self</emphasis>.rect.width&#32;/&#32;2F);
+00379 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_slider_1aac876ee4286370ad7a186d10d0c75848">horizontalSlideLimits</link>.x&#32;&gt;&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_slider_1aac876ee4286370ad7a186d10d0c75848">horizontalSlideLimits</link>.y)&#32;{
+00380 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_slider_1aac876ee4286370ad7a186d10d0c75848">horizontalSlideLimits</link>&#32;=&#32;<emphasis role="keyword">new</emphasis>&#32;Vector2(0F,&#32;0F);
+00381 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00382 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(Mathf.Abs(<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_slider_1aac876ee4286370ad7a186d10d0c75848">horizontalSlideLimits</link>.x)&#32;&lt;&#32;0.0001F)&#32;{
+00383 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_slider_1aac876ee4286370ad7a186d10d0c75848">horizontalSlideLimits</link>.x&#32;=&#32;0F;
+00384 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00385 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(Mathf.Abs(<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_slider_1aac876ee4286370ad7a186d10d0c75848">horizontalSlideLimits</link>.y)&#32;&lt;&#32;0.0001F)&#32;{
+00386 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_slider_1aac876ee4286370ad7a186d10d0c75848">horizontalSlideLimits</link>.y&#32;=&#32;0F;
+00387 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00388 
+00389 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_slider_1a6f401163a50594104f9e9e54c473d5a0">verticalSlideLimits</link>&#32;=&#32;<emphasis role="keyword">new</emphasis>&#32;Vector2(<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_slider_1a8db525944d09fcb639d3808153307691">parent</link>.rect.yMin&#32;-&#32;<link linkend="_interface_leap_1_1_unity_1_1_interaction_1_1_i_interaction_behaviour_1a2ff1423c8145ae05a1cc8506d6932136">transform</link>.localPosition.y&#32;+&#32;<emphasis role="keyword">self</emphasis>.rect.height&#32;/&#32;2F,&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_slider_1a8db525944d09fcb639d3808153307691">parent</link>.rect.yMax&#32;-&#32;<link linkend="_interface_leap_1_1_unity_1_1_interaction_1_1_i_interaction_behaviour_1a2ff1423c8145ae05a1cc8506d6932136">transform</link>.localPosition.y&#32;-&#32;<emphasis role="keyword">self</emphasis>.rect.height&#32;/&#32;2F);
+00390 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_slider_1a6f401163a50594104f9e9e54c473d5a0">verticalSlideLimits</link>.x&#32;&gt;&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_slider_1a6f401163a50594104f9e9e54c473d5a0">verticalSlideLimits</link>.y)&#32;{
+00391 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_slider_1a6f401163a50594104f9e9e54c473d5a0">verticalSlideLimits</link>&#32;=&#32;<emphasis role="keyword">new</emphasis>&#32;Vector2(0F,&#32;0F);
+00392 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00393 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(Mathf.Abs(<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_slider_1a6f401163a50594104f9e9e54c473d5a0">verticalSlideLimits</link>.x)&#32;&lt;&#32;0.0001F)&#32;{
+00394 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_slider_1a6f401163a50594104f9e9e54c473d5a0">verticalSlideLimits</link>.x&#32;=&#32;0F;
+00395 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00396 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(Mathf.Abs(<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_slider_1a6f401163a50594104f9e9e54c473d5a0">verticalSlideLimits</link>.y)&#32;&lt;&#32;0.0001F)&#32;{
+00397 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_slider_1a6f401163a50594104f9e9e54c473d5a0">verticalSlideLimits</link>.y&#32;=&#32;0F;
+00398 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00399 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}&#32;<emphasis role="keywordflow">else</emphasis>&#32;{
+00400 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_slider_1aac876ee4286370ad7a186d10d0c75848">horizontalSlideLimits</link>&#32;=&#32;<emphasis role="keyword">new</emphasis>&#32;Vector2(<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_slider_1a8db525944d09fcb639d3808153307691">parent</link>.rect.xMin&#32;-&#32;<link linkend="_interface_leap_1_1_unity_1_1_interaction_1_1_i_interaction_behaviour_1a2ff1423c8145ae05a1cc8506d6932136">transform</link>.localPosition.x,&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_slider_1a8db525944d09fcb639d3808153307691">parent</link>.rect.xMax&#32;-&#32;<link linkend="_interface_leap_1_1_unity_1_1_interaction_1_1_i_interaction_behaviour_1a2ff1423c8145ae05a1cc8506d6932136">transform</link>.localPosition.x);
+00401 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_slider_1a6f401163a50594104f9e9e54c473d5a0">verticalSlideLimits</link>&#32;=&#32;<emphasis role="keyword">new</emphasis>&#32;Vector2(<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_slider_1a8db525944d09fcb639d3808153307691">parent</link>.rect.yMin&#32;-&#32;<link linkend="_interface_leap_1_1_unity_1_1_interaction_1_1_i_interaction_behaviour_1a2ff1423c8145ae05a1cc8506d6932136">transform</link>.localPosition.y,&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_slider_1a8db525944d09fcb639d3808153307691">parent</link>.rect.yMax&#32;-&#32;<link linkend="_interface_leap_1_1_unity_1_1_interaction_1_1_i_interaction_behaviour_1a2ff1423c8145ae05a1cc8506d6932136">transform</link>.localPosition.y);
+00402 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00403 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00404 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00405 &#32;&#32;&#32;&#32;&#32;&#32;}
+00406 &#32;&#32;&#32;&#32;}
+00407 
+<anchor xml:id="__interaction_slider_8cs_source_1l00408"/><link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_slider_1a8c06bb5258dd92f60e1dd42e65617028">00408</link> &#32;&#32;&#32;&#32;<emphasis role="keyword">protected</emphasis>&#32;<emphasis role="keyword">override</emphasis>&#32;Vector3&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_slider_1a8c06bb5258dd92f60e1dd42e65617028">constrainDepressedLocalPosition</link>(Vector3&#32;desiredOffset)&#32;{
+00409 &#32;&#32;&#32;&#32;&#32;&#32;Vector3&#32;unSnappedPosition&#32;=
+00410 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">new</emphasis>&#32;Vector3(Mathf.Clamp((<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_button_1a33b1313c855fc4e54f7d85dfa17000f0">localPhysicsPosition</link>.x&#32;+&#32;desiredOffset.x),&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_button_1aaff55c4ea819215e2100b6906f970746">initialLocalPosition</link>.x&#32;+&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_slider_1aac876ee4286370ad7a186d10d0c75848">horizontalSlideLimits</link>.x,&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_button_1aaff55c4ea819215e2100b6906f970746">initialLocalPosition</link>.x&#32;+&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_slider_1aac876ee4286370ad7a186d10d0c75848">horizontalSlideLimits</link>.y),
+00411 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;Mathf.Clamp((<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_button_1a33b1313c855fc4e54f7d85dfa17000f0">localPhysicsPosition</link>.y&#32;+&#32;desiredOffset.y),&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_button_1aaff55c4ea819215e2100b6906f970746">initialLocalPosition</link>.y&#32;+&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_slider_1a6f401163a50594104f9e9e54c473d5a0">verticalSlideLimits</link>.x,&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_button_1aaff55c4ea819215e2100b6906f970746">initialLocalPosition</link>.y&#32;+&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_slider_1a6f401163a50594104f9e9e54c473d5a0">verticalSlideLimits</link>.y),
+00412 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;(<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_button_1a33b1313c855fc4e54f7d85dfa17000f0">localPhysicsPosition</link>.z&#32;+&#32;desiredOffset.z));
+00413 
+00414 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordtype">float</emphasis>&#32;hSliderPercent&#32;=&#32;Mathf.InverseLerp(<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_button_1aaff55c4ea819215e2100b6906f970746">initialLocalPosition</link>.x&#32;+&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_slider_1aac876ee4286370ad7a186d10d0c75848">horizontalSlideLimits</link>.x,&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_button_1aaff55c4ea819215e2100b6906f970746">initialLocalPosition</link>.x&#32;+&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_slider_1aac876ee4286370ad7a186d10d0c75848">horizontalSlideLimits</link>.y,&#32;unSnappedPosition.x);
+00415 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_slider_1a3d961fb69c6c913958da01b8aa9c4e04">horizontalSteps</link>&#32;&gt;&#32;0)&#32;{
+00416 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;hSliderPercent&#32;=&#32;Mathf.Round(hSliderPercent&#32;*&#32;(<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_slider_1a3d961fb69c6c913958da01b8aa9c4e04">horizontalSteps</link>))&#32;/&#32;(<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_slider_1a3d961fb69c6c913958da01b8aa9c4e04">horizontalSteps</link>);
+00417 &#32;&#32;&#32;&#32;&#32;&#32;}
+00418 
+00419 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordtype">float</emphasis>&#32;vSliderPercent&#32;=&#32;Mathf.InverseLerp(<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_button_1aaff55c4ea819215e2100b6906f970746">initialLocalPosition</link>.y&#32;+&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_slider_1a6f401163a50594104f9e9e54c473d5a0">verticalSlideLimits</link>.x,&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_button_1aaff55c4ea819215e2100b6906f970746">initialLocalPosition</link>.y&#32;+&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_slider_1a6f401163a50594104f9e9e54c473d5a0">verticalSlideLimits</link>.y,&#32;unSnappedPosition.y);
+00420 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_slider_1a1c480cd9ec1089bfe6084fe6e5b3f52c">verticalSteps</link>&#32;&gt;&#32;0)&#32;{
+00421 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;vSliderPercent&#32;=&#32;Mathf.Round(vSliderPercent&#32;*&#32;(<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_slider_1a1c480cd9ec1089bfe6084fe6e5b3f52c">verticalSteps</link>))&#32;/&#32;(<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_slider_1a1c480cd9ec1089bfe6084fe6e5b3f52c">verticalSteps</link>);
+00422 &#32;&#32;&#32;&#32;&#32;&#32;}
+00423 
+00424 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;<emphasis role="keyword">new</emphasis>&#32;Vector3(Mathf.Lerp(<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_button_1aaff55c4ea819215e2100b6906f970746">initialLocalPosition</link>.x&#32;+&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_slider_1aac876ee4286370ad7a186d10d0c75848">horizontalSlideLimits</link>.x,&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_button_1aaff55c4ea819215e2100b6906f970746">initialLocalPosition</link>.x&#32;+&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_slider_1aac876ee4286370ad7a186d10d0c75848">horizontalSlideLimits</link>.y,&#32;hSliderPercent),
+00425 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;Mathf.Lerp(<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_button_1aaff55c4ea819215e2100b6906f970746">initialLocalPosition</link>.y&#32;+&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_slider_1a6f401163a50594104f9e9e54c473d5a0">verticalSlideLimits</link>.x,&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_button_1aaff55c4ea819215e2100b6906f970746">initialLocalPosition</link>.y&#32;+&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_slider_1a6f401163a50594104f9e9e54c473d5a0">verticalSlideLimits</link>.y,&#32;vSliderPercent),
+00426 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;(<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_button_1a33b1313c855fc4e54f7d85dfa17000f0">localPhysicsPosition</link>.z&#32;+&#32;desiredOffset.z));
+00427 &#32;&#32;&#32;&#32;}
+00428 
+00429 <emphasis role="preprocessor">&#32;&#32;&#32;&#32;#endregion</emphasis>
+00430 
+00431 <emphasis role="preprocessor">&#32;&#32;&#32;&#32;#region&#32;Gizmos</emphasis>
+00432 
+<anchor xml:id="__interaction_slider_8cs_source_1l00433"/><link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_slider_1a231a11f6e3fdd351816de72c016a9b19">00433</link> &#32;&#32;&#32;&#32;<emphasis role="keyword">protected</emphasis>&#32;<emphasis role="keyword">override</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_slider_1a231a11f6e3fdd351816de72c016a9b19">OnDrawGizmosSelected</link>()&#32;{
+00434 &#32;&#32;&#32;&#32;&#32;&#32;base.OnDrawGizmosSelected();
+00435 
+00436 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(<link linkend="_interface_leap_1_1_unity_1_1_interaction_1_1_i_interaction_behaviour_1a2ff1423c8145ae05a1cc8506d6932136">transform</link>.parent&#32;!=&#32;<emphasis role="keyword">null</emphasis>)&#32;{
+00437 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;Vector3&#32;originPosition&#32;=&#32;Application.isPlaying&#32;?&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_button_1aaff55c4ea819215e2100b6906f970746">initialLocalPosition</link>&#32;:&#32;<link linkend="_interface_leap_1_1_unity_1_1_interaction_1_1_i_interaction_behaviour_1a2ff1423c8145ae05a1cc8506d6932136">transform</link>.localPosition;
+00438 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(Application.isPlaying&#32;&amp;&amp;&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_button_1a48c30245b6b71691985f9b4423c8ce59">startingPositionMode</link>&#32;==&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_button_1a29761e33189cdf8131bb519cdc114fd2">StartingPositionMode</link>.Relaxed)&#32;{
+00439 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;originPosition&#32;=&#32;originPosition&#32;+&#32;Vector3.back&#32;*&#32;Mathf.Lerp(<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_button_1a26f7eabb9d9880d63ab19f7dbeff186a">minMaxHeight</link>.x,&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_button_1a26f7eabb9d9880d63ab19f7dbeff186a">minMaxHeight</link>.y,&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_button_1ac5d100f680957b8a06989b47241d3624">restingHeight</link>);
+00440 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00441 
+00442 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;Actual&#32;slider&#32;slide&#32;limits</emphasis>
+00443 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;Gizmos.color&#32;=&#32;Color.blue;
+00444 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;Gizmos.DrawWireCube(originPosition&#32;+
+00445 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">new</emphasis>&#32;Vector3((<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_slider_1a7d25fc4d3c00bacc32c01b4c55cac68b">sliderType</link>&#32;==&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_slider_1ae3fefc578d521cc71c2ea5d222e01748">SliderType</link>.Vertical&#32;?&#32;0F&#32;:&#32;(<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_slider_1aac876ee4286370ad7a186d10d0c75848">horizontalSlideLimits</link>.x&#32;+&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_slider_1aac876ee4286370ad7a186d10d0c75848">horizontalSlideLimits</link>.y)&#32;*&#32;0.5f),
+00446 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;(<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_slider_1a7d25fc4d3c00bacc32c01b4c55cac68b">sliderType</link>&#32;==&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_slider_1ae3fefc578d521cc71c2ea5d222e01748">SliderType</link>.Horizontal&#32;?&#32;0F&#32;:&#32;(<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_slider_1a6f401163a50594104f9e9e54c473d5a0">verticalSlideLimits</link>.x&#32;+&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_slider_1a6f401163a50594104f9e9e54c473d5a0">verticalSlideLimits</link>.y)&#32;*&#32;0.5f),
+00447 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;0f),
+00448 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">new</emphasis>&#32;Vector3((<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_slider_1a7d25fc4d3c00bacc32c01b4c55cac68b">sliderType</link>&#32;==&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_slider_1ae3fefc578d521cc71c2ea5d222e01748">SliderType</link>.Vertical&#32;?&#32;0F&#32;:&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_slider_1aac876ee4286370ad7a186d10d0c75848">horizontalSlideLimits</link>.y&#32;-&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_slider_1aac876ee4286370ad7a186d10d0c75848">horizontalSlideLimits</link>.x),
+00449 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;(<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_slider_1a7d25fc4d3c00bacc32c01b4c55cac68b">sliderType</link>&#32;==&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_slider_1ae3fefc578d521cc71c2ea5d222e01748">SliderType</link>.Horizontal&#32;?&#32;0F&#32;:&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_slider_1a6f401163a50594104f9e9e54c473d5a0">verticalSlideLimits</link>.y&#32;-&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_slider_1a6f401163a50594104f9e9e54c473d5a0">verticalSlideLimits</link>.x),
+00450 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;0f));
+00451 
+00452 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;var&#32;<emphasis role="keyword">self</emphasis>&#32;=&#32;GetComponent&lt;RectTransform&gt;();
+00453 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(<emphasis role="keyword">self</emphasis>&#32;!=&#32;<emphasis role="keyword">null</emphasis>)&#32;{
+00454 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;Apparent&#32;slide&#32;limits&#32;(against&#32;own&#32;rect&#32;limits)</emphasis>
+00455 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_slider_1a8db525944d09fcb639d3808153307691">parent</link>&#32;=&#32;<link linkend="_interface_leap_1_1_unity_1_1_interaction_1_1_i_interaction_behaviour_1a2ff1423c8145ae05a1cc8506d6932136">transform</link>.parent.GetComponent&lt;RectTransform&gt;();
+00456 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_slider_1a8db525944d09fcb639d3808153307691">parent</link>&#32;!=&#32;<emphasis role="keyword">null</emphasis>)&#32;{
+00457 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;var&#32;parentRectHorizontal&#32;=&#32;<emphasis role="keyword">new</emphasis>&#32;Vector2(<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_slider_1a8db525944d09fcb639d3808153307691">parent</link>.rect.xMin&#32;-&#32;originPosition.x,&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_slider_1a8db525944d09fcb639d3808153307691">parent</link>.rect.xMax&#32;-&#32;originPosition.x);
+00458 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;var&#32;parentRectVertical&#32;=&#32;<emphasis role="keyword">new</emphasis>&#32;Vector2(<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_slider_1a8db525944d09fcb639d3808153307691">parent</link>.rect.yMin&#32;-&#32;originPosition.y,&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_slider_1a8db525944d09fcb639d3808153307691">parent</link>.rect.yMax&#32;-&#32;originPosition.y);
+00459 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;Gizmos.color&#32;=&#32;Color.Lerp(Color.blue,&#32;Color.cyan,&#32;0.5F);
+00460 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;Gizmos.DrawWireCube(originPosition&#32;+
+00461 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">new</emphasis>&#32;Vector3((parentRectHorizontal.x&#32;+&#32;parentRectHorizontal.y)&#32;*&#32;0.5f,
+00462 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;(parentRectVertical.x&#32;+&#32;parentRectVertical.y)&#32;*&#32;0.5f,
+00463 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;(<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_button_1a48c30245b6b71691985f9b4423c8ce59">startingPositionMode</link>&#32;==&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_button_1a29761e33189cdf8131bb519cdc114fd2">StartingPositionMode</link>.Relaxed&#32;?
+00464 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;Mathf.Lerp(<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_button_1a26f7eabb9d9880d63ab19f7dbeff186a">minMaxHeight</link>.x,&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_button_1a26f7eabb9d9880d63ab19f7dbeff186a">minMaxHeight</link>.y,&#32;0.5F)&#32;-&#32;Mathf.Lerp(<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_button_1a26f7eabb9d9880d63ab19f7dbeff186a">minMaxHeight</link>.x,&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_button_1a26f7eabb9d9880d63ab19f7dbeff186a">minMaxHeight</link>.y,&#32;1&#32;-&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_button_1ac5d100f680957b8a06989b47241d3624">restingHeight</link>)
+00465 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;:&#32;-1F&#32;*&#32;Mathf.Lerp(<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_button_1a26f7eabb9d9880d63ab19f7dbeff186a">minMaxHeight</link>.x,&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_button_1a26f7eabb9d9880d63ab19f7dbeff186a">minMaxHeight</link>.y,&#32;0.5F))),
+00466 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">new</emphasis>&#32;Vector3(parentRectHorizontal.y&#32;-&#32;parentRectHorizontal.x,&#32;parentRectVertical.y&#32;-&#32;parentRectVertical.x,&#32;(<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_button_1a26f7eabb9d9880d63ab19f7dbeff186a">minMaxHeight</link>.y&#32;-&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_button_1a26f7eabb9d9880d63ab19f7dbeff186a">minMaxHeight</link>.x)));
+00467 
+00468 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;Own&#32;rect&#32;width/height</emphasis>
+00469 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;Gizmos.color&#32;=&#32;Color.cyan;
+00470 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;Gizmos.DrawWireCube(originPosition,
+00471 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">self</emphasis>.rect.width&#32;*&#32;Vector3.right
+00472 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;+&#32;<emphasis role="keyword">self</emphasis>.rect.height&#32;*&#32;Vector3.up);
+00473 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00474 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00475 &#32;&#32;&#32;&#32;&#32;&#32;}
+00476 &#32;&#32;&#32;&#32;}
+00477 
+00478 <emphasis role="preprocessor">&#32;&#32;&#32;&#32;#endregion</emphasis>
+00479 &#32;&#32;}
+00480 }
+</programlisting></section>

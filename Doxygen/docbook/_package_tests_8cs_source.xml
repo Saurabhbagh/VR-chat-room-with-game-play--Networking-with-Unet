@@ -1,0 +1,526 @@
+<?xml version='1.0' encoding='UTF-8' standalone='no'?>
+<section xmlns="http://docbook.org/ns/docbook" version="5.0" xmlns:xlink="http://www.w3.org/1999/xlink" xml:id="__package_tests_8cs_source">
+<title>PackageTests.cs</title>
+<indexterm><primary>O:/GitHUBMINIPRoject/Library/PackageCache/com.unity.package-manager-ui@2.0.7/Tests/Editor/Services/Packages/PackageTests.cs</primary></indexterm>
+<programlisting>00001 <emphasis role="keyword">using</emphasis>&#32;System;
+00002 <emphasis role="keyword">using</emphasis>&#32;System.Collections.Generic;
+00003 <emphasis role="keyword">using</emphasis>&#32;System.Linq;
+00004 <emphasis role="keyword">using</emphasis>&#32;NUnit.Framework;
+00005 <emphasis role="keyword">using</emphasis>&#32;<link linkend="_namespace_semver">Semver</link>;
+00006 
+00007 <emphasis role="keyword">namespace&#32;</emphasis><link linkend="_namespace_unity_editor_1_1_package_manager_1_1_u_i_1_1_tests">UnityEditor.PackageManager.UI.Tests</link>
+00008 {
+<anchor xml:id="__package_tests_8cs_source_1l00009"/><link linkend="_class_unity_editor_1_1_package_manager_1_1_u_i_1_1_tests_1_1_package_tests">00009</link> &#32;&#32;&#32;&#32;<emphasis role="keyword">internal</emphasis>&#32;<emphasis role="keyword">class&#32;</emphasis><link linkend="_class_unity_editor_1_1_package_manager_1_1_u_i_1_1_tests_1_1_package_tests">PackageTests</link>&#32;:&#32;<link linkend="_class_unity_editor_1_1_package_manager_1_1_u_i_1_1_tests_1_1_package_base_tests">PackageBaseTests</link>
+00010 &#32;&#32;&#32;&#32;{
+00011 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;Action&lt;IAddOperation&gt;&#32;OnAddOperation;
+00012 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;Action&lt;IRemoveOperation&gt;&#32;OnRemoveOperation;
+00013 
+00014 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;Package&#32;version&#32;to&#32;display</emphasis>
+<anchor xml:id="__package_tests_8cs_source_1l00015"/><link linkend="_class_unity_editor_1_1_package_manager_1_1_u_i_1_1_tests_1_1_package_tests_1a7a200103be4867c4cbd373d3d768607d">00015</link> &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<link linkend="_class_unity_editor_1_1_package_manager_1_1_u_i_1_1_package_info">PackageInfo</link>&#32;<link linkend="_class_unity_editor_1_1_package_manager_1_1_u_i_1_1_tests_1_1_package_tests_1a7a200103be4867c4cbd373d3d768607d">Display</link>(<link linkend="_class_unity_editor_1_1_package_manager_1_1_u_i_1_1_package">Package</link>&#32;package)
+00016 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00017 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;<link linkend="_class_unity_editor_1_1_package_manager_1_1_u_i_1_1_package_collection">PackageCollection</link>.<link linkend="_class_unity_editor_1_1_package_manager_1_1_u_i_1_1_package_collection_1a75a698a6c798e48fbddf0e7edbf6db71">Instance</link>.<link linkend="_class_unity_editor_1_1_package_manager_1_1_u_i_1_1_package_collection_1ae9d3d53d670427dfbe398441d7be141e">Filter</link>&#32;==&#32;<link linkend="_namespace_unity_editor_1_1_package_manager_1_1_u_i_1aec89f744729646d8e261787be78942c8">PackageFilter</link>.All&#32;||&#32;package.<link linkend="_class_unity_editor_1_1_package_manager_1_1_u_i_1_1_package_1ac9a3a0581e85149b7e0a614b9f3de3f6">Current</link>&#32;==&#32;<emphasis role="keyword">null</emphasis>&#32;?&#32;package.Latest&#32;:&#32;package.<link linkend="_class_unity_editor_1_1_package_manager_1_1_u_i_1_1_package_1ac9a3a0581e85149b7e0a614b9f3de3f6">Current</link>;
+00018 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00019 
+00020 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;[SetUp]
+<anchor xml:id="__package_tests_8cs_source_1l00021"/><link linkend="_class_unity_editor_1_1_package_manager_1_1_u_i_1_1_tests_1_1_package_tests_1aac79965e0fd129079c1d535214d34ea9">00021</link> &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;<link linkend="_class_unity_editor_1_1_package_manager_1_1_u_i_1_1_tests_1_1_package_tests_1aac79965e0fd129079c1d535214d34ea9">Setup</link>()
+00022 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00023 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_unity_editor_1_1_package_manager_1_1_u_i_1_1_package_collection">PackageCollection</link>.<link linkend="_class_unity_editor_1_1_package_manager_1_1_u_i_1_1_package_collection_1a75a698a6c798e48fbddf0e7edbf6db71">Instance</link>.<link linkend="_class_unity_editor_1_1_package_manager_1_1_u_i_1_1_package_collection_1a376f256e424d8ac231a101e35d83799b">SetFilter</link>(<link linkend="_namespace_unity_editor_1_1_package_manager_1_1_u_i_1aec89f744729646d8e261787be78942c8">PackageFilter</link>.Local);
+00024 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00025 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;
+00026 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;[<link linkend="_class_unity_editor_1_1_package_manager_1_1_u_i_1_1_tests_1_1_package_tests_1a1b0b13f585117f97780e36d6d41635be">TearDown</link>]
+<anchor xml:id="__package_tests_8cs_source_1l00027"/><link linkend="_class_unity_editor_1_1_package_manager_1_1_u_i_1_1_tests_1_1_package_tests_1a1b0b13f585117f97780e36d6d41635be">00027</link> &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;<link linkend="_class_unity_editor_1_1_package_manager_1_1_u_i_1_1_tests_1_1_package_tests_1a1b0b13f585117f97780e36d6d41635be">TearDown</link>()
+00028 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00029 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_unity_editor_1_1_package_manager_1_1_u_i_1_1_tests_1_1_package_base_tests_1af2b2bd5acb144a46619ffa922f01d080">Factory</link>.<link linkend="_class_unity_editor_1_1_package_manager_1_1_u_i_1_1_tests_1_1_mock_operation_factory_1a9f58ffa587113492f7124ae4e2974028">ResetOperations</link>();
+00030 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_unity_editor_1_1_package_manager_1_1_u_i_1_1_tests_1_1_package_base_tests_1af2b2bd5acb144a46619ffa922f01d080">Factory</link>.<link linkend="_class_unity_editor_1_1_package_manager_1_1_u_i_1_1_tests_1_1_mock_operation_factory_1ac5b0b5d8a6b7202e5f650bbd79e94836">Packages</link>&#32;=&#32;Enumerable.Empty&lt;<link linkend="_class_unity_editor_1_1_package_manager_1_1_u_i_1_1_package_info">PackageInfo</link>&gt;();
+00031 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00032 
+00033 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;[Test]
+<anchor xml:id="__package_tests_8cs_source_1l00034"/><link linkend="_class_unity_editor_1_1_package_manager_1_1_u_i_1_1_tests_1_1_package_tests_1a8a3843c591aeee904e7f8102ce083cfd">00034</link> &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;<link linkend="_class_unity_editor_1_1_package_manager_1_1_u_i_1_1_tests_1_1_package_tests_1a8a3843c591aeee904e7f8102ce083cfd">Constructor_WithNullPackageName_ThrowsException</link>()
+00035 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00036 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;var&#32;packages&#32;=&#32;<link linkend="_class_unity_editor_1_1_package_manager_1_1_u_i_1_1_tests_1_1_package_sets">PackageSets</link>.<link linkend="_class_unity_editor_1_1_package_manager_1_1_u_i_1_1_tests_1_1_package_sets_1a8330e0a210e88e4598e34dbef1a17430">Instance</link>.<link linkend="_class_unity_editor_1_1_package_manager_1_1_u_i_1_1_tests_1_1_package_sets_1a86750fa77ba04573c7eaa5d605576a6a">Many</link>(<link linkend="_class_unity_editor_1_1_package_manager_1_1_u_i_1_1_tests_1_1_package_base_tests_1abc4043fbd68eb046d466063f1f5b7bf1">kPackageTestName</link>,&#32;1,&#32;<emphasis role="keyword">true</emphasis>);
+00037 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;Assert.Throws&lt;ArgumentException&gt;(()&#32;=&gt;&#32;
+00038 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00039 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">new</emphasis>&#32;<link linkend="_class_unity_editor_1_1_package_manager_1_1_u_i_1_1_package">Package</link>(<emphasis role="keyword">null</emphasis>,&#32;packages);
+00040 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;});
+00041 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00042 
+00043 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;[Test]
+<anchor xml:id="__package_tests_8cs_source_1l00044"/><link linkend="_class_unity_editor_1_1_package_manager_1_1_u_i_1_1_tests_1_1_package_tests_1ade50bb9418c7c1a6975dc38f71dd1367">00044</link> &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;<link linkend="_class_unity_editor_1_1_package_manager_1_1_u_i_1_1_tests_1_1_package_tests_1ade50bb9418c7c1a6975dc38f71dd1367">Constructor_WithEmptyPackageName_ThrowsException</link>()
+00045 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00046 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;var&#32;packages&#32;=&#32;<link linkend="_class_unity_editor_1_1_package_manager_1_1_u_i_1_1_tests_1_1_package_sets">PackageSets</link>.<link linkend="_class_unity_editor_1_1_package_manager_1_1_u_i_1_1_tests_1_1_package_sets_1a8330e0a210e88e4598e34dbef1a17430">Instance</link>.<link linkend="_class_unity_editor_1_1_package_manager_1_1_u_i_1_1_tests_1_1_package_sets_1a86750fa77ba04573c7eaa5d605576a6a">Many</link>(<link linkend="_class_unity_editor_1_1_package_manager_1_1_u_i_1_1_tests_1_1_package_base_tests_1abc4043fbd68eb046d466063f1f5b7bf1">kPackageTestName</link>,&#32;1,&#32;<emphasis role="keyword">true</emphasis>);
+00047 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;Assert.Throws&lt;ArgumentException&gt;(()&#32;=&gt;&#32;
+00048 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00049 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">new</emphasis>&#32;<link linkend="_class_unity_editor_1_1_package_manager_1_1_u_i_1_1_package">Package</link>(<emphasis role="stringliteral">&quot;&quot;</emphasis>,&#32;packages);
+00050 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;});
+00051 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00052 
+00053 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;[Test]
+<anchor xml:id="__package_tests_8cs_source_1l00054"/><link linkend="_class_unity_editor_1_1_package_manager_1_1_u_i_1_1_tests_1_1_package_tests_1a346cfcef79d969b27f5711395424fdc2">00054</link> &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;<link linkend="_class_unity_editor_1_1_package_manager_1_1_u_i_1_1_tests_1_1_package_tests_1a346cfcef79d969b27f5711395424fdc2">Constructor_WithNullPackageInfos_ThrowsException</link>()
+00055 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00056 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;Assert.Throws&lt;ArgumentNullException&gt;(()&#32;=&gt;&#32;
+00057 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00058 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">new</emphasis>&#32;<link linkend="_class_unity_editor_1_1_package_manager_1_1_u_i_1_1_package">Package</link>(<link linkend="_class_unity_editor_1_1_package_manager_1_1_u_i_1_1_tests_1_1_package_base_tests_1abc4043fbd68eb046d466063f1f5b7bf1">kPackageTestName</link>,&#32;<emphasis role="keyword">null</emphasis>);
+00059 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;});
+00060 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00061 
+00062 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;[Test]
+<anchor xml:id="__package_tests_8cs_source_1l00063"/><link linkend="_class_unity_editor_1_1_package_manager_1_1_u_i_1_1_tests_1_1_package_tests_1a5bb0a3413d5cc9940db10387dd66b2d4">00063</link> &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;<link linkend="_class_unity_editor_1_1_package_manager_1_1_u_i_1_1_tests_1_1_package_tests_1a5bb0a3413d5cc9940db10387dd66b2d4">Constructor_WithEmptyPackageInfos_ThrowsException</link>()
+00064 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00065 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;var&#32;packages&#32;=&#32;Enumerable.Empty&lt;<link linkend="_class_unity_editor_1_1_package_manager_1_1_u_i_1_1_package_info">PackageInfo</link>&gt;();
+00066 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;Assert.Throws&lt;ArgumentException&gt;(()&#32;=&gt;&#32;
+00067 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00068 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">new</emphasis>&#32;<link linkend="_class_unity_editor_1_1_package_manager_1_1_u_i_1_1_package">Package</link>(<link linkend="_class_unity_editor_1_1_package_manager_1_1_u_i_1_1_tests_1_1_package_base_tests_1abc4043fbd68eb046d466063f1f5b7bf1">kPackageTestName</link>,&#32;packages);
+00069 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;});
+00070 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00071 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;
+00072 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;[Test]
+<anchor xml:id="__package_tests_8cs_source_1l00073"/><link linkend="_class_unity_editor_1_1_package_manager_1_1_u_i_1_1_tests_1_1_package_tests_1a995258491bcad1e1e88b09f288677379">00073</link> &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;<link linkend="_class_unity_editor_1_1_package_manager_1_1_u_i_1_1_tests_1_1_package_tests_1a995258491bcad1e1e88b09f288677379">Constructor_WithOnePackageInfo_CurrentIsFirstVersion</link>()
+00074 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00075 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;var&#32;packages&#32;=&#32;<link linkend="_class_unity_editor_1_1_package_manager_1_1_u_i_1_1_tests_1_1_package_sets">PackageSets</link>.<link linkend="_class_unity_editor_1_1_package_manager_1_1_u_i_1_1_tests_1_1_package_sets_1a8330e0a210e88e4598e34dbef1a17430">Instance</link>.<link linkend="_class_unity_editor_1_1_package_manager_1_1_u_i_1_1_tests_1_1_package_sets_1a86750fa77ba04573c7eaa5d605576a6a">Many</link>(<link linkend="_class_unity_editor_1_1_package_manager_1_1_u_i_1_1_tests_1_1_package_base_tests_1abc4043fbd68eb046d466063f1f5b7bf1">kPackageTestName</link>,&#32;1,&#32;<emphasis role="keyword">true</emphasis>);
+00076 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;var&#32;<emphasis role="keyword">package&#32;</emphasis>=&#32;new&#32;Package(kPackageTestName,&#32;packages);
+00077 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;
+00078 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;Assert.AreEqual(package.Current,&#32;package.Versions.First());
+00079 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;Assert.IsTrue(package.Current.IsCurrent);
+00080 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00081 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;
+00082 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;[Test]
+<anchor xml:id="__package_tests_8cs_source_1l00083"/><link linkend="_class_unity_editor_1_1_package_manager_1_1_u_i_1_1_tests_1_1_package_tests_1a469e410a12a86ca4044ed2d1ef0f4c09">00083</link> &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;<link linkend="_class_unity_editor_1_1_package_manager_1_1_u_i_1_1_tests_1_1_package_tests_1a469e410a12a86ca4044ed2d1ef0f4c09">Constructor_WithOnePackageInfo_LatestIsLastVersion</link>()
+00084 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00085 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;var&#32;packages&#32;=&#32;<link linkend="_class_unity_editor_1_1_package_manager_1_1_u_i_1_1_tests_1_1_package_sets">PackageSets</link>.<link linkend="_class_unity_editor_1_1_package_manager_1_1_u_i_1_1_tests_1_1_package_sets_1a8330e0a210e88e4598e34dbef1a17430">Instance</link>.<link linkend="_class_unity_editor_1_1_package_manager_1_1_u_i_1_1_tests_1_1_package_sets_1a86750fa77ba04573c7eaa5d605576a6a">Many</link>(<link linkend="_class_unity_editor_1_1_package_manager_1_1_u_i_1_1_tests_1_1_package_base_tests_1abc4043fbd68eb046d466063f1f5b7bf1">kPackageTestName</link>,&#32;1,&#32;<emphasis role="keyword">true</emphasis>);
+00086 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;var&#32;<emphasis role="keyword">package&#32;</emphasis>=&#32;new&#32;Package(kPackageTestName,&#32;packages);
+00087 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;
+00088 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;Assert.AreEqual(package.Latest,&#32;package.Versions.Last());
+00089 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;Assert.IsTrue(package.Latest.IsCurrent);
+00090 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00091 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;
+00092 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;[Test]
+<anchor xml:id="__package_tests_8cs_source_1l00093"/><link linkend="_class_unity_editor_1_1_package_manager_1_1_u_i_1_1_tests_1_1_package_tests_1a9f1f1f6c8ee528487dcc2d1393200b59">00093</link> &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;<link linkend="_class_unity_editor_1_1_package_manager_1_1_u_i_1_1_tests_1_1_package_tests_1a9f1f1f6c8ee528487dcc2d1393200b59">Constructor_WithOnePackageInfo_LatestAndCurrentAreEqual</link>()
+00094 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00095 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;var&#32;packages&#32;=&#32;<link linkend="_class_unity_editor_1_1_package_manager_1_1_u_i_1_1_tests_1_1_package_sets">PackageSets</link>.<link linkend="_class_unity_editor_1_1_package_manager_1_1_u_i_1_1_tests_1_1_package_sets_1a8330e0a210e88e4598e34dbef1a17430">Instance</link>.<link linkend="_class_unity_editor_1_1_package_manager_1_1_u_i_1_1_tests_1_1_package_sets_1a86750fa77ba04573c7eaa5d605576a6a">Many</link>(<link linkend="_class_unity_editor_1_1_package_manager_1_1_u_i_1_1_tests_1_1_package_base_tests_1abc4043fbd68eb046d466063f1f5b7bf1">kPackageTestName</link>,&#32;1,&#32;<emphasis role="keyword">true</emphasis>);
+00096 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;var&#32;<emphasis role="keyword">package&#32;</emphasis>=&#32;new&#32;Package(kPackageTestName,&#32;packages);
+00097 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;
+00098 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;Assert.AreEqual(package.Current,&#32;package.Latest);
+00099 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00100 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;
+00101 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;[Test]
+<anchor xml:id="__package_tests_8cs_source_1l00102"/><link linkend="_class_unity_editor_1_1_package_manager_1_1_u_i_1_1_tests_1_1_package_tests_1ac058860230b78ebda8b432bb7f91056c">00102</link> &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;<link linkend="_class_unity_editor_1_1_package_manager_1_1_u_i_1_1_tests_1_1_package_tests_1ac058860230b78ebda8b432bb7f91056c">Constructor_WithTwoPackageInfos_CurrentIsFirstVersion</link>()
+00103 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00104 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;var&#32;packages&#32;=&#32;<link linkend="_class_unity_editor_1_1_package_manager_1_1_u_i_1_1_tests_1_1_package_sets">PackageSets</link>.<link linkend="_class_unity_editor_1_1_package_manager_1_1_u_i_1_1_tests_1_1_package_sets_1a8330e0a210e88e4598e34dbef1a17430">Instance</link>.<link linkend="_class_unity_editor_1_1_package_manager_1_1_u_i_1_1_tests_1_1_package_sets_1a86750fa77ba04573c7eaa5d605576a6a">Many</link>(<link linkend="_class_unity_editor_1_1_package_manager_1_1_u_i_1_1_tests_1_1_package_base_tests_1abc4043fbd68eb046d466063f1f5b7bf1">kPackageTestName</link>,&#32;2,&#32;<emphasis role="keyword">true</emphasis>);
+00105 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;var&#32;<emphasis role="keyword">package&#32;</emphasis>=&#32;new&#32;Package(kPackageTestName,&#32;packages);
+00106 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;
+00107 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;Assert.AreEqual(package.Current,&#32;package.Versions.First());
+00108 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;Assert.IsTrue(package.Current.IsCurrent);
+00109 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00110 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;
+00111 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;[Test]
+<anchor xml:id="__package_tests_8cs_source_1l00112"/><link linkend="_class_unity_editor_1_1_package_manager_1_1_u_i_1_1_tests_1_1_package_tests_1a1419a2541f435b3c2fe41b2367b2490b">00112</link> &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;<link linkend="_class_unity_editor_1_1_package_manager_1_1_u_i_1_1_tests_1_1_package_tests_1a1419a2541f435b3c2fe41b2367b2490b">Constructor_WithTwoPackageInfos_LatestIsLastVersion</link>()
+00113 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00114 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;var&#32;packages&#32;=&#32;<link linkend="_class_unity_editor_1_1_package_manager_1_1_u_i_1_1_tests_1_1_package_sets">PackageSets</link>.<link linkend="_class_unity_editor_1_1_package_manager_1_1_u_i_1_1_tests_1_1_package_sets_1a8330e0a210e88e4598e34dbef1a17430">Instance</link>.<link linkend="_class_unity_editor_1_1_package_manager_1_1_u_i_1_1_tests_1_1_package_sets_1a86750fa77ba04573c7eaa5d605576a6a">Many</link>(<link linkend="_class_unity_editor_1_1_package_manager_1_1_u_i_1_1_tests_1_1_package_base_tests_1abc4043fbd68eb046d466063f1f5b7bf1">kPackageTestName</link>,&#32;2,&#32;<emphasis role="keyword">true</emphasis>);
+00115 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;var&#32;<emphasis role="keyword">package&#32;</emphasis>=&#32;new&#32;Package(kPackageTestName,&#32;packages);
+00116 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;
+00117 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;Assert.AreEqual(package.Latest,&#32;package.Versions.Last());
+00118 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;Assert.IsFalse(package.Latest.IsCurrent);
+00119 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00120 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;
+00121 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;[Test]
+<anchor xml:id="__package_tests_8cs_source_1l00122"/><link linkend="_class_unity_editor_1_1_package_manager_1_1_u_i_1_1_tests_1_1_package_tests_1a634c9a81083f3cfdac38528b09790117">00122</link> &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;<link linkend="_class_unity_editor_1_1_package_manager_1_1_u_i_1_1_tests_1_1_package_tests_1a634c9a81083f3cfdac38528b09790117">Constructor_WithTwoPackagesInfo_LatestAndCurrentAreNotEqual</link>()
+00123 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00124 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;var&#32;packages&#32;=&#32;<link linkend="_class_unity_editor_1_1_package_manager_1_1_u_i_1_1_tests_1_1_package_sets">PackageSets</link>.<link linkend="_class_unity_editor_1_1_package_manager_1_1_u_i_1_1_tests_1_1_package_sets_1a8330e0a210e88e4598e34dbef1a17430">Instance</link>.<link linkend="_class_unity_editor_1_1_package_manager_1_1_u_i_1_1_tests_1_1_package_sets_1a86750fa77ba04573c7eaa5d605576a6a">Many</link>(<link linkend="_class_unity_editor_1_1_package_manager_1_1_u_i_1_1_tests_1_1_package_base_tests_1abc4043fbd68eb046d466063f1f5b7bf1">kPackageTestName</link>,&#32;2,&#32;<emphasis role="keyword">true</emphasis>);
+00125 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;var&#32;<emphasis role="keyword">package&#32;</emphasis>=&#32;new&#32;Package(kPackageTestName,&#32;packages);
+00126 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;
+00127 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;Assert.AreNotEqual(package.Current,&#32;package.Latest);
+00128 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00129 
+00130 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;[Test]
+<anchor xml:id="__package_tests_8cs_source_1l00131"/><link linkend="_class_unity_editor_1_1_package_manager_1_1_u_i_1_1_tests_1_1_package_tests_1aca573e326a53bbb638dcf1cb667d259b">00131</link> &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;<link linkend="_class_unity_editor_1_1_package_manager_1_1_u_i_1_1_tests_1_1_package_tests_1aca573e326a53bbb638dcf1cb667d259b">Constructor_WithMultiplePackagesInfo_VersionsCorrespond</link>()
+00132 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00133 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;var&#32;packages&#32;=&#32;<link linkend="_class_unity_editor_1_1_package_manager_1_1_u_i_1_1_tests_1_1_package_sets">PackageSets</link>.<link linkend="_class_unity_editor_1_1_package_manager_1_1_u_i_1_1_tests_1_1_package_sets_1a8330e0a210e88e4598e34dbef1a17430">Instance</link>.<link linkend="_class_unity_editor_1_1_package_manager_1_1_u_i_1_1_tests_1_1_package_sets_1a86750fa77ba04573c7eaa5d605576a6a">Many</link>(<link linkend="_class_unity_editor_1_1_package_manager_1_1_u_i_1_1_tests_1_1_package_base_tests_1abc4043fbd68eb046d466063f1f5b7bf1">kPackageTestName</link>,&#32;5,&#32;<emphasis role="keyword">true</emphasis>);
+00134 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;var&#32;<emphasis role="keyword">package&#32;</emphasis>=&#32;new&#32;Package(kPackageTestName,&#32;packages);
+00135 
+00136 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;Assert.AreEqual(packages,&#32;package.Versions);
+00137 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00138 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;
+00139 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;[Test]
+<anchor xml:id="__package_tests_8cs_source_1l00140"/><link linkend="_class_unity_editor_1_1_package_manager_1_1_u_i_1_1_tests_1_1_package_tests_1a05b16e1a8af5ac0450837f5d003e9e8b">00140</link> &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;<link linkend="_class_unity_editor_1_1_package_manager_1_1_u_i_1_1_tests_1_1_package_tests_1a05b16e1a8af5ac0450837f5d003e9e8b">Add_WhenPackageInfoIsCurrent_AddOperationIsNotCalled</link>()
+00141 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00142 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;var&#32;packages&#32;=&#32;<link linkend="_class_unity_editor_1_1_package_manager_1_1_u_i_1_1_tests_1_1_package_sets">PackageSets</link>.<link linkend="_class_unity_editor_1_1_package_manager_1_1_u_i_1_1_tests_1_1_package_sets_1a8330e0a210e88e4598e34dbef1a17430">Instance</link>.<link linkend="_class_unity_editor_1_1_package_manager_1_1_u_i_1_1_tests_1_1_package_sets_1a86750fa77ba04573c7eaa5d605576a6a">Many</link>(<link linkend="_class_unity_editor_1_1_package_manager_1_1_u_i_1_1_tests_1_1_package_base_tests_1abc4043fbd68eb046d466063f1f5b7bf1">kPackageTestName</link>,&#32;3,&#32;<emphasis role="keyword">true</emphasis>);
+00143 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_unity_editor_1_1_package_manager_1_1_u_i_1_1_tests_1_1_package_base_tests_1af2b2bd5acb144a46619ffa922f01d080">Factory</link>.<link linkend="_class_unity_editor_1_1_package_manager_1_1_u_i_1_1_tests_1_1_mock_operation_factory_1ac5b0b5d8a6b7202e5f650bbd79e94836">Packages</link>&#32;=&#32;packages;
+00144 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;var&#32;<emphasis role="keyword">package&#32;</emphasis>=&#32;new&#32;Package(kPackageTestName,&#32;packages);
+00145 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;var&#32;addOperationCalled&#32;=&#32;<emphasis role="keyword">false</emphasis>;
+00146 
+00147 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;OnAddOperation&#32;=&#32;operation&#32;=&gt;
+00148 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00149 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;addOperationCalled&#32;=&#32;<emphasis role="keyword">true</emphasis>;
+00150 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;};
+00151 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;
+00152 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;package.AddSignal.OnOperation&#32;+=&#32;OnAddOperation;
+00153 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;package.Add(packages.First());
+00154 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;package.AddSignal.OnOperation&#32;-=&#32;OnAddOperation;
+00155 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;
+00156 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;Assert.IsFalse(addOperationCalled);
+00157 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00158 
+00159 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;[Test]
+<anchor xml:id="__package_tests_8cs_source_1l00160"/><link linkend="_class_unity_editor_1_1_package_manager_1_1_u_i_1_1_tests_1_1_package_tests_1ab1ebdc02e500b94375b6e2c7f1e812f1">00160</link> &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;<link linkend="_class_unity_editor_1_1_package_manager_1_1_u_i_1_1_tests_1_1_package_tests_1ab1ebdc02e500b94375b6e2c7f1e812f1">Add_WhenPackageInfoIsNotCurrent_AddOperationIsCalled</link>()
+00161 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00162 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;var&#32;packages&#32;=&#32;<link linkend="_class_unity_editor_1_1_package_manager_1_1_u_i_1_1_tests_1_1_package_sets">PackageSets</link>.<link linkend="_class_unity_editor_1_1_package_manager_1_1_u_i_1_1_tests_1_1_package_sets_1a8330e0a210e88e4598e34dbef1a17430">Instance</link>.<link linkend="_class_unity_editor_1_1_package_manager_1_1_u_i_1_1_tests_1_1_package_sets_1a86750fa77ba04573c7eaa5d605576a6a">Many</link>(<link linkend="_class_unity_editor_1_1_package_manager_1_1_u_i_1_1_tests_1_1_package_base_tests_1abc4043fbd68eb046d466063f1f5b7bf1">kPackageTestName</link>,&#32;3,&#32;<emphasis role="keyword">true</emphasis>);
+00163 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_unity_editor_1_1_package_manager_1_1_u_i_1_1_tests_1_1_package_base_tests_1af2b2bd5acb144a46619ffa922f01d080">Factory</link>.<link linkend="_class_unity_editor_1_1_package_manager_1_1_u_i_1_1_tests_1_1_mock_operation_factory_1ac5b0b5d8a6b7202e5f650bbd79e94836">Packages</link>&#32;=&#32;packages;
+00164 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_unity_editor_1_1_package_manager_1_1_u_i_1_1_tests_1_1_package_base_tests_1af2b2bd5acb144a46619ffa922f01d080">Factory</link>.<link linkend="_class_unity_editor_1_1_package_manager_1_1_u_i_1_1_tests_1_1_mock_operation_factory_1afbe73c35242df8c6e6fa2b1a7ac2f732">AddOperation</link>&#32;=&#32;<emphasis role="keyword">new</emphasis>&#32;<link linkend="_class_unity_editor_1_1_package_manager_1_1_u_i_1_1_tests_1_1_mock_add_operation">MockAddOperation</link>(<link linkend="_class_unity_editor_1_1_package_manager_1_1_u_i_1_1_tests_1_1_package_base_tests_1af2b2bd5acb144a46619ffa922f01d080">Factory</link>,&#32;packages[1]);
+00165 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;var&#32;<emphasis role="keyword">package&#32;</emphasis>=&#32;new&#32;Package(kPackageTestName,&#32;packages);
+00166 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;var&#32;addOperationCalled&#32;=&#32;<emphasis role="keyword">false</emphasis>;
+00167 
+00168 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;OnAddOperation&#32;=&#32;operation&#32;=&gt;
+00169 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00170 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;addOperationCalled&#32;=&#32;<emphasis role="keyword">true</emphasis>;
+00171 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;};
+00172 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;
+00173 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;package.AddSignal.OnOperation&#32;+=&#32;OnAddOperation;
+00174 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;package.Add(packages[1]);
+00175 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;package.AddSignal.OnOperation&#32;-=&#32;OnAddOperation;
+00176 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;
+00177 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;Assert.IsTrue(addOperationCalled);
+00178 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00179 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;[Test]
+<anchor xml:id="__package_tests_8cs_source_1l00180"/><link linkend="_class_unity_editor_1_1_package_manager_1_1_u_i_1_1_tests_1_1_package_tests_1abf77a1325c307c7ed930066919a530c0">00180</link> &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;<link linkend="_class_unity_editor_1_1_package_manager_1_1_u_i_1_1_tests_1_1_package_tests_1abf77a1325c307c7ed930066919a530c0">Update_WhenCurrentIsLatest_AddOperationIsNotCalled</link>()
+00181 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00182 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;var&#32;packages&#32;=&#32;<link linkend="_class_unity_editor_1_1_package_manager_1_1_u_i_1_1_tests_1_1_package_sets">PackageSets</link>.<link linkend="_class_unity_editor_1_1_package_manager_1_1_u_i_1_1_tests_1_1_package_sets_1a8330e0a210e88e4598e34dbef1a17430">Instance</link>.<link linkend="_class_unity_editor_1_1_package_manager_1_1_u_i_1_1_tests_1_1_package_sets_1a86750fa77ba04573c7eaa5d605576a6a">Many</link>(<link linkend="_class_unity_editor_1_1_package_manager_1_1_u_i_1_1_tests_1_1_package_base_tests_1abc4043fbd68eb046d466063f1f5b7bf1">kPackageTestName</link>,&#32;1,&#32;<emphasis role="keyword">true</emphasis>);
+00183 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_unity_editor_1_1_package_manager_1_1_u_i_1_1_tests_1_1_package_base_tests_1af2b2bd5acb144a46619ffa922f01d080">Factory</link>.<link linkend="_class_unity_editor_1_1_package_manager_1_1_u_i_1_1_tests_1_1_mock_operation_factory_1ac5b0b5d8a6b7202e5f650bbd79e94836">Packages</link>&#32;=&#32;packages;
+00184 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;var&#32;<emphasis role="keyword">package&#32;</emphasis>=&#32;new&#32;Package(kPackageTestName,&#32;packages);
+00185 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;var&#32;addOperationCalled&#32;=&#32;<emphasis role="keyword">false</emphasis>;
+00186 
+00187 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;OnAddOperation&#32;=&#32;operation&#32;=&gt;
+00188 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00189 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;addOperationCalled&#32;=&#32;<emphasis role="keyword">true</emphasis>;
+00190 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;};
+00191 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;
+00192 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;package.AddSignal.OnOperation&#32;+=&#32;OnAddOperation;
+00193 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;package.Update();
+00194 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;package.AddSignal.OnOperation&#32;-=&#32;OnAddOperation;
+00195 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;
+00196 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;Assert.IsFalse(addOperationCalled);
+00197 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00198 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;
+00199 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;[Test]
+<anchor xml:id="__package_tests_8cs_source_1l00200"/><link linkend="_class_unity_editor_1_1_package_manager_1_1_u_i_1_1_tests_1_1_package_tests_1a70cc54a77ed51c945e080d7e5cf4afa8">00200</link> &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;<link linkend="_class_unity_editor_1_1_package_manager_1_1_u_i_1_1_tests_1_1_package_tests_1a70cc54a77ed51c945e080d7e5cf4afa8">Update_WhenCurrentIsNotLatest_AddOperationIsCalled</link>()
+00201 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00202 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;var&#32;packages&#32;=&#32;<link linkend="_class_unity_editor_1_1_package_manager_1_1_u_i_1_1_tests_1_1_package_sets">PackageSets</link>.<link linkend="_class_unity_editor_1_1_package_manager_1_1_u_i_1_1_tests_1_1_package_sets_1a8330e0a210e88e4598e34dbef1a17430">Instance</link>.<link linkend="_class_unity_editor_1_1_package_manager_1_1_u_i_1_1_tests_1_1_package_sets_1a86750fa77ba04573c7eaa5d605576a6a">Many</link>(<link linkend="_class_unity_editor_1_1_package_manager_1_1_u_i_1_1_tests_1_1_package_base_tests_1abc4043fbd68eb046d466063f1f5b7bf1">kPackageTestName</link>,&#32;2,&#32;<emphasis role="keyword">true</emphasis>);
+00203 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_unity_editor_1_1_package_manager_1_1_u_i_1_1_tests_1_1_package_base_tests_1af2b2bd5acb144a46619ffa922f01d080">Factory</link>.<link linkend="_class_unity_editor_1_1_package_manager_1_1_u_i_1_1_tests_1_1_mock_operation_factory_1ac5b0b5d8a6b7202e5f650bbd79e94836">Packages</link>&#32;=&#32;packages;
+00204 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_unity_editor_1_1_package_manager_1_1_u_i_1_1_tests_1_1_package_base_tests_1af2b2bd5acb144a46619ffa922f01d080">Factory</link>.<link linkend="_class_unity_editor_1_1_package_manager_1_1_u_i_1_1_tests_1_1_mock_operation_factory_1afbe73c35242df8c6e6fa2b1a7ac2f732">AddOperation</link>&#32;=&#32;<emphasis role="keyword">new</emphasis>&#32;<link linkend="_class_unity_editor_1_1_package_manager_1_1_u_i_1_1_tests_1_1_mock_add_operation">MockAddOperation</link>(<link linkend="_class_unity_editor_1_1_package_manager_1_1_u_i_1_1_tests_1_1_package_base_tests_1af2b2bd5acb144a46619ffa922f01d080">Factory</link>,&#32;packages.Last());
+00205 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;var&#32;<emphasis role="keyword">package&#32;</emphasis>=&#32;new&#32;Package(kPackageTestName,&#32;packages);
+00206 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;var&#32;addOperationCalled&#32;=&#32;<emphasis role="keyword">false</emphasis>;
+00207 
+00208 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;OnAddOperation&#32;=&#32;operation&#32;=&gt;
+00209 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00210 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;addOperationCalled&#32;=&#32;<emphasis role="keyword">true</emphasis>;
+00211 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;};
+00212 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;
+00213 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;package.AddSignal.OnOperation&#32;+=&#32;OnAddOperation;
+00214 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;package.Update();
+00215 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;package.AddSignal.OnOperation&#32;-=&#32;OnAddOperation;
+00216 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;
+00217 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;Assert.IsTrue(addOperationCalled);
+00218 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00219 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;
+00220 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;[Test]
+<anchor xml:id="__package_tests_8cs_source_1l00221"/><link linkend="_class_unity_editor_1_1_package_manager_1_1_u_i_1_1_tests_1_1_package_tests_1aca6eaef1c7c2fa7ad4359e07a0de45ed">00221</link> &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;<link linkend="_class_unity_editor_1_1_package_manager_1_1_u_i_1_1_tests_1_1_package_tests_1aca6eaef1c7c2fa7ad4359e07a0de45ed">Remove_RemoveOperationIsCalled</link>()
+00222 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00223 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;var&#32;packages&#32;=&#32;<link linkend="_class_unity_editor_1_1_package_manager_1_1_u_i_1_1_tests_1_1_package_sets">PackageSets</link>.<link linkend="_class_unity_editor_1_1_package_manager_1_1_u_i_1_1_tests_1_1_package_sets_1a8330e0a210e88e4598e34dbef1a17430">Instance</link>.<link linkend="_class_unity_editor_1_1_package_manager_1_1_u_i_1_1_tests_1_1_package_sets_1a86750fa77ba04573c7eaa5d605576a6a">Many</link>(<link linkend="_class_unity_editor_1_1_package_manager_1_1_u_i_1_1_tests_1_1_package_base_tests_1abc4043fbd68eb046d466063f1f5b7bf1">kPackageTestName</link>,&#32;1,&#32;<emphasis role="keyword">true</emphasis>);
+00224 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_unity_editor_1_1_package_manager_1_1_u_i_1_1_tests_1_1_package_base_tests_1af2b2bd5acb144a46619ffa922f01d080">Factory</link>.<link linkend="_class_unity_editor_1_1_package_manager_1_1_u_i_1_1_tests_1_1_mock_operation_factory_1ac5b0b5d8a6b7202e5f650bbd79e94836">Packages</link>&#32;=&#32;packages;
+00225 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;var&#32;<emphasis role="keyword">package&#32;</emphasis>=&#32;new&#32;Package(kPackageTestName,&#32;packages);
+00226 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;var&#32;removeOperationCalled&#32;=&#32;<emphasis role="keyword">false</emphasis>;
+00227 
+00228 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;OnRemoveOperation&#32;=&#32;operation&#32;=&gt;
+00229 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00230 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;removeOperationCalled&#32;=&#32;<emphasis role="keyword">true</emphasis>;
+00231 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;};
+00232 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;
+00233 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;package.RemoveSignal.OnOperation&#32;+=&#32;OnRemoveOperation;
+00234 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;package.Remove();
+00235 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;package.RemoveSignal.OnOperation&#32;-=&#32;OnRemoveOperation;
+00236 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;
+00237 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;Assert.IsTrue(removeOperationCalled);
+00238 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00239 
+00240 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;[Test]
+<anchor xml:id="__package_tests_8cs_source_1l00241"/><link linkend="_class_unity_editor_1_1_package_manager_1_1_u_i_1_1_tests_1_1_package_tests_1abd0f7fe40ee28a53004af7d1f36d3659">00241</link> &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;<link linkend="_class_unity_editor_1_1_package_manager_1_1_u_i_1_1_tests_1_1_package_tests_1abd0f7fe40ee28a53004af7d1f36d3659">IsPackageManagerUI_WhenPackageManagerUIPackage_ReturnsTrue</link>()
+00242 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00243 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;var&#32;packages&#32;=&#32;<emphasis role="keyword">new</emphasis>&#32;List&lt;PackageInfo&gt;
+00244 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00245 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_unity_editor_1_1_package_manager_1_1_u_i_1_1_tests_1_1_package_sets">PackageSets</link>.<link linkend="_class_unity_editor_1_1_package_manager_1_1_u_i_1_1_tests_1_1_package_sets_1a8330e0a210e88e4598e34dbef1a17430">Instance</link>.<link linkend="_class_unity_editor_1_1_package_manager_1_1_u_i_1_1_tests_1_1_package_sets_1a7a674621cd6993b95bf2f727f713bf62">Single</link>(PackageSource.Unknown,&#32;<link linkend="_class_unity_editor_1_1_package_manager_1_1_u_i_1_1_package">Package</link>.packageManagerUIName,&#32;<emphasis role="stringliteral">&quot;1.0.0&quot;</emphasis>)
+00246 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;};
+00247 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;var&#32;<emphasis role="keyword">package&#32;</emphasis>=&#32;new&#32;Package(Package.packageManagerUIName,&#32;packages);
+00248 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;
+00249 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;Assert.IsTrue(package.IsPackageManagerUI);
+00250 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00251 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;
+00252 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;[Test]
+<anchor xml:id="__package_tests_8cs_source_1l00253"/><link linkend="_class_unity_editor_1_1_package_manager_1_1_u_i_1_1_tests_1_1_package_tests_1a48b8d614c482ec4b8300b756c81e7dfc">00253</link> &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;<link linkend="_class_unity_editor_1_1_package_manager_1_1_u_i_1_1_tests_1_1_package_tests_1a48b8d614c482ec4b8300b756c81e7dfc">IsPackageManagerUI_WhenNotPackageManagerUIPackage_ReturnsFalse</link>()
+00254 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00255 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;var&#32;packages&#32;=&#32;<link linkend="_class_unity_editor_1_1_package_manager_1_1_u_i_1_1_tests_1_1_package_sets">PackageSets</link>.<link linkend="_class_unity_editor_1_1_package_manager_1_1_u_i_1_1_tests_1_1_package_sets_1a8330e0a210e88e4598e34dbef1a17430">Instance</link>.<link linkend="_class_unity_editor_1_1_package_manager_1_1_u_i_1_1_tests_1_1_package_sets_1a86750fa77ba04573c7eaa5d605576a6a">Many</link>(<link linkend="_class_unity_editor_1_1_package_manager_1_1_u_i_1_1_tests_1_1_package_base_tests_1abc4043fbd68eb046d466063f1f5b7bf1">kPackageTestName</link>,&#32;1,&#32;<emphasis role="keyword">true</emphasis>);
+00256 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;var&#32;<emphasis role="keyword">package&#32;</emphasis>=&#32;new&#32;Package(kPackageTestName,&#32;packages);
+00257 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;
+00258 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;Assert.IsFalse(package.IsPackageManagerUI);
+00259 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00260 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;
+00261 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;[Test]
+<anchor xml:id="__package_tests_8cs_source_1l00262"/><link linkend="_class_unity_editor_1_1_package_manager_1_1_u_i_1_1_tests_1_1_package_tests_1aab1f3d3f1e2518ca2c48acb9234932c6">00262</link> &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;<link linkend="_class_unity_editor_1_1_package_manager_1_1_u_i_1_1_tests_1_1_package_tests_1aab1f3d3f1e2518ca2c48acb9234932c6">Name_ReturnsExpectedValue</link>()
+00263 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00264 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;var&#32;packages&#32;=&#32;<link linkend="_class_unity_editor_1_1_package_manager_1_1_u_i_1_1_tests_1_1_package_sets">PackageSets</link>.<link linkend="_class_unity_editor_1_1_package_manager_1_1_u_i_1_1_tests_1_1_package_sets_1a8330e0a210e88e4598e34dbef1a17430">Instance</link>.<link linkend="_class_unity_editor_1_1_package_manager_1_1_u_i_1_1_tests_1_1_package_sets_1a86750fa77ba04573c7eaa5d605576a6a">Many</link>(<link linkend="_class_unity_editor_1_1_package_manager_1_1_u_i_1_1_tests_1_1_package_base_tests_1abc4043fbd68eb046d466063f1f5b7bf1">kPackageTestName</link>,&#32;1,&#32;<emphasis role="keyword">true</emphasis>);
+00265 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;var&#32;<emphasis role="keyword">package&#32;</emphasis>=&#32;new&#32;Package(kPackageTestName,&#32;packages);
+00266 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;
+00267 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;Assert.AreEqual(<link linkend="_class_unity_editor_1_1_package_manager_1_1_u_i_1_1_tests_1_1_package_base_tests_1abc4043fbd68eb046d466063f1f5b7bf1">kPackageTestName</link>,&#32;package.Name);
+00268 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00269 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;
+00270 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;[Test]
+<anchor xml:id="__package_tests_8cs_source_1l00271"/><link linkend="_class_unity_editor_1_1_package_manager_1_1_u_i_1_1_tests_1_1_package_tests_1ad75497ae6dce53d4545ea4b4b249371c">00271</link> &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;<link linkend="_class_unity_editor_1_1_package_manager_1_1_u_i_1_1_tests_1_1_package_tests_1ad75497ae6dce53d4545ea4b4b249371c">Display_WhenCurrentIsNotNull_ReturnsCurrent</link>()
+00272 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00273 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;var&#32;packages&#32;=&#32;<link linkend="_class_unity_editor_1_1_package_manager_1_1_u_i_1_1_tests_1_1_package_sets">PackageSets</link>.<link linkend="_class_unity_editor_1_1_package_manager_1_1_u_i_1_1_tests_1_1_package_sets_1a8330e0a210e88e4598e34dbef1a17430">Instance</link>.<link linkend="_class_unity_editor_1_1_package_manager_1_1_u_i_1_1_tests_1_1_package_sets_1a86750fa77ba04573c7eaa5d605576a6a">Many</link>(<link linkend="_class_unity_editor_1_1_package_manager_1_1_u_i_1_1_tests_1_1_package_base_tests_1abc4043fbd68eb046d466063f1f5b7bf1">kPackageTestName</link>,&#32;2,&#32;<emphasis role="keyword">true</emphasis>);
+00274 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;var&#32;<emphasis role="keyword">package&#32;</emphasis>=&#32;new&#32;Package(kPackageTestName,&#32;packages);
+00275 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;
+00276 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;Assert.AreEqual(package.Current,&#32;<link linkend="_class_unity_editor_1_1_package_manager_1_1_u_i_1_1_tests_1_1_package_tests_1a7a200103be4867c4cbd373d3d768607d">Display</link>(package));
+00277 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00278 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;
+00279 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;[Test]
+<anchor xml:id="__package_tests_8cs_source_1l00280"/><link linkend="_class_unity_editor_1_1_package_manager_1_1_u_i_1_1_tests_1_1_package_tests_1a0e7e900706dbdb75e080ad1067b4d080">00280</link> &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;<link linkend="_class_unity_editor_1_1_package_manager_1_1_u_i_1_1_tests_1_1_package_tests_1a0e7e900706dbdb75e080ad1067b4d080">Display_WhenCurrentIsNull_ReturnsLatest</link>()
+00281 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00282 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;var&#32;packages&#32;=&#32;<link linkend="_class_unity_editor_1_1_package_manager_1_1_u_i_1_1_tests_1_1_package_sets">PackageSets</link>.<link linkend="_class_unity_editor_1_1_package_manager_1_1_u_i_1_1_tests_1_1_package_sets_1a8330e0a210e88e4598e34dbef1a17430">Instance</link>.<link linkend="_class_unity_editor_1_1_package_manager_1_1_u_i_1_1_tests_1_1_package_sets_1a86750fa77ba04573c7eaa5d605576a6a">Many</link>(<link linkend="_class_unity_editor_1_1_package_manager_1_1_u_i_1_1_tests_1_1_package_base_tests_1abc4043fbd68eb046d466063f1f5b7bf1">kPackageTestName</link>,&#32;2,&#32;<emphasis role="keyword">true</emphasis>);
+00283 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;packages[0].IsCurrent&#32;=&#32;<emphasis role="keyword">false</emphasis>;
+00284 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;var&#32;<emphasis role="keyword">package&#32;</emphasis>=&#32;new&#32;Package(kPackageTestName,&#32;packages);
+00285 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;
+00286 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;Assert.AreEqual(package.Latest,&#32;<link linkend="_class_unity_editor_1_1_package_manager_1_1_u_i_1_1_tests_1_1_package_tests_1a7a200103be4867c4cbd373d3d768607d">Display</link>(package));
+00287 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00288 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;
+00289 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;[Test]
+<anchor xml:id="__package_tests_8cs_source_1l00290"/><link linkend="_class_unity_editor_1_1_package_manager_1_1_u_i_1_1_tests_1_1_package_tests_1aa4081941d225974ef96ab9ee1199ed97">00290</link> &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;<link linkend="_class_unity_editor_1_1_package_manager_1_1_u_i_1_1_tests_1_1_package_tests_1aa4081941d225974ef96ab9ee1199ed97">Display_WhenCurrentAndLatest_ReturnsLatest</link>()
+00291 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00292 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;var&#32;packages&#32;=&#32;<link linkend="_class_unity_editor_1_1_package_manager_1_1_u_i_1_1_tests_1_1_package_sets">PackageSets</link>.<link linkend="_class_unity_editor_1_1_package_manager_1_1_u_i_1_1_tests_1_1_package_sets_1a8330e0a210e88e4598e34dbef1a17430">Instance</link>.<link linkend="_class_unity_editor_1_1_package_manager_1_1_u_i_1_1_tests_1_1_package_sets_1a86750fa77ba04573c7eaa5d605576a6a">Many</link>(<link linkend="_class_unity_editor_1_1_package_manager_1_1_u_i_1_1_tests_1_1_package_base_tests_1abc4043fbd68eb046d466063f1f5b7bf1">kPackageTestName</link>,&#32;2,&#32;<emphasis role="keyword">true</emphasis>);
+00293 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;packages[0].IsCurrent&#32;=&#32;<emphasis role="keyword">false</emphasis>;
+00294 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;var&#32;<emphasis role="keyword">package&#32;</emphasis>=&#32;new&#32;Package(kPackageTestName,&#32;packages);
+00295 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;var&#32;answer&#32;=&#32;packages.Max(x&#32;=&gt;&#32;x.Version);
+00296 
+00297 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;Assert.AreEqual(<link linkend="_class_unity_editor_1_1_package_manager_1_1_u_i_1_1_tests_1_1_package_tests_1a7a200103be4867c4cbd373d3d768607d">Display</link>(package).Version,&#32;answer);
+00298 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00299 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;
+00300 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;[Test]
+<anchor xml:id="__package_tests_8cs_source_1l00301"/><link linkend="_class_unity_editor_1_1_package_manager_1_1_u_i_1_1_tests_1_1_package_tests_1afc24bc79019df27f2236af48e45e2e7e">00301</link> &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;<link linkend="_class_unity_editor_1_1_package_manager_1_1_u_i_1_1_tests_1_1_package_tests_1afc24bc79019df27f2236af48e45e2e7e">Versions_WhenOrderedPackageInfo_ReturnsOrderedValues</link>()
+00302 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00303 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;var&#32;packages&#32;=&#32;<link linkend="_class_unity_editor_1_1_package_manager_1_1_u_i_1_1_tests_1_1_package_sets">PackageSets</link>.<link linkend="_class_unity_editor_1_1_package_manager_1_1_u_i_1_1_tests_1_1_package_sets_1a8330e0a210e88e4598e34dbef1a17430">Instance</link>.<link linkend="_class_unity_editor_1_1_package_manager_1_1_u_i_1_1_tests_1_1_package_sets_1a86750fa77ba04573c7eaa5d605576a6a">Many</link>(<link linkend="_class_unity_editor_1_1_package_manager_1_1_u_i_1_1_tests_1_1_package_base_tests_1abc4043fbd68eb046d466063f1f5b7bf1">kPackageTestName</link>,&#32;5,&#32;<emphasis role="keyword">true</emphasis>);
+00304 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;var&#32;<emphasis role="keyword">package&#32;</emphasis>=&#32;new&#32;Package(kPackageTestName,&#32;packages);
+00305 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;
+00306 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;Assert.AreEqual(packages,&#32;package.Versions);
+00307 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00308 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;
+00309 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;[Test]
+<anchor xml:id="__package_tests_8cs_source_1l00310"/><link linkend="_class_unity_editor_1_1_package_manager_1_1_u_i_1_1_tests_1_1_package_tests_1a0b76dc1142873b65a94b3b35ece7fd18">00310</link> &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;<link linkend="_class_unity_editor_1_1_package_manager_1_1_u_i_1_1_tests_1_1_package_tests_1a0b76dc1142873b65a94b3b35ece7fd18">Versions_WhenUnorderedPackageInfo_ReturnsOrderedValues</link>()
+00311 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00312 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;var&#32;packages&#32;=&#32;<link linkend="_class_unity_editor_1_1_package_manager_1_1_u_i_1_1_tests_1_1_package_sets">PackageSets</link>.<link linkend="_class_unity_editor_1_1_package_manager_1_1_u_i_1_1_tests_1_1_package_sets_1a8330e0a210e88e4598e34dbef1a17430">Instance</link>.<link linkend="_class_unity_editor_1_1_package_manager_1_1_u_i_1_1_tests_1_1_package_sets_1a86750fa77ba04573c7eaa5d605576a6a">Many</link>(<link linkend="_class_unity_editor_1_1_package_manager_1_1_u_i_1_1_tests_1_1_package_base_tests_1abc4043fbd68eb046d466063f1f5b7bf1">kPackageTestName</link>,&#32;5,&#32;<emphasis role="keyword">true</emphasis>);
+00313 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;packages[0].Version&#32;=&#32;<emphasis role="keyword">new</emphasis>&#32;<link linkend="_class_semver_1_1_sem_version">SemVersion</link>(1);
+00314 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;packages[1].Version&#32;=&#32;<emphasis role="keyword">new</emphasis>&#32;<link linkend="_class_semver_1_1_sem_version">SemVersion</link>(4);
+00315 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;packages[2].Version&#32;=&#32;<emphasis role="keyword">new</emphasis>&#32;<link linkend="_class_semver_1_1_sem_version">SemVersion</link>(2);
+00316 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;packages[3].Version&#32;=&#32;<emphasis role="keyword">new</emphasis>&#32;<link linkend="_class_semver_1_1_sem_version">SemVersion</link>(5);
+00317 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;packages[4].Version&#32;=&#32;<emphasis role="keyword">new</emphasis>&#32;<link linkend="_class_semver_1_1_sem_version">SemVersion</link>(3);
+00318 
+00319 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;var&#32;orderPackages&#32;=&#32;packages.OrderBy(p&#32;=&gt;&#32;p.Version);
+00320 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;
+00321 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;var&#32;<emphasis role="keyword">package&#32;</emphasis>=&#32;new&#32;Package(kPackageTestName,&#32;packages);
+00322 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;
+00323 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;Assert.AreEqual(orderPackages,&#32;package.Versions);
+00324 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00325 
+00326 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//</emphasis>
+00327 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;Version&#32;Comparison&#32;tests</emphasis>
+00328 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//</emphasis>
+00329 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;<emphasis role="keyword">static</emphasis>&#32;<emphasis role="keywordtype">string</emphasis>&#32;name&#32;=&#32;<emphasis role="stringliteral">&quot;test&quot;</emphasis>;
+00330 
+00331 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;[Test]
+<anchor xml:id="__package_tests_8cs_source_1l00332"/><link linkend="_class_unity_editor_1_1_package_manager_1_1_u_i_1_1_tests_1_1_package_tests_1ad707cd0a3a74d516f5dad859751ace0f">00332</link> &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;<link linkend="_class_unity_editor_1_1_package_manager_1_1_u_i_1_1_tests_1_1_package_tests_1ad707cd0a3a74d516f5dad859751ace0f">VersionUpdate_Current_lessthen_Verified</link>()
+00333 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00334 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;var&#32;<emphasis role="keyword">package&#32;</emphasis>=&#32;new&#32;Package(name,&#32;new&#32;List&lt;PackageInfo&gt;
+00335 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00336 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;PackageSets.Instance.Single(PackageSource.Registry,&#32;name,&#32;&quot;1.0.0&quot;,&#32;true),&#32;
+00337 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;PackageSets.Instance.Single(PackageSource.Registry,&#32;name,&#32;&quot;2.0.0&quot;,&#32;false,&#32;true),&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;Verified</emphasis>
+00338 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;PackageSets.Instance.Single(PackageSource.Registry,&#32;name,&#32;&quot;3.0.0&quot;,&#32;false)
+00339 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;});
+00340 
+00341 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;Assert.IsTrue(package.LatestUpdate.Version&#32;==&#32;<emphasis role="stringliteral">&quot;2.0.0&quot;</emphasis>);
+00342 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00343 
+00344 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;[Test]
+<anchor xml:id="__package_tests_8cs_source_1l00345"/><link linkend="_class_unity_editor_1_1_package_manager_1_1_u_i_1_1_tests_1_1_package_tests_1aaa959599a501efe57024905ad279a612">00345</link> &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;<link linkend="_class_unity_editor_1_1_package_manager_1_1_u_i_1_1_tests_1_1_package_tests_1aaa959599a501efe57024905ad279a612">VersionUpdate_Current_equalto_Verified</link>()
+00346 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00347 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;var&#32;<emphasis role="keyword">package&#32;</emphasis>=&#32;new&#32;Package(name,&#32;new&#32;List&lt;PackageInfo&gt;
+00348 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00349 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;PackageSets.Instance.Single(PackageSource.Registry,&#32;name,&#32;&quot;2.0.0&quot;,&#32;true,&#32;true),&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;Verified</emphasis>
+00350 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;PackageSets.Instance.Single(PackageSource.Registry,&#32;name,&#32;&quot;3.0.0&quot;,&#32;false)
+00351 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;});
+00352 
+00353 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;Assert.IsTrue(package.LatestUpdate.Version&#32;==&#32;<emphasis role="stringliteral">&quot;2.0.0&quot;</emphasis>);
+00354 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00355 
+00356 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;[Test]
+<anchor xml:id="__package_tests_8cs_source_1l00357"/><link linkend="_class_unity_editor_1_1_package_manager_1_1_u_i_1_1_tests_1_1_package_tests_1a18fc2d3b764315a21f6a15bcdd40ece4">00357</link> &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;<link linkend="_class_unity_editor_1_1_package_manager_1_1_u_i_1_1_tests_1_1_package_tests_1a18fc2d3b764315a21f6a15bcdd40ece4">VersionUpdate_Current_greaterthen_Verified</link>()
+00358 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00359 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;var&#32;<emphasis role="keyword">package&#32;</emphasis>=&#32;new&#32;Package(name,&#32;new&#32;List&lt;PackageInfo&gt;
+00360 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00361 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;PackageSets.Instance.Single(PackageSource.Registry,&#32;name,&#32;&quot;3.0.0&quot;,&#32;true),&#32;
+00362 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;PackageSets.Instance.Single(PackageSource.Registry,&#32;name,&#32;&quot;2.0.0&quot;,&#32;false,&#32;true),&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;Verified</emphasis>
+00363 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;});
+00364 
+00365 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;Assert.IsTrue(package.LatestUpdate.Version&#32;==&#32;<emphasis role="stringliteral">&quot;3.0.0&quot;</emphasis>);
+00366 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00367 
+00368 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;[Test]
+<anchor xml:id="__package_tests_8cs_source_1l00369"/><link linkend="_class_unity_editor_1_1_package_manager_1_1_u_i_1_1_tests_1_1_package_tests_1a61fe41cf388660def95375971ba9bc6f">00369</link> &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;<link linkend="_class_unity_editor_1_1_package_manager_1_1_u_i_1_1_tests_1_1_package_tests_1a61fe41cf388660def95375971ba9bc6f">VersionUpdate_Current_greaterthen_Verified_WithLatest</link>()
+00370 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00371 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;var&#32;<emphasis role="keyword">package&#32;</emphasis>=&#32;new&#32;Package(name,&#32;new&#32;List&lt;PackageInfo&gt;
+00372 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00373 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;PackageSets.Instance.Single(PackageSource.Registry,&#32;name,&#32;&quot;3.0.0&quot;,&#32;true),&#32;
+00374 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;PackageSets.Instance.Single(PackageSource.Registry,&#32;name,&#32;&quot;2.0.0&quot;,&#32;false,&#32;true),&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;Verified</emphasis>
+00375 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;PackageSets.Instance.Single(PackageSource.Registry,&#32;name,&#32;&quot;4.0.0&quot;,&#32;false)
+00376 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;});
+00377 
+00378 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;Assert.IsTrue(package.LatestUpdate.Version&#32;==&#32;<emphasis role="stringliteral">&quot;4.0.0&quot;</emphasis>);
+00379 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00380 
+00381 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;[Test]
+<anchor xml:id="__package_tests_8cs_source_1l00382"/><link linkend="_class_unity_editor_1_1_package_manager_1_1_u_i_1_1_tests_1_1_package_tests_1ad025d2fadcd4f1c351b06cc0910e0328">00382</link> &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;<link linkend="_class_unity_editor_1_1_package_manager_1_1_u_i_1_1_tests_1_1_package_tests_1ad025d2fadcd4f1c351b06cc0910e0328">VersionUpdate_NoVerified_Current_lessthen_Latest</link>()
+00383 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00384 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;var&#32;<emphasis role="keyword">package&#32;</emphasis>=&#32;new&#32;Package(name,&#32;new&#32;List&lt;PackageInfo&gt;
+00385 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00386 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;PackageSets.Instance.Single(PackageSource.Registry,&#32;name,&#32;&quot;1.0.0&quot;,&#32;true),&#32;
+00387 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;PackageSets.Instance.Single(PackageSource.Registry,&#32;name,&#32;&quot;2.0.0&quot;,&#32;false),
+00388 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;PackageSets.Instance.Single(PackageSource.Registry,&#32;name,&#32;&quot;3.0.0&quot;,&#32;false)
+00389 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;});
+00390 
+00391 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;Assert.IsTrue(package.LatestUpdate.Version&#32;==&#32;<emphasis role="stringliteral">&quot;3.0.0&quot;</emphasis>);
+00392 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00393 
+00394 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;[Test]
+<anchor xml:id="__package_tests_8cs_source_1l00395"/><link linkend="_class_unity_editor_1_1_package_manager_1_1_u_i_1_1_tests_1_1_package_tests_1aae0f0bbf8b39d03c93a6e61ca493ff1d">00395</link> &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;<link linkend="_class_unity_editor_1_1_package_manager_1_1_u_i_1_1_tests_1_1_package_tests_1aae0f0bbf8b39d03c93a6e61ca493ff1d">VersionUpdate_NoVerified_Current_equalto_Latest</link>()
+00396 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00397 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;var&#32;<emphasis role="keyword">package&#32;</emphasis>=&#32;new&#32;Package(name,&#32;new&#32;List&lt;PackageInfo&gt;
+00398 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00399 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;PackageSets.Instance.Single(PackageSource.Registry,&#32;name,&#32;&quot;0.0.0&quot;,&#32;false),&#32;
+00400 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;PackageSets.Instance.Single(PackageSource.Registry,&#32;name,&#32;&quot;1.0.0&quot;,&#32;true)&#32;
+00401 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;});
+00402 
+00403 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;Assert.IsTrue(package.LatestUpdate.Version&#32;==&#32;<emphasis role="stringliteral">&quot;1.0.0&quot;</emphasis>);
+00404 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00405 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;
+00406 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;[Test]
+<anchor xml:id="__package_tests_8cs_source_1l00407"/><link linkend="_class_unity_editor_1_1_package_manager_1_1_u_i_1_1_tests_1_1_package_tests_1a1260da1a54ec0c4bb31a9d843e66b13b">00407</link> &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;<link linkend="_class_unity_editor_1_1_package_manager_1_1_u_i_1_1_tests_1_1_package_tests_1a1260da1a54ec0c4bb31a9d843e66b13b">VersionUpdate_NoCurrent_WithVerified</link>()
+00408 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00409 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;var&#32;<emphasis role="keyword">package&#32;</emphasis>=&#32;new&#32;Package(name,&#32;new&#32;List&lt;PackageInfo&gt;
+00410 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00411 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;PackageSets.Instance.Single(PackageSource.Registry,&#32;name,&#32;&quot;1.0.0&quot;,&#32;false,&#32;true),&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;verified&#32;</emphasis>
+00412 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;PackageSets.Instance.Single(PackageSource.Registry,&#32;name,&#32;&quot;2.0.0&quot;,&#32;false)
+00413 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;});
+00414 
+00415 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;Assert.IsTrue(package.LatestUpdate.Version&#32;==&#32;<emphasis role="stringliteral">&quot;1.0.0&quot;</emphasis>);
+00416 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00417 
+00418 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;[Test]
+<anchor xml:id="__package_tests_8cs_source_1l00419"/><link linkend="_class_unity_editor_1_1_package_manager_1_1_u_i_1_1_tests_1_1_package_tests_1a6914df73ff53aa9a0c8ede7b1a952620">00419</link> &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;<link linkend="_class_unity_editor_1_1_package_manager_1_1_u_i_1_1_tests_1_1_package_tests_1a6914df73ff53aa9a0c8ede7b1a952620">VersionUpdate_NoCurrent_Latest</link>()
+00420 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00421 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;var&#32;<emphasis role="keyword">package&#32;</emphasis>=&#32;new&#32;Package(name,&#32;new&#32;List&lt;PackageInfo&gt;
+00422 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00423 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;PackageSets.Instance.Single(PackageSource.Registry,&#32;name,&#32;&quot;1.0.0&quot;,&#32;false),&#32;
+00424 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;PackageSets.Instance.Single(PackageSource.Registry,&#32;name,&#32;&quot;2.0.0&quot;,&#32;false)
+00425 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;});
+00426 
+00427 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;Assert.IsTrue(package.LatestUpdate.Version&#32;==&#32;<emphasis role="stringliteral">&quot;2.0.0&quot;</emphasis>);
+00428 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00429 
+00430 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;[Test]
+<anchor xml:id="__package_tests_8cs_source_1l00431"/><link linkend="_class_unity_editor_1_1_package_manager_1_1_u_i_1_1_tests_1_1_package_tests_1a848f7d53ba6a9c9bb0dfab4801688515">00431</link> &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;<link linkend="_class_unity_editor_1_1_package_manager_1_1_u_i_1_1_tests_1_1_package_tests_1a848f7d53ba6a9c9bb0dfab4801688515">VersionUpdate_NoCurrent_Latest_WithPreview</link>()
+00432 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00433 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;var&#32;<emphasis role="keyword">package&#32;</emphasis>=&#32;new&#32;Package(name,&#32;new&#32;List&lt;PackageInfo&gt;
+00434 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00435 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;PackageSets.Instance.Single(PackageSource.Registry,&#32;name,&#32;&quot;1.0.0&quot;,&#32;false),&#32;
+00436 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;PackageSets.Instance.Single(PackageSource.Registry,&#32;name,&#32;&quot;2.0.0&quot;,&#32;false),
+00437 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;PackageSets.Instance.Single(PackageSource.Registry,&#32;name,&#32;&quot;3.0.0-preview&quot;,&#32;false)
+00438 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;});
+00439 
+00440 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;Assert.IsTrue(package.LatestUpdate.Version&#32;==&#32;<emphasis role="stringliteral">&quot;2.0.0&quot;</emphasis>);
+00441 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00442 
+00443 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;[Test]
+<anchor xml:id="__package_tests_8cs_source_1l00444"/><link linkend="_class_unity_editor_1_1_package_manager_1_1_u_i_1_1_tests_1_1_package_tests_1a7ba13a28393f72936f75e7150ac5d7e8">00444</link> &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;<link linkend="_class_unity_editor_1_1_package_manager_1_1_u_i_1_1_tests_1_1_package_tests_1a7ba13a28393f72936f75e7150ac5d7e8">VersionUpdate_NoCurrent_Verified_WithPreview</link>()
+00445 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00446 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;var&#32;<emphasis role="keyword">package&#32;</emphasis>=&#32;new&#32;Package(name,&#32;new&#32;List&lt;PackageInfo&gt;
+00447 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00448 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;PackageSets.Instance.Single(PackageSource.Registry,&#32;name,&#32;&quot;1.0.0&quot;,&#32;false,&#32;true),&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;verified&#32;</emphasis>
+00449 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;PackageSets.Instance.Single(PackageSource.Registry,&#32;name,&#32;&quot;2.0.0&quot;,&#32;false),
+00450 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;PackageSets.Instance.Single(PackageSource.Registry,&#32;name,&#32;&quot;3.0.0-preview&quot;,&#32;false)
+00451 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;});
+00452 
+00453 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;Assert.IsTrue(package.LatestUpdate.Version&#32;==&#32;<emphasis role="stringliteral">&quot;1.0.0&quot;</emphasis>);
+00454 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00455 
+00456 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;[Test]
+<anchor xml:id="__package_tests_8cs_source_1l00457"/><link linkend="_class_unity_editor_1_1_package_manager_1_1_u_i_1_1_tests_1_1_package_tests_1aac3367bf8a0b72582da1dca4bed291f7">00457</link> &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;<link linkend="_class_unity_editor_1_1_package_manager_1_1_u_i_1_1_tests_1_1_package_tests_1aac3367bf8a0b72582da1dca4bed291f7">VersionUpdate_NoCurrent_OnlyPreviews</link>()
+00458 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00459 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;var&#32;<emphasis role="keyword">package&#32;</emphasis>=&#32;new&#32;Package(name,&#32;new&#32;List&lt;PackageInfo&gt;
+00460 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00461 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;PackageSets.Instance.Single(PackageSource.Registry,&#32;name,&#32;&quot;1.0.0-preview&quot;,&#32;false),&#32;
+00462 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;PackageSets.Instance.Single(PackageSource.Registry,&#32;name,&#32;&quot;2.0.0-preview&quot;,&#32;false)
+00463 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;});
+00464 
+00465 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;Assert.IsTrue(package.LatestUpdate.Version&#32;==&#32;<emphasis role="stringliteral">&quot;2.0.0-preview&quot;</emphasis>);
+00466 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00467 
+00468 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;[Test]
+<anchor xml:id="__package_tests_8cs_source_1l00469"/><link linkend="_class_unity_editor_1_1_package_manager_1_1_u_i_1_1_tests_1_1_package_tests_1a1b7dd5e5634ea23c6316eada03f878c0">00469</link> &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;<link linkend="_class_unity_editor_1_1_package_manager_1_1_u_i_1_1_tests_1_1_package_tests_1a1b7dd5e5634ea23c6316eada03f878c0">VersionUpdate_CurrentPreview_WithVerified</link>()
+00470 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00471 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;var&#32;<emphasis role="keyword">package&#32;</emphasis>=&#32;new&#32;Package(name,&#32;new&#32;List&lt;PackageInfo&gt;
+00472 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00473 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;PackageSets.Instance.Single(PackageSource.Registry,&#32;name,&#32;&quot;1.0.0&quot;,&#32;false,&#32;true),&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;verified&#32;</emphasis>
+00474 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;PackageSets.Instance.Single(PackageSource.Registry,&#32;name,&#32;&quot;2.0.0&quot;,&#32;false),
+00475 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;PackageSets.Instance.Single(PackageSource.Registry,&#32;name,&#32;&quot;3.0.0-preview&quot;,&#32;true)&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;current</emphasis>
+00476 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;});
+00477 
+00478 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;Assert.IsTrue(package.LatestUpdate.Version&#32;==&#32;<emphasis role="stringliteral">&quot;3.0.0-preview&quot;</emphasis>);
+00479 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00480 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;
+00481 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;[Test]
+<anchor xml:id="__package_tests_8cs_source_1l00482"/><link linkend="_class_unity_editor_1_1_package_manager_1_1_u_i_1_1_tests_1_1_package_tests_1a99c40c9b28c629b0812b3139805a0f39">00482</link> &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;<link linkend="_class_unity_editor_1_1_package_manager_1_1_u_i_1_1_tests_1_1_package_tests_1a99c40c9b28c629b0812b3139805a0f39">VersionUpdate_CurrentPreview_WithLatestPreview</link>()
+00483 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00484 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;var&#32;<emphasis role="keyword">package&#32;</emphasis>=&#32;new&#32;Package(name,&#32;new&#32;List&lt;PackageInfo&gt;
+00485 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00486 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;PackageSets.Instance.Single(PackageSource.Registry,&#32;name,&#32;&quot;1.0.0&quot;,&#32;false,&#32;true),&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;verified&#32;</emphasis>
+00487 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;PackageSets.Instance.Single(PackageSource.Registry,&#32;name,&#32;&quot;2.0.0&quot;,&#32;false),
+00488 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;PackageSets.Instance.Single(PackageSource.Registry,&#32;name,&#32;&quot;3.0.0-preview&quot;,&#32;true),&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;current</emphasis>
+00489 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;PackageSets.Instance.Single(PackageSource.Registry,&#32;name,&#32;&quot;4.0.0-preview&quot;,&#32;false)
+00490 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;});
+00491 
+00492 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;Assert.IsTrue(package.LatestUpdate.Version&#32;==&#32;<emphasis role="stringliteral">&quot;4.0.0-preview&quot;</emphasis>);
+00493 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00494 
+00495 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;[Test]
+<anchor xml:id="__package_tests_8cs_source_1l00496"/><link linkend="_class_unity_editor_1_1_package_manager_1_1_u_i_1_1_tests_1_1_package_tests_1ab098511841095c60f78dc079c00775e0">00496</link> &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;<link linkend="_class_unity_editor_1_1_package_manager_1_1_u_i_1_1_tests_1_1_package_tests_1ab098511841095c60f78dc079c00775e0">VersionUpdate_CurrentPreview_WithLatestPreviewNoVerified</link>()
+00497 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00498 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;var&#32;<emphasis role="keyword">package&#32;</emphasis>=&#32;new&#32;Package(name,&#32;new&#32;List&lt;PackageInfo&gt;
+00499 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00500 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;PackageSets.Instance.Single(PackageSource.Registry,&#32;name,&#32;&quot;1.0.0&quot;,&#32;false),
+00501 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;PackageSets.Instance.Single(PackageSource.Registry,&#32;name,&#32;&quot;2.0.0&quot;,&#32;false),
+00502 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;PackageSets.Instance.Single(PackageSource.Registry,&#32;name,&#32;&quot;3.0.0-preview&quot;,&#32;true),&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;current</emphasis>
+00503 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;PackageSets.Instance.Single(PackageSource.Registry,&#32;name,&#32;&quot;4.0.0-preview&quot;,&#32;false)
+00504 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;});
+00505 
+00506 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;Assert.IsTrue(package.LatestUpdate.Version&#32;==&#32;<emphasis role="stringliteral">&quot;4.0.0-preview&quot;</emphasis>);
+00507 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00508 
+00509 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;[Test]
+<anchor xml:id="__package_tests_8cs_source_1l00510"/><link linkend="_class_unity_editor_1_1_package_manager_1_1_u_i_1_1_tests_1_1_package_tests_1a4cee6d471732e7c597ba03fb431d0122">00510</link> &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;<link linkend="_class_unity_editor_1_1_package_manager_1_1_u_i_1_1_tests_1_1_package_tests_1a4cee6d471732e7c597ba03fb431d0122">VersionUpdate_CurrentEmbedded</link>()
+00511 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00512 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;var&#32;<emphasis role="keyword">package&#32;</emphasis>=&#32;new&#32;Package(name,&#32;new&#32;List&lt;PackageInfo&gt;
+00513 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00514 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;PackageSets.Instance.Single(PackageSource.Embedded,&#32;name,&#32;&quot;1.0.0&quot;,&#32;true),&#32;
+00515 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;PackageSets.Instance.Single(PackageSource.Registry,&#32;name,&#32;&quot;2.0.0&quot;,&#32;false,&#32;true),&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;verified</emphasis>
+00516 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;});
+00517 
+00518 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;Assert.IsTrue(package.LatestUpdate.Version&#32;==&#32;<emphasis role="stringliteral">&quot;1.0.0&quot;</emphasis>);
+00519 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00520 &#32;&#32;&#32;&#32;}
+00521 }
+</programlisting></section>

@@ -1,0 +1,81 @@
+<?xml version='1.0' encoding='UTF-8' standalone='no'?>
+<section xmlns="http://docbook.org/ns/docbook" version="5.0" xmlns:xlink="http://www.w3.org/1999/xlink" xml:id="__equippable_8cs_source">
+<title>Equippable.cs</title>
+<indexterm><primary>O:/GitHUBMINIPRoject/Assets/SteamVR/InteractionSystem/Core/Scripts/Equippable.cs</primary></indexterm>
+<programlisting>00001 <emphasis role="comment">//=======&#32;Copyright&#32;(c)&#32;Valve&#32;Corporation,&#32;All&#32;rights&#32;reserved.&#32;===============</emphasis>
+00002 <emphasis role="comment">//</emphasis>
+00003 <emphasis role="comment">//&#32;Purpose:&#32;Flip&#32;Object&#32;to&#32;match&#32;which&#32;hand&#32;you&#32;pick&#32;it&#32;up&#32;in</emphasis>
+00004 <emphasis role="comment">//</emphasis>
+00005 <emphasis role="comment">//=============================================================================</emphasis>
+00006 
+00007 <emphasis role="keyword">using</emphasis>&#32;System.Collections;
+00008 <emphasis role="keyword">using</emphasis>&#32;System.Collections.Generic;
+00009 <emphasis role="keyword">using</emphasis>&#32;<link linkend="__balloon_8cs_1a7d67e097df9376eb709b6a23aa3c7d23">UnityEngine</link>;
+00010 
+00011 <emphasis role="keyword">namespace&#32;</emphasis><link linkend="_namespace_valve_1_1_v_r_1_1_interaction_system">Valve.VR.InteractionSystem</link>
+00012 {
+00013 
+<anchor xml:id="__equippable_8cs_source_1l00014"/><link linkend="_namespace_valve_1_1_v_r_1_1_interaction_system_1a08985e7a537fc13e32e340a15d0b12af">00014</link> &#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keyword">enum</emphasis>&#32;<link linkend="_namespace_valve_1_1_v_r_1_1_interaction_system_1a08985e7a537fc13e32e340a15d0b12af">WhichHand</link>
+00015 &#32;&#32;&#32;&#32;{
+00016 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;Left,
+00017 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;Right
+00018 &#32;&#32;&#32;&#32;}
+00019 
+00020 &#32;&#32;&#32;&#32;[RequireComponent(typeof(Throwable))]
+00021 
+<anchor xml:id="__equippable_8cs_source_1l00022"/><link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_equippable">00022</link> &#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keyword">class&#32;</emphasis><link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_equippable">Equippable</link>&#32;:&#32;MonoBehaviour
+00023 &#32;&#32;&#32;&#32;{
+00024 
+00025 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;[Tooltip(<emphasis role="stringliteral">&quot;Array&#32;of&#32;children&#32;you&#32;do&#32;not&#32;want&#32;to&#32;be&#32;mirrored.&#32;Text,&#32;logos,&#32;etc.&quot;</emphasis>)]
+<anchor xml:id="__equippable_8cs_source_1l00026"/><link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_equippable_1aeace94f2573996c91d2e4de5db17f071">00026</link> &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;Transform[]&#32;<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_equippable_1aeace94f2573996c91d2e4de5db17f071">antiFlip</link>;
+00027 
+<anchor xml:id="__equippable_8cs_source_1l00028"/><link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_equippable_1ae2e7fc6e2e30a5830450289d7ee5af99">00028</link> &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<link linkend="_namespace_valve_1_1_v_r_1_1_interaction_system_1a08985e7a537fc13e32e340a15d0b12af">WhichHand</link>&#32;<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_equippable_1ae2e7fc6e2e30a5830450289d7ee5af99">defaultHand</link>&#32;=&#32;<link linkend="_namespace_valve_1_1_v_r_1_1_interaction_system_1a08985e7a537fc13e32e340a15d0b12af">WhichHand</link>.Right;
+00029 
+00030 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;Vector3&#32;initialScale;
+00031 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_interactable">Interactable</link>&#32;interactable;
+00032 
+00033 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;[HideInInspector]
+00034 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<link linkend="_namespace_valve_1_1_v_r_1a82e5bf501cc3aa155444ee3f0662853f">SteamVR_Input_Sources</link>&#32;<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_equippable_1a1e270504e8965c0706f49d45c0861e12">attachedHandType</link>
+<anchor xml:id="__equippable_8cs_source_1l00035"/><link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_equippable_1a1e270504e8965c0706f49d45c0861e12">00035</link> &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00036 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">get</emphasis>
+00037 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00038 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(interactable.<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_interactable_1a1980377b09ca72c574f045e7d6aac17f">attachedToHand</link>)
+00039 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;interactable.<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_interactable_1a1980377b09ca72c574f045e7d6aac17f">attachedToHand</link>.<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_hand_1a05520135148fd74ca10b8549d5c7354d">handType</link>;
+00040 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">else</emphasis>
+00041 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;<link linkend="_namespace_valve_1_1_v_r_1a82e5bf501cc3aa155444ee3f0662853f">SteamVR_Input_Sources</link>.Any;
+00042 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00043 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00044 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;
+00045 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;Start()
+00046 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00047 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;initialScale&#32;=&#32;transform.localScale;
+00048 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;interactable&#32;=&#32;GetComponent&lt;Interactable&gt;();
+00049 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00050 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;
+00051 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;Update()
+00052 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00053 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(interactable.<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_interactable_1a1980377b09ca72c574f045e7d6aac17f">attachedToHand</link>)
+00054 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00055 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;Vector3&#32;flipScale&#32;=&#32;initialScale;
+00056 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;((<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_equippable_1a1e270504e8965c0706f49d45c0861e12">attachedHandType</link>&#32;==&#32;<link linkend="_namespace_valve_1_1_v_r_1a82e5bf501cc3aa155444ee3f0662853f">SteamVR_Input_Sources</link>.RightHand&#32;&amp;&amp;&#32;<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_equippable_1ae2e7fc6e2e30a5830450289d7ee5af99">defaultHand</link>&#32;==&#32;<link linkend="_namespace_valve_1_1_v_r_1_1_interaction_system_1a08985e7a537fc13e32e340a15d0b12af">WhichHand</link>.Right)&#32;||&#32;(<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_equippable_1a1e270504e8965c0706f49d45c0861e12">attachedHandType</link>&#32;==&#32;<link linkend="_namespace_valve_1_1_v_r_1a82e5bf501cc3aa155444ee3f0662853f">SteamVR_Input_Sources</link>.LeftHand&#32;&amp;&amp;&#32;<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_equippable_1ae2e7fc6e2e30a5830450289d7ee5af99">defaultHand</link>&#32;==&#32;<link linkend="_namespace_valve_1_1_v_r_1_1_interaction_system_1a08985e7a537fc13e32e340a15d0b12af">WhichHand</link>.Left))
+00057 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00058 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;flipScale.x&#32;*=&#32;1;
+00059 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">for</emphasis>&#32;(<emphasis role="keywordtype">int</emphasis>&#32;transformIndex&#32;=&#32;0;&#32;transformIndex&#32;&lt;&#32;<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_equippable_1aeace94f2573996c91d2e4de5db17f071">antiFlip</link>.Length;&#32;transformIndex++)
+00060 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00061 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_equippable_1aeace94f2573996c91d2e4de5db17f071">antiFlip</link>[transformIndex].localScale&#32;=&#32;<emphasis role="keyword">new</emphasis>&#32;Vector3(1,&#32;1,&#32;1);
+00062 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00063 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00064 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">else</emphasis>
+00065 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00066 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;flipScale.x&#32;*=&#32;-1;
+00067 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">for</emphasis>&#32;(<emphasis role="keywordtype">int</emphasis>&#32;transformIndex&#32;=&#32;0;&#32;transformIndex&#32;&lt;&#32;<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_equippable_1aeace94f2573996c91d2e4de5db17f071">antiFlip</link>.Length;&#32;transformIndex++)
+00068 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00069 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_equippable_1aeace94f2573996c91d2e4de5db17f071">antiFlip</link>[transformIndex].localScale&#32;=&#32;<emphasis role="keyword">new</emphasis>&#32;Vector3(-1,&#32;1,&#32;1);
+00070 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00071 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00072 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;transform.localScale&#32;=&#32;flipScale;
+00073 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00074 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00075 &#32;&#32;&#32;&#32;}
+00076 }
+</programlisting></section>

@@ -1,0 +1,631 @@
+<?xml version='1.0' encoding='UTF-8' standalone='no'?>
+<section xmlns="http://docbook.org/ns/docbook" version="5.0" xmlns:xlink="http://www.w3.org/1999/xlink" xml:id="__package_details_8cs_source">
+<title>PackageDetails.cs</title>
+<indexterm><primary>O:/GitHUBMINIPRoject/Library/PackageCache/com.unity.package-manager-ui@2.0.7/Editor/Sources/UI/PackageDetails.cs</primary></indexterm>
+<programlisting>00001 <emphasis role="keyword">using</emphasis>&#32;System.Collections.Generic;
+00002 <emphasis role="keyword">using</emphasis>&#32;System.Linq;
+00003 <emphasis role="keyword">using</emphasis>&#32;<link linkend="_namespace_semver">Semver</link>;
+00004 <emphasis role="keyword">using</emphasis>&#32;<link linkend="__balloon_8cs_1a7d67e097df9376eb709b6a23aa3c7d23">UnityEngine</link>;
+00005 <emphasis role="keyword">using</emphasis>&#32;<link linkend="_namespace_unity_engine">UnityEngine</link>.Experimental.UIElements;
+00006 
+00007 <emphasis role="keyword">namespace&#32;</emphasis><link linkend="_namespace_unity_editor_1_1_package_manager_1_1_u_i">UnityEditor.PackageManager.UI</link>
+00008 {
+00009 <emphasis role="preprocessor">#if&#32;!UNITY_2018_3_OR_NEWER</emphasis>
+<anchor xml:id="__package_details_8cs_source_1l00010"/><link linkend="_class_unity_editor_1_1_package_manager_1_1_u_i_1_1_package_details_factory">00010</link> &#32;&#32;&#32;&#32;<emphasis role="keyword">internal</emphasis>&#32;<emphasis role="keyword">class&#32;</emphasis><link linkend="_class_unity_editor_1_1_package_manager_1_1_u_i_1_1_package_details_factory">PackageDetailsFactory</link>&#32;:&#32;UxmlFactory&lt;PackageDetails&gt;
+00011 &#32;&#32;&#32;&#32;{
+<anchor xml:id="__package_details_8cs_source_1l00012"/><link linkend="_class_unity_editor_1_1_package_manager_1_1_u_i_1_1_package_details_factory_1aeb5c01ceebef137fb852956777b38c30">00012</link> &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">protected</emphasis>&#32;<emphasis role="keyword">override</emphasis>&#32;<link linkend="_class_unity_editor_1_1_package_manager_1_1_u_i_1_1_package_details">PackageDetails</link>&#32;<link linkend="_class_unity_editor_1_1_package_manager_1_1_u_i_1_1_package_details_factory_1aeb5c01ceebef137fb852956777b38c30">DoCreate</link>(IUxmlAttributes&#32;bag,&#32;CreationContext&#32;cc)
+00013 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00014 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;<emphasis role="keyword">new</emphasis>&#32;<link linkend="_class_unity_editor_1_1_package_manager_1_1_u_i_1_1_package_details">PackageDetails</link>();
+00015 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00016 &#32;&#32;&#32;&#32;}
+00017 <emphasis role="preprocessor">#endif</emphasis>
+00018 
+<anchor xml:id="__package_details_8cs_source_1l00019"/><link linkend="_class_unity_editor_1_1_package_manager_1_1_u_i_1_1_package_details">00019</link> &#32;&#32;&#32;&#32;<emphasis role="keyword">internal</emphasis>&#32;<emphasis role="keyword">class&#32;</emphasis><link linkend="_class_unity_editor_1_1_package_manager_1_1_u_i_1_1_package_details">PackageDetails</link>&#32;:&#32;VisualElement
+00020 &#32;&#32;&#32;&#32;{
+00021 <emphasis role="preprocessor">#if&#32;UNITY_2018_3_OR_NEWER</emphasis>
+00022 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">internal</emphasis>&#32;<emphasis role="keyword">new</emphasis>&#32;<emphasis role="keyword">class&#32;</emphasis>UxmlFactory&#32;:&#32;UxmlFactory&lt;PackageDetails&gt;&#32;{&#32;}
+00023 <emphasis role="preprocessor">#endif</emphasis>
+00024 
+00025 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;readonly&#32;VisualElement&#32;root;
+00026 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;<link linkend="_class_unity_editor_1_1_package_manager_1_1_u_i_1_1_package">Package</link>&#32;package;
+00027 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;<emphasis role="keyword">const</emphasis>&#32;<emphasis role="keywordtype">string</emphasis>&#32;emptyDescriptionClass&#32;=&#32;<emphasis role="stringliteral">&quot;empty&quot;</emphasis>;
+00028 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;List&lt;VersionItem&gt;&#32;VersionItems;
+00029 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">internal</emphasis>&#32;<link linkend="_class_unity_editor_1_1_package_manager_1_1_u_i_1_1_popup_field">PopupField&lt;VersionItem&gt;</link>&#32;VersionPopup;
+00030 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;<link linkend="_class_unity_editor_1_1_package_manager_1_1_u_i_1_1_package_info">PackageInfo</link>&#32;DisplayPackage;
+00031 
+00032 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;<link linkend="_class_unity_editor_1_1_package_manager_1_1_u_i_1_1_package_info">PackageInfo</link>&#32;SelectedPackage
+00033 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00034 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">get</emphasis>&#32;{&#32;<emphasis role="keywordflow">return</emphasis>&#32;VersionPopup.<link linkend="_class_unity_editor_1_1_package_manager_1_1_u_i_1_1_popup_field_1aa27a791d6881262b65dea46b32578313">value</link>.Version&#32;!=&#32;<emphasis role="keyword">null</emphasis>&#32;?&#32;VersionPopup.<link linkend="_class_unity_editor_1_1_package_manager_1_1_u_i_1_1_popup_field_1aa27a791d6881262b65dea46b32578313">value</link>.Version&#32;:&#32;<emphasis role="keyword">null</emphasis>;&#32;}
+00035 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00036 
+00037 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">internal</emphasis>&#32;<emphasis role="keyword">enum</emphasis>&#32;PackageAction
+00038 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00039 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;Add,
+00040 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;Remove,
+00041 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;Update,
+00042 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;Downgrade,
+00043 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;Enable,
+00044 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;Disable,
+00045 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_namespace_unity_editor_1_1_package_manager_1_1_u_i_1ab1815eb3e48074893d9dc1dc99a4a32aa761266b390b3dc960c74d9194512850a">UpToDate</link>,
+00046 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;Current,
+00047 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_namespace_unity_editor_1_1_package_manager_1_1_u_i_1aec89f744729646d8e261787be78942c8a509820290d57f333403f490dde7316f4">Local</link>,
+00048 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;Git,
+00049 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;Embedded
+00050 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00051 
+00052 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;<emphasis role="keyword">static</emphasis>&#32;readonly&#32;<link linkend="_class_unity_editor_1_1_package_manager_1_1_u_i_1_1_version_item">VersionItem</link>&#32;EmptyVersion&#32;=&#32;<emphasis role="keyword">new</emphasis>&#32;<link linkend="_class_unity_editor_1_1_package_manager_1_1_u_i_1_1_version_item">VersionItem</link>&#32;{Version&#32;=&#32;<emphasis role="keyword">null</emphasis>};
+00053 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">internal</emphasis>&#32;<emphasis role="keyword">static</emphasis>&#32;readonly&#32;<emphasis role="keywordtype">string</emphasis>[]&#32;PackageActionVerbs&#32;=&#32;{&#32;<emphasis role="stringliteral">&quot;Install&quot;</emphasis>,&#32;<emphasis role="stringliteral">&quot;Remove&quot;</emphasis>,&#32;<emphasis role="stringliteral">&quot;Update&#32;to&quot;</emphasis>,&#32;<emphasis role="stringliteral">&quot;Update&#32;to&quot;</emphasis>,&#32;&#32;<emphasis role="stringliteral">&quot;Enable&quot;</emphasis>,&#32;<emphasis role="stringliteral">&quot;Disable&quot;</emphasis>,&#32;<emphasis role="stringliteral">&quot;Up&#32;to&#32;date&quot;</emphasis>,&#32;<emphasis role="stringliteral">&quot;Current&quot;</emphasis>,&#32;<emphasis role="stringliteral">&quot;Local&quot;</emphasis>,&#32;<emphasis role="stringliteral">&quot;Git&quot;</emphasis>,&#32;<emphasis role="stringliteral">&quot;Embedded&quot;</emphasis>&#32;};
+00054 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">internal</emphasis>&#32;<emphasis role="keyword">static</emphasis>&#32;readonly&#32;<emphasis role="keywordtype">string</emphasis>[]&#32;PackageActionInProgressVerbs&#32;=&#32;{&#32;<emphasis role="stringliteral">&quot;Installing&quot;</emphasis>,&#32;<emphasis role="stringliteral">&quot;Removing&quot;</emphasis>,&#32;<emphasis role="stringliteral">&quot;Updating&#32;to&quot;</emphasis>,&#32;<emphasis role="stringliteral">&quot;Updating&#32;to&quot;</emphasis>,&#32;<emphasis role="stringliteral">&quot;Enabling&quot;</emphasis>,&#32;<emphasis role="stringliteral">&quot;Disabling&quot;</emphasis>,&#32;<emphasis role="stringliteral">&quot;Up&#32;to&#32;date&quot;</emphasis>,&#32;<emphasis role="stringliteral">&quot;Current&quot;</emphasis>,&#32;<emphasis role="stringliteral">&quot;Local&quot;</emphasis>,&#32;<emphasis role="stringliteral">&quot;Git&quot;</emphasis>,&#32;<emphasis role="stringliteral">&quot;Embedded&quot;</emphasis>&#32;};
+00055 
+<anchor xml:id="__package_details_8cs_source_1l00056"/><link linkend="_class_unity_editor_1_1_package_manager_1_1_u_i_1_1_package_details_1a18b3270e141ee9096253d8e9955ea8b0">00056</link> &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<link linkend="_class_unity_editor_1_1_package_manager_1_1_u_i_1_1_package_details_1a18b3270e141ee9096253d8e9955ea8b0">PackageDetails</link>()
+00057 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00058 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;UIUtils.SetElementDisplay(<emphasis role="keyword">this</emphasis>,&#32;<emphasis role="keyword">false</emphasis>);
+00059 
+00060 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;root&#32;=&#32;Resources.GetTemplate(<emphasis role="stringliteral">&quot;PackageDetails.uxml&quot;</emphasis>);
+00061 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;Add(root);
+00062 
+00063 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">foreach</emphasis>&#32;(var&#32;extension&#32;<emphasis role="keywordflow">in</emphasis>&#32;PackageManagerExtensions.Extensions)
+00064 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;CustomContainer.Add(extension.CreateExtensionUI());
+00065 
+00066 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;root.StretchToParentSize();
+00067 
+00068 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;SetUpdateVisibility(<emphasis role="keyword">false</emphasis>);
+00069 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;RemoveButton.visible&#32;=&#32;<emphasis role="keyword">false</emphasis>;
+00070 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;UpdateBuiltIn.visible&#32;=&#32;<emphasis role="keyword">false</emphasis>;
+00071 
+00072 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;UpdateButton.clickable.clicked&#32;+=&#32;UpdateClick;
+00073 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;UpdateBuiltIn.clickable.clicked&#32;+=&#32;UpdateClick;
+00074 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;RemoveButton.clickable.clicked&#32;+=&#32;RemoveClick;
+00075 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;ViewDocButton.clickable.clicked&#32;+=&#32;ViewDocClick;
+00076 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;ViewChangelogButton.clickable.clicked&#32;+=&#32;ViewChangelogClick;
+00077 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;ViewLicenses.clickable.clicked&#32;+=&#32;ViewLicensesClick;
+00078 
+00079 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;VersionItems&#32;=&#32;<emphasis role="keyword">new</emphasis>&#32;List&lt;VersionItem&gt;&#32;{EmptyVersion};
+00080 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;VersionPopup&#32;=&#32;<emphasis role="keyword">new</emphasis>&#32;<link linkend="_class_unity_editor_1_1_package_manager_1_1_u_i_1_1_popup_field">PopupField&lt;VersionItem&gt;</link>(VersionItems,&#32;0);
+00081 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;VersionPopup.<link linkend="_class_unity_editor_1_1_package_manager_1_1_u_i_1_1_popup_field_1a9abe30176e465f59b1fa19c914fd9e64">SetLabelCallback</link>(VersionSelectionSetLabel);
+00082 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;VersionPopup.AddToClassList(<emphasis role="stringliteral">&quot;popup&quot;</emphasis>);
+00083 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;VersionPopup.<link linkend="_class_unity_editor_1_1_package_manager_1_1_u_i_1_1_popup_field_1a805375871c4f16bb18d81e28923fe7ca">OnValueChanged</link>(VersionSelectionChanged);
+00084 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;
+00085 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(VersionItems.Count&#32;==&#32;1)
+00086 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;VersionPopup.SetEnabled(<emphasis role="keyword">false</emphasis>);
+00087 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;
+00088 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;UpdateDropdownContainer.Add(VersionPopup);
+00089 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;VersionPopup.StretchToParentSize();
+00090 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;
+00091 
+00092 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;Fix&#32;button&#32;on&#32;dark&#32;skin&#32;but&#32;overlapping&#32;edge&#32;pixel&#32;perfectly</emphasis>
+00093 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(EditorGUIUtility.isProSkin)
+00094 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00095 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;VersionPopup.style.positionLeft&#32;=&#32;-1;
+00096 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;UpdateDropdownContainer.style.sliceLeft&#32;=&#32;4;
+00097 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00098 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00099 
+00100 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;<emphasis role="keywordtype">string</emphasis>&#32;VersionSelectionSetLabel(<link linkend="_class_unity_editor_1_1_package_manager_1_1_u_i_1_1_version_item">VersionItem</link>&#32;item)
+00101 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00102 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;item.<link linkend="_class_unity_editor_1_1_package_manager_1_1_u_i_1_1_version_item_1a80389f773561decd881c144a418def8f">Label</link>;
+00103 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00104 
+00105 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;VersionSelectionChanged(ChangeEvent&lt;VersionItem&gt;&#32;e)
+00106 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00107 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;RefreshAddButton();
+00108 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00109 
+00110 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;SetUpdateVisibility(<emphasis role="keywordtype">bool</emphasis>&#32;value)
+00111 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00112 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(UpdateContainer&#32;!=&#32;<emphasis role="keyword">null</emphasis>)
+00113 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;UIUtils.SetElementDisplay(UpdateContainer,&#32;value);
+00114 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00115 
+00116 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">internal</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;SetDisplayPackage(PackageInfo&#32;packageInfo)
+00117 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00118 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;DisplayPackage&#32;=&#32;packageInfo;
+00119 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;
+00120 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;var&#32;detailVisible&#32;=&#32;<emphasis role="keyword">true</emphasis>;
+00121 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_namespace_unity_editor_1_1_package_manager_1_1_u_i_1ab1815eb3e48074893d9dc1dc99a4a32aa902b0d55fddef6f8d651fe1035b7d4bd">Error</link>&#32;error&#32;=&#32;<emphasis role="keyword">null</emphasis>;
+00122 
+00123 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(package&#32;==&#32;<emphasis role="keyword">null</emphasis>&#32;||&#32;DisplayPackage&#32;==&#32;<emphasis role="keyword">null</emphasis>)
+00124 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00125 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;detailVisible&#32;=&#32;<emphasis role="keyword">false</emphasis>;
+00126 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;UIUtils.SetElementDisplay(DocumentationContainer,&#32;<emphasis role="keyword">false</emphasis>);
+00127 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;UIUtils.SetElementDisplay(CustomContainer,&#32;<emphasis role="keyword">false</emphasis>);
+00128 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;UIUtils.SetElementDisplay(UpdateBuiltIn,&#32;<emphasis role="keyword">false</emphasis>);
+00129 
+00130 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">foreach</emphasis>&#32;(var&#32;extension&#32;<emphasis role="keywordflow">in</emphasis>&#32;PackageManagerExtensions.Extensions)
+00131 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;extension.OnPackageSelectionChange(<emphasis role="keyword">null</emphasis>);
+00132 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00133 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">else</emphasis>
+00134 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00135 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;SetUpdateVisibility(<emphasis role="keyword">true</emphasis>);
+00136 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;UIUtils.SetElementDisplay(ViewDocButton,&#32;<emphasis role="keyword">true</emphasis>);
+00137 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;RemoveButton.visible&#32;=&#32;<emphasis role="keyword">true</emphasis>;
+00138 
+00139 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(<emphasis role="keywordtype">string</emphasis>.IsNullOrEmpty(DisplayPackage.<link linkend="_class_unity_editor_1_1_package_manager_1_1_u_i_1_1_package_info_1abdc0d7995e8ffed87deccd6bd4c7a95e">Description</link>))
+00140 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00141 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;DetailDesc.text&#32;=&#32;<emphasis role="stringliteral">&quot;There&#32;is&#32;no&#32;description&#32;for&#32;this&#32;package.&quot;</emphasis>;
+00142 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;DetailDesc.AddToClassList(emptyDescriptionClass);
+00143 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00144 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">else</emphasis>
+00145 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00146 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;DetailDesc.text&#32;=&#32;DisplayPackage.<link linkend="_class_unity_editor_1_1_package_manager_1_1_u_i_1_1_package_info_1abdc0d7995e8ffed87deccd6bd4c7a95e">Description</link>;
+00147 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;DetailDesc.RemoveFromClassList(emptyDescriptionClass);
+00148 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00149 
+00150 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_namespace_valve_1_1_v_r_1a99f7cc968994699a7485078bafddac17a63a9f0ea7bb98050796b649e85481845">root</link>.Q&lt;Label&gt;(<emphasis role="stringliteral">&quot;detailTitle&quot;</emphasis>).text&#32;=&#32;DisplayPackage.<link linkend="_class_unity_editor_1_1_package_manager_1_1_u_i_1_1_package_info_1aa16f3beff3e85a4be5a3c3c2536fed6a">DisplayName</link>;
+00151 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;DetailVersion.text&#32;=&#32;<emphasis role="stringliteral">&quot;Version&#32;&quot;</emphasis>&#32;+&#32;DisplayPackage.<link linkend="_class_unity_editor_1_1_package_manager_1_1_u_i_1_1_package_info_1a6ee0efc0cc759fedb012c3ffe8addc9d">VersionWithoutTag</link>;
+00152 
+00153 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;if&#32;(DisplayPackage.<link linkend="_class_unity_editor_1_1_package_manager_1_1_u_i_1_1_package_info_1a7a4802150f8db3d5cb6d2cc3b19fc8ca">IsInDevelopment</link>&#32;||&#32;DisplayPackage.<link linkend="_class_unity_editor_1_1_package_manager_1_1_u_i_1_1_package_info_1af0fa791bd7aa34dfec5f1dbdbddcb7dd">HasVersionTag</link>(<link linkend="_namespace_unity_editor_1_1_package_manager_1_1_u_i_1afd939208534e3c178925b2f726ab9efe">PackageTag</link>.preview))
+00154 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;UIUtils.SetElementDisplay(GetTag(<link linkend="_namespace_unity_editor_1_1_package_manager_1_1_u_i_1afd939208534e3c178925b2f726ab9efe">PackageTag</link>.verified),&#32;<emphasis role="keyword">false</emphasis>);
+00155 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">else</emphasis>
+00156 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00157 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;var&#32;unityVersionParts&#32;=&#32;<link linkend="_namespace_valve_1_1_v_r_1aecd07a81fe79a9f96c6787513e2d98e4ae498749f3c42246d50b15c81c101d988">Application</link>.unityVersion.Split(<emphasis role="charliteral">&apos;.&apos;</emphasis>);
+00158 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;var&#32;unityVersion&#32;=&#32;<emphasis role="keywordtype">string</emphasis>.Format(<emphasis role="stringliteral">&quot;{0}.{1}&quot;</emphasis>,&#32;unityVersionParts[0],&#32;unityVersionParts[1]);
+00159 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;VerifyLabel.text&#32;=&#32;unityVersion&#32;+&#32;<emphasis role="stringliteral">&quot;&#32;verified&quot;</emphasis>;
+00160 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;UIUtils.SetElementDisplay(GetTag(<link linkend="_namespace_unity_editor_1_1_package_manager_1_1_u_i_1afd939208534e3c178925b2f726ab9efe">PackageTag</link>.verified),&#32;DisplayPackage.<link linkend="_class_unity_editor_1_1_package_manager_1_1_u_i_1_1_package_info_1a4239ee671a01398f5c0d238123db65bc">IsVerified</link>);
+00161 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00162 
+00163 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;UIUtils.SetElementDisplay(GetTag(<link linkend="_namespace_unity_editor_1_1_package_manager_1_1_u_i_1afd939208534e3c178925b2f726ab9efe">PackageTag</link>.inDevelopment),&#32;DisplayPackage.<link linkend="_class_unity_editor_1_1_package_manager_1_1_u_i_1_1_package_info_1a7a4802150f8db3d5cb6d2cc3b19fc8ca">IsInDevelopment</link>);
+00164 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;UIUtils.SetElementDisplay(GetTag(<link linkend="_namespace_unity_editor_1_1_package_manager_1_1_u_i_1afd939208534e3c178925b2f726ab9efe">PackageTag</link>.local),&#32;DisplayPackage.<link linkend="_class_unity_editor_1_1_package_manager_1_1_u_i_1_1_package_info_1a6e1e74a584df08d2c48c09ba3a9cc5a2">IsLocal</link>);
+00165 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;UIUtils.SetElementDisplay(GetTag(<link linkend="_namespace_unity_editor_1_1_package_manager_1_1_u_i_1afd939208534e3c178925b2f726ab9efe">PackageTag</link>.preview),&#32;DisplayPackage.<link linkend="_class_unity_editor_1_1_package_manager_1_1_u_i_1_1_package_info_1af630a06ace1934e60d02db5287992efe">IsPreview</link>);
+00166 
+00167 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;UIUtils.SetElementDisplay(DocumentationContainer,&#32;DisplayPackage.<link linkend="_class_unity_editor_1_1_package_manager_1_1_u_i_1_1_package_info_1abce6a6307848b5ba3c16bb7837648c62">Origin</link>&#32;!=&#32;PackageSource.BuiltIn);
+00168 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;UIUtils.SetElementDisplay(ChangelogContainer,&#32;DisplayPackage.<link linkend="_class_unity_editor_1_1_package_manager_1_1_u_i_1_1_package_info_1addb2eb2857948538853897bf76743aea">HasChangelog</link>(DisplayPackage));
+00169 
+00170 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_namespace_valve_1_1_v_r_1a99f7cc968994699a7485078bafddac17a63a9f0ea7bb98050796b649e85481845">root</link>.Q&lt;Label&gt;(<emphasis role="stringliteral">&quot;detailName&quot;</emphasis>).text&#32;=&#32;DisplayPackage.<link linkend="_class_unity_editor_1_1_package_manager_1_1_u_i_1_1_package_info_1a14da48a80dbef0a69042364595e4eb16">Name</link>;
+00171 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_namespace_valve_1_1_v_r_1a99f7cc968994699a7485078bafddac17a63a9f0ea7bb98050796b649e85481845">root</link>.Q&lt;ScrollView&gt;(<emphasis role="stringliteral">&quot;detailView&quot;</emphasis>).scrollOffset&#32;=&#32;<emphasis role="keyword">new</emphasis>&#32;Vector2(0,&#32;0);
+00172 
+00173 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;DetailModuleReference.text&#32;=&#32;<emphasis role="stringliteral">&quot;&quot;</emphasis>;
+00174 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;var&#32;isBuiltIn&#32;=&#32;DisplayPackage.<link linkend="_class_unity_editor_1_1_package_manager_1_1_u_i_1_1_package_info_1a50613d88f03b92be0f684dd372a39007">IsBuiltIn</link>;
+00175 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(isBuiltIn)
+00176 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;DetailModuleReference.text&#32;=&#32;DisplayPackage.<link linkend="_class_unity_editor_1_1_package_manager_1_1_u_i_1_1_package_info_1a32e3d98091a6bf73f0e7d02740520fbe">BuiltInDescription</link>;
+00177 
+00178 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;DetailAuthor.text&#32;=&#32;<emphasis role="stringliteral">&quot;&quot;</emphasis>;
+00179 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(!<emphasis role="keywordtype">string</emphasis>.IsNullOrEmpty(DisplayPackage.<link linkend="_class_unity_editor_1_1_package_manager_1_1_u_i_1_1_package_info_1a01661fa340579f0f8fbf58855a0586b5">Author</link>))
+00180 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;DetailAuthor.text&#32;=&#32;<emphasis role="keywordtype">string</emphasis>.Format(<emphasis role="stringliteral">&quot;Author:&#32;{0}&quot;</emphasis>,&#32;DisplayPackage.<link linkend="_class_unity_editor_1_1_package_manager_1_1_u_i_1_1_package_info_1a01661fa340579f0f8fbf58855a0586b5">Author</link>);
+00181 
+00182 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;UIUtils.SetElementDisplay(DetailDesc,&#32;!isBuiltIn);
+00183 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;UIUtils.SetElementDisplay(DetailVersion,&#32;!isBuiltIn);
+00184 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;UIUtils.SetElementDisplayNonEmpty(DetailModuleReference);
+00185 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;UIUtils.SetElementDisplayNonEmpty(DetailAuthor);
+00186 
+00187 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(DisplayPackage.<link linkend="_class_unity_editor_1_1_package_manager_1_1_u_i_1_1_package_info_1a8ef278adf97a0c8766d57e03c6bfe9a8">Errors</link>.Count&#32;&gt;&#32;0)
+00188 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;error&#32;=&#32;DisplayPackage.<link linkend="_class_unity_editor_1_1_package_manager_1_1_u_i_1_1_package_info_1a8ef278adf97a0c8766d57e03c6bfe9a8">Errors</link>.First();
+00189 
+00190 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;RefreshAddButton();
+00191 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;RefreshRemoveButton();
+00192 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;UIUtils.SetElementDisplay(CustomContainer,&#32;<emphasis role="keyword">true</emphasis>);
+00193 
+00194 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;package.AddSignal.OnOperation&#32;+=&#32;OnAddOperation;
+00195 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;package.RemoveSignal.OnOperation&#32;+=&#32;OnRemoveOperation;
+00196 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">foreach</emphasis>&#32;(var&#32;extension&#32;<emphasis role="keywordflow">in</emphasis>&#32;PackageManagerExtensions.Extensions)
+00197 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;extension.OnPackageSelectionChange(DisplayPackage.<link linkend="_class_unity_editor_1_1_package_manager_1_1_u_i_1_1_package_info_1aa88ba8325f6ae75382a765c044aa8670">Info</link>);
+00198 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00199 
+00200 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;Set&#32;visibility</emphasis>
+00201 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_namespace_valve_1_1_v_r_1a99f7cc968994699a7485078bafddac17a63a9f0ea7bb98050796b649e85481845">root</link>.Q&lt;VisualElement&gt;(<emphasis role="stringliteral">&quot;detail&quot;</emphasis>).visible&#32;=&#32;detailVisible;
+00202 
+00203 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(<emphasis role="keyword">null</emphasis>&#32;==&#32;error)
+00204 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;error&#32;=&#32;PackageCollection.Instance.GetPackageError(package);
+00205 
+00206 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(error&#32;!=&#32;<emphasis role="keyword">null</emphasis>)
+00207 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;SetError(error);
+00208 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">else</emphasis>
+00209 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;DetailError.<link linkend="_class_unity_editor_1_1_package_manager_1_1_u_i_1_1_alert_1aa8a6fa9c50616c19e66e00e80c20f7a3">ClearError</link>();&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;
+00210 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00211 
+00212 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;ResetVersionItems(PackageInfo&#32;displayPackage)
+00213 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00214 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;VersionItems.Clear();&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;
+00215 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;VersionPopup.SetEnabled(<emphasis role="keyword">true</emphasis>);
+00216 
+00217 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(displayPackage&#32;==&#32;<emphasis role="keyword">null</emphasis>)
+00218 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>;
+00219 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;
+00220 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//</emphasis>
+00221 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;Get&#32;key&#32;versions&#32;--&#32;Latest,&#32;Verified,&#32;LatestPatch,&#32;Current.</emphasis>
+00222 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;var&#32;keyVersions&#32;=&#32;<emphasis role="keyword">new</emphasis>&#32;List&lt;PackageInfo&gt;();
+00223 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(package.LatestRelease&#32;!=&#32;<emphasis role="keyword">null</emphasis>)&#32;keyVersions.Add(package.LatestRelease);
+00224 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(package.<link linkend="_class_unity_editor_1_1_package_manager_1_1_u_i_1_1_package_1ac9a3a0581e85149b7e0a614b9f3de3f6">Current</link>&#32;!=&#32;<emphasis role="keyword">null</emphasis>)&#32;keyVersions.Add(package.<link linkend="_class_unity_editor_1_1_package_manager_1_1_u_i_1_1_package_1ac9a3a0581e85149b7e0a614b9f3de3f6">Current</link>);
+00225 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(package.Verified&#32;!=&#32;<emphasis role="keyword">null</emphasis>&#32;&amp;&amp;&#32;package.Verified&#32;!=&#32;package.<link linkend="_class_unity_editor_1_1_package_manager_1_1_u_i_1_1_package_1ac9a3a0581e85149b7e0a614b9f3de3f6">Current</link>)&#32;keyVersions.Add(package.Verified);
+00226 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(package.<link linkend="_class_unity_editor_1_1_package_manager_1_1_u_i_1_1_package_1abe3e3394cd7310123c5b4b885740d274">LatestPatch</link>&#32;!=&#32;<emphasis role="keyword">null</emphasis>&#32;&amp;&amp;&#32;package.IsAfterCurrentVersion(package.<link linkend="_class_unity_editor_1_1_package_manager_1_1_u_i_1_1_package_1abe3e3394cd7310123c5b4b885740d274">LatestPatch</link>))&#32;keyVersions.Add(package.<link linkend="_class_unity_editor_1_1_package_manager_1_1_u_i_1_1_package_1abe3e3394cd7310123c5b4b885740d274">LatestPatch</link>);
+00227 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(package.<link linkend="_class_unity_editor_1_1_package_manager_1_1_u_i_1_1_package_1ac9a3a0581e85149b7e0a614b9f3de3f6">Current</link>&#32;==&#32;<emphasis role="keyword">null</emphasis>&#32;&amp;&amp;&#32;package.LatestRelease&#32;==&#32;<emphasis role="keyword">null</emphasis>&#32;&amp;&amp;&#32;package.Latest&#32;!=&#32;<emphasis role="keyword">null</emphasis>)&#32;keyVersions.Add(package.Latest);
+00228 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(Package.ShouldProposeLatestVersions&#32;&amp;&amp;&#32;package.Latest&#32;!=&#32;package.LatestRelease&#32;&amp;&amp;&#32;package.Latest&#32;!=&#32;<emphasis role="keyword">null</emphasis>)&#32;keyVersions.Add(package.Latest);
+00229 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;keyVersions.Add(package.<link linkend="_class_unity_editor_1_1_package_manager_1_1_u_i_1_1_package_1a0a16f0854f348cea456abe0983590de3">LatestUpdate</link>);&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;Make&#32;sure&#32;LatestUpdate&#32;is&#32;always&#32;in&#32;the&#32;list.</emphasis>
+00230 
+00231 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">foreach</emphasis>&#32;(var&#32;version&#32;<emphasis role="keywordflow">in</emphasis>&#32;keyVersions.OrderBy(package&#32;=&gt;&#32;package.Version).Reverse())
+00232 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00233 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;var&#32;item&#32;=&#32;<emphasis role="keyword">new</emphasis>&#32;VersionItem&#32;{Version&#32;=&#32;version};
+00234 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;VersionItems.Add(item);
+00235 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;
+00236 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(version&#32;==&#32;package.<link linkend="_class_unity_editor_1_1_package_manager_1_1_u_i_1_1_package_1a0a16f0854f348cea456abe0983590de3">LatestUpdate</link>)
+00237 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;VersionPopup.<link linkend="_class_unity_editor_1_1_package_manager_1_1_u_i_1_1_popup_field_1aa27a791d6881262b65dea46b32578313">value</link>&#32;=&#32;item;
+00238 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00239 
+00240 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//</emphasis>
+00241 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;Add&#32;all&#32;versions</emphasis>
+00242 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">foreach</emphasis>&#32;(var&#32;version&#32;<emphasis role="keywordflow">in</emphasis>&#32;package.Versions.Reverse())
+00243 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00244 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;var&#32;item&#32;=&#32;<emphasis role="keyword">new</emphasis>&#32;VersionItem&#32;{Version&#32;=&#32;version};
+00245 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;item.MenuName&#32;=&#32;<emphasis role="stringliteral">&quot;All&#32;Versions/&quot;</emphasis>;
+00246 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;VersionItems.Add(item);
+00247 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00248 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;
+00249 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(VersionItems.Count&#32;==&#32;0)
+00250 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00251 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;VersionItems.Add(EmptyVersion);
+00252 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;VersionPopup.<link linkend="_class_unity_editor_1_1_package_manager_1_1_u_i_1_1_popup_field_1aa27a791d6881262b65dea46b32578313">value</link>&#32;=&#32;EmptyVersion;
+00253 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;VersionPopup.SetEnabled(<emphasis role="keyword">false</emphasis>);
+00254 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00255 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00256 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;
+<anchor xml:id="__package_details_8cs_source_1l00257"/><link linkend="_class_unity_editor_1_1_package_manager_1_1_u_i_1_1_package_details_1a712f501a6f645d732641337a9e3c5654">00257</link> &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;<link linkend="_class_unity_editor_1_1_package_manager_1_1_u_i_1_1_package_details_1a712f501a6f645d732641337a9e3c5654">SetPackage</link>(<link linkend="_class_unity_editor_1_1_package_manager_1_1_u_i_1_1_package">Package</link>&#32;package)
+00258 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00259 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(this.package&#32;!=&#32;<emphasis role="keyword">null</emphasis>)
+00260 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00261 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(this.package.AddSignal.Operation&#32;!=&#32;<emphasis role="keyword">null</emphasis>)
+00262 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00263 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;this.package.AddSignal.Operation.OnOperationError&#32;-=&#32;OnAddOperationError;
+00264 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;this.package.AddSignal.Operation.OnOperationSuccess&#32;-=&#32;OnAddOperationSuccess;
+00265 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00266 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;this.package.AddSignal.ResetEvents();
+00267 
+00268 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(this.package.RemoveSignal.Operation&#32;!=&#32;<emphasis role="keyword">null</emphasis>)
+00269 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00270 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;this.package.RemoveSignal.Operation.OnOperationSuccess&#32;-=&#32;OnRemoveOperationSuccess;
+00271 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;this.package.RemoveSignal.Operation.OnOperationError&#32;-=&#32;OnRemoveOperationError;
+00272 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00273 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;this.package.RemoveSignal.ResetEvents();
+00274 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00275 
+00276 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;UIUtils.SetElementDisplay(<emphasis role="keyword">this</emphasis>,&#32;<emphasis role="keyword">true</emphasis>);
+00277 
+00278 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;this.<emphasis role="keyword">package&#32;</emphasis>=&#32;package;
+00279 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;var&#32;displayPackage&#32;=&#32;<emphasis role="keyword">package&#32;</emphasis>!=&#32;null&#32;?&#32;package.VersionToDisplay&#32;:&#32;null;
+00280 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;ResetVersionItems(displayPackage);
+00281 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;SetDisplayPackage(displayPackage);
+00282 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00283 
+00284 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;SetError(<link linkend="_namespace_unity_editor_1_1_package_manager_1_1_u_i_1ab1815eb3e48074893d9dc1dc99a4a32aa902b0d55fddef6f8d651fe1035b7d4bd">Error</link>&#32;error)
+00285 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00286 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;DetailError.AdjustSize(DetailView.verticalScroller.visible);
+00287 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;DetailError.SetError(error);
+00288 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;DetailError.OnCloseError&#32;=&#32;()&#32;=&gt;
+00289 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00290 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_unity_editor_1_1_package_manager_1_1_u_i_1_1_package_collection">PackageCollection</link>.<link linkend="_class_unity_editor_1_1_package_manager_1_1_u_i_1_1_package_collection_1a75a698a6c798e48fbddf0e7edbf6db71">Instance</link>.<link linkend="_class_unity_editor_1_1_package_manager_1_1_u_i_1_1_package_collection_1a675bfec6785ec51c5f8c2d1d2aab3ff0">RemovePackageErrors</link>(package);
+00291 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_unity_editor_1_1_package_manager_1_1_u_i_1_1_package_collection">PackageCollection</link>.<link linkend="_class_unity_editor_1_1_package_manager_1_1_u_i_1_1_package_collection_1a75a698a6c798e48fbddf0e7edbf6db71">Instance</link>.<link linkend="_class_unity_editor_1_1_package_manager_1_1_u_i_1_1_package_collection_1a96dc5d2b0f975f54efa2a57a93d0cbdb">UpdatePackageCollection</link>();
+00292 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;};
+00293 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00294 
+00295 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;OnAddOperation(<link linkend="_interface_unity_editor_1_1_package_manager_1_1_u_i_1_1_i_add_operation">IAddOperation</link>&#32;operation)
+00296 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00297 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;operation.<link linkend="_interface_unity_editor_1_1_package_manager_1_1_u_i_1_1_i_base_operation_1a59bdb665b62e88e5fbbcd0d6e0c9d840">OnOperationError</link>&#32;+=&#32;OnAddOperationError;
+00298 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;operation.<link linkend="_interface_unity_editor_1_1_package_manager_1_1_u_i_1_1_i_add_operation_1a3ccee2fcd46de2afe67149e2d82e6705">OnOperationSuccess</link>&#32;+=&#32;OnAddOperationSuccess;
+00299 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00300 
+00301 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;OnAddOperationError(<link linkend="_namespace_unity_editor_1_1_package_manager_1_1_u_i_1ab1815eb3e48074893d9dc1dc99a4a32aa902b0d55fddef6f8d651fe1035b7d4bd">Error</link>&#32;error)
+00302 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00303 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(package&#32;!=&#32;<emphasis role="keyword">null</emphasis>&#32;&amp;&amp;&#32;package.AddSignal.Operation&#32;!=&#32;<emphasis role="keyword">null</emphasis>)
+00304 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00305 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;package.AddSignal.Operation.OnOperationSuccess&#32;-=&#32;OnAddOperationSuccess;
+00306 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;package.AddSignal.Operation.OnOperationError&#32;-=&#32;OnAddOperationError;
+00307 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;package.AddSignal.Operation&#32;=&#32;<emphasis role="keyword">null</emphasis>;
+00308 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00309 
+00310 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_unity_editor_1_1_package_manager_1_1_u_i_1_1_package_collection">PackageCollection</link>.<link linkend="_class_unity_editor_1_1_package_manager_1_1_u_i_1_1_package_collection_1a75a698a6c798e48fbddf0e7edbf6db71">Instance</link>.<link linkend="_class_unity_editor_1_1_package_manager_1_1_u_i_1_1_package_collection_1a8bd5c0f86d4add56e3e7b578ed70e4a5">AddPackageError</link>(package,&#32;error);
+00311 
+00312 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;SetError(error);
+00313 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(package&#32;!=&#32;<emphasis role="keyword">null</emphasis>)
+00314 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;ResetVersionItems(package.VersionToDisplay);
+00315 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_unity_editor_1_1_package_manager_1_1_u_i_1_1_package_collection">PackageCollection</link>.<link linkend="_class_unity_editor_1_1_package_manager_1_1_u_i_1_1_package_collection_1a75a698a6c798e48fbddf0e7edbf6db71">Instance</link>.<link linkend="_class_unity_editor_1_1_package_manager_1_1_u_i_1_1_package_collection_1a96dc5d2b0f975f54efa2a57a93d0cbdb">UpdatePackageCollection</link>();
+00316 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00317 
+00318 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;OnAddOperationSuccess(<link linkend="_class_unity_editor_1_1_package_manager_1_1_u_i_1_1_package_info">PackageInfo</link>&#32;packageInfo)
+00319 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00320 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(package&#32;!=&#32;<emphasis role="keyword">null</emphasis>&#32;&amp;&amp;&#32;package.AddSignal.Operation&#32;!=&#32;<emphasis role="keyword">null</emphasis>)
+00321 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00322 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;package.AddSignal.Operation.OnOperationSuccess&#32;-=&#32;OnAddOperationSuccess;
+00323 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;package.AddSignal.Operation.OnOperationError&#32;-=&#32;OnAddOperationError;
+00324 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;package.AddSignal.Operation&#32;=&#32;<emphasis role="keyword">null</emphasis>;
+00325 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00326 
+00327 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">foreach</emphasis>&#32;(var&#32;extension&#32;<emphasis role="keywordflow">in</emphasis>&#32;PackageManagerExtensions.Extensions)
+00328 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;extension.OnPackageAddedOrUpdated(packageInfo.<link linkend="_class_unity_editor_1_1_package_manager_1_1_u_i_1_1_package_info_1aa88ba8325f6ae75382a765c044aa8670">Info</link>);
+00329 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00330 
+00331 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;OnRemoveOperation(<link linkend="_interface_unity_editor_1_1_package_manager_1_1_u_i_1_1_i_remove_operation">IRemoveOperation</link>&#32;operation)
+00332 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00333 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;Make&#32;sure&#32;we&#32;are&#32;not&#32;already&#32;registered</emphasis>
+00334 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;operation.<link linkend="_interface_unity_editor_1_1_package_manager_1_1_u_i_1_1_i_base_operation_1a59bdb665b62e88e5fbbcd0d6e0c9d840">OnOperationError</link>&#32;-=&#32;OnRemoveOperationError;
+00335 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;operation.<link linkend="_interface_unity_editor_1_1_package_manager_1_1_u_i_1_1_i_remove_operation_1a533765ac0561fe7a7dd0eb718239594b">OnOperationSuccess</link>&#32;-=&#32;OnRemoveOperationSuccess;
+00336 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;
+00337 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;operation.<link linkend="_interface_unity_editor_1_1_package_manager_1_1_u_i_1_1_i_base_operation_1a59bdb665b62e88e5fbbcd0d6e0c9d840">OnOperationError</link>&#32;+=&#32;OnRemoveOperationError;
+00338 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;operation.<link linkend="_interface_unity_editor_1_1_package_manager_1_1_u_i_1_1_i_remove_operation_1a533765ac0561fe7a7dd0eb718239594b">OnOperationSuccess</link>&#32;+=&#32;OnRemoveOperationSuccess;
+00339 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00340 
+00341 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;OnRemoveOperationError(<link linkend="_namespace_unity_editor_1_1_package_manager_1_1_u_i_1ab1815eb3e48074893d9dc1dc99a4a32aa902b0d55fddef6f8d651fe1035b7d4bd">Error</link>&#32;error)
+00342 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00343 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(package&#32;!=&#32;<emphasis role="keyword">null</emphasis>&#32;&amp;&amp;&#32;package.RemoveSignal.Operation&#32;!=&#32;<emphasis role="keyword">null</emphasis>)
+00344 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00345 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;package.RemoveSignal.Operation.OnOperationSuccess&#32;-=&#32;OnRemoveOperationSuccess;
+00346 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;package.RemoveSignal.Operation.OnOperationError&#32;-=&#32;OnRemoveOperationError;
+00347 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;package.RemoveSignal.Operation&#32;=&#32;<emphasis role="keyword">null</emphasis>;
+00348 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00349 
+00350 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_unity_editor_1_1_package_manager_1_1_u_i_1_1_package_collection">PackageCollection</link>.<link linkend="_class_unity_editor_1_1_package_manager_1_1_u_i_1_1_package_collection_1a75a698a6c798e48fbddf0e7edbf6db71">Instance</link>.<link linkend="_class_unity_editor_1_1_package_manager_1_1_u_i_1_1_package_collection_1a8bd5c0f86d4add56e3e7b578ed70e4a5">AddPackageError</link>(package,&#32;error);
+00351 
+00352 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;SetError(error);
+00353 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_unity_editor_1_1_package_manager_1_1_u_i_1_1_package_collection">PackageCollection</link>.<link linkend="_class_unity_editor_1_1_package_manager_1_1_u_i_1_1_package_collection_1a75a698a6c798e48fbddf0e7edbf6db71">Instance</link>.<link linkend="_class_unity_editor_1_1_package_manager_1_1_u_i_1_1_package_collection_1a96dc5d2b0f975f54efa2a57a93d0cbdb">UpdatePackageCollection</link>();
+00354 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00355 
+00356 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;OnRemoveOperationSuccess(<link linkend="_class_unity_editor_1_1_package_manager_1_1_u_i_1_1_package_info">PackageInfo</link>&#32;packageInfo)
+00357 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00358 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(package&#32;!=&#32;<emphasis role="keyword">null</emphasis>&#32;&amp;&amp;&#32;package.RemoveSignal.Operation&#32;!=&#32;<emphasis role="keyword">null</emphasis>)
+00359 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00360 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;package.RemoveSignal.Operation.OnOperationSuccess&#32;-=&#32;OnRemoveOperationSuccess;
+00361 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;package.RemoveSignal.Operation.OnOperationError&#32;-=&#32;OnRemoveOperationError;
+00362 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;package.RemoveSignal.Operation&#32;=&#32;<emphasis role="keyword">null</emphasis>;
+00363 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00364 
+00365 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">foreach</emphasis>&#32;(var&#32;extension&#32;<emphasis role="keywordflow">in</emphasis>&#32;PackageManagerExtensions.Extensions)
+00366 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;extension.OnPackageRemoved(packageInfo.<link linkend="_class_unity_editor_1_1_package_manager_1_1_u_i_1_1_package_info_1aa88ba8325f6ae75382a765c044aa8670">Info</link>);
+00367 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00368 
+00369 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;RefreshAddButton()
+00370 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00371 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(package.<link linkend="_class_unity_editor_1_1_package_manager_1_1_u_i_1_1_package_1ac9a3a0581e85149b7e0a614b9f3de3f6">Current</link>&#32;!=&#32;<emphasis role="keyword">null</emphasis>&#32;&amp;&amp;&#32;package.<link linkend="_class_unity_editor_1_1_package_manager_1_1_u_i_1_1_package_1ac9a3a0581e85149b7e0a614b9f3de3f6">Current</link>.<link linkend="_class_unity_editor_1_1_package_manager_1_1_u_i_1_1_package_info_1a7a4802150f8db3d5cb6d2cc3b19fc8ca">IsInDevelopment</link>)
+00372 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00373 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;UIUtils.SetElementDisplay(UpdateBuiltIn,&#32;<emphasis role="keyword">false</emphasis>);
+00374 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;UIUtils.SetElementDisplay(UpdateCombo,&#32;<emphasis role="keyword">false</emphasis>);
+00375 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;UIUtils.SetElementDisplay(UpdateButton,&#32;<emphasis role="keyword">false</emphasis>);
+00376 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>;
+00377 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00378 
+00379 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;var&#32;targetVersion&#32;=&#32;SelectedPackage;
+00380 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(targetVersion&#32;==&#32;<emphasis role="keyword">null</emphasis>)
+00381 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>;
+00382 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;
+00383 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;var&#32;enableButton&#32;=&#32;!<link linkend="_class_unity_editor_1_1_package_manager_1_1_u_i_1_1_package">Package</link>.<link linkend="_class_unity_editor_1_1_package_manager_1_1_u_i_1_1_package_1a4b61acd81bacd398c6022e75cf33811a">AddRemoveOperationInProgress</link>;
+00384 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;var&#32;enableVersionButton&#32;=&#32;<emphasis role="keyword">true</emphasis>;
+00385 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;
+00386 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;var&#32;action&#32;=&#32;PackageAction.Update;
+00387 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;var&#32;inprogress&#32;=&#32;<emphasis role="keyword">false</emphasis>;
+00388 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;var&#32;isBuiltIn&#32;=&#32;package.IsBuiltIn;
+00389 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_semver_1_1_sem_version">SemVersion</link>&#32;version&#32;=&#32;<emphasis role="keyword">null</emphasis>;
+00390 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;
+00391 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(package.AddSignal.Operation&#32;!=&#32;<emphasis role="keyword">null</emphasis>)
+00392 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00393 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(isBuiltIn)
+00394 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00395 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;action&#32;=&#32;PackageAction.Enable;
+00396 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;inprogress&#32;=&#32;<emphasis role="keyword">true</emphasis>;
+00397 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;enableButton&#32;=&#32;<emphasis role="keyword">false</emphasis>;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;
+00398 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00399 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">else</emphasis>
+00400 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00401 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;var&#32;addOperationVersion&#32;=&#32;package.AddSignal.Operation.PackageInfo.Version;
+00402 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(package.<link linkend="_class_unity_editor_1_1_package_manager_1_1_u_i_1_1_package_1ac9a3a0581e85149b7e0a614b9f3de3f6">Current</link>&#32;==&#32;<emphasis role="keyword">null</emphasis>)
+00403 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00404 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;action&#32;=&#32;PackageAction.Add;
+00405 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;inprogress&#32;=&#32;<emphasis role="keyword">true</emphasis>;
+00406 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00407 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">else</emphasis>
+00408 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00409 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;action&#32;=&#32;addOperationVersion.CompareByPrecedence(package.<link linkend="_class_unity_editor_1_1_package_manager_1_1_u_i_1_1_package_1ac9a3a0581e85149b7e0a614b9f3de3f6">Current</link>.<link linkend="_class_unity_editor_1_1_package_manager_1_1_u_i_1_1_package_info_1ad1fa218396015cbbc2bb750eae1992ae">Version</link>)&#32;&gt;=&#32;0
+00410 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;?&#32;PackageAction.Update&#32;:&#32;PackageAction.Downgrade;
+00411 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;inprogress&#32;=&#32;<emphasis role="keyword">true</emphasis>;
+00412 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00413 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;
+00414 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;enableButton&#32;=&#32;<emphasis role="keyword">false</emphasis>;
+00415 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;enableVersionButton&#32;=&#32;<emphasis role="keyword">false</emphasis>;
+00416 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00417 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}&#32;
+00418 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">else</emphasis>&#32;
+00419 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00420 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(package.<link linkend="_class_unity_editor_1_1_package_manager_1_1_u_i_1_1_package_1ac9a3a0581e85149b7e0a614b9f3de3f6">Current</link>&#32;!=&#32;<emphasis role="keyword">null</emphasis>)
+00421 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00422 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;Installed</emphasis>
+00423 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(package.<link linkend="_class_unity_editor_1_1_package_manager_1_1_u_i_1_1_package_1ac9a3a0581e85149b7e0a614b9f3de3f6">Current</link>.<link linkend="_class_unity_editor_1_1_package_manager_1_1_u_i_1_1_package_info_1a5316302ed3e9bd712fb403b214e522d0">IsVersionLocked</link>)
+00424 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00425 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(package.<link linkend="_class_unity_editor_1_1_package_manager_1_1_u_i_1_1_package_1ac9a3a0581e85149b7e0a614b9f3de3f6">Current</link>.<link linkend="_class_unity_editor_1_1_package_manager_1_1_u_i_1_1_package_info_1abce6a6307848b5ba3c16bb7837648c62">Origin</link>&#32;==&#32;PackageSource.Embedded)
+00426 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;action&#32;=&#32;PackageAction.Embedded;
+00427 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">else</emphasis>&#32;<emphasis role="keywordflow">if</emphasis>&#32;(package.<link linkend="_class_unity_editor_1_1_package_manager_1_1_u_i_1_1_package_1ac9a3a0581e85149b7e0a614b9f3de3f6">Current</link>.<link linkend="_class_unity_editor_1_1_package_manager_1_1_u_i_1_1_package_info_1abce6a6307848b5ba3c16bb7837648c62">Origin</link>&#32;==&#32;PackageSource.Git)
+00428 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;action&#32;=&#32;PackageAction.Git;
+00429 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;
+00430 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;enableButton&#32;=&#32;<emphasis role="keyword">false</emphasis>;
+00431 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;enableVersionButton&#32;=&#32;<emphasis role="keyword">false</emphasis>;
+00432 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00433 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">else</emphasis>
+00434 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00435 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(targetVersion.IsCurrent)
+00436 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00437 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(targetVersion&#32;==&#32;package.<link linkend="_class_unity_editor_1_1_package_manager_1_1_u_i_1_1_package_1a0a16f0854f348cea456abe0983590de3">LatestUpdate</link>)
+00438 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;action&#32;=&#32;PackageAction.UpToDate;
+00439 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">else</emphasis>
+00440 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;action&#32;=&#32;PackageAction.Current;
+00441 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;
+00442 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;enableButton&#32;=&#32;<emphasis role="keyword">false</emphasis>;
+00443 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00444 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">else</emphasis>
+00445 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00446 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;action&#32;=&#32;targetVersion.Version.CompareByPrecedence(package.<link linkend="_class_unity_editor_1_1_package_manager_1_1_u_i_1_1_package_1ac9a3a0581e85149b7e0a614b9f3de3f6">Current</link>.<link linkend="_class_unity_editor_1_1_package_manager_1_1_u_i_1_1_package_info_1ad1fa218396015cbbc2bb750eae1992ae">Version</link>)&#32;&gt;=&#32;0
+00447 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;?&#32;PackageAction.Update&#32;:&#32;PackageAction.Downgrade;
+00448 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00449 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00450 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00451 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">else</emphasis>
+00452 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00453 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;Not&#32;Installed</emphasis>
+00454 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(package.Versions.Any())
+00455 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00456 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(isBuiltIn)
+00457 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;action&#32;=&#32;PackageAction.Enable;
+00458 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">else</emphasis>
+00459 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;action&#32;=&#32;PackageAction.Add;
+00460 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00461 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00462 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00463 
+00464 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(package.RemoveSignal.Operation&#32;!=&#32;<emphasis role="keyword">null</emphasis>)
+00465 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;enableButton&#32;=&#32;<emphasis role="keyword">false</emphasis>;
+00466 
+00467 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(EditorApplication.isCompiling)
+00468 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00469 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;enableButton&#32;=&#32;<emphasis role="keyword">false</emphasis>;
+00470 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;enableVersionButton&#32;=&#32;<emphasis role="keyword">false</emphasis>;
+00471 
+00472 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;EditorApplication.update&#32;-=&#32;CheckCompilationStatus;
+00473 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;EditorApplication.update&#32;+=&#32;CheckCompilationStatus;
+00474 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00475 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;
+00476 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;var&#32;button&#32;=&#32;isBuiltIn&#32;?&#32;UpdateBuiltIn&#32;:&#32;UpdateButton;
+00477 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;button.SetEnabled(enableButton);
+00478 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;VersionPopup.SetEnabled(enableVersionButton);
+00479 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;button.text&#32;=&#32;GetButtonText(action,&#32;inprogress,&#32;version);
+00480 
+00481 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;var&#32;visibleFlag&#32;=&#32;!(package.<link linkend="_class_unity_editor_1_1_package_manager_1_1_u_i_1_1_package_1ac9a3a0581e85149b7e0a614b9f3de3f6">Current</link>&#32;!=&#32;<emphasis role="keyword">null</emphasis>&#32;&amp;&amp;&#32;package.<link linkend="_class_unity_editor_1_1_package_manager_1_1_u_i_1_1_package_1ac9a3a0581e85149b7e0a614b9f3de3f6">Current</link>.<link linkend="_class_unity_editor_1_1_package_manager_1_1_u_i_1_1_package_info_1a5316302ed3e9bd712fb403b214e522d0">IsVersionLocked</link>);
+00482 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;UIUtils.SetElementDisplay(UpdateBuiltIn,&#32;isBuiltIn&#32;&amp;&amp;&#32;visibleFlag);
+00483 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;UIUtils.SetElementDisplay(UpdateCombo,&#32;!isBuiltIn&#32;&amp;&amp;&#32;visibleFlag);
+00484 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;UIUtils.SetElementDisplay(UpdateButton,&#32;!isBuiltIn&#32;&amp;&amp;&#32;visibleFlag);
+00485 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00486 
+00487 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;RefreshRemoveButton()
+00488 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00489 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;var&#32;visibleFlag&#32;=&#32;<emphasis role="keyword">false</emphasis>;
+00490 
+00491 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;var&#32;current&#32;=&#32;package.<link linkend="_class_unity_editor_1_1_package_manager_1_1_u_i_1_1_package_1ac9a3a0581e85149b7e0a614b9f3de3f6">Current</link>;
+00492 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;
+00493 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;Show&#32;only&#32;if&#32;there&#32;is&#32;a&#32;current&#32;package&#32;installed</emphasis>
+00494 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(current&#32;!=&#32;<emphasis role="keyword">null</emphasis>)
+00495 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00496 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;visibleFlag&#32;=&#32;current.<link linkend="_class_unity_editor_1_1_package_manager_1_1_u_i_1_1_package_info_1afbe46ed45242654d28a36570162f0bd4">CanBeRemoved</link>&#32;&amp;&amp;&#32;!package.<link linkend="_class_unity_editor_1_1_package_manager_1_1_u_i_1_1_package_1ab837ed795bd116a8f53fb33928a86c5b">IsPackageManagerUI</link>;
+00497 
+00498 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;var&#32;action&#32;=&#32;current.IsBuiltIn&#32;?&#32;PackageAction.Disable&#32;:&#32;PackageAction.Remove;
+00499 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;var&#32;inprogress&#32;=&#32;package.RemoveSignal.Operation&#32;!=&#32;<emphasis role="keyword">null</emphasis>;
+00500 
+00501 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;var&#32;enableButton&#32;=&#32;visibleFlag&#32;&amp;&amp;&#32;!EditorApplication.isCompiling&#32;&amp;&amp;&#32;!inprogress&#32;&amp;&amp;&#32;!<link linkend="_class_unity_editor_1_1_package_manager_1_1_u_i_1_1_package">Package</link>.<link linkend="_class_unity_editor_1_1_package_manager_1_1_u_i_1_1_package_1a4b61acd81bacd398c6022e75cf33811a">AddRemoveOperationInProgress</link>;
+00502 
+00503 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(EditorApplication.isCompiling)
+00504 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00505 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;EditorApplication.update&#32;-=&#32;CheckCompilationStatus;
+00506 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;EditorApplication.update&#32;+=&#32;CheckCompilationStatus;
+00507 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00508 
+00509 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;RemoveButton.SetEnabled(enableButton);
+00510 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;RemoveButton.text&#32;=&#32;GetButtonText(action,&#32;inprogress);&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;
+00511 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00512 
+00513 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;UIUtils.SetElementDisplay(RemoveButton,&#32;visibleFlag);
+00514 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00515 
+00516 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;CheckCompilationStatus()
+00517 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00518 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(EditorApplication.isCompiling)
+00519 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>;
+00520 
+00521 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;RefreshAddButton();
+00522 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;RefreshRemoveButton();
+00523 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;EditorApplication.update&#32;-=&#32;CheckCompilationStatus;
+00524 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00525 
+00526 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;<emphasis role="keyword">static</emphasis>&#32;<emphasis role="keywordtype">string</emphasis>&#32;GetButtonText(PackageAction&#32;action,&#32;<emphasis role="keywordtype">bool</emphasis>&#32;inProgress&#32;=&#32;<emphasis role="keyword">false</emphasis>,&#32;<link linkend="_class_semver_1_1_sem_version">SemVersion</link>&#32;version&#32;=&#32;<emphasis role="keyword">null</emphasis>)
+00527 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00528 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;version&#32;==&#32;<emphasis role="keyword">null</emphasis>&#32;?
+00529 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordtype">string</emphasis>.Format(<emphasis role="stringliteral">&quot;{0}&quot;</emphasis>,&#32;inProgress&#32;?&#32;PackageActionInProgressVerbs[(<emphasis role="keywordtype">int</emphasis>)&#32;action]&#32;:&#32;PackageActionVerbs[(<emphasis role="keywordtype">int</emphasis>)&#32;action])&#32;:
+00530 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordtype">string</emphasis>.Format(<emphasis role="stringliteral">&quot;{0}&#32;{1}&quot;</emphasis>,&#32;inProgress&#32;?&#32;PackageActionInProgressVerbs[(<emphasis role="keywordtype">int</emphasis>)&#32;action]&#32;:&#32;PackageActionVerbs[(<emphasis role="keywordtype">int</emphasis>)&#32;action],&#32;version);
+00531 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00532 
+00533 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;UpdateClick()
+00534 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00535 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(package.<link linkend="_class_unity_editor_1_1_package_manager_1_1_u_i_1_1_package_1ab837ed795bd116a8f53fb33928a86c5b">IsPackageManagerUI</link>)
+00536 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00537 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;Let&apos;s&#32;not&#32;allow&#32;updating&#32;of&#32;the&#32;UI&#32;if&#32;there&#32;are&#32;build&#32;errrors,&#32;as&#32;for&#32;now,&#32;that&#32;will&#32;prevent&#32;the&#32;UI&#32;from&#32;reloading&#32;properly.</emphasis>
+00538 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(EditorUtility.scriptCompilationFailed)
+00539 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00540 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;EditorUtility.DisplayDialog(<emphasis role="stringliteral">&quot;Unity&#32;Package&#32;Manager&quot;</emphasis>,&#32;<emphasis role="stringliteral">&quot;The&#32;Package&#32;Manager&#32;UI&#32;cannot&#32;be&#32;updated&#32;while&#32;there&#32;are&#32;script&#32;compilation&#32;errors&#32;in&#32;your&#32;project.&#32;&#32;Please&#32;fix&#32;the&#32;errors&#32;and&#32;try&#32;again.&quot;</emphasis>,&#32;<emphasis role="stringliteral">&quot;Ok&quot;</emphasis>);
+00541 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>;
+00542 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00543 
+00544 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(!EditorUtility.DisplayDialog(<emphasis role="stringliteral">&quot;Unity&#32;Package&#32;Manager&quot;</emphasis>,&#32;<emphasis role="stringliteral">&quot;Updating&#32;this&#32;package&#32;will&#32;close&#32;the&#32;Package&#32;Manager&#32;window.&#32;You&#32;will&#32;have&#32;to&#32;re-open&#32;it&#32;after&#32;the&#32;update&#32;is&#32;done.&#32;Do&#32;you&#32;want&#32;to&#32;continue?&quot;</emphasis>,&#32;<emphasis role="stringliteral">&quot;Yes&quot;</emphasis>,&#32;<emphasis role="stringliteral">&quot;No&quot;</emphasis>))
+00545 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>;
+00546 
+00547 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(package.AddSignal.Operation&#32;!=&#32;<emphasis role="keyword">null</emphasis>)
+00548 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00549 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;package.AddSignal.Operation.OnOperationSuccess&#32;-=&#32;OnAddOperationSuccess;
+00550 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;package.AddSignal.Operation.OnOperationError&#32;-=&#32;OnAddOperationError;
+00551 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;package.AddSignal.ResetEvents();
+00552 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;package.AddSignal.Operation&#32;=&#32;<emphasis role="keyword">null</emphasis>;
+00553 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00554 
+00555 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;DetailError.ClearError();
+00556 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;EditorApplication.update&#32;+=&#32;CloseAndUpdate;
+00557 
+00558 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>;
+00559 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00560 
+00561 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;DetailError.ClearError();
+00562 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;package.Add(SelectedPackage);
+00563 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;RefreshAddButton();
+00564 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;RefreshRemoveButton();
+00565 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00566 
+00567 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;CloseAndUpdate()
+00568 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00569 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;EditorApplication.update&#32;-=&#32;CloseAndUpdate;
+00570 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;package.Add(SelectedPackage);
+00571 
+00572 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;var&#32;windows&#32;=&#32;<link linkend="_namespace_unity_engine">UnityEngine</link>.Resources.FindObjectsOfTypeAll&lt;<link linkend="_class_unity_editor_1_1_package_manager_1_1_u_i_1_1_package_manager_window">PackageManagerWindow</link>&gt;();
+00573 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(windows.Length&#32;&gt;&#32;0)
+00574 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00575 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;windows[0].Close();
+00576 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00577 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00578 
+00579 
+00580 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;RemoveClick()
+00581 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00582 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;DetailError.ClearError();
+00583 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;package.<link linkend="_class_unity_editor_1_1_package_manager_1_1_u_i_1_1_package_1aab70b50e6866314537b5c0a0edfd60ec">Remove</link>();
+00584 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;RefreshRemoveButton();
+00585 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;RefreshAddButton();
+00586 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00587 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;
+00588 
+00589 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;ViewDocClick()
+00590 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00591 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;Application.OpenURL(DisplayPackage.<link linkend="_class_unity_editor_1_1_package_manager_1_1_u_i_1_1_package_info_1a5c12ef8e01f0de50ffdb25e36ba7864e">GetDocumentationUrl</link>());
+00592 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}&#32;
+00593 
+00594 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;ViewChangelogClick()
+00595 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00596 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;Application.OpenURL(DisplayPackage.<link linkend="_class_unity_editor_1_1_package_manager_1_1_u_i_1_1_package_info_1ae61a7b5bd59add6b1db9eb696c666533">GetChangelogUrl</link>());
+00597 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00598 
+00599 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;ViewLicensesClick()
+00600 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{&#32;&#32;&#32;&#32;
+00601 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;Application.OpenURL(DisplayPackage.<link linkend="_class_unity_editor_1_1_package_manager_1_1_u_i_1_1_package_info_1a112f0fd0999127b5599d3e1ff6dfa1f2">GetLicensesUrl</link>());&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;
+00602 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00603 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;
+00604 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;Label&#32;DetailDesc&#32;{&#32;<emphasis role="keyword">get</emphasis>&#32;{&#32;<emphasis role="keywordflow">return</emphasis>&#32;root.Q&lt;Label&gt;(<emphasis role="stringliteral">&quot;detailDesc&quot;</emphasis>);&#32;}&#32;}
+00605 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">internal</emphasis>&#32;Button&#32;UpdateButton&#32;{&#32;<emphasis role="keyword">get</emphasis>&#32;{&#32;<emphasis role="keywordflow">return</emphasis>&#32;root.Q&lt;Button&gt;(<emphasis role="stringliteral">&quot;update&quot;</emphasis>);&#32;}&#32;}
+00606 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;Button&#32;RemoveButton&#32;{&#32;<emphasis role="keyword">get</emphasis>&#32;{&#32;<emphasis role="keywordflow">return</emphasis>&#32;root.Q&lt;Button&gt;(<emphasis role="stringliteral">&quot;remove&quot;</emphasis>);&#32;}&#32;}
+00607 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;Button&#32;ViewDocButton&#32;{&#32;<emphasis role="keyword">get</emphasis>&#32;{&#32;<emphasis role="keywordflow">return</emphasis>&#32;root.Q&lt;Button&gt;(<emphasis role="stringliteral">&quot;viewDocumentation&quot;</emphasis>);&#32;}&#32;}
+00608 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;VisualElement&#32;DocumentationContainer&#32;{&#32;<emphasis role="keyword">get</emphasis>&#32;{&#32;<emphasis role="keywordflow">return</emphasis>&#32;root.Q&lt;VisualElement&gt;(<emphasis role="stringliteral">&quot;documentationContainer&quot;</emphasis>);&#32;}&#32;}
+00609 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;Button&#32;ViewChangelogButton&#32;{&#32;<emphasis role="keyword">get</emphasis>&#32;{&#32;<emphasis role="keywordflow">return</emphasis>&#32;root.Q&lt;Button&gt;(<emphasis role="stringliteral">&quot;viewChangelog&quot;</emphasis>);&#32;}&#32;}
+00610 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;VisualElement&#32;ChangelogContainer&#32;{&#32;<emphasis role="keyword">get</emphasis>&#32;{&#32;<emphasis role="keywordflow">return</emphasis>&#32;root.Q&lt;VisualElement&gt;(<emphasis role="stringliteral">&quot;changeLogContainer&quot;</emphasis>);&#32;}&#32;}
+00611 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;VisualElement&#32;ViewLicensesContainer&#32;{&#32;<emphasis role="keyword">get</emphasis>&#32;{&#32;<emphasis role="keywordflow">return</emphasis>&#32;root.Q&lt;VisualElement&gt;(<emphasis role="stringliteral">&quot;viewLicensesContainer&quot;</emphasis>);&#32;}&#32;}
+00612 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;Button&#32;ViewLicenses&#32;{&#32;<emphasis role="keyword">get</emphasis>&#32;{&#32;<emphasis role="keywordflow">return</emphasis>&#32;root.Q&lt;Button&gt;(<emphasis role="stringliteral">&quot;viewLicenses&quot;</emphasis>);&#32;}&#32;}&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;
+00613 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;VisualElement&#32;UpdateContainer&#32;{&#32;<emphasis role="keyword">get</emphasis>&#32;{&#32;<emphasis role="keywordflow">return</emphasis>&#32;root.Q&lt;VisualElement&gt;(<emphasis role="stringliteral">&quot;updateContainer&quot;</emphasis>);&#32;}&#32;}
+00614 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;<link linkend="_class_unity_editor_1_1_package_manager_1_1_u_i_1_1_alert">Alert</link>&#32;DetailError&#32;{&#32;<emphasis role="keyword">get</emphasis>&#32;{&#32;<emphasis role="keywordflow">return</emphasis>&#32;root.Q&lt;<link linkend="_class_unity_editor_1_1_package_manager_1_1_u_i_1_1_alert">Alert</link>&gt;(<emphasis role="stringliteral">&quot;detailError&quot;</emphasis>);&#32;}&#32;}
+00615 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;ScrollView&#32;DetailView&#32;{&#32;<emphasis role="keyword">get</emphasis>&#32;{&#32;<emphasis role="keywordflow">return</emphasis>&#32;root.Q&lt;ScrollView&gt;(<emphasis role="stringliteral">&quot;detailView&quot;</emphasis>);&#32;}&#32;}
+00616 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;Label&#32;DetailModuleReference&#32;{&#32;<emphasis role="keyword">get</emphasis>&#32;{&#32;<emphasis role="keywordflow">return</emphasis>&#32;root.Q&lt;Label&gt;(<emphasis role="stringliteral">&quot;detailModuleReference&quot;</emphasis>);&#32;}&#32;}
+00617 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;Label&#32;DetailVersion&#32;{&#32;<emphasis role="keyword">get</emphasis>&#32;{&#32;<emphasis role="keywordflow">return</emphasis>&#32;root.Q&lt;Label&gt;(<emphasis role="stringliteral">&quot;detailVersion&quot;</emphasis>);&#32;&#32;}}
+00618 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;Label&#32;DetailAuthor&#32;{&#32;<emphasis role="keyword">get</emphasis>&#32;{&#32;<emphasis role="keywordflow">return</emphasis>&#32;root.Q&lt;Label&gt;(<emphasis role="stringliteral">&quot;detailAuthor&quot;</emphasis>);&#32;&#32;}}
+00619 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;Label&#32;VerifyLabel&#32;{&#32;<emphasis role="keyword">get</emphasis>&#32;{&#32;<emphasis role="keywordflow">return</emphasis>&#32;root.Q&lt;Label&gt;(<emphasis role="stringliteral">&quot;tagVerify&quot;</emphasis>);&#32;}&#32;}
+00620 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;VisualElement&#32;CustomContainer&#32;{&#32;<emphasis role="keyword">get</emphasis>&#32;{&#32;<emphasis role="keywordflow">return</emphasis>&#32;root.Q&lt;VisualElement&gt;(<emphasis role="stringliteral">&quot;detailCustomContainer&quot;</emphasis>);&#32;}&#32;}
+00621 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">internal</emphasis>&#32;VisualElement&#32;GetTag(<link linkend="_namespace_unity_editor_1_1_package_manager_1_1_u_i_1afd939208534e3c178925b2f726ab9efe">PackageTag</link>&#32;tag)&#32;{<emphasis role="keywordflow">return</emphasis>&#32;root.Q&lt;VisualElement&gt;(<emphasis role="stringliteral">&quot;tag-&quot;</emphasis>&#32;+&#32;tag);&#32;}
+00622 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;VisualElement&#32;UpdateDropdownContainer&#32;{&#32;<emphasis role="keyword">get</emphasis>&#32;{&#32;<emphasis role="keywordflow">return</emphasis>&#32;root.Q&lt;VisualElement&gt;(<emphasis role="stringliteral">&quot;updateDropdownContainer&quot;</emphasis>);&#32;}&#32;}
+00623 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">internal</emphasis>&#32;VisualElement&#32;UpdateCombo&#32;{&#32;<emphasis role="keyword">get</emphasis>&#32;{&#32;<emphasis role="keywordflow">return</emphasis>&#32;root.Q&lt;VisualElement&gt;(<emphasis role="stringliteral">&quot;updateCombo&quot;</emphasis>);&#32;}&#32;}
+00624 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">internal</emphasis>&#32;Button&#32;UpdateBuiltIn&#32;{&#32;<emphasis role="keyword">get</emphasis>&#32;{&#32;<emphasis role="keywordflow">return</emphasis>&#32;root.Q&lt;Button&gt;(<emphasis role="stringliteral">&quot;updateBuiltIn&quot;</emphasis>);&#32;}&#32;}&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;
+00625 &#32;&#32;&#32;&#32;}
+00626 }
+</programlisting></section>

@@ -1,0 +1,205 @@
+<?xml version='1.0' encoding='UTF-8' standalone='no'?>
+<section xmlns="http://docbook.org/ns/docbook" version="5.0" xmlns:xlink="http://www.w3.org/1999/xlink" xml:id="__teleport_area_8cs_source">
+<title>TeleportArea.cs</title>
+<indexterm><primary>O:/GitHUBMINIPRoject/Assets/SteamVR/InteractionSystem/Teleport/Scripts/TeleportArea.cs</primary></indexterm>
+<programlisting>00001 <emphasis role="comment">//=======&#32;Copyright&#32;(c)&#32;Valve&#32;Corporation,&#32;All&#32;rights&#32;reserved.&#32;===============</emphasis>
+00002 <emphasis role="comment">//</emphasis>
+00003 <emphasis role="comment">//&#32;Purpose:&#32;An&#32;area&#32;that&#32;the&#32;player&#32;can&#32;teleport&#32;to</emphasis>
+00004 <emphasis role="comment">//</emphasis>
+00005 <emphasis role="comment">//=============================================================================</emphasis>
+00006 
+00007 <emphasis role="keyword">using</emphasis>&#32;<link linkend="__balloon_8cs_1a7d67e097df9376eb709b6a23aa3c7d23">UnityEngine</link>;
+00008 <emphasis role="preprocessor">#if&#32;UNITY_EDITOR</emphasis>
+00009 <emphasis role="keyword">using</emphasis>&#32;<link linkend="_namespace_unity_editor">UnityEditor</link>;
+00010 <emphasis role="preprocessor">#endif</emphasis>
+00011 
+00012 <emphasis role="keyword">namespace&#32;</emphasis><link linkend="_namespace_valve_1_1_v_r_1_1_interaction_system">Valve.VR.InteractionSystem</link>
+00013 {
+00014 &#32;&#32;&#32;&#32;<emphasis role="comment">//-------------------------------------------------------------------------</emphasis>
+<anchor xml:id="__teleport_area_8cs_source_1l00015"/><link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_teleport_area">00015</link> &#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keyword">class&#32;</emphasis><link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_teleport_area">TeleportArea</link>&#32;:&#32;<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_teleport_marker_base">TeleportMarkerBase</link>
+00016 &#32;&#32;&#32;&#32;{
+00017 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//Public&#32;properties</emphasis>
+<anchor xml:id="__teleport_area_8cs_source_1l00018"/><link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_teleport_area_1afead28060d4c08c26ddcc243eeac3c2d">00018</link> &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;Bounds&#32;<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_teleport_area_1afead28060d4c08c26ddcc243eeac3c2d">meshBounds</link>&#32;{&#32;<emphasis role="keyword">get</emphasis>;&#32;<emphasis role="keyword">private</emphasis>&#32;<emphasis role="keyword">set</emphasis>;&#32;}
+00019 
+00020 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//Private&#32;data</emphasis>
+00021 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;MeshRenderer&#32;areaMesh;
+00022 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;<emphasis role="keywordtype">int</emphasis>&#32;tintColorId&#32;=&#32;0;
+00023 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;Color&#32;visibleTintColor&#32;=&#32;Color.clear;
+00024 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;Color&#32;highlightedTintColor&#32;=&#32;Color.clear;
+00025 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;Color&#32;lockedTintColor&#32;=&#32;Color.clear;
+00026 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;<emphasis role="keywordtype">bool</emphasis>&#32;highlighted&#32;=&#32;<emphasis role="keyword">false</emphasis>;
+00027 
+00028 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//-------------------------------------------------</emphasis>
+<anchor xml:id="__teleport_area_8cs_source_1l00029"/><link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_teleport_area_1a721494a75b2e6cdabebe375b65bca58e">00029</link> &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_teleport_area_1a721494a75b2e6cdabebe375b65bca58e">Awake</link>()
+00030 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00031 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;areaMesh&#32;=&#32;GetComponent&lt;MeshRenderer&gt;();
+00032 
+00033 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;tintColorId&#32;=&#32;Shader.PropertyToID(&#32;<emphasis role="stringliteral">&quot;_TintColor&quot;</emphasis>&#32;);
+00034 
+00035 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;CalculateBounds();
+00036 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00037 
+00038 
+00039 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//-------------------------------------------------</emphasis>
+<anchor xml:id="__teleport_area_8cs_source_1l00040"/><link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_teleport_area_1abf4db69deb14ee86ecc61a6580b8437f">00040</link> &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_teleport_area_1abf4db69deb14ee86ecc61a6580b8437f">Start</link>()
+00041 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00042 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;visibleTintColor&#32;=&#32;<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_teleport">Teleport</link>.<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_teleport_1a46adf4ce0792e06c79053aa5b000c495">instance</link>.<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_teleport_1a11a66b6491fd7abcc0ad7fc88158ace0">areaVisibleMaterial</link>.GetColor(&#32;tintColorId&#32;);
+00043 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;highlightedTintColor&#32;=&#32;<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_teleport">Teleport</link>.<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_teleport_1a46adf4ce0792e06c79053aa5b000c495">instance</link>.<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_teleport_1a10b1fd1f658778f146e8a47e8f799a6b">areaHighlightedMaterial</link>.GetColor(&#32;tintColorId&#32;);
+00044 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;lockedTintColor&#32;=&#32;<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_teleport">Teleport</link>.<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_teleport_1a46adf4ce0792e06c79053aa5b000c495">instance</link>.<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_teleport_1afe6a97e3596199d6ed620b22e8b25eea">areaLockedMaterial</link>.GetColor(&#32;tintColorId&#32;);
+00045 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00046 
+00047 
+00048 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//-------------------------------------------------</emphasis>
+<anchor xml:id="__teleport_area_8cs_source_1l00049"/><link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_teleport_area_1ad9af038ae8e61a6494ce9dc42f902395">00049</link> &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keyword">override</emphasis>&#32;<emphasis role="keywordtype">bool</emphasis>&#32;<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_teleport_area_1ad9af038ae8e61a6494ce9dc42f902395">ShouldActivate</link>(&#32;Vector3&#32;playerPosition&#32;)
+00050 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00051 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;<emphasis role="keyword">true</emphasis>;
+00052 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00053 
+00054 
+00055 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//-------------------------------------------------</emphasis>
+<anchor xml:id="__teleport_area_8cs_source_1l00056"/><link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_teleport_area_1ad2785af739ebe7063eb636f0c8978a8e">00056</link> &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keyword">override</emphasis>&#32;<emphasis role="keywordtype">bool</emphasis>&#32;<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_teleport_area_1ad2785af739ebe7063eb636f0c8978a8e">ShouldMovePlayer</link>()
+00057 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00058 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;<emphasis role="keyword">true</emphasis>;
+00059 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00060 
+00061 
+00062 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//-------------------------------------------------</emphasis>
+<anchor xml:id="__teleport_area_8cs_source_1l00063"/><link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_teleport_area_1af6ccf32a483c32ef856b1f8a56bface5">00063</link> &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keyword">override</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_teleport_area_1af6ccf32a483c32ef856b1f8a56bface5">Highlight</link>(&#32;<emphasis role="keywordtype">bool</emphasis>&#32;highlight&#32;)
+00064 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00065 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(&#32;!<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_teleport_marker_base_1a0fe663ebf0fb74cfb7d6f5ca28c83493">locked</link>&#32;)
+00066 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00067 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;highlighted&#32;=&#32;highlight;
+00068 
+00069 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(&#32;highlight&#32;)
+00070 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00071 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;areaMesh.material&#32;=&#32;<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_teleport">Teleport</link>.<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_teleport_1a46adf4ce0792e06c79053aa5b000c495">instance</link>.<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_teleport_1a10b1fd1f658778f146e8a47e8f799a6b">areaHighlightedMaterial</link>;
+00072 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00073 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">else</emphasis>
+00074 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00075 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;areaMesh.material&#32;=&#32;<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_teleport">Teleport</link>.<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_teleport_1a46adf4ce0792e06c79053aa5b000c495">instance</link>.<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_teleport_1a11a66b6491fd7abcc0ad7fc88158ace0">areaVisibleMaterial</link>;
+00076 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00077 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00078 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00079 
+00080 
+00081 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//-------------------------------------------------</emphasis>
+<anchor xml:id="__teleport_area_8cs_source_1l00082"/><link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_teleport_area_1ae510f0958167635ad57ebab1a16bdd38">00082</link> &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keyword">override</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_teleport_area_1ae510f0958167635ad57ebab1a16bdd38">SetAlpha</link>(&#32;<emphasis role="keywordtype">float</emphasis>&#32;tintAlpha,&#32;<emphasis role="keywordtype">float</emphasis>&#32;alphaPercent&#32;)
+00083 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00084 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;Color&#32;tintedColor&#32;=&#32;GetTintColor();
+00085 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;tintedColor.a&#32;*=&#32;alphaPercent;
+00086 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;areaMesh.material.SetColor(&#32;tintColorId,&#32;tintedColor&#32;);
+00087 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00088 
+00089 
+00090 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//-------------------------------------------------</emphasis>
+<anchor xml:id="__teleport_area_8cs_source_1l00091"/><link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_teleport_area_1a385c0b75611a1d7b120fc5e45e69730e">00091</link> &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keyword">override</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_teleport_area_1a385c0b75611a1d7b120fc5e45e69730e">UpdateVisuals</link>()
+00092 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00093 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(&#32;<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_teleport_marker_base_1a0fe663ebf0fb74cfb7d6f5ca28c83493">locked</link>&#32;)
+00094 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00095 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;areaMesh.material&#32;=&#32;<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_teleport">Teleport</link>.<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_teleport_1a46adf4ce0792e06c79053aa5b000c495">instance</link>.<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_teleport_1afe6a97e3596199d6ed620b22e8b25eea">areaLockedMaterial</link>;
+00096 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00097 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">else</emphasis>
+00098 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00099 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;areaMesh.material&#32;=&#32;<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_teleport">Teleport</link>.<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_teleport_1a46adf4ce0792e06c79053aa5b000c495">instance</link>.<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_teleport_1a11a66b6491fd7abcc0ad7fc88158ace0">areaVisibleMaterial</link>;
+00100 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00101 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00102 
+00103 
+00104 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//-------------------------------------------------</emphasis>
+<anchor xml:id="__teleport_area_8cs_source_1l00105"/><link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_teleport_area_1adac79e154fb040c95d9d842aa5a1fe23">00105</link> &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_teleport_area_1adac79e154fb040c95d9d842aa5a1fe23">UpdateVisualsInEditor</link>()
+00106 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00107 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_teleport">Teleport</link>.<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_teleport_1a46adf4ce0792e06c79053aa5b000c495">instance</link>&#32;==&#32;<emphasis role="keyword">null</emphasis>)
+00108 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>;
+00109 
+00110 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;areaMesh&#32;=&#32;GetComponent&lt;MeshRenderer&gt;();
+00111 
+00112 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(&#32;<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_teleport_marker_base_1a0fe663ebf0fb74cfb7d6f5ca28c83493">locked</link>&#32;)
+00113 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00114 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;areaMesh.sharedMaterial&#32;=&#32;<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_teleport">Teleport</link>.<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_teleport_1a46adf4ce0792e06c79053aa5b000c495">instance</link>.<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_teleport_1afe6a97e3596199d6ed620b22e8b25eea">areaLockedMaterial</link>;
+00115 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00116 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">else</emphasis>
+00117 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00118 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;areaMesh.sharedMaterial&#32;=&#32;<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_teleport">Teleport</link>.<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_teleport_1a46adf4ce0792e06c79053aa5b000c495">instance</link>.<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_teleport_1a11a66b6491fd7abcc0ad7fc88158ace0">areaVisibleMaterial</link>;
+00119 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00120 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00121 
+00122 
+00123 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//-------------------------------------------------</emphasis>
+00124 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;<emphasis role="keywordtype">bool</emphasis>&#32;CalculateBounds()
+00125 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00126 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;MeshFilter&#32;meshFilter&#32;=&#32;GetComponent&lt;MeshFilter&gt;();
+00127 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(&#32;meshFilter&#32;==&#32;<emphasis role="keyword">null</emphasis>&#32;)
+00128 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00129 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;<emphasis role="keyword">false</emphasis>;
+00130 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00131 
+00132 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;Mesh&#32;mesh&#32;=&#32;meshFilter.sharedMesh;
+00133 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(&#32;mesh&#32;==&#32;<emphasis role="keyword">null</emphasis>&#32;)
+00134 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00135 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;<emphasis role="keyword">false</emphasis>;
+00136 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00137 
+00138 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_teleport_area_1afead28060d4c08c26ddcc243eeac3c2d">meshBounds</link>&#32;=&#32;mesh.bounds;
+00139 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;<emphasis role="keyword">true</emphasis>;
+00140 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00141 
+00142 
+00143 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//-------------------------------------------------</emphasis>
+00144 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;Color&#32;GetTintColor()
+00145 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00146 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(&#32;<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_teleport_marker_base_1a0fe663ebf0fb74cfb7d6f5ca28c83493">locked</link>&#32;)
+00147 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00148 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;lockedTintColor;
+00149 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00150 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">else</emphasis>
+00151 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00152 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(&#32;highlighted&#32;)
+00153 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00154 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;highlightedTintColor;
+00155 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00156 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">else</emphasis>
+00157 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00158 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;visibleTintColor;
+00159 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00160 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00161 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00162 &#32;&#32;&#32;&#32;}
+00163 
+00164 
+00165 <emphasis role="preprocessor">#if&#32;UNITY_EDITOR</emphasis>
+00166 &#32;&#32;&#32;&#32;<emphasis role="comment">//-------------------------------------------------------------------------</emphasis>
+00167 &#32;&#32;&#32;&#32;[CustomEditor(&#32;typeof(&#32;TeleportArea&#32;)&#32;)]
+00168 &#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keyword">class&#32;</emphasis>TeleportAreaEditor&#32;:&#32;Editor
+00169 &#32;&#32;&#32;&#32;{
+00170 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//-------------------------------------------------</emphasis>
+00171 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordtype">void</emphasis>&#32;OnEnable()
+00172 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00173 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(&#32;Selection.activeTransform&#32;!=&#32;<emphasis role="keyword">null</emphasis>&#32;)
+00174 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00175 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;TeleportArea&#32;teleportArea&#32;=&#32;Selection.activeTransform.GetComponent&lt;TeleportArea&gt;();
+00176 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(&#32;teleportArea&#32;!=&#32;<emphasis role="keyword">null</emphasis>&#32;)
+00177 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00178 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;teleportArea.UpdateVisualsInEditor();
+00179 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00180 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00181 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00182 
+00183 
+00184 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//-------------------------------------------------</emphasis>
+00185 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keyword">override</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;OnInspectorGUI()
+00186 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00187 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;DrawDefaultInspector();
+00188 
+00189 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(&#32;Selection.activeTransform&#32;!=&#32;<emphasis role="keyword">null</emphasis>&#32;)
+00190 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00191 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;TeleportArea&#32;teleportArea&#32;=&#32;Selection.activeTransform.GetComponent&lt;TeleportArea&gt;();
+00192 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(&#32;GUI.changed&#32;&amp;&amp;&#32;teleportArea&#32;!=&#32;<emphasis role="keyword">null</emphasis>&#32;)
+00193 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00194 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;teleportArea.UpdateVisualsInEditor();
+00195 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00196 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00197 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00198 &#32;&#32;&#32;&#32;}
+00199 <emphasis role="preprocessor">#endif</emphasis>
+00200 }
+</programlisting></section>

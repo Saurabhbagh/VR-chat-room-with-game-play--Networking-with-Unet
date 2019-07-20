@@ -1,0 +1,486 @@
+<?xml version='1.0' encoding='UTF-8' standalone='no'?>
+<section xmlns="http://docbook.org/ns/docbook" version="5.0" xmlns:xlink="http://www.w3.org/1999/xlink" xml:id="__attachment_hand_8cs_source">
+<title>AttachmentHand.cs</title>
+<indexterm><primary>O:/GitHUBMINIPRoject/Assets/LeapMotion/Core/Scripts/Attachments/AttachmentHand.cs</primary></indexterm>
+<programlisting>00001 <emphasis role="comment">/******************************************************************************</emphasis>
+00002 <emphasis role="comment">&#32;*&#32;Copyright&#32;(C)&#32;Leap&#32;Motion,&#32;Inc.&#32;2011-2018.&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;*</emphasis>
+00003 <emphasis role="comment">&#32;*&#32;Leap&#32;Motion&#32;proprietary&#32;and&#32;confidential.&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;*</emphasis>
+00004 <emphasis role="comment">&#32;*&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;*</emphasis>
+00005 <emphasis role="comment">&#32;*&#32;Use&#32;subject&#32;to&#32;the&#32;terms&#32;of&#32;the&#32;Leap&#32;Motion&#32;SDK&#32;Agreement&#32;available&#32;at&#32;&#32;&#32;&#32;&#32;*</emphasis>
+00006 <emphasis role="comment">&#32;*&#32;https://developer.leapmotion.com/sdk_agreement,&#32;or&#32;another&#32;agreement&#32;&#32;&#32;&#32;&#32;&#32;&#32;*</emphasis>
+00007 <emphasis role="comment">&#32;*&#32;between&#32;Leap&#32;Motion&#32;and&#32;you,&#32;your&#32;company&#32;or&#32;other&#32;organization.&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;*</emphasis>
+00008 <emphasis role="comment">&#32;******************************************************************************/</emphasis>
+00009 
+00010 <emphasis role="keyword">using</emphasis>&#32;<link linkend="_namespace_leap">Leap</link>.<link linkend="_namespace_leap_1_1_unity">Unity</link>.<link linkend="_namespace_leap_1_1_unity_1_1_attributes">Attributes</link>;
+00011 <emphasis role="keyword">using</emphasis>&#32;<link linkend="_namespace_leap">Leap</link>.<link linkend="_namespace_leap_1_1_unity">Unity</link>.<link linkend="_namespace_leap_1_1_unity_1_1_query">Query</link>;
+00012 <emphasis role="keyword">using</emphasis>&#32;System;
+00013 <emphasis role="keyword">using</emphasis>&#32;System.Collections;
+00014 <emphasis role="keyword">using</emphasis>&#32;System.Collections.Generic;
+00015 <emphasis role="preprocessor">#if&#32;UNITY_EDITOR</emphasis>
+00016 <emphasis role="keyword">using</emphasis>&#32;<link linkend="_namespace_unity_editor">UnityEditor</link>;
+00017 <emphasis role="preprocessor">#endif</emphasis>
+00018 <emphasis role="keyword">using</emphasis>&#32;<link linkend="__balloon_8cs_1a7d67e097df9376eb709b6a23aa3c7d23">UnityEngine</link>;
+00019 
+<anchor xml:id="__attachment_hand_8cs_source_1l00020"/><link linkend="_namespace_leap_1_1_unity_1_1_attachments">00020</link> <emphasis role="keyword">namespace&#32;</emphasis><link linkend="_namespace_leap_1_1_unity_1_1_attachments">Leap.Unity.Attachments</link>&#32;{
+00021 
+00027 &#32;&#32;[AddComponentMenu(<emphasis role="stringliteral">&quot;&quot;</emphasis>)]
+00028 &#32;&#32;[ExecuteInEditMode]
+<anchor xml:id="__attachment_hand_8cs_source_1l00029"/><link linkend="_class_leap_1_1_unity_1_1_attachments_1_1_attachment_hand">00029</link> &#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keyword">class&#32;</emphasis><link linkend="_class_leap_1_1_unity_1_1_attachments_1_1_attachment_hand">AttachmentHand</link>&#32;:&#32;MonoBehaviour&#32;{
+00030 
+<anchor xml:id="__attachment_hand_8cs_source_1l00040"/><link linkend="_class_leap_1_1_unity_1_1_attachments_1_1_attachment_hand_1a46767d010896459f352638e42c0bd5d1">00040</link> &#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;Action&#32;<link linkend="_class_leap_1_1_unity_1_1_attachments_1_1_attachment_hand_1a46767d010896459f352638e42c0bd5d1">OnAttachmentPointsModified</link>&#32;=&#32;()&#32;=&gt;&#32;{&#32;};
+00041 
+00042 <emphasis role="preprocessor">&#32;&#32;&#32;&#32;#region&#32;AttachmentPointBehaviours</emphasis>
+00043 
+00044 &#32;&#32;&#32;&#32;[HideInInspector]
+<anchor xml:id="__attachment_hand_8cs_source_1l00045"/><link linkend="_class_leap_1_1_unity_1_1_attachments_1_1_attachment_hand_1a92a8b41e8e6213733acf1b9c727d2b12">00045</link> &#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<link linkend="_class_leap_1_1_unity_1_1_attachments_1_1_attachment_point_behaviour">AttachmentPointBehaviour</link>&#32;<link linkend="_class_leap_1_1_unity_1_1_attachments_1_1_attachment_hand_1a92a8b41e8e6213733acf1b9c727d2b12">wrist</link>;
+00046 &#32;&#32;&#32;&#32;[HideInInspector]
+<anchor xml:id="__attachment_hand_8cs_source_1l00047"/><link linkend="_class_leap_1_1_unity_1_1_attachments_1_1_attachment_hand_1a0466e655bffd2fcde3a92976a13e6346">00047</link> &#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<link linkend="_class_leap_1_1_unity_1_1_attachments_1_1_attachment_point_behaviour">AttachmentPointBehaviour</link>&#32;<link linkend="_class_leap_1_1_unity_1_1_attachments_1_1_attachment_hand_1a0466e655bffd2fcde3a92976a13e6346">palm</link>;
+00048 
+00049 &#32;&#32;&#32;&#32;[HideInInspector]
+<anchor xml:id="__attachment_hand_8cs_source_1l00050"/><link linkend="_class_leap_1_1_unity_1_1_attachments_1_1_attachment_hand_1a8b37e85a9a82e6c8263f1454b8cb7bd2">00050</link> &#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<link linkend="_class_leap_1_1_unity_1_1_attachments_1_1_attachment_point_behaviour">AttachmentPointBehaviour</link>&#32;<link linkend="_class_leap_1_1_unity_1_1_attachments_1_1_attachment_hand_1a8b37e85a9a82e6c8263f1454b8cb7bd2">thumbProximalJoint</link>;
+00051 &#32;&#32;&#32;&#32;[HideInInspector]
+<anchor xml:id="__attachment_hand_8cs_source_1l00052"/><link linkend="_class_leap_1_1_unity_1_1_attachments_1_1_attachment_hand_1a354bb57f69d9929dd074ba07c1a5d5a2">00052</link> &#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<link linkend="_class_leap_1_1_unity_1_1_attachments_1_1_attachment_point_behaviour">AttachmentPointBehaviour</link>&#32;<link linkend="_class_leap_1_1_unity_1_1_attachments_1_1_attachment_hand_1a354bb57f69d9929dd074ba07c1a5d5a2">thumbDistalJoint</link>;
+00053 &#32;&#32;&#32;&#32;[HideInInspector]
+<anchor xml:id="__attachment_hand_8cs_source_1l00054"/><link linkend="_class_leap_1_1_unity_1_1_attachments_1_1_attachment_hand_1af4a0720fe7831d8e91d1237be65e69dc">00054</link> &#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<link linkend="_class_leap_1_1_unity_1_1_attachments_1_1_attachment_point_behaviour">AttachmentPointBehaviour</link>&#32;<link linkend="_class_leap_1_1_unity_1_1_attachments_1_1_attachment_hand_1af4a0720fe7831d8e91d1237be65e69dc">thumbTip</link>;
+00055 
+00056 &#32;&#32;&#32;&#32;[HideInInspector]
+<anchor xml:id="__attachment_hand_8cs_source_1l00057"/><link linkend="_class_leap_1_1_unity_1_1_attachments_1_1_attachment_hand_1acc59de37c5e837478892c8e4dd269384">00057</link> &#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<link linkend="_class_leap_1_1_unity_1_1_attachments_1_1_attachment_point_behaviour">AttachmentPointBehaviour</link>&#32;<link linkend="_class_leap_1_1_unity_1_1_attachments_1_1_attachment_hand_1acc59de37c5e837478892c8e4dd269384">indexKnuckle</link>;
+00058 &#32;&#32;&#32;&#32;[HideInInspector]
+<anchor xml:id="__attachment_hand_8cs_source_1l00059"/><link linkend="_class_leap_1_1_unity_1_1_attachments_1_1_attachment_hand_1a06fd1d26b898024f9e0ff8049d7440fc">00059</link> &#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<link linkend="_class_leap_1_1_unity_1_1_attachments_1_1_attachment_point_behaviour">AttachmentPointBehaviour</link>&#32;<link linkend="_class_leap_1_1_unity_1_1_attachments_1_1_attachment_hand_1a06fd1d26b898024f9e0ff8049d7440fc">indexMiddleJoint</link>;
+00060 &#32;&#32;&#32;&#32;[HideInInspector]
+<anchor xml:id="__attachment_hand_8cs_source_1l00061"/><link linkend="_class_leap_1_1_unity_1_1_attachments_1_1_attachment_hand_1a7db8480c370a8b599d21a13425bd3fec">00061</link> &#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<link linkend="_class_leap_1_1_unity_1_1_attachments_1_1_attachment_point_behaviour">AttachmentPointBehaviour</link>&#32;<link linkend="_class_leap_1_1_unity_1_1_attachments_1_1_attachment_hand_1a7db8480c370a8b599d21a13425bd3fec">indexDistalJoint</link>;
+00062 &#32;&#32;&#32;&#32;[HideInInspector]
+<anchor xml:id="__attachment_hand_8cs_source_1l00063"/><link linkend="_class_leap_1_1_unity_1_1_attachments_1_1_attachment_hand_1a1814dbacc4424119045e984de39b1495">00063</link> &#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<link linkend="_class_leap_1_1_unity_1_1_attachments_1_1_attachment_point_behaviour">AttachmentPointBehaviour</link>&#32;<link linkend="_class_leap_1_1_unity_1_1_attachments_1_1_attachment_hand_1a1814dbacc4424119045e984de39b1495">indexTip</link>;
+00064 
+00065 &#32;&#32;&#32;&#32;[HideInInspector]
+<anchor xml:id="__attachment_hand_8cs_source_1l00066"/><link linkend="_class_leap_1_1_unity_1_1_attachments_1_1_attachment_hand_1a28b3df9f430dfba90f9bab4a9bc236b6">00066</link> &#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<link linkend="_class_leap_1_1_unity_1_1_attachments_1_1_attachment_point_behaviour">AttachmentPointBehaviour</link>&#32;<link linkend="_class_leap_1_1_unity_1_1_attachments_1_1_attachment_hand_1a28b3df9f430dfba90f9bab4a9bc236b6">middleKnuckle</link>;
+00067 &#32;&#32;&#32;&#32;[HideInInspector]
+<anchor xml:id="__attachment_hand_8cs_source_1l00068"/><link linkend="_class_leap_1_1_unity_1_1_attachments_1_1_attachment_hand_1aff181d4c7e49ae9cd27cee350af0e37c">00068</link> &#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<link linkend="_class_leap_1_1_unity_1_1_attachments_1_1_attachment_point_behaviour">AttachmentPointBehaviour</link>&#32;<link linkend="_class_leap_1_1_unity_1_1_attachments_1_1_attachment_hand_1aff181d4c7e49ae9cd27cee350af0e37c">middleMiddleJoint</link>;
+00069 &#32;&#32;&#32;&#32;[HideInInspector]
+<anchor xml:id="__attachment_hand_8cs_source_1l00070"/><link linkend="_class_leap_1_1_unity_1_1_attachments_1_1_attachment_hand_1a320c99d54c83b67fee27ce037f92d471">00070</link> &#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<link linkend="_class_leap_1_1_unity_1_1_attachments_1_1_attachment_point_behaviour">AttachmentPointBehaviour</link>&#32;<link linkend="_class_leap_1_1_unity_1_1_attachments_1_1_attachment_hand_1a320c99d54c83b67fee27ce037f92d471">middleDistalJoint</link>;
+00071 &#32;&#32;&#32;&#32;[HideInInspector]
+<anchor xml:id="__attachment_hand_8cs_source_1l00072"/><link linkend="_class_leap_1_1_unity_1_1_attachments_1_1_attachment_hand_1adc9b5268e85291e49da1e1b5ffe0fbc4">00072</link> &#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<link linkend="_class_leap_1_1_unity_1_1_attachments_1_1_attachment_point_behaviour">AttachmentPointBehaviour</link>&#32;<link linkend="_class_leap_1_1_unity_1_1_attachments_1_1_attachment_hand_1adc9b5268e85291e49da1e1b5ffe0fbc4">middleTip</link>;
+00073 
+00074 &#32;&#32;&#32;&#32;[HideInInspector]
+<anchor xml:id="__attachment_hand_8cs_source_1l00075"/><link linkend="_class_leap_1_1_unity_1_1_attachments_1_1_attachment_hand_1aa0d764bc020a449f6fd4da335f61868b">00075</link> &#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<link linkend="_class_leap_1_1_unity_1_1_attachments_1_1_attachment_point_behaviour">AttachmentPointBehaviour</link>&#32;<link linkend="_class_leap_1_1_unity_1_1_attachments_1_1_attachment_hand_1aa0d764bc020a449f6fd4da335f61868b">ringKnuckle</link>;
+00076 &#32;&#32;&#32;&#32;[HideInInspector]
+<anchor xml:id="__attachment_hand_8cs_source_1l00077"/><link linkend="_class_leap_1_1_unity_1_1_attachments_1_1_attachment_hand_1a3c263a4e2585c05953909f9fa25ba91a">00077</link> &#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<link linkend="_class_leap_1_1_unity_1_1_attachments_1_1_attachment_point_behaviour">AttachmentPointBehaviour</link>&#32;<link linkend="_class_leap_1_1_unity_1_1_attachments_1_1_attachment_hand_1a3c263a4e2585c05953909f9fa25ba91a">ringMiddleJoint</link>;
+00078 &#32;&#32;&#32;&#32;[HideInInspector]
+<anchor xml:id="__attachment_hand_8cs_source_1l00079"/><link linkend="_class_leap_1_1_unity_1_1_attachments_1_1_attachment_hand_1ae2bfb151ae787764d9b2377db3083d0e">00079</link> &#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<link linkend="_class_leap_1_1_unity_1_1_attachments_1_1_attachment_point_behaviour">AttachmentPointBehaviour</link>&#32;<link linkend="_class_leap_1_1_unity_1_1_attachments_1_1_attachment_hand_1ae2bfb151ae787764d9b2377db3083d0e">ringDistalJoint</link>;
+00080 &#32;&#32;&#32;&#32;[HideInInspector]
+<anchor xml:id="__attachment_hand_8cs_source_1l00081"/><link linkend="_class_leap_1_1_unity_1_1_attachments_1_1_attachment_hand_1a79dc5d3d55873e263d2c19889b5750bd">00081</link> &#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<link linkend="_class_leap_1_1_unity_1_1_attachments_1_1_attachment_point_behaviour">AttachmentPointBehaviour</link>&#32;<link linkend="_class_leap_1_1_unity_1_1_attachments_1_1_attachment_hand_1a79dc5d3d55873e263d2c19889b5750bd">ringTip</link>;
+00082 
+00083 &#32;&#32;&#32;&#32;[HideInInspector]
+<anchor xml:id="__attachment_hand_8cs_source_1l00084"/><link linkend="_class_leap_1_1_unity_1_1_attachments_1_1_attachment_hand_1acf25a6a9bd80b4e8a7a2c95ed63850b1">00084</link> &#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<link linkend="_class_leap_1_1_unity_1_1_attachments_1_1_attachment_point_behaviour">AttachmentPointBehaviour</link>&#32;<link linkend="_class_leap_1_1_unity_1_1_attachments_1_1_attachment_hand_1acf25a6a9bd80b4e8a7a2c95ed63850b1">pinkyKnuckle</link>;
+00085 &#32;&#32;&#32;&#32;[HideInInspector]
+<anchor xml:id="__attachment_hand_8cs_source_1l00086"/><link linkend="_class_leap_1_1_unity_1_1_attachments_1_1_attachment_hand_1a015ead6242a09a475823d4a1ed444430">00086</link> &#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<link linkend="_class_leap_1_1_unity_1_1_attachments_1_1_attachment_point_behaviour">AttachmentPointBehaviour</link>&#32;<link linkend="_class_leap_1_1_unity_1_1_attachments_1_1_attachment_hand_1a015ead6242a09a475823d4a1ed444430">pinkyMiddleJoint</link>;
+00087 &#32;&#32;&#32;&#32;[HideInInspector]
+<anchor xml:id="__attachment_hand_8cs_source_1l00088"/><link linkend="_class_leap_1_1_unity_1_1_attachments_1_1_attachment_hand_1a9eb5679d56cfe7b976c9a014c2b60edf">00088</link> &#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<link linkend="_class_leap_1_1_unity_1_1_attachments_1_1_attachment_point_behaviour">AttachmentPointBehaviour</link>&#32;<link linkend="_class_leap_1_1_unity_1_1_attachments_1_1_attachment_hand_1a9eb5679d56cfe7b976c9a014c2b60edf">pinkyDistalJoint</link>;
+00089 &#32;&#32;&#32;&#32;[HideInInspector]
+<anchor xml:id="__attachment_hand_8cs_source_1l00090"/><link linkend="_class_leap_1_1_unity_1_1_attachments_1_1_attachment_hand_1ac49dbd62aae0132f263e792376a76954">00090</link> &#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<link linkend="_class_leap_1_1_unity_1_1_attachments_1_1_attachment_point_behaviour">AttachmentPointBehaviour</link>&#32;<link linkend="_class_leap_1_1_unity_1_1_attachments_1_1_attachment_hand_1ac49dbd62aae0132f263e792376a76954">pinkyTip</link>;
+00091 
+00092 <emphasis role="preprocessor">&#32;&#32;&#32;&#32;#endregion</emphasis>
+00093 
+<anchor xml:id="__attachment_hand_8cs_source_1l00097"/><link linkend="_class_leap_1_1_unity_1_1_attachments_1_1_attachment_hand_1aeb29b522823d247cf907a2488f1fbebf">00097</link> &#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<link linkend="_struct_leap_1_1_unity_1_1_attachments_1_1_attachment_hand_1_1_attachment_points_enumerator">AttachmentPointsEnumerator</link>&#32;<link linkend="_class_leap_1_1_unity_1_1_attachments_1_1_attachment_hand_1aeb29b522823d247cf907a2488f1fbebf">points</link>&#32;{&#32;<emphasis role="keyword">get</emphasis>&#32;{&#32;<emphasis role="keywordflow">return</emphasis>&#32;<emphasis role="keyword">new</emphasis>&#32;<link linkend="_struct_leap_1_1_unity_1_1_attachments_1_1_attachment_hand_1_1_attachment_points_enumerator">AttachmentPointsEnumerator</link>(<emphasis role="keyword">this</emphasis>);&#32;}&#32;}
+00098 
+00099 &#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;<emphasis role="keywordtype">bool</emphasis>&#32;_attachmentPointsDirty&#32;=&#32;<emphasis role="keyword">false</emphasis>;
+00100 
+00105 &#32;&#32;&#32;&#32;[SerializeField,&#32;Disable]
+00106 &#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;<link linkend="_namespace_leap_1_1_unity_1a4d15adcf20ba121b2cd9c07f503b606f">Chirality</link>&#32;_chirality;
+00107 
+<anchor xml:id="__attachment_hand_8cs_source_1l00112"/><link linkend="_class_leap_1_1_unity_1_1_attachments_1_1_attachment_hand_1af525bdb21f50e37061ce6b69a351654f">00112</link> &#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<link linkend="_namespace_leap_1_1_unity_1a4d15adcf20ba121b2cd9c07f503b606f">Chirality</link>&#32;<link linkend="_class_leap_1_1_unity_1_1_attachments_1_1_attachment_hand_1af525bdb21f50e37061ce6b69a351654f">chirality</link>&#32;{&#32;<emphasis role="keyword">get</emphasis>&#32;{&#32;<emphasis role="keywordflow">return</emphasis>&#32;_chirality;&#32;}&#32;<emphasis role="keyword">set</emphasis>&#32;{&#32;_chirality&#32;=&#32;value;&#32;}&#32;}
+00113 
+00118 &#32;&#32;&#32;&#32;[SerializeField,&#32;Disable]
+00119 &#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;<emphasis role="keywordtype">bool</emphasis>&#32;_isTracked;
+00120 
+<anchor xml:id="__attachment_hand_8cs_source_1l00125"/><link linkend="_class_leap_1_1_unity_1_1_attachments_1_1_attachment_hand_1a30d8d19f9b563e6207b3d317ab29d6e7">00125</link> &#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keywordtype">bool</emphasis>&#32;<link linkend="_class_leap_1_1_unity_1_1_attachments_1_1_attachment_hand_1a30d8d19f9b563e6207b3d317ab29d6e7">isTracked</link>&#32;{&#32;<emphasis role="keyword">get</emphasis>&#32;{&#32;<emphasis role="keywordflow">return</emphasis>&#32;_isTracked;&#32;}&#32;<emphasis role="keyword">set</emphasis>&#32;{&#32;_isTracked&#32;=&#32;value;&#32;}&#32;}
+00126 
+00127 &#32;&#32;&#32;&#32;<emphasis role="keywordtype">void</emphasis>&#32;OnValidate()&#32;{
+00128 &#32;&#32;&#32;&#32;&#32;&#32;initializeAttachmentPointFlagConstants();
+00129 &#32;&#32;&#32;&#32;}
+00130 
+00131 &#32;&#32;&#32;&#32;<emphasis role="keywordtype">void</emphasis>&#32;Awake()&#32;{
+00132 &#32;&#32;&#32;&#32;&#32;&#32;initializeAttachmentPointFlagConstants();
+00133 &#32;&#32;&#32;&#32;}
+00134 &#32;&#32;&#32;&#32;
+00135 <emphasis role="preprocessor">&#32;&#32;&#32;&#32;#if&#32;!UNITY_EDITOR</emphasis>
+00136 <emphasis role="preprocessor">&#32;&#32;&#32;&#32;#pragma&#32;warning&#32;disable&#32;0414</emphasis>
+00137 <emphasis role="preprocessor">&#32;&#32;&#32;&#32;#endif</emphasis>
+00138 &#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;<emphasis role="keywordtype">bool</emphasis>&#32;_isBeingDestroyed&#32;=&#32;<emphasis role="keyword">false</emphasis>;
+00139 <emphasis role="preprocessor">&#32;&#32;&#32;&#32;#if&#32;!UNITY_EDITOR</emphasis>
+00140 <emphasis role="preprocessor">&#32;&#32;&#32;&#32;#pragma&#32;warning&#32;restore&#32;0414</emphasis>
+00141 <emphasis role="preprocessor">&#32;&#32;&#32;&#32;#endif</emphasis>
+00142 &#32;&#32;&#32;&#32;<emphasis role="keywordtype">void</emphasis>&#32;OnDestroy()&#32;{
+00143 &#32;&#32;&#32;&#32;&#32;&#32;_isBeingDestroyed&#32;=&#32;<emphasis role="keyword">true</emphasis>;
+00144 &#32;&#32;&#32;&#32;}
+00145 
+<anchor xml:id="__attachment_hand_8cs_source_1l00150"/><link linkend="_class_leap_1_1_unity_1_1_attachments_1_1_attachment_hand_1a1a0809e8733aa114684f28e6e31f37c5">00150</link> &#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<link linkend="_class_leap_1_1_unity_1_1_attachments_1_1_attachment_point_behaviour">AttachmentPointBehaviour</link>&#32;<link linkend="_class_leap_1_1_unity_1_1_attachments_1_1_attachment_hand_1a1a0809e8733aa114684f28e6e31f37c5">GetBehaviourForPoint</link>(<link linkend="_namespace_leap_1_1_unity_1_1_attachments_1a4b32b38f722ad110fcd5a817256e09ab">AttachmentPointFlags</link>&#32;singlePoint)&#32;{
+00151 &#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_leap_1_1_unity_1_1_attachments_1_1_attachment_point_behaviour">AttachmentPointBehaviour</link>&#32;behaviour&#32;=&#32;<emphasis role="keyword">null</emphasis>;
+00152 
+00153 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">switch</emphasis>&#32;(singlePoint)&#32;{
+00154 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">case</emphasis>&#32;<link linkend="_namespace_leap_1_1_unity_1_1_attachments_1a4b32b38f722ad110fcd5a817256e09ab">AttachmentPointFlags</link>.None:&#32;<emphasis role="keywordflow">break</emphasis>;
+00155 
+00156 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">case</emphasis>&#32;<link linkend="_namespace_leap_1_1_unity_1_1_attachments_1a4b32b38f722ad110fcd5a817256e09ab">AttachmentPointFlags</link>.Wrist:&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;behaviour&#32;=&#32;<link linkend="_class_leap_1_1_unity_1_1_attachments_1_1_attachment_hand_1a92a8b41e8e6213733acf1b9c727d2b12">wrist</link>;&#32;<emphasis role="keywordflow">break</emphasis>;
+00157 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">case</emphasis>&#32;<link linkend="_namespace_leap_1_1_unity_1_1_attachments_1a4b32b38f722ad110fcd5a817256e09ab">AttachmentPointFlags</link>.Palm:&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;behaviour&#32;=&#32;<link linkend="_class_leap_1_1_unity_1_1_attachments_1_1_attachment_hand_1a0466e655bffd2fcde3a92976a13e6346">palm</link>;&#32;<emphasis role="keywordflow">break</emphasis>;
+00158 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;
+00159 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">case</emphasis>&#32;<link linkend="_namespace_leap_1_1_unity_1_1_attachments_1a4b32b38f722ad110fcd5a817256e09ab">AttachmentPointFlags</link>.ThumbProximalJoint:&#32;&#32;&#32;behaviour&#32;=&#32;<link linkend="_class_leap_1_1_unity_1_1_attachments_1_1_attachment_hand_1a8b37e85a9a82e6c8263f1454b8cb7bd2">thumbProximalJoint</link>;&#32;<emphasis role="keywordflow">break</emphasis>;
+00160 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">case</emphasis>&#32;<link linkend="_namespace_leap_1_1_unity_1_1_attachments_1a4b32b38f722ad110fcd5a817256e09ab">AttachmentPointFlags</link>.ThumbDistalJoint:&#32;&#32;&#32;&#32;&#32;behaviour&#32;=&#32;<link linkend="_class_leap_1_1_unity_1_1_attachments_1_1_attachment_hand_1a354bb57f69d9929dd074ba07c1a5d5a2">thumbDistalJoint</link>;&#32;<emphasis role="keywordflow">break</emphasis>;
+00161 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">case</emphasis>&#32;<link linkend="_namespace_leap_1_1_unity_1_1_attachments_1a4b32b38f722ad110fcd5a817256e09ab">AttachmentPointFlags</link>.ThumbTip:&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;behaviour&#32;=&#32;<link linkend="_class_leap_1_1_unity_1_1_attachments_1_1_attachment_hand_1af4a0720fe7831d8e91d1237be65e69dc">thumbTip</link>;&#32;<emphasis role="keywordflow">break</emphasis>;
+00162 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;
+00163 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">case</emphasis>&#32;<link linkend="_namespace_leap_1_1_unity_1_1_attachments_1a4b32b38f722ad110fcd5a817256e09ab">AttachmentPointFlags</link>.IndexKnuckle:&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;behaviour&#32;=&#32;<link linkend="_class_leap_1_1_unity_1_1_attachments_1_1_attachment_hand_1acc59de37c5e837478892c8e4dd269384">indexKnuckle</link>;&#32;<emphasis role="keywordflow">break</emphasis>;
+00164 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">case</emphasis>&#32;<link linkend="_namespace_leap_1_1_unity_1_1_attachments_1a4b32b38f722ad110fcd5a817256e09ab">AttachmentPointFlags</link>.IndexMiddleJoint:&#32;&#32;&#32;&#32;&#32;behaviour&#32;=&#32;<link linkend="_class_leap_1_1_unity_1_1_attachments_1_1_attachment_hand_1a06fd1d26b898024f9e0ff8049d7440fc">indexMiddleJoint</link>;&#32;<emphasis role="keywordflow">break</emphasis>;
+00165 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">case</emphasis>&#32;<link linkend="_namespace_leap_1_1_unity_1_1_attachments_1a4b32b38f722ad110fcd5a817256e09ab">AttachmentPointFlags</link>.IndexDistalJoint:&#32;&#32;&#32;&#32;&#32;behaviour&#32;=&#32;<link linkend="_class_leap_1_1_unity_1_1_attachments_1_1_attachment_hand_1a7db8480c370a8b599d21a13425bd3fec">indexDistalJoint</link>;&#32;<emphasis role="keywordflow">break</emphasis>;
+00166 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">case</emphasis>&#32;<link linkend="_namespace_leap_1_1_unity_1_1_attachments_1a4b32b38f722ad110fcd5a817256e09ab">AttachmentPointFlags</link>.IndexTip:&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;behaviour&#32;=&#32;<link linkend="_class_leap_1_1_unity_1_1_attachments_1_1_attachment_hand_1a1814dbacc4424119045e984de39b1495">indexTip</link>;&#32;<emphasis role="keywordflow">break</emphasis>;
+00167 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;
+00168 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">case</emphasis>&#32;<link linkend="_namespace_leap_1_1_unity_1_1_attachments_1a4b32b38f722ad110fcd5a817256e09ab">AttachmentPointFlags</link>.MiddleKnuckle:&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;behaviour&#32;=&#32;<link linkend="_class_leap_1_1_unity_1_1_attachments_1_1_attachment_hand_1a28b3df9f430dfba90f9bab4a9bc236b6">middleKnuckle</link>;&#32;<emphasis role="keywordflow">break</emphasis>;
+00169 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">case</emphasis>&#32;<link linkend="_namespace_leap_1_1_unity_1_1_attachments_1a4b32b38f722ad110fcd5a817256e09ab">AttachmentPointFlags</link>.MiddleMiddleJoint:&#32;&#32;&#32;&#32;behaviour&#32;=&#32;<link linkend="_class_leap_1_1_unity_1_1_attachments_1_1_attachment_hand_1aff181d4c7e49ae9cd27cee350af0e37c">middleMiddleJoint</link>;&#32;<emphasis role="keywordflow">break</emphasis>;
+00170 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">case</emphasis>&#32;<link linkend="_namespace_leap_1_1_unity_1_1_attachments_1a4b32b38f722ad110fcd5a817256e09ab">AttachmentPointFlags</link>.MiddleDistalJoint:&#32;&#32;&#32;&#32;behaviour&#32;=&#32;<link linkend="_class_leap_1_1_unity_1_1_attachments_1_1_attachment_hand_1a320c99d54c83b67fee27ce037f92d471">middleDistalJoint</link>;&#32;<emphasis role="keywordflow">break</emphasis>;
+00171 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">case</emphasis>&#32;<link linkend="_namespace_leap_1_1_unity_1_1_attachments_1a4b32b38f722ad110fcd5a817256e09ab">AttachmentPointFlags</link>.MiddleTip:&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;behaviour&#32;=&#32;<link linkend="_class_leap_1_1_unity_1_1_attachments_1_1_attachment_hand_1adc9b5268e85291e49da1e1b5ffe0fbc4">middleTip</link>;&#32;<emphasis role="keywordflow">break</emphasis>;
+00172 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;
+00173 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">case</emphasis>&#32;<link linkend="_namespace_leap_1_1_unity_1_1_attachments_1a4b32b38f722ad110fcd5a817256e09ab">AttachmentPointFlags</link>.RingKnuckle:&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;behaviour&#32;=&#32;<link linkend="_class_leap_1_1_unity_1_1_attachments_1_1_attachment_hand_1aa0d764bc020a449f6fd4da335f61868b">ringKnuckle</link>;&#32;<emphasis role="keywordflow">break</emphasis>;
+00174 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">case</emphasis>&#32;<link linkend="_namespace_leap_1_1_unity_1_1_attachments_1a4b32b38f722ad110fcd5a817256e09ab">AttachmentPointFlags</link>.RingMiddleJoint:&#32;&#32;&#32;&#32;&#32;&#32;behaviour&#32;=&#32;<link linkend="_class_leap_1_1_unity_1_1_attachments_1_1_attachment_hand_1a3c263a4e2585c05953909f9fa25ba91a">ringMiddleJoint</link>;&#32;<emphasis role="keywordflow">break</emphasis>;
+00175 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">case</emphasis>&#32;<link linkend="_namespace_leap_1_1_unity_1_1_attachments_1a4b32b38f722ad110fcd5a817256e09ab">AttachmentPointFlags</link>.RingDistalJoint:&#32;&#32;&#32;&#32;&#32;&#32;behaviour&#32;=&#32;<link linkend="_class_leap_1_1_unity_1_1_attachments_1_1_attachment_hand_1ae2bfb151ae787764d9b2377db3083d0e">ringDistalJoint</link>;&#32;<emphasis role="keywordflow">break</emphasis>;
+00176 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">case</emphasis>&#32;<link linkend="_namespace_leap_1_1_unity_1_1_attachments_1a4b32b38f722ad110fcd5a817256e09ab">AttachmentPointFlags</link>.RingTip:&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;behaviour&#32;=&#32;<link linkend="_class_leap_1_1_unity_1_1_attachments_1_1_attachment_hand_1a79dc5d3d55873e263d2c19889b5750bd">ringTip</link>;&#32;<emphasis role="keywordflow">break</emphasis>;
+00177 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;
+00178 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">case</emphasis>&#32;<link linkend="_namespace_leap_1_1_unity_1_1_attachments_1a4b32b38f722ad110fcd5a817256e09ab">AttachmentPointFlags</link>.PinkyKnuckle:&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;behaviour&#32;=&#32;<link linkend="_class_leap_1_1_unity_1_1_attachments_1_1_attachment_hand_1acf25a6a9bd80b4e8a7a2c95ed63850b1">pinkyKnuckle</link>;&#32;<emphasis role="keywordflow">break</emphasis>;
+00179 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">case</emphasis>&#32;<link linkend="_namespace_leap_1_1_unity_1_1_attachments_1a4b32b38f722ad110fcd5a817256e09ab">AttachmentPointFlags</link>.PinkyMiddleJoint:&#32;&#32;&#32;&#32;&#32;behaviour&#32;=&#32;<link linkend="_class_leap_1_1_unity_1_1_attachments_1_1_attachment_hand_1a015ead6242a09a475823d4a1ed444430">pinkyMiddleJoint</link>;&#32;<emphasis role="keywordflow">break</emphasis>;
+00180 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">case</emphasis>&#32;<link linkend="_namespace_leap_1_1_unity_1_1_attachments_1a4b32b38f722ad110fcd5a817256e09ab">AttachmentPointFlags</link>.PinkyDistalJoint:&#32;&#32;&#32;&#32;&#32;behaviour&#32;=&#32;<link linkend="_class_leap_1_1_unity_1_1_attachments_1_1_attachment_hand_1a9eb5679d56cfe7b976c9a014c2b60edf">pinkyDistalJoint</link>;&#32;<emphasis role="keywordflow">break</emphasis>;
+00181 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">case</emphasis>&#32;<link linkend="_namespace_leap_1_1_unity_1_1_attachments_1a4b32b38f722ad110fcd5a817256e09ab">AttachmentPointFlags</link>.PinkyTip:&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;behaviour&#32;=&#32;<link linkend="_class_leap_1_1_unity_1_1_attachments_1_1_attachment_hand_1ac49dbd62aae0132f263e792376a76954">pinkyTip</link>;&#32;<emphasis role="keywordflow">break</emphasis>;
+00182 &#32;&#32;&#32;&#32;&#32;&#32;}
+00183 
+00184 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;behaviour;
+00185 &#32;&#32;&#32;&#32;}
+00186 
+<anchor xml:id="__attachment_hand_8cs_source_1l00187"/><link linkend="_class_leap_1_1_unity_1_1_attachments_1_1_attachment_hand_1ad3c1c16a0e65333e017b6799f0adf234">00187</link> &#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;<link linkend="_class_leap_1_1_unity_1_1_attachments_1_1_attachment_hand_1ad3c1c16a0e65333e017b6799f0adf234">refreshAttachmentTransforms</link>(<link linkend="_namespace_leap_1_1_unity_1_1_attachments_1a4b32b38f722ad110fcd5a817256e09ab">AttachmentPointFlags</link>&#32;<link linkend="_class_leap_1_1_unity_1_1_attachments_1_1_attachment_hand_1aeb29b522823d247cf907a2488f1fbebf">points</link>)&#32;{
+00188 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(_attachmentPointFlagConstants&#32;==&#32;<emphasis role="keyword">null</emphasis>&#32;||&#32;_attachmentPointFlagConstants.Length&#32;==&#32;0)&#32;{
+00189 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;initializeAttachmentPointFlagConstants();
+00190 &#32;&#32;&#32;&#32;&#32;&#32;}
+00191 
+00192 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;First&#32;just&#32;_check_&#32;whether&#32;we&apos;ll&#32;need&#32;to&#32;do&#32;any&#32;destruction&#32;or&#32;creation</emphasis>
+00193 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordtype">bool</emphasis>&#32;requiresDestructionOrCreation&#32;=&#32;<emphasis role="keyword">false</emphasis>;
+00194 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">foreach</emphasis>&#32;(var&#32;flag&#32;<emphasis role="keywordflow">in</emphasis>&#32;_attachmentPointFlagConstants)&#32;{
+00195 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(flag&#32;==&#32;<link linkend="_namespace_leap_1_1_unity_1_1_attachments_1a4b32b38f722ad110fcd5a817256e09ab">AttachmentPointFlags</link>.None)&#32;<emphasis role="keywordflow">continue</emphasis>;
+00196 
+00197 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;((!<link linkend="_class_leap_1_1_unity_1_1_attachments_1_1_attachment_hand_1aeb29b522823d247cf907a2488f1fbebf">points</link>.Contains(flag)&#32;&amp;&amp;&#32;<link linkend="_class_leap_1_1_unity_1_1_attachments_1_1_attachment_hand_1a1a0809e8733aa114684f28e6e31f37c5">GetBehaviourForPoint</link>(flag)&#32;!=&#32;<emphasis role="keyword">null</emphasis>)
+00198 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;||&#32;(<link linkend="_class_leap_1_1_unity_1_1_attachments_1_1_attachment_hand_1aeb29b522823d247cf907a2488f1fbebf">points</link>.Contains(flag)&#32;&amp;&amp;&#32;<link linkend="_class_leap_1_1_unity_1_1_attachments_1_1_attachment_hand_1a1a0809e8733aa114684f28e6e31f37c5">GetBehaviourForPoint</link>(flag)&#32;==&#32;<emphasis role="keyword">null</emphasis>))&#32;{
+00199 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;requiresDestructionOrCreation&#32;=&#32;<emphasis role="keyword">true</emphasis>;
+00200 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00201 &#32;&#32;&#32;&#32;&#32;&#32;}
+00202 
+00203 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;Go&#32;through&#32;the&#32;work&#32;of&#32;flattening&#32;and&#32;rebuilding&#32;if&#32;it&#32;is&#32;necessary.</emphasis>
+00204 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(requiresDestructionOrCreation)&#32;{
+00205 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;Remove&#32;parent-child&#32;relationships&#32;so&#32;deleting&#32;parent&#32;Transforms&#32;doesn&apos;t&#32;annihilate</emphasis>
+00206 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;child&#32;Transforms&#32;that&#32;don&apos;t&#32;need&#32;to&#32;be&#32;deleted&#32;themselves.</emphasis>
+00207 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;flattenAttachmentTransformHierarchy();
+00208 
+00209 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">foreach</emphasis>&#32;(<link linkend="_namespace_leap_1_1_unity_1_1_attachments_1a4b32b38f722ad110fcd5a817256e09ab">AttachmentPointFlags</link>&#32;flag&#32;<emphasis role="keywordflow">in</emphasis>&#32;_attachmentPointFlagConstants)&#32;{
+00210 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(flag&#32;==&#32;<link linkend="_namespace_leap_1_1_unity_1_1_attachments_1a4b32b38f722ad110fcd5a817256e09ab">AttachmentPointFlags</link>.None)&#32;<emphasis role="keywordflow">continue</emphasis>;
+00211 
+00212 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(<link linkend="_class_leap_1_1_unity_1_1_attachments_1_1_attachment_hand_1aeb29b522823d247cf907a2488f1fbebf">points</link>.Contains(flag))&#32;{
+00213 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;ensureTransformExists(flag);
+00214 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00215 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">else</emphasis>&#32;{
+00216 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;ensureTransformDoesNotExist(flag);
+00217 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00218 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00219 
+00220 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;Organize&#32;transforms,&#32;restoring&#32;parent-child&#32;relationships.</emphasis>
+00221 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;organizeAttachmentTransforms();
+00222 &#32;&#32;&#32;&#32;&#32;&#32;}
+00223 
+00224 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(_attachmentPointsDirty)&#32;{
+00225 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_leap_1_1_unity_1_1_attachments_1_1_attachment_hand_1a46767d010896459f352638e42c0bd5d1">OnAttachmentPointsModified</link>();
+00226 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;_attachmentPointsDirty&#32;=&#32;<emphasis role="keyword">false</emphasis>;
+00227 &#32;&#32;&#32;&#32;&#32;&#32;}
+00228 &#32;&#32;&#32;&#32;}
+00229 
+<anchor xml:id="__attachment_hand_8cs_source_1l00230"/><link linkend="_class_leap_1_1_unity_1_1_attachments_1_1_attachment_hand_1adedcd7d579e0f342314d32a4af28092b">00230</link> &#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;<link linkend="_class_leap_1_1_unity_1_1_attachments_1_1_attachment_hand_1adedcd7d579e0f342314d32a4af28092b">notifyPointBehaviourDeleted</link>(<link linkend="_class_leap_1_1_unity_1_1_attachments_1_1_attachment_point_behaviour">AttachmentPointBehaviour</link>&#32;point)&#32;{
+00231 <emphasis role="preprocessor">&#32;&#32;&#32;&#32;&#32;&#32;#if&#32;UNITY_EDITOR</emphasis>
+00232 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;Only&#32;valid&#32;if&#32;the&#32;AttachmentHand&#32;itself&#32;is&#32;also&#32;not&#32;being&#32;destroyed.</emphasis>
+00233 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(_isBeingDestroyed)&#32;<emphasis role="keywordflow">return</emphasis>;
+00234 
+00235 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;Refresh&#32;this&#32;hand&apos;s&#32;attachment&#32;transforms&#32;on&#32;a&#32;slight&#32;delay.</emphasis>
+00236 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;Only&#32;AttachmentHands&#32;can&#32;_truly_&#32;remove&#32;attachment&#32;points!</emphasis>
+00237 &#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_leap_1_1_unity_1_1_attachments_1_1_attachment_hands">AttachmentHands</link>&#32;attachHands&#32;=&#32;GetComponentInParent&lt;AttachmentHands&gt;();
+00238 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(attachHands&#32;!=&#32;<emphasis role="keyword">null</emphasis>)&#32;{
+00239 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;EditorApplication.delayCall&#32;+=&#32;()&#32;=&gt;&#32;{&#32;<link linkend="_class_leap_1_1_unity_1_1_attachments_1_1_attachment_hand_1ad3c1c16a0e65333e017b6799f0adf234">refreshAttachmentTransforms</link>(attachHands.<link linkend="_class_leap_1_1_unity_1_1_attachments_1_1_attachment_hands_1aa5e61a917e83531792e87dee55f5ffd5">attachmentPoints</link>);&#32;};
+00240 &#32;&#32;&#32;&#32;&#32;&#32;}
+00241 <emphasis role="preprocessor">&#32;&#32;&#32;&#32;&#32;&#32;#endif</emphasis>
+00242 &#32;&#32;&#32;&#32;}
+00243 
+00244 <emphasis role="preprocessor">&#32;&#32;&#32;&#32;#region&#32;Internal</emphasis>
+00245 
+00246 &#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;<link linkend="_namespace_leap_1_1_unity_1_1_attachments_1a4b32b38f722ad110fcd5a817256e09ab">AttachmentPointFlags</link>[]&#32;_attachmentPointFlagConstants;
+00247 &#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;initializeAttachmentPointFlagConstants()&#32;{
+00248 &#32;&#32;&#32;&#32;&#32;&#32;Array&#32;flagConstants&#32;=&#32;Enum.GetValues(typeof(<link linkend="_namespace_leap_1_1_unity_1_1_attachments_1a4b32b38f722ad110fcd5a817256e09ab">AttachmentPointFlags</link>));
+00249 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(_attachmentPointFlagConstants&#32;==&#32;<emphasis role="keyword">null</emphasis>&#32;||&#32;_attachmentPointFlagConstants.Length&#32;==&#32;0)&#32;{
+00250 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;_attachmentPointFlagConstants&#32;=&#32;<emphasis role="keyword">new</emphasis>&#32;<link linkend="_namespace_leap_1_1_unity_1_1_attachments_1a4b32b38f722ad110fcd5a817256e09ab">AttachmentPointFlags</link>[flagConstants.Length];
+00251 &#32;&#32;&#32;&#32;&#32;&#32;}
+00252 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordtype">int</emphasis>&#32;i&#32;=&#32;0;
+00253 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">foreach</emphasis>&#32;(<emphasis role="keywordtype">int</emphasis>&#32;f&#32;<emphasis role="keywordflow">in</emphasis>&#32;flagConstants)&#32;{
+00254 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;_attachmentPointFlagConstants[i++]&#32;=&#32;(<link linkend="_namespace_leap_1_1_unity_1_1_attachments_1a4b32b38f722ad110fcd5a817256e09ab">AttachmentPointFlags</link>)f;
+00255 &#32;&#32;&#32;&#32;&#32;&#32;}
+00256 &#32;&#32;&#32;&#32;}
+00257 
+00258 &#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;setBehaviourForPoint(<link linkend="_namespace_leap_1_1_unity_1_1_attachments_1a4b32b38f722ad110fcd5a817256e09ab">AttachmentPointFlags</link>&#32;singlePoint,&#32;AttachmentPointBehaviour&#32;behaviour)&#32;{
+00259 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">switch</emphasis>&#32;(singlePoint)&#32;{
+00260 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">case</emphasis>&#32;<link linkend="_namespace_leap_1_1_unity_1_1_attachments_1a4b32b38f722ad110fcd5a817256e09ab">AttachmentPointFlags</link>.None:&#32;<emphasis role="keywordflow">break</emphasis>;
+00261 
+00262 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">case</emphasis>&#32;<link linkend="_namespace_leap_1_1_unity_1_1_attachments_1a4b32b38f722ad110fcd5a817256e09ab">AttachmentPointFlags</link>.Wrist:&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_leap_1_1_unity_1_1_attachments_1_1_attachment_hand_1a92a8b41e8e6213733acf1b9c727d2b12">wrist</link>&#32;=&#32;behaviour;&#32;<emphasis role="keywordflow">break</emphasis>;
+00263 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">case</emphasis>&#32;<link linkend="_namespace_leap_1_1_unity_1_1_attachments_1a4b32b38f722ad110fcd5a817256e09ab">AttachmentPointFlags</link>.Palm:&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_leap_1_1_unity_1_1_attachments_1_1_attachment_hand_1a0466e655bffd2fcde3a92976a13e6346">palm</link>&#32;=&#32;behaviour;&#32;<emphasis role="keywordflow">break</emphasis>;
+00264 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;
+00265 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">case</emphasis>&#32;<link linkend="_namespace_leap_1_1_unity_1_1_attachments_1a4b32b38f722ad110fcd5a817256e09ab">AttachmentPointFlags</link>.ThumbProximalJoint:&#32;&#32;&#32;<link linkend="_class_leap_1_1_unity_1_1_attachments_1_1_attachment_hand_1a8b37e85a9a82e6c8263f1454b8cb7bd2">thumbProximalJoint</link>&#32;=&#32;behaviour;&#32;<emphasis role="keywordflow">break</emphasis>;
+00266 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">case</emphasis>&#32;<link linkend="_namespace_leap_1_1_unity_1_1_attachments_1a4b32b38f722ad110fcd5a817256e09ab">AttachmentPointFlags</link>.ThumbDistalJoint:&#32;&#32;&#32;&#32;&#32;<link linkend="_class_leap_1_1_unity_1_1_attachments_1_1_attachment_hand_1a354bb57f69d9929dd074ba07c1a5d5a2">thumbDistalJoint</link>&#32;=&#32;behaviour;&#32;<emphasis role="keywordflow">break</emphasis>;
+00267 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">case</emphasis>&#32;<link linkend="_namespace_leap_1_1_unity_1_1_attachments_1a4b32b38f722ad110fcd5a817256e09ab">AttachmentPointFlags</link>.ThumbTip:&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_leap_1_1_unity_1_1_attachments_1_1_attachment_hand_1af4a0720fe7831d8e91d1237be65e69dc">thumbTip</link>&#32;=&#32;behaviour;&#32;<emphasis role="keywordflow">break</emphasis>;
+00268 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;
+00269 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">case</emphasis>&#32;<link linkend="_namespace_leap_1_1_unity_1_1_attachments_1a4b32b38f722ad110fcd5a817256e09ab">AttachmentPointFlags</link>.IndexKnuckle:&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_leap_1_1_unity_1_1_attachments_1_1_attachment_hand_1acc59de37c5e837478892c8e4dd269384">indexKnuckle</link>&#32;=&#32;behaviour;&#32;<emphasis role="keywordflow">break</emphasis>;
+00270 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">case</emphasis>&#32;<link linkend="_namespace_leap_1_1_unity_1_1_attachments_1a4b32b38f722ad110fcd5a817256e09ab">AttachmentPointFlags</link>.IndexMiddleJoint:&#32;&#32;&#32;&#32;&#32;<link linkend="_class_leap_1_1_unity_1_1_attachments_1_1_attachment_hand_1a06fd1d26b898024f9e0ff8049d7440fc">indexMiddleJoint</link>&#32;=&#32;behaviour;&#32;<emphasis role="keywordflow">break</emphasis>;
+00271 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">case</emphasis>&#32;<link linkend="_namespace_leap_1_1_unity_1_1_attachments_1a4b32b38f722ad110fcd5a817256e09ab">AttachmentPointFlags</link>.IndexDistalJoint:&#32;&#32;&#32;&#32;&#32;<link linkend="_class_leap_1_1_unity_1_1_attachments_1_1_attachment_hand_1a7db8480c370a8b599d21a13425bd3fec">indexDistalJoint</link>&#32;=&#32;behaviour;&#32;<emphasis role="keywordflow">break</emphasis>;
+00272 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">case</emphasis>&#32;<link linkend="_namespace_leap_1_1_unity_1_1_attachments_1a4b32b38f722ad110fcd5a817256e09ab">AttachmentPointFlags</link>.IndexTip:&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_leap_1_1_unity_1_1_attachments_1_1_attachment_hand_1a1814dbacc4424119045e984de39b1495">indexTip</link>&#32;=&#32;behaviour;&#32;<emphasis role="keywordflow">break</emphasis>;
+00273 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;
+00274 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">case</emphasis>&#32;<link linkend="_namespace_leap_1_1_unity_1_1_attachments_1a4b32b38f722ad110fcd5a817256e09ab">AttachmentPointFlags</link>.MiddleKnuckle:&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_leap_1_1_unity_1_1_attachments_1_1_attachment_hand_1a28b3df9f430dfba90f9bab4a9bc236b6">middleKnuckle</link>&#32;=&#32;behaviour;&#32;<emphasis role="keywordflow">break</emphasis>;
+00275 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">case</emphasis>&#32;<link linkend="_namespace_leap_1_1_unity_1_1_attachments_1a4b32b38f722ad110fcd5a817256e09ab">AttachmentPointFlags</link>.MiddleMiddleJoint:&#32;&#32;&#32;&#32;<link linkend="_class_leap_1_1_unity_1_1_attachments_1_1_attachment_hand_1aff181d4c7e49ae9cd27cee350af0e37c">middleMiddleJoint</link>&#32;=&#32;behaviour;&#32;<emphasis role="keywordflow">break</emphasis>;
+00276 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">case</emphasis>&#32;<link linkend="_namespace_leap_1_1_unity_1_1_attachments_1a4b32b38f722ad110fcd5a817256e09ab">AttachmentPointFlags</link>.MiddleDistalJoint:&#32;&#32;&#32;&#32;<link linkend="_class_leap_1_1_unity_1_1_attachments_1_1_attachment_hand_1a320c99d54c83b67fee27ce037f92d471">middleDistalJoint</link>&#32;=&#32;behaviour;&#32;<emphasis role="keywordflow">break</emphasis>;
+00277 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">case</emphasis>&#32;<link linkend="_namespace_leap_1_1_unity_1_1_attachments_1a4b32b38f722ad110fcd5a817256e09ab">AttachmentPointFlags</link>.MiddleTip:&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_leap_1_1_unity_1_1_attachments_1_1_attachment_hand_1adc9b5268e85291e49da1e1b5ffe0fbc4">middleTip</link>&#32;=&#32;behaviour;&#32;<emphasis role="keywordflow">break</emphasis>;
+00278 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;
+00279 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">case</emphasis>&#32;<link linkend="_namespace_leap_1_1_unity_1_1_attachments_1a4b32b38f722ad110fcd5a817256e09ab">AttachmentPointFlags</link>.RingKnuckle:&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_leap_1_1_unity_1_1_attachments_1_1_attachment_hand_1aa0d764bc020a449f6fd4da335f61868b">ringKnuckle</link>&#32;=&#32;behaviour;&#32;<emphasis role="keywordflow">break</emphasis>;
+00280 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">case</emphasis>&#32;<link linkend="_namespace_leap_1_1_unity_1_1_attachments_1a4b32b38f722ad110fcd5a817256e09ab">AttachmentPointFlags</link>.RingMiddleJoint:&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_leap_1_1_unity_1_1_attachments_1_1_attachment_hand_1a3c263a4e2585c05953909f9fa25ba91a">ringMiddleJoint</link>&#32;=&#32;behaviour;&#32;<emphasis role="keywordflow">break</emphasis>;
+00281 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">case</emphasis>&#32;<link linkend="_namespace_leap_1_1_unity_1_1_attachments_1a4b32b38f722ad110fcd5a817256e09ab">AttachmentPointFlags</link>.RingDistalJoint:&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_leap_1_1_unity_1_1_attachments_1_1_attachment_hand_1ae2bfb151ae787764d9b2377db3083d0e">ringDistalJoint</link>&#32;=&#32;behaviour;&#32;<emphasis role="keywordflow">break</emphasis>;
+00282 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">case</emphasis>&#32;<link linkend="_namespace_leap_1_1_unity_1_1_attachments_1a4b32b38f722ad110fcd5a817256e09ab">AttachmentPointFlags</link>.RingTip:&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_leap_1_1_unity_1_1_attachments_1_1_attachment_hand_1a79dc5d3d55873e263d2c19889b5750bd">ringTip</link>&#32;=&#32;behaviour;&#32;<emphasis role="keywordflow">break</emphasis>;
+00283 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;
+00284 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">case</emphasis>&#32;<link linkend="_namespace_leap_1_1_unity_1_1_attachments_1a4b32b38f722ad110fcd5a817256e09ab">AttachmentPointFlags</link>.PinkyKnuckle:&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_leap_1_1_unity_1_1_attachments_1_1_attachment_hand_1acf25a6a9bd80b4e8a7a2c95ed63850b1">pinkyKnuckle</link>&#32;=&#32;behaviour;&#32;<emphasis role="keywordflow">break</emphasis>;
+00285 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">case</emphasis>&#32;<link linkend="_namespace_leap_1_1_unity_1_1_attachments_1a4b32b38f722ad110fcd5a817256e09ab">AttachmentPointFlags</link>.PinkyMiddleJoint:&#32;&#32;&#32;&#32;&#32;<link linkend="_class_leap_1_1_unity_1_1_attachments_1_1_attachment_hand_1a015ead6242a09a475823d4a1ed444430">pinkyMiddleJoint</link>&#32;=&#32;behaviour;&#32;<emphasis role="keywordflow">break</emphasis>;
+00286 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">case</emphasis>&#32;<link linkend="_namespace_leap_1_1_unity_1_1_attachments_1a4b32b38f722ad110fcd5a817256e09ab">AttachmentPointFlags</link>.PinkyDistalJoint:&#32;&#32;&#32;&#32;&#32;<link linkend="_class_leap_1_1_unity_1_1_attachments_1_1_attachment_hand_1a9eb5679d56cfe7b976c9a014c2b60edf">pinkyDistalJoint</link>&#32;=&#32;behaviour;&#32;<emphasis role="keywordflow">break</emphasis>;
+00287 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">case</emphasis>&#32;<link linkend="_namespace_leap_1_1_unity_1_1_attachments_1a4b32b38f722ad110fcd5a817256e09ab">AttachmentPointFlags</link>.PinkyTip:&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_leap_1_1_unity_1_1_attachments_1_1_attachment_hand_1ac49dbd62aae0132f263e792376a76954">pinkyTip</link>&#32;=&#32;behaviour;&#32;<emphasis role="keywordflow">break</emphasis>;
+00288 &#32;&#32;&#32;&#32;&#32;&#32;}
+00289 
+00290 <emphasis role="preprocessor">&#32;&#32;&#32;&#32;&#32;&#32;#if&#32;UNITY_EDITOR</emphasis>
+00291 &#32;&#32;&#32;&#32;&#32;&#32;EditorUtility.SetDirty(<emphasis role="keyword">this</emphasis>);
+00292 <emphasis role="preprocessor">&#32;&#32;&#32;&#32;&#32;&#32;#endif</emphasis>
+00293 &#32;&#32;&#32;&#32;}
+00294 
+00295 &#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;ensureTransformExists(<link linkend="_namespace_leap_1_1_unity_1_1_attachments_1a4b32b38f722ad110fcd5a817256e09ab">AttachmentPointFlags</link>&#32;singlePoint)&#32;{
+00296 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(!singlePoint.IsSinglePoint())&#32;{
+00297 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;Debug.LogError(<emphasis role="stringliteral">&quot;Tried&#32;to&#32;ensure&#32;transform&#32;exists&#32;for&#32;singlePoint,&#32;but&#32;it&#32;contains&#32;more&#32;than&#32;one&#32;set&#32;flag.&quot;</emphasis>);
+00298 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>;
+00299 &#32;&#32;&#32;&#32;&#32;&#32;}
+00300 
+00301 &#32;&#32;&#32;&#32;&#32;&#32;AttachmentPointBehaviour&#32;pointBehaviour&#32;=&#32;<link linkend="_class_leap_1_1_unity_1_1_attachments_1_1_attachment_hand_1a1a0809e8733aa114684f28e6e31f37c5">GetBehaviourForPoint</link>(singlePoint);
+00302 
+00303 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(pointBehaviour&#32;==&#32;<emphasis role="keyword">null</emphasis>)&#32;{
+00304 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;First,&#32;see&#32;if&#32;there&apos;s&#32;already&#32;one&#32;in&#32;the&#32;hierarchy!&#32;Might&#32;exist&#32;due&#32;to,&#32;e.g.&#32;an&#32;Undo&#32;operation</emphasis>
+00305 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;var&#32;existingPointBehaviour&#32;=&#32;this.gameObject.GetComponentsInChildren&lt;AttachmentPointBehaviour&gt;()
+00306 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;.<link linkend="_struct_leap_1_1_unity_1_1_query_1_1_query">Query</link>()
+00307 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;.FirstOrDefault(p&#32;=&gt;&#32;p.attachmentPoint&#32;==&#32;singlePoint);
+00308 
+00309 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;Only&#32;make&#32;a&#32;new&#32;object&#32;if&#32;the&#32;transform&#32;really&#32;doesn&apos;t&#32;exist.</emphasis>
+00310 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(existingPointBehaviour&#32;==&#32;<link linkend="_namespace_leap_1_1_unity_1_1_attachments_1a4b32b38f722ad110fcd5a817256e09ab">AttachmentPointFlags</link>.None)&#32;{
+00311 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;GameObject&#32;obj&#32;=&#32;<emphasis role="keyword">new</emphasis>&#32;GameObject(Enum.GetName(typeof(<link linkend="_namespace_leap_1_1_unity_1_1_attachments_1a4b32b38f722ad110fcd5a817256e09ab">AttachmentPointFlags</link>),&#32;singlePoint));
+00312 <emphasis role="preprocessor">&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;#if&#32;UNITY_EDITOR</emphasis>
+00313 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;Undo.RegisterCreatedObjectUndo(obj,&#32;<emphasis role="stringliteral">&quot;Created&#32;Object&quot;</emphasis>);
+00314 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;pointBehaviour&#32;=&#32;Undo.AddComponent&lt;AttachmentPointBehaviour&gt;(obj);
+00315 <emphasis role="preprocessor">&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;#else</emphasis>
+00316 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;pointBehaviour&#32;=&#32;obj.AddComponent&lt;AttachmentPointBehaviour&gt;();
+00317 <emphasis role="preprocessor">&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;#endif</emphasis>
+00318 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00319 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">else</emphasis>&#32;{
+00320 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;pointBehaviour&#32;=&#32;existingPointBehaviour;
+00321 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00322 
+00323 <emphasis role="preprocessor">&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;#if&#32;UNITY_EDITOR</emphasis>
+00324 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;Undo.RecordObject(pointBehaviour,&#32;<emphasis role="stringliteral">&quot;Set&#32;Attachment&#32;Point&quot;</emphasis>);
+00325 <emphasis role="preprocessor">&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;#endif</emphasis>
+00326 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;pointBehaviour.attachmentPoint&#32;=&#32;singlePoint;
+00327 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;pointBehaviour.attachmentHand&#32;=&#32;<emphasis role="keyword">this</emphasis>;
+00328 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;setBehaviourForPoint(singlePoint,&#32;pointBehaviour);
+00329 
+00330 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;SetTransformParent(pointBehaviour.transform,&#32;<emphasis role="keyword">this</emphasis>.transform);
+00331 
+00332 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;_attachmentPointsDirty&#32;=&#32;<emphasis role="keyword">true</emphasis>;
+00333 
+00334 <emphasis role="preprocessor">&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;#if&#32;UNITY_EDITOR</emphasis>
+00335 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;EditorUtility.SetDirty(<emphasis role="keyword">this</emphasis>);
+00336 <emphasis role="preprocessor">&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;#endif</emphasis>
+00337 &#32;&#32;&#32;&#32;&#32;&#32;}
+00338 &#32;&#32;&#32;&#32;}
+00339 
+00340 &#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;<emphasis role="keyword">static</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;SetTransformParent(Transform&#32;t,&#32;Transform&#32;parent)&#32;{
+00341 <emphasis role="preprocessor">&#32;&#32;&#32;&#32;&#32;&#32;#if&#32;UNITY_EDITOR</emphasis>
+00342 &#32;&#32;&#32;&#32;&#32;&#32;Undo.SetTransformParent(t,&#32;parent,&#32;<emphasis role="stringliteral">&quot;Set&#32;Transform&#32;Parent&quot;</emphasis>);
+00343 <emphasis role="preprocessor">&#32;&#32;&#32;&#32;&#32;&#32;#else</emphasis>
+00344 &#32;&#32;&#32;&#32;&#32;&#32;t.parent&#32;=&#32;parent;
+00345 <emphasis role="preprocessor">&#32;&#32;&#32;&#32;&#32;&#32;#endif</emphasis>
+00346 &#32;&#32;&#32;&#32;}
+00347 
+00348 &#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;ensureTransformDoesNotExist(<link linkend="_namespace_leap_1_1_unity_1_1_attachments_1a4b32b38f722ad110fcd5a817256e09ab">AttachmentPointFlags</link>&#32;singlePoint)&#32;{
+00349 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(!singlePoint.IsSinglePoint())&#32;{
+00350 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;Debug.LogError(<emphasis role="stringliteral">&quot;Tried&#32;to&#32;ensure&#32;transform&#32;exists&#32;for&#32;singlePoint,&#32;but&#32;it&#32;contains&#32;more&#32;than&#32;one&#32;set&#32;flag&quot;</emphasis>);
+00351 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>;
+00352 &#32;&#32;&#32;&#32;&#32;&#32;}
+00353 
+00354 &#32;&#32;&#32;&#32;&#32;&#32;var&#32;pointBehaviour&#32;=&#32;<link linkend="_class_leap_1_1_unity_1_1_attachments_1_1_attachment_hand_1a1a0809e8733aa114684f28e6e31f37c5">GetBehaviourForPoint</link>(singlePoint);
+00355 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(pointBehaviour&#32;!=&#32;<emphasis role="keyword">null</emphasis>)&#32;{
+00356 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;InternalUtility.Destroy(pointBehaviour.gameObject);
+00357 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;setBehaviourForPoint(singlePoint,&#32;<emphasis role="keyword">null</emphasis>);
+00358 
+00359 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;pointBehaviour&#32;=&#32;<emphasis role="keyword">null</emphasis>;
+00360 
+00361 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;_attachmentPointsDirty&#32;=&#32;<emphasis role="keyword">true</emphasis>;
+00362 
+00363 <emphasis role="preprocessor">&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;#if&#32;UNITY_EDITOR</emphasis>
+00364 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;EditorUtility.SetDirty(<emphasis role="keyword">this</emphasis>);
+00365 <emphasis role="preprocessor">&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;#endif</emphasis>
+00366 &#32;&#32;&#32;&#32;&#32;&#32;}
+00367 &#32;&#32;&#32;&#32;}
+00368 
+00369 &#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;flattenAttachmentTransformHierarchy()&#32;{
+00370 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">foreach</emphasis>&#32;(var&#32;point&#32;<emphasis role="keywordflow">in</emphasis>&#32;this.<link linkend="_class_leap_1_1_unity_1_1_attachments_1_1_attachment_hand_1aeb29b522823d247cf907a2488f1fbebf">points</link>)&#32;{
+00371 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;SetTransformParent(point.transform,&#32;<emphasis role="keyword">this</emphasis>.transform);
+00372 &#32;&#32;&#32;&#32;&#32;&#32;}
+00373 &#32;&#32;&#32;&#32;}
+00374 
+00375 &#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;organizeAttachmentTransforms()&#32;{
+00376 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordtype">int</emphasis>&#32;siblingIdx&#32;=&#32;0;
+00377 
+00378 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;Wrist</emphasis>
+00379 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(<link linkend="_class_leap_1_1_unity_1_1_attachments_1_1_attachment_hand_1a92a8b41e8e6213733acf1b9c727d2b12">wrist</link>&#32;!=&#32;<emphasis role="keyword">null</emphasis>)&#32;{
+00380 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_leap_1_1_unity_1_1_attachments_1_1_attachment_hand_1a92a8b41e8e6213733acf1b9c727d2b12">wrist</link>.transform.SetSiblingIndex(siblingIdx++);
+00381 &#32;&#32;&#32;&#32;&#32;&#32;}
+00382 
+00383 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;Palm</emphasis>
+00384 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(<link linkend="_class_leap_1_1_unity_1_1_attachments_1_1_attachment_hand_1a0466e655bffd2fcde3a92976a13e6346">palm</link>&#32;!=&#32;<emphasis role="keyword">null</emphasis>)&#32;{
+00385 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_leap_1_1_unity_1_1_attachments_1_1_attachment_hand_1a0466e655bffd2fcde3a92976a13e6346">palm</link>.transform.SetSiblingIndex(siblingIdx++);
+00386 &#32;&#32;&#32;&#32;&#32;&#32;}
+00387 
+00388 &#32;&#32;&#32;&#32;&#32;&#32;Transform&#32;topLevelTransform;
+00389 
+00390 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;Thumb</emphasis>
+00391 &#32;&#32;&#32;&#32;&#32;&#32;topLevelTransform&#32;=&#32;tryStackTransformHierarchy(<link linkend="_class_leap_1_1_unity_1_1_attachments_1_1_attachment_hand_1a8b37e85a9a82e6c8263f1454b8cb7bd2">thumbProximalJoint</link>,
+00392 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_leap_1_1_unity_1_1_attachments_1_1_attachment_hand_1a354bb57f69d9929dd074ba07c1a5d5a2">thumbDistalJoint</link>,
+00393 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_leap_1_1_unity_1_1_attachments_1_1_attachment_hand_1af4a0720fe7831d8e91d1237be65e69dc">thumbTip</link>);
+00394 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(topLevelTransform&#32;!=&#32;<emphasis role="keyword">null</emphasis>)&#32;{
+00395 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;topLevelTransform.SetSiblingIndex(siblingIdx++);
+00396 &#32;&#32;&#32;&#32;&#32;&#32;}
+00397 
+00398 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;Index</emphasis>
+00399 &#32;&#32;&#32;&#32;&#32;&#32;topLevelTransform&#32;=&#32;tryStackTransformHierarchy(<link linkend="_class_leap_1_1_unity_1_1_attachments_1_1_attachment_hand_1acc59de37c5e837478892c8e4dd269384">indexKnuckle</link>,
+00400 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_leap_1_1_unity_1_1_attachments_1_1_attachment_hand_1a06fd1d26b898024f9e0ff8049d7440fc">indexMiddleJoint</link>,
+00401 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_leap_1_1_unity_1_1_attachments_1_1_attachment_hand_1a7db8480c370a8b599d21a13425bd3fec">indexDistalJoint</link>,
+00402 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_leap_1_1_unity_1_1_attachments_1_1_attachment_hand_1a1814dbacc4424119045e984de39b1495">indexTip</link>);
+00403 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(topLevelTransform&#32;!=&#32;<emphasis role="keyword">null</emphasis>)&#32;{
+00404 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;topLevelTransform.SetSiblingIndex(siblingIdx++);
+00405 &#32;&#32;&#32;&#32;&#32;&#32;}
+00406 
+00407 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;Middle</emphasis>
+00408 &#32;&#32;&#32;&#32;&#32;&#32;topLevelTransform&#32;=&#32;tryStackTransformHierarchy(<link linkend="_class_leap_1_1_unity_1_1_attachments_1_1_attachment_hand_1a28b3df9f430dfba90f9bab4a9bc236b6">middleKnuckle</link>,
+00409 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_leap_1_1_unity_1_1_attachments_1_1_attachment_hand_1aff181d4c7e49ae9cd27cee350af0e37c">middleMiddleJoint</link>,
+00410 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_leap_1_1_unity_1_1_attachments_1_1_attachment_hand_1a320c99d54c83b67fee27ce037f92d471">middleDistalJoint</link>,
+00411 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_leap_1_1_unity_1_1_attachments_1_1_attachment_hand_1adc9b5268e85291e49da1e1b5ffe0fbc4">middleTip</link>);
+00412 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(topLevelTransform&#32;!=&#32;<emphasis role="keyword">null</emphasis>)&#32;{
+00413 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;topLevelTransform.SetSiblingIndex(siblingIdx++);
+00414 &#32;&#32;&#32;&#32;&#32;&#32;}
+00415 
+00416 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;Ring</emphasis>
+00417 &#32;&#32;&#32;&#32;&#32;&#32;topLevelTransform&#32;=&#32;tryStackTransformHierarchy(<link linkend="_class_leap_1_1_unity_1_1_attachments_1_1_attachment_hand_1aa0d764bc020a449f6fd4da335f61868b">ringKnuckle</link>,
+00418 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_leap_1_1_unity_1_1_attachments_1_1_attachment_hand_1a3c263a4e2585c05953909f9fa25ba91a">ringMiddleJoint</link>,
+00419 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_leap_1_1_unity_1_1_attachments_1_1_attachment_hand_1ae2bfb151ae787764d9b2377db3083d0e">ringDistalJoint</link>,
+00420 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_leap_1_1_unity_1_1_attachments_1_1_attachment_hand_1a79dc5d3d55873e263d2c19889b5750bd">ringTip</link>);
+00421 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(topLevelTransform&#32;!=&#32;<emphasis role="keyword">null</emphasis>)&#32;{
+00422 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;topLevelTransform.SetSiblingIndex(siblingIdx++);
+00423 &#32;&#32;&#32;&#32;&#32;&#32;}
+00424 
+00425 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;Pinky</emphasis>
+00426 &#32;&#32;&#32;&#32;&#32;&#32;topLevelTransform&#32;=&#32;tryStackTransformHierarchy(<link linkend="_class_leap_1_1_unity_1_1_attachments_1_1_attachment_hand_1acf25a6a9bd80b4e8a7a2c95ed63850b1">pinkyKnuckle</link>,
+00427 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_leap_1_1_unity_1_1_attachments_1_1_attachment_hand_1a015ead6242a09a475823d4a1ed444430">pinkyMiddleJoint</link>,
+00428 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_leap_1_1_unity_1_1_attachments_1_1_attachment_hand_1a9eb5679d56cfe7b976c9a014c2b60edf">pinkyDistalJoint</link>,
+00429 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_leap_1_1_unity_1_1_attachments_1_1_attachment_hand_1ac49dbd62aae0132f263e792376a76954">pinkyTip</link>);
+00430 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(topLevelTransform&#32;!=&#32;<emphasis role="keyword">null</emphasis>)&#32;{
+00431 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;topLevelTransform.SetSiblingIndex(siblingIdx++);
+00432 &#32;&#32;&#32;&#32;&#32;&#32;}
+00433 &#32;&#32;&#32;&#32;}
+00434 
+00435 &#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;<emphasis role="keyword">static</emphasis>&#32;Transform[]&#32;s_hierarchyTransformsBuffer&#32;=&#32;<emphasis role="keyword">new</emphasis>&#32;Transform[4];
+00441 &#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;Transform&#32;tryStackTransformHierarchy(params&#32;Transform[]&#32;transforms)&#32;{
+00442 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">for</emphasis>&#32;(<emphasis role="keywordtype">int</emphasis>&#32;i&#32;=&#32;0;&#32;i&#32;&lt;&#32;s_hierarchyTransformsBuffer.Length;&#32;i++)&#32;{
+00443 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;s_hierarchyTransformsBuffer[i]&#32;=&#32;<emphasis role="keyword">null</emphasis>;
+00444 &#32;&#32;&#32;&#32;&#32;&#32;}
+00445 
+00446 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordtype">int</emphasis>&#32;hierarchyCount&#32;=&#32;0;
+00447 
+00448 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">foreach</emphasis>&#32;(var&#32;transform&#32;<emphasis role="keywordflow">in</emphasis>&#32;transforms.Query().Where(t&#32;=&gt;&#32;t&#32;!=&#32;<emphasis role="keyword">null</emphasis>))&#32;{
+00449 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;s_hierarchyTransformsBuffer[hierarchyCount++]&#32;=&#32;transform;
+00450 &#32;&#32;&#32;&#32;&#32;&#32;}
+00451 
+00452 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">for</emphasis>&#32;(<emphasis role="keywordtype">int</emphasis>&#32;i&#32;=&#32;hierarchyCount&#32;-&#32;1;&#32;i&#32;&gt;&#32;0;&#32;i--)&#32;{
+00453 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;SetTransformParent(s_hierarchyTransformsBuffer[i],&#32;s_hierarchyTransformsBuffer[i&#32;-&#32;1]);
+00454 &#32;&#32;&#32;&#32;&#32;&#32;}
+00455 
+00456 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(hierarchyCount&#32;&gt;&#32;0)&#32;{
+00457 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;s_hierarchyTransformsBuffer[0];
+00458 &#32;&#32;&#32;&#32;&#32;&#32;}
+00459 
+00460 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;<emphasis role="keyword">null</emphasis>;
+00461 &#32;&#32;&#32;&#32;}
+00462 
+00463 &#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;<emphasis role="keyword">static</emphasis>&#32;Transform[]&#32;s_transformsBuffer&#32;=&#32;<emphasis role="keyword">new</emphasis>&#32;Transform[4];
+00464 &#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;Transform&#32;tryStackTransformHierarchy(params&#32;MonoBehaviour[]&#32;monoBehaviours)&#32;{
+00465 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">for</emphasis>&#32;(<emphasis role="keywordtype">int</emphasis>&#32;i&#32;=&#32;0;&#32;i&#32;&lt;&#32;s_transformsBuffer.Length;&#32;i++)&#32;{
+00466 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;s_transformsBuffer[i]&#32;=&#32;<emphasis role="keyword">null</emphasis>;
+00467 &#32;&#32;&#32;&#32;&#32;&#32;}
+00468 
+00469 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordtype">int</emphasis>&#32;tIdx&#32;=&#32;0;
+00470 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">foreach</emphasis>&#32;(var&#32;behaviour&#32;<emphasis role="keywordflow">in</emphasis>&#32;monoBehaviours.Query().Where(b&#32;=&gt;&#32;b&#32;!=&#32;<emphasis role="keyword">null</emphasis>))&#32;{
+00471 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;s_transformsBuffer[tIdx++]&#32;=&#32;behaviour.transform;
+00472 &#32;&#32;&#32;&#32;&#32;&#32;}
+00473 
+00474 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;tryStackTransformHierarchy(s_transformsBuffer);
+00475 &#32;&#32;&#32;&#32;}
+00476 
+<anchor xml:id="__attachment_hand_8cs_source_1l00481"/><link linkend="_struct_leap_1_1_unity_1_1_attachments_1_1_attachment_hand_1_1_attachment_points_enumerator">00481</link> &#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keyword">struct&#32;</emphasis><link linkend="_struct_leap_1_1_unity_1_1_attachments_1_1_attachment_hand_1_1_attachment_points_enumerator">AttachmentPointsEnumerator</link>&#32;{
+00482 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;<emphasis role="keywordtype">int</emphasis>&#32;_curIdx;
+00483 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;<link linkend="_class_leap_1_1_unity_1_1_attachments_1_1_attachment_hand">AttachmentHand</link>&#32;_hand;
+00484 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;<emphasis role="keywordtype">int</emphasis>&#32;_flagsCount;
+00485 
+<anchor xml:id="__attachment_hand_8cs_source_1l00486"/><link linkend="_struct_leap_1_1_unity_1_1_attachments_1_1_attachment_hand_1_1_attachment_points_enumerator_1ae56c04a878116f4a11ac951e2dd8961b">00486</link> &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<link linkend="_struct_leap_1_1_unity_1_1_attachments_1_1_attachment_hand_1_1_attachment_points_enumerator">AttachmentPointsEnumerator</link>&#32;<link linkend="_struct_leap_1_1_unity_1_1_attachments_1_1_attachment_hand_1_1_attachment_points_enumerator_1ae56c04a878116f4a11ac951e2dd8961b">GetEnumerator</link>()&#32;{&#32;<emphasis role="keywordflow">return</emphasis>&#32;<emphasis role="keyword">this</emphasis>;&#32;}
+00487 
+<anchor xml:id="__attachment_hand_8cs_source_1l00488"/><link linkend="_struct_leap_1_1_unity_1_1_attachments_1_1_attachment_hand_1_1_attachment_points_enumerator_1a21baee4894d501232749feb115899ebc">00488</link> &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<link linkend="_struct_leap_1_1_unity_1_1_attachments_1_1_attachment_hand_1_1_attachment_points_enumerator_1a21baee4894d501232749feb115899ebc">AttachmentPointsEnumerator</link>(<link linkend="_class_leap_1_1_unity_1_1_attachments_1_1_attachment_hand">AttachmentHand</link>&#32;hand)&#32;{
+00489 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(hand&#32;!=&#32;<emphasis role="keyword">null</emphasis>&#32;&amp;&amp;&#32;hand._attachmentPointFlagConstants&#32;!=&#32;<emphasis role="keyword">null</emphasis>)&#32;{
+00490 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;_curIdx&#32;=&#32;-1;
+00491 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;_hand&#32;=&#32;hand;
+00492 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;_flagsCount&#32;=&#32;hand._attachmentPointFlagConstants.Length;
+00493 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00494 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">else</emphasis>&#32;{
+00495 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;Hand&#32;doesn&apos;t&#32;exist&#32;(destroyed?)&#32;or&#32;isn&apos;t&#32;initialized&#32;yet.</emphasis>
+00496 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;_curIdx&#32;=&#32;-1;
+00497 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;_hand&#32;=&#32;<emphasis role="keyword">null</emphasis>;
+00498 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;_flagsCount&#32;=&#32;0;
+00499 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00500 &#32;&#32;&#32;&#32;&#32;&#32;}
+00501 
+<anchor xml:id="__attachment_hand_8cs_source_1l00502"/><link linkend="_struct_leap_1_1_unity_1_1_attachments_1_1_attachment_hand_1_1_attachment_points_enumerator_1ab6e30358c523430d02f3a0fd2ab093f6">00502</link> &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<link linkend="_class_leap_1_1_unity_1_1_attachments_1_1_attachment_point_behaviour">AttachmentPointBehaviour</link>&#32;<link linkend="_struct_leap_1_1_unity_1_1_attachments_1_1_attachment_hand_1_1_attachment_points_enumerator_1ab6e30358c523430d02f3a0fd2ab093f6">Current</link>&#32;{
+00503 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">get</emphasis>&#32;{
+00504 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(_hand&#32;==&#32;<emphasis role="keyword">null</emphasis>)&#32;<emphasis role="keywordflow">return</emphasis>&#32;<emphasis role="keyword">null</emphasis>;
+00505 
+00506 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;_hand.<link linkend="_class_leap_1_1_unity_1_1_attachments_1_1_attachment_hand_1a1a0809e8733aa114684f28e6e31f37c5">GetBehaviourForPoint</link>(GetFlagFromFlagIdx(_curIdx));
+00507 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00508 &#32;&#32;&#32;&#32;&#32;&#32;}
+00509 
+<anchor xml:id="__attachment_hand_8cs_source_1l00510"/><link linkend="_struct_leap_1_1_unity_1_1_attachments_1_1_attachment_hand_1_1_attachment_points_enumerator_1a695bc493413b1dbcd3c04605db591f19">00510</link> &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keywordtype">bool</emphasis>&#32;<link linkend="_struct_leap_1_1_unity_1_1_attachments_1_1_attachment_hand_1_1_attachment_points_enumerator_1a695bc493413b1dbcd3c04605db591f19">MoveNext</link>()&#32;{
+00511 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">do</emphasis>&#32;{
+00512 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;_curIdx++;
+00513 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}&#32;<emphasis role="keywordflow">while</emphasis>&#32;(_curIdx&#32;&lt;&#32;_flagsCount&#32;&amp;&amp;&#32;_hand.<link linkend="_class_leap_1_1_unity_1_1_attachments_1_1_attachment_hand_1a1a0809e8733aa114684f28e6e31f37c5">GetBehaviourForPoint</link>(GetFlagFromFlagIdx(_curIdx))&#32;==&#32;<emphasis role="keyword">null</emphasis>);
+00514 
+00515 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;_curIdx&#32;&lt;&#32;_flagsCount;
+00516 &#32;&#32;&#32;&#32;&#32;&#32;}
+00517 &#32;&#32;&#32;&#32;}
+00518 
+00519 &#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;<emphasis role="keyword">static</emphasis>&#32;<link linkend="_namespace_leap_1_1_unity_1_1_attachments_1a4b32b38f722ad110fcd5a817256e09ab">AttachmentPointFlags</link>&#32;GetFlagFromFlagIdx(<emphasis role="keywordtype">int</emphasis>&#32;pointIdx)&#32;{
+00520 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;(<link linkend="_namespace_leap_1_1_unity_1_1_attachments_1a4b32b38f722ad110fcd5a817256e09ab">AttachmentPointFlags</link>)(1&#32;&lt;&lt;&#32;pointIdx&#32;+&#32;1);
+00521 &#32;&#32;&#32;&#32;}
+00522 
+00523 <emphasis role="preprocessor">&#32;&#32;&#32;&#32;#endregion</emphasis>
+00524 
+00525 &#32;&#32;}
+00526 
+00527 }
+</programlisting></section>

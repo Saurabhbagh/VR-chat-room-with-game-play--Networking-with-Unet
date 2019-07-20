@@ -1,0 +1,148 @@
+<?xml version='1.0' encoding='UTF-8' standalone='no'?>
+<section xmlns="http://docbook.org/ns/docbook" version="5.0" xmlns:xlink="http://www.w3.org/1999/xlink" xml:id="__kerning_pair_drawer_8cs_source">
+<title>KerningPairDrawer.cs</title>
+<indexterm><primary>O:/GitHUBMINIPRoject/Library/PackageCache/com.unity.textmeshpro@1.3.0/Scripts/Editor/KerningPairDrawer.cs</primary></indexterm>
+<programlisting>00001 <emphasis role="keyword">using</emphasis>&#32;<link linkend="__balloon_8cs_1a7d67e097df9376eb709b6a23aa3c7d23">UnityEngine</link>;
+00002 <emphasis role="keyword">using</emphasis>&#32;<link linkend="_namespace_unity_editor">UnityEditor</link>;
+00003 <emphasis role="keyword">using</emphasis>&#32;System.Collections;
+00004 
+00005 
+00006 <emphasis role="keyword">namespace&#32;</emphasis><link linkend="_namespace_t_m_pro_1_1_editor_utilities">TMPro.EditorUtilities</link>
+00007 {
+00008 
+00009 &#32;&#32;&#32;&#32;[CustomPropertyDrawer(typeof(KerningPair))]
+<anchor xml:id="__kerning_pair_drawer_8cs_source_1l00010"/><link linkend="_class_t_m_pro_1_1_editor_utilities_1_1_kerning_pair_drawer">00010</link> &#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keyword">class&#32;</emphasis><link linkend="_class_t_m_pro_1_1_editor_utilities_1_1_kerning_pair_drawer">KerningPairDrawer</link>&#32;:&#32;PropertyDrawer
+00011 &#32;&#32;&#32;&#32;{
+00012 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;<emphasis role="keywordtype">bool</emphasis>&#32;isEditingEnabled&#32;=&#32;<emphasis role="keyword">false</emphasis>;
+00013 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;<emphasis role="keywordtype">bool</emphasis>&#32;isSelectable&#32;=&#32;<emphasis role="keyword">false</emphasis>;
+00014 
+<anchor xml:id="__kerning_pair_drawer_8cs_source_1l00015"/><link linkend="_class_t_m_pro_1_1_editor_utilities_1_1_kerning_pair_drawer_1ad08e30458554681755ef80e29dea72e9">00015</link> &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keyword">override</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;<link linkend="_class_t_m_pro_1_1_editor_utilities_1_1_kerning_pair_drawer_1ad08e30458554681755ef80e29dea72e9">OnGUI</link>(Rect&#32;position,&#32;SerializedProperty&#32;property,&#32;GUIContent&#32;label)
+00016 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00017 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;SerializedProperty&#32;prop_FirstGlyph&#32;=&#32;<emphasis role="keyword">property</emphasis>.FindPropertyRelative(<emphasis role="stringliteral">&quot;m_FirstGlyph&quot;</emphasis>);
+00018 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;SerializedProperty&#32;prop_FirstGlyphAdjustment&#32;=&#32;<emphasis role="keyword">property</emphasis>.FindPropertyRelative(<emphasis role="stringliteral">&quot;m_FirstGlyphAdjustments&quot;</emphasis>);
+00019 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;SerializedProperty&#32;prop_SecondGlyph&#32;=&#32;<emphasis role="keyword">property</emphasis>.FindPropertyRelative(<emphasis role="stringliteral">&quot;m_SecondGlyph&quot;</emphasis>);
+00020 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;SerializedProperty&#32;prop_SecondGlyphAdjustment&#32;=&#32;<emphasis role="keyword">property</emphasis>.FindPropertyRelative(<emphasis role="stringliteral">&quot;m_SecondGlyphAdjustments&quot;</emphasis>);
+00021 
+00022 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;position.yMin&#32;+=&#32;2;
+00023 
+00024 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;We&#32;get&#32;Rect&#32;since&#32;a&#32;valid&#32;position&#32;may&#32;not&#32;be&#32;provided&#32;by&#32;the&#32;caller.</emphasis>
+00025 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;GUILayoutUtility.GetRect(position.width,&#32;45);
+00026 
+00027 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordtype">float</emphasis>&#32;width&#32;=&#32;position.width&#32;/&#32;2;
+00028 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordtype">float</emphasis>&#32;padding&#32;=&#32;5.0f;
+00029 
+00030 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;Rect&#32;rect;
+00031 
+00032 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;isEditingEnabled&#32;=&#32;GUI.enabled;
+00033 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;isSelectable&#32;=&#32;label.text&#32;==&#32;<emphasis role="stringliteral">&quot;Selectable&quot;</emphasis>&#32;?&#32;true&#32;:&#32;<emphasis role="keyword">false</emphasis>;
+00034 
+00035 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;First&#32;Glyph</emphasis>
+00036 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;GUI.enabled&#32;=&#32;isEditingEnabled;
+00037 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(isSelectable)
+00038 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00039 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordtype">bool</emphasis>&#32;prevGuiState&#32;=&#32;GUI.enabled;
+00040 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;GUI.enabled&#32;=&#32;<emphasis role="keyword">true</emphasis>;
+00041 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;rect&#32;=&#32;<emphasis role="keyword">new</emphasis>&#32;Rect(position.x,&#32;position.y,&#32;40,&#32;18);
+00042 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;EditorGUI.LabelField(rect,&#32;<emphasis role="stringliteral">&quot;Char:&quot;</emphasis>,&#32;TMP_UIStyleManager.label);
+00043 
+00044 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;rect&#32;=&#32;<emphasis role="keyword">new</emphasis>&#32;Rect(position.x&#32;+&#32;35f,&#32;position.y,&#32;30,&#32;18);
+00045 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;EditorGUI.LabelField(rect,&#32;<emphasis role="stringliteral">&quot;&lt;color=#FFFF80&gt;&quot;</emphasis>&#32;+&#32;(<emphasis role="keywordtype">char</emphasis>)prop_FirstGlyph.intValue&#32;+&#32;<emphasis role="stringliteral">&quot;&lt;/color&gt;&quot;</emphasis>,&#32;TMP_UIStyleManager.label);
+00046 
+00047 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;Display&#32;ASCII&#32;decimal&#32;value</emphasis>
+00048 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;rect&#32;=&#32;<emphasis role="keyword">new</emphasis>&#32;Rect(position.x&#32;+&#32;60f,&#32;position.y,&#32;30,&#32;18);
+00049 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;EditorGUI.LabelField(rect,&#32;<emphasis role="stringliteral">&quot;ID:&quot;</emphasis>,&#32;TMP_UIStyleManager.label);
+00050 
+00051 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;rect&#32;=&#32;<emphasis role="keyword">new</emphasis>&#32;Rect(position.x&#32;+&#32;80f,&#32;position.y,&#32;40,&#32;18);
+00052 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;EditorGUI.LabelField(rect,&#32;<emphasis role="stringliteral">&quot;&lt;color=#FFFF80&gt;&quot;</emphasis>&#32;+&#32;prop_FirstGlyph.intValue&#32;+&#32;<emphasis role="stringliteral">&quot;&lt;/color&gt;&quot;</emphasis>,&#32;TMP_UIStyleManager.label);
+00053 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;GUI.enabled&#32;=&#32;prevGuiState;
+00054 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00055 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">else</emphasis>
+00056 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00057 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;rect&#32;=&#32;<emphasis role="keyword">new</emphasis>&#32;Rect(position.x,&#32;position.y,&#32;width&#32;/&#32;2&#32;*&#32;0.8f&#32;-&#32;padding,&#32;18);
+00058 
+00059 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordtype">string</emphasis>&#32;glyph&#32;=&#32;EditorGUI.TextArea(rect,&#32;<emphasis role="stringliteral">&quot;&quot;</emphasis>&#32;+&#32;(<emphasis role="keywordtype">char</emphasis>)prop_FirstGlyph.intValue);
+00060 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(GUI.changed&#32;&amp;&amp;&#32;glyph&#32;!=&#32;<emphasis role="stringliteral">&quot;&quot;</emphasis>)
+00061 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00062 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;GUI.changed&#32;=&#32;<emphasis role="keyword">false</emphasis>;
+00063 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;prop_FirstGlyph.intValue&#32;=&#32;glyph[0];
+00064 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00065 
+00066 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;rect.x&#32;+=&#32;width&#32;/&#32;2&#32;*&#32;0.8f;
+00067 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;EditorGUI.PropertyField(rect,&#32;prop_FirstGlyph,&#32;GUIContent.none);
+00068 
+00069 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00070 
+00071 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;GUI.enabled&#32;=&#32;isEditingEnabled;
+00072 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;EditorGUIUtility.labelWidth&#32;=&#32;25f;
+00073 
+00074 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;rect&#32;=&#32;<emphasis role="keyword">new</emphasis>&#32;Rect(position.x,&#32;position.y&#32;+&#32;20,&#32;width&#32;*&#32;0.5f&#32;-&#32;padding,&#32;18);
+00075 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;EditorGUI.PropertyField(rect,&#32;prop_FirstGlyphAdjustment.FindPropertyRelative(<emphasis role="stringliteral">&quot;xPlacement&quot;</emphasis>),&#32;<emphasis role="keyword">new</emphasis>&#32;GUIContent(<emphasis role="stringliteral">&quot;OX&quot;</emphasis>));
+00076 
+00077 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;rect.x&#32;+=&#32;width&#32;*&#32;0.5f;
+00078 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;EditorGUI.PropertyField(rect,&#32;prop_FirstGlyphAdjustment.FindPropertyRelative(<emphasis role="stringliteral">&quot;yPlacement&quot;</emphasis>),&#32;<emphasis role="keyword">new</emphasis>&#32;GUIContent(<emphasis role="stringliteral">&quot;OY&quot;</emphasis>));
+00079 
+00080 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;rect.x&#32;=&#32;position.x;
+00081 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;rect.y&#32;+=&#32;20;
+00082 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;EditorGUI.PropertyField(rect,&#32;prop_FirstGlyphAdjustment.FindPropertyRelative(<emphasis role="stringliteral">&quot;xAdvance&quot;</emphasis>),&#32;<emphasis role="keyword">new</emphasis>&#32;GUIContent(<emphasis role="stringliteral">&quot;AX&quot;</emphasis>));
+00083 
+00084 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//rect.x&#32;+=&#32;width&#32;*&#32;0.5f;</emphasis>
+00085 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//EditorGUI.PropertyField(rect,&#32;prop_FirstGlyphAdjustment.FindPropertyRelative(&quot;yAdvance&quot;),&#32;new&#32;GUIContent(&quot;AY&quot;));</emphasis>
+00086 
+00087 
+00088 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;Second&#32;Glyph</emphasis>
+00089 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;GUI.enabled&#32;=&#32;isEditingEnabled;
+00090 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(isSelectable)
+00091 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00092 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordtype">bool</emphasis>&#32;prevGuiState&#32;=&#32;GUI.enabled;
+00093 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;GUI.enabled&#32;=&#32;<emphasis role="keyword">true</emphasis>;
+00094 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;rect&#32;=&#32;<emphasis role="keyword">new</emphasis>&#32;Rect(position.width&#32;/&#32;2&#32;+&#32;20,&#32;position.y,&#32;40f,&#32;18);
+00095 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;EditorGUI.LabelField(rect,&#32;<emphasis role="stringliteral">&quot;Char:&quot;</emphasis>,&#32;TMP_UIStyleManager.label);
+00096 
+00097 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;rect&#32;=&#32;<emphasis role="keyword">new</emphasis>&#32;Rect(rect.x&#32;+&#32;35f,&#32;position.y,&#32;30,&#32;18);
+00098 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;EditorGUI.LabelField(rect,&#32;<emphasis role="stringliteral">&quot;&lt;color=#FFFF80&gt;&quot;</emphasis>&#32;+&#32;(<emphasis role="keywordtype">char</emphasis>)prop_SecondGlyph.intValue&#32;+&#32;<emphasis role="stringliteral">&quot;&lt;/color&gt;&quot;</emphasis>,&#32;TMP_UIStyleManager.label);
+00099 
+00100 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;Display&#32;ASCII&#32;decimal&#32;value</emphasis>
+00101 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;rect&#32;=&#32;<emphasis role="keyword">new</emphasis>&#32;Rect(rect.x&#32;+&#32;25f,&#32;position.y,&#32;30,&#32;18);
+00102 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;EditorGUI.LabelField(rect,&#32;<emphasis role="stringliteral">&quot;ID:&quot;</emphasis>,&#32;TMP_UIStyleManager.label);
+00103 
+00104 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;rect&#32;=&#32;<emphasis role="keyword">new</emphasis>&#32;Rect(rect.x&#32;+&#32;20f,&#32;position.y,&#32;40,&#32;18);
+00105 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;EditorGUI.LabelField(rect,&#32;<emphasis role="stringliteral">&quot;&lt;color=#FFFF80&gt;&quot;</emphasis>&#32;+&#32;prop_SecondGlyph.intValue&#32;+&#32;<emphasis role="stringliteral">&quot;&lt;/color&gt;&quot;</emphasis>,&#32;TMP_UIStyleManager.label);
+00106 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;GUI.enabled&#32;=&#32;prevGuiState;
+00107 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00108 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">else</emphasis>
+00109 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00110 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;rect&#32;=&#32;<emphasis role="keyword">new</emphasis>&#32;Rect(position.width&#32;/&#32;2&#32;+&#32;20,&#32;position.y,&#32;width&#32;/&#32;2&#32;*&#32;0.8f&#32;-&#32;padding,&#32;18);
+00111 
+00112 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordtype">string</emphasis>&#32;glyph&#32;=&#32;EditorGUI.TextArea(rect,&#32;<emphasis role="stringliteral">&quot;&quot;</emphasis>&#32;+&#32;(<emphasis role="keywordtype">char</emphasis>)prop_SecondGlyph.intValue);
+00113 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(GUI.changed&#32;&amp;&amp;&#32;glyph&#32;!=&#32;<emphasis role="stringliteral">&quot;&quot;</emphasis>)
+00114 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00115 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;GUI.changed&#32;=&#32;<emphasis role="keyword">false</emphasis>;
+00116 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;prop_SecondGlyph.intValue&#32;=&#32;glyph[0];
+00117 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00118 
+00119 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;rect.x&#32;+=&#32;width&#32;/&#32;2&#32;*&#32;0.8f;
+00120 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;EditorGUI.PropertyField(rect,&#32;prop_SecondGlyph,&#32;GUIContent.none);
+00121 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00122 
+00123 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;GUI.enabled&#32;=&#32;isEditingEnabled;
+00124 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;EditorGUIUtility.labelWidth&#32;=&#32;25f;
+00125 
+00126 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;rect&#32;=&#32;<emphasis role="keyword">new</emphasis>&#32;Rect(position.width&#32;/&#32;2&#32;+&#32;20,&#32;position.y&#32;+&#32;20,&#32;width&#32;*&#32;0.5f&#32;-&#32;padding,&#32;18);
+00127 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;EditorGUI.PropertyField(rect,&#32;prop_SecondGlyphAdjustment.FindPropertyRelative(<emphasis role="stringliteral">&quot;xPlacement&quot;</emphasis>),&#32;<emphasis role="keyword">new</emphasis>&#32;GUIContent(<emphasis role="stringliteral">&quot;OX&quot;</emphasis>));
+00128 
+00129 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;rect.x&#32;+=&#32;width&#32;*&#32;0.5f;
+00130 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;EditorGUI.PropertyField(rect,&#32;prop_SecondGlyphAdjustment.FindPropertyRelative(<emphasis role="stringliteral">&quot;yPlacement&quot;</emphasis>),&#32;<emphasis role="keyword">new</emphasis>&#32;GUIContent(<emphasis role="stringliteral">&quot;OY&quot;</emphasis>));
+00131 
+00132 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;rect.x&#32;=&#32;position.width&#32;/&#32;2&#32;+&#32;20;
+00133 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;rect.y&#32;+=&#32;20;
+00134 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;EditorGUI.PropertyField(rect,&#32;prop_SecondGlyphAdjustment.FindPropertyRelative(<emphasis role="stringliteral">&quot;xAdvance&quot;</emphasis>),&#32;<emphasis role="keyword">new</emphasis>&#32;GUIContent(<emphasis role="stringliteral">&quot;AX&quot;</emphasis>));
+00135 
+00136 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//rect.x&#32;+=&#32;width&#32;*&#32;0.5f;</emphasis>
+00137 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//EditorGUI.PropertyField(rect,&#32;prop_SecondGlyphAdjustment.FindPropertyRelative(&quot;yAdvance&quot;),&#32;new&#32;GUIContent(&quot;AY&quot;));</emphasis>
+00138 
+00139 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00140 
+00141 
+00142 &#32;&#32;&#32;&#32;}
+00143 }
+</programlisting></section>

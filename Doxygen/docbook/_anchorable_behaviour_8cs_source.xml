@@ -1,0 +1,748 @@
+<?xml version='1.0' encoding='UTF-8' standalone='no'?>
+<section xmlns="http://docbook.org/ns/docbook" version="5.0" xmlns:xlink="http://www.w3.org/1999/xlink" xml:id="__anchorable_behaviour_8cs_source">
+<title>AnchorableBehaviour.cs</title>
+<indexterm><primary>O:/GitHUBMINIPRoject/Assets/LeapMotion/Modules/InteractionEngine/Scripts/UI/Anchors/AnchorableBehaviour.cs</primary></indexterm>
+<programlisting>00001 <emphasis role="comment">/******************************************************************************</emphasis>
+00002 <emphasis role="comment">&#32;*&#32;Copyright&#32;(C)&#32;Leap&#32;Motion,&#32;Inc.&#32;2011-2018.&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;*</emphasis>
+00003 <emphasis role="comment">&#32;*&#32;Leap&#32;Motion&#32;proprietary&#32;and&#32;confidential.&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;*</emphasis>
+00004 <emphasis role="comment">&#32;*&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;*</emphasis>
+00005 <emphasis role="comment">&#32;*&#32;Use&#32;subject&#32;to&#32;the&#32;terms&#32;of&#32;the&#32;Leap&#32;Motion&#32;SDK&#32;Agreement&#32;available&#32;at&#32;&#32;&#32;&#32;&#32;*</emphasis>
+00006 <emphasis role="comment">&#32;*&#32;https://developer.leapmotion.com/sdk_agreement,&#32;or&#32;another&#32;agreement&#32;&#32;&#32;&#32;&#32;&#32;&#32;*</emphasis>
+00007 <emphasis role="comment">&#32;*&#32;between&#32;Leap&#32;Motion&#32;and&#32;you,&#32;your&#32;company&#32;or&#32;other&#32;organization.&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;*</emphasis>
+00008 <emphasis role="comment">&#32;******************************************************************************/</emphasis>
+00009 
+00010 <emphasis role="keyword">using</emphasis>&#32;<link linkend="_namespace_leap">Leap</link>.<link linkend="_namespace_leap_1_1_unity">Unity</link>.<link linkend="_namespace_leap_1_1_unity_1_1_attributes">Attributes</link>;
+00011 <emphasis role="keyword">using</emphasis>&#32;<link linkend="_namespace_leap">Leap</link>.<link linkend="_namespace_leap_1_1_unity">Unity</link>.<link linkend="_namespace_leap_1_1_unity_1_1_interaction">Interaction</link>;
+00012 <emphasis role="keyword">using</emphasis>&#32;System;
+00013 <emphasis role="keyword">using</emphasis>&#32;System.Collections;
+00014 <emphasis role="keyword">using</emphasis>&#32;System.Collections.Generic;
+00015 <emphasis role="keyword">using</emphasis>&#32;<link linkend="__balloon_8cs_1a7d67e097df9376eb709b6a23aa3c7d23">UnityEngine</link>;
+00016 <emphasis role="keyword">using</emphasis>&#32;<link linkend="_namespace_unity_engine">UnityEngine</link>.Events;
+00017 
+00018 <emphasis role="keyword">namespace&#32;</emphasis><link linkend="_namespace_leap_1_1_unity_1_1_interaction">Leap.Unity.Interaction</link>&#32;{
+00019 
+<anchor xml:id="__anchorable_behaviour_8cs_source_1l00025"/><link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_anchorable_behaviour">00025</link> &#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keyword">class&#32;</emphasis><link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_anchorable_behaviour">AnchorableBehaviour</link>&#32;:&#32;MonoBehaviour&#32;{
+00026 
+00027 &#32;&#32;&#32;&#32;[Disable]
+00028 &#32;&#32;&#32;&#32;[SerializeField]
+00029 &#32;&#32;&#32;&#32;[Tooltip(<emphasis role="stringliteral">&quot;Whether&#32;or&#32;not&#32;this&#32;AnchorableBehaviour&#32;is&#32;actively&#32;attached&#32;to&#32;its&#32;anchor.&quot;</emphasis>)]
+00030 &#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;<emphasis role="keywordtype">bool</emphasis>&#32;_isAttached&#32;=&#32;<emphasis role="keyword">false</emphasis>;
+<anchor xml:id="__anchorable_behaviour_8cs_source_1l00031"/><link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_anchorable_behaviour_1ad44eb15001e88b33e46f06e1b2501e59">00031</link> &#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keywordtype">bool</emphasis>&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_anchorable_behaviour_1ad44eb15001e88b33e46f06e1b2501e59">isAttached</link>&#32;{
+00032 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">get</emphasis>&#32;{
+00033 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;_isAttached;
+00034 &#32;&#32;&#32;&#32;&#32;&#32;}
+00035 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">set</emphasis>&#32;{
+00036 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(_isAttached&#32;!=&#32;value)&#32;{
+00037 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(value&#32;==&#32;<emphasis role="keyword">true</emphasis>)&#32;{
+00038 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(_anchor&#32;!=&#32;<emphasis role="keyword">null</emphasis>)&#32;{
+00039 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;_isAttached&#32;=&#32;value;
+00040 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;_anchor.<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_anchor_1a063da3d8209d998112e4268f024ececa">NotifyAttached</link>(<emphasis role="keyword">this</emphasis>);
+00041 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_anchorable_behaviour_1a6fbe787555ba1bcbae45f715777e0b7d">OnAttachedToAnchor</link>.Invoke();
+00042 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00043 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">else</emphasis>&#32;{
+00044 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;Debug.LogWarning(<emphasis role="stringliteral">&quot;Tried&#32;to&#32;attach&#32;an&#32;anchorable&#32;behaviour,&#32;but&#32;it&#32;has&#32;no&#32;assigned&#32;anchor.&quot;</emphasis>,&#32;this.gameObject);
+00045 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00046 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00047 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">else</emphasis>&#32;{
+00048 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;_isAttached&#32;=&#32;<emphasis role="keyword">false</emphasis>;
+00049 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;_isLockedToAnchor&#32;=&#32;<emphasis role="keyword">false</emphasis>;
+00050 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;_isRotationLockedToAnchor&#32;=&#32;<emphasis role="keyword">false</emphasis>;
+00051 
+00052 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_anchorable_behaviour_1a61aec444eb2b020981d37d7a15c1b280">OnDetachedFromAnchor</link>.Invoke();
+00053 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;_anchor.<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_anchor_1af1262853ca7469aec0058bc30d1b9f31">NotifyDetached</link>(<emphasis role="keyword">this</emphasis>);
+00054 
+00055 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;_hasTargetPositionLastUpdate&#32;=&#32;<emphasis role="keyword">false</emphasis>;
+00056 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;_hasTargetRotationLastUpdate&#32;=&#32;<emphasis role="keyword">false</emphasis>;
+00057 
+00058 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;TODO:&#32;A&#32;more&#32;robust&#32;gravity&#32;fix.</emphasis>
+00059 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(_reactivateGravityOnDetach)&#32;{
+00060 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_anchorable_behaviour_1aa067c979e2602b16f03103c18de20a92">interactionBehaviour</link>&#32;!=&#32;<emphasis role="keyword">null</emphasis>)&#32;{
+00061 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_anchorable_behaviour_1aa067c979e2602b16f03103c18de20a92">interactionBehaviour</link>.<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_behaviour_1a4f54f1794944882d8cf51bd641a5341c">rigidbody</link>.useGravity&#32;=&#32;<emphasis role="keyword">true</emphasis>;
+00062 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00063 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;_reactivateGravityOnDetach&#32;=&#32;<emphasis role="keyword">false</emphasis>;
+00064 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00065 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00066 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00067 &#32;&#32;&#32;&#32;&#32;&#32;}
+00068 &#32;&#32;&#32;&#32;}
+00069 
+00070 &#32;&#32;&#32;&#32;[Tooltip(<emphasis role="stringliteral">&quot;The&#32;current&#32;anchor&#32;of&#32;this&#32;AnchorableBehaviour.&quot;</emphasis>)]
+00071 &#32;&#32;&#32;&#32;[OnEditorChange(<emphasis role="stringliteral">&quot;anchor&quot;</emphasis>),&#32;SerializeField]
+00072 &#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_anchor">Anchor</link>&#32;_anchor;
+<anchor xml:id="__anchorable_behaviour_8cs_source_1l00073"/><link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_anchorable_behaviour_1acc535c0d9a79d1ddcaab2dd0587ba9bb">00073</link> &#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_anchor">Anchor</link>&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_anchorable_behaviour_1acc535c0d9a79d1ddcaab2dd0587ba9bb">anchor</link>&#32;{
+00074 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">get</emphasis>&#32;{
+00075 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;_anchor;
+00076 &#32;&#32;&#32;&#32;&#32;&#32;}
+00077 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">set</emphasis>&#32;{
+00078 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(_anchor&#32;!=&#32;value)&#32;{
+00079 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_anchorable_behaviour_1a8e014a55c2402653af66bff1ea6b2ba9">IsValidAnchor</link>(value))&#32;{
+00080 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(_anchor&#32;!=&#32;<emphasis role="keyword">null</emphasis>)&#32;{
+00081 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_anchorable_behaviour_1a61aec444eb2b020981d37d7a15c1b280">OnDetachedFromAnchor</link>.Invoke();
+00082 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;_anchor.<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_anchor_1af1262853ca7469aec0058bc30d1b9f31">NotifyDetached</link>(<emphasis role="keyword">this</emphasis>);
+00083 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00084 
+00085 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;_isLockedToAnchor&#32;=&#32;<emphasis role="keyword">false</emphasis>;
+00086 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;_isRotationLockedToAnchor&#32;=&#32;<emphasis role="keyword">false</emphasis>;
+00087 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;_anchor&#32;=&#32;value;
+00088 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;_hasTargetPositionLastUpdate&#32;=&#32;<emphasis role="keyword">false</emphasis>;
+00089 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;_hasTargetRotationLastUpdate&#32;=&#32;<emphasis role="keyword">false</emphasis>;
+00090 
+00091 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(_anchor&#32;!=&#32;<emphasis role="keyword">null</emphasis>)&#32;{
+00092 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_anchorable_behaviour_1ad44eb15001e88b33e46f06e1b2501e59">isAttached</link>&#32;=&#32;<emphasis role="keyword">true</emphasis>;
+00093 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00094 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">else</emphasis>&#32;{
+00095 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_anchorable_behaviour_1ad44eb15001e88b33e46f06e1b2501e59">isAttached</link>&#32;=&#32;<emphasis role="keyword">false</emphasis>;
+00096 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00097 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00098 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">else</emphasis>&#32;{
+00099 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;Debug.LogWarning(<emphasis role="stringliteral">&quot;The&#32;&apos;&quot;</emphasis>&#32;+&#32;value.name&#32;+&#32;<emphasis role="stringliteral">&quot;&apos;&#32;anchor&#32;is&#32;not&#32;in&#32;&quot;</emphasis>&#32;+&#32;<emphasis role="keyword">this</emphasis>.name&#32;+&#32;<emphasis role="stringliteral">&quot;&apos;s&#32;anchor&#32;group.&quot;</emphasis>,&#32;<emphasis role="keyword">this</emphasis>.gameObject);
+00100 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00101 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00102 &#32;&#32;&#32;&#32;&#32;&#32;}
+00103 &#32;&#32;&#32;&#32;}
+00104 
+00105 &#32;&#32;&#32;&#32;[Tooltip(<emphasis role="stringliteral">&quot;The&#32;anchor&#32;group&#32;for&#32;this&#32;AnchorableBehaviour.&#32;If&#32;set&#32;to&#32;null,&#32;all&#32;Anchors&#32;&quot;</emphasis>
+00106 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;+&#32;<emphasis role="stringliteral">&quot;will&#32;be&#32;valid&#32;anchors&#32;for&#32;this&#32;object.&quot;</emphasis>)]
+00107 &#32;&#32;&#32;&#32;[OnEditorChange(<emphasis role="stringliteral">&quot;anchorGroup&quot;</emphasis>),&#32;SerializeField]
+00108 &#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_anchor_group">AnchorGroup</link>&#32;_anchorGroup;
+<anchor xml:id="__anchorable_behaviour_8cs_source_1l00109"/><link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_anchorable_behaviour_1a493657fd562e747009c5536592f30e7a">00109</link> &#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_anchor_group">AnchorGroup</link>&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_anchorable_behaviour_1a493657fd562e747009c5536592f30e7a">anchorGroup</link>&#32;{
+00110 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">get</emphasis>&#32;{&#32;<emphasis role="keywordflow">return</emphasis>&#32;_anchorGroup;&#32;}
+00111 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">set</emphasis>&#32;{
+00112 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(_anchorGroup&#32;!=&#32;<emphasis role="keyword">null</emphasis>)&#32;_anchorGroup.<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_anchor_group_1a76fd6cba4f8581ac74f37c8ce19bed52">NotifyAnchorableObjectRemoved</link>(<emphasis role="keyword">this</emphasis>);
+00113 
+00114 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;_anchorGroup&#32;=&#32;value;
+00115 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_anchorable_behaviour_1acc535c0d9a79d1ddcaab2dd0587ba9bb">anchor</link>&#32;!=&#32;<emphasis role="keyword">null</emphasis>&#32;&amp;&amp;&#32;!_anchorGroup.<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_anchor_group_1a8a1125abd6cbd8bb0083b9fe8ecf4fdc">Contains</link>(<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_anchorable_behaviour_1acc535c0d9a79d1ddcaab2dd0587ba9bb">anchor</link>))&#32;{
+00116 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_anchorable_behaviour_1acc535c0d9a79d1ddcaab2dd0587ba9bb">anchor</link>&#32;=&#32;<emphasis role="keyword">null</emphasis>;
+00117 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;Debug.LogWarning(this.name&#32;+&#32;<emphasis role="stringliteral">&quot;&apos;s&#32;anchor&#32;is&#32;not&#32;within&#32;its&#32;anchorGroup&#32;(setting&#32;it&#32;to&#32;null).&quot;</emphasis>,&#32;this.gameObject);
+00118 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00119 
+00120 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(_anchorGroup&#32;!=&#32;<emphasis role="keyword">null</emphasis>)&#32;_anchorGroup.<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_anchor_group_1a1f681a3c9b69d0e472e6ca2369103f5d">NotifyAnchorableObjectAdded</link>(<emphasis role="keyword">this</emphasis>);
+00121 &#32;&#32;&#32;&#32;&#32;&#32;}
+00122 &#32;&#32;&#32;&#32;}
+00123 
+00124 &#32;&#32;&#32;&#32;[Header(<emphasis role="stringliteral">&quot;Attachment&quot;</emphasis>)]
+00125 
+00126 &#32;&#32;&#32;&#32;[Tooltip(<emphasis role="stringliteral">&quot;Anchors&#32;beyond&#32;this&#32;range&#32;are&#32;ignored&#32;as&#32;possible&#32;anchors&#32;for&#32;this&#32;object.&quot;</emphasis>)]
+<anchor xml:id="__anchorable_behaviour_8cs_source_1l00127"/><link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_anchorable_behaviour_1a894d0a63d373fe4cebaf382daef1c940">00127</link> &#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keywordtype">float</emphasis>&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_anchorable_behaviour_1a894d0a63d373fe4cebaf382daef1c940">maxAnchorRange</link>&#32;=&#32;0.3F;
+00128 
+00129 &#32;&#32;&#32;&#32;[Tooltip(<emphasis role="stringliteral">&quot;Only&#32;allowed&#32;when&#32;an&#32;InteractionBehaviour&#32;is&#32;attached&#32;to&#32;this&#32;object.&#32;If&#32;enabled,&#32;this&#32;&quot;</emphasis>
+00130 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;+&#32;<emphasis role="stringliteral">&quot;object&apos;s&#32;Attach()&#32;method&#32;or&#32;its&#32;variants&#32;will&#32;weigh&#32;its&#32;velocity&#32;towards&#32;an&#32;anchor&#32;along&#32;&quot;</emphasis>
+00131 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;+&#32;<emphasis role="stringliteral">&quot;with&#32;its&#32;proximity&#32;when&#32;seeking&#32;an&#32;anchor&#32;to&#32;attach&#32;to.&quot;</emphasis>)]
+00132 &#32;&#32;&#32;&#32;[<link linkend="_class_leap_1_1_unity_1_1_attributes_1_1_disable_if">DisableIf</link>(<emphasis role="stringliteral">&quot;_interactionBehaviourIsNull&quot;</emphasis>,&#32;<emphasis role="keyword">true</emphasis>)]
+<anchor xml:id="__anchorable_behaviour_8cs_source_1l00133"/><link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_anchorable_behaviour_1ab05fef36f601748387b8a283433909f3">00133</link> &#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keywordtype">bool</emphasis>&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_anchorable_behaviour_1ab05fef36f601748387b8a283433909f3">useTrajectory</link>&#32;=&#32;<emphasis role="keyword">true</emphasis>;
+00134 
+00135 &#32;&#32;&#32;&#32;[Tooltip(<emphasis role="stringliteral">&quot;The&#32;fraction&#32;of&#32;the&#32;maximum&#32;anchor&#32;range&#32;to&#32;use&#32;as&#32;the&#32;effective&#32;max&#32;range&#32;when&#32;&quot;</emphasis>
+00136 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;+&#32;<emphasis role="stringliteral">&quot;useTrajectory&#32;is&#32;enabled,&#32;but&#32;the&#32;object&#32;attempts&#32;to&#32;find&#32;an&#32;anchor&#32;without&#32;any&#32;&quot;</emphasis>
+00137 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;+&#32;<emphasis role="stringliteral">&quot;velocity.&quot;</emphasis>)]
+00138 &#32;&#32;&#32;&#32;[SerializeField]
+00139 &#32;&#32;&#32;&#32;[Range(0.01F,&#32;1F)]
+00140 &#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;<emphasis role="keywordtype">float</emphasis>&#32;_motionlessRangeFraction&#32;=&#32;0.40F;
+00141 &#32;&#32;&#32;&#32;[SerializeField,&#32;Disable]
+00142 &#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;<emphasis role="keywordtype">float</emphasis>&#32;_maxMotionlessRange;
+00143 
+00144 &#32;&#32;&#32;&#32;[Tooltip(<emphasis role="stringliteral">&quot;The&#32;maximum&#32;angle&#32;this&#32;object&apos;s&#32;trajectory&#32;can&#32;be&#32;away&#32;from&#32;an&#32;anchor&#32;to&#32;consider&#32;it&#32;as&#32;&quot;</emphasis>
+00145 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;+&#32;<emphasis role="stringliteral">&quot;an&#32;anchor&#32;to&#32;attach&#32;to.&quot;</emphasis>)]
+00146 &#32;&#32;&#32;&#32;[SerializeField]
+00147 &#32;&#32;&#32;&#32;[Range(20F,&#32;90F)]
+00148 &#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;<emphasis role="keywordtype">float</emphasis>&#32;_maxAttachmentAngle&#32;=&#32;60F;
+00150 &#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;<emphasis role="keywordtype">float</emphasis>&#32;_minAttachmentDotProduct;
+00151 
+00152 &#32;&#32;&#32;&#32;[Tooltip(<emphasis role="stringliteral">&quot;Always&#32;attach&#32;an&#32;anchor&#32;if&#32;there&#32;is&#32;one&#32;within&#32;this&#32;distance,&#32;regardless&#32;&quot;</emphasis>
+00153 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;+&#32;<emphasis role="stringliteral">&quot;of&#32;trajectory.&quot;</emphasis>)]
+00154 &#32;&#32;&#32;&#32;[SerializeField]
+00155 &#32;&#32;&#32;&#32;[<link linkend="_class_leap_1_1_unity_1_1_attributes_1_1_min_value">MinValue</link>(0f)]
+00156 &#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;<emphasis role="keywordtype">float</emphasis>&#32;_alwaysAttachDistance&#32;=&#32;0f;
+00157 
+00158 &#32;&#32;&#32;&#32;[Header(<emphasis role="stringliteral">&quot;Motion&quot;</emphasis>)]
+00159 
+00160 &#32;&#32;&#32;&#32;[Tooltip(<emphasis role="stringliteral">&quot;Should&#32;the&#32;object&#32;move&#32;instantly&#32;to&#32;the&#32;anchor&#32;position?&quot;</emphasis>)]
+<anchor xml:id="__anchorable_behaviour_8cs_source_1l00161"/><link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_anchorable_behaviour_1a639dc5b718626a5ab76777eb8d2a24a2">00161</link> &#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keywordtype">bool</emphasis>&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_anchorable_behaviour_1a639dc5b718626a5ab76777eb8d2a24a2">lockToAnchor</link>&#32;=&#32;<emphasis role="keyword">false</emphasis>;
+00162 
+00163 &#32;&#32;&#32;&#32;[Tooltip(<emphasis role="stringliteral">&quot;Should&#32;the&#32;object&#32;move&#32;smoothly&#32;towards&#32;the&#32;anchor&#32;at&#32;first,&#32;but&#32;lock&#32;to&#32;it&#32;once&#32;it&#32;reaches&#32;the&#32;anchor?&#32;&quot;</emphasis>
+00164 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;+&#32;<emphasis role="stringliteral">&quot;Note:&#32;Disabling&#32;the&#32;AnchorableBehaviour&#32;will&#32;stop&#32;the&#32;object&#32;from&#32;moving&#32;towards&#32;its&#32;anchor,&#32;and&#32;will&#32;&quot;</emphasis>
+00165 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;+&#32;<emphasis role="stringliteral">&quot;&apos;release&apos;&#32;it&#32;from&#32;the&#32;anchor,&#32;so&#32;that&#32;on&#32;re-enable&#32;the&#32;object&#32;will&#32;smoothly&#32;move&#32;to&#32;the&#32;anchor&#32;again.&quot;</emphasis>)]
+00166 &#32;&#32;&#32;&#32;[<link linkend="_class_leap_1_1_unity_1_1_attributes_1_1_disable_if">DisableIf</link>(<emphasis role="stringliteral">&quot;lockToAnchor&quot;</emphasis>,&#32;isEqualTo:&#32;<emphasis role="keyword">true</emphasis>)]
+<anchor xml:id="__anchorable_behaviour_8cs_source_1l00167"/><link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_anchorable_behaviour_1a06a27a8ca63c701cfea9f99ee512d293">00167</link> &#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keywordtype">bool</emphasis>&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_anchorable_behaviour_1a06a27a8ca63c701cfea9f99ee512d293">lockWhenAttached</link>&#32;=&#32;<emphasis role="keyword">true</emphasis>;
+00168 
+00169 &#32;&#32;&#32;&#32;[Tooltip(<emphasis role="stringliteral">&quot;While&#32;this&#32;object&#32;is&#32;moving&#32;smoothly&#32;towards&#32;its&#32;anchor,&#32;should&#32;it&#32;also&#32;inherit&#32;the&#32;motion&#32;of&#32;the&#32;&quot;</emphasis>
+00170 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;+&#32;<emphasis role="stringliteral">&quot;anchor&#32;itself&#32;if&#32;the&#32;anchor&#32;is&#32;not&#32;stationary?&#32;Otherwise,&#32;the&#32;anchor&#32;might&#32;be&#32;able&#32;to&#32;run&#32;away&#32;from&#32;this&#32;&quot;</emphasis>
+00171 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;+&#32;<emphasis role="stringliteral">&quot;AnchorableBehaviour&#32;and&#32;prevent&#32;it&#32;from&#32;actually&#32;getting&#32;to&#32;the&#32;anchor.&quot;</emphasis>)]
+00172 &#32;&#32;&#32;&#32;[<link linkend="_class_leap_1_1_unity_1_1_attributes_1_1_disable_if">DisableIf</link>(<emphasis role="stringliteral">&quot;lockToAnchor&quot;</emphasis>,&#32;isEqualTo:&#32;<emphasis role="keyword">true</emphasis>)]
+<anchor xml:id="__anchorable_behaviour_8cs_source_1l00173"/><link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_anchorable_behaviour_1ae08e06de9abe0fe650acd8f1f1c31f74">00173</link> &#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keywordtype">bool</emphasis>&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_anchorable_behaviour_1ae08e06de9abe0fe650acd8f1f1c31f74">matchAnchorMotionWhileAttaching</link>&#32;=&#32;<emphasis role="keyword">true</emphasis>;
+00174 
+00175 &#32;&#32;&#32;&#32;[Tooltip(<emphasis role="stringliteral">&quot;How&#32;fast&#32;should&#32;the&#32;object&#32;move&#32;towards&#32;its&#32;target&#32;position?&#32;Higher&#32;values&#32;are&#32;faster.&quot;</emphasis>)]
+00176 &#32;&#32;&#32;&#32;[<link linkend="_class_leap_1_1_unity_1_1_attributes_1_1_disable_if">DisableIf</link>(<emphasis role="stringliteral">&quot;lockToAnchor&quot;</emphasis>,&#32;isEqualTo:&#32;<emphasis role="keyword">true</emphasis>)]
+00177 &#32;&#32;&#32;&#32;[Range(0,&#32;100F)]
+<anchor xml:id="__anchorable_behaviour_8cs_source_1l00178"/><link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_anchorable_behaviour_1a4f5df5a27d79d1ffcbbcdfb80da57274">00178</link> &#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keywordtype">float</emphasis>&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_anchorable_behaviour_1a4f5df5a27d79d1ffcbbcdfb80da57274">anchorLerpCoeffPerSec</link>&#32;=&#32;20F;
+00179 
+00180 &#32;&#32;&#32;&#32;[Header(<emphasis role="stringliteral">&quot;Rotation&quot;</emphasis>)]
+00181 
+00182 &#32;&#32;&#32;&#32;[Tooltip(<emphasis role="stringliteral">&quot;Should&#32;the&#32;object&#32;also&#32;rotate&#32;to&#32;match&#32;its&#32;anchor&apos;s&#32;rotation?&#32;If&#32;checked,&#32;motion&#32;settings&#32;applied&#32;&quot;</emphasis>
+00183 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;+&#32;<emphasis role="stringliteral">&quot;to&#32;how&#32;the&#32;anchor&#32;translates&#32;will&#32;also&#32;apply&#32;to&#32;how&#32;it&#32;rotates.&quot;</emphasis>)]
+<anchor xml:id="__anchorable_behaviour_8cs_source_1l00184"/><link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_anchorable_behaviour_1a6e8db2d74a39b3647c7019c1c7ee92d5">00184</link> &#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keywordtype">bool</emphasis>&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_anchorable_behaviour_1a6e8db2d74a39b3647c7019c1c7ee92d5">anchorRotation</link>&#32;=&#32;<emphasis role="keyword">false</emphasis>;
+00185 
+00186 &#32;&#32;&#32;&#32;[Header(<emphasis role="stringliteral">&quot;Interaction&quot;</emphasis>)]
+00187 
+00188 &#32;&#32;&#32;&#32;[Tooltip(<emphasis role="stringliteral">&quot;Additional&#32;features&#32;are&#32;enabled&#32;when&#32;this&#32;GameObject&#32;also&#32;has&#32;an&#32;InteractionBehaviour&#32;component.&quot;</emphasis>)]
+00189 &#32;&#32;&#32;&#32;[Disable]
+<anchor xml:id="__anchorable_behaviour_8cs_source_1l00190"/><link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_anchorable_behaviour_1aa067c979e2602b16f03103c18de20a92">00190</link> &#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_behaviour">InteractionBehaviour</link>&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_anchorable_behaviour_1aa067c979e2602b16f03103c18de20a92">interactionBehaviour</link>;
+00191 &#32;&#32;&#32;&#32;[SerializeField,&#32;HideInInspector]
+00192 &#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;<emphasis role="keywordtype">bool</emphasis>&#32;_interactionBehaviourIsNull&#32;=&#32;<emphasis role="keyword">true</emphasis>;
+00193 
+00194 &#32;&#32;&#32;&#32;[Tooltip(<emphasis role="stringliteral">&quot;If&#32;the&#32;InteractionBehaviour&#32;is&#32;set,&#32;objects&#32;will&#32;automatically&#32;detach&#32;from&#32;their&#32;anchor&#32;when&#32;grasped.&quot;</emphasis>)]
+00195 &#32;&#32;&#32;&#32;[Disable]
+<anchor xml:id="__anchorable_behaviour_8cs_source_1l00196"/><link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_anchorable_behaviour_1a3cffb103b9353e00207cea037e2054a0">00196</link> &#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keywordtype">bool</emphasis>&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_anchorable_behaviour_1a3cffb103b9353e00207cea037e2054a0">detachWhenGrasped</link>&#32;=&#32;<emphasis role="keyword">true</emphasis>;
+00197 
+00198 &#32;&#32;&#32;&#32;[Tooltip(<emphasis role="stringliteral">&quot;Should&#32;the&#32;AnchorableBehaviour&#32;automatically&#32;try&#32;to&#32;anchor&#32;itself&#32;when&#32;a&#32;grasp&#32;ends?&#32;If&#32;useTrajectory&#32;is&#32;enabled,&#32;&quot;</emphasis>
+00199 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;+&#32;<emphasis role="stringliteral">&quot;this&#32;object&#32;will&#32;automatically&#32;attempt&#32;to&#32;attach&#32;to&#32;the&#32;nearest&#32;valid&#32;anchor&#32;that&#32;is&#32;in&#32;the&#32;direction&#32;of&#32;its&#32;trajectory,&#32;&quot;</emphasis>
+00200 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;+&#32;<emphasis role="stringliteral">&quot;otherwise&#32;it&#32;will&#32;simply&#32;attempt&#32;to&#32;attach&#32;to&#32;its&#32;nearest&#32;valid&#32;anchor.&quot;</emphasis>)]
+00201 &#32;&#32;&#32;&#32;[SerializeField]
+00202 &#32;&#32;&#32;&#32;[OnEditorChange(<emphasis role="stringliteral">&quot;tryAnchorNearestOnGraspEnd&quot;</emphasis>)]
+00203 &#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;<emphasis role="keywordtype">bool</emphasis>&#32;_tryAnchorNearestOnGraspEnd&#32;=&#32;<emphasis role="keyword">true</emphasis>;
+<anchor xml:id="__anchorable_behaviour_8cs_source_1l00204"/><link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_anchorable_behaviour_1aaa63f2fc2253c8a559150fb0127730f5">00204</link> &#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keywordtype">bool</emphasis>&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_anchorable_behaviour_1aaa63f2fc2253c8a559150fb0127730f5">tryAnchorNearestOnGraspEnd</link>&#32;{
+00205 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">get</emphasis>&#32;{
+00206 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;_tryAnchorNearestOnGraspEnd;
+00207 &#32;&#32;&#32;&#32;&#32;&#32;}
+00208 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">set</emphasis>&#32;{
+00209 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_anchorable_behaviour_1aa067c979e2602b16f03103c18de20a92">interactionBehaviour</link>&#32;!=&#32;<emphasis role="keyword">null</emphasis>)&#32;{
+00210 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;Prevent&#32;duplicate&#32;subscription.</emphasis>
+00211 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_anchorable_behaviour_1aa067c979e2602b16f03103c18de20a92">interactionBehaviour</link>.<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_behaviour_1aa28fa95514cad60b292efec67f235e35">OnGraspEnd</link>&#32;-=&#32;tryToAnchorOnGraspEnd;
+00212 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00213 
+00214 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;_tryAnchorNearestOnGraspEnd&#32;=&#32;value;
+00215 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_anchorable_behaviour_1aa067c979e2602b16f03103c18de20a92">interactionBehaviour</link>&#32;!=&#32;<emphasis role="keyword">null</emphasis>&#32;&amp;&amp;&#32;_tryAnchorNearestOnGraspEnd)&#32;{
+00216 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_anchorable_behaviour_1aa067c979e2602b16f03103c18de20a92">interactionBehaviour</link>.<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_behaviour_1aa28fa95514cad60b292efec67f235e35">OnGraspEnd</link>&#32;+=&#32;tryToAnchorOnGraspEnd;
+00217 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00218 &#32;&#32;&#32;&#32;&#32;&#32;}
+00219 &#32;&#32;&#32;&#32;}
+00220 
+00221 &#32;&#32;&#32;&#32;[Tooltip(<emphasis role="stringliteral">&quot;Should&#32;the&#32;object&#32;pull&#32;away&#32;from&#32;its&#32;anchor&#32;and&#32;reach&#32;towards&#32;the&#32;user&apos;s&#32;hand&#32;when&#32;the&#32;user&apos;s&#32;hand&#32;is&#32;nearby?&quot;</emphasis>)]
+<anchor xml:id="__anchorable_behaviour_8cs_source_1l00222"/><link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_anchorable_behaviour_1a85262d2cae0fd2ab5291d18406868c48">00222</link> &#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keywordtype">bool</emphasis>&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_anchorable_behaviour_1a85262d2cae0fd2ab5291d18406868c48">isAttractedByHand</link>&#32;=&#32;<emphasis role="keyword">false</emphasis>;
+00223 
+00224 &#32;&#32;&#32;&#32;[Tooltip(<emphasis role="stringliteral">&quot;If&#32;the&#32;object&#32;is&#32;attracted&#32;to&#32;hands,&#32;how&#32;far&#32;should&#32;the&#32;object&#32;be&#32;allowed&#32;to&#32;pull&#32;away&#32;from&#32;its&#32;anchor&#32;&quot;</emphasis>
+00225 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;+&#32;<emphasis role="stringliteral">&quot;towards&#32;a&#32;nearby&#32;InteractionHand?&#32;Value&#32;is&#32;in&#32;Unity&#32;distance&#32;units,&#32;WORLD&#32;space.&quot;</emphasis>)]
+<anchor xml:id="__anchorable_behaviour_8cs_source_1l00226"/><link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_anchorable_behaviour_1a71b2fb0a2dba4935795a00a88f15bf1a">00226</link> &#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keywordtype">float</emphasis>&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_anchorable_behaviour_1a71b2fb0a2dba4935795a00a88f15bf1a">maxAttractionReach</link>&#32;=&#32;0.1F;
+00227 
+00228 &#32;&#32;&#32;&#32;[Tooltip(<emphasis role="stringliteral">&quot;This&#32;curve&#32;converts&#32;the&#32;distance&#32;of&#32;the&#32;hand&#32;(X&#32;axis)&#32;to&#32;the&#32;desired&#32;attraction&#32;reach&#32;distance&#32;for&#32;the&#32;object&#32;(Y&#32;axis).&#32;&quot;</emphasis>
+00229 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;+&#32;<emphasis role="stringliteral">&quot;The&#32;evaluated&#32;value&#32;is&#32;clamped&#32;between&#32;0&#32;and&#32;1,&#32;and&#32;then&#32;scaled&#32;by&#32;maxAttractionReach.&quot;</emphasis>)]
+<anchor xml:id="__anchorable_behaviour_8cs_source_1l00230"/><link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_anchorable_behaviour_1a8ff2f11921e25a9a278de2cf09f8499f">00230</link> &#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;AnimationCurve&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_anchorable_behaviour_1a8ff2f11921e25a9a278de2cf09f8499f">attractionReachByDistance</link>;
+00231 
+00232 &#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_anchor">Anchor</link>&#32;_preferredAnchor&#32;=&#32;<emphasis role="keyword">null</emphasis>;
+<anchor xml:id="__anchorable_behaviour_8cs_source_1l00238"/><link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_anchorable_behaviour_1ab82e05ed50e6b2de8cad02a53efec6d4">00238</link> &#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_anchor">Anchor</link>&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_anchorable_behaviour_1ab82e05ed50e6b2de8cad02a53efec6d4">preferredAnchor</link>&#32;{&#32;<emphasis role="keyword">get</emphasis>&#32;{&#32;<emphasis role="keywordflow">return</emphasis>&#32;_preferredAnchor;&#32;}&#32;}
+00239 
+00240 <emphasis role="preprocessor">&#32;&#32;&#32;&#32;#region&#32;Events</emphasis>
+00241 
+<anchor xml:id="__anchorable_behaviour_8cs_source_1l00245"/><link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_anchorable_behaviour_1a6fbe787555ba1bcbae45f715777e0b7d">00245</link> &#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;Action&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_anchorable_behaviour_1a6fbe787555ba1bcbae45f715777e0b7d">OnAttachedToAnchor</link>&#32;=&#32;()&#32;=&gt;&#32;{&#32;};
+00246 
+<anchor xml:id="__anchorable_behaviour_8cs_source_1l00250"/><link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_anchorable_behaviour_1a03147adbeb35c85e8bded5c70a266f5d">00250</link> &#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;Action&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_anchorable_behaviour_1a03147adbeb35c85e8bded5c70a266f5d">OnLockedToAnchor</link>&#32;=&#32;()&#32;=&gt;&#32;{&#32;};
+00251 
+<anchor xml:id="__anchorable_behaviour_8cs_source_1l00255"/><link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_anchorable_behaviour_1a61aec444eb2b020981d37d7a15c1b280">00255</link> &#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;Action&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_anchorable_behaviour_1a61aec444eb2b020981d37d7a15c1b280">OnDetachedFromAnchor</link>&#32;=&#32;()&#32;=&gt;&#32;{&#32;};
+00256 
+<anchor xml:id="__anchorable_behaviour_8cs_source_1l00260"/><link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_anchorable_behaviour_1aaf482a8b7ddc06ccae2435b20e211c32">00260</link> &#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;Action&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_anchorable_behaviour_1aaf482a8b7ddc06ccae2435b20e211c32">WhileAttachedToAnchor</link>&#32;=&#32;()&#32;=&gt;&#32;{&#32;};
+00261 
+<anchor xml:id="__anchorable_behaviour_8cs_source_1l00265"/><link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_anchorable_behaviour_1ae28b784351149af7a30d9079820c1a35">00265</link> &#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;Action&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_anchorable_behaviour_1ae28b784351149af7a30d9079820c1a35">WhileLockedToAnchor</link>&#32;=&#32;()&#32;=&gt;&#32;{&#32;};
+00266 
+<anchor xml:id="__anchorable_behaviour_8cs_source_1l00275"/><link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_anchorable_behaviour_1a29a27e344ab1105d4fa8657de3fe5dab">00275</link> &#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;Action&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_anchorable_behaviour_1a29a27e344ab1105d4fa8657de3fe5dab">OnPostTryAnchorOnGraspEnd</link>&#32;=&#32;()&#32;=&gt;&#32;{&#32;};
+00276 
+00277 <emphasis role="preprocessor">&#32;&#32;&#32;&#32;#endregion</emphasis>
+00278 
+00279 &#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;<emphasis role="keywordtype">bool</emphasis>&#32;_isLockedToAnchor&#32;=&#32;<emphasis role="keyword">false</emphasis>;
+00280 &#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;Vector3&#32;_offsetTowardsHand&#32;=&#32;Vector3.zero;
+00281 &#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;Vector3&#32;_targetPositionLastUpdate&#32;=&#32;Vector3.zero;
+00282 &#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;<emphasis role="keywordtype">bool</emphasis>&#32;_hasTargetPositionLastUpdate&#32;=&#32;<emphasis role="keyword">false</emphasis>;
+00283 
+00284 &#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;<emphasis role="keywordtype">bool</emphasis>&#32;_isRotationLockedToAnchor&#32;=&#32;<emphasis role="keyword">false</emphasis>;
+00285 &#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;Quaternion&#32;_targetRotationLastUpdate&#32;=&#32;Quaternion.identity;
+00286 &#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;<emphasis role="keywordtype">bool</emphasis>&#32;_hasTargetRotationLastUpdate&#32;=&#32;<emphasis role="keyword">false</emphasis>;
+00287 
+00288 &#32;&#32;&#32;&#32;<emphasis role="keywordtype">void</emphasis>&#32;OnValidate()&#32;{
+00289 &#32;&#32;&#32;&#32;&#32;&#32;refreshInteractionBehaviour();
+00290 &#32;&#32;&#32;&#32;&#32;&#32;refreshInspectorConveniences();
+00291 &#32;&#32;&#32;&#32;}
+00292 
+00293 &#32;&#32;&#32;&#32;<emphasis role="keywordtype">void</emphasis>&#32;Reset()&#32;{
+00294 &#32;&#32;&#32;&#32;&#32;&#32;refreshInteractionBehaviour();
+00295 &#32;&#32;&#32;&#32;}
+00296 
+00297 &#32;&#32;&#32;&#32;<emphasis role="keywordtype">void</emphasis>&#32;Awake()&#32;{
+00298 &#32;&#32;&#32;&#32;&#32;&#32;refreshInteractionBehaviour();
+00299 &#32;&#32;&#32;&#32;&#32;&#32;refreshInspectorConveniences();
+00300 
+00301 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_anchorable_behaviour_1aa067c979e2602b16f03103c18de20a92">interactionBehaviour</link>&#32;!=&#32;<emphasis role="keyword">null</emphasis>)&#32;{
+00302 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_anchorable_behaviour_1aa067c979e2602b16f03103c18de20a92">interactionBehaviour</link>.<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_behaviour_1a2d1393f9aa91a358e24fa6919eb09265">OnGraspBegin</link>&#32;+=&#32;detachAnchorOnGraspBegin;
+00303 
+00304 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(_tryAnchorNearestOnGraspEnd)&#32;{
+00305 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_anchorable_behaviour_1aa067c979e2602b16f03103c18de20a92">interactionBehaviour</link>.<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_behaviour_1aa28fa95514cad60b292efec67f235e35">OnGraspEnd</link>&#32;+=&#32;tryToAnchorOnGraspEnd;
+00306 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00307 &#32;&#32;&#32;&#32;&#32;&#32;}
+00308 
+00309 &#32;&#32;&#32;&#32;&#32;&#32;initUnityEvents();
+00310 &#32;&#32;&#32;&#32;}
+00311 
+00312 &#32;&#32;&#32;&#32;<emphasis role="keywordtype">void</emphasis>&#32;Start()&#32;{
+00313 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_anchorable_behaviour_1acc535c0d9a79d1ddcaab2dd0587ba9bb">anchor</link>&#32;!=&#32;<emphasis role="keyword">null</emphasis>&#32;&amp;&amp;&#32;_isAttached)&#32;{
+00314 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_anchorable_behaviour_1acc535c0d9a79d1ddcaab2dd0587ba9bb">anchor</link>.<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_anchor_1a063da3d8209d998112e4268f024ececa">NotifyAttached</link>(<emphasis role="keyword">this</emphasis>);
+00315 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_anchorable_behaviour_1a6fbe787555ba1bcbae45f715777e0b7d">OnAttachedToAnchor</link>();
+00316 &#32;&#32;&#32;&#32;&#32;&#32;}
+00317 &#32;&#32;&#32;&#32;}
+00318 
+00319 &#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;<emphasis role="keywordtype">bool</emphasis>&#32;_reactivateGravityOnDetach&#32;=&#32;<emphasis role="keyword">false</emphasis>;
+00320 
+00321 &#32;&#32;&#32;&#32;<emphasis role="keywordtype">void</emphasis>&#32;Update()&#32;{
+00322 &#32;&#32;&#32;&#32;&#32;&#32;updateAttractionToHand();
+00323 
+00324 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_anchorable_behaviour_1acc535c0d9a79d1ddcaab2dd0587ba9bb">anchor</link>&#32;!=&#32;<emphasis role="keyword">null</emphasis>&#32;&amp;&amp;&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_anchorable_behaviour_1ad44eb15001e88b33e46f06e1b2501e59">isAttached</link>)&#32;{
+00325 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_anchorable_behaviour_1aa067c979e2602b16f03103c18de20a92">interactionBehaviour</link>&#32;!=&#32;<emphasis role="keyword">null</emphasis>&#32;&amp;&amp;&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_anchorable_behaviour_1aa067c979e2602b16f03103c18de20a92">interactionBehaviour</link>.<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_behaviour_1a4f54f1794944882d8cf51bd641a5341c">rigidbody</link>.useGravity)&#32;{
+00326 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;TODO:&#32;This&#32;is&#32;a&#32;temporary&#32;fix&#32;for&#32;gravity&#32;to&#32;be&#32;fixed&#32;in&#32;a&#32;future&#32;IE&#32;PR.</emphasis>
+00327 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;The&#32;proper&#32;solution&#32;involves&#32;switching&#32;the&#32;behaviour&#32;to&#32;FixedUpdate&#32;and&#32;more</emphasis>
+00328 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;intelligently&#32;communicating&#32;with&#32;the&#32;attached&#32;InteractionBehaviour.</emphasis>
+00329 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_anchorable_behaviour_1aa067c979e2602b16f03103c18de20a92">interactionBehaviour</link>.<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_behaviour_1a4f54f1794944882d8cf51bd641a5341c">rigidbody</link>.useGravity&#32;=&#32;<emphasis role="keyword">false</emphasis>;
+00330 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;_reactivateGravityOnDetach&#32;=&#32;<emphasis role="keyword">true</emphasis>;
+00331 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00332 
+00333 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;updateAnchorAttachment();
+00334 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_anchorable_behaviour_1a6e8db2d74a39b3647c7019c1c7ee92d5">anchorRotation</link>)&#32;{
+00335 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;updateAnchorAttachmentRotation();
+00336 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00337 
+00338 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_anchorable_behaviour_1aaf482a8b7ddc06ccae2435b20e211c32">WhileAttachedToAnchor</link>.Invoke();
+00339 
+00340 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(_isLockedToAnchor)&#32;{
+00341 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_anchorable_behaviour_1ae28b784351149af7a30d9079820c1a35">WhileLockedToAnchor</link>.Invoke();
+00342 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00343 &#32;&#32;&#32;&#32;&#32;&#32;}
+00344 
+00345 &#32;&#32;&#32;&#32;&#32;&#32;updateAnchorPreference();
+00346 &#32;&#32;&#32;&#32;}
+00347 
+00348 &#32;&#32;&#32;&#32;<emphasis role="keywordtype">void</emphasis>&#32;OnDisable()&#32;{
+00349 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(!this.enabled)&#32;{
+00350 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_anchorable_behaviour_1afdba1fc31f7d6a20af66bdac91bf5d72">Detach</link>();
+00351 &#32;&#32;&#32;&#32;&#32;&#32;}
+00352 
+00353 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;Make&#32;sure&#32;we&#32;don&apos;t&#32;leave&#32;dangling&#32;anchor-preference&#32;state.</emphasis>
+00354 &#32;&#32;&#32;&#32;&#32;&#32;endAnchorPreference();
+00355 &#32;&#32;&#32;&#32;}
+00356 
+00357 &#32;&#32;&#32;&#32;<emphasis role="keywordtype">void</emphasis>&#32;OnDestroy()&#32;{
+00358 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_anchorable_behaviour_1aa067c979e2602b16f03103c18de20a92">interactionBehaviour</link>&#32;!=&#32;<emphasis role="keyword">null</emphasis>)&#32;{
+00359 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_anchorable_behaviour_1aa067c979e2602b16f03103c18de20a92">interactionBehaviour</link>.<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_behaviour_1a2d1393f9aa91a358e24fa6919eb09265">OnGraspBegin</link>&#32;-=&#32;detachAnchorOnGraspBegin;
+00360 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_anchorable_behaviour_1aa067c979e2602b16f03103c18de20a92">interactionBehaviour</link>.<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_behaviour_1aa28fa95514cad60b292efec67f235e35">OnGraspEnd</link>&#32;-=&#32;tryToAnchorOnGraspEnd;
+00361 &#32;&#32;&#32;&#32;&#32;&#32;}
+00362 
+00363 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;Make&#32;sure&#32;we&#32;don&apos;t&#32;leave&#32;dangling&#32;anchor-preference&#32;state.</emphasis>
+00364 &#32;&#32;&#32;&#32;&#32;&#32;endAnchorPreference();
+00365 &#32;&#32;&#32;&#32;}
+00366 
+00367 &#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;refreshInspectorConveniences()&#32;{
+00368 &#32;&#32;&#32;&#32;&#32;&#32;_minAttachmentDotProduct&#32;=&#32;Mathf.Cos(_maxAttachmentAngle&#32;*&#32;Mathf.Deg2Rad);
+00369 &#32;&#32;&#32;&#32;&#32;&#32;_maxMotionlessRange&#32;=&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_anchorable_behaviour_1a894d0a63d373fe4cebaf382daef1c940">maxAnchorRange</link>&#32;*&#32;_motionlessRangeFraction;
+00370 &#32;&#32;&#32;&#32;}
+00371 
+00372 &#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;refreshInteractionBehaviour()&#32;{
+00373 &#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_anchorable_behaviour_1aa067c979e2602b16f03103c18de20a92">interactionBehaviour</link>&#32;=&#32;GetComponent&lt;InteractionBehaviour&gt;();
+00374 &#32;&#32;&#32;&#32;&#32;&#32;_interactionBehaviourIsNull&#32;=&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_anchorable_behaviour_1aa067c979e2602b16f03103c18de20a92">interactionBehaviour</link>&#32;==&#32;<emphasis role="keyword">null</emphasis>;
+00375 
+00376 &#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_anchorable_behaviour_1a3cffb103b9353e00207cea037e2054a0">detachWhenGrasped</link>&#32;=&#32;!_interactionBehaviourIsNull;
+00377 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(_interactionBehaviourIsNull)&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_anchorable_behaviour_1ab05fef36f601748387b8a283433909f3">useTrajectory</link>&#32;=&#32;<emphasis role="keyword">false</emphasis>;
+00378 &#32;&#32;&#32;&#32;}
+00379 
+<anchor xml:id="__anchorable_behaviour_8cs_source_1l00384"/><link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_anchorable_behaviour_1afdba1fc31f7d6a20af66bdac91bf5d72">00384</link> &#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_anchorable_behaviour_1afdba1fc31f7d6a20af66bdac91bf5d72">Detach</link>()&#32;{
+00385 &#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_anchorable_behaviour_1ad44eb15001e88b33e46f06e1b2501e59">isAttached</link>&#32;=&#32;<emphasis role="keyword">false</emphasis>;
+00386 &#32;&#32;&#32;&#32;}
+00387 
+<anchor xml:id="__anchorable_behaviour_8cs_source_1l00393"/><link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_anchorable_behaviour_1a8e014a55c2402653af66bff1ea6b2ba9">00393</link> &#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keywordtype">bool</emphasis>&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_anchorable_behaviour_1a8e014a55c2402653af66bff1ea6b2ba9">IsValidAnchor</link>(<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_anchor">Anchor</link>&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_anchorable_behaviour_1acc535c0d9a79d1ddcaab2dd0587ba9bb">anchor</link>)&#32;{
+00394 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(this.<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_anchorable_behaviour_1a493657fd562e747009c5536592f30e7a">anchorGroup</link>&#32;!=&#32;<emphasis role="keyword">null</emphasis>)&#32;{
+00395 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;this.<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_anchorable_behaviour_1a493657fd562e747009c5536592f30e7a">anchorGroup</link>.<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_anchor_group_1a8a1125abd6cbd8bb0083b9fe8ecf4fdc">Contains</link>(anchor);
+00396 &#32;&#32;&#32;&#32;&#32;&#32;}
+00397 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">else</emphasis>&#32;{
+00398 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;<emphasis role="keyword">true</emphasis>;
+00399 &#32;&#32;&#32;&#32;&#32;&#32;}
+00400 &#32;&#32;&#32;&#32;}
+00401 
+<anchor xml:id="__anchorable_behaviour_8cs_source_1l00405"/><link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_anchorable_behaviour_1a93ce5813c3ce4805451e93d5c5050d4e">00405</link> &#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keywordtype">bool</emphasis>&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_anchorable_behaviour_1a93ce5813c3ce4805451e93d5c5050d4e">IsWithinRange</link>(<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_anchor">Anchor</link>&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_anchorable_behaviour_1acc535c0d9a79d1ddcaab2dd0587ba9bb">anchor</link>)&#32;{
+00406 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;(this.transform.position&#32;-&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_anchorable_behaviour_1acc535c0d9a79d1ddcaab2dd0587ba9bb">anchor</link>.transform.position).sqrMagnitude&#32;&lt;&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_anchorable_behaviour_1a894d0a63d373fe4cebaf382daef1c940">maxAnchorRange</link>&#32;*&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_anchorable_behaviour_1a894d0a63d373fe4cebaf382daef1c940">maxAnchorRange</link>;
+00407 &#32;&#32;&#32;&#32;}
+00408 
+<anchor xml:id="__anchorable_behaviour_8cs_source_1l00420"/><link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_anchorable_behaviour_1a1ec7edef87a35f76a8ffc601ce1b615a">00420</link> &#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_anchor">Anchor</link>&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_anchorable_behaviour_1a1ec7edef87a35f76a8ffc601ce1b615a">FindPreferredAnchor</link>()&#32;{
+00421 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(!<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_anchorable_behaviour_1ab05fef36f601748387b8a283433909f3">useTrajectory</link>)&#32;{
+00422 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;Simply&#32;try&#32;to&#32;attach&#32;to&#32;the&#32;nearest&#32;valid&#32;anchor.</emphasis>
+00423 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_anchorable_behaviour_1a34daac6bf30d498a6df3c847124dd219">GetNearestValidAnchor</link>();
+00424 &#32;&#32;&#32;&#32;&#32;&#32;}
+00425 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">else</emphasis>&#32;{
+00426 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;Pick&#32;the&#32;nearby&#32;valid&#32;anchor&#32;with&#32;the&#32;highest&#32;score,&#32;based&#32;on&#32;proximity&#32;and&#32;trajectory.</emphasis>
+00427 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_anchor">Anchor</link>&#32;optimalAnchor&#32;=&#32;<emphasis role="keyword">null</emphasis>;
+00428 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordtype">float</emphasis>&#32;optimalScore&#32;=&#32;0F;
+00429 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_anchor">Anchor</link>&#32;testAnchor&#32;=&#32;<emphasis role="keyword">null</emphasis>;
+00430 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordtype">float</emphasis>&#32;testScore&#32;=&#32;0F;
+00431 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">foreach</emphasis>&#32;(var&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_anchorable_behaviour_1acc535c0d9a79d1ddcaab2dd0587ba9bb">anchor</link>&#32;<emphasis role="keywordflow">in</emphasis>&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_anchorable_behaviour_1a5a5c9e551804405da221dd9bdc3b9e42">GetNearbyValidAnchors</link>())&#32;{
+00432 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;testAnchor&#32;=&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_anchorable_behaviour_1acc535c0d9a79d1ddcaab2dd0587ba9bb">anchor</link>;
+00433 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;testScore&#32;=&#32;getAnchorScore(<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_anchorable_behaviour_1acc535c0d9a79d1ddcaab2dd0587ba9bb">anchor</link>);
+00434 
+00435 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;Scores&#32;of&#32;0&#32;mark&#32;ineligible&#32;anchors.</emphasis>
+00436 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(testScore&#32;==&#32;0F)&#32;<emphasis role="keywordflow">continue</emphasis>;
+00437 
+00438 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(testScore&#32;&gt;&#32;optimalScore)&#32;{
+00439 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;optimalAnchor&#32;=&#32;testAnchor;
+00440 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;optimalScore&#32;=&#32;testScore;
+00441 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00442 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00443 
+00444 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;optimalAnchor;
+00445 &#32;&#32;&#32;&#32;&#32;&#32;}
+00446 &#32;&#32;&#32;&#32;}
+00447 
+00448 &#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;List&lt;Anchor&gt;&#32;_nearbyAnchorsBuffer&#32;=&#32;<emphasis role="keyword">new</emphasis>&#32;List&lt;Anchor&gt;();
+<anchor xml:id="__anchorable_behaviour_8cs_source_1l00458"/><link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_anchorable_behaviour_1a5a5c9e551804405da221dd9bdc3b9e42">00458</link> &#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;List&lt;Anchor&gt;&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_anchorable_behaviour_1a5a5c9e551804405da221dd9bdc3b9e42">GetNearbyValidAnchors</link>(<emphasis role="keywordtype">bool</emphasis>&#32;requireAnchorHasSpace&#32;=&#32;<emphasis role="keyword">true</emphasis>,
+00459 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordtype">bool</emphasis>&#32;requireAnchorActiveAndEnabled&#32;=&#32;<emphasis role="keyword">true</emphasis>)&#32;{
+00460 &#32;&#32;&#32;&#32;&#32;&#32;HashSet&lt;Anchor&gt;&#32;anchorsToCheck;
+00461 
+00462 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(this.<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_anchorable_behaviour_1a493657fd562e747009c5536592f30e7a">anchorGroup</link>&#32;==&#32;<emphasis role="keyword">null</emphasis>)&#32;{
+00463 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;anchorsToCheck&#32;=&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_anchor">Anchor</link>.<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_anchor_1ac55ba01abd9142448ba2ec9dc1f66baa">allAnchors</link>;
+00464 &#32;&#32;&#32;&#32;&#32;&#32;}
+00465 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">else</emphasis>&#32;{
+00466 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;anchorsToCheck&#32;=&#32;this.<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_anchorable_behaviour_1a493657fd562e747009c5536592f30e7a">anchorGroup</link>.<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_anchor_group_1a57bbc5ec4573e3c75a1716fa4650020c">anchors</link>;
+00467 &#32;&#32;&#32;&#32;&#32;&#32;}
+00468 
+00469 &#32;&#32;&#32;&#32;&#32;&#32;_nearbyAnchorsBuffer.<link linkend="_class_leap_1_1_unity_1_1_serializable_hash_set_1a54a8a46ea0b8b525ef10ef18d7e2aba6">Clear</link>();
+00470 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">foreach</emphasis>&#32;(var&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_anchorable_behaviour_1acc535c0d9a79d1ddcaab2dd0587ba9bb">anchor</link>&#32;<emphasis role="keywordflow">in</emphasis>&#32;anchorsToCheck)&#32;{
+00471 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;((requireAnchorHasSpace&#32;&amp;&amp;&#32;(!<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_anchorable_behaviour_1acc535c0d9a79d1ddcaab2dd0587ba9bb">anchor</link>.<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_anchor_1ad0581637844a848f9e8948a48abfc77d">allowMultipleObjects</link>&#32;&amp;&amp;&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_anchorable_behaviour_1acc535c0d9a79d1ddcaab2dd0587ba9bb">anchor</link>.<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_anchor_1a33e0bc00ec1ff195fac8f709abe72cbc">anchoredObjects</link>.Count&#32;!=&#32;0))
+00472 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;||&#32;(requireAnchorActiveAndEnabled&#32;&amp;&amp;&#32;!<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_anchorable_behaviour_1acc535c0d9a79d1ddcaab2dd0587ba9bb">anchor</link>.isActiveAndEnabled))&#32;<emphasis role="keywordflow">continue</emphasis>;
+00473 
+00474 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;((<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_anchorable_behaviour_1acc535c0d9a79d1ddcaab2dd0587ba9bb">anchor</link>.transform.position&#32;-&#32;<emphasis role="keyword">this</emphasis>.transform.position).sqrMagnitude&#32;&lt;=&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_anchorable_behaviour_1a894d0a63d373fe4cebaf382daef1c940">maxAnchorRange</link>&#32;*&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_anchorable_behaviour_1a894d0a63d373fe4cebaf382daef1c940">maxAnchorRange</link>)&#32;{
+00475 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;_nearbyAnchorsBuffer.Add(<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_anchorable_behaviour_1acc535c0d9a79d1ddcaab2dd0587ba9bb">anchor</link>);
+00476 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00477 &#32;&#32;&#32;&#32;&#32;&#32;}
+00478 
+00479 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;_nearbyAnchorsBuffer;
+00480 &#32;&#32;&#32;&#32;}
+00481 
+<anchor xml:id="__anchorable_behaviour_8cs_source_1l00492"/><link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_anchorable_behaviour_1a34daac6bf30d498a6df3c847124dd219">00492</link> &#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_anchor">Anchor</link>&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_anchorable_behaviour_1a34daac6bf30d498a6df3c847124dd219">GetNearestValidAnchor</link>(<emphasis role="keywordtype">bool</emphasis>&#32;requireWithinRange&#32;=&#32;<emphasis role="keyword">true</emphasis>,
+00493 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordtype">bool</emphasis>&#32;requireAnchorHasSpace&#32;=&#32;<emphasis role="keyword">true</emphasis>,
+00494 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordtype">bool</emphasis>&#32;requireAnchorActiveAndEnabled&#32;=&#32;<emphasis role="keyword">true</emphasis>)&#32;{
+00495 &#32;&#32;&#32;&#32;&#32;&#32;HashSet&lt;Anchor&gt;&#32;anchorsToCheck;
+00496 
+00497 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(this.<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_anchorable_behaviour_1a493657fd562e747009c5536592f30e7a">anchorGroup</link>&#32;==&#32;<emphasis role="keyword">null</emphasis>)&#32;{
+00498 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;anchorsToCheck&#32;=&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_anchor">Anchor</link>.<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_anchor_1ac55ba01abd9142448ba2ec9dc1f66baa">allAnchors</link>;
+00499 &#32;&#32;&#32;&#32;&#32;&#32;}
+00500 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">else</emphasis>&#32;{
+00501 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;anchorsToCheck&#32;=&#32;this.<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_anchorable_behaviour_1a493657fd562e747009c5536592f30e7a">anchorGroup</link>.<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_anchor_group_1a57bbc5ec4573e3c75a1716fa4650020c">anchors</link>;
+00502 &#32;&#32;&#32;&#32;&#32;&#32;}
+00503 
+00504 &#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_anchor">Anchor</link>&#32;closestAnchor&#32;=&#32;<emphasis role="keyword">null</emphasis>;
+00505 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordtype">float</emphasis>&#32;closestDistSqrd&#32;=&#32;<emphasis role="keywordtype">float</emphasis>.PositiveInfinity;
+00506 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">foreach</emphasis>&#32;(var&#32;testAnchor&#32;<emphasis role="keywordflow">in</emphasis>&#32;anchorsToCheck)&#32;{
+00507 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(requireAnchorHasSpace)&#32;{
+00508 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordtype">bool</emphasis>&#32;anchorHasSpace&#32;=&#32;testAnchor.<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_anchor_1a33e0bc00ec1ff195fac8f709abe72cbc">anchoredObjects</link>.Count&#32;==&#32;0
+00509 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;||&#32;testAnchor.allowMultipleObjects;
+00510 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(!anchorHasSpace)&#32;{
+00511 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;Skip&#32;the&#32;anchor&#32;for&#32;consideration.</emphasis>
+00512 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">continue</emphasis>;
+00513 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00514 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00515 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(requireAnchorActiveAndEnabled&#32;&amp;&amp;&#32;!testAnchor.isActiveAndEnabled)&#32;{
+00516 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;Skip&#32;the&#32;anchor&#32;for&#32;consideration.</emphasis>
+00517 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">continue</emphasis>;
+00518 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00519 
+00520 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordtype">float</emphasis>&#32;testDistanceSqrd&#32;=&#32;(testAnchor.transform.position&#32;-&#32;this.transform.position).sqrMagnitude;
+00521 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(testDistanceSqrd&#32;&lt;&#32;closestDistSqrd)&#32;{
+00522 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;closestAnchor&#32;=&#32;testAnchor;
+00523 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;closestDistSqrd&#32;=&#32;testDistanceSqrd;
+00524 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00525 &#32;&#32;&#32;&#32;&#32;&#32;}
+00526 
+00527 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(!requireWithinRange&#32;||&#32;closestDistSqrd&#32;&lt;&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_anchorable_behaviour_1a894d0a63d373fe4cebaf382daef1c940">maxAnchorRange</link>&#32;*&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_anchorable_behaviour_1a894d0a63d373fe4cebaf382daef1c940">maxAnchorRange</link>)&#32;{
+00528 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;closestAnchor;
+00529 &#32;&#32;&#32;&#32;&#32;&#32;}
+00530 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">else</emphasis>&#32;{
+00531 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;<emphasis role="keyword">null</emphasis>;
+00532 &#32;&#32;&#32;&#32;&#32;&#32;}
+00533 &#32;&#32;&#32;&#32;}
+00534 
+<anchor xml:id="__anchorable_behaviour_8cs_source_1l00540"/><link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_anchorable_behaviour_1acf8928aca2c223daa30c8650564b9ab0">00540</link> &#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keywordtype">bool</emphasis>&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_anchorable_behaviour_1acf8928aca2c223daa30c8650564b9ab0">TryAttach</link>(<emphasis role="keywordtype">bool</emphasis>&#32;ignoreRange&#32;=&#32;<emphasis role="keyword">false</emphasis>)&#32;{
+00541 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_anchorable_behaviour_1acc535c0d9a79d1ddcaab2dd0587ba9bb">anchor</link>&#32;!=&#32;<emphasis role="keyword">null</emphasis>&#32;&amp;&amp;&#32;(ignoreRange&#32;||&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_anchorable_behaviour_1a93ce5813c3ce4805451e93d5c5050d4e">IsWithinRange</link>(<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_anchorable_behaviour_1acc535c0d9a79d1ddcaab2dd0587ba9bb">anchor</link>)))&#32;{
+00542 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_anchorable_behaviour_1ad44eb15001e88b33e46f06e1b2501e59">isAttached</link>&#32;=&#32;<emphasis role="keyword">true</emphasis>;
+00543 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;<emphasis role="keyword">true</emphasis>;
+00544 &#32;&#32;&#32;&#32;&#32;&#32;}
+00545 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">else</emphasis>&#32;{
+00546 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;<emphasis role="keyword">false</emphasis>;
+00547 &#32;&#32;&#32;&#32;&#32;&#32;}
+00548 &#32;&#32;&#32;&#32;}
+00549 
+<anchor xml:id="__anchorable_behaviour_8cs_source_1l00555"/><link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_anchorable_behaviour_1a526fd155d1bfdb640231bb0f5b26f159">00555</link> &#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keywordtype">bool</emphasis>&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_anchorable_behaviour_1a526fd155d1bfdb640231bb0f5b26f159">TryAttachToNearestAnchor</link>()&#32;{
+00556 &#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_anchor">Anchor</link>&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_anchorable_behaviour_1ab82e05ed50e6b2de8cad02a53efec6d4">preferredAnchor</link>&#32;=&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_anchorable_behaviour_1a1ec7edef87a35f76a8ffc601ce1b615a">FindPreferredAnchor</link>();
+00557 
+00558 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_anchorable_behaviour_1ab82e05ed50e6b2de8cad02a53efec6d4">preferredAnchor</link>&#32;!=&#32;<emphasis role="keyword">null</emphasis>)&#32;{
+00559 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;_preferredAnchor&#32;=&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_anchorable_behaviour_1ab82e05ed50e6b2de8cad02a53efec6d4">preferredAnchor</link>;
+00560 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_anchorable_behaviour_1acc535c0d9a79d1ddcaab2dd0587ba9bb">anchor</link>&#32;=&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_anchorable_behaviour_1ab82e05ed50e6b2de8cad02a53efec6d4">preferredAnchor</link>;
+00561 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_anchorable_behaviour_1ad44eb15001e88b33e46f06e1b2501e59">isAttached</link>&#32;=&#32;<emphasis role="keyword">true</emphasis>;
+00562 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;<emphasis role="keyword">true</emphasis>;
+00563 &#32;&#32;&#32;&#32;&#32;&#32;}
+00564 
+00565 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;<emphasis role="keyword">false</emphasis>;
+00566 &#32;&#32;&#32;&#32;}
+00567 
+00569 &#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;<emphasis role="keywordtype">float</emphasis>&#32;getAnchorScore(<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_anchor">Anchor</link>&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_anchorable_behaviour_1acc535c0d9a79d1ddcaab2dd0587ba9bb">anchor</link>)&#32;{
+00570 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_anchorable_behaviour_1a72020fda147a7ba0a31c30e4b8d03b7f">GetAnchorScore</link>(this.interactionBehaviour.<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_behaviour_1a4f54f1794944882d8cf51bd641a5341c">rigidbody</link>.position,
+00571 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">this</emphasis>.interactionBehaviour.rigidbody.velocity,
+00572 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_anchorable_behaviour_1acc535c0d9a79d1ddcaab2dd0587ba9bb">anchor</link>.transform.position,
+00573 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_anchorable_behaviour_1a894d0a63d373fe4cebaf382daef1c940">maxAnchorRange</link>,
+00574 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;_maxMotionlessRange,
+00575 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;_minAttachmentDotProduct,
+00576 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;_alwaysAttachDistance);
+00577 &#32;&#32;&#32;&#32;}
+00578 
+<anchor xml:id="__anchorable_behaviour_8cs_source_1l00586"/><link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_anchorable_behaviour_1a72020fda147a7ba0a31c30e4b8d03b7f">00586</link> &#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keyword">static</emphasis>&#32;<emphasis role="keywordtype">float</emphasis>&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_anchorable_behaviour_1a72020fda147a7ba0a31c30e4b8d03b7f">GetAnchorScore</link>(Vector3&#32;anchObjPos,&#32;Vector3&#32;anchObjVel,&#32;Vector3&#32;anchorPos,&#32;<emphasis role="keywordtype">float</emphasis>&#32;maxDistance,&#32;<emphasis role="keywordtype">float</emphasis>&#32;nonDirectedMaxDistance,&#32;<emphasis role="keywordtype">float</emphasis>&#32;minAngleProduct,
+00587 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordtype">float</emphasis>&#32;alwaysAttachDistance&#32;=&#32;0f)&#32;{
+00588 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;Calculated&#32;a&#32;&quot;directedness&quot;&#32;heuristic&#32;for&#32;determining&#32;whether&#32;the&#32;user&#32;is&#32;throwing&#32;or&#32;releasing&#32;without&#32;directed&#32;motion.</emphasis>
+00589 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordtype">float</emphasis>&#32;directedness&#32;=&#32;anchObjVel.magnitude.Map(0.20F,&#32;1F,&#32;0F,&#32;1F);
+00590 
+00591 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordtype">float</emphasis>&#32;effMaxDistance&#32;=&#32;directedness.Map(0F,&#32;1F,&#32;nonDirectedMaxDistance,&#32;maxDistance);
+00592 &#32;&#32;&#32;&#32;&#32;&#32;Vector3&#32;effPos&#32;=&#32;Utils.Map(Mathf.Sqrt(Mathf.Sqrt(directedness)),&#32;0f,&#32;1f,
+00593 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;anchObjPos,&#32;(anchObjPos&#32;-&#32;anchObjVel.normalized&#32;*&#32;effMaxDistance&#32;*&#32;0.30f));
+00594 
+00595 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordtype">float</emphasis>&#32;distanceSqrd&#32;=&#32;(anchorPos&#32;-&#32;effPos).sqrMagnitude;
+00596 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordtype">float</emphasis>&#32;distanceScore;
+00597 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(distanceSqrd&#32;&gt;&#32;effMaxDistance&#32;*&#32;effMaxDistance)&#32;{
+00598 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;distanceScore&#32;=&#32;0F;
+00599 &#32;&#32;&#32;&#32;&#32;&#32;}
+00600 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">else</emphasis>&#32;{
+00601 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;distanceScore&#32;=&#32;distanceSqrd.Map(0F,&#32;effMaxDistance&#32;*&#32;effMaxDistance,&#32;1F,&#32;0F);
+00602 &#32;&#32;&#32;&#32;&#32;&#32;}
+00603 
+00604 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordtype">float</emphasis>&#32;angleScore;
+00605 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordtype">float</emphasis>&#32;dotProduct&#32;=&#32;Vector3.Dot(anchObjVel.normalized,&#32;(anchorPos&#32;-&#32;effPos).normalized);
+00606 
+00607 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;Angular&#32;score&#32;only&#32;factors&#32;in&#32;based&#32;on&#32;how&#32;directed&#32;the&#32;motion&#32;of&#32;the&#32;object&#32;is.</emphasis>
+00608 &#32;&#32;&#32;&#32;&#32;&#32;dotProduct&#32;=&#32;Mathf.Lerp(1F,&#32;dotProduct,&#32;directedness);
+00609 &#32;&#32;&#32;&#32;&#32;&#32;
+00610 &#32;&#32;&#32;&#32;&#32;&#32;angleScore&#32;=&#32;dotProduct.Map(minAngleProduct,&#32;1f,&#32;0f,&#32;1f);
+00611 &#32;&#32;&#32;&#32;&#32;&#32;angleScore&#32;*=&#32;angleScore;
+00612 
+00613 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;Support&#32;an&#32;&quot;always-attach&#32;distance&quot;&#32;within&#32;which&#32;only&#32;distanceScore&#32;matters</emphasis>
+00614 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordtype">float</emphasis>&#32;semiDistanceSqrd&#32;=&#32;(anchorPos&#32;-&#32;Vector3.Lerp(anchObjPos,&#32;effPos,&#32;0.5f)).sqrMagnitude;
+00615 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordtype">float</emphasis>&#32;useAlwaysAttachDistanceAmount&#32;=&#32;semiDistanceSqrd.Map(0f,&#32;Mathf.Max(0.0001f,&#32;(0.25f&#32;*&#32;alwaysAttachDistance&#32;*&#32;alwaysAttachDistance)),
+00616 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;1f,&#32;0f);
+00617 &#32;&#32;&#32;&#32;&#32;&#32;angleScore&#32;=&#32;useAlwaysAttachDistanceAmount.Map(0f,&#32;1f,&#32;angleScore,&#32;1f);
+00618 
+00619 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;distanceScore&#32;*&#32;angleScore;
+00620 &#32;&#32;&#32;&#32;}
+00621 
+00622 &#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;updateAttractionToHand()&#32;{
+00623 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_anchorable_behaviour_1aa067c979e2602b16f03103c18de20a92">interactionBehaviour</link>&#32;==&#32;<emphasis role="keyword">null</emphasis>&#32;||&#32;!<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_anchorable_behaviour_1a85262d2cae0fd2ab5291d18406868c48">isAttractedByHand</link>)&#32;{
+00624 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(_offsetTowardsHand&#32;!=&#32;Vector3.zero)&#32;{
+00625 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;_offsetTowardsHand&#32;=&#32;Vector3.Lerp(_offsetTowardsHand,&#32;Vector3.zero,&#32;5F&#32;*&#32;Time.deltaTime);
+00626 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00627 
+00628 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>;
+00629 &#32;&#32;&#32;&#32;&#32;&#32;}
+00630 
+00631 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordtype">float</emphasis>&#32;reachTargetAmount&#32;=&#32;0F;
+00632 &#32;&#32;&#32;&#32;&#32;&#32;Vector3&#32;towardsHand&#32;=&#32;Vector3.zero;
+00633 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_anchorable_behaviour_1aa067c979e2602b16f03103c18de20a92">interactionBehaviour</link>.<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_behaviour_1ae8875ff423f6183c256101320ff28fa7">isHovered</link>)&#32;{
+00634 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_leap_1_1_hand">Hand</link>&#32;hoveringHand&#32;=&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_anchorable_behaviour_1aa067c979e2602b16f03103c18de20a92">interactionBehaviour</link>.<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_behaviour_1aeee4285667a660b5d1f8c49268eee4a5">closestHoveringHand</link>;
+00635 
+00636 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;reachTargetAmount&#32;=&#32;Mathf.Clamp01(<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_anchorable_behaviour_1a8ff2f11921e25a9a278de2cf09f8499f">attractionReachByDistance</link>.Evaluate(
+00637 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;Vector3.Distance(hoveringHand.<link linkend="_class_leap_1_1_hand_1aaf0940b9108e92c22e33b9c6cd32921a">PalmPosition</link>.ToVector3(),&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_anchorable_behaviour_1acc535c0d9a79d1ddcaab2dd0587ba9bb">anchor</link>.transform.position)
+00638 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;));
+00639 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;towardsHand&#32;=&#32;hoveringHand.<link linkend="_class_leap_1_1_hand_1aaf0940b9108e92c22e33b9c6cd32921a">PalmPosition</link>.ToVector3()&#32;-&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_anchorable_behaviour_1acc535c0d9a79d1ddcaab2dd0587ba9bb">anchor</link>.transform.position;
+00640 &#32;&#32;&#32;&#32;&#32;&#32;}
+00641 
+00642 &#32;&#32;&#32;&#32;&#32;&#32;Vector3&#32;targetOffsetTowardsHand&#32;=&#32;towardsHand&#32;*&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_anchorable_behaviour_1a71b2fb0a2dba4935795a00a88f15bf1a">maxAttractionReach</link>&#32;*&#32;reachTargetAmount;
+00643 &#32;&#32;&#32;&#32;&#32;&#32;_offsetTowardsHand&#32;=&#32;Vector3.Lerp(_offsetTowardsHand,&#32;targetOffsetTowardsHand,&#32;5&#32;*&#32;Time.deltaTime);
+00644 &#32;&#32;&#32;&#32;}
+00645 
+00646 &#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;updateAnchorAttachment()&#32;{
+00647 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;Initialize&#32;position.</emphasis>
+00648 &#32;&#32;&#32;&#32;&#32;&#32;Vector3&#32;finalPosition;
+00649 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_anchorable_behaviour_1aa067c979e2602b16f03103c18de20a92">interactionBehaviour</link>&#32;!=&#32;<emphasis role="keyword">null</emphasis>)&#32;{
+00650 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;finalPosition&#32;=&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_anchorable_behaviour_1aa067c979e2602b16f03103c18de20a92">interactionBehaviour</link>.<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_behaviour_1a4f54f1794944882d8cf51bd641a5341c">rigidbody</link>.position;
+00651 &#32;&#32;&#32;&#32;&#32;&#32;}
+00652 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">else</emphasis>&#32;{
+00653 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;finalPosition&#32;=&#32;this.transform.position;
+00654 &#32;&#32;&#32;&#32;&#32;&#32;}
+00655 
+00656 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;Update&#32;position&#32;based&#32;on&#32;anchor&#32;state.</emphasis>
+00657 &#32;&#32;&#32;&#32;&#32;&#32;Vector3&#32;targetPosition&#32;=&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_anchorable_behaviour_1acc535c0d9a79d1ddcaab2dd0587ba9bb">anchor</link>.transform.position;
+00658 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_anchorable_behaviour_1a639dc5b718626a5ab76777eb8d2a24a2">lockToAnchor</link>)&#32;{
+00659 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;In&#32;this&#32;state,&#32;we&#32;are&#32;simply&#32;locked&#32;directly&#32;to&#32;the&#32;anchor.</emphasis>
+00660 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;finalPosition&#32;=&#32;targetPosition&#32;+&#32;_offsetTowardsHand;
+00661 
+00662 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;Reset&#32;anchor&#32;position&#32;storage;&#32;it&#32;can&apos;t&#32;be&#32;updated&#32;from&#32;this&#32;state.</emphasis>
+00663 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;_hasTargetPositionLastUpdate&#32;=&#32;<emphasis role="keyword">false</emphasis>;
+00664 &#32;&#32;&#32;&#32;&#32;&#32;}
+00665 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">else</emphasis>&#32;<emphasis role="keywordflow">if</emphasis>&#32;(<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_anchorable_behaviour_1a06a27a8ca63c701cfea9f99ee512d293">lockWhenAttached</link>)&#32;{
+00666 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(_isLockedToAnchor)&#32;{
+00667 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;In&#32;this&#32;state,&#32;we&#32;are&#32;already&#32;attached&#32;to&#32;the&#32;anchor.</emphasis>
+00668 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;finalPosition&#32;=&#32;targetPosition&#32;+&#32;_offsetTowardsHand;
+00669 
+00670 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;Reset&#32;anchor&#32;position&#32;storage;&#32;it&#32;can&apos;t&#32;be&#32;updated&#32;from&#32;this&#32;state.</emphasis>
+00671 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;_hasTargetPositionLastUpdate&#32;=&#32;<emphasis role="keyword">false</emphasis>;
+00672 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00673 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">else</emphasis>&#32;{
+00674 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;Undo&#32;any&#32;&quot;reach&#32;towards&#32;hand&quot;&#32;offset.</emphasis>
+00675 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;finalPosition&#32;-=&#32;_offsetTowardsHand;
+00676 
+00677 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;If&#32;desired,&#32;automatically&#32;correct&#32;for&#32;the&#32;anchor&#32;itself&#32;moving&#32;while&#32;attempting&#32;to&#32;return&#32;to&#32;it.</emphasis>
+00678 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_anchorable_behaviour_1ae08e06de9abe0fe650acd8f1f1c31f74">matchAnchorMotionWhileAttaching</link>&#32;&amp;&amp;&#32;this.transform.parent&#32;!=&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_anchorable_behaviour_1acc535c0d9a79d1ddcaab2dd0587ba9bb">anchor</link>.transform)&#32;{
+00679 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(_hasTargetPositionLastUpdate)&#32;{
+00680 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;finalPosition&#32;+=&#32;(targetPosition&#32;-&#32;_targetPositionLastUpdate);
+00681 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00682 
+00683 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;_targetPositionLastUpdate&#32;=&#32;targetPosition;
+00684 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;_hasTargetPositionLastUpdate&#32;=&#32;<emphasis role="keyword">true</emphasis>;
+00685 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00686 
+00687 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;Lerp&#32;towards&#32;the&#32;anchor.</emphasis>
+00688 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;finalPosition&#32;=&#32;Vector3.Lerp(finalPosition,&#32;targetPosition,&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_anchorable_behaviour_1a4f5df5a27d79d1ffcbbcdfb80da57274">anchorLerpCoeffPerSec</link>&#32;*&#32;Time.deltaTime);
+00689 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(Vector3.Distance(finalPosition,&#32;targetPosition)&#32;&lt;&#32;0.001F)&#32;{
+00690 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;_isLockedToAnchor&#32;=&#32;<emphasis role="keyword">true</emphasis>;
+00691 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00692 
+00693 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;Redo&#32;any&#32;&quot;reach&#32;toward&#32;hand&quot;&#32;offset.</emphasis>
+00694 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;finalPosition&#32;+=&#32;_offsetTowardsHand;
+00695 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00696 &#32;&#32;&#32;&#32;&#32;&#32;}
+00697 
+00698 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;Set&#32;final&#32;position.</emphasis>
+00699 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_anchorable_behaviour_1aa067c979e2602b16f03103c18de20a92">interactionBehaviour</link>&#32;!=&#32;<emphasis role="keyword">null</emphasis>)&#32;{
+00700 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_anchorable_behaviour_1aa067c979e2602b16f03103c18de20a92">interactionBehaviour</link>.<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_behaviour_1a4f54f1794944882d8cf51bd641a5341c">rigidbody</link>.position&#32;=&#32;finalPosition;
+00701 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;this.transform.position&#32;=&#32;finalPosition;
+00702 &#32;&#32;&#32;&#32;&#32;&#32;}
+00703 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">else</emphasis>&#32;{
+00704 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;this.transform.position&#32;=&#32;finalPosition;
+00705 &#32;&#32;&#32;&#32;&#32;&#32;}
+00706 &#32;&#32;&#32;&#32;}
+00707 
+00708 &#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;updateAnchorAttachmentRotation()&#32;{
+00709 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;Initialize&#32;rotation.</emphasis>
+00710 &#32;&#32;&#32;&#32;&#32;&#32;Quaternion&#32;finalRotation;
+00711 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_anchorable_behaviour_1aa067c979e2602b16f03103c18de20a92">interactionBehaviour</link>&#32;!=&#32;<emphasis role="keyword">null</emphasis>)&#32;{
+00712 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;finalRotation&#32;=&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_anchorable_behaviour_1aa067c979e2602b16f03103c18de20a92">interactionBehaviour</link>.<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_behaviour_1a4f54f1794944882d8cf51bd641a5341c">rigidbody</link>.rotation;
+00713 &#32;&#32;&#32;&#32;&#32;&#32;}
+00714 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">else</emphasis>&#32;{
+00715 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;finalRotation&#32;=&#32;this.transform.rotation;
+00716 &#32;&#32;&#32;&#32;&#32;&#32;}
+00717 
+00718 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;Update&#32;rotation&#32;based&#32;on&#32;anchor&#32;state.</emphasis>
+00719 &#32;&#32;&#32;&#32;&#32;&#32;Quaternion&#32;targetRotation&#32;=&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_anchorable_behaviour_1acc535c0d9a79d1ddcaab2dd0587ba9bb">anchor</link>.transform.rotation;
+00720 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_anchorable_behaviour_1a639dc5b718626a5ab76777eb8d2a24a2">lockToAnchor</link>)&#32;{
+00721 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;In&#32;this&#32;state,&#32;we&#32;are&#32;simply&#32;locked&#32;directly&#32;to&#32;the&#32;anchor.</emphasis>
+00722 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;finalRotation&#32;=&#32;targetRotation;
+00723 
+00724 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;Reset&#32;anchor&#32;rotation&#32;storage;&#32;it&#32;can&apos;t&#32;be&#32;updated&#32;from&#32;this&#32;state.</emphasis>
+00725 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;_hasTargetPositionLastUpdate&#32;=&#32;<emphasis role="keyword">false</emphasis>;
+00726 &#32;&#32;&#32;&#32;&#32;&#32;}
+00727 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">else</emphasis>&#32;<emphasis role="keywordflow">if</emphasis>&#32;(<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_anchorable_behaviour_1a06a27a8ca63c701cfea9f99ee512d293">lockWhenAttached</link>)&#32;{
+00728 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(_isRotationLockedToAnchor)&#32;{
+00729 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;In&#32;this&#32;state,&#32;we&#32;are&#32;already&#32;attached&#32;to&#32;the&#32;anchor.</emphasis>
+00730 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;finalRotation&#32;=&#32;targetRotation;
+00731 
+00732 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;Reset&#32;anchor&#32;rotation&#32;storage;&#32;it&#32;can&apos;t&#32;be&#32;updated&#32;from&#32;this&#32;state.</emphasis>
+00733 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;_hasTargetRotationLastUpdate&#32;=&#32;<emphasis role="keyword">false</emphasis>;
+00734 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00735 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">else</emphasis>&#32;{
+00736 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;If&#32;desired,&#32;automatically&#32;correct&#32;for&#32;the&#32;anchor&#32;itself&#32;moving&#32;while&#32;attempting&#32;to&#32;return&#32;to&#32;it.</emphasis>
+00737 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_anchorable_behaviour_1ae08e06de9abe0fe650acd8f1f1c31f74">matchAnchorMotionWhileAttaching</link>&#32;&amp;&amp;&#32;this.transform.parent&#32;!=&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_anchorable_behaviour_1acc535c0d9a79d1ddcaab2dd0587ba9bb">anchor</link>.transform)&#32;{
+00738 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(_hasTargetRotationLastUpdate)&#32;{
+00739 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;finalRotation&#32;=&#32;(Quaternion.Inverse(_targetRotationLastUpdate)&#32;*&#32;targetRotation)&#32;*&#32;finalRotation;
+00740 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00741 
+00742 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;_targetRotationLastUpdate&#32;=&#32;targetRotation;
+00743 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;_hasTargetRotationLastUpdate&#32;=&#32;<emphasis role="keyword">true</emphasis>;
+00744 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00745 
+00746 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;Slerp&#32;towards&#32;the&#32;anchor&#32;rotation.</emphasis>
+00747 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;finalRotation&#32;=&#32;Quaternion.Slerp(finalRotation,&#32;targetRotation,&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_anchorable_behaviour_1a4f5df5a27d79d1ffcbbcdfb80da57274">anchorLerpCoeffPerSec</link>&#32;*&#32;0.8F&#32;*&#32;Time.deltaTime);
+00748 
+00749 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(Quaternion.Angle(targetRotation,&#32;finalRotation)&#32;&lt;&#32;2F)&#32;{
+00750 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;_isRotationLockedToAnchor&#32;=&#32;<emphasis role="keyword">true</emphasis>;
+00751 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00752 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00753 &#32;&#32;&#32;&#32;&#32;&#32;}
+00754 
+00755 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;Set&#32;final&#32;rotation.</emphasis>
+00756 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_anchorable_behaviour_1aa067c979e2602b16f03103c18de20a92">interactionBehaviour</link>&#32;!=&#32;<emphasis role="keyword">null</emphasis>)&#32;{
+00757 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_anchorable_behaviour_1aa067c979e2602b16f03103c18de20a92">interactionBehaviour</link>.<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_behaviour_1a4f54f1794944882d8cf51bd641a5341c">rigidbody</link>.rotation&#32;=&#32;finalRotation;
+00758 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;this.transform.rotation&#32;=&#32;finalRotation;
+00759 &#32;&#32;&#32;&#32;&#32;&#32;}
+00760 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">else</emphasis>&#32;{
+00761 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;this.transform.rotation&#32;=&#32;finalRotation;
+00762 &#32;&#32;&#32;&#32;&#32;&#32;}
+00763 &#32;&#32;&#32;&#32;}
+00764 
+00765 &#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;updateAnchorPreference()&#32;{
+00766 &#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_anchor">Anchor</link>&#32;newPreferredAnchor;
+00767 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(!<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_anchorable_behaviour_1ad44eb15001e88b33e46f06e1b2501e59">isAttached</link>)&#32;{
+00768 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;newPreferredAnchor&#32;=&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_anchorable_behaviour_1a1ec7edef87a35f76a8ffc601ce1b615a">FindPreferredAnchor</link>();
+00769 &#32;&#32;&#32;&#32;&#32;&#32;}
+00770 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">else</emphasis>&#32;{
+00771 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;newPreferredAnchor&#32;=&#32;<emphasis role="keyword">null</emphasis>;
+00772 &#32;&#32;&#32;&#32;&#32;&#32;}
+00773 
+00774 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(_preferredAnchor&#32;!=&#32;newPreferredAnchor)&#32;{
+00775 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(_preferredAnchor&#32;!=&#32;<emphasis role="keyword">null</emphasis>)&#32;{
+00776 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;_preferredAnchor.<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_anchor_1af120f6521d455d9aa99f6e4bef45b692">NotifyEndAnchorPreference</link>(<emphasis role="keyword">this</emphasis>);
+00777 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00778 
+00779 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;_preferredAnchor&#32;=&#32;newPreferredAnchor;
+00780 
+00781 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(_preferredAnchor&#32;!=&#32;<emphasis role="keyword">null</emphasis>)&#32;{
+00782 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;_preferredAnchor.<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_anchor_1ac796b1e8a66df11300cf9766543fbe31">NotifyAnchorPreference</link>(<emphasis role="keyword">this</emphasis>);
+00783 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00784 &#32;&#32;&#32;&#32;&#32;&#32;}
+00785 &#32;&#32;&#32;&#32;}
+00786 
+00787 &#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;endAnchorPreference()&#32;{
+00788 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(_preferredAnchor&#32;!=&#32;<emphasis role="keyword">null</emphasis>)&#32;{
+00789 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;_preferredAnchor.<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_anchor_1af120f6521d455d9aa99f6e4bef45b692">NotifyEndAnchorPreference</link>(<emphasis role="keyword">this</emphasis>);
+00790 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;_preferredAnchor&#32;=&#32;<emphasis role="keyword">null</emphasis>;
+00791 &#32;&#32;&#32;&#32;&#32;&#32;}
+00792 &#32;&#32;&#32;&#32;}
+00793 
+00794 &#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;detachAnchorOnGraspBegin()&#32;{
+00795 &#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_anchorable_behaviour_1afdba1fc31f7d6a20af66bdac91bf5d72">Detach</link>();
+00796 &#32;&#32;&#32;&#32;}
+00797 
+00798 &#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;tryToAnchorOnGraspEnd()&#32;{
+00799 &#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_anchorable_behaviour_1a526fd155d1bfdb640231bb0f5b26f159">TryAttachToNearestAnchor</link>();
+00800 
+00801 &#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_anchorable_behaviour_1a29a27e344ab1105d4fa8657de3fe5dab">OnPostTryAnchorOnGraspEnd</link>();
+00802 &#32;&#32;&#32;&#32;}
+00803 
+00804 <emphasis role="preprocessor">&#32;&#32;&#32;&#32;#region&#32;Unity&#32;Events&#32;(Internal)</emphasis>
+00805 
+00806 &#32;&#32;&#32;&#32;[SerializeField]
+00807 &#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;EnumEventTable&#32;_eventTable;
+00808 
+<anchor xml:id="__anchorable_behaviour_8cs_source_1l00809"/><link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_anchorable_behaviour_1aaca223949e4a2b5124579fe4681e3d47">00809</link> &#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keyword">enum</emphasis>&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_anchorable_behaviour_1aaca223949e4a2b5124579fe4681e3d47">EventType</link>&#32;{
+00810 &#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_anchorable_behaviour_1a6fbe787555ba1bcbae45f715777e0b7d">OnAttachedToAnchor</link>&#32;=&#32;100,
+00811 &#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_anchorable_behaviour_1a03147adbeb35c85e8bded5c70a266f5d">OnLockedToAnchor</link>&#32;=&#32;105,
+00812 &#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_anchorable_behaviour_1a61aec444eb2b020981d37d7a15c1b280">OnDetachedFromAnchor</link>&#32;=&#32;110,
+00813 &#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_anchorable_behaviour_1aaf482a8b7ddc06ccae2435b20e211c32">WhileAttachedToAnchor</link>&#32;=&#32;120,
+00814 &#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_anchorable_behaviour_1ae28b784351149af7a30d9079820c1a35">WhileLockedToAnchor</link>&#32;=&#32;125,
+00815 &#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_anchorable_behaviour_1a29a27e344ab1105d4fa8657de3fe5dab">OnPostTryAnchorOnGraspEnd</link>&#32;=&#32;130
+00816 &#32;&#32;&#32;&#32;}
+00817 
+00818 &#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;initUnityEvents()&#32;{
+00819 &#32;&#32;&#32;&#32;&#32;&#32;setupCallback(ref&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_anchorable_behaviour_1a6fbe787555ba1bcbae45f715777e0b7d">OnAttachedToAnchor</link>,&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_anchorable_behaviour_1aaca223949e4a2b5124579fe4681e3d47">EventType</link>.OnAttachedToAnchor);
+00820 &#32;&#32;&#32;&#32;&#32;&#32;setupCallback(ref&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_anchorable_behaviour_1a03147adbeb35c85e8bded5c70a266f5d">OnLockedToAnchor</link>,&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_anchorable_behaviour_1aaca223949e4a2b5124579fe4681e3d47">EventType</link>.OnLockedToAnchor);
+00821 &#32;&#32;&#32;&#32;&#32;&#32;setupCallback(ref&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_anchorable_behaviour_1a61aec444eb2b020981d37d7a15c1b280">OnDetachedFromAnchor</link>,&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_anchorable_behaviour_1aaca223949e4a2b5124579fe4681e3d47">EventType</link>.OnDetachedFromAnchor);
+00822 &#32;&#32;&#32;&#32;&#32;&#32;setupCallback(ref&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_anchorable_behaviour_1aaf482a8b7ddc06ccae2435b20e211c32">WhileAttachedToAnchor</link>,&#32;&#32;&#32;&#32;&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_anchorable_behaviour_1aaca223949e4a2b5124579fe4681e3d47">EventType</link>.WhileAttachedToAnchor);
+00823 &#32;&#32;&#32;&#32;&#32;&#32;setupCallback(ref&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_anchorable_behaviour_1ae28b784351149af7a30d9079820c1a35">WhileLockedToAnchor</link>,&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_anchorable_behaviour_1aaca223949e4a2b5124579fe4681e3d47">EventType</link>.WhileLockedToAnchor);
+00824 &#32;&#32;&#32;&#32;&#32;&#32;setupCallback(ref&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_anchorable_behaviour_1a29a27e344ab1105d4fa8657de3fe5dab">OnPostTryAnchorOnGraspEnd</link>,&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_anchorable_behaviour_1aaca223949e4a2b5124579fe4681e3d47">EventType</link>.OnPostTryAnchorOnGraspEnd);
+00825 &#32;&#32;&#32;&#32;}
+00826 
+00827 &#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;setupCallback(ref&#32;Action&#32;action,&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_anchorable_behaviour_1aaca223949e4a2b5124579fe4681e3d47">EventType</link>&#32;type)&#32;{
+00828 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(_eventTable.HasUnityEvent((<emphasis role="keywordtype">int</emphasis>)type))&#32;{
+00829 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;action&#32;+=&#32;()&#32;=&gt;&#32;_eventTable.Invoke((<emphasis role="keywordtype">int</emphasis>)type);
+00830 &#32;&#32;&#32;&#32;&#32;&#32;}
+00831 &#32;&#32;&#32;&#32;}
+00832 
+00833 <emphasis role="preprocessor">&#32;&#32;&#32;&#32;#endregion</emphasis>
+00834 
+00835 &#32;&#32;}
+00836 
+00837 }
+</programlisting></section>

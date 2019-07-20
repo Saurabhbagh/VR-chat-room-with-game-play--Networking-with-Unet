@@ -1,0 +1,238 @@
+<?xml version='1.0' encoding='UTF-8' standalone='no'?>
+<section xmlns="http://docbook.org/ns/docbook" version="5.0" xmlns:xlink="http://www.w3.org/1999/xlink" xml:id="__serializable_dictionary_8cs_source">
+<title>SerializableDictionary.cs</title>
+<indexterm><primary>O:/GitHUBMINIPRoject/Assets/LeapMotion/Core/Scripts/DataStructures/SerializableDictionary.cs</primary></indexterm>
+<programlisting>00001 <emphasis role="comment">/******************************************************************************</emphasis>
+00002 <emphasis role="comment">&#32;*&#32;Copyright&#32;(C)&#32;Leap&#32;Motion,&#32;Inc.&#32;2011-2018.&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;*</emphasis>
+00003 <emphasis role="comment">&#32;*&#32;Leap&#32;Motion&#32;proprietary&#32;and&#32;confidential.&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;*</emphasis>
+00004 <emphasis role="comment">&#32;*&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;*</emphasis>
+00005 <emphasis role="comment">&#32;*&#32;Use&#32;subject&#32;to&#32;the&#32;terms&#32;of&#32;the&#32;Leap&#32;Motion&#32;SDK&#32;Agreement&#32;available&#32;at&#32;&#32;&#32;&#32;&#32;*</emphasis>
+00006 <emphasis role="comment">&#32;*&#32;https://developer.leapmotion.com/sdk_agreement,&#32;or&#32;another&#32;agreement&#32;&#32;&#32;&#32;&#32;&#32;&#32;*</emphasis>
+00007 <emphasis role="comment">&#32;*&#32;between&#32;Leap&#32;Motion&#32;and&#32;you,&#32;your&#32;company&#32;or&#32;other&#32;organization.&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;*</emphasis>
+00008 <emphasis role="comment">&#32;******************************************************************************/</emphasis>
+00009 
+00010 <emphasis role="keyword">using</emphasis>&#32;<link linkend="__balloon_8cs_1a7d67e097df9376eb709b6a23aa3c7d23">UnityEngine</link>;
+00011 <emphasis role="keyword">using</emphasis>&#32;System;
+00012 <emphasis role="keyword">using</emphasis>&#32;System.Text;
+00013 <emphasis role="keyword">using</emphasis>&#32;System.Collections.Generic;
+00014 <emphasis role="keyword">using</emphasis>&#32;System.Linq;
+00015 <emphasis role="keyword">using</emphasis>&#32;System.Collections;
+00016 
+00017 <emphasis role="keyword">namespace&#32;</emphasis><link linkend="_namespace_leap_1_1_unity">Leap.Unity</link>&#32;{
+00018 
+00019 &#32;&#32;[Obsolete(<emphasis role="stringliteral">&quot;It&#32;is&#32;no&#32;longer&#32;required&#32;to&#32;annotate&#32;SerializableDictionary&#32;with&#32;an&#32;SDictionary&#32;attribute&quot;</emphasis>)]
+<anchor xml:id="__serializable_dictionary_8cs_source_1l00020"/><link linkend="_class_leap_1_1_unity_1_1_s_dictionary_attribute">00020</link> &#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keyword">class&#32;</emphasis><link linkend="_class_leap_1_1_unity_1_1_s_dictionary_attribute">SDictionaryAttribute</link>&#32;:&#32;PropertyAttribute&#32;{&#32;}
+00021 
+<anchor xml:id="__serializable_dictionary_8cs_source_1l00022"/><link linkend="_class_leap_1_1_unity_1_1_serializable_dictionary_base">00022</link> &#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keyword">abstract</emphasis>&#32;<emphasis role="keyword">class&#32;</emphasis><link linkend="_class_leap_1_1_unity_1_1_serializable_dictionary_base">SerializableDictionaryBase</link>&#32;{&#32;}
+00023 
+<anchor xml:id="__serializable_dictionary_8cs_source_1l00024"/><link linkend="_interface_leap_1_1_unity_1_1_i_can_report_duplicate_information">00024</link> &#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keyword">interface&#32;</emphasis><link linkend="_interface_leap_1_1_unity_1_1_i_can_report_duplicate_information">ICanReportDuplicateInformation</link>&#32;{
+00025 <emphasis role="preprocessor">#if&#32;UNITY_EDITOR</emphasis>
+00026 &#32;&#32;&#32;&#32;List&lt;int&gt;&#32;GetDuplicationInformation();
+00027 &#32;&#32;&#32;&#32;<emphasis role="keywordtype">void</emphasis>&#32;ClearDuplicates();
+00028 <emphasis role="preprocessor">#endif</emphasis>
+00029 &#32;&#32;}
+00030 
+<anchor xml:id="__serializable_dictionary_8cs_source_1l00031"/><link linkend="_interface_leap_1_1_unity_1_1_i_serializable_dictionary">00031</link> &#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keyword">interface&#32;</emphasis><link linkend="_interface_leap_1_1_unity_1_1_i_serializable_dictionary">ISerializableDictionary</link>&#32;{
+00032 &#32;&#32;&#32;&#32;<emphasis role="keywordtype">float</emphasis>&#32;<link linkend="_interface_leap_1_1_unity_1_1_i_serializable_dictionary_1adaa691139a897ab05b48b4d57b083d0d">KeyDisplayRatio</link>();
+00033 &#32;&#32;}
+00034 
+<anchor xml:id="__serializable_dictionary_8cs_source_1l00040"/><link linkend="_class_leap_1_1_unity_1_1_serializable_dictionary">00040</link> &#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keyword">class&#32;</emphasis><link linkend="_class_leap_1_1_unity_1_1_serializable_dictionary">SerializableDictionary</link>&lt;TKey,&#32;TValue&gt;&#32;:&#32;<link linkend="_class_leap_1_1_unity_1_1_serializable_dictionary_base">SerializableDictionaryBase</link>,
+00041 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;IEnumerable&lt;KeyValuePair&lt;TKey,&#32;TValue&gt;&gt;,
+00042 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_interface_leap_1_1_unity_1_1_i_can_report_duplicate_information">ICanReportDuplicateInformation</link>,
+00043 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;ISerializationCallbackReceiver,
+00044 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_interface_leap_1_1_unity_1_1_i_serializable_dictionary">ISerializableDictionary</link>&#32;{
+00045 
+00046 &#32;&#32;&#32;&#32;[SerializeField]
+00047 &#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;List&lt;TKey&gt;&#32;_keys&#32;=&#32;<emphasis role="keyword">new</emphasis>&#32;List&lt;TKey&gt;();
+00048 
+00049 &#32;&#32;&#32;&#32;[SerializeField]
+00050 &#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;List&lt;TValue&gt;&#32;_values&#32;=&#32;<emphasis role="keyword">new</emphasis>&#32;List&lt;TValue&gt;();
+00051 
+00052 &#32;&#32;&#32;&#32;[NonSerialized]
+00053 &#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;Dictionary&lt;TKey,&#32;TValue&gt;&#32;_dictionary&#32;=&#32;<emphasis role="keyword">new</emphasis>&#32;Dictionary&lt;TKey,&#32;TValue&gt;();
+00054 
+00055 <emphasis role="preprocessor">&#32;&#32;&#32;&#32;#region&#32;DICTIONARY&#32;API</emphasis>
+00056 
+<anchor xml:id="__serializable_dictionary_8cs_source_1l00057"/><link linkend="_class_leap_1_1_unity_1_1_serializable_dictionary_1ad571fbbe0720c416b08eb11f7cda2386">00057</link> &#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;TValue&#32;<emphasis role="keyword">this</emphasis>[TKey&#32;key]&#32;{
+00058 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">get</emphasis>&#32;{&#32;<emphasis role="keywordflow">return</emphasis>&#32;_dictionary[key];&#32;}
+00059 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">set</emphasis>&#32;{&#32;_dictionary[key]&#32;=&#32;value;&#32;}
+00060 &#32;&#32;&#32;&#32;}
+00061 
+<anchor xml:id="__serializable_dictionary_8cs_source_1l00062"/><link linkend="_class_leap_1_1_unity_1_1_serializable_dictionary_1af69e275b3676874afb3018aa3b6297c1">00062</link> &#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;Dictionary&lt;TKey,&#32;TValue&gt;.KeyCollection&#32;<link linkend="_class_leap_1_1_unity_1_1_serializable_dictionary_1af69e275b3676874afb3018aa3b6297c1">Keys</link>&#32;{
+00063 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">get</emphasis>&#32;{&#32;<emphasis role="keywordflow">return</emphasis>&#32;_dictionary.Keys;&#32;}
+00064 &#32;&#32;&#32;&#32;}
+00065 
+<anchor xml:id="__serializable_dictionary_8cs_source_1l00066"/><link linkend="_class_leap_1_1_unity_1_1_serializable_dictionary_1a2e69280a4555f8beaa81a567c55401ef">00066</link> &#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;Dictionary&lt;TKey,&#32;TValue&gt;.ValueCollection&#32;<link linkend="_class_leap_1_1_unity_1_1_serializable_dictionary_1a2e69280a4555f8beaa81a567c55401ef">Values</link>&#32;{
+00067 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">get</emphasis>&#32;{&#32;<emphasis role="keywordflow">return</emphasis>&#32;_dictionary.Values;&#32;}
+00068 &#32;&#32;&#32;&#32;}
+00069 
+<anchor xml:id="__serializable_dictionary_8cs_source_1l00070"/><link linkend="_class_leap_1_1_unity_1_1_serializable_dictionary_1a929397d492ac8fb3ff01f3f0841f9193">00070</link> &#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keywordtype">int</emphasis>&#32;<link linkend="_class_leap_1_1_unity_1_1_serializable_dictionary_1a929397d492ac8fb3ff01f3f0841f9193">Count</link>&#32;{
+00071 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">get</emphasis>&#32;{&#32;<emphasis role="keywordflow">return</emphasis>&#32;_dictionary.Count;&#32;}
+00072 &#32;&#32;&#32;&#32;}
+00073 
+<anchor xml:id="__serializable_dictionary_8cs_source_1l00074"/><link linkend="_class_leap_1_1_unity_1_1_serializable_dictionary_1ac8288964eb2327f755c683d703e7c1fc">00074</link> &#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;<link linkend="_class_leap_1_1_unity_1_1_serializable_dictionary_1ac8288964eb2327f755c683d703e7c1fc">Add</link>(TKey&#32;key,&#32;TValue&#32;value)&#32;{
+00075 &#32;&#32;&#32;&#32;&#32;&#32;_dictionary.Add(key,&#32;value);
+00076 &#32;&#32;&#32;&#32;}
+00077 
+<anchor xml:id="__serializable_dictionary_8cs_source_1l00078"/><link linkend="_class_leap_1_1_unity_1_1_serializable_dictionary_1a639b66b29184dc85c510dfa858759552">00078</link> &#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;<link linkend="_class_leap_1_1_unity_1_1_serializable_dictionary_1a639b66b29184dc85c510dfa858759552">Clear</link>()&#32;{
+00079 &#32;&#32;&#32;&#32;&#32;&#32;_dictionary.Clear();
+00080 &#32;&#32;&#32;&#32;}
+00081 
+<anchor xml:id="__serializable_dictionary_8cs_source_1l00082"/><link linkend="_class_leap_1_1_unity_1_1_serializable_dictionary_1adb0dfe61a1e4012e51235683bbdba17b">00082</link> &#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keywordtype">bool</emphasis>&#32;<link linkend="_class_leap_1_1_unity_1_1_serializable_dictionary_1adb0dfe61a1e4012e51235683bbdba17b">ContainsKey</link>(TKey&#32;key)&#32;{
+00083 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;_dictionary.ContainsKey(key);
+00084 &#32;&#32;&#32;&#32;}
+00085 
+<anchor xml:id="__serializable_dictionary_8cs_source_1l00086"/><link linkend="_class_leap_1_1_unity_1_1_serializable_dictionary_1a3c33b37ec2f3ed641a8bd26edebe13d8">00086</link> &#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keywordtype">bool</emphasis>&#32;<link linkend="_class_leap_1_1_unity_1_1_serializable_dictionary_1a3c33b37ec2f3ed641a8bd26edebe13d8">ContainsValue</link>(TValue&#32;value)&#32;{
+00087 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;_dictionary.ContainsValue(value);
+00088 &#32;&#32;&#32;&#32;}
+00089 
+<anchor xml:id="__serializable_dictionary_8cs_source_1l00090"/><link linkend="_class_leap_1_1_unity_1_1_serializable_dictionary_1a30c184229841877e480fd3cb1a16d207">00090</link> &#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keywordtype">bool</emphasis>&#32;<link linkend="_class_leap_1_1_unity_1_1_serializable_dictionary_1a30c184229841877e480fd3cb1a16d207">Remove</link>(TKey&#32;key)&#32;{
+00091 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;_dictionary.Remove(key);
+00092 &#32;&#32;&#32;&#32;}
+00093 
+<anchor xml:id="__serializable_dictionary_8cs_source_1l00094"/><link linkend="_class_leap_1_1_unity_1_1_serializable_dictionary_1a2e1b99c2ddcefc2fb599290ac3158690">00094</link> &#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keywordtype">bool</emphasis>&#32;<link linkend="_class_leap_1_1_unity_1_1_serializable_dictionary_1a2e1b99c2ddcefc2fb599290ac3158690">TryGetValue</link>(TKey&#32;key,&#32;out&#32;TValue&#32;value)&#32;{
+00095 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;_dictionary.TryGetValue(key,&#32;out&#32;value);
+00096 &#32;&#32;&#32;&#32;}
+00097 
+<anchor xml:id="__serializable_dictionary_8cs_source_1l00098"/><link linkend="_class_leap_1_1_unity_1_1_serializable_dictionary_1ad6975ce8fcf734f94863e9fda5506ccb">00098</link> &#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;IEnumerator&lt;KeyValuePair&lt;TKey,&#32;TValue&gt;&gt;&#32;<link linkend="_class_leap_1_1_unity_1_1_serializable_dictionary_1ad6975ce8fcf734f94863e9fda5506ccb">GetEnumerator</link>()&#32;{
+00099 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;_dictionary.GetEnumerator();
+00100 &#32;&#32;&#32;&#32;}
+00101 
+00102 &#32;&#32;&#32;&#32;IEnumerator&#32;IEnumerable.GetEnumerator()&#32;{
+00103 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;_dictionary.GetEnumerator();
+00104 &#32;&#32;&#32;&#32;}
+00105 
+<anchor xml:id="__serializable_dictionary_8cs_source_1l00106"/><link linkend="_class_leap_1_1_unity_1_1_serializable_dictionary_1aee53ce7d72c6a43a1c90e43c8a321272">00106</link> &#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keyword">static</emphasis>&#32;implicit&#32;<emphasis role="keyword">operator</emphasis>&#32;Dictionary&lt;TKey,&#32;TValue&gt;(<link linkend="_class_leap_1_1_unity_1_1_serializable_dictionary">SerializableDictionary&lt;TKey, TValue&gt;</link>&#32;serializableDictionary)&#32;{
+00107 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;serializableDictionary._dictionary;
+00108 &#32;&#32;&#32;&#32;}
+00109 
+00110 <emphasis role="preprocessor">&#32;&#32;&#32;&#32;#endregion</emphasis>
+00111 
+<anchor xml:id="__serializable_dictionary_8cs_source_1l00116"/><link linkend="_class_leap_1_1_unity_1_1_serializable_dictionary_1a237caec5f2755f82e24f0eedf9005968">00116</link> &#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keyword">virtual</emphasis>&#32;<emphasis role="keywordtype">float</emphasis>&#32;<link linkend="_class_leap_1_1_unity_1_1_serializable_dictionary_1a237caec5f2755f82e24f0eedf9005968">KeyDisplayRatio</link>()&#32;{
+00117 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;0.5f;
+00118 &#32;&#32;&#32;&#32;}
+00119 
+<anchor xml:id="__serializable_dictionary_8cs_source_1l00120"/><link linkend="_class_leap_1_1_unity_1_1_serializable_dictionary_1a4756832a6c1b8f6c6a88f3d465583132">00120</link> &#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keyword">override</emphasis>&#32;<emphasis role="keywordtype">string</emphasis>&#32;<link linkend="_class_leap_1_1_unity_1_1_serializable_dictionary_1a4756832a6c1b8f6c6a88f3d465583132">ToString</link>()&#32;{
+00121 &#32;&#32;&#32;&#32;&#32;&#32;StringBuilder&#32;toReturn&#32;=&#32;<emphasis role="keyword">new</emphasis>&#32;StringBuilder();
+00122 &#32;&#32;&#32;&#32;&#32;&#32;List&lt;TKey&gt;&#32;keys&#32;=&#32;_dictionary.Keys.ToList&lt;TKey&gt;();
+00123 &#32;&#32;&#32;&#32;&#32;&#32;List&lt;TValue&gt;&#32;values&#32;=&#32;_dictionary.Values.ToList&lt;TValue&gt;();
+00124 &#32;&#32;&#32;&#32;&#32;&#32;toReturn.Append(<emphasis role="stringliteral">&quot;[&quot;</emphasis>);
+00125 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">for</emphasis>&#32;(<emphasis role="keywordtype">int</emphasis>&#32;i&#32;=&#32;0;&#32;i&#32;&lt;&#32;keys.Count;&#32;i++)&#32;{
+00126 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;toReturn.Append(<emphasis role="stringliteral">&quot;{&quot;</emphasis>);
+00127 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;toReturn.Append(keys[i].<link linkend="_class_leap_1_1_unity_1_1_serializable_dictionary_1a4756832a6c1b8f6c6a88f3d465583132">ToString</link>());
+00128 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;toReturn.Append(<emphasis role="stringliteral">&quot;&#32;:&#32;&quot;</emphasis>);
+00129 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;toReturn.Append(values[i].<link linkend="_class_leap_1_1_unity_1_1_serializable_dictionary_1a4756832a6c1b8f6c6a88f3d465583132">ToString</link>());
+00130 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;toReturn.Append(<emphasis role="stringliteral">&quot;},&#32;\n&quot;</emphasis>);
+00131 &#32;&#32;&#32;&#32;&#32;&#32;}
+00132 &#32;&#32;&#32;&#32;&#32;&#32;toReturn.Remove(toReturn.Length&#32;-&#32;3,&#32;3);
+00133 &#32;&#32;&#32;&#32;&#32;&#32;toReturn.Append(<emphasis role="stringliteral">&quot;]&quot;</emphasis>);
+00134 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;toReturn.ToString();
+00135 &#32;&#32;&#32;&#32;}
+00136 
+<anchor xml:id="__serializable_dictionary_8cs_source_1l00137"/><link linkend="_class_leap_1_1_unity_1_1_serializable_dictionary_1a7ea2114f250e768f7cde70359178d83d">00137</link> &#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;<link linkend="_class_leap_1_1_unity_1_1_serializable_dictionary_1a7ea2114f250e768f7cde70359178d83d">OnAfterDeserialize</link>()&#32;{
+00138 &#32;&#32;&#32;&#32;&#32;&#32;_dictionary.Clear();
+00139 
+00140 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(_keys&#32;!=&#32;<emphasis role="keyword">null</emphasis>&#32;&amp;&amp;&#32;_values&#32;!=&#32;<emphasis role="keyword">null</emphasis>)&#32;{
+00141 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordtype">int</emphasis>&#32;count&#32;=&#32;Mathf.Min(_keys.Count,&#32;_values.Count);
+00142 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">for</emphasis>&#32;(<emphasis role="keywordtype">int</emphasis>&#32;i&#32;=&#32;0;&#32;i&#32;&lt;&#32;count;&#32;i++)&#32;{
+00143 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;TKey&#32;key&#32;=&#32;_keys[i];
+00144 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;TValue&#32;value&#32;=&#32;_values[i];
+00145 
+00146 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(key&#32;==&#32;<emphasis role="keyword">null</emphasis>)&#32;{
+00147 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">continue</emphasis>;
+00148 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00149 
+00150 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;_dictionary[key]&#32;=&#32;value;
+00151 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00152 &#32;&#32;&#32;&#32;&#32;&#32;}
+00153 
+00154 <emphasis role="preprocessor">#if&#32;!UNITY_EDITOR</emphasis>
+00155 &#32;&#32;&#32;&#32;&#32;&#32;_keys.Clear();
+00156 &#32;&#32;&#32;&#32;&#32;&#32;_values.Clear();
+00157 <emphasis role="preprocessor">#endif</emphasis>
+00158 &#32;&#32;&#32;&#32;}
+00159 
+00160 <emphasis role="preprocessor">#if&#32;UNITY_EDITOR</emphasis>
+00161 &#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;List&lt;int&gt;&#32;GetDuplicationInformation()&#32;{
+00162 &#32;&#32;&#32;&#32;&#32;&#32;Dictionary&lt;TKey,&#32;int&gt;&#32;info&#32;=&#32;<emphasis role="keyword">new</emphasis>&#32;Dictionary&lt;TKey,&#32;int&gt;();
+00163 
+00164 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">for</emphasis>&#32;(<emphasis role="keywordtype">int</emphasis>&#32;i&#32;=&#32;0;&#32;i&#32;&lt;&#32;_keys.Count;&#32;i++)&#32;{
+00165 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;TKey&#32;key&#32;=&#32;_keys[i];
+00166 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(key&#32;==&#32;<emphasis role="keyword">null</emphasis>)&#32;{
+00167 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">continue</emphasis>;
+00168 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00169 
+00170 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(info.ContainsKey(key))&#32;{
+00171 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;info[key]++;
+00172 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}&#32;<emphasis role="keywordflow">else</emphasis>&#32;{
+00173 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;info[key]&#32;=&#32;1;
+00174 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00175 &#32;&#32;&#32;&#32;&#32;&#32;}
+00176 
+00177 &#32;&#32;&#32;&#32;&#32;&#32;List&lt;int&gt;&#32;dups&#32;=&#32;<emphasis role="keyword">new</emphasis>&#32;List&lt;int&gt;();
+00178 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">for</emphasis>&#32;(<emphasis role="keywordtype">int</emphasis>&#32;i&#32;=&#32;0;&#32;i&#32;&lt;&#32;_keys.Count;&#32;i++)&#32;{
+00179 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;TKey&#32;key&#32;=&#32;_keys[i];
+00180 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(key&#32;==&#32;<emphasis role="keyword">null</emphasis>)&#32;{
+00181 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">continue</emphasis>;
+00182 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00183 
+00184 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;dups.Add(info[key]);
+00185 &#32;&#32;&#32;&#32;&#32;&#32;}
+00186 
+00187 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;dups;
+00188 &#32;&#32;&#32;&#32;}
+00189 
+00190 &#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;ClearDuplicates()&#32;{
+00191 &#32;&#32;&#32;&#32;&#32;&#32;HashSet&lt;TKey&gt;&#32;takenKeys&#32;=&#32;<emphasis role="keyword">new</emphasis>&#32;HashSet&lt;TKey&gt;();
+00192 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">for</emphasis>&#32;(<emphasis role="keywordtype">int</emphasis>&#32;i&#32;=&#32;0;&#32;i&#32;&lt;&#32;_keys.Count;&#32;i++)&#32;{
+00193 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;TKey&#32;key&#32;=&#32;_keys[i];
+00194 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(takenKeys.Contains(key))&#32;{
+00195 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;_keys.RemoveAt(i);
+00196 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;_values.RemoveAt(i);
+00197 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;i--;
+00198 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}&#32;<emphasis role="keywordflow">else</emphasis>&#32;{
+00199 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;takenKeys.Add(key);
+00200 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00201 &#32;&#32;&#32;&#32;&#32;&#32;}
+00202 &#32;&#32;&#32;&#32;}
+00203 <emphasis role="preprocessor">#endif</emphasis>
+00204 
+<anchor xml:id="__serializable_dictionary_8cs_source_1l00205"/><link linkend="_class_leap_1_1_unity_1_1_serializable_dictionary_1a5ee05f76684d203c2d801682b1f039ef">00205</link> &#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;<link linkend="_class_leap_1_1_unity_1_1_serializable_dictionary_1a5ee05f76684d203c2d801682b1f039ef">OnBeforeSerialize</link>()&#32;{
+00206 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(_keys&#32;==&#32;<emphasis role="keyword">null</emphasis>)&#32;{
+00207 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;_keys&#32;=&#32;<emphasis role="keyword">new</emphasis>&#32;List&lt;TKey&gt;();
+00208 &#32;&#32;&#32;&#32;&#32;&#32;}
+00209 
+00210 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(_values&#32;==&#32;<emphasis role="keyword">null</emphasis>)&#32;{
+00211 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;_values&#32;=&#32;<emphasis role="keyword">new</emphasis>&#32;List&lt;TValue&gt;();
+00212 &#32;&#32;&#32;&#32;&#32;&#32;}
+00213 
+00214 <emphasis role="preprocessor">#if&#32;UNITY_EDITOR</emphasis>
+00215 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">for</emphasis>&#32;(<emphasis role="keywordtype">int</emphasis>&#32;i&#32;=&#32;_keys.Count;&#32;i--&#32;!=&#32;0;)&#32;{
+00216 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;TKey&#32;key&#32;=&#32;_keys[i];
+00217 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(key&#32;==&#32;<emphasis role="keyword">null</emphasis>)&#32;<emphasis role="keywordflow">continue</emphasis>;
+00218 
+00219 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(!_dictionary.ContainsKey(key))&#32;{
+00220 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;_keys.RemoveAt(i);
+00221 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;_values.RemoveAt(i);
+00222 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00223 &#32;&#32;&#32;&#32;&#32;&#32;}
+00224 <emphasis role="preprocessor">#endif</emphasis>
+00225 
+00226 &#32;&#32;&#32;&#32;&#32;&#32;Dictionary&lt;TKey,&#32;TValue&gt;.Enumerator&#32;enumerator&#32;=&#32;_dictionary.GetEnumerator();
+00227 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">while</emphasis>&#32;(enumerator.MoveNext())&#32;{
+00228 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;var&#32;pair&#32;=&#32;enumerator.Current;
+00229 
+00230 <emphasis role="preprocessor">#if&#32;UNITY_EDITOR</emphasis>
+00231 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(!_keys.Contains(pair.Key))&#32;{
+00232 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;_keys.Add(pair.Key);
+00233 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;_values.Add(pair.Value);
+00234 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00235 <emphasis role="preprocessor">#else</emphasis>
+00236 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;_keys.Add(pair.Key);
+00237 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;_values.Add(pair.Value);
+00238 <emphasis role="preprocessor">#endif</emphasis>
+00239 &#32;&#32;&#32;&#32;&#32;&#32;}
+00240 &#32;&#32;&#32;&#32;}
+00241 &#32;&#32;}
+00242 }
+</programlisting></section>

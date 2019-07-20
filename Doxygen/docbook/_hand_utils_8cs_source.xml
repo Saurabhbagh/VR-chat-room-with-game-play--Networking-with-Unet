@@ -1,0 +1,375 @@
+<?xml version='1.0' encoding='UTF-8' standalone='no'?>
+<section xmlns="http://docbook.org/ns/docbook" version="5.0" xmlns:xlink="http://www.w3.org/1999/xlink" xml:id="__hand_utils_8cs_source">
+<title>HandUtils.cs</title>
+<indexterm><primary>O:/GitHUBMINIPRoject/Assets/LeapMotion/Core/Scripts/Utils/HandUtils.cs</primary></indexterm>
+<programlisting>00001 <emphasis role="comment">/******************************************************************************</emphasis>
+00002 <emphasis role="comment">&#32;*&#32;Copyright&#32;(C)&#32;Leap&#32;Motion,&#32;Inc.&#32;2011-2018.&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;*</emphasis>
+00003 <emphasis role="comment">&#32;*&#32;Leap&#32;Motion&#32;proprietary&#32;and&#32;confidential.&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;*</emphasis>
+00004 <emphasis role="comment">&#32;*&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;*</emphasis>
+00005 <emphasis role="comment">&#32;*&#32;Use&#32;subject&#32;to&#32;the&#32;terms&#32;of&#32;the&#32;Leap&#32;Motion&#32;SDK&#32;Agreement&#32;available&#32;at&#32;&#32;&#32;&#32;&#32;*</emphasis>
+00006 <emphasis role="comment">&#32;*&#32;https://developer.leapmotion.com/sdk_agreement,&#32;or&#32;another&#32;agreement&#32;&#32;&#32;&#32;&#32;&#32;&#32;*</emphasis>
+00007 <emphasis role="comment">&#32;*&#32;between&#32;Leap&#32;Motion&#32;and&#32;you,&#32;your&#32;company&#32;or&#32;other&#32;organization.&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;*</emphasis>
+00008 <emphasis role="comment">&#32;******************************************************************************/</emphasis>
+00009 
+00010 <emphasis role="keyword">using</emphasis>&#32;<link linkend="_namespace_leap">Leap</link>.<link linkend="_namespace_leap_1_1_unity">Unity</link>.<link linkend="_namespace_leap_1_1_unity_1_1_query">Query</link>;
+00011 <emphasis role="keyword">using</emphasis>&#32;<link linkend="_namespace_unity_engine">UnityEngine</link>.Events;
+00012 <emphasis role="keyword">using</emphasis>&#32;<link linkend="__balloon_8cs_1a7d67e097df9376eb709b6a23aa3c7d23">UnityEngine</link>;
+00013 <emphasis role="keyword">using</emphasis>&#32;<link linkend="_namespace_unity_engine">UnityEngine</link>.SceneManagement;
+00014 <emphasis role="keyword">using</emphasis>&#32;System.Collections.Generic;
+00015 
+00016 <emphasis role="keyword">namespace&#32;</emphasis><link linkend="_namespace_leap_1_1_unity">Leap.Unity</link>&#32;{
+00017 
+00021 &#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keyword">static</emphasis>&#32;<emphasis role="keyword">class&#32;</emphasis>Hands&#32;{
+00022 
+00023 &#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;<emphasis role="keyword">static</emphasis>&#32;LeapProvider&#32;s_provider;
+00024 &#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;<emphasis role="keyword">static</emphasis>&#32;GameObject&#32;s_leapRig;
+00025 
+00026 &#32;&#32;&#32;&#32;<emphasis role="keyword">static</emphasis>&#32;Hands()&#32;{
+00027 &#32;&#32;&#32;&#32;&#32;&#32;InitStatic();
+00028 &#32;&#32;&#32;&#32;&#32;&#32;SceneManager.activeSceneChanged&#32;+=&#32;InitStaticOnNewScene;
+00029 &#32;&#32;&#32;&#32;}
+00030 
+00031 &#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;<emphasis role="keyword">static</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;InitStaticOnNewScene(Scene&#32;unused,&#32;Scene&#32;unused2)&#32;{
+00032 &#32;&#32;&#32;&#32;&#32;&#32;InitStatic();
+00033 &#32;&#32;&#32;&#32;}
+00034 
+00035 &#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;<emphasis role="keyword">static</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;InitStatic()&#32;{
+00036 &#32;&#32;&#32;&#32;&#32;&#32;s_provider&#32;=&#32;<link linkend="__t_m_pro___font_asset_creator_window_8cs_1aef19bab18b9814edeef255c43e4f6bbc">Object</link>.FindObjectOfType&lt;LeapServiceProvider&gt;();
+00037 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(s_provider&#32;==&#32;<emphasis role="keyword">null</emphasis>)&#32;{
+00038 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;s_provider&#32;=&#32;<link linkend="__t_m_pro___font_asset_creator_window_8cs_1aef19bab18b9814edeef255c43e4f6bbc">Object</link>.FindObjectOfType&lt;LeapProvider&gt;();
+00039 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(s_provider&#32;==&#32;<emphasis role="keyword">null</emphasis>)&#32;{
+00040 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>;
+00041 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00042 &#32;&#32;&#32;&#32;&#32;&#32;}
+00043 
+00044 &#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_namespace_valve_1_1_v_r_1a82e5bf501cc3aa155444ee3f0662853fa967d35e40f3f95b1f538bd248640bf3b">Camera</link>&#32;providerCamera&#32;=&#32;s_provider.GetComponentInParent&lt;<link linkend="_namespace_valve_1_1_v_r_1a82e5bf501cc3aa155444ee3f0662853fa967d35e40f3f95b1f538bd248640bf3b">Camera</link>&gt;();
+00045 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(providerCamera&#32;==&#32;<emphasis role="keyword">null</emphasis>)&#32;<emphasis role="keywordflow">return</emphasis>;
+00046 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(providerCamera.transform.parent&#32;==&#32;<emphasis role="keyword">null</emphasis>)&#32;<emphasis role="keywordflow">return</emphasis>;
+00047 &#32;&#32;&#32;&#32;&#32;&#32;s_leapRig&#32;=&#32;providerCamera.transform.parent.gameObject;
+00048 &#32;&#32;&#32;&#32;}
+00049 
+00055 &#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keyword">static</emphasis>&#32;GameObject&#32;CameraRig&#32;{
+00056 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">get</emphasis>&#32;{
+00057 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(s_leapRig&#32;==&#32;<emphasis role="keyword">null</emphasis>)&#32;{
+00058 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;InitStatic();
+00059 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00060 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;s_leapRig;
+00061 &#32;&#32;&#32;&#32;&#32;&#32;}
+00062 &#32;&#32;&#32;&#32;}
+00063 
+00076 &#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keyword">static</emphasis>&#32;LeapProvider&#32;Provider&#32;{
+00077 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">get</emphasis>&#32;{
+00078 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(s_provider&#32;==&#32;<emphasis role="keyword">null</emphasis>)&#32;{
+00079 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;InitStatic();
+00080 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00081 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;s_provider;
+00082 &#32;&#32;&#32;&#32;&#32;&#32;}
+00083 &#32;&#32;&#32;&#32;}
+00084 
+00089 &#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keyword">static</emphasis>&#32;<link linkend="_namespace_leap_1_1_unity_1_1_interaction_1a9752eb3e2905e8ebd134fff20c155e6baa78b1ac16c0cd02168097fc9a9bd7604">Hand</link>&#32;Get(<link linkend="_namespace_leap_1_1_unity_1a4d15adcf20ba121b2cd9c07f503b606f">Chirality</link>&#32;chirality)&#32;{
+00090 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(chirality&#32;==&#32;<link linkend="_namespace_leap_1_1_unity_1a4d15adcf20ba121b2cd9c07f503b606f">Chirality</link>.Left)&#32;<emphasis role="keywordflow">return</emphasis>&#32;<link linkend="_namespace_leap_1_1_unity_1a4d15adcf20ba121b2cd9c07f503b606fa945d5e233cf7d6240f6b783b36a374ff">Left</link>;
+00091 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">else</emphasis>&#32;<emphasis role="keywordflow">return</emphasis>&#32;<link linkend="_namespace_leap_1_1_unity_1a4d15adcf20ba121b2cd9c07f503b606fa92b09c7c48c520c3c55e497875da437c">Right</link>;
+00092 &#32;&#32;&#32;&#32;}
+00093 
+00097 &#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keyword">static</emphasis>&#32;<link linkend="_namespace_leap_1_1_unity_1_1_interaction_1a9752eb3e2905e8ebd134fff20c155e6baa78b1ac16c0cd02168097fc9a9bd7604">Hand</link>&#32;GetFixed(<link linkend="_namespace_leap_1_1_unity_1a4d15adcf20ba121b2cd9c07f503b606f">Chirality</link>&#32;chirality)&#32;{
+00098 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(chirality&#32;==&#32;<link linkend="_namespace_leap_1_1_unity_1a4d15adcf20ba121b2cd9c07f503b606f">Chirality</link>.Left)&#32;<emphasis role="keywordflow">return</emphasis>&#32;FixedLeft;
+00099 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">else</emphasis>&#32;<emphasis role="keywordflow">return</emphasis>&#32;FixedRight;
+00100 &#32;&#32;&#32;&#32;}
+00101 
+00106 &#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keyword">static</emphasis>&#32;<link linkend="_namespace_leap_1_1_unity_1_1_interaction_1a9752eb3e2905e8ebd134fff20c155e6baa78b1ac16c0cd02168097fc9a9bd7604">Hand</link>&#32;<link linkend="_namespace_leap_1_1_unity_1a4d15adcf20ba121b2cd9c07f503b606fa945d5e233cf7d6240f6b783b36a374ff">Left</link>&#32;{
+00107 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">get</emphasis>&#32;{
+00108 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(Provider&#32;==&#32;<emphasis role="keyword">null</emphasis>)&#32;<emphasis role="keywordflow">return</emphasis>&#32;<emphasis role="keyword">null</emphasis>;
+00109 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(Provider.CurrentFrame&#32;==&#32;<emphasis role="keyword">null</emphasis>)&#32;<emphasis role="keywordflow">return</emphasis>&#32;<emphasis role="keyword">null</emphasis>;
+00110 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;Provider.CurrentFrame.Hands.Query().FirstOrDefault(hand&#32;=&gt;&#32;hand.IsLeft);
+00111 &#32;&#32;&#32;&#32;&#32;&#32;}
+00112 &#32;&#32;&#32;&#32;}
+00113 
+00118 &#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keyword">static</emphasis>&#32;<link linkend="_namespace_leap_1_1_unity_1_1_interaction_1a9752eb3e2905e8ebd134fff20c155e6baa78b1ac16c0cd02168097fc9a9bd7604">Hand</link>&#32;<link linkend="_namespace_leap_1_1_unity_1a4d15adcf20ba121b2cd9c07f503b606fa92b09c7c48c520c3c55e497875da437c">Right</link>&#32;{
+00119 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">get</emphasis>&#32;{
+00120 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(Provider&#32;==&#32;<emphasis role="keyword">null</emphasis>)&#32;<emphasis role="keywordflow">return</emphasis>&#32;<emphasis role="keyword">null</emphasis>;
+00121 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(Provider.CurrentFrame&#32;==&#32;<emphasis role="keyword">null</emphasis>)&#32;<emphasis role="keywordflow">return</emphasis>&#32;<emphasis role="keyword">null</emphasis>;
+00122 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">else</emphasis>&#32;<emphasis role="keywordflow">return</emphasis>&#32;Provider.CurrentFrame.Hands.Query().FirstOrDefault(hand&#32;=&gt;&#32;hand.IsRight);
+00123 &#32;&#32;&#32;&#32;&#32;&#32;}
+00124 &#32;&#32;&#32;&#32;}
+00125 
+00130 &#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keyword">static</emphasis>&#32;<link linkend="_namespace_leap_1_1_unity_1_1_interaction_1a9752eb3e2905e8ebd134fff20c155e6baa78b1ac16c0cd02168097fc9a9bd7604">Hand</link>&#32;FixedLeft&#32;{
+00131 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">get</emphasis>&#32;{
+00132 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(Provider&#32;==&#32;<emphasis role="keyword">null</emphasis>)&#32;<emphasis role="keywordflow">return</emphasis>&#32;<emphasis role="keyword">null</emphasis>;
+00133 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(Provider.CurrentFixedFrame&#32;==&#32;<emphasis role="keyword">null</emphasis>)&#32;<emphasis role="keywordflow">return</emphasis>&#32;<emphasis role="keyword">null</emphasis>;
+00134 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;Provider.CurrentFixedFrame.Hands.Query().FirstOrDefault(hand&#32;=&gt;&#32;hand.IsLeft);
+00135 &#32;&#32;&#32;&#32;&#32;&#32;}
+00136 &#32;&#32;&#32;&#32;}
+00137 
+00142 &#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keyword">static</emphasis>&#32;<link linkend="_namespace_leap_1_1_unity_1_1_interaction_1a9752eb3e2905e8ebd134fff20c155e6baa78b1ac16c0cd02168097fc9a9bd7604">Hand</link>&#32;FixedRight&#32;{
+00143 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">get</emphasis>&#32;{
+00144 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(Provider&#32;==&#32;<emphasis role="keyword">null</emphasis>)&#32;<emphasis role="keywordflow">return</emphasis>&#32;<emphasis role="keyword">null</emphasis>;
+00145 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(Provider.CurrentFixedFrame&#32;==&#32;<emphasis role="keyword">null</emphasis>)&#32;<emphasis role="keywordflow">return</emphasis>&#32;<emphasis role="keyword">null</emphasis>;
+00146 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">else</emphasis>&#32;<emphasis role="keywordflow">return</emphasis>&#32;Provider.CurrentFixedFrame.Hands.Query().FirstOrDefault(hand&#32;=&gt;&#32;hand.IsRight);
+00147 &#32;&#32;&#32;&#32;&#32;&#32;}
+00148 &#32;&#32;&#32;&#32;}
+00149 
+00153 &#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keyword">static</emphasis>&#32;Finger&#32;GetThumb(<emphasis role="keyword">this</emphasis>&#32;Hand&#32;hand)&#32;{
+00154 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;hand.Fingers[(int)<link linkend="_namespace_leap">Leap</link>.<link linkend="_class_leap_1_1_finger">Finger</link>.<link linkend="_class_leap_1_1_finger_1ae75e8d46a01aff0bd5c6d6fb99e2f2ba">FingerType</link>.TYPE_THUMB];
+00155 &#32;&#32;&#32;&#32;}
+00156 
+00161 &#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keyword">static</emphasis>&#32;Finger&#32;GetIndex(<emphasis role="keyword">this</emphasis>&#32;Hand&#32;hand)&#32;{
+00162 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;hand.Fingers[(int)<link linkend="_namespace_leap">Leap</link>.<link linkend="_class_leap_1_1_finger">Finger</link>.<link linkend="_class_leap_1_1_finger_1ae75e8d46a01aff0bd5c6d6fb99e2f2ba">FingerType</link>.TYPE_INDEX];
+00163 &#32;&#32;&#32;&#32;}
+00164 
+00169 &#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keyword">static</emphasis>&#32;Finger&#32;GetMiddle(<emphasis role="keyword">this</emphasis>&#32;Hand&#32;hand)&#32;{
+00170 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;hand.Fingers[(int)<link linkend="_namespace_leap">Leap</link>.<link linkend="_class_leap_1_1_finger">Finger</link>.<link linkend="_class_leap_1_1_finger_1ae75e8d46a01aff0bd5c6d6fb99e2f2ba">FingerType</link>.TYPE_MIDDLE];
+00171 &#32;&#32;&#32;&#32;}
+00172 
+00177 &#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keyword">static</emphasis>&#32;Finger&#32;GetRing(<emphasis role="keyword">this</emphasis>&#32;Hand&#32;hand)&#32;{
+00178 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;hand.Fingers[(int)<link linkend="_namespace_leap">Leap</link>.<link linkend="_class_leap_1_1_finger">Finger</link>.<link linkend="_class_leap_1_1_finger_1ae75e8d46a01aff0bd5c6d6fb99e2f2ba">FingerType</link>.TYPE_RING];
+00179 &#32;&#32;&#32;&#32;}
+00180 
+00185 &#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keyword">static</emphasis>&#32;Finger&#32;GetPinky(<emphasis role="keyword">this</emphasis>&#32;Hand&#32;hand)&#32;{
+00186 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;hand.Fingers[(int)<link linkend="_namespace_leap">Leap</link>.<link linkend="_class_leap_1_1_finger">Finger</link>.<link linkend="_class_leap_1_1_finger_1ae75e8d46a01aff0bd5c6d6fb99e2f2ba">FingerType</link>.TYPE_PINKY];
+00187 &#32;&#32;&#32;&#32;}
+00188 
+00192 &#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keyword">static</emphasis>&#32;Pose&#32;GetPalmPose(<emphasis role="keyword">this</emphasis>&#32;Hand&#32;hand)&#32;{
+00193 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;<emphasis role="keyword">new</emphasis>&#32;Pose(hand.PalmPosition.ToVector3(),&#32;hand.Rotation.ToQuaternion());
+00194 &#32;&#32;&#32;&#32;}
+00195 
+00199 &#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keyword">static</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;SetPalmPose(<emphasis role="keyword">this</emphasis>&#32;Hand&#32;hand,&#32;Pose&#32;newPalmPose)&#32;{
+00200 &#32;&#32;&#32;&#32;&#32;&#32;hand.SetTransform(newPalmPose.position,&#32;newPalmPose.rotation);
+00201 &#32;&#32;&#32;&#32;}
+00202 
+00209 &#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keyword">static</emphasis>&#32;Vector3&#32;PalmarAxis(<emphasis role="keyword">this</emphasis>&#32;Hand&#32;hand)&#32;{
+00210 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;-hand.Basis.yBasis.ToVector3();
+00211 &#32;&#32;&#32;&#32;}
+00212 
+00219 &#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keyword">static</emphasis>&#32;Vector3&#32;RadialAxis(<emphasis role="keyword">this</emphasis>&#32;Hand&#32;hand)&#32;{
+00220 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(hand.IsRight)&#32;{
+00221 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;-hand.Basis.xBasis.ToVector3();
+00222 &#32;&#32;&#32;&#32;&#32;&#32;}
+00223 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">else</emphasis>&#32;{
+00224 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;hand.Basis.xBasis.ToVector3();
+00225 &#32;&#32;&#32;&#32;&#32;&#32;}
+00226 &#32;&#32;&#32;&#32;}
+00227 
+00234 &#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keyword">static</emphasis>&#32;Vector3&#32;DistalAxis&#32;(<emphasis role="keyword">this</emphasis>&#32;Hand&#32;hand)&#32;{
+00235 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;hand.Basis.zBasis.ToVector3();
+00236 &#32;&#32;&#32;&#32;}
+00237 
+00242 &#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keyword">static</emphasis>&#32;<emphasis role="keywordtype">bool</emphasis>&#32;IsPinching(<emphasis role="keyword">this</emphasis>&#32;Hand&#32;hand)&#32;{
+00243 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;hand.PinchStrength&#32;&gt;&#32;0.8F;
+00244 &#32;&#32;&#32;&#32;}
+00245 
+00249 &#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keyword">static</emphasis>&#32;Vector3&#32;GetPinchPosition(<emphasis role="keyword">this</emphasis>&#32;Hand&#32;hand)&#32;{
+00250 &#32;&#32;&#32;&#32;&#32;&#32;Vector&#32;indexPosition&#32;=&#32;hand.Fingers[(int)Finger.FingerType.TYPE_INDEX].TipPosition;
+00251 &#32;&#32;&#32;&#32;&#32;&#32;Vector&#32;thumbPosition&#32;=&#32;hand.Fingers[(<emphasis role="keywordtype">int</emphasis>)Finger.FingerType.TYPE_THUMB].TipPosition;
+00252 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;(2&#32;*&#32;thumbPosition&#32;+&#32;indexPosition).ToVector3()&#32;*&#32;0.333333F;
+00253 &#32;&#32;&#32;&#32;}
+00254 
+00261 &#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keyword">static</emphasis>&#32;Vector3&#32;GetPredictedPinchPosition(<emphasis role="keyword">this</emphasis>&#32;Hand&#32;hand)&#32;{
+00262 &#32;&#32;&#32;&#32;&#32;&#32;Vector3&#32;<link linkend="_namespace_valve_1_1_v_r_1a99f7cc968994699a7485078bafddac17afff4b1bc9444941114a424298cd59033">indexTip</link>&#32;=&#32;hand.GetIndex().TipPosition.ToVector3();
+00263 &#32;&#32;&#32;&#32;&#32;&#32;Vector3&#32;<link linkend="_namespace_valve_1_1_v_r_1a99f7cc968994699a7485078bafddac17adaeaa4568171eb6656917f9f26ce1c5c">thumbTip</link>&#32;=&#32;hand.GetThumb().TipPosition.ToVector3();
+00264 
+00265 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;The&#32;predicted&#32;pinch&#32;point&#32;is&#32;a&#32;rigid&#32;point&#32;in&#32;hand-space&#32;linearly&#32;offset&#32;by&#32;the</emphasis>
+00266 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;index&#32;finger&#32;knuckle&#32;position,&#32;scaled&#32;by&#32;the&#32;index&#32;finger&apos;s&#32;length,&#32;and&#32;lightly</emphasis>
+00267 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;influenced&#32;by&#32;the&#32;actual&#32;thumb&#32;and&#32;index&#32;tip&#32;positions.</emphasis>
+00268 &#32;&#32;&#32;&#32;&#32;&#32;Vector3&#32;indexKnuckle&#32;=&#32;hand.Fingers[1].bones[1].PrevJoint.ToVector3();
+00269 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordtype">float</emphasis>&#32;indexLength&#32;=&#32;hand.Fingers[1].Length;
+00270 &#32;&#32;&#32;&#32;&#32;&#32;Vector3&#32;radialAxis&#32;=&#32;hand.RadialAxis();
+00271 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordtype">float</emphasis>&#32;thumbInfluence&#32;=&#32;Vector3.Dot((thumbTip&#32;-&#32;indexKnuckle).normalized,&#32;radialAxis).Map(0F,&#32;1F,&#32;0.5F,&#32;0F);
+00272 &#32;&#32;&#32;&#32;&#32;&#32;Vector3&#32;predictedPinchPoint&#32;=&#32;indexKnuckle&#32;+&#32;hand.PalmarAxis()&#32;*&#32;indexLength&#32;*&#32;0.85F
+00273 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;+&#32;hand.DistalAxis()&#32;*&#32;indexLength&#32;*&#32;0.20F
+00274 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;+&#32;radialAxis&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;*&#32;indexLength&#32;*&#32;0.20F;
+00275 &#32;&#32;&#32;&#32;&#32;&#32;predictedPinchPoint&#32;=&#32;Vector3.Lerp(predictedPinchPoint,&#32;thumbTip,&#32;thumbInfluence);
+00276 &#32;&#32;&#32;&#32;&#32;&#32;predictedPinchPoint&#32;=&#32;Vector3.Lerp(predictedPinchPoint,&#32;indexTip,&#32;0.15F);
+00277 
+00278 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;predictedPinchPoint;
+00279 &#32;&#32;&#32;&#32;}
+00280 
+00284 &#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keyword">static</emphasis>&#32;<emphasis role="keywordtype">bool</emphasis>&#32;IsFacing(<emphasis role="keyword">this</emphasis>&#32;Vector3&#32;facingVector,&#32;Vector3&#32;fromWorldPosition,&#32;Vector3&#32;towardsWorldPosition,&#32;<emphasis role="keywordtype">float</emphasis>&#32;maxOffsetAngleAllowed)&#32;{
+00285 &#32;&#32;&#32;&#32;&#32;&#32;Vector3&#32;actualVectorTowardsWorldPosition&#32;=&#32;(towardsWorldPosition&#32;-&#32;fromWorldPosition).normalized;
+00286 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;Vector3.Angle(facingVector,&#32;actualVectorTowardsWorldPosition)&#32;&lt;=&#32;maxOffsetAngleAllowed;
+00287 &#32;&#32;&#32;&#32;}
+00288 
+00292 &#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keyword">static</emphasis>&#32;<emphasis role="keywordtype">float</emphasis>&#32;GetFistStrength(<emphasis role="keyword">this</emphasis>&#32;Hand&#32;hand)&#32;{
+00293 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;(Vector3.Dot(hand.Fingers[1].Direction.ToVector3(),&#32;-hand.DistalAxis()&#32;)
+00294 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;+&#32;Vector3.Dot(hand.Fingers[2].Direction.ToVector3(),&#32;-hand.DistalAxis()&#32;)
+00295 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;+&#32;Vector3.Dot(hand.Fingers[3].Direction.ToVector3(),&#32;-hand.DistalAxis()&#32;)
+00296 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;+&#32;Vector3.Dot(hand.Fingers[4].Direction.ToVector3(),&#32;-hand.DistalAxis()&#32;)
+00297 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;+&#32;Vector3.Dot(hand.Fingers[0].Direction.ToVector3(),&#32;-hand.RadialAxis()&#32;)
+00298 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;).Map(-5,&#32;5,&#32;0,&#32;1);
+00299 &#32;&#32;&#32;&#32;}
+00300 
+00304 &#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keyword">static</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;Transform(<emphasis role="keyword">this</emphasis>&#32;Bone&#32;bone,&#32;Vector3&#32;position,&#32;Quaternion&#32;rotation)&#32;{
+00305 &#32;&#32;&#32;&#32;&#32;&#32;bone.Transform(<emphasis role="keyword">new</emphasis>&#32;LeapTransform(position.ToVector(),&#32;rotation.ToLeapQuaternion()));
+00306 &#32;&#32;&#32;&#32;}
+00307 
+00311 &#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keyword">static</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;Transform(<emphasis role="keyword">this</emphasis>&#32;Finger&#32;finger,&#32;Vector3&#32;position,&#32;Quaternion&#32;rotation)&#32;{
+00312 &#32;&#32;&#32;&#32;&#32;&#32;finger.Transform(<emphasis role="keyword">new</emphasis>&#32;LeapTransform(position.ToVector(),&#32;rotation.ToLeapQuaternion()));
+00313 &#32;&#32;&#32;&#32;}
+00314 
+00318 &#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keyword">static</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;Transform(<emphasis role="keyword">this</emphasis>&#32;Hand&#32;hand,&#32;Vector3&#32;position,&#32;Quaternion&#32;rotation)&#32;{
+00319 &#32;&#32;&#32;&#32;&#32;&#32;hand.Transform(<emphasis role="keyword">new</emphasis>&#32;LeapTransform(position.ToVector(),&#32;rotation.ToLeapQuaternion()));
+00320 &#32;&#32;&#32;&#32;}
+00321 
+00325 &#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keyword">static</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;Transform(<emphasis role="keyword">this</emphasis>&#32;Frame&#32;frame,&#32;Vector3&#32;position,&#32;Quaternion&#32;rotation)&#32;{
+00326 &#32;&#32;&#32;&#32;&#32;&#32;frame.Transform(<emphasis role="keyword">new</emphasis>&#32;LeapTransform(position.ToVector(),&#32;rotation.ToLeapQuaternion()));
+00327 &#32;&#32;&#32;&#32;}
+00328 
+00332 &#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keyword">static</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;SetTransform(<emphasis role="keyword">this</emphasis>&#32;Bone&#32;bone,&#32;Vector3&#32;position,&#32;Quaternion&#32;rotation)&#32;{
+00333 &#32;&#32;&#32;&#32;&#32;&#32;bone.Transform(Vector3.zero,&#32;(rotation&#32;*&#32;Quaternion.Inverse(bone.Rotation.ToQuaternion())));
+00334 &#32;&#32;&#32;&#32;&#32;&#32;bone.Transform(position&#32;-&#32;bone.PrevJoint.ToVector3(),&#32;Quaternion.identity);
+00335 &#32;&#32;&#32;&#32;}
+00336 
+00340 &#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keyword">static</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;SetTipTransform(<emphasis role="keyword">this</emphasis>&#32;Finger&#32;finger,&#32;Vector3&#32;position,&#32;Quaternion&#32;rotation)&#32;{
+00341 &#32;&#32;&#32;&#32;&#32;&#32;finger.Transform(Vector3.zero,&#32;(rotation&#32;*&#32;Quaternion.Inverse(finger.bones[3].Rotation.ToQuaternion())));
+00342 &#32;&#32;&#32;&#32;&#32;&#32;finger.Transform(position&#32;-&#32;finger.bones[3].NextJoint.ToVector3(),&#32;Quaternion.identity);
+00343 &#32;&#32;&#32;&#32;}
+00344 
+00348 &#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keyword">static</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;SetTransform(<emphasis role="keyword">this</emphasis>&#32;Hand&#32;hand,&#32;Vector3&#32;position,&#32;Quaternion&#32;rotation)&#32;{
+00349 &#32;&#32;&#32;&#32;&#32;&#32;hand.Transform(Vector3.zero,&#32;Quaternion.Slerp((rotation&#32;*&#32;Quaternion.Inverse(hand.Rotation.ToQuaternion())),&#32;Quaternion.identity,&#32;0f));
+00350 &#32;&#32;&#32;&#32;&#32;&#32;hand.Transform(position&#32;-&#32;hand.PalmPosition.ToVector3(),&#32;Quaternion.identity);
+00351 &#32;&#32;&#32;&#32;}
+00352 
+00353 &#32;&#32;}
+00354 
+00358 &#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keyword">static</emphasis>&#32;<emphasis role="keyword">class&#32;</emphasis>HandUtils&#32;{
+00359 
+00364 &#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keyword">static</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;Fill(<emphasis role="keyword">this</emphasis>&#32;Hand&#32;toFill,
+00365 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordtype">long</emphasis>&#32;frameID,
+00366 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordtype">int</emphasis>&#32;<emphasis role="keywordtype">id</emphasis>,
+00367 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordtype">float</emphasis>&#32;confidence,
+00368 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordtype">float</emphasis>&#32;grabStrength,
+00369 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordtype">float</emphasis>&#32;grabAngle,
+00370 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordtype">float</emphasis>&#32;pinchStrength,
+00371 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordtype">float</emphasis>&#32;pinchDistance,
+00372 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordtype">float</emphasis>&#32;palmWidth,
+00373 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordtype">bool</emphasis>&#32;isLeft,
+00374 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordtype">float</emphasis>&#32;timeVisible,
+00375 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">/*&#32;Arm&#32;arm,*/</emphasis>
+00376 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;List&lt;Finger&gt;&#32;fingers,
+00377 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;Vector&#32;palmPosition,
+00378 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;Vector&#32;stabilizedPalmPosition,
+00379 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;Vector&#32;palmVelocity,
+00380 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;Vector&#32;palmNormal,
+00381 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;LeapQuaternion&#32;rotation,
+00382 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;Vector&#32;direction,
+00383 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;Vector&#32;wristPosition)&#32;{
+00384 &#32;&#32;&#32;&#32;&#32;&#32;toFill.FrameId&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;=&#32;frameID;
+00385 &#32;&#32;&#32;&#32;&#32;&#32;toFill.Id&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;=&#32;id;
+00386 &#32;&#32;&#32;&#32;&#32;&#32;toFill.Confidence&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;=&#32;confidence;
+00387 &#32;&#32;&#32;&#32;&#32;&#32;toFill.GrabStrength&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;=&#32;grabStrength;
+00388 &#32;&#32;&#32;&#32;&#32;&#32;toFill.GrabAngle&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;=&#32;grabAngle;
+00389 &#32;&#32;&#32;&#32;&#32;&#32;toFill.PinchStrength&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;=&#32;pinchStrength;
+00390 &#32;&#32;&#32;&#32;&#32;&#32;toFill.PinchDistance&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;=&#32;pinchDistance;
+00391 &#32;&#32;&#32;&#32;&#32;&#32;toFill.PalmWidth&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;=&#32;palmWidth;
+00392 &#32;&#32;&#32;&#32;&#32;&#32;toFill.IsLeft&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;=&#32;isLeft;
+00393 &#32;&#32;&#32;&#32;&#32;&#32;toFill.TimeVisible&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;=&#32;timeVisible;
+00394 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(fingers&#32;!=&#32;<emphasis role="keyword">null</emphasis>)&#32;toFill.Fingers&#32;=&#32;fingers;
+00395 &#32;&#32;&#32;&#32;&#32;&#32;toFill.PalmPosition&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;=&#32;palmPosition;
+00396 &#32;&#32;&#32;&#32;&#32;&#32;toFill.StabilizedPalmPosition&#32;&#32;&#32;&#32;&#32;&#32;&#32;=&#32;stabilizedPalmPosition;
+00397 &#32;&#32;&#32;&#32;&#32;&#32;toFill.PalmVelocity&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;=&#32;palmVelocity;
+00398 &#32;&#32;&#32;&#32;&#32;&#32;toFill.PalmNormal&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;=&#32;palmNormal;
+00399 &#32;&#32;&#32;&#32;&#32;&#32;toFill.Rotation&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;=&#32;rotation;
+00400 &#32;&#32;&#32;&#32;&#32;&#32;toFill.Direction&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;=&#32;direction;
+00401 &#32;&#32;&#32;&#32;&#32;&#32;toFill.WristPosition&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;=&#32;wristPosition;
+00402 &#32;&#32;&#32;&#32;}
+00403 
+00407 &#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keyword">static</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;Fill(<emphasis role="keyword">this</emphasis>&#32;Bone&#32;toFill,
+00408 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;Vector&#32;prevJoint,
+00409 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;Vector&#32;nextJoint,
+00410 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;Vector&#32;center,
+00411 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;Vector&#32;direction,
+00412 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordtype">float</emphasis>&#32;length,
+00413 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordtype">float</emphasis>&#32;width,
+00414 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;Bone.BoneType&#32;type,
+00415 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;LeapQuaternion&#32;rotation)&#32;{
+00416 &#32;&#32;&#32;&#32;&#32;&#32;toFill.PrevJoint&#32;&#32;=&#32;prevJoint;
+00417 &#32;&#32;&#32;&#32;&#32;&#32;toFill.NextJoint&#32;&#32;=&#32;nextJoint;
+00418 &#32;&#32;&#32;&#32;&#32;&#32;toFill.Center&#32;&#32;&#32;&#32;&#32;=&#32;center;
+00419 &#32;&#32;&#32;&#32;&#32;&#32;toFill.Direction&#32;&#32;=&#32;direction;
+00420 &#32;&#32;&#32;&#32;&#32;&#32;toFill.Length&#32;&#32;&#32;&#32;&#32;=&#32;length;
+00421 &#32;&#32;&#32;&#32;&#32;&#32;toFill.Width&#32;&#32;&#32;&#32;&#32;&#32;=&#32;width;
+00422 &#32;&#32;&#32;&#32;&#32;&#32;toFill.Type&#32;&#32;&#32;&#32;&#32;&#32;&#32;=&#32;type;
+00423 &#32;&#32;&#32;&#32;&#32;&#32;toFill.Rotation&#32;&#32;&#32;=&#32;rotation;
+00424 &#32;&#32;&#32;&#32;}
+00425 
+00430 &#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keyword">static</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;Fill(<emphasis role="keyword">this</emphasis>&#32;Finger&#32;toFill,
+00431 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordtype">long</emphasis>&#32;frameId,
+00432 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordtype">int</emphasis>&#32;handId,
+00433 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordtype">int</emphasis>&#32;fingerId,
+00434 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordtype">float</emphasis>&#32;timeVisible,
+00435 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;Vector&#32;tipPosition,
+00436 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;Vector&#32;direction,
+00437 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordtype">float</emphasis>&#32;width,
+00438 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordtype">float</emphasis>&#32;length,
+00439 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordtype">bool</emphasis>&#32;isExtended,
+00440 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;Finger.FingerType&#32;type,
+00441 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;Bone&#32;metacarpal&#32;&#32;&#32;=&#32;<emphasis role="keyword">null</emphasis>,
+00442 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;Bone&#32;proximal&#32;&#32;&#32;&#32;&#32;=&#32;<emphasis role="keyword">null</emphasis>,
+00443 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;Bone&#32;intermediate&#32;=&#32;<emphasis role="keyword">null</emphasis>,
+00444 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;Bone&#32;distal&#32;&#32;&#32;&#32;&#32;&#32;&#32;=&#32;<emphasis role="keyword">null</emphasis>)&#32;{
+00445 &#32;&#32;&#32;&#32;&#32;&#32;toFill.Id&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;=&#32;handId;
+00446 &#32;&#32;&#32;&#32;&#32;&#32;toFill.HandId&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;=&#32;handId;
+00447 &#32;&#32;&#32;&#32;&#32;&#32;toFill.TimeVisible&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;=&#32;timeVisible;
+00448 &#32;&#32;&#32;&#32;&#32;&#32;toFill.TipPosition&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;=&#32;tipPosition;
+00449 &#32;&#32;&#32;&#32;&#32;&#32;toFill.Direction&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;=&#32;direction;
+00450 &#32;&#32;&#32;&#32;&#32;&#32;toFill.Width&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;=&#32;width;
+00451 &#32;&#32;&#32;&#32;&#32;&#32;toFill.Length&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;=&#32;length;
+00452 &#32;&#32;&#32;&#32;&#32;&#32;toFill.IsExtended&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;=&#32;isExtended;
+00453 &#32;&#32;&#32;&#32;&#32;&#32;toFill.Type&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;=&#32;type;
+00454 
+00455 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(metacarpal&#32;&#32;&#32;!=&#32;<emphasis role="keyword">null</emphasis>)&#32;toFill.bones[0]&#32;=&#32;metacarpal;
+00456 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(proximal&#32;&#32;&#32;&#32;&#32;!=&#32;<emphasis role="keyword">null</emphasis>)&#32;toFill.bones[1]&#32;=&#32;proximal;
+00457 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(intermediate&#32;!=&#32;<emphasis role="keyword">null</emphasis>)&#32;toFill.bones[2]&#32;=&#32;intermediate;
+00458 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(distal&#32;&#32;&#32;&#32;&#32;&#32;&#32;!=&#32;<emphasis role="keyword">null</emphasis>)&#32;toFill.bones[3]&#32;=&#32;distal;
+00459 &#32;&#32;&#32;&#32;}
+00460 
+00464 &#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keyword">static</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;Fill(<emphasis role="keyword">this</emphasis>&#32;Arm&#32;toFill,
+00465 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;Vector&#32;elbow,
+00466 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;Vector&#32;wrist,
+00467 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;Vector&#32;center,
+00468 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;Vector&#32;direction,
+00469 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordtype">float</emphasis>&#32;length,
+00470 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordtype">float</emphasis>&#32;width,
+00471 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;LeapQuaternion&#32;rotation)&#32;{
+00472 &#32;&#32;&#32;&#32;&#32;&#32;toFill.PrevJoint&#32;&#32;=&#32;elbow;
+00473 &#32;&#32;&#32;&#32;&#32;&#32;toFill.NextJoint&#32;&#32;=&#32;<link linkend="_namespace_valve_1_1_v_r_1a99f7cc968994699a7485078bafddac17a5f412bd74e8ece87b8e45743c8c1e014">wrist</link>;
+00474 &#32;&#32;&#32;&#32;&#32;&#32;toFill.Center&#32;&#32;&#32;&#32;&#32;=&#32;center;
+00475 &#32;&#32;&#32;&#32;&#32;&#32;toFill.Direction&#32;&#32;=&#32;direction;
+00476 &#32;&#32;&#32;&#32;&#32;&#32;toFill.Length&#32;&#32;&#32;&#32;&#32;=&#32;length;
+00477 &#32;&#32;&#32;&#32;&#32;&#32;toFill.Width&#32;&#32;&#32;&#32;&#32;&#32;=&#32;width;
+00478 &#32;&#32;&#32;&#32;&#32;&#32;toFill.Rotation&#32;&#32;&#32;=&#32;rotation;
+00479 &#32;&#32;&#32;&#32;}
+00480 
+00485 &#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keyword">static</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;FillTemporalData(<emphasis role="keyword">this</emphasis>&#32;Hand&#32;toFill,
+00486 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;Hand&#32;previousHand,&#32;<emphasis role="keywordtype">float</emphasis>&#32;deltaTime)&#32;{
+00487 &#32;&#32;&#32;&#32;&#32;&#32;toFill.PalmVelocity&#32;=&#32;(toFill.PalmPosition&#32;-&#32;previousHand.PalmPosition)
+00488 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;/&#32;deltaTime;
+00489 &#32;&#32;&#32;&#32;}
+00490 &#32;&#32;&#32;&#32;
+00491 <emphasis role="preprocessor">&#32;&#32;&#32;&#32;#region&#32;Frame&#32;Utils</emphasis>
+00492 
+00493 &#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keyword">static</emphasis>&#32;<link linkend="_namespace_leap_1_1_unity_1_1_interaction_1a9752eb3e2905e8ebd134fff20c155e6baa78b1ac16c0cd02168097fc9a9bd7604">Hand</link>&#32;Get(<emphasis role="keyword">this</emphasis>&#32;Frame&#32;frame,&#32;<link linkend="_namespace_leap_1_1_unity_1a4d15adcf20ba121b2cd9c07f503b606f">Chirality</link>&#32;whichHand)&#32;{
+00494 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;frame.Hands.Query().FirstOrDefault(h&#32;=&gt;&#32;h.IsLeft&#32;==&#32;(whichHand&#32;==&#32;<link linkend="_namespace_leap_1_1_unity_1a4d15adcf20ba121b2cd9c07f503b606f">Chirality</link>.Left));
+00495 &#32;&#32;&#32;&#32;}
+00496 
+00497 <emphasis role="preprocessor">&#32;&#32;&#32;&#32;#endregion</emphasis>
+00498 
+00499 <emphasis role="preprocessor">&#32;&#32;&#32;&#32;#region&#32;Provider&#32;Utils</emphasis>
+00500 
+00501 &#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keyword">static</emphasis>&#32;<link linkend="_namespace_leap_1_1_unity_1_1_interaction_1a9752eb3e2905e8ebd134fff20c155e6baa78b1ac16c0cd02168097fc9a9bd7604">Hand</link>&#32;Get(<emphasis role="keyword">this</emphasis>&#32;LeapProvider&#32;provider,&#32;<link linkend="_namespace_leap_1_1_unity_1a4d15adcf20ba121b2cd9c07f503b606f">Chirality</link>&#32;whichHand)&#32;{
+00502 &#32;&#32;&#32;&#32;&#32;&#32;Frame&#32;frame;
+00503 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(Time.inFixedTimeStep)&#32;{
+00504 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;frame&#32;=&#32;provider.CurrentFixedFrame;
+00505 &#32;&#32;&#32;&#32;&#32;&#32;}
+00506 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">else</emphasis>&#32;{
+00507 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;frame&#32;=&#32;provider.CurrentFrame;
+00508 &#32;&#32;&#32;&#32;&#32;&#32;}
+00509 
+00510 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;frame.Get(whichHand);
+00511 &#32;&#32;&#32;&#32;}
+00512 
+00513 <emphasis role="preprocessor">&#32;&#32;&#32;&#32;#endregion</emphasis>
+00514 
+00515 &#32;&#32;}
+00516 
+00517 }
+</programlisting></section>

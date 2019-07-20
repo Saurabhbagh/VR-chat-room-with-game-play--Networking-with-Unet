@@ -1,0 +1,267 @@
+<?xml version='1.0' encoding='UTF-8' standalone='no'?>
+<section xmlns="http://docbook.org/ns/docbook" version="5.0" xmlns:xlink="http://www.w3.org/1999/xlink" xml:id="__throwable_8cs_source">
+<title>Throwable.cs</title>
+<indexterm><primary>O:/GitHUBMINIPRoject/Assets/SteamVR/InteractionSystem/Core/Scripts/Throwable.cs</primary></indexterm>
+<programlisting>00001 <emphasis role="comment">//=======&#32;Copyright&#32;(c)&#32;Valve&#32;Corporation,&#32;All&#32;rights&#32;reserved.&#32;===============</emphasis>
+00002 <emphasis role="comment">//</emphasis>
+00003 <emphasis role="comment">//&#32;Purpose:&#32;Basic&#32;throwable&#32;object</emphasis>
+00004 <emphasis role="comment">//</emphasis>
+00005 <emphasis role="comment">//=============================================================================</emphasis>
+00006 
+00007 <emphasis role="keyword">using</emphasis>&#32;<link linkend="__balloon_8cs_1a7d67e097df9376eb709b6a23aa3c7d23">UnityEngine</link>;
+00008 <emphasis role="keyword">using</emphasis>&#32;<link linkend="_namespace_unity_engine">UnityEngine</link>.Events;
+00009 <emphasis role="keyword">using</emphasis>&#32;System.Collections;
+00010 
+00011 <emphasis role="keyword">namespace&#32;</emphasis><link linkend="_namespace_valve_1_1_v_r_1_1_interaction_system">Valve.VR.InteractionSystem</link>
+00012 {
+00013 &#32;&#32;&#32;&#32;<emphasis role="comment">//-------------------------------------------------------------------------</emphasis>
+00014 &#32;&#32;&#32;&#32;[RequireComponent(&#32;typeof(&#32;Interactable&#32;)&#32;)]
+00015 &#32;&#32;&#32;&#32;[RequireComponent(&#32;typeof(&#32;Rigidbody&#32;)&#32;)]
+00016 &#32;&#32;&#32;&#32;[RequireComponent(&#32;typeof(VelocityEstimator))]
+<anchor xml:id="__throwable_8cs_source_1l00017"/><link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_throwable">00017</link> &#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keyword">class&#32;</emphasis><link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_throwable">Throwable</link>&#32;:&#32;MonoBehaviour
+00018 &#32;&#32;&#32;&#32;{
+00019 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;[<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_enum_flags">EnumFlags</link>]
+00020 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;[Tooltip(&#32;<emphasis role="stringliteral">&quot;The&#32;flags&#32;used&#32;to&#32;attach&#32;this&#32;object&#32;to&#32;the&#32;hand.&quot;</emphasis>&#32;)]
+<anchor xml:id="__throwable_8cs_source_1l00021"/><link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_throwable_1ae9660f75eeae3bc5c0d0d4883ea0e667">00021</link> &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_hand">Hand</link>.<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_hand_1a61701f82b8f3fac8818954ec71804cb5">AttachmentFlags</link>&#32;<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_throwable_1ae9660f75eeae3bc5c0d0d4883ea0e667">attachmentFlags</link>&#32;=&#32;<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_hand">Hand</link>.<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_hand_1a61701f82b8f3fac8818954ec71804cb5">AttachmentFlags</link>.ParentToHand&#32;|&#32;<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_hand">Hand</link>.<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_hand_1a61701f82b8f3fac8818954ec71804cb5">AttachmentFlags</link>.DetachFromOtherHand&#32;|&#32;<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_hand">Hand</link>.<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_hand_1a61701f82b8f3fac8818954ec71804cb5">AttachmentFlags</link>.TurnOnKinematic;
+00022 
+00023 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;[Tooltip(<emphasis role="stringliteral">&quot;The&#32;local&#32;point&#32;which&#32;acts&#32;as&#32;a&#32;positional&#32;and&#32;rotational&#32;offset&#32;to&#32;use&#32;while&#32;held&quot;</emphasis>)]
+<anchor xml:id="__throwable_8cs_source_1l00024"/><link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_throwable_1afaf5441c0787a5dfd7672c1ad6a279c0">00024</link> &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;Transform&#32;<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_throwable_1afaf5441c0787a5dfd7672c1ad6a279c0">attachmentOffset</link>;
+00025 
+00026 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;[Tooltip(&#32;<emphasis role="stringliteral">&quot;How&#32;fast&#32;must&#32;this&#32;object&#32;be&#32;moving&#32;to&#32;attach&#32;due&#32;to&#32;a&#32;trigger&#32;hold&#32;instead&#32;of&#32;a&#32;trigger&#32;press?&#32;(-1&#32;to&#32;disable)&quot;</emphasis>&#32;)]
+<anchor xml:id="__throwable_8cs_source_1l00027"/><link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_throwable_1ab955499f5c483d693bb20c69e0d52cc2">00027</link> &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keywordtype">float</emphasis>&#32;<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_throwable_1ab955499f5c483d693bb20c69e0d52cc2">catchingSpeedThreshold</link>&#32;=&#32;-1;
+00028 
+<anchor xml:id="__throwable_8cs_source_1l00029"/><link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_throwable_1a86e0cdec8d857c57f29b83b7e9bffa29">00029</link> &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<link linkend="_namespace_valve_1_1_v_r_1_1_interaction_system_1a4d44088760d96c5718173d8ca2c48ad1">ReleaseStyle</link>&#32;<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_throwable_1a86e0cdec8d857c57f29b83b7e9bffa29">releaseVelocityStyle</link>&#32;=&#32;<link linkend="_namespace_valve_1_1_v_r_1_1_interaction_system_1a4d44088760d96c5718173d8ca2c48ad1">ReleaseStyle</link>.GetFromHand;
+00030 
+00031 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;[Tooltip(<emphasis role="stringliteral">&quot;The&#32;time&#32;offset&#32;used&#32;when&#32;releasing&#32;the&#32;object&#32;with&#32;the&#32;RawFromHand&#32;option&quot;</emphasis>)]
+<anchor xml:id="__throwable_8cs_source_1l00032"/><link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_throwable_1a24b452ac7877e0ff3a713fdf3a4301ae">00032</link> &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keywordtype">float</emphasis>&#32;<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_throwable_1a24b452ac7877e0ff3a713fdf3a4301ae">releaseVelocityTimeOffset</link>&#32;=&#32;-0.011f;
+00033 
+<anchor xml:id="__throwable_8cs_source_1l00034"/><link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_throwable_1a0f4aa8b227aa10ddb50a23314a7a55a1">00034</link> &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keywordtype">float</emphasis>&#32;<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_throwable_1a0f4aa8b227aa10ddb50a23314a7a55a1">scaleReleaseVelocity</link>&#32;=&#32;1.1f;
+00035 
+00036 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;[Tooltip(&#32;<emphasis role="stringliteral">&quot;When&#32;detaching&#32;the&#32;object,&#32;should&#32;it&#32;return&#32;to&#32;its&#32;original&#32;parent?&quot;</emphasis>&#32;)]
+<anchor xml:id="__throwable_8cs_source_1l00037"/><link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_throwable_1ac45418f7f469d63e566ca1cfa6b4a9cf">00037</link> &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keywordtype">bool</emphasis>&#32;<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_throwable_1ac45418f7f469d63e566ca1cfa6b4a9cf">restoreOriginalParent</link>&#32;=&#32;<emphasis role="keyword">false</emphasis>;
+00038 
+00039 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;
+00040 
+<anchor xml:id="__throwable_8cs_source_1l00041"/><link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_throwable_1a19421d37faa186b5c0271a73e2976484">00041</link> &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">protected</emphasis>&#32;<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_velocity_estimator">VelocityEstimator</link>&#32;<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_throwable_1a19421d37faa186b5c0271a73e2976484">velocityEstimator</link>;
+<anchor xml:id="__throwable_8cs_source_1l00042"/><link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_throwable_1ac0133980c2673c707c3eddf40d973670">00042</link> &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">protected</emphasis>&#32;<emphasis role="keywordtype">bool</emphasis>&#32;<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_throwable_1ac0133980c2673c707c3eddf40d973670">attached</link>&#32;=&#32;<emphasis role="keyword">false</emphasis>;
+<anchor xml:id="__throwable_8cs_source_1l00043"/><link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_throwable_1afa7afa89b85a2decca730e217ad7d807">00043</link> &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">protected</emphasis>&#32;<emphasis role="keywordtype">float</emphasis>&#32;<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_throwable_1afa7afa89b85a2decca730e217ad7d807">attachTime</link>;
+<anchor xml:id="__throwable_8cs_source_1l00044"/><link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_throwable_1a41ab4ee9a6ae0fe64045fb9453366b24">00044</link> &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">protected</emphasis>&#32;Vector3&#32;<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_throwable_1a41ab4ee9a6ae0fe64045fb9453366b24">attachPosition</link>;
+<anchor xml:id="__throwable_8cs_source_1l00045"/><link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_throwable_1a9b65d4f08e91341132e5dfcd011fc7d8">00045</link> &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">protected</emphasis>&#32;Quaternion&#32;<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_throwable_1a9b65d4f08e91341132e5dfcd011fc7d8">attachRotation</link>;
+<anchor xml:id="__throwable_8cs_source_1l00046"/><link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_throwable_1ae2e434b1a5a71076ff41e3b8d593fbe3">00046</link> &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">protected</emphasis>&#32;Transform&#32;<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_throwable_1ae2e434b1a5a71076ff41e3b8d593fbe3">attachEaseInTransform</link>;
+00047 
+<anchor xml:id="__throwable_8cs_source_1l00048"/><link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_throwable_1ab36effd81a7d72a06cea05edc0c70f7b">00048</link> &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;UnityEvent&#32;<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_throwable_1ab36effd81a7d72a06cea05edc0c70f7b">onPickUp</link>;
+<anchor xml:id="__throwable_8cs_source_1l00049"/><link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_throwable_1ab5e437cb99376da336c6f85192e22a7b">00049</link> &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;UnityEvent&#32;<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_throwable_1ab5e437cb99376da336c6f85192e22a7b">onDetachFromHand</link>;
+<anchor xml:id="__throwable_8cs_source_1l00050"/><link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_throwable_1aa9e15815a6db859e2624d9b4cdf1a10e">00050</link> &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;UnityEvent&lt;Hand&gt;&#32;<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_throwable_1aa9e15815a6db859e2624d9b4cdf1a10e">onHeldUpdate</link>;
+00051 
+00052 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;
+<anchor xml:id="__throwable_8cs_source_1l00053"/><link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_throwable_1a22c7869dc935bef435a290824507fa64">00053</link> &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">protected</emphasis>&#32;RigidbodyInterpolation&#32;<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_throwable_1a22c7869dc935bef435a290824507fa64">hadInterpolation</link>&#32;=&#32;RigidbodyInterpolation.None;
+00054 
+<anchor xml:id="__throwable_8cs_source_1l00055"/><link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_throwable_1adc5a38d1b150a29c9deb08fdfd52b497">00055</link> &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">protected</emphasis>&#32;<emphasis role="keyword">new</emphasis>&#32;Rigidbody&#32;<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_throwable_1adc5a38d1b150a29c9deb08fdfd52b497">rigidbody</link>;
+00056 
+00057 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;[HideInInspector]
+<anchor xml:id="__throwable_8cs_source_1l00058"/><link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_throwable_1a1f706c176bf75ddd5044b67751f9420c">00058</link> &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_interactable">Interactable</link>&#32;<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_throwable_1a1f706c176bf75ddd5044b67751f9420c">interactable</link>;
+00059 
+00060 
+00061 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//-------------------------------------------------</emphasis>
+<anchor xml:id="__throwable_8cs_source_1l00062"/><link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_throwable_1a24abdee13fd616927dbf00d13b9ecd53">00062</link> &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">protected</emphasis>&#32;<emphasis role="keyword">virtual</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_throwable_1a24abdee13fd616927dbf00d13b9ecd53">Awake</link>()
+00063 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00064 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_throwable_1a19421d37faa186b5c0271a73e2976484">velocityEstimator</link>&#32;=&#32;GetComponent&lt;VelocityEstimator&gt;();
+00065 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_throwable_1a1f706c176bf75ddd5044b67751f9420c">interactable</link>&#32;=&#32;GetComponent&lt;Interactable&gt;();
+00066 
+00067 
+00068 
+00069 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_throwable_1adc5a38d1b150a29c9deb08fdfd52b497">rigidbody</link>&#32;=&#32;GetComponent&lt;Rigidbody&gt;();
+00070 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_throwable_1adc5a38d1b150a29c9deb08fdfd52b497">rigidbody</link>.maxAngularVelocity&#32;=&#32;50.0f;
+00071 
+00072 
+00073 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>(<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_throwable_1afaf5441c0787a5dfd7672c1ad6a279c0">attachmentOffset</link>&#32;!=&#32;<emphasis role="keyword">null</emphasis>)
+00074 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00075 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;remove?</emphasis>
+00076 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//interactable.handFollowTransform&#32;=&#32;attachmentOffset;</emphasis>
+00077 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00078 
+00079 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00080 
+00081 
+00082 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//-------------------------------------------------</emphasis>
+<anchor xml:id="__throwable_8cs_source_1l00083"/><link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_throwable_1a02723daa6d6ea48dc5905231e9b7decf">00083</link> &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">protected</emphasis>&#32;<emphasis role="keyword">virtual</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_throwable_1a02723daa6d6ea48dc5905231e9b7decf">OnHandHoverBegin</link>(&#32;<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_hand">Hand</link>&#32;hand&#32;)
+00084 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00085 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordtype">bool</emphasis>&#32;showHint&#32;=&#32;<emphasis role="keyword">false</emphasis>;
+00086 
+00087 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;&quot;Catch&quot;&#32;the&#32;throwable&#32;by&#32;holding&#32;down&#32;the&#32;interaction&#32;button&#32;instead&#32;of&#32;pressing&#32;it.</emphasis>
+00088 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;Only&#32;do&#32;this&#32;if&#32;the&#32;throwable&#32;is&#32;moving&#32;faster&#32;than&#32;the&#32;prescribed&#32;threshold&#32;speed,</emphasis>
+00089 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;and&#32;if&#32;it&#32;isn&apos;t&#32;attached&#32;to&#32;another&#32;hand</emphasis>
+00090 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(&#32;!<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_throwable_1ac0133980c2673c707c3eddf40d973670">attached</link>&#32;&amp;&amp;&#32;<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_throwable_1ab955499f5c483d693bb20c69e0d52cc2">catchingSpeedThreshold</link>&#32;!=&#32;-1)
+00091 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00092 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordtype">float</emphasis>&#32;catchingThreshold&#32;=&#32;<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_throwable_1ab955499f5c483d693bb20c69e0d52cc2">catchingSpeedThreshold</link>&#32;*&#32;SteamVR_Utils.GetLossyScale(<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_player">Player</link>.<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_player_1ad6c38e0b00917563e4b19d206d20466e">instance</link>.<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_player_1a8bcf90ac5a364154517e0a0343e090a3">trackingOriginTransform</link>);
+00093 
+00094 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_namespace_valve_1_1_v_r_1_1_interaction_system_1ae03ab84d315f5997fd000817bfb96a0f">GrabTypes</link>&#32;bestGrabType&#32;=&#32;hand.<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_hand_1aef5b383b995bb0674bf3e53eaadd76e6">GetBestGrabbingType</link>();
+00095 
+00096 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(&#32;bestGrabType&#32;!=&#32;<link linkend="_namespace_valve_1_1_v_r_1_1_interaction_system_1ae03ab84d315f5997fd000817bfb96a0f">GrabTypes</link>.None&#32;)
+00097 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00098 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_throwable_1adc5a38d1b150a29c9deb08fdfd52b497">rigidbody</link>.velocity.magnitude&#32;&gt;=&#32;catchingThreshold)
+00099 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00100 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;hand.<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_hand_1a73b0ea1d5b037fca1b7cb453061d98d6">AttachObject</link>(&#32;gameObject,&#32;bestGrabType,&#32;<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_throwable_1ae9660f75eeae3bc5c0d0d4883ea0e667">attachmentFlags</link>&#32;);
+00101 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;showHint&#32;=&#32;<emphasis role="keyword">false</emphasis>;
+00102 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00103 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00104 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00105 
+00106 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(&#32;showHint&#32;)
+00107 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00108 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;hand.<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_hand_1a261392cdd2f2a398b16738ea522fb099">ShowGrabHint</link>();
+00109 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00110 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00111 
+00112 
+00113 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//-------------------------------------------------</emphasis>
+<anchor xml:id="__throwable_8cs_source_1l00114"/><link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_throwable_1a7069b2b28bd0b39f12a055b1db2b0f94">00114</link> &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">protected</emphasis>&#32;<emphasis role="keyword">virtual</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_throwable_1a7069b2b28bd0b39f12a055b1db2b0f94">OnHandHoverEnd</link>(&#32;<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_hand">Hand</link>&#32;hand&#32;)
+00115 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00116 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;hand.<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_hand_1a186d8af3a990ec94164f6aa62ac1d2c4">HideGrabHint</link>();
+00117 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00118 
+00119 
+00120 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//-------------------------------------------------</emphasis>
+<anchor xml:id="__throwable_8cs_source_1l00121"/><link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_throwable_1a8a5523917812ed611fe385c195c8e55f">00121</link> &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">protected</emphasis>&#32;<emphasis role="keyword">virtual</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_throwable_1a8a5523917812ed611fe385c195c8e55f">HandHoverUpdate</link>(&#32;<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_hand">Hand</link>&#32;hand&#32;)
+00122 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00123 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_namespace_valve_1_1_v_r_1_1_interaction_system_1ae03ab84d315f5997fd000817bfb96a0f">GrabTypes</link>&#32;startingGrabType&#32;=&#32;hand.<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_hand_1a3708622be32d8aaca12d368c0fed2047">GetGrabStarting</link>();
+00124 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;
+00125 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(startingGrabType&#32;!=&#32;<link linkend="_namespace_valve_1_1_v_r_1_1_interaction_system_1ae03ab84d315f5997fd000817bfb96a0f">GrabTypes</link>.None)
+00126 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00127 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;hand.<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_hand_1a73b0ea1d5b037fca1b7cb453061d98d6">AttachObject</link>(&#32;gameObject,&#32;startingGrabType,&#32;<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_throwable_1ae9660f75eeae3bc5c0d0d4883ea0e667">attachmentFlags</link>,&#32;<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_throwable_1afaf5441c0787a5dfd7672c1ad6a279c0">attachmentOffset</link>&#32;);
+00128 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;hand.<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_hand_1a186d8af3a990ec94164f6aa62ac1d2c4">HideGrabHint</link>();
+00129 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00130 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00131 
+00132 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//-------------------------------------------------</emphasis>
+<anchor xml:id="__throwable_8cs_source_1l00133"/><link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_throwable_1a2de42df50ffc477913161053600ede31">00133</link> &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">protected</emphasis>&#32;<emphasis role="keyword">virtual</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_throwable_1a2de42df50ffc477913161053600ede31">OnAttachedToHand</link>(&#32;<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_hand">Hand</link>&#32;hand&#32;)
+00134 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00135 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//Debug.Log(&quot;&lt;b&gt;[SteamVR&#32;Interaction]&lt;/b&gt;&#32;Pickup:&#32;&quot;&#32;+&#32;hand.GetGrabStarting().ToString());</emphasis>
+00136 
+00137 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_throwable_1a22c7869dc935bef435a290824507fa64">hadInterpolation</link>&#32;=&#32;this.rigidbody.interpolation;
+00138 
+00139 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_throwable_1ac0133980c2673c707c3eddf40d973670">attached</link>&#32;=&#32;<emphasis role="keyword">true</emphasis>;
+00140 
+00141 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_throwable_1ab36effd81a7d72a06cea05edc0c70f7b">onPickUp</link>.Invoke();
+00142 
+00143 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;hand.<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_hand_1a07600fb46d1bdbf3a02e70197d471134">HoverLock</link>(&#32;<emphasis role="keyword">null</emphasis>&#32;);
+00144 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;
+00145 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_throwable_1adc5a38d1b150a29c9deb08fdfd52b497">rigidbody</link>.interpolation&#32;=&#32;RigidbodyInterpolation.None;
+00146 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;
+00147 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_throwable_1a19421d37faa186b5c0271a73e2976484">velocityEstimator</link>.<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_velocity_estimator_1a7e6e08f723805cc2837f9e90aa8d583d">BeginEstimatingVelocity</link>();
+00148 
+00149 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_throwable_1afa7afa89b85a2decca730e217ad7d807">attachTime</link>&#32;=&#32;Time.time;
+00150 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_throwable_1a41ab4ee9a6ae0fe64045fb9453366b24">attachPosition</link>&#32;=&#32;transform.position;
+00151 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_throwable_1a9b65d4f08e91341132e5dfcd011fc7d8">attachRotation</link>&#32;=&#32;transform.rotation;
+00152 
+00153 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00154 
+00155 
+00156 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//-------------------------------------------------</emphasis>
+<anchor xml:id="__throwable_8cs_source_1l00157"/><link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_throwable_1ad868955737538f23428d9123cab46110">00157</link> &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">protected</emphasis>&#32;<emphasis role="keyword">virtual</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_throwable_1ad868955737538f23428d9123cab46110">OnDetachedFromHand</link>(<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_hand">Hand</link>&#32;hand)
+00158 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00159 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_throwable_1ac0133980c2673c707c3eddf40d973670">attached</link>&#32;=&#32;<emphasis role="keyword">false</emphasis>;
+00160 
+00161 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_throwable_1ab5e437cb99376da336c6f85192e22a7b">onDetachFromHand</link>.Invoke();
+00162 
+00163 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;hand.<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_hand_1aebd333682282351892fcc4b9df395e30">HoverUnlock</link>(<emphasis role="keyword">null</emphasis>);
+00164 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;
+00165 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_throwable_1adc5a38d1b150a29c9deb08fdfd52b497">rigidbody</link>.interpolation&#32;=&#32;<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_throwable_1a22c7869dc935bef435a290824507fa64">hadInterpolation</link>;
+00166 
+00167 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;Vector3&#32;velocity;
+00168 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;Vector3&#32;angularVelocity;
+00169 
+00170 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_throwable_1a8ecf0e0de4937d710e4e4d8a6a717246">GetReleaseVelocities</link>(hand,&#32;out&#32;velocity,&#32;out&#32;angularVelocity);
+00171 
+00172 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_throwable_1adc5a38d1b150a29c9deb08fdfd52b497">rigidbody</link>.velocity&#32;=&#32;velocity;
+00173 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_throwable_1adc5a38d1b150a29c9deb08fdfd52b497">rigidbody</link>.angularVelocity&#32;=&#32;angularVelocity;
+00174 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00175 
+00176 
+<anchor xml:id="__throwable_8cs_source_1l00177"/><link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_throwable_1a8ecf0e0de4937d710e4e4d8a6a717246">00177</link> &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keyword">virtual</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_throwable_1a8ecf0e0de4937d710e4e4d8a6a717246">GetReleaseVelocities</link>(<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_hand">Hand</link>&#32;hand,&#32;out&#32;Vector3&#32;velocity,&#32;out&#32;Vector3&#32;angularVelocity)
+00178 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00179 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(hand.<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_hand_1a287ff904313aa07224a718959bdee4c5">noSteamVRFallbackCamera</link>&#32;&amp;&amp;&#32;<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_throwable_1a86e0cdec8d857c57f29b83b7e9bffa29">releaseVelocityStyle</link>&#32;!=&#32;<link linkend="_namespace_valve_1_1_v_r_1_1_interaction_system_1a4d44088760d96c5718173d8ca2c48ad1">ReleaseStyle</link>.NoChange)
+00180 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_throwable_1a86e0cdec8d857c57f29b83b7e9bffa29">releaseVelocityStyle</link>&#32;=&#32;<link linkend="_namespace_valve_1_1_v_r_1_1_interaction_system_1a4d44088760d96c5718173d8ca2c48ad1">ReleaseStyle</link>.ShortEstimation;&#32;<emphasis role="comment">//&#32;only&#32;type&#32;that&#32;works&#32;with&#32;fallback&#32;hand&#32;is&#32;short&#32;estimation.</emphasis>
+00181 
+00182 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">switch</emphasis>&#32;(<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_throwable_1a86e0cdec8d857c57f29b83b7e9bffa29">releaseVelocityStyle</link>)
+00183 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00184 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">case</emphasis>&#32;<link linkend="_namespace_valve_1_1_v_r_1_1_interaction_system_1a4d44088760d96c5718173d8ca2c48ad1">ReleaseStyle</link>.ShortEstimation:
+00185 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_throwable_1a19421d37faa186b5c0271a73e2976484">velocityEstimator</link>.<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_velocity_estimator_1aead319a66f9f5153e29b1979aa29c829">FinishEstimatingVelocity</link>();
+00186 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;velocity&#32;=&#32;<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_throwable_1a19421d37faa186b5c0271a73e2976484">velocityEstimator</link>.<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_velocity_estimator_1a559516108b17223f0ed8de71e52e8d49">GetVelocityEstimate</link>();
+00187 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;angularVelocity&#32;=&#32;<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_throwable_1a19421d37faa186b5c0271a73e2976484">velocityEstimator</link>.<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_velocity_estimator_1a83bd0335b0f4ac8f17d93403f9339026">GetAngularVelocityEstimate</link>();
+00188 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">break</emphasis>;
+00189 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">case</emphasis>&#32;<link linkend="_namespace_valve_1_1_v_r_1_1_interaction_system_1a4d44088760d96c5718173d8ca2c48ad1">ReleaseStyle</link>.AdvancedEstimation:
+00190 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;hand.<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_hand_1a0fa717c485c85536493e1da9239ceed7">GetEstimatedPeakVelocities</link>(out&#32;velocity,&#32;out&#32;angularVelocity);
+00191 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">break</emphasis>;
+00192 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">case</emphasis>&#32;<link linkend="_namespace_valve_1_1_v_r_1_1_interaction_system_1a4d44088760d96c5718173d8ca2c48ad1">ReleaseStyle</link>.GetFromHand:
+00193 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;velocity&#32;=&#32;hand.<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_hand_1a128de24fb785ca4bfdb3e5516e20573e">GetTrackedObjectVelocity</link>(<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_throwable_1a24b452ac7877e0ff3a713fdf3a4301ae">releaseVelocityTimeOffset</link>);
+00194 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;angularVelocity&#32;=&#32;hand.<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_hand_1a5b524967844a7d090649d90eb82aafe7">GetTrackedObjectAngularVelocity</link>(<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_throwable_1a24b452ac7877e0ff3a713fdf3a4301ae">releaseVelocityTimeOffset</link>);
+00195 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">break</emphasis>;
+00196 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">default</emphasis>:
+00197 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">case</emphasis>&#32;<link linkend="_namespace_valve_1_1_v_r_1_1_interaction_system_1a4d44088760d96c5718173d8ca2c48ad1">ReleaseStyle</link>.NoChange:
+00198 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;velocity&#32;=&#32;<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_throwable_1adc5a38d1b150a29c9deb08fdfd52b497">rigidbody</link>.velocity;
+00199 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;angularVelocity&#32;=&#32;<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_throwable_1adc5a38d1b150a29c9deb08fdfd52b497">rigidbody</link>.angularVelocity;
+00200 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">break</emphasis>;
+00201 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00202 
+00203 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_throwable_1a86e0cdec8d857c57f29b83b7e9bffa29">releaseVelocityStyle</link>&#32;!=&#32;<link linkend="_namespace_valve_1_1_v_r_1_1_interaction_system_1a4d44088760d96c5718173d8ca2c48ad1">ReleaseStyle</link>.NoChange)
+00204 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;velocity&#32;*=&#32;<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_throwable_1a0f4aa8b227aa10ddb50a23314a7a55a1">scaleReleaseVelocity</link>;
+00205 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00206 
+00207 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//-------------------------------------------------</emphasis>
+<anchor xml:id="__throwable_8cs_source_1l00208"/><link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_throwable_1a5171da639ced71a69f5c3fa7934e99ca">00208</link> &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">protected</emphasis>&#32;<emphasis role="keyword">virtual</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_throwable_1a5171da639ced71a69f5c3fa7934e99ca">HandAttachedUpdate</link>(<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_hand">Hand</link>&#32;hand)
+00209 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00210 
+00211 
+00212 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(hand.<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_hand_1af0f01b740ecc869ae14ec6c1be426461">IsGrabEnding</link>(<emphasis role="keyword">this</emphasis>.gameObject))
+00213 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00214 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;hand.<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_hand_1ab0bccf232d1291c6c3000d9a967635ca">DetachObject</link>(gameObject,&#32;<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_throwable_1ac45418f7f469d63e566ca1cfa6b4a9cf">restoreOriginalParent</link>);
+00215 
+00216 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;Uncomment&#32;to&#32;detach&#32;ourselves&#32;late&#32;in&#32;the&#32;frame.</emphasis>
+00217 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;This&#32;is&#32;so&#32;that&#32;any&#32;vehicles&#32;the&#32;player&#32;is&#32;attached&#32;to</emphasis>
+00218 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;have&#32;a&#32;chance&#32;to&#32;finish&#32;updating&#32;themselves.</emphasis>
+00219 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;If&#32;we&#32;detach&#32;now,&#32;our&#32;position&#32;could&#32;be&#32;behind&#32;what&#32;it</emphasis>
+00220 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;will&#32;be&#32;at&#32;the&#32;end&#32;of&#32;the&#32;frame,&#32;and&#32;the&#32;object&#32;may&#32;appear</emphasis>
+00221 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;to&#32;teleport&#32;behind&#32;the&#32;hand&#32;when&#32;the&#32;player&#32;releases&#32;it.</emphasis>
+00222 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//StartCoroutine(&#32;LateDetach(&#32;hand&#32;)&#32;);</emphasis>
+00223 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00224 
+00225 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_throwable_1aa9e15815a6db859e2624d9b4cdf1a10e">onHeldUpdate</link>&#32;!=&#32;<emphasis role="keyword">null</emphasis>)
+00226 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_throwable_1aa9e15815a6db859e2624d9b4cdf1a10e">onHeldUpdate</link>.Invoke(hand);
+00227 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00228 
+00229 
+00230 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//-------------------------------------------------</emphasis>
+<anchor xml:id="__throwable_8cs_source_1l00231"/><link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_throwable_1a322e3327e63a7ff4de8b16882ecf7d2d">00231</link> &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">protected</emphasis>&#32;<emphasis role="keyword">virtual</emphasis>&#32;IEnumerator&#32;<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_throwable_1a322e3327e63a7ff4de8b16882ecf7d2d">LateDetach</link>(&#32;<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_hand">Hand</link>&#32;hand&#32;)
+00232 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00233 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;yield&#32;<emphasis role="keywordflow">return</emphasis>&#32;<emphasis role="keyword">new</emphasis>&#32;WaitForEndOfFrame();
+00234 
+00235 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;hand.<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_hand_1ab0bccf232d1291c6c3000d9a967635ca">DetachObject</link>(&#32;gameObject,&#32;<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_throwable_1ac45418f7f469d63e566ca1cfa6b4a9cf">restoreOriginalParent</link>&#32;);
+00236 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00237 
+00238 
+00239 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//-------------------------------------------------</emphasis>
+<anchor xml:id="__throwable_8cs_source_1l00240"/><link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_throwable_1a160dddbe807b3bce6ac27b73dceee3ae">00240</link> &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">protected</emphasis>&#32;<emphasis role="keyword">virtual</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_throwable_1a160dddbe807b3bce6ac27b73dceee3ae">OnHandFocusAcquired</link>(&#32;<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_hand">Hand</link>&#32;hand&#32;)
+00241 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00242 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;gameObject.SetActive(&#32;<emphasis role="keyword">true</emphasis>&#32;);
+00243 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_throwable_1a19421d37faa186b5c0271a73e2976484">velocityEstimator</link>.<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_velocity_estimator_1a7e6e08f723805cc2837f9e90aa8d583d">BeginEstimatingVelocity</link>();
+00244 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00245 
+00246 
+00247 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//-------------------------------------------------</emphasis>
+<anchor xml:id="__throwable_8cs_source_1l00248"/><link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_throwable_1ae56d0a8f98ee8b8855d1a74817c35fcb">00248</link> &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">protected</emphasis>&#32;<emphasis role="keyword">virtual</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_throwable_1ae56d0a8f98ee8b8855d1a74817c35fcb">OnHandFocusLost</link>(&#32;<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_hand">Hand</link>&#32;hand&#32;)
+00249 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00250 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;gameObject.SetActive(&#32;<emphasis role="keyword">false</emphasis>&#32;);
+00251 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_throwable_1a19421d37faa186b5c0271a73e2976484">velocityEstimator</link>.<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_velocity_estimator_1aead319a66f9f5153e29b1979aa29c829">FinishEstimatingVelocity</link>();
+00252 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00253 &#32;&#32;&#32;&#32;}
+00254 
+<anchor xml:id="__throwable_8cs_source_1l00255"/><link linkend="_namespace_valve_1_1_v_r_1_1_interaction_system_1a4d44088760d96c5718173d8ca2c48ad1">00255</link> &#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keyword">enum</emphasis>&#32;<link linkend="_namespace_valve_1_1_v_r_1_1_interaction_system_1a4d44088760d96c5718173d8ca2c48ad1">ReleaseStyle</link>
+00256 &#32;&#32;&#32;&#32;{
+00257 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_namespace_valve_1_1_v_r_1_1_interaction_system_1a4d44088760d96c5718173d8ca2c48ad1a4bac8cdf0a968472b519b3b295d0d48b">NoChange</link>,
+00258 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_namespace_valve_1_1_v_r_1_1_interaction_system_1a4d44088760d96c5718173d8ca2c48ad1ab60a6ddd9cc9eff76f80622812edbbd7">GetFromHand</link>,
+00259 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_namespace_valve_1_1_v_r_1_1_interaction_system_1a4d44088760d96c5718173d8ca2c48ad1a32c081d68545e2bb8dde9d2999d4360a">ShortEstimation</link>,
+00260 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_namespace_valve_1_1_v_r_1_1_interaction_system_1a4d44088760d96c5718173d8ca2c48ad1ace1216b9fba54c97949c55b67b852c7f">AdvancedEstimation</link>,
+00261 &#32;&#32;&#32;&#32;}
+00262 }
+</programlisting></section>

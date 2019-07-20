@@ -1,0 +1,143 @@
+<?xml version='1.0' encoding='UTF-8' standalone='no'?>
+<section xmlns="http://docbook.org/ns/docbook" version="5.0" xmlns:xlink="http://www.w3.org/1999/xlink" xml:id="__memory_manager_8cs_source">
+<title>MemoryManager.cs</title>
+<indexterm><primary>O:/GitHUBMINIPRoject/Assets/LeapMotion/Core/Plugins/LeapCSharp/MemoryManager.cs</primary></indexterm>
+<programlisting>00001 <emphasis role="comment">/******************************************************************************</emphasis>
+00002 <emphasis role="comment">&#32;*&#32;Copyright&#32;(C)&#32;Leap&#32;Motion,&#32;Inc.&#32;2011-2018.&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;*</emphasis>
+00003 <emphasis role="comment">&#32;*&#32;Leap&#32;Motion&#32;proprietary&#32;and&#32;confidential.&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;*</emphasis>
+00004 <emphasis role="comment">&#32;*&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;*</emphasis>
+00005 <emphasis role="comment">&#32;*&#32;Use&#32;subject&#32;to&#32;the&#32;terms&#32;of&#32;the&#32;Leap&#32;Motion&#32;SDK&#32;Agreement&#32;available&#32;at&#32;&#32;&#32;&#32;&#32;*</emphasis>
+00006 <emphasis role="comment">&#32;*&#32;https://developer.leapmotion.com/sdk_agreement,&#32;or&#32;another&#32;agreement&#32;&#32;&#32;&#32;&#32;&#32;&#32;*</emphasis>
+00007 <emphasis role="comment">&#32;*&#32;between&#32;Leap&#32;Motion&#32;and&#32;you,&#32;your&#32;company&#32;or&#32;other&#32;organization.&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;*</emphasis>
+00008 <emphasis role="comment">&#32;******************************************************************************/</emphasis>
+00009 
+00010 <emphasis role="keyword">using</emphasis>&#32;AOT;
+00011 <emphasis role="keyword">using</emphasis>&#32;System;
+00012 <emphasis role="keyword">using</emphasis>&#32;System.Collections.Generic;
+00013 <emphasis role="keyword">using</emphasis>&#32;System.Runtime.InteropServices;
+00014 
+00015 <emphasis role="keyword">namespace&#32;</emphasis><link linkend="_namespace_leap_internal">LeapInternal</link>&#32;{
+00016 
+00017 &#32;&#32;[UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+00018 &#32;&#32;<emphasis role="keyword">public</emphasis>&#32;delegate&#32;IntPtr&#32;<link linkend="_namespace_leap_internal_1abdbcd89d8bb63e029a380256e3679660">Allocate</link>(UInt32&#32;size,&#32;<link linkend="_namespace_leap_internal_1a0c50b13c3367bbb0a225d62335fb6aab">eLeapAllocatorType</link>&#32;typeHint,&#32;IntPtr&#32;state);
+00019 
+00020 &#32;&#32;[UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+00021 &#32;&#32;<emphasis role="keyword">public</emphasis>&#32;delegate&#32;<emphasis role="keywordtype">void</emphasis>&#32;<link linkend="_namespace_leap_internal_1a5a737b35c25482e1d39e14a9d766553a">Deallocate</link>(IntPtr&#32;buffer,&#32;IntPtr&#32;state);
+00022 
+00023 &#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keyword">static</emphasis>&#32;<emphasis role="keyword">class&#32;</emphasis>MemoryManager&#32;{
+00024 
+00035 &#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keyword">static</emphasis>&#32;<emphasis role="keywordtype">bool</emphasis>&#32;EnablePooling&#32;=&#32;<emphasis role="keyword">false</emphasis>;
+00036 
+00044 &#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keyword">static</emphasis>&#32;uint&#32;MinPoolSize&#32;=&#32;8;
+00045 
+00046 &#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;<emphasis role="keyword">static</emphasis>&#32;Dictionary&lt;IntPtr,&#32;ActiveMemoryInfo&gt;&#32;_activeMemory&#32;=&#32;<emphasis role="keyword">new</emphasis>&#32;Dictionary&lt;IntPtr,&#32;ActiveMemoryInfo&gt;();
+00047 &#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;<emphasis role="keyword">static</emphasis>&#32;Dictionary&lt;PoolKey,&#32;Queue&lt;object&gt;&gt;&#32;_pooledMemory&#32;=&#32;<emphasis role="keyword">new</emphasis>&#32;Dictionary&lt;PoolKey,&#32;Queue&lt;object&gt;&gt;();
+00048 
+00049 &#32;&#32;&#32;&#32;[MonoPInvokeCallback(typeof(<link linkend="_namespace_leap_internal_1abdbcd89d8bb63e029a380256e3679660">Allocate</link>))]
+00050 &#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keyword">static</emphasis>&#32;IntPtr&#32;Pin(UInt32&#32;size,&#32;<link linkend="_namespace_leap_internal_1a0c50b13c3367bbb0a225d62335fb6aab">eLeapAllocatorType</link>&#32;typeHint,&#32;IntPtr&#32;state)&#32;{
+00051 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">try</emphasis>&#32;{
+00052 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//Construct&#32;a&#32;key&#32;to&#32;identify&#32;the&#32;desired&#32;allocation</emphasis>
+00053 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;PoolKey&#32;key&#32;=&#32;<emphasis role="keyword">new</emphasis>&#32;PoolKey()&#32;{
+00054 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;type&#32;=&#32;typeHint,
+00055 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;size&#32;=&#32;size
+00056 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;};
+00057 
+00058 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//Attempt&#32;to&#32;find&#32;the&#32;pool&#32;that&#32;holds&#32;this&#32;type&#32;of&#32;allocation</emphasis>
+00059 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;Queue&lt;object&gt;&#32;pool;
+00060 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(!_pooledMemory.TryGetValue(key,&#32;out&#32;pool))&#32;{
+00061 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//Construct&#32;a&#32;new&#32;pool&#32;if&#32;none&#32;exists&#32;yet</emphasis>
+00062 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;pool&#32;=&#32;<emphasis role="keyword">new</emphasis>&#32;Queue&lt;object&gt;();
+00063 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;_pooledMemory[key]&#32;=&#32;pool;
+00064 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00065 
+00066 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//Attempt&#32;to&#32;get&#32;an&#32;object&#32;from&#32;the&#32;pool</emphasis>
+00067 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordtype">object</emphasis>&#32;memory;
+00068 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(EnablePooling&#32;&amp;&amp;&#32;pool.Count&#32;&gt;&#32;MinPoolSize)&#32;{
+00069 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;memory&#32;=&#32;pool.Dequeue();
+00070 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}&#32;<emphasis role="keywordflow">else</emphasis>&#32;{
+00071 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//If&#32;the&#32;pool&#32;is&#32;empty,&#32;we&#32;need&#32;to&#32;construct&#32;a&#32;new&#32;object</emphasis>
+00072 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">switch</emphasis>&#32;(typeHint)&#32;{
+00073 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">default</emphasis>:
+00074 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">case</emphasis>&#32;<link linkend="_namespace_leap_internal_1a0c50b13c3367bbb0a225d62335fb6aab">eLeapAllocatorType</link>.eLeapAllocatorType_Uint8:
+00075 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;memory&#32;=&#32;<emphasis role="keyword">new</emphasis>&#32;<emphasis role="keywordtype">byte</emphasis>[size];
+00076 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">break</emphasis>;
+00077 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">case</emphasis>&#32;<link linkend="_namespace_leap_internal_1a0c50b13c3367bbb0a225d62335fb6aab">eLeapAllocatorType</link>.eLeapAllocatorType_Float:
+00078 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;memory&#32;=&#32;<emphasis role="keyword">new</emphasis>&#32;<emphasis role="keywordtype">float</emphasis>[(size&#32;+&#32;<emphasis role="keyword">sizeof</emphasis>(float)&#32;-&#32;1)&#32;/&#32;<emphasis role="keyword">sizeof</emphasis>(float)];
+00079 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">break</emphasis>;
+00080 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00081 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00082 
+00083 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//Pin&#32;the&#32;object&#32;so&#32;its&#32;address&#32;will&#32;not&#32;change</emphasis>
+00084 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;GCHandle&#32;handle&#32;=&#32;GCHandle.Alloc(memory,&#32;GCHandleType.Pinned);
+00085 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;IntPtr&#32;ptr&#32;=&#32;handle.AddrOfPinnedObject();
+00086 
+00087 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//Put&#32;the&#32;information&#32;about&#32;the&#32;newly&#32;pinned&#32;allocation&#32;into&#32;the</emphasis>
+00088 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//active&#32;memory&#32;map&#32;so&#32;it&#32;can&#32;be&#32;retrieved&#32;and&#32;freed&#32;layer.</emphasis>
+00089 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;_activeMemory.Add(ptr,&#32;<emphasis role="keyword">new</emphasis>&#32;ActiveMemoryInfo()&#32;{
+00090 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;handle&#32;=&#32;handle,
+00091 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;key&#32;=&#32;key
+00092 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;});
+00093 
+00094 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;ptr;
+00095 &#32;&#32;&#32;&#32;&#32;&#32;}&#32;<emphasis role="keywordflow">catch</emphasis>&#32;(Exception&#32;e)&#32;{
+00096 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_namespace_unity_engine">UnityEngine</link>.Debug.LogException(e);
+00097 &#32;&#32;&#32;&#32;&#32;&#32;}
+00098 
+00099 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;IntPtr.Zero;
+00100 &#32;&#32;&#32;&#32;}
+00101 
+00102 &#32;&#32;&#32;&#32;[MonoPInvokeCallback(typeof(<link linkend="_namespace_leap_internal_1a5a737b35c25482e1d39e14a9d766553a">Deallocate</link>))]
+00103 &#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keyword">static</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;Unpin(IntPtr&#32;ptr,&#32;IntPtr&#32;state)&#32;{
+00104 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">try</emphasis>&#32;{
+00105 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//Grab&#32;the&#32;info&#32;for&#32;the&#32;given&#32;pointer</emphasis>
+00106 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;ActiveMemoryInfo&#32;info&#32;=&#32;_activeMemory[ptr];
+00107 
+00108 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//First&#32;we&#32;return&#32;the&#32;object&#32;back&#32;to&#32;its&#32;pool</emphasis>
+00109 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;_pooledMemory[info.key].Enqueue(info.handle.Target);
+00110 
+00111 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//Then&#32;we&#32;remove&#32;the&#32;pointer&#32;from&#32;the&#32;active&#32;memory&#32;map</emphasis>
+00112 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;_activeMemory.Remove(ptr);
+00113 
+00114 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//Finally&#32;we&#32;unpin&#32;the&#32;memory</emphasis>
+00115 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;info.handle.Free();
+00116 &#32;&#32;&#32;&#32;&#32;&#32;}&#32;<emphasis role="keywordflow">catch</emphasis>&#32;(Exception&#32;e)&#32;{
+00117 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_namespace_unity_engine">UnityEngine</link>.Debug.LogException(e);
+00118 &#32;&#32;&#32;&#32;&#32;&#32;}
+00119 &#32;&#32;&#32;&#32;}
+00120 
+00121 &#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keyword">static</emphasis>&#32;<emphasis role="keywordtype">object</emphasis>&#32;GetPinnedObject(IntPtr&#32;ptr)&#32;{
+00122 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">try</emphasis>&#32;{
+00123 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;_activeMemory[ptr].handle.Target;
+00124 &#32;&#32;&#32;&#32;&#32;&#32;}&#32;<emphasis role="keywordflow">catch</emphasis>&#32;(Exception)&#32;{&#32;}
+00125 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;<emphasis role="keyword">null</emphasis>;
+00126 &#32;&#32;&#32;&#32;}
+00127 
+00128 &#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;<emphasis role="keyword">struct&#32;</emphasis>PoolKey&#32;:&#32;IEquatable&lt;PoolKey&gt;&#32;{
+00129 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<link linkend="_namespace_leap_internal_1a0c50b13c3367bbb0a225d62335fb6aab">eLeapAllocatorType</link>&#32;type;
+00130 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;UInt32&#32;size;
+00131 
+00132 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keyword">override</emphasis>&#32;<emphasis role="keywordtype">int</emphasis>&#32;GetHashCode()&#32;{
+00133 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;(<emphasis role="keywordtype">int</emphasis>)type&#32;|&#32;(int)size&#32;&lt;&lt;&#32;4;
+00134 &#32;&#32;&#32;&#32;&#32;&#32;}
+00135 
+00136 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keywordtype">bool</emphasis>&#32;Equals(PoolKey&#32;other)&#32;{
+00137 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;type&#32;==&#32;other.type&#32;&amp;&amp;
+00138 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;size&#32;==&#32;other.size;
+00139 &#32;&#32;&#32;&#32;&#32;&#32;}
+00140 
+00141 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keyword">override</emphasis>&#32;<emphasis role="keywordtype">bool</emphasis>&#32;Equals(<emphasis role="keywordtype">object</emphasis>&#32;obj)&#32;{
+00142 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(obj&#32;is&#32;PoolKey)&#32;{
+00143 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;Equals((PoolKey)obj);
+00144 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}&#32;<emphasis role="keywordflow">else</emphasis>&#32;{
+00145 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;<emphasis role="keyword">false</emphasis>;
+00146 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00147 &#32;&#32;&#32;&#32;&#32;&#32;}
+00148 &#32;&#32;&#32;&#32;}
+00149 
+00150 &#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;<emphasis role="keyword">struct&#32;</emphasis>ActiveMemoryInfo&#32;{
+00151 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;GCHandle&#32;handle;
+00152 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;PoolKey&#32;key;
+00153 &#32;&#32;&#32;&#32;}
+00154 &#32;&#32;}
+00155 }
+</programlisting></section>

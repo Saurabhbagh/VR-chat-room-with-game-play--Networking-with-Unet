@@ -1,0 +1,435 @@
+.TH "Leap.Unity.Interaction.InteractionHand" 3 "Sat Jul 20 2019" "Version https://github.com/Saurabhbagh/Multi-User-VR-Viewer--10th-July/" "Multi User Vr Viewer" \" -*- nroff -*-
+.ad l
+.nh
+.SH NAME
+Leap.Unity.Interaction.InteractionHand
+.SH SYNOPSIS
+.br
+.PP
+.PP
+Inherits \fBLeap\&.Unity\&.Interaction\&.InteractionController\fP\&.
+.SS "Public Member Functions"
+
+.in +1c
+.ti -1c
+.RI "void \fBFillBones\fP (\fBHand\fP inHand)"
+.br
+.RI "A utility function that sets a \fBHand\fP object's bones based on this \fBInteractionHand\fP\&. Can be used to display a graphical hand that matches the physical one\&. "
+.ti -1c
+.RI "override Vector3 \fBGetGraspPoint\fP ()"
+.br
+.RI "Returns approximately where the controller is grasping the currently-grasped \fBInteractionBehaviour\fP\&. Specifically, returns the average position of all grasping fingertips of the \fBInteractionHand\fP\&. "
+.ti -1c
+.RI "override void \fBSwapGrasp\fP (\fBIInteractionBehaviour\fP replacement)"
+.br
+.RI "Seamlessly swap the currently grasped object for a replacement object\&. It will behave like the hand released the current object, and then grasped the new object\&. "
+.in -1c
+.SS "Public Attributes"
+
+.in +1c
+.ti -1c
+.RI "bool [] \fBenabledPrimaryHoverFingertips\fP = new bool[5] { true, true, true, false, false }"
+.br
+.RI "Set slots to true to consider the corresponding finger's fingertip for primary hover checks\&. 0 is the thumb, 1 is the index finger, etc\&. Generally speaking, enable the fingertips you'd like users to be able to use to choose and push a button, but keep in mind you pay distance check costs for each fingertip enabled! "
+.in -1c
+.SS "Protected Member Functions"
+
+.in +1c
+.ti -1c
+.RI "override void \fBReset\fP ()"
+.br
+.ti -1c
+.RI "override void \fBStart\fP ()"
+.br
+.ti -1c
+.RI "override void \fBonObjectUnregistered\fP (\fBIInteractionBehaviour\fP intObj)"
+.br
+.RI "This method is called by the \fBInteractionController\fP when it is notified by the \fBInteractionManager\fP that an \fBInteractionBehaviour\fP has been unregistered from the \fBInteraction\fP Engine\&. If your controller has any state that remembers or tracks interaction objects, this method should clear that state, because unregistered objects won't receive state updates or callbacks from this controller's \fBInteraction\fP Manager anymore\&. "
+.ti -1c
+.RI "override void \fBfixedUpdateController\fP ()"
+.br
+.RI "Called just before the \fBInteractionController\fP proceeds with its usual FixedUpdate\&. "
+.ti -1c
+.RI "override void \fBunwarpColliders\fP (Transform primaryHoverPoint, \fBISpaceComponent\fP warpedSpaceElement)"
+.br
+.RI "Implementing this method is necessary to support curved spaces as rendered by a \fBLeap\fP Graphic Renderer\&. See \fBInteractionHand\fP for an example implementation\&. (Implementing this method is optional if you are not using a curved space as rendered by a \fBLeap\fP Graphic Renderer\&.) "
+.ti -1c
+.RI "override void \fBgetColliderBoneTargetPositionRotation\fP (int contactBoneIndex, out Vector3 targetPosition, out Quaternion targetRotation)"
+.br
+.RI "If your controller features no moving colliders relative to itself, simply return the desired position and rotation for the given indexed contact bone in the contactBones array\&. (For example, by recording the local position and local rotation of each contact bone in \fBinitContact()\fP)\&. More complex controllers, such as \fBInteractionHand\fP, uses this method to set \fBContactBone\fP target positions and rotations based on the tracked \fBLeap\fP hand\&. "
+.ti -1c
+.RI "override bool \fBinitContact\fP ()"
+.br
+.RI "Called to initialize contact colliders\&. See remarks for implementation requirements\&. "
+.ti -1c
+.RI "override void \fBonPreEnableSoftContact\fP ()"
+.br
+.RI "Optionally override this method to perform logic just before soft contact is enabled for this controller\&. "
+.ti -1c
+.RI "override void \fBonPostDisableSoftContact\fP ()"
+.br
+.RI "Optionally override this method to perform logic just after soft contact is disabled for this controller\&. "
+.ti -1c
+.RI "override bool \fBcheckShouldGraspAtemporal\fP (\fBIInteractionBehaviour\fP intObj)"
+.br
+.RI "Attempts to manually initiate a grasp on the argument interaction object\&. A grasp will only begin if a finger and thumb are both in contact with the interaction object\&. If this method successfully initiates a grasp, it will return true, otherwise it will return false\&. "
+.ti -1c
+.RI "override void \fBfixedUpdateGraspingState\fP ()"
+.br
+.RI "Called every fixed frame if grasping is enabled in the \fBInteraction\fP Manager\&. "
+.ti -1c
+.RI "override void \fBonGraspedObjectForciblyReleased\fP (\fBIInteractionBehaviour\fP objectToBeReleased)"
+.br
+.RI "Optionally override this method to perform logic just before a grasped object is released because it is no longer eligible to be grasped by this controller or \fBReleaseGrasp()\fP was manually called on the controller\&. "
+.ti -1c
+.RI "override bool \fBcheckShouldRelease\fP (out \fBIInteractionBehaviour\fP objectToRelease)"
+.br
+.RI "Returns whether this controller should release an object this fixed frame, and if so, sets objectToRelease to the object the controller should release\&. "
+.ti -1c
+.RI "override bool \fBcheckShouldGrasp\fP (out \fBIInteractionBehaviour\fP objectToGrasp)"
+.br
+.RI "Returns whether this controller should grasp an object this fixed frame, and if so, sets objectToGrasp to the object the controller should grasp\&. "
+.in -1c
+.SS "Properties"
+
+.in +1c
+.ti -1c
+.RI "\fBHandDataMode\fP \fBhandDataMode\fP\fC [get, set]\fP"
+.br
+.ti -1c
+.RI "\fBLeapProvider\fP \fBleapProvider\fP\fC [get, set]\fP"
+.br
+.RI "If the hand data mode for this \fBInteractionHand\fP is set to Custom, you must also manually specify the provider from which to retrieve \fBLeap\fP frames containing hand data\&. "
+.ti -1c
+.RI "Func< \fBLeap\&.Frame\fP, \fBLeap\&.Hand\fP > \fBhandAccessorFunc\fP\fC [get, set]\fP"
+.br
+.RI "If the hand data mode for this \fBInteractionHand\fP is set to Custom, you must manually specify how this \fBInteractionHand\fP should retrieve a specific \fBHand\fP data object from a \fBLeap\fP frame\&. "
+.ti -1c
+.RI "override bool \fBisTracked\fP\fC [get]\fP"
+.br
+.RI "Gets whether the underlying \fBLeap\fP hand is currently tracked\&. "
+.ti -1c
+.RI "override bool \fBisBeingMoved\fP\fC [get]\fP"
+.br
+.RI "Gets whether the underlying \fBLeap\fP hand is currently being moved in worldspace\&. "
+.ti -1c
+.RI "\fBHand\fP \fBleapHand\fP\fC [get]\fP"
+.br
+.RI "Gets the last tracked state of the \fBLeap\fP hand\&. "
+.ti -1c
+.RI "override bool \fBisLeft\fP\fC [get]\fP"
+.br
+.RI "Gets whether the underlying tracked \fBLeap\fP hand is a left hand\&. "
+.ti -1c
+.RI "override Vector3 \fBposition\fP\fC [get]\fP"
+.br
+.RI "Gets the last-tracked position of the underlying \fBLeap\fP hand\&. "
+.ti -1c
+.RI "override Quaternion \fBrotation\fP\fC [get]\fP"
+.br
+.RI "Gets the last-tracked rotation of the underlying \fBLeap\fP hand\&. "
+.ti -1c
+.RI "override Vector3? \fBvelocity\fP\fC [get]\fP"
+.br
+.RI "Gets the velocity of the underlying tracked \fBLeap\fP hand\&. "
+.ti -1c
+.RI "override \fBControllerType\fP \fBcontrollerType\fP\fC [get]\fP"
+.br
+.RI "Gets the controller type of this InteractionControllerBase\&. InteractionHands are \fBInteraction\fP Engine controllers implemented over \fBLeap\fP hands\&. "
+.ti -1c
+.RI "override \fBInteractionHand\fP \fBintHand\fP\fC [get]\fP"
+.br
+.RI "Returns this \fBInteractionHand\fP object\&. This property will be null if the InteractionControllerBase is not \fBControllerType\&.Hand\fP\&. "
+.ti -1c
+.RI "override Vector3 \fBhoverPoint\fP\fC [get]\fP"
+.br
+.ti -1c
+.RI "override List< Transform > \fB_primaryHoverPoints\fP\fC [get]\fP"
+.br
+.ti -1c
+.RI "override \fBContactBone\fP [] \fBcontactBones\fP\fC [get]\fP"
+.br
+.ti -1c
+.RI "override GameObject \fBcontactBoneParent\fP\fC [get]\fP"
+.br
+.ti -1c
+.RI "override List< Vector3 > \fBgraspManipulatorPoints\fP\fC [get]\fP"
+.br
+.ti -1c
+.RI "\fBHeuristicGrabClassifier\fP \fBgrabClassifier\fP\fC [get]\fP"
+.br
+.RI "Handles logic determining whether a hand has grabbed or released an interaction object\&. "
+.in -1c
+.SS "Additional Inherited Members"
+.SH "Detailed Description"
+.PP 
+Definition at line 26 of file InteractionHand\&.cs\&.
+.SH "Member Function Documentation"
+.PP 
+.SS "override bool Leap\&.Unity\&.Interaction\&.InteractionHand\&.checkShouldGrasp (out \fBIInteractionBehaviour\fP objectToGrasp)\fC [protected]\fP, \fC [virtual]\fP"
+
+.PP
+Returns whether this controller should grasp an object this fixed frame, and if so, sets objectToGrasp to the object the controller should grasp\&. 
+.PP
+Implements \fBLeap\&.Unity\&.Interaction\&.InteractionController\fP\&.
+.PP
+Definition at line 735 of file InteractionHand\&.cs\&.
+.SS "override bool Leap\&.Unity\&.Interaction\&.InteractionHand\&.checkShouldGraspAtemporal (\fBIInteractionBehaviour\fP intObj)\fC [protected]\fP, \fC [virtual]\fP"
+
+.PP
+Attempts to manually initiate a grasp on the argument interaction object\&. A grasp will only begin if a finger and thumb are both in contact with the interaction object\&. If this method successfully initiates a grasp, it will return true, otherwise it will return false\&. 
+.PP
+Implements \fBLeap\&.Unity\&.Interaction\&.InteractionController\fP\&.
+.PP
+Definition at line 698 of file InteractionHand\&.cs\&.
+.SS "override bool Leap\&.Unity\&.Interaction\&.InteractionHand\&.checkShouldRelease (out \fBIInteractionBehaviour\fP objectToRelease)\fC [protected]\fP, \fC [virtual]\fP"
+
+.PP
+Returns whether this controller should release an object this fixed frame, and if so, sets objectToRelease to the object the controller should release\&. 
+.PP
+Implements \fBLeap\&.Unity\&.Interaction\&.InteractionController\fP\&.
+.PP
+Definition at line 731 of file InteractionHand\&.cs\&.
+.SS "void Leap\&.Unity\&.Interaction\&.InteractionHand\&.FillBones (\fBHand\fP inHand)"
+
+.PP
+A utility function that sets a \fBHand\fP object's bones based on this \fBInteractionHand\fP\&. Can be used to display a graphical hand that matches the physical one\&. 
+.PP
+Definition at line 595 of file InteractionHand\&.cs\&.
+.SS "override void Leap\&.Unity\&.Interaction\&.InteractionHand\&.fixedUpdateController ()\fC [protected]\fP, \fC [virtual]\fP"
+
+.PP
+Called just before the \fBInteractionController\fP proceeds with its usual FixedUpdate\&. It's generally better to override this method instead of having your \fBInteractionController\fP implement FixedUpdate because its execution order relative to the \fBInteraction\fP Manager is fixed\&. 
+.PP
+Reimplemented from \fBLeap\&.Unity\&.Interaction\&.InteractionController\fP\&.
+.PP
+Definition at line 285 of file InteractionHand\&.cs\&.
+.SS "override void Leap\&.Unity\&.Interaction\&.InteractionHand\&.fixedUpdateGraspingState ()\fC [protected]\fP, \fC [virtual]\fP"
+
+.PP
+Called every fixed frame if grasping is enabled in the \fBInteraction\fP Manager\&. graspActivityManager\&.ActiveObjects will contain objects around the hoverPoint within the grasping radius -- in other words, objects eligible to be grasped by the controller\&. Refer to it to avoid checking grasp eligibility against all graspable objects in your scene\&. 
+.PP
+Implements \fBLeap\&.Unity\&.Interaction\&.InteractionController\fP\&.
+.PP
+Definition at line 723 of file InteractionHand\&.cs\&.
+.SS "override void Leap\&.Unity\&.Interaction\&.InteractionHand\&.getColliderBoneTargetPositionRotation (int contactBoneIndex, out Vector3 targetPosition, out Quaternion targetRotation)\fC [protected]\fP, \fC [virtual]\fP"
+
+.PP
+If your controller features no moving colliders relative to itself, simply return the desired position and rotation for the given indexed contact bone in the contactBones array\&. (For example, by recording the local position and local rotation of each contact bone in \fBinitContact()\fP)\&. More complex controllers, such as \fBInteractionHand\fP, uses this method to set \fBContactBone\fP target positions and rotations based on the tracked \fBLeap\fP hand\&. 
+.PP
+Implements \fBLeap\&.Unity\&.Interaction\&.InteractionController\fP\&.
+.PP
+Definition at line 390 of file InteractionHand\&.cs\&.
+.SS "override Vector3 Leap\&.Unity\&.Interaction\&.InteractionHand\&.GetGraspPoint ()\fC [virtual]\fP"
+
+.PP
+Returns approximately where the controller is grasping the currently-grasped \fBInteractionBehaviour\fP\&. Specifically, returns the average position of all grasping fingertips of the \fBInteractionHand\fP\&. This method will print an error if the hand is not currently grasping an object\&. 
+.PP
+Implements \fBLeap\&.Unity\&.Interaction\&.InteractionController\fP\&.
+.PP
+Definition at line 671 of file InteractionHand\&.cs\&.
+.SS "override bool Leap\&.Unity\&.Interaction\&.InteractionHand\&.initContact ()\fC [protected]\fP, \fC [virtual]\fP"
+
+.PP
+Called to initialize contact colliders\&. See remarks for implementation requirements\&. \fBinitContact()\fP should:
+.IP "\(bu" 2
+Return false at any time if initialization cannot be performed\&.
+.IP "\(bu" 2
+Ensure the 'contactBones' property returns all contact colliders\&.
+.IP "  \(bu" 4
+(Construct contact colliders if they don't already exist\&.)
+.PP
+
+.IP "\(bu" 2
+Ensure the 'contactBoneParent' property returns the common parent of all contact colliders\&.
+.IP "  \(bu" 4
+(Construct the contact bone parent if it doesn't already exist\&.)
+.PP
+
+.IP "\(bu" 2
+Return true if initialization was successful\&.
+.PP
+.PP
+Contact will only begin updating after initialization succeeds, otherwise it will try to initialize again on the next fixed frame\&.
+.PP
+After initialization, the contact bone parent's layer will be set to the \fBInteraction\fP Manager's contactBoneLayer\&. 
+.PP
+Implements \fBLeap\&.Unity\&.Interaction\&.InteractionController\fP\&.
+.PP
+Definition at line 400 of file InteractionHand\&.cs\&.
+.SS "override void Leap\&.Unity\&.Interaction\&.InteractionHand\&.onGraspedObjectForciblyReleased (\fBIInteractionBehaviour\fP objectToBeReleased)\fC [protected]\fP, \fC [virtual]\fP"
+
+.PP
+Optionally override this method to perform logic just before a grasped object is released because it is no longer eligible to be grasped by this controller or \fBReleaseGrasp()\fP was manually called on the controller\&. 
+.PP
+Reimplemented from \fBLeap\&.Unity\&.Interaction\&.InteractionController\fP\&.
+.PP
+Definition at line 727 of file InteractionHand\&.cs\&.
+.SS "override void Leap\&.Unity\&.Interaction\&.InteractionHand\&.onObjectUnregistered (\fBIInteractionBehaviour\fP intObj)\fC [protected]\fP, \fC [virtual]\fP"
+
+.PP
+This method is called by the \fBInteractionController\fP when it is notified by the \fBInteractionManager\fP that an \fBInteractionBehaviour\fP has been unregistered from the \fBInteraction\fP Engine\&. If your controller has any state that remembers or tracks interaction objects, this method should clear that state, because unregistered objects won't receive state updates or callbacks from this controller's \fBInteraction\fP Manager anymore\&. 
+.PP
+Implements \fBLeap\&.Unity\&.Interaction\&.InteractionController\fP\&.
+.PP
+Definition at line 281 of file InteractionHand\&.cs\&.
+.SS "override void Leap\&.Unity\&.Interaction\&.InteractionHand\&.onPostDisableSoftContact ()\fC [protected]\fP, \fC [virtual]\fP"
+
+.PP
+Optionally override this method to perform logic just after soft contact is disabled for this controller\&. The \fBInteractionHand\fP implementation takes the opportunity to reset its contact bone's joints, which my have initialized slightly out of alignment on initial construction\&. 
+.PP
+Reimplemented from \fBLeap\&.Unity\&.Interaction\&.InteractionController\fP\&.
+.PP
+Definition at line 413 of file InteractionHand\&.cs\&.
+.SS "override void Leap\&.Unity\&.Interaction\&.InteractionHand\&.onPreEnableSoftContact ()\fC [protected]\fP, \fC [virtual]\fP"
+
+.PP
+Optionally override this method to perform logic just before soft contact is enabled for this controller\&. The \fBInteractionHand\fP implementation takes the opportunity to reset its contact bone's joints, which may have initialized slightly out of alignment on initial construction\&. 
+.PP
+Reimplemented from \fBLeap\&.Unity\&.Interaction\&.InteractionController\fP\&.
+.PP
+Definition at line 409 of file InteractionHand\&.cs\&.
+.SS "override void Leap\&.Unity\&.Interaction\&.InteractionHand\&.Reset ()\fC [protected]\fP, \fC [virtual]\fP"
+
+.PP
+Reimplemented from \fBLeap\&.Unity\&.Interaction\&.InteractionController\fP\&.
+.PP
+Definition at line 112 of file InteractionHand\&.cs\&.
+.SS "override void Leap\&.Unity\&.Interaction\&.InteractionHand\&.Start ()\fC [protected]\fP, \fC [virtual]\fP"
+
+.PP
+Reimplemented from \fBLeap\&.Unity\&.Interaction\&.InteractionController\fP\&.
+.PP
+Definition at line 118 of file InteractionHand\&.cs\&.
+.SS "override void Leap\&.Unity\&.Interaction\&.InteractionHand\&.SwapGrasp (\fBIInteractionBehaviour\fP replacement)\fC [virtual]\fP"
+
+.PP
+Seamlessly swap the currently grasped object for a replacement object\&. It will behave like the hand released the current object, and then grasped the new object\&. This method will not teleport the replacement object or move it in any way, it will just cause it to be grasped\&. That means that you will be responsible for moving the replacement object into a reasonable position for it to be grasped\&. 
+.PP
+Reimplemented from \fBLeap\&.Unity\&.Interaction\&.InteractionController\fP\&.
+.PP
+Definition at line 715 of file InteractionHand\&.cs\&.
+.SS "override void Leap\&.Unity\&.Interaction\&.InteractionHand\&.unwarpColliders (Transform primaryHoverPoint, \fBISpaceComponent\fP warpedSpaceElement)\fC [protected]\fP, \fC [virtual]\fP"
+
+.PP
+Implementing this method is necessary to support curved spaces as rendered by a \fBLeap\fP Graphic Renderer\&. See \fBInteractionHand\fP for an example implementation\&. (Implementing this method is optional if you are not using a curved space as rendered by a \fBLeap\fP Graphic Renderer\&.) Warps the collider transforms of this controller by the inverse of the transformation that is applied on the provided warpedSpaceElement, using the primaryHoverPoint as the pivot transform for the transformation\&.
+.PP
+ITransformer\&.WorldSpaceUnwarp is a useful method here\&. (ISpaceComponents contain references to their transformers via their anchors\&.)
+.PP
+ISpaceComponents denote game objects whose visual positions are warped from rectilinear (non-warped) space into a curved space (via, for example, a LeapCylindricalSpace, which can only be rendered correctly by the \fBLeap\fP Graphic Renderer)\&. This method reverses that transformation for the hand, bringing it into the object's rectilinear space, allowing objects curved in this way to correctly collide with the bones in the hand or collider of a held controller\&.
+.PP
+The provided Transform is the closest primary hover point to any given primary hover candidate, so it is used as the pivot point for unwarping the colliders of this \fBInteractionController\fP\&. 
+.PP
+Implements \fBLeap\&.Unity\&.Interaction\&.InteractionController\fP\&.
+.PP
+Definition at line 348 of file InteractionHand\&.cs\&.
+.SH "Member Data Documentation"
+.PP 
+.SS "bool [] Leap\&.Unity\&.Interaction\&.InteractionHand\&.enabledPrimaryHoverFingertips = new bool[5] { true, true, true, false, false }"
+
+.PP
+Set slots to true to consider the corresponding finger's fingertip for primary hover checks\&. 0 is the thumb, 1 is the index finger, etc\&. Generally speaking, enable the fingertips you'd like users to be able to use to choose and push a button, but keep in mind you pay distance check costs for each fingertip enabled! 
+.PP
+Definition at line 55 of file InteractionHand\&.cs\&.
+.SH "Property Documentation"
+.PP 
+.SS "override List<Transform> Leap\&.Unity\&.Interaction\&.InteractionHand\&._primaryHoverPoints\fC [get]\fP, \fC [protected]\fP"
+
+.PP
+Definition at line 316 of file InteractionHand\&.cs\&.
+.SS "override GameObject Leap\&.Unity\&.Interaction\&.InteractionHand\&.contactBoneParent\fC [get]\fP, \fC [protected]\fP"
+
+.PP
+Definition at line 382 of file InteractionHand\&.cs\&.
+.SS "override \fBContactBone\fP [] Leap\&.Unity\&.Interaction\&.InteractionHand\&.contactBones\fC [get]\fP"
+
+.PP
+Definition at line 377 of file InteractionHand\&.cs\&.
+.SS "override \fBControllerType\fP Leap\&.Unity\&.Interaction\&.InteractionHand\&.controllerType\fC [get]\fP"
+
+.PP
+Gets the controller type of this InteractionControllerBase\&. InteractionHands are \fBInteraction\fP Engine controllers implemented over \fBLeap\fP hands\&. 
+.PP
+Definition at line 269 of file InteractionHand\&.cs\&.
+.SS "\fBHeuristicGrabClassifier\fP Leap\&.Unity\&.Interaction\&.InteractionHand\&.grabClassifier\fC [get]\fP"
+
+.PP
+Handles logic determining whether a hand has grabbed or released an interaction object\&. 
+.PP
+Definition at line 656 of file InteractionHand\&.cs\&.
+.SS "override List<Vector3> Leap\&.Unity\&.Interaction\&.InteractionHand\&.graspManipulatorPoints\fC [get]\fP"
+
+.PP
+Definition at line 626 of file InteractionHand\&.cs\&.
+.SS "Func<\fBLeap\&.Frame\fP, \fBLeap\&.Hand\fP> Leap\&.Unity\&.Interaction\&.InteractionHand\&.handAccessorFunc\fC [get]\fP, \fC [set]\fP"
+
+.PP
+If the hand data mode for this \fBInteractionHand\fP is set to Custom, you must manually specify how this \fBInteractionHand\fP should retrieve a specific \fBHand\fP data object from a \fBLeap\fP frame\&. 
+.PP
+Definition at line 86 of file InteractionHand\&.cs\&.
+.SS "\fBHandDataMode\fP Leap\&.Unity\&.Interaction\&.InteractionHand\&.handDataMode\fC [get]\fP, \fC [set]\fP"
+
+.PP
+Definition at line 41 of file InteractionHand\&.cs\&.
+.SS "override Vector3 Leap\&.Unity\&.Interaction\&.InteractionHand\&.hoverPoint\fC [get]\fP"
+
+.PP
+Definition at line 303 of file InteractionHand\&.cs\&.
+.SS "override \fBInteractionHand\fP Leap\&.Unity\&.Interaction\&.InteractionHand\&.intHand\fC [get]\fP"
+
+.PP
+Returns this \fBInteractionHand\fP object\&. This property will be null if the InteractionControllerBase is not \fBControllerType\&.Hand\fP\&. 
+.PP
+Definition at line 277 of file InteractionHand\&.cs\&.
+.SS "override bool Leap\&.Unity\&.Interaction\&.InteractionHand\&.isBeingMoved\fC [get]\fP"
+
+.PP
+Gets whether the underlying \fBLeap\fP hand is currently being moved in worldspace\&. 
+.PP
+Definition at line 214 of file InteractionHand\&.cs\&.
+.SS "override bool Leap\&.Unity\&.Interaction\&.InteractionHand\&.isLeft\fC [get]\fP"
+
+.PP
+Gets whether the underlying tracked \fBLeap\fP hand is a left hand\&. 
+.PP
+Definition at line 231 of file InteractionHand\&.cs\&.
+.SS "override bool Leap\&.Unity\&.Interaction\&.InteractionHand\&.isTracked\fC [get]\fP"
+
+.PP
+Gets whether the underlying \fBLeap\fP hand is currently tracked\&. 
+.PP
+Definition at line 209 of file InteractionHand\&.cs\&.
+.SS "\fBHand\fP Leap\&.Unity\&.Interaction\&.InteractionHand\&.leapHand\fC [get]\fP"
+
+.PP
+Gets the last tracked state of the \fBLeap\fP hand\&. Note for those using the \fBLeap\fP Graphical Renderer: If the hand required warping due to the nearby presence of an object in warped (curved) space, this will return the hand as warped from that object's curved space into the rectilinear space containing its colliders\&. This is only relevant if you are using the \fBLeap\fP Graphical Renderer to render curved, interactive objects\&. 
+.PP
+Definition at line 225 of file InteractionHand\&.cs\&.
+.SS "\fBLeapProvider\fP Leap\&.Unity\&.Interaction\&.InteractionHand\&.leapProvider\fC [get]\fP, \fC [set]\fP"
+
+.PP
+If the hand data mode for this \fBInteractionHand\fP is set to Custom, you must also manually specify the provider from which to retrieve \fBLeap\fP frames containing hand data\&. 
+.PP
+Definition at line 65 of file InteractionHand\&.cs\&.
+.SS "override Vector3 Leap\&.Unity\&.Interaction\&.InteractionHand\&.position\fC [get]\fP"
+
+.PP
+Gets the last-tracked position of the underlying \fBLeap\fP hand\&. 
+.PP
+Definition at line 247 of file InteractionHand\&.cs\&.
+.SS "override Quaternion Leap\&.Unity\&.Interaction\&.InteractionHand\&.rotation\fC [get]\fP"
+
+.PP
+Gets the last-tracked rotation of the underlying \fBLeap\fP hand\&. 
+.PP
+Definition at line 254 of file InteractionHand\&.cs\&.
+.SS "override Vector3? Leap\&.Unity\&.Interaction\&.InteractionHand\&.velocity\fC [get]\fP"
+
+.PP
+Gets the velocity of the underlying tracked \fBLeap\fP hand\&. 
+.PP
+Definition at line 261 of file InteractionHand\&.cs\&.
+
+.SH "Author"
+.PP 
+Generated automatically by Doxygen for Multi User Vr Viewer from the source code\&.

@@ -88,7 +88,7 @@ public class VoiceChecker : NetworkBehaviour
     /// This methods is taking the byte voice data and converting into float and then to voice again using Audio.create
     /// </summary>
     /// <param name="bytedata">Byte form of voice </param>
-    void SoundOut(byte[] bytedata)
+   public void SoundOut(byte[] bytedata)
     {
         if (!isLocalPlayer) // sound comes out in other pc 
         {

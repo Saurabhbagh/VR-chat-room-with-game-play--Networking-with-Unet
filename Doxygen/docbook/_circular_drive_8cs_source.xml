@@ -1,0 +1,553 @@
+<?xml version='1.0' encoding='UTF-8' standalone='no'?>
+<section xmlns="http://docbook.org/ns/docbook" version="5.0" xmlns:xlink="http://www.w3.org/1999/xlink" xml:id="__circular_drive_8cs_source">
+<title>CircularDrive.cs</title>
+<indexterm><primary>O:/GitHUBMINIPRoject/Assets/SteamVR/InteractionSystem/Core/Scripts/CircularDrive.cs</primary></indexterm>
+<programlisting>00001 <emphasis role="comment">//=======&#32;Copyright&#32;(c)&#32;Valve&#32;Corporation,&#32;All&#32;rights&#32;reserved.&#32;===============</emphasis>
+00002 <emphasis role="comment">//</emphasis>
+00003 <emphasis role="comment">//&#32;Purpose:&#32;Interactable&#32;that&#32;can&#32;be&#32;used&#32;to&#32;move&#32;in&#32;a&#32;circular&#32;motion</emphasis>
+00004 <emphasis role="comment">//</emphasis>
+00005 <emphasis role="comment">//=============================================================================</emphasis>
+00006 
+00007 <emphasis role="keyword">using</emphasis>&#32;<link linkend="__balloon_8cs_1a7d67e097df9376eb709b6a23aa3c7d23">UnityEngine</link>;
+00008 <emphasis role="keyword">using</emphasis>&#32;<link linkend="_namespace_unity_engine">UnityEngine</link>.Events;
+00009 <emphasis role="keyword">using</emphasis>&#32;System.Collections;
+00010 
+00011 <emphasis role="keyword">namespace&#32;</emphasis><link linkend="_namespace_valve_1_1_v_r_1_1_interaction_system">Valve.VR.InteractionSystem</link>
+00012 {
+00013 
+00014 &#32;&#32;&#32;&#32;<emphasis role="comment">//-------------------------------------------------------------------------</emphasis>
+00015 &#32;&#32;&#32;&#32;[RequireComponent(&#32;typeof(&#32;Interactable&#32;)&#32;)]
+<anchor xml:id="__circular_drive_8cs_source_1l00016"/><link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_circular_drive">00016</link> &#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keyword">class&#32;</emphasis><link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_circular_drive">CircularDrive</link>&#32;:&#32;MonoBehaviour
+00017 &#32;&#32;&#32;&#32;{
+<anchor xml:id="__circular_drive_8cs_source_1l00018"/><link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_circular_drive_1a9a0227d59ad0af7a3422fcab9798b5dd">00018</link> &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keyword">enum</emphasis>&#32;<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_circular_drive_1a9a0227d59ad0af7a3422fcab9798b5dd">Axis_t</link>
+00019 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00020 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;XAxis,
+00021 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;YAxis,
+00022 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;ZAxis
+00023 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;};
+00024 
+00025 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;[Tooltip(&#32;<emphasis role="stringliteral">&quot;The&#32;axis&#32;around&#32;which&#32;the&#32;circular&#32;drive&#32;will&#32;rotate&#32;in&#32;local&#32;space&quot;</emphasis>&#32;)]
+<anchor xml:id="__circular_drive_8cs_source_1l00026"/><link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_circular_drive_1a2f9b36dd2c045b2f4bc219f44a8f11da">00026</link> &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_circular_drive_1a9a0227d59ad0af7a3422fcab9798b5dd">Axis_t</link>&#32;<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_circular_drive_1a2f9b36dd2c045b2f4bc219f44a8f11da">axisOfRotation</link>&#32;=&#32;<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_circular_drive_1a9a0227d59ad0af7a3422fcab9798b5dd">Axis_t</link>.XAxis;
+00027 
+00028 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;[Tooltip(&#32;<emphasis role="stringliteral">&quot;Child&#32;GameObject&#32;which&#32;has&#32;the&#32;Collider&#32;component&#32;to&#32;initiate&#32;interaction,&#32;only&#32;needs&#32;to&#32;be&#32;set&#32;if&#32;there&#32;is&#32;more&#32;than&#32;one&#32;Collider&#32;child&quot;</emphasis>&#32;)]
+<anchor xml:id="__circular_drive_8cs_source_1l00029"/><link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_circular_drive_1a0011853018f4888638b3da5d80a9ea4f">00029</link> &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;Collider&#32;<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_circular_drive_1a0011853018f4888638b3da5d80a9ea4f">childCollider</link>&#32;=&#32;<emphasis role="keyword">null</emphasis>;
+00030 
+00031 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;[Tooltip(&#32;<emphasis role="stringliteral">&quot;A&#32;LinearMapping&#32;component&#32;to&#32;drive,&#32;if&#32;not&#32;specified&#32;one&#32;will&#32;be&#32;dynamically&#32;added&#32;to&#32;this&#32;GameObject&quot;</emphasis>&#32;)]
+<anchor xml:id="__circular_drive_8cs_source_1l00032"/><link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_circular_drive_1a1cbb357fea44834490a548d1c0aabe38">00032</link> &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_linear_mapping">LinearMapping</link>&#32;<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_circular_drive_1a1cbb357fea44834490a548d1c0aabe38">linearMapping</link>;
+00033 
+00034 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;[Tooltip(&#32;<emphasis role="stringliteral">&quot;If&#32;true,&#32;the&#32;drive&#32;will&#32;stay&#32;manipulating&#32;as&#32;long&#32;as&#32;the&#32;button&#32;is&#32;held&#32;down,&#32;if&#32;false,&#32;it&#32;will&#32;stop&#32;if&#32;the&#32;controller&#32;moves&#32;out&#32;of&#32;the&#32;collider&quot;</emphasis>&#32;)]
+<anchor xml:id="__circular_drive_8cs_source_1l00035"/><link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_circular_drive_1a6e182eb36a646459a16013762119cb26">00035</link> &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keywordtype">bool</emphasis>&#32;<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_circular_drive_1a6e182eb36a646459a16013762119cb26">hoverLock</link>&#32;=&#32;<emphasis role="keyword">false</emphasis>;
+00036 
+00037 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;[HeaderAttribute(&#32;<emphasis role="stringliteral">&quot;Limited&#32;Rotation&quot;</emphasis>&#32;)]
+00038 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;[Tooltip(&#32;<emphasis role="stringliteral">&quot;If&#32;true,&#32;the&#32;rotation&#32;will&#32;be&#32;limited&#32;to&#32;[minAngle,&#32;maxAngle],&#32;if&#32;false,&#32;the&#32;rotation&#32;is&#32;unlimited&quot;</emphasis>&#32;)]
+<anchor xml:id="__circular_drive_8cs_source_1l00039"/><link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_circular_drive_1a791a378c083be76541596cf8f0114f65">00039</link> &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keywordtype">bool</emphasis>&#32;<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_circular_drive_1a791a378c083be76541596cf8f0114f65">limited</link>&#32;=&#32;<emphasis role="keyword">false</emphasis>;
+<anchor xml:id="__circular_drive_8cs_source_1l00040"/><link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_circular_drive_1a515609613e137b1444f0401aec533168">00040</link> &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;Vector2&#32;<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_circular_drive_1a515609613e137b1444f0401aec533168">frozenDistanceMinMaxThreshold</link>&#32;=&#32;<emphasis role="keyword">new</emphasis>&#32;Vector2(&#32;0.1f,&#32;0.2f&#32;);
+<anchor xml:id="__circular_drive_8cs_source_1l00041"/><link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_circular_drive_1aa5f8b17da9994727affd36aecd5d638a">00041</link> &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;UnityEvent&#32;<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_circular_drive_1aa5f8b17da9994727affd36aecd5d638a">onFrozenDistanceThreshold</link>;
+00042 
+00043 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;[HeaderAttribute(&#32;<emphasis role="stringliteral">&quot;Limited&#32;Rotation&#32;Min&quot;</emphasis>&#32;)]
+00044 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;[Tooltip(&#32;<emphasis role="stringliteral">&quot;If&#32;limited&#32;is&#32;true,&#32;the&#32;specifies&#32;the&#32;lower&#32;limit,&#32;otherwise&#32;value&#32;is&#32;unused&quot;</emphasis>&#32;)]
+<anchor xml:id="__circular_drive_8cs_source_1l00045"/><link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_circular_drive_1a94c3a6e446bd4b264da0635cef83f240">00045</link> &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keywordtype">float</emphasis>&#32;<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_circular_drive_1a94c3a6e446bd4b264da0635cef83f240">minAngle</link>&#32;=&#32;-45.0f;
+00046 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;[Tooltip(&#32;<emphasis role="stringliteral">&quot;If&#32;limited,&#32;set&#32;whether&#32;drive&#32;will&#32;freeze&#32;its&#32;angle&#32;when&#32;the&#32;min&#32;angle&#32;is&#32;reached&quot;</emphasis>&#32;)]
+<anchor xml:id="__circular_drive_8cs_source_1l00047"/><link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_circular_drive_1a92e4f8585a4bbe701388468402167461">00047</link> &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keywordtype">bool</emphasis>&#32;<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_circular_drive_1a92e4f8585a4bbe701388468402167461">freezeOnMin</link>&#32;=&#32;<emphasis role="keyword">false</emphasis>;
+00048 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;[Tooltip(&#32;<emphasis role="stringliteral">&quot;If&#32;limited,&#32;event&#32;invoked&#32;when&#32;minAngle&#32;is&#32;reached&quot;</emphasis>&#32;)]
+<anchor xml:id="__circular_drive_8cs_source_1l00049"/><link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_circular_drive_1ac0e1d669f1f18a4229c18f09a843af27">00049</link> &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;UnityEvent&#32;<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_circular_drive_1ac0e1d669f1f18a4229c18f09a843af27">onMinAngle</link>;
+00050 
+00051 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;[HeaderAttribute(&#32;<emphasis role="stringliteral">&quot;Limited&#32;Rotation&#32;Max&quot;</emphasis>&#32;)]
+00052 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;[Tooltip(&#32;<emphasis role="stringliteral">&quot;If&#32;limited&#32;is&#32;true,&#32;the&#32;specifies&#32;the&#32;upper&#32;limit,&#32;otherwise&#32;value&#32;is&#32;unused&quot;</emphasis>&#32;)]
+<anchor xml:id="__circular_drive_8cs_source_1l00053"/><link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_circular_drive_1a6dd5a1ce6896c643324ef89b890557d2">00053</link> &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keywordtype">float</emphasis>&#32;<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_circular_drive_1a6dd5a1ce6896c643324ef89b890557d2">maxAngle</link>&#32;=&#32;45.0f;
+00054 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;[Tooltip(&#32;<emphasis role="stringliteral">&quot;If&#32;limited,&#32;set&#32;whether&#32;drive&#32;will&#32;freeze&#32;its&#32;angle&#32;when&#32;the&#32;max&#32;angle&#32;is&#32;reached&quot;</emphasis>&#32;)]
+<anchor xml:id="__circular_drive_8cs_source_1l00055"/><link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_circular_drive_1ad8f3727a1120306fa69e3d6d56055aa9">00055</link> &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keywordtype">bool</emphasis>&#32;<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_circular_drive_1ad8f3727a1120306fa69e3d6d56055aa9">freezeOnMax</link>&#32;=&#32;<emphasis role="keyword">false</emphasis>;
+00056 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;[Tooltip(&#32;<emphasis role="stringliteral">&quot;If&#32;limited,&#32;event&#32;invoked&#32;when&#32;maxAngle&#32;is&#32;reached&quot;</emphasis>&#32;)]
+<anchor xml:id="__circular_drive_8cs_source_1l00057"/><link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_circular_drive_1a4b44323fd2fc1d9f21aa3adfb631697b">00057</link> &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;UnityEvent&#32;<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_circular_drive_1a4b44323fd2fc1d9f21aa3adfb631697b">onMaxAngle</link>;
+00058 
+00059 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;[Tooltip(&#32;<emphasis role="stringliteral">&quot;If&#32;limited&#32;is&#32;true,&#32;this&#32;forces&#32;the&#32;starting&#32;angle&#32;to&#32;be&#32;startAngle,&#32;clamped&#32;to&#32;[minAngle,&#32;maxAngle]&quot;</emphasis>&#32;)]
+<anchor xml:id="__circular_drive_8cs_source_1l00060"/><link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_circular_drive_1a0f4cfceb109259e41800cce25dce0c3f">00060</link> &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keywordtype">bool</emphasis>&#32;<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_circular_drive_1a0f4cfceb109259e41800cce25dce0c3f">forceStart</link>&#32;=&#32;<emphasis role="keyword">false</emphasis>;
+00061 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;[Tooltip(&#32;<emphasis role="stringliteral">&quot;If&#32;limited&#32;is&#32;true&#32;and&#32;forceStart&#32;is&#32;true,&#32;the&#32;starting&#32;angle&#32;will&#32;be&#32;this,&#32;clamped&#32;to&#32;[minAngle,&#32;maxAngle]&quot;</emphasis>&#32;)]
+<anchor xml:id="__circular_drive_8cs_source_1l00062"/><link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_circular_drive_1aeb873828f646a744d57bd77b8ef7b1bd">00062</link> &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keywordtype">float</emphasis>&#32;<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_circular_drive_1aeb873828f646a744d57bd77b8ef7b1bd">startAngle</link>&#32;=&#32;0.0f;
+00063 
+00064 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;[Tooltip(&#32;<emphasis role="stringliteral">&quot;If&#32;true,&#32;the&#32;transform&#32;of&#32;the&#32;GameObject&#32;this&#32;component&#32;is&#32;on&#32;will&#32;be&#32;rotated&#32;accordingly&quot;</emphasis>&#32;)]
+<anchor xml:id="__circular_drive_8cs_source_1l00065"/><link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_circular_drive_1a35df98d8e3d550859610175298fe32e6">00065</link> &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keywordtype">bool</emphasis>&#32;<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_circular_drive_1a35df98d8e3d550859610175298fe32e6">rotateGameObject</link>&#32;=&#32;<emphasis role="keyword">true</emphasis>;
+00066 
+00067 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;[Tooltip(&#32;<emphasis role="stringliteral">&quot;If&#32;true,&#32;the&#32;path&#32;of&#32;the&#32;Hand&#32;(red)&#32;and&#32;the&#32;projected&#32;value&#32;(green)&#32;will&#32;be&#32;drawn&quot;</emphasis>&#32;)]
+<anchor xml:id="__circular_drive_8cs_source_1l00068"/><link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_circular_drive_1a155bba9d6c9819bce12a66f739c3e3a7">00068</link> &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keywordtype">bool</emphasis>&#32;<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_circular_drive_1a155bba9d6c9819bce12a66f739c3e3a7">debugPath</link>&#32;=&#32;<emphasis role="keyword">false</emphasis>;
+00069 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;[Tooltip(&#32;<emphasis role="stringliteral">&quot;If&#32;debugPath&#32;is&#32;true,&#32;this&#32;is&#32;the&#32;maximum&#32;number&#32;of&#32;GameObjects&#32;to&#32;create&#32;to&#32;draw&#32;the&#32;path&quot;</emphasis>&#32;)]
+<anchor xml:id="__circular_drive_8cs_source_1l00070"/><link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_circular_drive_1a4c793fa3de71c7d7063b70c8566516ec">00070</link> &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keywordtype">int</emphasis>&#32;<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_circular_drive_1a4c793fa3de71c7d7063b70c8566516ec">dbgPathLimit</link>&#32;=&#32;50;
+00071 
+00072 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;[Tooltip(&#32;<emphasis role="stringliteral">&quot;If&#32;not&#32;null,&#32;the&#32;TextMesh&#32;will&#32;display&#32;the&#32;linear&#32;value&#32;and&#32;the&#32;angular&#32;value&#32;of&#32;this&#32;circular&#32;drive&quot;</emphasis>&#32;)]
+<anchor xml:id="__circular_drive_8cs_source_1l00073"/><link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_circular_drive_1a918ce2445696801ab1e723fbf39522e3">00073</link> &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;TextMesh&#32;<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_circular_drive_1a918ce2445696801ab1e723fbf39522e3">debugText</link>&#32;=&#32;<emphasis role="keyword">null</emphasis>;
+00074 
+00075 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;[Tooltip(&#32;<emphasis role="stringliteral">&quot;The&#32;output&#32;angle&#32;value&#32;of&#32;the&#32;drive&#32;in&#32;degrees,&#32;unlimited&#32;will&#32;increase&#32;or&#32;decrease&#32;without&#32;bound,&#32;take&#32;the&#32;360&#32;modulus&#32;to&#32;find&#32;number&#32;of&#32;rotations&quot;</emphasis>&#32;)]
+<anchor xml:id="__circular_drive_8cs_source_1l00076"/><link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_circular_drive_1ae22ed245544a713344e01eafaf91122c">00076</link> &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keywordtype">float</emphasis>&#32;<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_circular_drive_1ae22ed245544a713344e01eafaf91122c">outAngle</link>;
+00077 
+00078 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;Quaternion&#32;start;
+00079 
+00080 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;Vector3&#32;worldPlaneNormal&#32;=&#32;<emphasis role="keyword">new</emphasis>&#32;Vector3(&#32;1.0f,&#32;0.0f,&#32;0.0f&#32;);
+00081 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;Vector3&#32;localPlaneNormal&#32;=&#32;<emphasis role="keyword">new</emphasis>&#32;Vector3(&#32;1.0f,&#32;0.0f,&#32;0.0f&#32;);
+00082 
+00083 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;Vector3&#32;lastHandProjected;
+00084 
+00085 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;Color&#32;red&#32;=&#32;<emphasis role="keyword">new</emphasis>&#32;Color(&#32;1.0f,&#32;0.0f,&#32;0.0f&#32;);
+00086 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;Color&#32;green&#32;=&#32;<emphasis role="keyword">new</emphasis>&#32;Color(&#32;0.0f,&#32;1.0f,&#32;0.0f&#32;);
+00087 
+00088 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;GameObject[]&#32;dbgHandObjects;
+00089 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;GameObject[]&#32;dbgProjObjects;
+00090 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;GameObject&#32;dbgObjectsParent;
+00091 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;<emphasis role="keywordtype">int</emphasis>&#32;dbgObjectCount&#32;=&#32;0;
+00092 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;<emphasis role="keywordtype">int</emphasis>&#32;dbgObjectIndex&#32;=&#32;0;
+00093 
+00094 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;<emphasis role="keywordtype">bool</emphasis>&#32;driving&#32;=&#32;<emphasis role="keyword">false</emphasis>;
+00095 
+00096 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;If&#32;the&#32;drive&#32;is&#32;limited&#32;as&#32;is&#32;at&#32;min/max,&#32;angles&#32;greater&#32;than&#32;this&#32;are&#32;ignored&#32;</emphasis>
+00097 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;<emphasis role="keywordtype">float</emphasis>&#32;minMaxAngularThreshold&#32;=&#32;1.0f;
+00098 
+00099 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;<emphasis role="keywordtype">bool</emphasis>&#32;frozen&#32;=&#32;<emphasis role="keyword">false</emphasis>;
+00100 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;<emphasis role="keywordtype">float</emphasis>&#32;frozenAngle&#32;=&#32;0.0f;
+00101 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;Vector3&#32;frozenHandWorldPos&#32;=&#32;<emphasis role="keyword">new</emphasis>&#32;Vector3(&#32;0.0f,&#32;0.0f,&#32;0.0f&#32;);
+00102 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;Vector2&#32;frozenSqDistanceMinMaxThreshold&#32;=&#32;<emphasis role="keyword">new</emphasis>&#32;Vector2(&#32;0.0f,&#32;0.0f&#32;);
+00103 
+00104 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_hand">Hand</link>&#32;handHoverLocked&#32;=&#32;<emphasis role="keyword">null</emphasis>;
+00105 
+00106 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_interactable">Interactable</link>&#32;interactable;
+00107 
+00108 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//-------------------------------------------------</emphasis>
+00109 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;Freeze(&#32;<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_hand">Hand</link>&#32;hand&#32;)
+00110 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00111 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;frozen&#32;=&#32;<emphasis role="keyword">true</emphasis>;
+00112 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;frozenAngle&#32;=&#32;<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_circular_drive_1ae22ed245544a713344e01eafaf91122c">outAngle</link>;
+00113 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;frozenHandWorldPos&#32;=&#32;hand.<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_hand_1a5248cf59c17fc539634027c699b7126b">hoverSphereTransform</link>.position;
+00114 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;frozenSqDistanceMinMaxThreshold.x&#32;=&#32;<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_circular_drive_1a515609613e137b1444f0401aec533168">frozenDistanceMinMaxThreshold</link>.x&#32;*&#32;<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_circular_drive_1a515609613e137b1444f0401aec533168">frozenDistanceMinMaxThreshold</link>.x;
+00115 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;frozenSqDistanceMinMaxThreshold.y&#32;=&#32;<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_circular_drive_1a515609613e137b1444f0401aec533168">frozenDistanceMinMaxThreshold</link>.y&#32;*&#32;<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_circular_drive_1a515609613e137b1444f0401aec533168">frozenDistanceMinMaxThreshold</link>.y;
+00116 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00117 
+00118 
+00119 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//-------------------------------------------------</emphasis>
+00120 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;UnFreeze()
+00121 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00122 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;frozen&#32;=&#32;<emphasis role="keyword">false</emphasis>;
+00123 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;frozenHandWorldPos.Set(&#32;0.0f,&#32;0.0f,&#32;0.0f&#32;);
+00124 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00125 
+00126 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;Awake()
+00127 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00128 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;interactable&#32;=&#32;this.GetComponent&lt;Interactable&gt;();
+00129 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00130 
+00131 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//-------------------------------------------------</emphasis>
+00132 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;Start()
+00133 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00134 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(&#32;<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_circular_drive_1a0011853018f4888638b3da5d80a9ea4f">childCollider</link>&#32;==&#32;<emphasis role="keyword">null</emphasis>&#32;)
+00135 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00136 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_circular_drive_1a0011853018f4888638b3da5d80a9ea4f">childCollider</link>&#32;=&#32;GetComponentInChildren&lt;Collider&gt;();
+00137 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00138 
+00139 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(&#32;<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_circular_drive_1a1cbb357fea44834490a548d1c0aabe38">linearMapping</link>&#32;==&#32;<emphasis role="keyword">null</emphasis>&#32;)
+00140 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00141 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_circular_drive_1a1cbb357fea44834490a548d1c0aabe38">linearMapping</link>&#32;=&#32;GetComponent&lt;LinearMapping&gt;();
+00142 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00143 
+00144 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(&#32;<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_circular_drive_1a1cbb357fea44834490a548d1c0aabe38">linearMapping</link>&#32;==&#32;<emphasis role="keyword">null</emphasis>&#32;)
+00145 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00146 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_circular_drive_1a1cbb357fea44834490a548d1c0aabe38">linearMapping</link>&#32;=&#32;gameObject.AddComponent&lt;LinearMapping&gt;();
+00147 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00148 
+00149 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;worldPlaneNormal&#32;=&#32;<emphasis role="keyword">new</emphasis>&#32;Vector3(&#32;0.0f,&#32;0.0f,&#32;0.0f&#32;);
+00150 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;worldPlaneNormal[(int)<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_circular_drive_1a2f9b36dd2c045b2f4bc219f44a8f11da">axisOfRotation</link>]&#32;=&#32;1.0f;
+00151 
+00152 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;localPlaneNormal&#32;=&#32;worldPlaneNormal;
+00153 
+00154 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(&#32;transform.parent&#32;)
+00155 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00156 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;worldPlaneNormal&#32;=&#32;transform.parent.localToWorldMatrix.MultiplyVector(&#32;worldPlaneNormal&#32;).normalized;
+00157 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00158 
+00159 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(&#32;<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_circular_drive_1a791a378c083be76541596cf8f0114f65">limited</link>&#32;)
+00160 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00161 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;start&#32;=&#32;Quaternion.identity;
+00162 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_circular_drive_1ae22ed245544a713344e01eafaf91122c">outAngle</link>&#32;=&#32;transform.localEulerAngles[(int)<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_circular_drive_1a2f9b36dd2c045b2f4bc219f44a8f11da">axisOfRotation</link>];
+00163 
+00164 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(&#32;<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_circular_drive_1a0f4cfceb109259e41800cce25dce0c3f">forceStart</link>&#32;)
+00165 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00166 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_circular_drive_1ae22ed245544a713344e01eafaf91122c">outAngle</link>&#32;=&#32;Mathf.Clamp(&#32;<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_circular_drive_1aeb873828f646a744d57bd77b8ef7b1bd">startAngle</link>,&#32;<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_circular_drive_1a94c3a6e446bd4b264da0635cef83f240">minAngle</link>,&#32;<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_circular_drive_1a6dd5a1ce6896c643324ef89b890557d2">maxAngle</link>&#32;);
+00167 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00168 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00169 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">else</emphasis>
+00170 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00171 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;start&#32;=&#32;Quaternion.AngleAxis(&#32;transform.localEulerAngles[(<emphasis role="keywordtype">int</emphasis>)<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_circular_drive_1a2f9b36dd2c045b2f4bc219f44a8f11da">axisOfRotation</link>],&#32;localPlaneNormal&#32;);
+00172 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_circular_drive_1ae22ed245544a713344e01eafaf91122c">outAngle</link>&#32;=&#32;0.0f;
+00173 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00174 
+00175 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(&#32;<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_circular_drive_1a918ce2445696801ab1e723fbf39522e3">debugText</link>&#32;)
+00176 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00177 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_circular_drive_1a918ce2445696801ab1e723fbf39522e3">debugText</link>.alignment&#32;=&#32;TextAlignment.Left;
+00178 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_circular_drive_1a918ce2445696801ab1e723fbf39522e3">debugText</link>.anchor&#32;=&#32;TextAnchor.UpperLeft;
+00179 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00180 
+00181 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;UpdateAll();
+00182 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00183 
+00184 
+00185 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//-------------------------------------------------</emphasis>
+00186 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordtype">void</emphasis>&#32;OnDisable()
+00187 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00188 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(&#32;handHoverLocked&#32;)
+00189 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00190 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;handHoverLocked.<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_hand_1a186d8af3a990ec94164f6aa62ac1d2c4">HideGrabHint</link>();
+00191 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;handHoverLocked.<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_hand_1aebd333682282351892fcc4b9df395e30">HoverUnlock</link>(interactable);
+00192 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;handHoverLocked&#32;=&#32;<emphasis role="keyword">null</emphasis>;
+00193 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00194 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00195 
+00196 
+00197 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//-------------------------------------------------</emphasis>
+00198 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;IEnumerator&#32;HapticPulses(&#32;Hand&#32;hand,&#32;<emphasis role="keywordtype">float</emphasis>&#32;flMagnitude,&#32;<emphasis role="keywordtype">int</emphasis>&#32;nCount&#32;)
+00199 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00200 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(&#32;hand&#32;!=&#32;<emphasis role="keyword">null</emphasis>&#32;)
+00201 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00202 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordtype">int</emphasis>&#32;nRangeMax&#32;=&#32;(int)Util.RemapNumberClamped(&#32;flMagnitude,&#32;0.0f,&#32;1.0f,&#32;100.0f,&#32;900.0f&#32;);
+00203 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;nCount&#32;=&#32;Mathf.Clamp(&#32;nCount,&#32;1,&#32;10&#32;);
+00204 
+00205 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//float&#32;hapticDuration&#32;=&#32;nRangeMax&#32;*&#32;nCount;</emphasis>
+00206 
+00207 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//hand.TriggerHapticPulse(hapticDuration,&#32;nRangeMax,&#32;flMagnitude);</emphasis>
+00208 
+00209 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">for</emphasis>&#32;(&#32;ushort&#32;i&#32;=&#32;0;&#32;i&#32;&lt;&#32;nCount;&#32;++i&#32;)
+00210 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00211 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;ushort&#32;duration&#32;=&#32;(ushort)Random.Range(&#32;100,&#32;nRangeMax&#32;);
+00212 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;hand.<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_hand_1ab9e8c722bbad5cb37f0268f4c1745118">TriggerHapticPulse</link>(&#32;duration&#32;);
+00213 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;yield&#32;<emphasis role="keywordflow">return</emphasis>&#32;<emphasis role="keyword">new</emphasis>&#32;WaitForSeconds(&#32;.01f&#32;);
+00214 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00215 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00216 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00217 
+00218 
+00219 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//-------------------------------------------------</emphasis>
+00220 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;OnHandHoverBegin(&#32;Hand&#32;hand&#32;)
+00221 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00222 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;hand.ShowGrabHint();
+00223 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00224 
+00225 
+00226 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//-------------------------------------------------</emphasis>
+00227 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;OnHandHoverEnd(&#32;Hand&#32;hand&#32;)
+00228 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00229 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;hand.HideGrabHint();
+00230 
+00231 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(&#32;driving&#32;&amp;&amp;&#32;hand&#32;)
+00232 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00233 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//hand.TriggerHapticPulse()&#32;//todo:&#32;fix</emphasis>
+00234 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;StartCoroutine(&#32;HapticPulses(&#32;hand,&#32;1.0f,&#32;10&#32;)&#32;);
+00235 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00236 
+00237 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;driving&#32;=&#32;<emphasis role="keyword">false</emphasis>;
+00238 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;handHoverLocked&#32;=&#32;<emphasis role="keyword">null</emphasis>;
+00239 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00240 
+00241 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;<link linkend="_namespace_valve_1_1_v_r_1_1_interaction_system_1ae03ab84d315f5997fd000817bfb96a0f">GrabTypes</link>&#32;grabbedWithType;
+00242 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//-------------------------------------------------</emphasis>
+00243 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;HandHoverUpdate(&#32;Hand&#32;hand&#32;)
+00244 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00245 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_namespace_valve_1_1_v_r_1_1_interaction_system_1ae03ab84d315f5997fd000817bfb96a0f">GrabTypes</link>&#32;startingGrabType&#32;=&#32;hand.GetGrabStarting();
+00246 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordtype">bool</emphasis>&#32;isGrabEnding&#32;=&#32;hand.IsGrabbingWithType(grabbedWithType)&#32;==&#32;<emphasis role="keyword">false</emphasis>;
+00247 
+00248 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(grabbedWithType&#32;==&#32;<link linkend="_namespace_valve_1_1_v_r_1_1_interaction_system_1ae03ab84d315f5997fd000817bfb96a0f">GrabTypes</link>.None&#32;&amp;&amp;&#32;startingGrabType&#32;!=&#32;<link linkend="_namespace_valve_1_1_v_r_1_1_interaction_system_1ae03ab84d315f5997fd000817bfb96a0f">GrabTypes</link>.None)
+00249 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00250 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;grabbedWithType&#32;=&#32;startingGrabType;
+00251 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;Trigger&#32;was&#32;just&#32;pressed</emphasis>
+00252 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;lastHandProjected&#32;=&#32;ComputeToTransformProjected(&#32;hand.hoverSphereTransform&#32;);
+00253 
+00254 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(&#32;<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_circular_drive_1a6e182eb36a646459a16013762119cb26">hoverLock</link>&#32;)
+00255 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00256 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;hand.HoverLock(interactable);
+00257 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;handHoverLocked&#32;=&#32;hand;
+00258 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00259 
+00260 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;driving&#32;=&#32;<emphasis role="keyword">true</emphasis>;
+00261 
+00262 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;ComputeAngle(&#32;hand&#32;);
+00263 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;UpdateAll();
+00264 
+00265 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;hand.HideGrabHint();
+00266 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00267 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">else</emphasis>&#32;<emphasis role="keywordflow">if</emphasis>&#32;(grabbedWithType&#32;!=&#32;<link linkend="_namespace_valve_1_1_v_r_1_1_interaction_system_1ae03ab84d315f5997fd000817bfb96a0f">GrabTypes</link>.None&#32;&amp;&amp;&#32;isGrabEnding)
+00268 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00269 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;Trigger&#32;was&#32;just&#32;released</emphasis>
+00270 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(&#32;<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_circular_drive_1a6e182eb36a646459a16013762119cb26">hoverLock</link>&#32;)
+00271 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00272 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;hand.HoverUnlock(interactable);
+00273 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;handHoverLocked&#32;=&#32;<emphasis role="keyword">null</emphasis>;
+00274 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00275 
+00276 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;driving&#32;=&#32;<emphasis role="keyword">false</emphasis>;
+00277 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;grabbedWithType&#32;=&#32;<link linkend="_namespace_valve_1_1_v_r_1_1_interaction_system_1ae03ab84d315f5997fd000817bfb96a0f">GrabTypes</link>.None;
+00278 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00279 
+00280 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(&#32;driving&#32;&amp;&amp;&#32;isGrabEnding&#32;==&#32;<emphasis role="keyword">false</emphasis>&#32;&amp;&amp;&#32;hand.hoveringInteractable&#32;==&#32;<emphasis role="keyword">this</emphasis>.interactable&#32;)
+00281 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00282 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;ComputeAngle(&#32;hand&#32;);
+00283 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;UpdateAll();
+00284 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00285 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00286 
+00287 
+00288 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//-------------------------------------------------</emphasis>
+00289 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;Vector3&#32;ComputeToTransformProjected(&#32;Transform&#32;xForm&#32;)
+00290 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00291 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;Vector3&#32;toTransform&#32;=&#32;(&#32;xForm.position&#32;-&#32;transform.position&#32;).normalized;
+00292 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;Vector3&#32;toTransformProjected&#32;=&#32;<emphasis role="keyword">new</emphasis>&#32;Vector3(&#32;0.0f,&#32;0.0f,&#32;0.0f&#32;);
+00293 
+00294 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;Need&#32;a&#32;non-zero&#32;distance&#32;from&#32;the&#32;hand&#32;to&#32;the&#32;center&#32;of&#32;the&#32;CircularDrive</emphasis>
+00295 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(&#32;toTransform.sqrMagnitude&#32;&gt;&#32;0.0f&#32;)
+00296 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00297 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;toTransformProjected&#32;=&#32;Vector3.ProjectOnPlane(&#32;toTransform,&#32;worldPlaneNormal&#32;).normalized;
+00298 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00299 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">else</emphasis>
+00300 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00301 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;Debug.LogFormat(<emphasis role="stringliteral">&quot;&lt;b&gt;[SteamVR&#32;Interaction]&lt;/b&gt;&#32;The&#32;collider&#32;needs&#32;to&#32;be&#32;a&#32;minimum&#32;distance&#32;away&#32;from&#32;the&#32;CircularDrive&#32;GameObject&#32;{0}&quot;</emphasis>,&#32;gameObject.ToString()&#32;);
+00302 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;Debug.Assert(&#32;<emphasis role="keyword">false</emphasis>,&#32;<emphasis role="keywordtype">string</emphasis>.Format(<emphasis role="stringliteral">&quot;&lt;b&gt;[SteamVR&#32;Interaction]&lt;/b&gt;&#32;The&#32;collider&#32;needs&#32;to&#32;be&#32;a&#32;minimum&#32;distance&#32;away&#32;from&#32;the&#32;CircularDrive&#32;GameObject&#32;{0}&quot;</emphasis>,&#32;gameObject.ToString()&#32;)&#32;);
+00303 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00304 
+00305 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(&#32;<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_circular_drive_1a155bba9d6c9819bce12a66f739c3e3a7">debugPath</link>&#32;&amp;&amp;&#32;<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_circular_drive_1a4c793fa3de71c7d7063b70c8566516ec">dbgPathLimit</link>&#32;&gt;&#32;0&#32;)
+00306 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00307 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;DrawDebugPath(&#32;xForm,&#32;toTransformProjected&#32;);
+00308 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00309 
+00310 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;toTransformProjected;
+00311 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00312 
+00313 
+00314 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//-------------------------------------------------</emphasis>
+00315 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;DrawDebugPath(&#32;Transform&#32;xForm,&#32;Vector3&#32;toTransformProjected&#32;)
+00316 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00317 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(&#32;dbgObjectCount&#32;==&#32;0&#32;)
+00318 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00319 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;dbgObjectsParent&#32;=&#32;<emphasis role="keyword">new</emphasis>&#32;GameObject(&#32;<emphasis role="stringliteral">&quot;Circular&#32;Drive&#32;Debug&quot;</emphasis>&#32;);
+00320 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;dbgHandObjects&#32;=&#32;<emphasis role="keyword">new</emphasis>&#32;GameObject[<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_circular_drive_1a4c793fa3de71c7d7063b70c8566516ec">dbgPathLimit</link>];
+00321 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;dbgProjObjects&#32;=&#32;<emphasis role="keyword">new</emphasis>&#32;GameObject[<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_circular_drive_1a4c793fa3de71c7d7063b70c8566516ec">dbgPathLimit</link>];
+00322 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;dbgObjectCount&#32;=&#32;<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_circular_drive_1a4c793fa3de71c7d7063b70c8566516ec">dbgPathLimit</link>;
+00323 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;dbgObjectIndex&#32;=&#32;0;
+00324 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00325 
+00326 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//Actual&#32;path</emphasis>
+00327 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;GameObject&#32;gSphere&#32;=&#32;<emphasis role="keyword">null</emphasis>;
+00328 
+00329 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(&#32;dbgHandObjects[dbgObjectIndex]&#32;)
+00330 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00331 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;gSphere&#32;=&#32;dbgHandObjects[dbgObjectIndex];
+00332 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00333 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">else</emphasis>
+00334 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00335 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;gSphere&#32;=&#32;GameObject.CreatePrimitive(&#32;PrimitiveType.Sphere&#32;);
+00336 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;gSphere.transform.SetParent(&#32;dbgObjectsParent.transform&#32;);
+00337 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;dbgHandObjects[dbgObjectIndex]&#32;=&#32;gSphere;
+00338 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00339 
+00340 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;gSphere.name&#32;=&#32;<emphasis role="keywordtype">string</emphasis>.Format(&#32;<emphasis role="stringliteral">&quot;actual_{0}&quot;</emphasis>,&#32;(<emphasis role="keywordtype">int</emphasis>)(&#32;(&#32;1.0f&#32;-&#32;red.r&#32;)&#32;*&#32;10.0f&#32;)&#32;);
+00341 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;gSphere.transform.position&#32;=&#32;xForm.position;
+00342 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;gSphere.transform.rotation&#32;=&#32;Quaternion.Euler(&#32;0.0f,&#32;0.0f,&#32;0.0f&#32;);
+00343 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;gSphere.transform.localScale&#32;=&#32;<emphasis role="keyword">new</emphasis>&#32;Vector3(&#32;0.004f,&#32;0.004f,&#32;0.004f&#32;);
+00344 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;gSphere.gameObject.GetComponent&lt;Renderer&gt;().material.color&#32;=&#32;red;
+00345 
+00346 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;if&#32;(&#32;red.r&#32;&gt;&#32;0.1f&#32;)
+00347 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00348 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;red.r&#32;-=&#32;0.1f;
+00349 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00350 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">else</emphasis>
+00351 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00352 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;red.r&#32;=&#32;1.0f;
+00353 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00354 
+00355 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//Projected&#32;path</emphasis>
+00356 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;gSphere&#32;=&#32;<emphasis role="keyword">null</emphasis>;
+00357 
+00358 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(&#32;dbgProjObjects[dbgObjectIndex]&#32;)
+00359 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00360 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;gSphere&#32;=&#32;dbgProjObjects[dbgObjectIndex];
+00361 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00362 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">else</emphasis>
+00363 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00364 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;gSphere&#32;=&#32;GameObject.CreatePrimitive(&#32;PrimitiveType.Sphere&#32;);
+00365 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;gSphere.transform.SetParent(&#32;dbgObjectsParent.transform&#32;);
+00366 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;dbgProjObjects[dbgObjectIndex]&#32;=&#32;gSphere;
+00367 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00368 
+00369 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;gSphere.name&#32;=&#32;<emphasis role="keywordtype">string</emphasis>.Format(&#32;<emphasis role="stringliteral">&quot;projed_{0}&quot;</emphasis>,&#32;(<emphasis role="keywordtype">int</emphasis>)(&#32;(&#32;1.0f&#32;-&#32;green.g&#32;)&#32;*&#32;10.0f&#32;)&#32;);
+00370 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;gSphere.transform.position&#32;=&#32;transform.position&#32;+&#32;toTransformProjected&#32;*&#32;0.25f;
+00371 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;gSphere.transform.rotation&#32;=&#32;Quaternion.Euler(&#32;0.0f,&#32;0.0f,&#32;0.0f&#32;);
+00372 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;gSphere.transform.localScale&#32;=&#32;<emphasis role="keyword">new</emphasis>&#32;Vector3(&#32;0.004f,&#32;0.004f,&#32;0.004f&#32;);
+00373 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;gSphere.gameObject.GetComponent&lt;Renderer&gt;().material.color&#32;=&#32;green;
+00374 
+00375 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;if&#32;(&#32;green.g&#32;&gt;&#32;0.1f&#32;)
+00376 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00377 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;green.g&#32;-=&#32;0.1f;
+00378 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00379 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">else</emphasis>
+00380 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00381 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;green.g&#32;=&#32;1.0f;
+00382 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00383 
+00384 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;dbgObjectIndex&#32;=&#32;(&#32;dbgObjectIndex&#32;+&#32;1&#32;)&#32;%&#32;dbgObjectCount;
+00385 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00386 
+00387 
+00388 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//-------------------------------------------------</emphasis>
+00389 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;Updates&#32;the&#32;LinearMapping&#32;value&#32;from&#32;the&#32;angle</emphasis>
+00390 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//-------------------------------------------------</emphasis>
+00391 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;UpdateLinearMapping()
+00392 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00393 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(&#32;<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_circular_drive_1a791a378c083be76541596cf8f0114f65">limited</link>&#32;)
+00394 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00395 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;Map&#32;it&#32;to&#32;a&#32;[0,&#32;1]&#32;value</emphasis>
+00396 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_circular_drive_1a1cbb357fea44834490a548d1c0aabe38">linearMapping</link>.<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_linear_mapping_1a775b4f01f606f8083af2dc1ae0f373a5">value</link>&#32;=&#32;(&#32;<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_circular_drive_1ae22ed245544a713344e01eafaf91122c">outAngle</link>&#32;-&#32;<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_circular_drive_1a94c3a6e446bd4b264da0635cef83f240">minAngle</link>&#32;)&#32;/&#32;(&#32;<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_circular_drive_1a6dd5a1ce6896c643324ef89b890557d2">maxAngle</link>&#32;-&#32;<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_circular_drive_1a94c3a6e446bd4b264da0635cef83f240">minAngle</link>&#32;);
+00397 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00398 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">else</emphasis>
+00399 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00400 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;Normalize&#32;to&#32;[0,&#32;1]&#32;based&#32;on&#32;360&#32;degree&#32;windings</emphasis>
+00401 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordtype">float</emphasis>&#32;flTmp&#32;=&#32;<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_circular_drive_1ae22ed245544a713344e01eafaf91122c">outAngle</link>&#32;/&#32;360.0f;
+00402 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_circular_drive_1a1cbb357fea44834490a548d1c0aabe38">linearMapping</link>.<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_linear_mapping_1a775b4f01f606f8083af2dc1ae0f373a5">value</link>&#32;=&#32;flTmp&#32;-&#32;Mathf.Floor(&#32;flTmp&#32;);
+00403 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00404 
+00405 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;UpdateDebugText();
+00406 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00407 
+00408 
+00409 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//-------------------------------------------------</emphasis>
+00410 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;Updates&#32;the&#32;LinearMapping&#32;value&#32;from&#32;the&#32;angle</emphasis>
+00411 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//-------------------------------------------------</emphasis>
+00412 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;UpdateGameObject()
+00413 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00414 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(&#32;<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_circular_drive_1a35df98d8e3d550859610175298fe32e6">rotateGameObject</link>&#32;)
+00415 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00416 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;transform.localRotation&#32;=&#32;start&#32;*&#32;Quaternion.AngleAxis(&#32;<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_circular_drive_1ae22ed245544a713344e01eafaf91122c">outAngle</link>,&#32;localPlaneNormal&#32;);
+00417 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00418 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00419 
+00420 
+00421 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//-------------------------------------------------</emphasis>
+00422 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;Updates&#32;the&#32;Debug&#32;TextMesh&#32;with&#32;the&#32;linear&#32;mapping&#32;value&#32;and&#32;the&#32;angle</emphasis>
+00423 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//-------------------------------------------------</emphasis>
+00424 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;UpdateDebugText()
+00425 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00426 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(&#32;<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_circular_drive_1a918ce2445696801ab1e723fbf39522e3">debugText</link>&#32;)
+00427 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00428 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_circular_drive_1a918ce2445696801ab1e723fbf39522e3">debugText</link>.text&#32;=&#32;<emphasis role="keywordtype">string</emphasis>.Format(&#32;<emphasis role="stringliteral">&quot;Linear:&#32;{0}\nAngle:&#32;&#32;{1}\n&quot;</emphasis>,&#32;<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_circular_drive_1a1cbb357fea44834490a548d1c0aabe38">linearMapping</link>.<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_linear_mapping_1a775b4f01f606f8083af2dc1ae0f373a5">value</link>,&#32;<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_circular_drive_1ae22ed245544a713344e01eafaf91122c">outAngle</link>&#32;);
+00429 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00430 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00431 
+00432 
+00433 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//-------------------------------------------------</emphasis>
+00434 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;Updates&#32;the&#32;Debug&#32;TextMesh&#32;with&#32;the&#32;linear&#32;mapping&#32;value&#32;and&#32;the&#32;angle</emphasis>
+00435 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//-------------------------------------------------</emphasis>
+00436 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;UpdateAll()
+00437 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00438 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;UpdateLinearMapping();
+00439 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;UpdateGameObject();
+00440 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;UpdateDebugText();
+00441 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00442 
+00443 
+00444 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//-------------------------------------------------</emphasis>
+00445 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;Computes&#32;the&#32;angle&#32;to&#32;rotate&#32;the&#32;game&#32;object&#32;based&#32;on&#32;the&#32;change&#32;in&#32;the&#32;transform</emphasis>
+00446 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//-------------------------------------------------</emphasis>
+00447 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;ComputeAngle(&#32;Hand&#32;hand&#32;)
+00448 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00449 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;Vector3&#32;toHandProjected&#32;=&#32;ComputeToTransformProjected(&#32;hand.hoverSphereTransform&#32;);
+00450 
+00451 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(&#32;!toHandProjected.Equals(&#32;lastHandProjected&#32;)&#32;)
+00452 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00453 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordtype">float</emphasis>&#32;absAngleDelta&#32;=&#32;Vector3.Angle(&#32;lastHandProjected,&#32;toHandProjected&#32;);
+00454 
+00455 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(&#32;absAngleDelta&#32;&gt;&#32;0.0f&#32;)
+00456 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00457 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(&#32;frozen&#32;)
+00458 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00459 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordtype">float</emphasis>&#32;frozenSqDist&#32;=&#32;(&#32;hand.hoverSphereTransform.position&#32;-&#32;frozenHandWorldPos&#32;).sqrMagnitude;
+00460 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(&#32;frozenSqDist&#32;&gt;&#32;frozenSqDistanceMinMaxThreshold.x&#32;)
+00461 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00462 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_circular_drive_1ae22ed245544a713344e01eafaf91122c">outAngle</link>&#32;=&#32;frozenAngle&#32;+&#32;Random.Range(&#32;-1.0f,&#32;1.0f&#32;);
+00463 
+00464 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordtype">float</emphasis>&#32;magnitude&#32;=&#32;Util.RemapNumberClamped(&#32;frozenSqDist,&#32;frozenSqDistanceMinMaxThreshold.x,&#32;frozenSqDistanceMinMaxThreshold.y,&#32;0.0f,&#32;1.0f&#32;);
+00465 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(&#32;magnitude&#32;&gt;&#32;0&#32;)
+00466 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00467 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;StartCoroutine(&#32;HapticPulses(&#32;hand,&#32;magnitude,&#32;10&#32;)&#32;);
+00468 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00469 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">else</emphasis>
+00470 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00471 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;StartCoroutine(&#32;HapticPulses(&#32;hand,&#32;0.5f,&#32;10&#32;)&#32;);
+00472 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00473 
+00474 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(&#32;frozenSqDist&#32;&gt;=&#32;frozenSqDistanceMinMaxThreshold.y&#32;)
+00475 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00476 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_circular_drive_1aa5f8b17da9994727affd36aecd5d638a">onFrozenDistanceThreshold</link>.Invoke();
+00477 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00478 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00479 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00480 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">else</emphasis>
+00481 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00482 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;Vector3&#32;cross&#32;=&#32;Vector3.Cross(&#32;lastHandProjected,&#32;toHandProjected&#32;).normalized;
+00483 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordtype">float</emphasis>&#32;dot&#32;=&#32;Vector3.Dot(&#32;worldPlaneNormal,&#32;cross&#32;);
+00484 
+00485 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordtype">float</emphasis>&#32;signedAngleDelta&#32;=&#32;absAngleDelta;
+00486 
+00487 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(&#32;dot&#32;&lt;&#32;0.0f&#32;)
+00488 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00489 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;signedAngleDelta&#32;=&#32;-signedAngleDelta;
+00490 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00491 
+00492 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(&#32;<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_circular_drive_1a791a378c083be76541596cf8f0114f65">limited</link>&#32;)
+00493 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00494 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordtype">float</emphasis>&#32;angleTmp&#32;=&#32;Mathf.Clamp(&#32;<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_circular_drive_1ae22ed245544a713344e01eafaf91122c">outAngle</link>&#32;+&#32;signedAngleDelta,&#32;<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_circular_drive_1a94c3a6e446bd4b264da0635cef83f240">minAngle</link>,&#32;<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_circular_drive_1a6dd5a1ce6896c643324ef89b890557d2">maxAngle</link>&#32;);
+00495 
+00496 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(&#32;<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_circular_drive_1ae22ed245544a713344e01eafaf91122c">outAngle</link>&#32;==&#32;<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_circular_drive_1a94c3a6e446bd4b264da0635cef83f240">minAngle</link>&#32;)
+00497 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00498 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(&#32;angleTmp&#32;&gt;&#32;<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_circular_drive_1a94c3a6e446bd4b264da0635cef83f240">minAngle</link>&#32;&amp;&amp;&#32;absAngleDelta&#32;&lt;&#32;minMaxAngularThreshold&#32;)
+00499 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00500 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_circular_drive_1ae22ed245544a713344e01eafaf91122c">outAngle</link>&#32;=&#32;angleTmp;
+00501 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;lastHandProjected&#32;=&#32;toHandProjected;
+00502 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00503 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00504 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">else</emphasis>&#32;<emphasis role="keywordflow">if</emphasis>&#32;(&#32;<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_circular_drive_1ae22ed245544a713344e01eafaf91122c">outAngle</link>&#32;==&#32;<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_circular_drive_1a6dd5a1ce6896c643324ef89b890557d2">maxAngle</link>&#32;)
+00505 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00506 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(&#32;angleTmp&#32;&lt;&#32;<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_circular_drive_1a6dd5a1ce6896c643324ef89b890557d2">maxAngle</link>&#32;&amp;&amp;&#32;absAngleDelta&#32;&lt;&#32;minMaxAngularThreshold&#32;)
+00507 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00508 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_circular_drive_1ae22ed245544a713344e01eafaf91122c">outAngle</link>&#32;=&#32;angleTmp;
+00509 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;lastHandProjected&#32;=&#32;toHandProjected;
+00510 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00511 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00512 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">else</emphasis>&#32;<emphasis role="keywordflow">if</emphasis>&#32;(&#32;angleTmp&#32;==&#32;<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_circular_drive_1a94c3a6e446bd4b264da0635cef83f240">minAngle</link>&#32;)
+00513 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00514 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_circular_drive_1ae22ed245544a713344e01eafaf91122c">outAngle</link>&#32;=&#32;angleTmp;
+00515 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;lastHandProjected&#32;=&#32;toHandProjected;
+00516 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_circular_drive_1ac0e1d669f1f18a4229c18f09a843af27">onMinAngle</link>.Invoke();
+00517 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(&#32;<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_circular_drive_1a92e4f8585a4bbe701388468402167461">freezeOnMin</link>&#32;)
+00518 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00519 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;Freeze(&#32;hand&#32;);
+00520 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00521 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00522 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">else</emphasis>&#32;<emphasis role="keywordflow">if</emphasis>&#32;(&#32;angleTmp&#32;==&#32;<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_circular_drive_1a6dd5a1ce6896c643324ef89b890557d2">maxAngle</link>&#32;)
+00523 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00524 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_circular_drive_1ae22ed245544a713344e01eafaf91122c">outAngle</link>&#32;=&#32;angleTmp;
+00525 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;lastHandProjected&#32;=&#32;toHandProjected;
+00526 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_circular_drive_1a4b44323fd2fc1d9f21aa3adfb631697b">onMaxAngle</link>.Invoke();
+00527 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(&#32;<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_circular_drive_1ad8f3727a1120306fa69e3d6d56055aa9">freezeOnMax</link>&#32;)
+00528 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00529 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;Freeze(&#32;hand&#32;);
+00530 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00531 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00532 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">else</emphasis>
+00533 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00534 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_circular_drive_1ae22ed245544a713344e01eafaf91122c">outAngle</link>&#32;=&#32;angleTmp;
+00535 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;lastHandProjected&#32;=&#32;toHandProjected;
+00536 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00537 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00538 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">else</emphasis>
+00539 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00540 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_valve_1_1_v_r_1_1_interaction_system_1_1_circular_drive_1ae22ed245544a713344e01eafaf91122c">outAngle</link>&#32;+=&#32;signedAngleDelta;
+00541 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;lastHandProjected&#32;=&#32;toHandProjected;
+00542 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00543 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00544 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00545 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00546 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00547 &#32;&#32;&#32;&#32;}
+00548 }
+</programlisting></section>

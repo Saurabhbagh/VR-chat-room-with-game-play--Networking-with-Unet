@@ -1,0 +1,120 @@
+<?xml version='1.0' encoding='UTF-8' standalone='no'?>
+<section xmlns="http://docbook.org/ns/docbook" version="5.0" xmlns:xlink="http://www.w3.org/1999/xlink" xml:id="__interaction_hand_editor_8cs_source">
+<title>InteractionHandEditor.cs</title>
+<indexterm><primary>O:/GitHUBMINIPRoject/Assets/LeapMotion/Modules/InteractionEngine/Scripts/Editor/InteractionHandEditor.cs</primary></indexterm>
+<programlisting>00001 <emphasis role="comment">/******************************************************************************</emphasis>
+00002 <emphasis role="comment">&#32;*&#32;Copyright&#32;(C)&#32;Leap&#32;Motion,&#32;Inc.&#32;2011-2018.&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;*</emphasis>
+00003 <emphasis role="comment">&#32;*&#32;Leap&#32;Motion&#32;proprietary&#32;and&#32;confidential.&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;*</emphasis>
+00004 <emphasis role="comment">&#32;*&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;*</emphasis>
+00005 <emphasis role="comment">&#32;*&#32;Use&#32;subject&#32;to&#32;the&#32;terms&#32;of&#32;the&#32;Leap&#32;Motion&#32;SDK&#32;Agreement&#32;available&#32;at&#32;&#32;&#32;&#32;&#32;*</emphasis>
+00006 <emphasis role="comment">&#32;*&#32;https://developer.leapmotion.com/sdk_agreement,&#32;or&#32;another&#32;agreement&#32;&#32;&#32;&#32;&#32;&#32;&#32;*</emphasis>
+00007 <emphasis role="comment">&#32;*&#32;between&#32;Leap&#32;Motion&#32;and&#32;you,&#32;your&#32;company&#32;or&#32;other&#32;organization.&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;*</emphasis>
+00008 <emphasis role="comment">&#32;******************************************************************************/</emphasis>
+00009 
+00010 <emphasis role="keyword">using</emphasis>&#32;<link linkend="_namespace_leap">Leap</link>.<link linkend="_namespace_leap_1_1_unity">Unity</link>.<link linkend="_namespace_leap_1_1_unity_1_1_query">Query</link>;
+00011 <emphasis role="keyword">using</emphasis>&#32;System.Collections;
+00012 <emphasis role="keyword">using</emphasis>&#32;System.Collections.Generic;
+00013 <emphasis role="keyword">using</emphasis>&#32;<link linkend="_namespace_unity_editor">UnityEditor</link>;
+00014 <emphasis role="keyword">using</emphasis>&#32;<link linkend="__balloon_8cs_1a7d67e097df9376eb709b6a23aa3c7d23">UnityEngine</link>;
+00015 
+00016 <emphasis role="keyword">namespace&#32;</emphasis><link linkend="_namespace_leap_1_1_unity_1_1_interaction">Leap.Unity.Interaction</link>&#32;{
+00017 
+00018 &#32;&#32;[CanEditMultipleObjects]
+00019 &#32;&#32;[CustomEditor(typeof(InteractionHand),&#32;editorForChildClasses:&#32;<emphasis role="keyword">true</emphasis>)]
+<anchor xml:id="__interaction_hand_editor_8cs_source_1l00020"/><link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_hand_editor">00020</link> &#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keyword">class&#32;</emphasis><link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_hand_editor">InteractionHandEditor</link>&#32;:&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_controller_editor">InteractionControllerEditor</link>&#32;{
+00021 
+00022 &#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;Texture&#32;_handTex;
+00023 &#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;Rect&#32;_handTexRect;
+00024 
+<anchor xml:id="__interaction_hand_editor_8cs_source_1l00025"/><link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_hand_editor_1acba8102c4783d1aead83f13213e949a7">00025</link> &#32;&#32;&#32;&#32;<emphasis role="keyword">protected</emphasis>&#32;<emphasis role="keyword">override</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;<link linkend="_class_leap_1_1_unity_1_1_interaction_1_1_interaction_hand_editor_1acba8102c4783d1aead83f13213e949a7">OnEnable</link>()&#32;{
+00026 &#32;&#32;&#32;&#32;&#32;&#32;base.OnEnable();
+00027 &#32;&#32;&#32;&#32;&#32;&#32;
+00028 &#32;&#32;&#32;&#32;&#32;&#32;_handTex&#32;=&#32;EditorResources.Load&lt;Texture2D&gt;(<emphasis role="stringliteral">&quot;HandTex&quot;</emphasis>);
+00029 
+00030 &#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_leap_1_1_unity_1_1_custom_editor_base_1a4d6cf21850698537d7bf81aa27acc6c9">hideField</link>(<emphasis role="stringliteral">&quot;_leapProvider&quot;</emphasis>);
+00031 &#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_leap_1_1_unity_1_1_custom_editor_base_1ac4af66143c23aa0601e20d58bb3f532e">specifyCustomDecorator</link>(<emphasis role="stringliteral">&quot;manager&quot;</emphasis>,&#32;drawProvider);
+00032 
+00033 &#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_leap_1_1_unity_1_1_custom_editor_base_1aab8bbda3edcc92a5c3d5a5360988c265">specifyCustomDrawer</link>(<emphasis role="stringliteral">&quot;enabledPrimaryHoverFingertips&quot;</emphasis>,&#32;drawPrimaryHoverFingertipsEditor);
+00034 &#32;&#32;&#32;&#32;}
+00035 
+00036 &#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;drawProvider(SerializedProperty&#32;p)&#32;{
+00037 &#32;&#32;&#32;&#32;&#32;&#32;EditorGUILayout.PropertyField(serializedObject.FindProperty(<emphasis role="stringliteral">&quot;_leapProvider&quot;</emphasis>));
+00038 &#32;&#32;&#32;&#32;}
+00039 
+00040 &#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;drawPrimaryHoverFingertipsEditor(SerializedProperty&#32;property)&#32;{
+00041 
+00042 &#32;&#32;&#32;&#32;&#32;&#32;EditorGUILayout.BeginHorizontal();
+00043 
+00044 &#32;&#32;&#32;&#32;&#32;&#32;EditorGUILayout.PrefixLabel(
+00045 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">new</emphasis>&#32;GUIContent(<emphasis role="stringliteral">&quot;Primary&#32;Hover&#32;Fingertips&quot;</emphasis>,
+00046 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="stringliteral">&quot;Check&#32;which&#32;fingertips&#32;should&#32;be&#32;used&#32;&quot;</emphasis>
+00047 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;+&#32;<emphasis role="stringliteral">&quot;as&#32;primary&#32;hover&#32;points&#32;for&#32;this&#32;interaction&#32;controller.&#32;Fewer&#32;&quot;</emphasis>
+00048 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;+&#32;<emphasis role="stringliteral">&quot;points&#32;is&#32;cheaper.&#32;Proximity&#32;to&#32;one&#32;of&#32;these&#32;points&#32;determines&#32;&quot;</emphasis>
+00049 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;+&#32;<emphasis role="stringliteral">&quot;which&#32;interaction&#32;object&#32;is&#32;chosen&#32;as&#32;the&#32;primary&#32;hover&#32;for&#32;this&#32;&quot;</emphasis>
+00050 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;+&#32;<emphasis role="stringliteral">&quot;interaction&#32;controller&#32;at&#32;any&#32;given&#32;time.&#32;Generally&#32;speaking,&#32;&quot;</emphasis>
+00051 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;+&#32;<emphasis role="stringliteral">&quot;choose&#32;the&#32;fingertips&#32;you&apos;d&#32;like&#32;users&#32;to&#32;be&#32;able&#32;to&#32;use&#32;to&#32;&quot;</emphasis>
+00052 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;+&#32;<emphasis role="stringliteral">&quot;choose&#32;and&#32;push&#32;a&#32;button.&quot;</emphasis>));
+00053 
+00054 &#32;&#32;&#32;&#32;&#32;&#32;Rect&#32;controlRect&#32;=&#32;EditorGUILayout.GetControlRect(GUILayout.Height(102));
+00055 &#32;&#32;&#32;&#32;&#32;&#32;drawHandEditor(controlRect);
+00056 
+00057 &#32;&#32;&#32;&#32;&#32;&#32;EditorGUILayout.EndHorizontal();
+00058 &#32;&#32;&#32;&#32;}
+00059 
+00060 &#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;drawHandEditor(Rect&#32;controlRect)&#32;{
+00061 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;Determine&#32;whether&#32;the&#32;target&#32;object&#32;is&#32;a&#32;prefab.&#32;AttachmentPoints&#32;cannot&#32;be&#32;edited&#32;on&#32;prefabs.</emphasis>
+00062 &#32;&#32;&#32;&#32;&#32;&#32;PrefabType&#32;prefabType&#32;=&#32;PrefabUtility.GetPrefabType(<link linkend="_class_leap_1_1_unity_1_1_custom_editor_base_1a20eea7e492831d5b4cde7eeaf0ce749e">target</link>.gameObject);
+00063 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordtype">bool</emphasis>&#32;isTargetPrefab&#32;=&#32;prefabType&#32;==&#32;PrefabType.Prefab&#32;||&#32;prefabType&#32;==&#32;PrefabType.ModelPrefab;
+00064 
+00065 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;Image&#32;container.</emphasis>
+00066 &#32;&#32;&#32;&#32;&#32;&#32;Rect&#32;imageContainerRect&#32;=&#32;controlRect;
+00067 &#32;&#32;&#32;&#32;&#32;&#32;EditorGUI.DrawRect(imageContainerRect,&#32;<emphasis role="keyword">new</emphasis>&#32;Color(0.2F,&#32;0.2F,&#32;0.2F));
+00068 &#32;&#32;&#32;&#32;&#32;&#32;imageContainerRect.x&#32;+=&#32;1;&#32;imageContainerRect.y&#32;+=&#32;1;&#32;imageContainerRect.width&#32;-=&#32;2;&#32;imageContainerRect.height&#32;-=&#32;2;
+00069 &#32;&#32;&#32;&#32;&#32;&#32;EditorGUI.DrawRect(imageContainerRect,&#32;<emphasis role="keyword">new</emphasis>&#32;Color(0.6F,&#32;0.6F,&#32;0.6F));
+00070 &#32;&#32;&#32;&#32;&#32;&#32;imageContainerRect.x&#32;+=&#32;1;&#32;imageContainerRect.y&#32;+=&#32;1;&#32;imageContainerRect.width&#32;-=&#32;2;&#32;imageContainerRect.height&#32;-=&#32;2;
+00071 &#32;&#32;&#32;&#32;&#32;&#32;EditorGUI.DrawRect(imageContainerRect,&#32;<emphasis role="keyword">new</emphasis>&#32;Color(0.2F,&#32;0.2F,&#32;0.2F));
+00072 
+00073 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;Hand&#32;image.</emphasis>
+00074 &#32;&#32;&#32;&#32;&#32;&#32;_handTexRect&#32;=&#32;<emphasis role="keyword">new</emphasis>&#32;Rect(0F,&#32;0F,&#32;(controlRect.height&#32;-&#32;2)&#32;*&#32;(_handTex.width&#32;/&#32;(<emphasis role="keywordtype">float</emphasis>)_handTex.height),&#32;controlRect.height&#32;-&#32;2);
+00075 &#32;&#32;&#32;&#32;&#32;&#32;_handTexRect.center&#32;+=&#32;imageContainerRect.center&#32;-&#32;_handTexRect.center;
+00076 &#32;&#32;&#32;&#32;&#32;&#32;EditorGUI.DrawTextureTransparent(_handTexRect,&#32;_handTex);
+00077 
+00078 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;Toggle&#32;boxes.</emphasis>
+00079 &#32;&#32;&#32;&#32;&#32;&#32;EditorGUI.BeginDisabledGroup(isTargetPrefab);
+00080 
+00081 &#32;&#32;&#32;&#32;&#32;&#32;makeFingertipToggle(0,&#32;<emphasis role="keyword">new</emphasis>&#32;Vector2(-0.390F,&#32;0.110F));
+00082 &#32;&#32;&#32;&#32;&#32;&#32;makeFingertipToggle(1,&#32;<emphasis role="keyword">new</emphasis>&#32;Vector2(-0.080F,&#32;-0.380F));
+00083 &#32;&#32;&#32;&#32;&#32;&#32;makeFingertipToggle(2,&#32;<emphasis role="keyword">new</emphasis>&#32;Vector2(0.090F,&#32;-0.420F));
+00084 &#32;&#32;&#32;&#32;&#32;&#32;makeFingertipToggle(3,&#32;<emphasis role="keyword">new</emphasis>&#32;Vector2(0.245F,&#32;-0.380F));
+00085 &#32;&#32;&#32;&#32;&#32;&#32;makeFingertipToggle(4,&#32;<emphasis role="keyword">new</emphasis>&#32;Vector2(0.410F,&#32;-0.210F));
+00086 &#32;&#32;&#32;&#32;}
+00087 
+00088 &#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;makeFingertipToggle(<emphasis role="keywordtype">int</emphasis>&#32;fingerIndex,&#32;Vector2&#32;offCenterPosImgSpace)&#32;{
+00089 &#32;&#32;&#32;&#32;&#32;&#32;InteractionHand&#32;targetHand&#32;=&#32;<link linkend="_class_leap_1_1_unity_1_1_custom_editor_base_1a20eea7e492831d5b4cde7eeaf0ce749e">target</link>.intHand;
+00090 &#32;&#32;&#32;&#32;&#32;&#32;InteractionHand[]&#32;targetHands&#32;=&#32;<link linkend="_class_leap_1_1_unity_1_1_custom_editor_base_1ab3c7d33ed1e58869160ccc7d1a189264">targets</link>.Query().Cast&lt;InteractionHand&gt;().ToArray();
+00091 
+00092 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(EditorGUI.Toggle(makeToggleRect(_handTexRect.center
+00093 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;+&#32;<emphasis role="keyword">new</emphasis>&#32;Vector2(offCenterPosImgSpace.x&#32;*&#32;_handTexRect.width,
+00094 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;offCenterPosImgSpace.y&#32;*&#32;_handTexRect.height)),
+00095 
+00096 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;targetHand.enabledPrimaryHoverFingertips[fingerIndex]))&#32;{
+00097 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">foreach</emphasis>&#32;(var&#32;singleTarget&#32;<emphasis role="keywordflow">in</emphasis>&#32;targetHands)&#32;{
+00098 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;serializedObject.FindProperty(<emphasis role="stringliteral">&quot;enabledPrimaryHoverFingertips&quot;</emphasis>).GetArrayElementAtIndex(fingerIndex).boolValue&#32;=&#32;<emphasis role="keyword">true</emphasis>;
+00099 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00100 &#32;&#32;&#32;&#32;&#32;&#32;}
+00101 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">else</emphasis>&#32;{
+00102 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">foreach</emphasis>&#32;(var&#32;singleTarget&#32;<emphasis role="keywordflow">in</emphasis>&#32;targetHands)&#32;{
+00103 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;serializedObject.FindProperty(<emphasis role="stringliteral">&quot;enabledPrimaryHoverFingertips&quot;</emphasis>).GetArrayElementAtIndex(fingerIndex).boolValue&#32;=&#32;<emphasis role="keyword">false</emphasis>;
+00104 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00105 &#32;&#32;&#32;&#32;&#32;&#32;}
+00106 &#32;&#32;&#32;&#32;}
+00107 
+00108 &#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;<emphasis role="keyword">const</emphasis>&#32;<emphasis role="keywordtype">float</emphasis>&#32;TOGGLE_SIZE&#32;=&#32;15.0F;
+00109 &#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;Rect&#32;makeToggleRect(Vector2&#32;centerPos)&#32;{
+00110 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;<emphasis role="keyword">new</emphasis>&#32;Rect(centerPos.x&#32;-&#32;TOGGLE_SIZE&#32;/&#32;2F,&#32;centerPos.y&#32;-&#32;TOGGLE_SIZE&#32;/&#32;2F,&#32;TOGGLE_SIZE,&#32;TOGGLE_SIZE);
+00111 &#32;&#32;&#32;&#32;}
+00112 
+00113 &#32;&#32;}
+00114 
+00115 }
+</programlisting></section>

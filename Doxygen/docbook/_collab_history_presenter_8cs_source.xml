@@ -1,0 +1,233 @@
+<?xml version='1.0' encoding='UTF-8' standalone='no'?>
+<section xmlns="http://docbook.org/ns/docbook" version="5.0" xmlns:xlink="http://www.w3.org/1999/xlink" xml:id="__collab_history_presenter_8cs_source">
+<title>CollabHistoryPresenter.cs</title>
+<indexterm><primary>O:/GitHUBMINIPRoject/Library/PackageCache/com.unity.collab-proxy@1.2.15/Editor/Collab/Presenters/CollabHistoryPresenter.cs</primary></indexterm>
+<programlisting>00001 <emphasis role="keyword">using</emphasis>&#32;System.Collections.Generic;
+00002 <emphasis role="keyword">using</emphasis>&#32;<link linkend="_namespace_unity_editor">UnityEditor</link>.Connect;
+00003 <emphasis role="keyword">using</emphasis>&#32;<link linkend="_namespace_unity_editor">UnityEditor</link>.Web;
+00004 
+00005 <emphasis role="keyword">namespace&#32;</emphasis><link linkend="_namespace_unity_editor_1_1_collaboration">UnityEditor.Collaboration</link>
+00006 {
+<anchor xml:id="__collab_history_presenter_8cs_source_1l00007"/><link linkend="_class_unity_editor_1_1_collaboration_1_1_collab_history_presenter">00007</link> &#32;&#32;&#32;&#32;<emphasis role="keyword">internal</emphasis>&#32;<emphasis role="keyword">class&#32;</emphasis><link linkend="_class_unity_editor_1_1_collaboration_1_1_collab_history_presenter">CollabHistoryPresenter</link>
+00008 &#32;&#32;&#32;&#32;{
+<anchor xml:id="__collab_history_presenter_8cs_source_1l00009"/><link linkend="_class_unity_editor_1_1_collaboration_1_1_collab_history_presenter_1a8c5a56abaa6379581e5d7894ea2cb65d">00009</link> &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keyword">const</emphasis>&#32;<emphasis role="keywordtype">int</emphasis>&#32;<link linkend="_class_unity_editor_1_1_collaboration_1_1_collab_history_presenter_1a8c5a56abaa6379581e5d7894ea2cb65d">ItemsPerPage</link>&#32;=&#32;5;
+00010 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;ICollabHistoryWindow&#32;m_Window;
+00011 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_interface_unity_editor_1_1_collaboration_1_1_i_collab_history_item_factory">ICollabHistoryItemFactory</link>&#32;m_Factory;
+00012 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;IRevisionsService&#32;m_Service;
+00013 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;ConnectInfo&#32;m_ConnectState;
+00014 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;CollabInfo&#32;m_CollabState;
+00015 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordtype">bool</emphasis>&#32;m_IsCollabError;
+00016 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordtype">int</emphasis>&#32;m_TotalRevisions;
+00017 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordtype">int</emphasis>&#32;m_CurrentPage;
+00018 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordtype">int</emphasis>&#32;m_RequestedPage;
+00019 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordtype">bool</emphasis>&#32;m_FetchInProgress;
+00020 
+00021 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;BuildAccess&#32;m_BuildAccess;
+00022 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordtype">string</emphasis>&#32;m_ProgressRevision;
+<anchor xml:id="__collab_history_presenter_8cs_source_1l00023"/><link linkend="_class_unity_editor_1_1_collaboration_1_1_collab_history_presenter_1a8a575bcd378e10cd9f3a3c84266933fd">00023</link> &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keywordtype">bool</emphasis>&#32;<link linkend="_class_unity_editor_1_1_collaboration_1_1_collab_history_presenter_1a8a575bcd378e10cd9f3a3c84266933fd">BuildServiceEnabled</link>&#32;{<emphasis role="keyword">get</emphasis>;&#32;<emphasis role="keyword">set</emphasis>;&#32;}
+00024 
+<anchor xml:id="__collab_history_presenter_8cs_source_1l00025"/><link linkend="_class_unity_editor_1_1_collaboration_1_1_collab_history_presenter_1a98a53853b14ff55206d6d1a0c97529f1">00025</link> &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<link linkend="_class_unity_editor_1_1_collaboration_1_1_collab_history_presenter_1a98a53853b14ff55206d6d1a0c97529f1">CollabHistoryPresenter</link>(ICollabHistoryWindow&#32;window,&#32;<link linkend="_interface_unity_editor_1_1_collaboration_1_1_i_collab_history_item_factory">ICollabHistoryItemFactory</link>&#32;factory,&#32;IRevisionsService&#32;service)
+00026 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00027 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;m_Window&#32;=&#32;window;
+00028 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;m_Factory&#32;=&#32;factory;
+00029 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;m_Service&#32;=&#32;service;
+00030 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;m_CurrentPage&#32;=&#32;0;
+00031 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;m_BuildAccess&#32;=&#32;<emphasis role="keyword">new</emphasis>&#32;BuildAccess();
+00032 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;m_Service.FetchRevisionsCallback&#32;+=&#32;OnFetchRevisions;
+00033 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00034 
+<anchor xml:id="__collab_history_presenter_8cs_source_1l00035"/><link linkend="_class_unity_editor_1_1_collaboration_1_1_collab_history_presenter_1acba3dc89a6ab81f606e1aab7f5f67630">00035</link> &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;<link linkend="_class_unity_editor_1_1_collaboration_1_1_collab_history_presenter_1acba3dc89a6ab81f606e1aab7f5f67630">OnWindowEnabled</link>()
+00036 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00037 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;UnityConnect.instance.StateChanged&#32;+=&#32;OnConnectStateChanged;
+00038 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;Collab.instance.StateChanged&#32;+=&#32;OnCollabStateChanged;
+00039 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;Collab.instance.RevisionUpdated&#32;+=&#32;OnCollabRevisionUpdated;
+00040 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;Collab.instance.JobsCompleted&#32;+=&#32;OnCollabJobsCompleted;
+00041 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;Collab.instance.ErrorOccurred&#32;+=&#32;OnCollabError;
+00042 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;Collab.instance.ErrorCleared&#32;+=&#32;OnCollabErrorCleared;
+00043 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;EditorApplication.playModeStateChanged&#32;+=&#32;OnPlayModeStateChanged;
+00044 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;m_ConnectState&#32;=&#32;UnityConnect.instance.GetConnectInfo();
+00045 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;m_CollabState&#32;=&#32;Collab.instance.GetCollabInfo();
+00046 
+00047 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;m_Window.revisionActionsEnabled&#32;=&#32;!EditorApplication.isPlayingOrWillChangePlaymode;
+00048 
+00049 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;Setup&#32;window&#32;callbacks</emphasis>
+00050 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;m_Window.OnPageChangeAction&#32;=&#32;<link linkend="_class_unity_editor_1_1_collaboration_1_1_collab_history_presenter_1adeccc84634516b7006ba0f9eeeaf42c5">OnUpdatePage</link>;
+00051 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;m_Window.OnUpdateAction&#32;=&#32;OnUpdate;
+00052 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;m_Window.OnRestoreAction&#32;=&#32;OnRestore;
+00053 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;m_Window.OnGoBackAction&#32;=&#32;OnGoBack;
+00054 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;m_Window.OnShowBuildAction&#32;=&#32;<link linkend="_class_unity_editor_1_1_collaboration_1_1_collab_history_presenter_1af05c6fa5503d623f18938306e1c764f1">ShowBuildForCommit</link>;
+00055 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;m_Window.OnShowServicesAction&#32;=&#32;<link linkend="_class_unity_editor_1_1_collaboration_1_1_collab_history_presenter_1ac2d859f1145229b9e3f79a6f3bcdadab">ShowServicePage</link>;
+00056 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;m_Window.itemsPerPage&#32;=&#32;<link linkend="_class_unity_editor_1_1_collaboration_1_1_collab_history_presenter_1a8c5a56abaa6379581e5d7894ea2cb65d">ItemsPerPage</link>;
+00057 
+00058 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;Initialize&#32;data</emphasis>
+00059 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_unity_editor_1_1_collaboration_1_1_collab_history_presenter_1affaaa9e1fa64b6028db288c380c0023d">UpdateBuildServiceStatus</link>();
+00060 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;var&#32;state&#32;=&#32;RecalculateState();
+00061 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;Only&#32;try&#32;to&#32;load&#32;the&#32;page&#32;if&#32;we&apos;re&#32;ready</emphasis>
+00062 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(state&#32;==&#32;HistoryState.Ready)
+00063 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_unity_editor_1_1_collaboration_1_1_collab_history_presenter_1adeccc84634516b7006ba0f9eeeaf42c5">OnUpdatePage</link>(m_CurrentPage);
+00064 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;m_Window.UpdateState(state,&#32;<emphasis role="keyword">true</emphasis>);
+00065 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00066 
+<anchor xml:id="__collab_history_presenter_8cs_source_1l00067"/><link linkend="_class_unity_editor_1_1_collaboration_1_1_collab_history_presenter_1a1d9943c824329af4ff6008dc891b6cba">00067</link> &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;<link linkend="_class_unity_editor_1_1_collaboration_1_1_collab_history_presenter_1a1d9943c824329af4ff6008dc891b6cba">OnWindowDisabled</link>()
+00068 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00069 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;UnityConnect.instance.StateChanged&#32;-=&#32;OnConnectStateChanged;
+00070 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;Collab.instance.StateChanged&#32;-=&#32;OnCollabStateChanged;
+00071 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;Collab.instance.RevisionUpdated&#32;-=&#32;OnCollabRevisionUpdated;
+00072 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;Collab.instance.JobsCompleted&#32;-=&#32;OnCollabJobsCompleted;
+00073 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;EditorApplication.playModeStateChanged&#32;-=&#32;OnPlayModeStateChanged;
+00074 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00075 
+00076 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;OnConnectStateChanged(ConnectInfo&#32;state)
+00077 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00078 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;m_ConnectState&#32;=&#32;state;
+00079 
+00080 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;m_Window.UpdateState(RecalculateState(),&#32;<emphasis role="keyword">false</emphasis>);
+00081 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00082 
+00083 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;OnCollabStateChanged(CollabInfo&#32;state)
+00084 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00085 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;Sometimes&#32;a&#32;collab&#32;state&#32;change&#32;will&#32;trigger&#32;even&#32;though&#32;everything&#32;is&#32;the&#32;same</emphasis>
+00086 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(m_CollabState.Equals(state))
+00087 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>;
+00088 
+00089 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(m_CollabState.tip&#32;!=&#32;state.tip)
+00090 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_unity_editor_1_1_collaboration_1_1_collab_history_presenter_1adeccc84634516b7006ba0f9eeeaf42c5">OnUpdatePage</link>(m_CurrentPage);
+00091 
+00092 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;m_CollabState&#32;=&#32;state;
+00093 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;m_Window.UpdateState(RecalculateState(),&#32;<emphasis role="keyword">false</emphasis>);
+00094 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(state.inProgress)
+00095 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00096 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;m_Window.inProgressRevision&#32;=&#32;m_ProgressRevision;
+00097 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00098 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">else</emphasis>
+00099 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00100 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;m_Window.inProgressRevision&#32;=&#32;<emphasis role="keyword">null</emphasis>;
+00101 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00102 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00103 
+00104 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;OnCollabRevisionUpdated(CollabInfo&#32;state)
+00105 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00106 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_unity_editor_1_1_collaboration_1_1_collab_history_presenter_1adeccc84634516b7006ba0f9eeeaf42c5">OnUpdatePage</link>(m_CurrentPage);
+00107 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00108 
+00109 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;OnCollabJobsCompleted(CollabInfo&#32;state)
+00110 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00111 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;m_ProgressRevision&#32;=&#32;<emphasis role="keyword">null</emphasis>;
+00112 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00113 
+00114 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;OnCollabError()
+00115 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00116 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;m_IsCollabError&#32;=&#32;<emphasis role="keyword">true</emphasis>;
+00117 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;m_Window.UpdateState(RecalculateState(),&#32;<emphasis role="keyword">false</emphasis>);
+00118 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00119 
+00120 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;OnCollabErrorCleared()
+00121 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00122 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;m_IsCollabError&#32;=&#32;<emphasis role="keyword">false</emphasis>;
+00123 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;m_FetchInProgress&#32;=&#32;<emphasis role="keyword">true</emphasis>;
+00124 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;m_Service.GetRevisions(m_CurrentPage&#32;*&#32;<link linkend="_class_unity_editor_1_1_collaboration_1_1_collab_history_presenter_1a8c5a56abaa6379581e5d7894ea2cb65d">ItemsPerPage</link>,&#32;<link linkend="_class_unity_editor_1_1_collaboration_1_1_collab_history_presenter_1a8c5a56abaa6379581e5d7894ea2cb65d">ItemsPerPage</link>);
+00125 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;m_Window.UpdateState(RecalculateState(),&#32;<emphasis role="keyword">false</emphasis>);
+00126 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00127 
+00128 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;OnPlayModeStateChanged(PlayModeStateChange&#32;stateChange)
+00129 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00130 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;If&#32;entering&#32;play&#32;mode,&#32;disable</emphasis>
+00131 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(stateChange&#32;==&#32;PlayModeStateChange.ExitingEditMode&#32;||
+00132 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;stateChange&#32;==&#32;PlayModeStateChange.EnteredPlayMode)
+00133 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00134 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;m_Window.revisionActionsEnabled&#32;=&#32;<emphasis role="keyword">false</emphasis>;
+00135 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00136 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;If&#32;exiting&#32;play&#32;mode,&#32;enable!</emphasis>
+00137 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">else</emphasis>&#32;<emphasis role="keywordflow">if</emphasis>&#32;(stateChange&#32;==&#32;PlayModeStateChange.EnteredEditMode&#32;||
+00138 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;stateChange&#32;==&#32;PlayModeStateChange.ExitingPlayMode)
+00139 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00140 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;m_Window.revisionActionsEnabled&#32;=&#32;<emphasis role="keyword">true</emphasis>;
+00141 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00142 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00143 
+00144 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;HistoryState&#32;RecalculateState()
+00145 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00146 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(!m_ConnectState.online)
+00147 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;HistoryState.Offline;
+00148 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(m_ConnectState.maintenance&#32;||&#32;m_CollabState.maintenance)
+00149 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;HistoryState.Maintenance;
+00150 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(!m_ConnectState.loggedIn)
+00151 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;HistoryState.LoggedOut;
+00152 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(!m_CollabState.seat)
+00153 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;HistoryState.NoSeat;
+00154 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(!Collab.instance.IsCollabEnabledForCurrentProject())
+00155 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;HistoryState.Disabled;
+00156 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;if&#32;(!Collab.instance.IsConnected()&#32;||&#32;!m_CollabState.ready&#32;||&#32;m_FetchInProgress)
+00157 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;HistoryState.Waiting;
+00158 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;if&#32;(m_ConnectState.error&#32;||&#32;m_IsCollabError)
+00159 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;HistoryState.Error;
+00160 
+00161 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;HistoryState.Ready;
+00162 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00163 
+00164 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;TODO:&#32;Eventually&#32;this&#32;can&#32;be&#32;a&#32;listener&#32;on&#32;the&#32;build&#32;service&#32;status</emphasis>
+<anchor xml:id="__collab_history_presenter_8cs_source_1l00165"/><link linkend="_class_unity_editor_1_1_collaboration_1_1_collab_history_presenter_1affaaa9e1fa64b6028db288c380c0023d">00165</link> &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;<link linkend="_class_unity_editor_1_1_collaboration_1_1_collab_history_presenter_1affaaa9e1fa64b6028db288c380c0023d">UpdateBuildServiceStatus</link>()
+00166 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00167 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">foreach</emphasis>&#32;(var&#32;service&#32;<emphasis role="keywordflow">in</emphasis>&#32;UnityConnectServiceCollection.instance.GetAllServiceInfos())
+00168 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00169 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(service.name.Equals(<emphasis role="stringliteral">&quot;Build&quot;</emphasis>))
+00170 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00171 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_unity_editor_1_1_collaboration_1_1_collab_history_presenter_1a8a575bcd378e10cd9f3a3c84266933fd">BuildServiceEnabled</link>&#32;=&#32;service.enabled;
+00172 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00173 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00174 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00175 
+<anchor xml:id="__collab_history_presenter_8cs_source_1l00176"/><link linkend="_class_unity_editor_1_1_collaboration_1_1_collab_history_presenter_1af05c6fa5503d623f18938306e1c764f1">00176</link> &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;<link linkend="_class_unity_editor_1_1_collaboration_1_1_collab_history_presenter_1af05c6fa5503d623f18938306e1c764f1">ShowBuildForCommit</link>(<emphasis role="keywordtype">string</emphasis>&#32;revisionID)
+00177 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00178 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;m_BuildAccess.ShowBuildForCommit(revisionID);
+00179 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00180 
+<anchor xml:id="__collab_history_presenter_8cs_source_1l00181"/><link linkend="_class_unity_editor_1_1_collaboration_1_1_collab_history_presenter_1ac2d859f1145229b9e3f79a6f3bcdadab">00181</link> &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;<link linkend="_class_unity_editor_1_1_collaboration_1_1_collab_history_presenter_1ac2d859f1145229b9e3f79a6f3bcdadab">ShowServicePage</link>()
+00182 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00183 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;m_BuildAccess.ShowServicePage();
+00184 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00185 
+<anchor xml:id="__collab_history_presenter_8cs_source_1l00186"/><link linkend="_class_unity_editor_1_1_collaboration_1_1_collab_history_presenter_1adeccc84634516b7006ba0f9eeeaf42c5">00186</link> &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;<link linkend="_class_unity_editor_1_1_collaboration_1_1_collab_history_presenter_1adeccc84634516b7006ba0f9eeeaf42c5">OnUpdatePage</link>(<emphasis role="keywordtype">int</emphasis>&#32;page)
+00187 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00188 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;m_FetchInProgress&#32;=&#32;<emphasis role="keyword">true</emphasis>;
+00189 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;m_Service.GetRevisions(page&#32;*&#32;<link linkend="_class_unity_editor_1_1_collaboration_1_1_collab_history_presenter_1a8c5a56abaa6379581e5d7894ea2cb65d">ItemsPerPage</link>,&#32;<link linkend="_class_unity_editor_1_1_collaboration_1_1_collab_history_presenter_1a8c5a56abaa6379581e5d7894ea2cb65d">ItemsPerPage</link>);
+00190 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;m_Window.UpdateState(RecalculateState(),&#32;<emphasis role="keyword">false</emphasis>);
+00191 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;m_RequestedPage&#32;=&#32;page;
+00192 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00193 
+00194 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;OnFetchRevisions(RevisionsResult&#32;data)
+00195 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00196 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;m_FetchInProgress&#32;=&#32;<emphasis role="keyword">false</emphasis>;
+00197 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;IEnumerable&lt;RevisionData&gt;&#32;items&#32;=&#32;<emphasis role="keyword">null</emphasis>;
+00198 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(data&#32;!=&#32;<emphasis role="keyword">null</emphasis>)
+00199 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00200 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;m_CurrentPage&#32;=&#32;m_RequestedPage;
+00201 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;m_TotalRevisions&#32;=&#32;data.RevisionsInRepo;
+00202 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;items&#32;=&#32;m_Factory.<link linkend="_interface_unity_editor_1_1_collaboration_1_1_i_collab_history_item_factory_1a82679f4deecbbb2a95fc125228a6a22e">GenerateElements</link>(data.Revisions,&#32;m_TotalRevisions,&#32;m_CurrentPage&#32;*&#32;<link linkend="_class_unity_editor_1_1_collaboration_1_1_collab_history_presenter_1a8c5a56abaa6379581e5d7894ea2cb65d">ItemsPerPage</link>,&#32;m_Service.tipRevision,&#32;m_Window.inProgressRevision,&#32;m_Window.revisionActionsEnabled,&#32;<link linkend="_class_unity_editor_1_1_collaboration_1_1_collab_history_presenter_1a8a575bcd378e10cd9f3a3c84266933fd">BuildServiceEnabled</link>,&#32;m_Service.currentUser);
+00203 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00204 
+00205 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;State&#32;must&#32;be&#32;recalculated&#32;prior&#32;to&#32;inserting&#32;items</emphasis>
+00206 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;m_Window.UpdateState(RecalculateState(),&#32;<emphasis role="keyword">false</emphasis>);
+00207 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;m_Window.UpdateRevisions(items,&#32;m_Service.tipRevision,&#32;m_TotalRevisions,&#32;m_CurrentPage);
+00208 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00209 
+00210 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;OnRestore(<emphasis role="keywordtype">string</emphasis>&#32;revisionId,&#32;<emphasis role="keywordtype">bool</emphasis>&#32;updatetorevision)
+00211 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00212 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;m_ProgressRevision&#32;=&#32;revisionId;
+00213 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;Collab.instance.ResyncToRevision(revisionId);
+00214 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00215 
+00216 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;OnGoBack(<emphasis role="keywordtype">string</emphasis>&#32;revisionId,&#32;<emphasis role="keywordtype">bool</emphasis>&#32;updatetorevision)
+00217 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00218 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;m_ProgressRevision&#32;=&#32;revisionId;
+00219 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;Collab.instance.GoBackToRevision(revisionId,&#32;<emphasis role="keyword">false</emphasis>);
+00220 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00221 
+00222 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;OnUpdate(<emphasis role="keywordtype">string</emphasis>&#32;revisionId,&#32;<emphasis role="keywordtype">bool</emphasis>&#32;updatetorevision)
+00223 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00224 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;m_ProgressRevision&#32;=&#32;revisionId;
+00225 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;Collab.instance.Update(revisionId,&#32;updatetorevision);
+00226 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00227 &#32;&#32;&#32;&#32;}
+00228 }
+</programlisting></section>

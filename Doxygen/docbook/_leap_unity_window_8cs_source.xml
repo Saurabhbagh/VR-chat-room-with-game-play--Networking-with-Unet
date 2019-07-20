@@ -1,0 +1,162 @@
+<?xml version='1.0' encoding='UTF-8' standalone='no'?>
+<section xmlns="http://docbook.org/ns/docbook" version="5.0" xmlns:xlink="http://www.w3.org/1999/xlink" xml:id="__leap_unity_window_8cs_source">
+<title>LeapUnityWindow.cs</title>
+<indexterm><primary>O:/GitHUBMINIPRoject/Assets/LeapMotion/Core/Scripts/EditorTools/Editor/LeapUnityWindow.cs</primary></indexterm>
+<programlisting>00001 <emphasis role="comment">/******************************************************************************</emphasis>
+00002 <emphasis role="comment">&#32;*&#32;Copyright&#32;(C)&#32;Leap&#32;Motion,&#32;Inc.&#32;2011-2018.&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;*</emphasis>
+00003 <emphasis role="comment">&#32;*&#32;Leap&#32;Motion&#32;proprietary&#32;and&#32;confidential.&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;*</emphasis>
+00004 <emphasis role="comment">&#32;*&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;*</emphasis>
+00005 <emphasis role="comment">&#32;*&#32;Use&#32;subject&#32;to&#32;the&#32;terms&#32;of&#32;the&#32;Leap&#32;Motion&#32;SDK&#32;Agreement&#32;available&#32;at&#32;&#32;&#32;&#32;&#32;*</emphasis>
+00006 <emphasis role="comment">&#32;*&#32;https://developer.leapmotion.com/sdk_agreement,&#32;or&#32;another&#32;agreement&#32;&#32;&#32;&#32;&#32;&#32;&#32;*</emphasis>
+00007 <emphasis role="comment">&#32;*&#32;between&#32;Leap&#32;Motion&#32;and&#32;you,&#32;your&#32;company&#32;or&#32;other&#32;organization.&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;*</emphasis>
+00008 <emphasis role="comment">&#32;******************************************************************************/</emphasis>
+00009 
+00010 <emphasis role="keyword">using</emphasis>&#32;<link linkend="_namespace_unity_editor">UnityEditor</link>;
+00011 <emphasis role="keyword">using</emphasis>&#32;<link linkend="__balloon_8cs_1a7d67e097df9376eb709b6a23aa3c7d23">UnityEngine</link>;
+00012 <emphasis role="keyword">using</emphasis>&#32;<link linkend="_namespace_leap">Leap</link>.<link linkend="_namespace_leap_1_1_unity">Unity</link>;
+00013 
+00014 <emphasis role="keyword">namespace&#32;</emphasis><link linkend="_namespace_leap_1_1_unity">Leap.Unity</link>&#32;{
+00015 
+00016 &#32;&#32;[InitializeOnLoad]
+<anchor xml:id="__leap_unity_window_8cs_source_1l00017"/><link linkend="_class_leap_1_1_unity_1_1_leap_unity_window">00017</link> &#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keyword">class&#32;</emphasis><link linkend="_class_leap_1_1_unity_1_1_leap_unity_window">LeapUnityWindow</link>&#32;:&#32;EditorWindow&#32;{
+00018 
+00019 <emphasis role="preprocessor">&#32;&#32;&#32;&#32;#region&#32;Settings&#32;&amp;&#32;Init</emphasis>
+00020 
+00021 &#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;<emphasis role="keyword">const</emphasis>&#32;<emphasis role="keywordtype">string</emphasis>&#32;WINDOW_TITLE&#32;=&#32;<emphasis role="stringliteral">&quot;Leap&#32;Motion&#32;Unity&#32;Modules&quot;</emphasis>;
+00022 &#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;<emphasis role="keyword">static</emphasis>&#32;readonly&#32;Vector2&#32;WINDOW_MIN_SIZE&#32;=&#32;<emphasis role="keyword">new</emphasis>&#32;Vector2(600f,&#32;600f);
+00023 &#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;<emphasis role="keyword">static</emphasis>&#32;<link linkend="_class_leap_1_1_unity_1_1_leap_unity_window">LeapUnityWindow</link>&#32;_currentWindow&#32;=&#32;<emphasis role="keyword">null</emphasis>;
+00024 
+00030 &#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;<emphasis role="keyword">const</emphasis>&#32;<emphasis role="keywordtype">string</emphasis>&#32;LEAP_UNITY_WINDOW_LAUNCHED_PREF&#32;=&#32;<emphasis role="stringliteral">&quot;Leap&#32;Unity&#32;Window&#32;Launched&quot;</emphasis>;
+00035 &#32;&#32;&#32;&#32;<emphasis role="keyword">static</emphasis>&#32;<link linkend="_class_leap_1_1_unity_1_1_leap_unity_window">LeapUnityWindow</link>()&#32;{
+00036 &#32;&#32;&#32;&#32;&#32;&#32;EditorApplication.delayCall&#32;+=&#32;()&#32;=&gt;&#32;{
+00037 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(!EditorPrefs.GetBool(LEAP_UNITY_WINDOW_LAUNCHED_PREF))&#32;{
+00038 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;EditorPrefs.SetBool(LEAP_UNITY_WINDOW_LAUNCHED_PREF,&#32;<emphasis role="keyword">true</emphasis>);
+00039 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_leap_1_1_unity_1_1_leap_unity_window_1a23365de0fb2b614ce387eb2b97feb8a9">Init</link>();
+00040 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00041 &#32;&#32;&#32;&#32;&#32;&#32;};
+00042 &#32;&#32;&#32;&#32;}
+00043 
+00044 &#32;&#32;&#32;&#32;[MenuItem(<emphasis role="stringliteral">&quot;Window/Leap&#32;Motion&quot;</emphasis>)]
+<anchor xml:id="__leap_unity_window_8cs_source_1l00045"/><link linkend="_class_leap_1_1_unity_1_1_leap_unity_window_1a23365de0fb2b614ce387eb2b97feb8a9">00045</link> &#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keyword">static</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;<link linkend="_class_leap_1_1_unity_1_1_leap_unity_window_1a23365de0fb2b614ce387eb2b97feb8a9">Init</link>()&#32;{
+00046 &#32;&#32;&#32;&#32;&#32;&#32;var&#32;window&#32;=&#32;(<link linkend="_class_leap_1_1_unity_1_1_leap_unity_window">LeapUnityWindow</link>)GetWindow(typeof(<link linkend="_class_leap_1_1_unity_1_1_leap_unity_window">LeapUnityWindow</link>),
+00047 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;utility:&#32;<emphasis role="keyword">true</emphasis>,&#32;title:&#32;WINDOW_TITLE,&#32;focus:&#32;<emphasis role="keyword">true</emphasis>);
+00048 &#32;&#32;&#32;&#32;&#32;&#32;window.name&#32;=&#32;<emphasis role="stringliteral">&quot;Leap&#32;Motion&#32;Unity&#32;Modules&#32;Window&quot;</emphasis>;
+00049 &#32;&#32;&#32;&#32;&#32;&#32;window.minSize&#32;=&#32;WINDOW_MIN_SIZE;
+00050 &#32;&#32;&#32;&#32;&#32;&#32;_currentWindow&#32;=&#32;window;
+00051 &#32;&#32;&#32;&#32;}
+00052 
+00053 <emphasis role="preprocessor">&#32;&#32;&#32;&#32;#endregion</emphasis>
+00054 
+00055 <emphasis role="preprocessor">&#32;&#32;&#32;&#32;#region&#32;Resources</emphasis>
+00056 
+00057 &#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;<emphasis role="keywordtype">string</emphasis>&#32;leapLogoResourceName&#32;{
+00058 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">get</emphasis>&#32;{
+00059 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(EditorGUIUtility.isProSkin)&#32;<emphasis role="keywordflow">return</emphasis>&#32;<emphasis role="stringliteral">&quot;LM_Logo_White&quot;</emphasis>;
+00060 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">else</emphasis>&#32;<emphasis role="keywordflow">return</emphasis>&#32;<emphasis role="stringliteral">&quot;LM_Logo_Black&quot;</emphasis>;
+00061 &#32;&#32;&#32;&#32;&#32;&#32;}
+00062 &#32;&#32;&#32;&#32;}
+00063 
+00064 &#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;Texture2D&#32;_backingLeapTex&#32;=&#32;<emphasis role="keyword">null</emphasis>;
+00065 &#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;Texture2D&#32;leapTex&#32;{
+00066 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">get</emphasis>&#32;{
+00067 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(_backingLeapTex&#32;==&#32;<emphasis role="keyword">null</emphasis>)&#32;{
+00068 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;_backingLeapTex&#32;=&#32;EditorResources.Load&lt;Texture2D&gt;(leapLogoResourceName);
+00069 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00070 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;_backingLeapTex;
+00071 &#32;&#32;&#32;&#32;&#32;&#32;}
+00072 &#32;&#32;&#32;&#32;}
+00073 
+00074 &#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;<emphasis role="keyword">static</emphasis>&#32;GUISkin&#32;s_backingWindowSkin;
+<anchor xml:id="__leap_unity_window_8cs_source_1l00075"/><link linkend="_class_leap_1_1_unity_1_1_leap_unity_window_1a52ba0d06fb0957e6a5e608fb4164b5e8">00075</link> &#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keyword">static</emphasis>&#32;GUISkin&#32;<link linkend="_class_leap_1_1_unity_1_1_leap_unity_window_1a52ba0d06fb0957e6a5e608fb4164b5e8">windowSkin</link>&#32;{
+00076 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">get</emphasis>&#32;{
+00077 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(s_backingWindowSkin&#32;==&#32;<emphasis role="keyword">null</emphasis>)&#32;{
+00078 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;s_backingWindowSkin&#32;=&#32;EditorGUIUtility.GetBuiltinSkin(EditorSkin.Scene);
+00079 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00080 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;s_backingWindowSkin;
+00081 &#32;&#32;&#32;&#32;&#32;&#32;}
+00082 &#32;&#32;&#32;&#32;}
+00083 
+00084 <emphasis role="preprocessor">&#32;&#32;&#32;&#32;#endregion</emphasis>
+00085 
+00086 <emphasis role="preprocessor">&#32;&#32;&#32;&#32;#region&#32;Window&#32;State</emphasis>
+00087 
+<anchor xml:id="__leap_unity_window_8cs_source_1l00088"/><link linkend="_class_leap_1_1_unity_1_1_leap_unity_window_1aab787ca9a41ea00fa31ab7e478e95628">00088</link> &#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keyword">static</emphasis>&#32;<emphasis role="keywordtype">bool</emphasis>&#32;<link linkend="_class_leap_1_1_unity_1_1_leap_unity_window_1aab787ca9a41ea00fa31ab7e478e95628">isWindowOpen</link>&#32;{
+00089 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">get</emphasis>&#32;{
+00090 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;_currentWindow&#32;!=&#32;<emphasis role="keyword">null</emphasis>;
+00091 &#32;&#32;&#32;&#32;&#32;&#32;}
+00092 &#32;&#32;&#32;&#32;}
+00093 
+00094 &#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;<emphasis role="keywordtype">int</emphasis>&#32;_tabIndex&#32;=&#32;0;
+00095 &#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;<emphasis role="keyword">static</emphasis>&#32;<emphasis role="keywordtype">string</emphasis>[]&#32;_tabs&#32;=&#32;<emphasis role="keyword">new</emphasis>&#32;<emphasis role="keywordtype">string</emphasis>[]&#32;{
+00096 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="stringliteral">&quot;Project&#32;Checks&quot;</emphasis>,&#32;<emphasis role="stringliteral">&quot;Rig&#32;Upgrader&quot;</emphasis>,&#32;<emphasis role="stringliteral">&quot;Preferences&quot;</emphasis>
+00097 &#32;&#32;&#32;&#32;};
+<anchor xml:id="__leap_unity_window_8cs_source_1l00098"/><link linkend="_class_leap_1_1_unity_1_1_leap_unity_window_1a98239c66f391636c27540d9ab60e99a4">00098</link> &#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keyword">static</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;<link linkend="_class_leap_1_1_unity_1_1_leap_unity_window_1a98239c66f391636c27540d9ab60e99a4">ShowTab</link>(<emphasis role="keywordtype">int</emphasis>&#32;tabIndex)&#32;{
+00099 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(_currentWindow&#32;!=&#32;<emphasis role="keyword">null</emphasis>)&#32;{
+00100 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;_currentWindow._tabIndex&#32;=&#32;tabIndex;
+00101 &#32;&#32;&#32;&#32;&#32;&#32;}
+00102 &#32;&#32;&#32;&#32;}
+<anchor xml:id="__leap_unity_window_8cs_source_1l00103"/><link linkend="_class_leap_1_1_unity_1_1_leap_unity_window_1aa6f053a75ac307fc50ef1bdc9bcf5fed">00103</link> &#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<emphasis role="keyword">static</emphasis>&#32;<emphasis role="keywordtype">int</emphasis>&#32;<link linkend="_class_leap_1_1_unity_1_1_leap_unity_window_1aa6f053a75ac307fc50ef1bdc9bcf5fed">GetTabCount</link>()&#32;{&#32;<emphasis role="keywordflow">return</emphasis>&#32;_tabs.Length;&#32;}
+00104 
+00105 &#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;Vector2&#32;_scrollPosition&#32;=&#32;Vector2.zero;
+00106 
+00107 <emphasis role="preprocessor">&#32;&#32;&#32;&#32;#endregion</emphasis>
+00108 
+00109 <emphasis role="preprocessor">&#32;&#32;&#32;&#32;#region&#32;OnGUI</emphasis>
+00110 
+00111 &#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;OnGUI()&#32;{
+00112 &#32;&#32;&#32;&#32;&#32;&#32;var&#32;origSkin&#32;=&#32;GUI.skin;
+00113 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">try</emphasis>&#32;{
+00114 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;GUI.skin&#32;=&#32;<link linkend="_class_leap_1_1_unity_1_1_leap_unity_window_1a52ba0d06fb0957e6a5e608fb4164b5e8">windowSkin</link>;
+00115 
+00116 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;drawGUI();
+00117 &#32;&#32;&#32;&#32;&#32;&#32;}
+00118 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">finally</emphasis>&#32;{
+00119 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;GUI.skin&#32;=&#32;origSkin;
+00120 &#32;&#32;&#32;&#32;&#32;&#32;}
+00121 &#32;&#32;&#32;&#32;}
+00122 
+00123 &#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;drawGUI()&#32;{
+00124 &#32;&#32;&#32;&#32;&#32;&#32;var&#32;boxStyle&#32;=&#32;<link linkend="_class_leap_1_1_unity_1_1_leap_unity_window_1a52ba0d06fb0957e6a5e608fb4164b5e8">windowSkin</link>.box;
+00125 &#32;&#32;&#32;&#32;&#32;&#32;GUILayout.BeginVertical();
+00126 
+00127 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;Logo.</emphasis>
+00128 &#32;&#32;&#32;&#32;&#32;&#32;var&#32;logoStyle&#32;=&#32;<link linkend="_class_leap_1_1_unity_1_1_leap_unity_window_1a52ba0d06fb0957e6a5e608fb4164b5e8">windowSkin</link>.box;
+00129 &#32;&#32;&#32;&#32;&#32;&#32;logoStyle.fixedHeight&#32;=&#32;150;
+00130 &#32;&#32;&#32;&#32;&#32;&#32;logoStyle.stretchWidth&#32;=&#32;<emphasis role="keyword">true</emphasis>;
+00131 &#32;&#32;&#32;&#32;&#32;&#32;logoStyle.alignment&#32;=&#32;TextAnchor.MiddleCenter;
+00132 &#32;&#32;&#32;&#32;&#32;&#32;logoStyle.margin&#32;=&#32;<emphasis role="keyword">new</emphasis>&#32;RectOffset(0,&#32;0,&#32;top:&#32;20,&#32;bottom:&#32;20);
+00133 &#32;&#32;&#32;&#32;&#32;&#32;GUILayout.Box(<emphasis role="keyword">new</emphasis>&#32;GUIContent(leapTex),&#32;logoStyle,&#32;GUILayout.ExpandWidth(<emphasis role="keyword">true</emphasis>),
+00134 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;GUILayout.MaxHeight(150f));
+00135 
+00136 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;Window&#32;tabs.</emphasis>
+00137 &#32;&#32;&#32;&#32;&#32;&#32;_tabIndex&#32;=&#32;GUILayout.Toolbar(_tabIndex,&#32;_tabs);
+00138 &#32;&#32;&#32;&#32;&#32;&#32;_scrollPosition&#32;=&#32;GUILayout.BeginScrollView(_scrollPosition,
+00139 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;GUILayout.ExpandWidth(<emphasis role="keyword">true</emphasis>),&#32;GUILayout.ExpandHeight(<emphasis role="keyword">true</emphasis>));
+00140 &#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">switch</emphasis>&#32;(_tabIndex)&#32;{
+00141 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">case</emphasis>&#32;0:
+00142 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;LeapProjectChecks.DrawProjectChecksGUI();
+00143 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">break</emphasis>;
+00144 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">case</emphasis>&#32;1:
+00145 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;LeapRigUpgrader.DrawUpgraderGUI();
+00146 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">break</emphasis>;
+00147 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">case</emphasis>&#32;2:
+00148 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordtype">float</emphasis>&#32;prevLabelWidth&#32;=&#32;EditorGUIUtility.labelWidth;
+00149 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;EditorGUIUtility.labelWidth&#32;=&#32;200;
+00150 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_leap_1_1_unity_1_1_leap_preferences">LeapPreferences</link>.DrawPreferencesGUI();
+00151 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;EditorGUIUtility.labelWidth&#32;=&#32;prevLabelWidth;
+00152 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">break</emphasis>;
+00153 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">default</emphasis>:
+00154 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;_tabIndex&#32;=&#32;0;
+00155 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">break</emphasis>;
+00156 &#32;&#32;&#32;&#32;&#32;&#32;}
+00157 &#32;&#32;&#32;&#32;&#32;&#32;GUILayout.EndScrollView();
+00158 
+00159 &#32;&#32;&#32;&#32;&#32;&#32;GUILayout.EndVertical();
+00160 &#32;&#32;&#32;&#32;}
+00161 
+00162 <emphasis role="preprocessor">&#32;&#32;&#32;&#32;#endregion</emphasis>
+00163 
+00164 &#32;&#32;}
+00165 
+00166 }
+</programlisting></section>

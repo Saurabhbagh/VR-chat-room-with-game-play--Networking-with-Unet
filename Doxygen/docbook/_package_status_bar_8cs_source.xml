@@ -1,0 +1,155 @@
+<?xml version='1.0' encoding='UTF-8' standalone='no'?>
+<section xmlns="http://docbook.org/ns/docbook" version="5.0" xmlns:xlink="http://www.w3.org/1999/xlink" xml:id="__package_status_bar_8cs_source">
+<title>PackageStatusBar.cs</title>
+<indexterm><primary>O:/GitHUBMINIPRoject/Library/PackageCache/com.unity.package-manager-ui@2.0.7/Editor/Sources/UI/PackageStatusBar.cs</primary></indexterm>
+<programlisting>00001 <emphasis role="keyword">using</emphasis>&#32;System.Collections.Generic;
+00002 <emphasis role="keyword">using</emphasis>&#32;System.Linq;
+00003 <emphasis role="keyword">using</emphasis>&#32;<link linkend="__balloon_8cs_1a7d67e097df9376eb709b6a23aa3c7d23">UnityEngine</link>;
+00004 <emphasis role="keyword">using</emphasis>&#32;<link linkend="_namespace_unity_engine">UnityEngine</link>.Experimental.UIElements;
+00005 
+00006 <emphasis role="keyword">namespace&#32;</emphasis><link linkend="_namespace_unity_editor_1_1_package_manager_1_1_u_i">UnityEditor.PackageManager.UI</link>
+00007 {
+00008 <emphasis role="preprocessor">#if&#32;!UNITY_2018_3_OR_NEWER</emphasis>
+<anchor xml:id="__package_status_bar_8cs_source_1l00009"/><link linkend="_class_unity_editor_1_1_package_manager_1_1_u_i_1_1_package_status_bar_factory">00009</link> &#32;&#32;&#32;&#32;<emphasis role="keyword">internal</emphasis>&#32;<emphasis role="keyword">class&#32;</emphasis><link linkend="_class_unity_editor_1_1_package_manager_1_1_u_i_1_1_package_status_bar_factory">PackageStatusBarFactory</link>&#32;:&#32;UxmlFactory&lt;PackageStatusBar&gt;
+00010 &#32;&#32;&#32;&#32;{
+<anchor xml:id="__package_status_bar_8cs_source_1l00011"/><link linkend="_class_unity_editor_1_1_package_manager_1_1_u_i_1_1_package_status_bar_factory_1aafa3a4cf39109549145b667d5fb5b5d8">00011</link> &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">protected</emphasis>&#32;<emphasis role="keyword">override</emphasis>&#32;<link linkend="_class_unity_editor_1_1_package_manager_1_1_u_i_1_1_package_status_bar">PackageStatusBar</link>&#32;<link linkend="_class_unity_editor_1_1_package_manager_1_1_u_i_1_1_package_status_bar_factory_1aafa3a4cf39109549145b667d5fb5b5d8">DoCreate</link>(IUxmlAttributes&#32;bag,&#32;CreationContext&#32;cc)
+00012 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00013 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;<emphasis role="keyword">new</emphasis>&#32;<link linkend="_class_unity_editor_1_1_package_manager_1_1_u_i_1_1_package_status_bar">PackageStatusBar</link>();
+00014 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00015 &#32;&#32;&#32;&#32;}
+00016 <emphasis role="preprocessor">#endif</emphasis>
+00017 &#32;&#32;&#32;&#32;
+<anchor xml:id="__package_status_bar_8cs_source_1l00018"/><link linkend="_class_unity_editor_1_1_package_manager_1_1_u_i_1_1_package_status_bar">00018</link> &#32;&#32;&#32;&#32;<emphasis role="keyword">internal</emphasis>&#32;<emphasis role="keyword">class&#32;</emphasis><link linkend="_class_unity_editor_1_1_package_manager_1_1_u_i_1_1_package_status_bar">PackageStatusBar</link>&#32;:&#32;VisualElement
+00019 &#32;&#32;&#32;&#32;{
+00020 <emphasis role="preprocessor">#if&#32;UNITY_2018_3_OR_NEWER</emphasis>
+00021 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">internal</emphasis>&#32;<emphasis role="keyword">new</emphasis>&#32;<emphasis role="keyword">class&#32;</emphasis>UxmlFactory&#32;:&#32;UxmlFactory&lt;PackageStatusBar&gt;&#32;{&#32;}
+00022 <emphasis role="preprocessor">#endif</emphasis>
+00023 
+00024 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;readonly&#32;VisualElement&#32;root;
+00025 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;<emphasis role="keywordtype">string</emphasis>&#32;LastErrorMessage;
+00026 
+00027 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;List&lt;IBaseOperation&gt;&#32;operationsInProgress;
+00028 
+00029 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;<emphasis role="keyword">enum</emphasis>&#32;StatusType&#32;{Normal,&#32;Loading,&#32;Error};&#32;&#32;
+00030 
+<anchor xml:id="__package_status_bar_8cs_source_1l00031"/><link linkend="_class_unity_editor_1_1_package_manager_1_1_u_i_1_1_package_status_bar_1a7472387bc58a83d2c98107e127c506c4">00031</link> &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">public</emphasis>&#32;<link linkend="_class_unity_editor_1_1_package_manager_1_1_u_i_1_1_package_status_bar_1a7472387bc58a83d2c98107e127c506c4">PackageStatusBar</link>()
+00032 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00033 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;root&#32;=&#32;Resources.GetTemplate(<emphasis role="stringliteral">&quot;PackageStatusBar.uxml&quot;</emphasis>);
+00034 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;Add(root);
+00035 
+00036 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;MoreAddOptionsButton.clickable.clicked&#32;+=&#32;OnMoreAddOptionsButtonClick;
+00037 
+00038 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;LastErrorMessage&#32;=&#32;<emphasis role="keywordtype">string</emphasis>.Empty;
+00039 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;operationsInProgress&#32;=&#32;<emphasis role="keyword">new</emphasis>&#32;List&lt;IBaseOperation&gt;();
+00040 
+00041 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;SetDefaultMessage();
+00042 
+00043 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_unity_editor_1_1_package_manager_1_1_u_i_1_1_package_collection">PackageCollection</link>.<link linkend="_class_unity_editor_1_1_package_manager_1_1_u_i_1_1_package_collection_1a75a698a6c798e48fbddf0e7edbf6db71">Instance</link>.<link linkend="_class_unity_editor_1_1_package_manager_1_1_u_i_1_1_package_collection_1a6859e240ee04e416808e527b11107775">ListSignal</link>.WhenOperation(OnListOrSearchOperation);
+00044 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_class_unity_editor_1_1_package_manager_1_1_u_i_1_1_package_collection">PackageCollection</link>.<link linkend="_class_unity_editor_1_1_package_manager_1_1_u_i_1_1_package_collection_1a75a698a6c798e48fbddf0e7edbf6db71">Instance</link>.<link linkend="_class_unity_editor_1_1_package_manager_1_1_u_i_1_1_package_collection_1a0ae7851281d0246d8c715db1e3b10a63">SearchSignal</link>.WhenOperation(OnListOrSearchOperation);
+00045 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00046 
+00047 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;SetDefaultMessage()
+00048 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00049 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>(!<emphasis role="keywordtype">string</emphasis>.IsNullOrEmpty(<link linkend="_class_unity_editor_1_1_package_manager_1_1_u_i_1_1_package_collection">PackageCollection</link>.<link linkend="_class_unity_editor_1_1_package_manager_1_1_u_i_1_1_package_collection_1a75a698a6c798e48fbddf0e7edbf6db71">Instance</link>.lastUpdateTime))
+00050 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;SetStatusMessage(StatusType.Normal,&#32;<emphasis role="stringliteral">&quot;Last&#32;update&#32;&quot;</emphasis>&#32;+&#32;<link linkend="_class_unity_editor_1_1_package_manager_1_1_u_i_1_1_package_collection">PackageCollection</link>.<link linkend="_class_unity_editor_1_1_package_manager_1_1_u_i_1_1_package_collection_1a75a698a6c798e48fbddf0e7edbf6db71">Instance</link>.lastUpdateTime);
+00051 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">else</emphasis>
+00052 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;SetStatusMessage(StatusType.Normal,&#32;<emphasis role="keywordtype">string</emphasis>.Empty);
+00053 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00054 
+00055 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;OnListOrSearchOperation(IBaseOperation&#32;operation)
+00056 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00057 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(operation&#32;==&#32;<emphasis role="keyword">null</emphasis>&#32;||&#32;operation.IsCompleted)
+00058 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>;
+00059 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;operationsInProgress.Add(operation);
+00060 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;operation.OnOperationFinalized&#32;+=&#32;()&#32;=&gt;&#32;{&#32;OnOperationFinalized(operation);&#32;};
+00061 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;operation.OnOperationError&#32;+=&#32;OnOperationError;
+00062 
+00063 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;SetStatusMessage(StatusType.Loading,&#32;<emphasis role="stringliteral">&quot;Loading&#32;packages...&quot;</emphasis>);
+00064 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00065 
+00066 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;OnOperationFinalized(IBaseOperation&#32;operation)
+00067 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00068 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;operationsInProgress.Remove(operation);
+00069 
+00070 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(operationsInProgress.Any())&#32;<emphasis role="keywordflow">return</emphasis>;
+00071 
+00072 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;var&#32;errorMessage&#32;=&#32;LastErrorMessage;
+00073 
+00074 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(Application.internetReachability&#32;==&#32;NetworkReachability.NotReachable)
+00075 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00076 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;EditorApplication.update&#32;-=&#32;CheckInternetReachability;
+00077 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;EditorApplication.update&#32;+=&#32;CheckInternetReachability;
+00078 
+00079 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;errorMessage&#32;=&#32;<emphasis role="stringliteral">&quot;You&#32;seem&#32;to&#32;be&#32;offline.&quot;</emphasis>;
+00080 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00081 
+00082 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(!<emphasis role="keywordtype">string</emphasis>.IsNullOrEmpty(errorMessage))
+00083 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;SetStatusMessage(StatusType.Error,&#32;errorMessage);
+00084 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">else</emphasis>
+00085 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;SetDefaultMessage();
+00086 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00087 
+00088 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;OnOperationError(Error&#32;error)
+00089 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00090 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;LastErrorMessage&#32;=&#32;<emphasis role="stringliteral">&quot;Cannot&#32;load&#32;packages,&#32;see&#32;console.&quot;</emphasis>;
+00091 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00092 
+00093 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;CheckInternetReachability()
+00094 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00095 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(<link linkend="_namespace_valve_1_1_v_r_1aecd07a81fe79a9f96c6787513e2d98e4ae498749f3c42246d50b15c81c101d988">Application</link>.internetReachability&#32;==&#32;NetworkReachability.NotReachable)&#32;<emphasis role="keywordflow">return</emphasis>;
+00096 
+00097 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;PackageCollection.Instance.FetchListCache(<emphasis role="keyword">true</emphasis>);
+00098 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;PackageCollection.Instance.FetchSearchCache(<emphasis role="keyword">true</emphasis>);
+00099 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;EditorApplication.update&#32;-=&#32;CheckInternetReachability;
+00100 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00101 
+00102 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;SetStatusMessage(StatusType&#32;status,&#32;<emphasis role="keywordtype">string</emphasis>&#32;message)
+00103 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00104 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(status&#32;==&#32;StatusType.Loading)
+00105 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;LoadingSpinner.<link linkend="_class_unity_editor_1_1_package_manager_1_1_u_i_1_1_loading_spinner_1ad559c1d41767f5f48ae5556a7003a3dc">Start</link>();
+00106 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">else</emphasis>
+00107 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;LoadingSpinner.<link linkend="_class_unity_editor_1_1_package_manager_1_1_u_i_1_1_loading_spinner_1a70c60e8f4237f93733e0a78fff702b96">Stop</link>();
+00108 
+00109 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;UIUtils.SetElementDisplay(LoadingIcon,&#32;status&#32;==&#32;StatusType.Error);
+00110 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(status&#32;==&#32;StatusType.Error)
+00111 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;LoadingText.AddToClassList(<emphasis role="stringliteral">&quot;icon&quot;</emphasis>);
+00112 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">else</emphasis>
+00113 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;LoadingText.RemoveFromClassList(<emphasis role="stringliteral">&quot;icon&quot;</emphasis>);
+00114 
+00115 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;LoadingText.text&#32;=&#32;message;
+00116 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00117 
+00118 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;OnMoreAddOptionsButtonClick()
+00119 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00120 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;var&#32;menu&#32;=&#32;<emphasis role="keyword">new</emphasis>&#32;GenericMenu();
+00121 
+00122 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;var&#32;addPackageFromDiskItem&#32;=&#32;<emphasis role="keyword">new</emphasis>&#32;GUIContent(<emphasis role="stringliteral">&quot;Add&#32;package&#32;from&#32;disk...&quot;</emphasis>);
+00123 
+00124 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">/*&#32;//&#32;Disable&#32;adding&#32;from&#32;url&#32;field&#32;before&#32;the&#32;feature&#32;is&#32;ready</emphasis>
+00125 <emphasis role="comment">&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;var&#32;addPackageFromUrlItem&#32;=&#32;new&#32;GUIContent(&quot;Add&#32;package&#32;from&#32;URL...&quot;);</emphasis>
+00126 <emphasis role="comment">&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;menu.AddItem(addPackageFromUrlItem,&#32;false,&#32;delegate</emphasis>
+00127 <emphasis role="comment">&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{</emphasis>
+00128 <emphasis role="comment">&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;AddFromUrlField.Show(true);</emphasis>
+00129 <emphasis role="comment">&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;});</emphasis>
+00130 <emphasis role="comment">&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;*/</emphasis>
+00131 
+00132 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;menu.AddItem(addPackageFromDiskItem,&#32;<emphasis role="keyword">false</emphasis>,&#32;delegate
+00133 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;{
+00134 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;var&#32;path&#32;=&#32;EditorUtility.OpenFilePanelWithFilters(<emphasis role="stringliteral">&quot;Select&#32;package&#32;on&#32;disk&quot;</emphasis>,&#32;<emphasis role="stringliteral">&quot;&quot;</emphasis>,&#32;<emphasis role="keyword">new</emphasis>[]&#32;{&#32;<emphasis role="stringliteral">&quot;package.json&#32;file&quot;</emphasis>,&#32;<emphasis role="stringliteral">&quot;json&quot;</emphasis>&#32;});
+00135 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(!<emphasis role="keywordtype">string</emphasis>.IsNullOrEmpty(path)&#32;&amp;&amp;&#32;!Package.AddRemoveOperationInProgress)
+00136 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;Package.AddFromLocalDisk(path);
+00137 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;});
+00138 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;var&#32;menuPosition&#32;=&#32;MoreAddOptionsButton.LocalToWorld(<emphasis role="keyword">new</emphasis>&#32;Vector2(MoreAddOptionsButton.layout.width,&#32;0));
+00139 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;var&#32;menuRect&#32;=&#32;<emphasis role="keyword">new</emphasis>&#32;Rect(menuPosition,&#32;Vector2.zero);
+00140 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;menu.DropDown(menuRect);
+00141 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+00142 
+00143 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;PackageAddFromUrlField&#32;AddFromUrlField&#32;{&#32;<emphasis role="keyword">get</emphasis>&#32;{&#32;<emphasis role="keywordflow">return</emphasis>&#32;<link linkend="_namespace_valve_1_1_v_r_1a99f7cc968994699a7485078bafddac17a63a9f0ea7bb98050796b649e85481845">root</link>.Q&lt;PackageAddFromUrlField&gt;(<emphasis role="stringliteral">&quot;packageAddFromUrlField&quot;</emphasis>);&#32;&#32;}}
+00144 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;VisualElement&#32;LoadingSpinnerContainer&#32;{&#32;<emphasis role="keyword">get</emphasis>&#32;{&#32;<emphasis role="keywordflow">return</emphasis>&#32;<link linkend="_namespace_valve_1_1_v_r_1a99f7cc968994699a7485078bafddac17a63a9f0ea7bb98050796b649e85481845">root</link>.Q&lt;VisualElement&gt;(<emphasis role="stringliteral">&quot;loadingSpinnerContainer&quot;</emphasis>);&#32;&#32;}}
+00145 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;LoadingSpinner&#32;LoadingSpinner&#32;{&#32;<emphasis role="keyword">get</emphasis>&#32;{&#32;<emphasis role="keywordflow">return</emphasis>&#32;<link linkend="_namespace_valve_1_1_v_r_1a99f7cc968994699a7485078bafddac17a63a9f0ea7bb98050796b649e85481845">root</link>.Q&lt;LoadingSpinner&gt;(<emphasis role="stringliteral">&quot;packageSpinner&quot;</emphasis>);&#32;&#32;}}
+00146 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;Label&#32;LoadingIcon&#32;{&#32;<emphasis role="keyword">get</emphasis>&#32;{&#32;<emphasis role="keywordflow">return</emphasis>&#32;<link linkend="_namespace_valve_1_1_v_r_1a99f7cc968994699a7485078bafddac17a63a9f0ea7bb98050796b649e85481845">root</link>.Q&lt;Label&gt;(<emphasis role="stringliteral">&quot;loadingIcon&quot;</emphasis>);&#32;&#32;}}
+00147 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;Label&#32;LoadingText&#32;{&#32;<emphasis role="keyword">get</emphasis>&#32;{&#32;<emphasis role="keywordflow">return</emphasis>&#32;<link linkend="_namespace_valve_1_1_v_r_1a99f7cc968994699a7485078bafddac17a63a9f0ea7bb98050796b649e85481845">root</link>.Q&lt;Label&gt;(<emphasis role="stringliteral">&quot;loadingText&quot;</emphasis>);&#32;&#32;}}
+00148 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keyword">private</emphasis>&#32;Button&#32;MoreAddOptionsButton{&#32;<emphasis role="keyword">get</emphasis>&#32;{&#32;<emphasis role="keywordflow">return</emphasis>&#32;<link linkend="_namespace_valve_1_1_v_r_1a99f7cc968994699a7485078bafddac17a63a9f0ea7bb98050796b649e85481845">root</link>.Q&lt;Button&gt;(<emphasis role="stringliteral">&quot;moreAddOptionsButton&quot;</emphasis>);&#32;&#32;}}
+00149 &#32;&#32;&#32;&#32;}
+00150 }
+</programlisting></section>
