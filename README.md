@@ -1,5 +1,13 @@
-# Multi User VR Viewer Mini Project 
-Multi user VR Viewer with voice chat and Hand IK 
+# Multi User VR Viewer
+           Multi user VR Viewer with voice chat and Hand IK.
+           This project has the following features:
+                      Fully Functional Hand IK over the network.
+                      Voice chat support system over the network. 
+                      A shooting game over the network.
+                      Health Bar. 
+            # Note: 
+                      The voice chat system is a bit buggy.
+                      
 
 # How to play :   
            Drag the  Main scene and place it under Environment Hierarchy.   
